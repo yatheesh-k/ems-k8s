@@ -1,0 +1,25 @@
+server:
+  port: 9090
+  servlet:
+    contextPath: /ems
+spring:
+  aop:
+    proxy-target-class: true
+  main:
+    allow-circular-references: true
+    # Multipart configuration
+    servlet:
+      multipart:
+        enabled: true
+        max-file-size: 2GB
+        max-request-size: 2GB
+  thymeleaf:
+    cache: false
+  security:
+    basic:
+      enabled: false
+fixed:
+  otp: 123456
+es:
+  esHost: localhost
+  esPort: 9200
