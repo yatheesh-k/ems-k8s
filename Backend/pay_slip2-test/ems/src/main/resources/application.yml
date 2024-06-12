@@ -1,8 +1,6 @@
 server:
   port: 8092
 spring:
-  profiles:
-    include: common
   datasource:
     url: jdbc:mysql://localhost:3306/srivenb8_vbrs
     username: root
@@ -39,6 +37,6 @@ fixed:
   otp: 123456
 file:
   upload:
-    path: '/var/lib/jenkins/workspace/payslip-pipe/Payslip_Documents/'
+    path: '/var/lib/jenkins/workspace/payslip-pipe/Ems_Documents/'
 
 
