@@ -77,7 +77,7 @@ public class OpenSearchConfig {
               .id(id)
               .document(entity));
     } catch (Exception e) {
-      logger.error("Index already exists");
+      logger.warn("Index already exists");
     }
     return esClient;
   }

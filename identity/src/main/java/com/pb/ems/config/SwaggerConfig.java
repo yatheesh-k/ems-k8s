@@ -23,7 +23,7 @@ public class SwaggerConfig {
     SpringDocUtils.getConfig().addFileType(MultipartFile.class);
   }
 
-  /*@Bean
+  @Bean
   public OpenAPI emsOpenApi() {
     return new OpenAPI()
             .info(new Info().title("EMS REST API")
@@ -36,7 +36,7 @@ public class SwaggerConfig {
                     .description("PathBreaker - Website")
                     .url("#"));
   }
-*/
+
   @Bean
   public WebMvcConfigurer corsConfigurer() {
     return new WebMvcConfigurer() {
