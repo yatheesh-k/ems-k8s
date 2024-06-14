@@ -1,5 +1,6 @@
 package com.pb.ems.serviceImpl;
 
+import com.pb.ems.auth.JwtTokenUtil;
 import com.pb.ems.common.ResponseBuilder;
 import com.pb.ems.common.ResponseObject;
 import com.pb.ems.exception.ErrorMessageHandler;
@@ -42,16 +43,18 @@ public class LoginServiceImpl implements LoginService {
                     log.debug("Successfully logged into ems portal for {}", request.getUsername());
                 }
             } else {
+                log.error("Invalid credentials");
                 throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_CREDENTIALS),
                         HttpStatus.FORBIDDEN);
             }
         } catch (Exception e) {
+            log.error("Invalid creds {}", e.getMessage(),e);
             throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_CREDENTIALS),
                     HttpStatus.FORBIDDEN);
         }
-        //TODO genereate jwt token
+        String token = JwtTokenUtil.generateToken(request.getUsername(), null);
         return new ResponseEntity<>(
-                ResponseBuilder.builder().build().createSuccessResponse(Constants.LOGIN_SUCCESS), HttpStatus.OK);
+                ResponseBuilder.builder().build().createSuccessResponse(new LoginResponse(token, null)), HttpStatus.OK);
     }
 
     /**
