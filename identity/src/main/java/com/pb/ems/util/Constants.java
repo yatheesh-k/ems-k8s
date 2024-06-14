@@ -19,6 +19,11 @@ public class Constants {
     public static final String EMS_PASSWORD = "ems.password";
     public static final String EMS_ADMIN = "ems_admin";
     public static final String LOGIN_SUCCESS = "success";
+    public static final String ROLES = "roles";
+    public static final String EMPLOYEE_TYPE = "CompanyAdmin";
+    public static final String EMPLOYEE_NAME = "EmployeeName";
+    public static final String EMPLOYEE = "employee";
+    public static final String SUCCESS = "success";
 }
 
 
