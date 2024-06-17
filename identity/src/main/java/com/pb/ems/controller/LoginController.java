@@ -1,14 +1,16 @@
 package com.pb.ems.controller;
 
+import com.pb.ems.auth.JwtTokenUtil;
+import com.pb.ems.common.ResponseBuilder;
 import com.pb.ems.common.ResponseObject;
 import com.pb.ems.config.SwaggerConfig;
 import com.pb.ems.exception.IdentityException;
-import com.pb.ems.model.LoginRequest;
-import com.pb.ems.model.OTPRequest;
+import com.pb.ems.model.*;
 import com.pb.ems.service.LoginService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +36,32 @@ public class LoginController {
     private LoginService loginService;
 
     @PostMapping("emsadmin/login")
-    public ResponseEntity<?> sendOtp(@RequestBody @Valid LoginRequest request) throws IdentityException {
-            return loginService.login(request);
-        }
+    @io.swagger.v3.oas.annotations.Operation(
+            summary = "${api.login.tag}", description = "${api.login.description}")
+    @ResponseStatus(HttpStatus.OK)
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) throws IdentityException {
+        return loginService.login(request);
+    }
+
+    @PostMapping("/token/validate")
+    @io.swagger.v3.oas.annotations.Operation(
+            summary = "${api.tokenvalidate.tag}", description = "${api.tokenvalidate.description}")
+    @ResponseStatus(HttpStatus.OK)
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
+    public ResponseEntity<?> validateToken(@RequestBody @Valid ValidateLoginRequest request) throws IdentityException {
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(JwtTokenUtil.validateToken(request.getToken())), HttpStatus.OK);
+    }
+
+    @PostMapping("company/login")
+    @io.swagger.v3.oas.annotations.Operation(
+            summary = "${api.login.tag}", description = "${api.login.description}")
+    @ResponseStatus(HttpStatus.CREATED)
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description= "CREATED")
+    public ResponseEntity<?> compayLogin(@RequestBody @Valid EmployeeLoginRequest request) throws IdentityException {
+        //return loginService.login(request);
+    }
+
+
 }

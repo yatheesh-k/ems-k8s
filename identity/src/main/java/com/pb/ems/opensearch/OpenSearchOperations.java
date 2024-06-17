@@ -71,6 +71,16 @@ public class OpenSearchOperations {
         }
         return null;
     }
+    public UserEntity getEmployeeById(String user, String company) throws IOException {
+        String index = Constants.INDEX_EMS+"_"+company;
+        GetRequest getRequest = new GetRequest.Builder().id(Constants.EMPLOYEE+"_"+user)
+                .index(index).build();
+        GetResponse<UserEntity> searchResponse = esClient.get(getRequest, UserEntity.class);
+        if(searchResponse != null && searchResponse.source() != null){
+            return searchResponse.source();
+        }
+        return null;
+    }
 
     public SearchResponse<Object> searchByQuery(BoolQuery.Builder query, String index, Class targetClass) throws IdentityException {
         SearchResponse searchResponse = null;

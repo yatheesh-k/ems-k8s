@@ -9,7 +9,7 @@ import org.springframework.core.env.Environment;
 
 
 @Configuration
-@PropertySource(value = {"classpath:error.properties"})
+@PropertySource(value = {"classpath:error.properties","classpath:application-operation.properties"})
 public class AppEnvironment implements EnvironmentAware {
     public static Environment environment;
 

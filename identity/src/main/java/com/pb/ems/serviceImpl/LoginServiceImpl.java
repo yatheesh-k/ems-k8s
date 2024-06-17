@@ -6,10 +6,7 @@ import com.pb.ems.common.ResponseObject;
 import com.pb.ems.exception.ErrorMessageHandler;
 import com.pb.ems.exception.IdentityErrorMessageKey;
 import com.pb.ems.exception.IdentityException;
-import com.pb.ems.model.LoginRequest;
-import com.pb.ems.model.LoginResponse;
-import com.pb.ems.model.OTPRequest;
-import com.pb.ems.model.UserEntity;
+import com.pb.ems.model.*;
 import com.pb.ems.opensearch.OpenSearchOperations;
 import com.pb.ems.service.LoginService;
 import com.pb.ems.util.Constants;
@@ -52,7 +49,35 @@ public class LoginServiceImpl implements LoginService {
             throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_CREDENTIALS),
                     HttpStatus.FORBIDDEN);
         }
-        String token = JwtTokenUtil.generateToken(request.getUsername(), null);
+        List<String> roles = new ArrayList<>();
+        roles.add(Constants.EMS_ADMIN);
+        String token = JwtTokenUtil.generateToken(request.getUsername(), roles);
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(new LoginResponse(token, null)), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<?> employeeLogin(EmployeeLoginRequest request) throws IdentityException {
+        try{
+            UserEntity user = openSearchOperations.getEmployeeById(request.getUsername(), request.getCompany());
+            if(user != null && user.getPassword() != null) {
+                String password = new String(Base64.getDecoder().decode(user.getPassword()), StandardCharsets.UTF_8);
+                if(request.getPassword().equals(password)) {
+                    log.debug("Successfully logged into ems portal for {}", request.getUsername());
+                }
+            } else {
+                log.error("Invalid credentials");
+                throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_CREDENTIALS),
+                        HttpStatus.FORBIDDEN);
+            }
+        } catch (Exception e) {
+            log.error("Invalid creds {}", e.getMessage(),e);
+            throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_CREDENTIALS),
+                    HttpStatus.FORBIDDEN);
+        }
+        List<String> roles = new ArrayList<>();
+        roles.add(Constants.EMS_ADMIN);
+        String token = JwtTokenUtil.generateToken(request.getUsername(), roles);
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(new LoginResponse(token, null)), HttpStatus.OK);
     }
