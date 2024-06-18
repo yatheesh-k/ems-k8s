@@ -60,7 +60,7 @@ public class LoginController {
     @ResponseStatus(HttpStatus.CREATED)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description= "CREATED")
     public ResponseEntity<?> compayLogin(@RequestBody @Valid EmployeeLoginRequest request) throws IdentityException {
-        //return loginService.login(request);
+        return loginService.employeeLogin(request);
     }
 
 

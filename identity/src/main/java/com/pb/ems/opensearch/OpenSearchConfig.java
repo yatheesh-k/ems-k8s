@@ -1,6 +1,6 @@
 package com.pb.ems.opensearch;
 
-import com.pb.ems.model.UserEntity;
+import com.pb.ems.model.EmployeeEntity;
 import com.pb.ems.persistance.Entity;
 import com.pb.ems.util.Constants;
 import org.apache.http.HttpHost;
@@ -69,7 +69,7 @@ public class OpenSearchConfig {
       logger.info("Creating EMS admin user");
       String userName = environment.getProperty(Constants.EMS_USERNAME);
       String password = environment.getProperty(Constants.EMS_PASSWORD);
-      Entity entity = new UserEntity().builder().username(userName)
+      Entity entity = new EmployeeEntity().builder().emailId(userName)
               .password(password).
               type(Constants.EMS_ADMIN).build();
       String id = Constants.EMS_ADMIN+"_" + userName;

@@ -2,7 +2,6 @@ package com.pb.ems.serviceImpl;
 
 import com.pb.ems.auth.JwtTokenUtil;
 import com.pb.ems.common.ResponseBuilder;
-import com.pb.ems.common.ResponseObject;
 import com.pb.ems.exception.ErrorMessageHandler;
 import com.pb.ems.exception.IdentityErrorMessageKey;
 import com.pb.ems.exception.IdentityException;
@@ -16,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -33,11 +31,15 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public ResponseEntity<?> login(LoginRequest request) throws IdentityException {
         try{
-            UserEntity user = openSearchOperations.getEMSAdminById(request.getUsername());
+            EmployeeEntity user = openSearchOperations.getEMSAdminById(request.getUsername());
             if(user != null && user.getPassword() != null) {
                 String password = new String(Base64.getDecoder().decode(user.getPassword()), StandardCharsets.UTF_8);
                 if(request.getPassword().equals(password)) {
                     log.debug("Successfully logged into ems portal for {}", request.getUsername());
+                } else {
+                    log.error("Invalid credentials");
+                    throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_CREDENTIALS),
+                            HttpStatus.FORBIDDEN);
                 }
             } else {
                 log.error("Invalid credentials");
@@ -59,11 +61,15 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public ResponseEntity<?> employeeLogin(EmployeeLoginRequest request) throws IdentityException {
         try{
-            UserEntity user = openSearchOperations.getEmployeeById(request.getUsername(), request.getCompany());
+            EmployeeEntity user = openSearchOperations.getEmployeeById(request.getUsername(), request.getCompany());
             if(user != null && user.getPassword() != null) {
                 String password = new String(Base64.getDecoder().decode(user.getPassword()), StandardCharsets.UTF_8);
                 if(request.getPassword().equals(password)) {
                     log.debug("Successfully logged into ems portal for {}", request.getUsername());
+                } else {
+                    log.error("Invalid credentials");
+                    throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_CREDENTIALS),
+                            HttpStatus.FORBIDDEN);
                 }
             } else {
                 log.error("Invalid credentials");
@@ -76,7 +82,7 @@ public class LoginServiceImpl implements LoginService {
                     HttpStatus.FORBIDDEN);
         }
         List<String> roles = new ArrayList<>();
-        roles.add(Constants.EMS_ADMIN);
+        roles.add(Constants.COMPANY_ADMIN);
         String token = JwtTokenUtil.generateToken(request.getUsername(), roles);
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(new LoginResponse(token, null)), HttpStatus.OK);
