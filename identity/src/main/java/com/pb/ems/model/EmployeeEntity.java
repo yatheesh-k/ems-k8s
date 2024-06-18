@@ -12,7 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-@JsonIgnoreProperties
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EmployeeEntity implements Entity {
     private String resourceId;
