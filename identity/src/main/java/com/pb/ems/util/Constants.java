@@ -18,6 +18,7 @@ public class Constants {
     public static final String EMS_USERNAME = "ems.username";
     public static final String EMS_PASSWORD = "ems.password";
     public static final String EMS_ADMIN = "ems_admin";
+    public static final String COMPANY_ADMIN = "company_admin";
     public static final String LOGIN_SUCCESS = "success";
     public static final String ROLES = "roles";
     public static final String EMPLOYEE_TYPE = "CompanyAdmin";

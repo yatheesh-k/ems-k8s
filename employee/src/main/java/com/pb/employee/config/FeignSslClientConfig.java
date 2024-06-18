@@ -11,7 +11,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
- * @author srokade
+ * @author
  * sets the ssl certifacte to be used for calling other services running on https
  */
 public class FeignSslClientConfig {

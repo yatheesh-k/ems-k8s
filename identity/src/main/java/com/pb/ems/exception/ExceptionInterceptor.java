@@ -12,7 +12,6 @@ import org.apache.http.client.HttpResponseException;
 import org.apache.http.conn.HttpHostConnectException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -187,7 +186,7 @@ public class ExceptionInterceptor extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(IdentityException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    ResponseEntity<ResponseObject> handleEntitlementExceptions(IdentityException exception) {
+    ResponseEntity<ResponseObject> handleIdentityExceptions(IdentityException exception) {
         logger.error("exception occured  ",exception);
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         if (exception.getHttpStatus() != null) {

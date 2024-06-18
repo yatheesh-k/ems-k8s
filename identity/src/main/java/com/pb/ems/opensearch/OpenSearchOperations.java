@@ -1,7 +1,7 @@
 package com.pb.ems.opensearch;
 
 import com.pb.ems.exception.IdentityException;
-import com.pb.ems.model.UserEntity;
+import com.pb.ems.model.EmployeeEntity;
 import com.pb.ems.persistance.Entity;
 import com.pb.ems.util.Constants;
 import org.opensearch.client.opensearch.OpenSearchClient;
@@ -62,20 +62,20 @@ public class OpenSearchOperations {
         return Id;
     }
 
-    public UserEntity getEMSAdminById(String user) throws IOException {
+    public EmployeeEntity getEMSAdminById(String user) throws IOException {
         GetRequest getRequest = new GetRequest.Builder().id(Constants.EMS_ADMIN+"_"+user)
                 .index(Constants.INDEX_EMS).build();
-        GetResponse<UserEntity> searchResponse = esClient.get(getRequest, UserEntity.class);
+        GetResponse<EmployeeEntity> searchResponse = esClient.get(getRequest, EmployeeEntity.class);
         if(searchResponse != null && searchResponse.source() != null){
             return searchResponse.source();
         }
         return null;
     }
-    public UserEntity getEmployeeById(String user, String company) throws IOException {
+    public EmployeeEntity getEmployeeById(String user, String company) throws IOException {
         String index = Constants.INDEX_EMS+"_"+company;
         GetRequest getRequest = new GetRequest.Builder().id(Constants.EMPLOYEE+"_"+user)
                 .index(index).build();
-        GetResponse<UserEntity> searchResponse = esClient.get(getRequest, UserEntity.class);
+        GetResponse<EmployeeEntity> searchResponse = esClient.get(getRequest, EmployeeEntity.class);
         if(searchResponse != null && searchResponse.source() != null){
             return searchResponse.source();
         }

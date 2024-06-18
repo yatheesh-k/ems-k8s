@@ -49,7 +49,7 @@ public class JwtTokenUtil {
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .claim(Constants.ROLES, roles)
-                .setExpiration(new Date(System.currentTimeMillis() + 1800000)) // 1 day expiration
+                .setExpiration(new Date(System.currentTimeMillis() + 1800000))
                 .signWith(key)
                 .compact();
 
