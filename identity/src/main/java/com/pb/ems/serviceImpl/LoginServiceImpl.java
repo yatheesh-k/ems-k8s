@@ -60,10 +60,11 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public ResponseEntity<?> employeeLogin(EmployeeLoginRequest request) throws IdentityException {
+        EmployeeEntity employee;
         try{
-            EmployeeEntity user = openSearchOperations.getEmployeeById(request.getUsername(), request.getCompany());
-            if(user != null && user.getPassword() != null) {
-                String password = new String(Base64.getDecoder().decode(user.getPassword()), StandardCharsets.UTF_8);
+            employee = openSearchOperations.getEmployeeById(request.getUsername(), request.getCompany());
+            if(employee != null && employee.getPassword() != null) {
+                String password = new String(Base64.getDecoder().decode(employee.getPassword()), StandardCharsets.UTF_8);
                 if(request.getPassword().equals(password)) {
                     log.debug("Successfully logged into ems portal for {}", request.getUsername());
                 } else {
@@ -82,7 +83,12 @@ public class LoginServiceImpl implements LoginService {
                     HttpStatus.FORBIDDEN);
         }
         List<String> roles = new ArrayList<>();
-        roles.add(Constants.COMPANY_ADMIN);
+        if(employee != null && employee.getRoles() != null && employee.getRoles().size() > 0) {
+            roles.addAll(employee.getRoles());
+        } else {
+            roles.add(Constants.COMPANY_ADMIN);
+        }
+
         String token = JwtTokenUtil.generateToken(request.getUsername(), roles);
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(new LoginResponse(token, null)), HttpStatus.OK);

@@ -5,6 +5,7 @@ import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.model.UserEntity;
 import com.pb.employee.persistance.model.CompanyEntity;
+import com.pb.employee.persistance.model.EmployeeEntity;
 import com.pb.employee.persistance.model.Entity;
 import com.pb.employee.util.Constants;
 import com.pb.employee.util.ResourceIdUtils;
@@ -147,6 +148,37 @@ public class OpenSearchOperations {
             }
         }
         return subscriberEntities;
+    }
+
+    public List<EmployeeEntity> getCompanyEmployeeByData(String companyName, String empId, String emailId) throws EmployeeException {
+        logger.debug("Getting the Resource by emailId {}", companyName, empId, emailId);
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        boolQueryBuilder = boolQueryBuilder
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.EMPLOYEE_ID).query(empId)));
+        if(emailId != null) {
+            boolQueryBuilder = boolQueryBuilder
+                    .filter(q -> q.matchPhrase(t -> t.field(Constants.EMAIL_ID).query(emailId)));
+        }
+        BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
+        SearchResponse<EmployeeEntity> searchResponse = null;
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+        try {
+            searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                    .query(finalBoolQueryBuilder.build()._toQuery()), EmployeeEntity.class);
+        } catch (IOException e) {
+            e.getStackTrace();
+            logger.error(e.getMessage());
+            throw new EmployeeException("Unable to search ", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        List<Hit<EmployeeEntity>> hits = searchResponse.hits().hits();
+        logger.info("Number of hits {}", hits.size());
+        List<EmployeeEntity> employeeEntities = new ArrayList<>();
+        if(hits.size() > 0) {
+            for(Hit<EmployeeEntity> hit : hits){
+                employeeEntities.add(hit.source());
+            }
+        }
+        return employeeEntities;
     }
     public SearchResponse<Object> searchByQuery(BoolQuery.Builder query, String index, Class targetClass) throws EmployeeException {
         SearchResponse searchResponse = null;

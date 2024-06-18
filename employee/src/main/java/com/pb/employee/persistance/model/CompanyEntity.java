@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompanyEntity implements Entity{
-
+    private String id;
     private String companyName;
     private String emailId;
     private String password;

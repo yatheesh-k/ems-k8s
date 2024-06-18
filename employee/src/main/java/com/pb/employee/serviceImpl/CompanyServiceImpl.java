@@ -68,7 +68,7 @@ public class CompanyServiceImpl implements CompanyService {
                     HttpStatus.CONFLICT);
         }
         try{
-            Entity companyEntity = CompanyUtils.maskCompanyProperties(companyRequest);
+            Entity companyEntity = CompanyUtils.maskCompanyProperties(companyRequest, resourceId);
             Entity result = openSearchOperations.saveEntity(companyEntity, resourceId, Constants.INDEX_EMS);
         } catch (Exception exception) {
             log.error("Unable to save the company details {} {}", companyRequest.getCompanyName(),exception.getMessage());
@@ -79,7 +79,7 @@ public class CompanyServiceImpl implements CompanyService {
         String password = Base64.getEncoder().encodeToString(companyRequest.getPassword().getBytes());
         log.info("Creating the employee of company admin");
         String index = ResourceIdUtils.generateCompanyIndex(companyRequest.getShortName());
-        String employeeAdminId = Constants.EMPLOYEE +"_"+companyRequest.getEmailId();
+        String employeeAdminId = ResourceIdUtils.generateEmployeeResourceId(companyRequest.getEmailId());
         EmployeeEntity employee = EmployeeEntity.builder().
                 employeeType(Constants.EMPLOYEE_TYPE).
                 emailId(companyRequest.getEmailId()).
