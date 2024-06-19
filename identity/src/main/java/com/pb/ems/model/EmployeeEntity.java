@@ -6,6 +6,7 @@ import com.pb.ems.persistance.Entity;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,7 +32,7 @@ public class EmployeeEntity implements Entity {
     private String department;
     private String location;
     private String manager;
-    private String role;
+    private List<String> roles;
     private String panNo;
     private String uanNo;
     private String dateOfBirth;
