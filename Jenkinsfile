@@ -1,8 +1,10 @@
-pipeline{
+pipeline {
     agent any
-    stages{
-        stage('print a message'){
-            sh 'echo "pipeline is working"'
+    stages {
+        stage('Build') {
+            steps {
+                sh 'echo "pipeline is working"'
+            }
         }
     }
 }
