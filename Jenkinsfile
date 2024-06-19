@@ -4,6 +4,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'echo "pipeline is working"'
+                sh 'echo "trigger status : green "'
             }
         }
     }
