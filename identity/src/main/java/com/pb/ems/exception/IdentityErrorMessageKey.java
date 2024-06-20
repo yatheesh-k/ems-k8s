@@ -8,6 +8,7 @@ public enum IdentityErrorMessageKey {
 
     INVALID_CREDENTIALS("invalid.credentials"),
     INVALID_TOKEN("invalid.token"),
+    INVALID_USERNAME("invalid.username"),
        ;
 
     private final String key;

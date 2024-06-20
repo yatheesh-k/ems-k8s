@@ -29,8 +29,9 @@ import java.util.*;
 public class RestFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(RestFilter.class);
     private static Set<String> SWAGGER_URLS_TO_BYPASS_AUTH = Set.of(
-                                                                "/api-docs",
-                                                                "/swagger-ui/index.html");
+                                                                "/ems/api-docs",
+                                                                "/ems/swagger-ui/index.html",
+            "/ems/api-docs/swagger-config");
 
     private Jws<Claims> parsedToken = null;
     @Autowired

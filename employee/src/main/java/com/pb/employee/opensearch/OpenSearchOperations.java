@@ -116,6 +116,19 @@ public class OpenSearchOperations {
         return null;
     }
 
+    public CompanyEntity getCompanyById(String resourceId, String type, String index) throws IOException {
+        if(type != null) {
+            resourceId = type+"_"+resourceId;
+        }
+        GetRequest getRequest = new GetRequest.Builder().id(resourceId)
+                .index(index).build();
+        GetResponse<CompanyEntity> searchResponse = esClient.get(getRequest, CompanyEntity.class);
+        if(searchResponse != null && searchResponse.source() != null){
+            return searchResponse.source();
+        }
+        return null;
+    }
+
     public List<CompanyEntity> getCompanyByData(String companyName, String type, String shortName) throws EmployeeException {
         logger.debug("Getting the Resource by name {}", companyName, type, shortName);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
@@ -180,6 +193,33 @@ public class OpenSearchOperations {
         }
         return employeeEntities;
     }
+
+    public List<CompanyEntity> getCompanies() throws EmployeeException {
+        logger.debug("Getting all the companies ");
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        boolQueryBuilder = boolQueryBuilder
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.COMPANY)));
+        BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
+        SearchResponse<CompanyEntity> searchResponse = null;
+        try {
+            searchResponse = esClient.search(t -> t.index(Constants.INDEX_EMS).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                    .query(finalBoolQueryBuilder.build()._toQuery()), CompanyEntity.class);
+        } catch (IOException e) {
+            e.getStackTrace();
+            logger.error(e.getMessage());
+            throw new EmployeeException("Unable to search ", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        List<Hit<CompanyEntity>> hits = searchResponse.hits().hits();
+        logger.info("Number of hits {}", hits.size());
+        List<CompanyEntity> companyEntities = new ArrayList<>();
+        if(hits.size() > 0) {
+            for(Hit<CompanyEntity> hit : hits){
+                companyEntities.add(hit.source());
+            }
+        }
+        return companyEntities;
+    }
+
     public SearchResponse<Object> searchByQuery(BoolQuery.Builder query, String index, Class targetClass) throws EmployeeException {
         SearchResponse searchResponse = null;
         try {

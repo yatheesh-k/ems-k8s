@@ -186,7 +186,7 @@ public class ExceptionInterceptor extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(EmployeeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    ResponseEntity<ResponseObject> handleEntitlementExceptions(EmployeeException exception) {
+    ResponseEntity<ResponseObject> handleEmployeeExceptions(EmployeeException exception) {
         logger.error("exception occured  ",exception);
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         if (exception.getHttpStatus() != null) {

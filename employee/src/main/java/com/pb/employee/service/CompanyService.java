@@ -2,6 +2,7 @@ package com.pb.employee.service;
 
 
 import com.pb.employee.exception.EmployeeException;
+import com.pb.employee.persistance.model.CompanyEntity;
 import com.pb.employee.request.CompanyRequest;
 import com.pb.employee.request.CompanyUpdateRequest;
 import com.pb.employee.response.CompanyResponse;
@@ -13,8 +14,8 @@ import java.util.List;
 
 public interface CompanyService {
     ResponseEntity<?> registerCompany(CompanyRequest companyRequest) throws EmployeeException;
-    List<CompanyResponse> getCompanies() throws IOException;
-    CompanyResponse getCompanyById(String companyId);
+    ResponseEntity<?> getCompanies() throws EmployeeException;
+    ResponseEntity<?> getCompanyById(String companyId) throws EmployeeException;
     ResponseEntity<?> updateCompanyById(String companyId, CompanyUpdateRequest companyUpdateRequest,MultipartFile multipartFile)throws IOException;
     ResponseEntity<?> deleteCompanyById(String companyId);
 

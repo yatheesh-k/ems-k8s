@@ -11,6 +11,7 @@ public enum EmployeeErrorMessageKey {
     COMPANY_ALREADY_EXISTS("company.already.exists"),
     COMPANY_SHORT_NAME_ALREADY_EXISTS("company.shortname.already.exists"),
     UNABLE_SAVE_COMPANY("unable.save.company"),
+    UNABLE_GET_COMPANY("unable.get.company"),
     UNABLE_TO_CREATE_COMPANY("unable.to.create.index"),
     INVALID_COMPANY("invalid.company"),
     INVALID_EMPLOYEE("invalid.employee"),
