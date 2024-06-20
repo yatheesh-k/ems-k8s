@@ -1,0 +1,525 @@
+2024-06-20 18:06:53,134 INFO  [main] org.springframework.boot.StartupInfoLogger.logStarting:50 Starting EmployeeApplication using Java 21.0.3 with PID 13216 (D:\ems\employee\build\classes\java\main started by Admin in D:\ems\employee)
+2024-06-20 18:06:53,142 INFO  [main] org.springframework.boot.SpringApplication.logStartupProfileInfo:660 The following 2 profiles are active: "employee", "operation"
+2024-06-20 18:06:55,708 INFO  [main] org.springframework.cloud.context.scope.GenericScope.setSerializationId:282 BeanFactory id=46f9a785-015b-3dac-8d0c-b501958bfbeb
+2024-06-20 18:06:56,179 INFO  [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer.initialize:111 Tomcat initialized with port 8092 (http)
+2024-06-20 18:06:56,192 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Initializing ProtocolHandler ["http-nio-8092"]
+2024-06-20 18:06:56,196 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Starting service [Tomcat]
+2024-06-20 18:06:56,198 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Starting Servlet engine: [Apache Tomcat/10.1.24]
+2024-06-20 18:06:56,266 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Initializing Spring embedded WebApplicationContext
+2024-06-20 18:06:56,268 INFO  [main] org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.prepareWebApplicationContext:296 Root WebApplicationContext: initialization completed in 2887 ms
+2024-06-20 18:06:57,576 WARN  [main] com.pb.employee.opensearch.OpenSearchConfig.esClient:68 Not able to create index {} 
+2024-06-20 18:06:57,798 WARN  [main] org.springframework.context.support.AbstractApplicationContext.refresh:632 Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'requestMappingHandlerMapping' defined in class path resource [org/springframework/boot/autoconfigure/web/servlet/WebMvcAutoConfiguration$EnableWebMvcConfiguration.class]: Ambiguous mapping. Cannot map 'companyController' method 
+com.pb.employee.controller.CompanyController#registerCompany(String, CompanyRequest)
+to {POST [/company], consumes [application/json]}: There is already 'companyController' bean method
+com.pb.employee.controller.CompanyController#updateCompanyById(String, String, CompanyUpdateRequest, MultipartFile) mapped.
+2024-06-20 18:06:57,801 WARN  [main] org.springframework.context.support.AbstractApplicationContext.doClose:1133 Exception thrown from ApplicationListener handling ContextClosedEvent
+org.springframework.beans.factory.BeanCreationNotAllowedException: Error creating bean with name 'applicationTaskExecutor': Singleton bean creation not allowed while singletons of this factory are in destruction (Do not request a bean from a BeanFactory in a destroy method implementation!)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:220)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205)
+	at org.springframework.context.event.AbstractApplicationEventMulticaster.retrieveApplicationListeners(AbstractApplicationEventMulticaster.java:265)
+	at org.springframework.context.event.AbstractApplicationEventMulticaster.getApplicationListeners(AbstractApplicationEventMulticaster.java:222)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:145)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:451)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:457)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:384)
+	at org.springframework.context.support.AbstractApplicationContext.doClose(AbstractApplicationContext.java:1130)
+	at org.springframework.context.support.AbstractApplicationContext.close(AbstractApplicationContext.java:1093)
+	at org.springframework.cloud.context.named.NamedContextFactory.destroy(NamedContextFactory.java:114)
+	at org.springframework.beans.factory.support.DisposableBeanAdapter.destroy(DisposableBeanAdapter.java:211)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.destroyBean(DefaultSingletonBeanRegistry.java:587)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.destroySingleton(DefaultSingletonBeanRegistry.java:559)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.destroySingleton(DefaultListableBeanFactory.java:1202)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.destroySingletons(DefaultSingletonBeanRegistry.java:520)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.destroySingletons(DefaultListableBeanFactory.java:1195)
+	at org.springframework.context.support.AbstractApplicationContext.destroyBeans(AbstractApplicationContext.java:1186)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:637)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.pb.employee.EmployeeApplication.main(EmployeeApplication.java:19)
+2024-06-20 18:06:57,842 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Stopping service [Tomcat]
+2024-06-20 18:06:57,873 INFO  [main] org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLogger.logMessage:82 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2024-06-20 18:06:57,897 ERROR [main] org.springframework.boot.SpringApplication.reportFailure:859 Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'requestMappingHandlerMapping' defined in class path resource [org/springframework/boot/autoconfigure/web/servlet/WebMvcAutoConfiguration$EnableWebMvcConfiguration.class]: Ambiguous mapping. Cannot map 'companyController' method 
+com.pb.employee.controller.CompanyController#registerCompany(String, CompanyRequest)
+to {POST [/company], consumes [application/json]}: There is already 'companyController' bean method
+com.pb.employee.controller.CompanyController#updateCompanyById(String, String, CompanyUpdateRequest, MultipartFile) mapped.
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1788)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:975)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:962)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:624)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
+	at com.pb.employee.EmployeeApplication.main(EmployeeApplication.java:19)
+Caused by: java.lang.IllegalStateException: Ambiguous mapping. Cannot map 'companyController' method 
+com.pb.employee.controller.CompanyController#registerCompany(String, CompanyRequest)
+to {POST [/company], consumes [application/json]}: There is already 'companyController' bean method
+com.pb.employee.controller.CompanyController#updateCompanyById(String, String, CompanyUpdateRequest, MultipartFile) mapped.
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping$MappingRegistry.validateMethodMapping(AbstractHandlerMethodMapping.java:674)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping$MappingRegistry.register(AbstractHandlerMethodMapping.java:636)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.registerHandlerMethod(AbstractHandlerMethodMapping.java:331)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.registerHandlerMethod(RequestMappingHandlerMapping.java:508)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.registerHandlerMethod(RequestMappingHandlerMapping.java:84)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.lambda$detectHandlerMethods$2(AbstractHandlerMethodMapping.java:298)
+	at java.base/java.util.LinkedHashMap.forEach(LinkedHashMap.java:986)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.detectHandlerMethods(AbstractHandlerMethodMapping.java:296)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.processCandidateBean(AbstractHandlerMethodMapping.java:265)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.initHandlerMethods(AbstractHandlerMethodMapping.java:224)
+	at org.springframework.web.servlet.handler.AbstractHandlerMethodMapping.afterPropertiesSet(AbstractHandlerMethodMapping.java:212)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.afterPropertiesSet(RequestMappingHandlerMapping.java:239)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1835)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1784)
+	... 16 common frames omitted
+2024-06-20 18:08:11,006 INFO  [main] org.springframework.boot.StartupInfoLogger.logStarting:50 Starting EmployeeApplication using Java 21.0.3 with PID 11676 (D:\ems\employee\build\classes\java\main started by Admin in D:\ems\employee)
+2024-06-20 18:08:11,012 INFO  [main] org.springframework.boot.SpringApplication.logStartupProfileInfo:660 The following 2 profiles are active: "employee", "operation"
+2024-06-20 18:08:13,633 INFO  [main] org.springframework.cloud.context.scope.GenericScope.setSerializationId:282 BeanFactory id=46f9a785-015b-3dac-8d0c-b501958bfbeb
+2024-06-20 18:08:14,103 INFO  [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer.initialize:111 Tomcat initialized with port 8092 (http)
+2024-06-20 18:08:14,129 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Initializing ProtocolHandler ["http-nio-8092"]
+2024-06-20 18:08:14,133 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Starting service [Tomcat]
+2024-06-20 18:08:14,133 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Starting Servlet engine: [Apache Tomcat/10.1.24]
+2024-06-20 18:08:14,230 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Initializing Spring embedded WebApplicationContext
+2024-06-20 18:08:14,232 INFO  [main] org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.prepareWebApplicationContext:296 Root WebApplicationContext: initialization completed in 3096 ms
+2024-06-20 18:08:15,292 WARN  [main] com.pb.employee.opensearch.OpenSearchConfig.esClient:68 Not able to create index {} 
+2024-06-20 18:08:18,049 WARN  [main] org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration.checkTemplateLocationExists:101 Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+2024-06-20 18:08:19,569 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Starting ProtocolHandler ["http-nio-8092"]
+2024-06-20 18:08:19,683 INFO  [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer.start:243 Tomcat started on port 8092 (http) with context path '/ems'
+2024-06-20 18:08:19,732 INFO  [main] org.springframework.boot.StartupInfoLogger.logStarted:56 Started EmployeeApplication in 9.616 seconds (process running for 10.133)
+2024-06-20 18:08:46,348 INFO  [http-nio-8092-exec-2] org.apache.juli.logging.DirectJDKLog.log:173 Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-06-20 18:08:46,349 INFO  [http-nio-8092-exec-2] org.springframework.web.servlet.FrameworkServlet.initServletBean:532 Initializing Servlet 'dispatcherServlet'
+2024-06-20 18:08:46,353 INFO  [http-nio-8092-exec-2] org.springframework.web.servlet.FrameworkServlet.initServletBean:554 Completed initialization in 2 ms
+2024-06-20 18:08:48,608 WARN  [http-nio-8092-exec-3] org.springdoc.core.utils.PropertyResolverUtils.resolve:98 Could not resolve placeholder 'globalResource.path.description' in value "${globalResource.path.description}"
+2024-06-20 18:08:48,609 WARN  [http-nio-8092-exec-3] org.springdoc.core.utils.PropertyResolverUtils.resolve:98 Could not resolve placeholder 'globalResource.message.description' in value "${globalResource.message.description}"
+2024-06-20 18:08:48,610 WARN  [http-nio-8092-exec-3] org.springdoc.core.utils.PropertyResolverUtils.resolve:98 Could not resolve placeholder 'globalResource.data.description' in value "${globalResource.data.description}"
+2024-06-20 18:08:48,614 INFO  [http-nio-8092-exec-3] org.springdoc.api.AbstractOpenApiResource.getOpenApi:387 Init duration for springdoc-openapi is: 1546 ms
+2024-06-20 18:13:45,673 INFO  [http-nio-8092-exec-7] com.pb.employee.config.RestFilter.doFilter:76 {path=http://localhost:9090/ems/token/validate, message=Success, data={sub=admin@pathbreaker.com, iat=1718887222, roles=[ems_admin], exp=1718889022}}
+2024-06-20 18:13:46,692 INFO  [http-nio-8092-exec-7] com.pb.employee.opensearch.OpenSearchOperations.getCompanyByData:156 Number of hits 0
+2024-06-20 18:13:47,402 INFO  [http-nio-8092-exec-7] com.pb.employee.opensearch.OpenSearchOperations.createIndex:51 creating index ems_PBT
+2024-06-20 18:13:47,417 ERROR [http-nio-8092-exec-7] com.pb.employee.opensearch.OpenSearchOperations.createIndex:55 Not able to create index Request failed: [invalid_index_name_exception] Invalid index name [ems_PBT], must be lowercase 
+2024-06-20 18:13:47,426 ERROR [http-nio-8092-exec-7] com.pb.employee.exception.ExceptionInterceptor.handleEmployeeExceptions:190 exception occured  
+com.pb.employee.exception.EmployeeException: Unable to create company database ems_PBT
+	at com.pb.employee.opensearch.OpenSearchOperations.createIndex(OpenSearchOperations.java:56)
+	at com.pb.employee.serviceImpl.CompanyServiceImpl.registerCompany(CompanyServiceImpl.java:78)
+	at com.pb.employee.controller.CompanyController.registerCompany(CompanyController.java:39)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:188)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:926)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:831)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at com.pb.employee.config.RestFilter.doFilter(RestFilter.java:98)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.servlet.resource.ResourceUrlEncodingFilter.doFilter(ResourceUrlEncodingFilter.java:66)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:389)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:896)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2024-06-20 18:15:02,790 INFO  [http-nio-8092-exec-10] com.pb.employee.config.RestFilter.doFilter:76 {path=http://localhost:9090/ems/token/validate, message=Success, data={sub=admin@pathbreaker.com, iat=1718887222, roles=[ems_admin], exp=1718889022}}
+2024-06-20 18:15:02,882 ERROR [http-nio-8092-exec-10] com.pb.employee.serviceImpl.CompanyServiceImpl.registerCompany:49 Company details existedPathbreaker
+2024-06-20 18:15:02,884 ERROR [http-nio-8092-exec-10] com.pb.employee.exception.ExceptionInterceptor.handleEmployeeExceptions:190 exception occured  
+com.pb.employee.exception.EmployeeException: Company Pathbreaker already exists
+	at com.pb.employee.serviceImpl.CompanyServiceImpl.registerCompany(CompanyServiceImpl.java:50)
+	at com.pb.employee.controller.CompanyController.registerCompany(CompanyController.java:39)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:188)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:926)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:831)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at com.pb.employee.config.RestFilter.doFilter(RestFilter.java:98)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.servlet.resource.ResourceUrlEncodingFilter.doFilter(ResourceUrlEncodingFilter.java:66)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:389)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:896)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2024-06-20 18:17:04,550 INFO  [http-nio-8092-exec-6] com.pb.employee.config.RestFilter.doFilter:76 {path=http://localhost:9090/ems/token/validate, message=Success, data={sub=admin@pathbreaker.com, iat=1718887222, roles=[ems_admin], exp=1718889022}}
+2024-06-20 18:17:04,666 INFO  [http-nio-8092-exec-6] com.pb.employee.opensearch.OpenSearchOperations.getCompanyByData:156 Number of hits 0
+2024-06-20 18:17:04,704 INFO  [http-nio-8092-exec-6] com.pb.employee.opensearch.OpenSearchOperations.createIndex:51 creating index ems_VBRS
+2024-06-20 18:17:04,714 ERROR [http-nio-8092-exec-6] com.pb.employee.opensearch.OpenSearchOperations.createIndex:55 Not able to create index Request failed: [invalid_index_name_exception] Invalid index name [ems_VBRS], must be lowercase 
+2024-06-20 18:17:04,716 ERROR [http-nio-8092-exec-6] com.pb.employee.exception.ExceptionInterceptor.handleEmployeeExceptions:190 exception occured  
+com.pb.employee.exception.EmployeeException: Unable to create company database ems_VBRS
+	at com.pb.employee.opensearch.OpenSearchOperations.createIndex(OpenSearchOperations.java:56)
+	at com.pb.employee.serviceImpl.CompanyServiceImpl.registerCompany(CompanyServiceImpl.java:78)
+	at com.pb.employee.controller.CompanyController.registerCompany(CompanyController.java:39)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:188)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:926)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:831)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at com.pb.employee.config.RestFilter.doFilter(RestFilter.java:98)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.servlet.resource.ResourceUrlEncodingFilter.doFilter(ResourceUrlEncodingFilter.java:66)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:389)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:896)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2024-06-20 18:29:02,131 INFO  [http-nio-8092-exec-1] com.pb.employee.config.RestFilter.doFilter:76 {path=http://localhost:9090/ems/token/validate, message=Success, data={sub=admin@pathbreaker.com, iat=1718887222, roles=[ems_admin], exp=1718889022}}
+2024-06-20 18:29:42,488 INFO  [main] org.springframework.boot.StartupInfoLogger.logStarting:50 Starting EmployeeApplication using Java 21.0.3 with PID 9820 (D:\ems\employee\build\classes\java\main started by Admin in D:\ems\employee)
+2024-06-20 18:29:42,497 INFO  [main] org.springframework.boot.SpringApplication.logStartupProfileInfo:660 The following 2 profiles are active: "employee", "operation"
+2024-06-20 18:29:43,994 INFO  [main] org.springframework.cloud.context.scope.GenericScope.setSerializationId:282 BeanFactory id=46f9a785-015b-3dac-8d0c-b501958bfbeb
+2024-06-20 18:29:44,479 INFO  [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer.initialize:111 Tomcat initialized with port 8092 (http)
+2024-06-20 18:29:44,492 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Initializing ProtocolHandler ["http-nio-8092"]
+2024-06-20 18:29:44,494 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Starting service [Tomcat]
+2024-06-20 18:29:44,495 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Starting Servlet engine: [Apache Tomcat/10.1.24]
+2024-06-20 18:29:44,575 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Initializing Spring embedded WebApplicationContext
+2024-06-20 18:29:44,577 INFO  [main] org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.prepareWebApplicationContext:296 Root WebApplicationContext: initialization completed in 1984 ms
+2024-06-20 18:29:45,641 WARN  [main] com.pb.employee.opensearch.OpenSearchConfig.esClient:68 Not able to create index {} 
+2024-06-20 18:29:47,301 WARN  [main] org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration.checkTemplateLocationExists:101 Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+2024-06-20 18:29:47,758 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Starting ProtocolHandler ["http-nio-8092"]
+2024-06-20 18:29:47,814 INFO  [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer.start:243 Tomcat started on port 8092 (http) with context path '/ems'
+2024-06-20 18:29:47,861 INFO  [main] org.springframework.boot.StartupInfoLogger.logStarted:56 Started EmployeeApplication in 6.424 seconds (process running for 7.052)
+2024-06-20 18:29:55,496 INFO  [http-nio-8092-exec-1] org.apache.juli.logging.DirectJDKLog.log:173 Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-06-20 18:29:55,497 INFO  [http-nio-8092-exec-1] org.springframework.web.servlet.FrameworkServlet.initServletBean:532 Initializing Servlet 'dispatcherServlet'
+2024-06-20 18:29:55,501 INFO  [http-nio-8092-exec-1] org.springframework.web.servlet.FrameworkServlet.initServletBean:554 Completed initialization in 3 ms
+2024-06-20 18:29:55,647 INFO  [http-nio-8092-exec-1] com.pb.employee.config.RestFilter.doFilter:76 {path=http://localhost:9090/ems/token/validate, message=Success, data={sub=admin@pathbreaker.com, iat=1718887222, roles=[ems_admin], exp=1718889022}}
+2024-06-20 18:29:55,658 WARN  [http-nio-8092-exec-1] org.springframework.web.servlet.DispatcherServlet.noHandlerFound:1300 No mapping for POST /ems/employee
+2024-06-20 18:30:05,524 WARN  [http-nio-8092-exec-6] org.springdoc.core.utils.PropertyResolverUtils.resolve:98 Could not resolve placeholder 'globalResource.path.description' in value "${globalResource.path.description}"
+2024-06-20 18:30:05,525 WARN  [http-nio-8092-exec-6] org.springdoc.core.utils.PropertyResolverUtils.resolve:98 Could not resolve placeholder 'globalResource.message.description' in value "${globalResource.message.description}"
+2024-06-20 18:30:05,528 WARN  [http-nio-8092-exec-6] org.springdoc.core.utils.PropertyResolverUtils.resolve:98 Could not resolve placeholder 'globalResource.data.description' in value "${globalResource.data.description}"
+2024-06-20 18:30:05,532 INFO  [http-nio-8092-exec-6] org.springdoc.api.AbstractOpenApiResource.getOpenApi:387 Init duration for springdoc-openapi is: 1393 ms
+2024-06-20 18:32:36,394 INFO  [http-nio-8092-exec-10] com.pb.employee.config.RestFilter.doFilter:76 {path=http://localhost:9090/ems/token/validate, message=Success, data={sub=admin@pathbreaker.com, iat=1718887222, roles=[ems_admin], exp=1718889022}}
+2024-06-20 18:47:01,192 INFO  [main] org.springframework.boot.StartupInfoLogger.logStarting:50 Starting EmployeeApplication using Java 21.0.3 with PID 7448 (D:\ems\employee\build\classes\java\main started by Admin in D:\ems\employee)
+2024-06-20 18:47:01,196 INFO  [main] org.springframework.boot.SpringApplication.logStartupProfileInfo:660 The following 2 profiles are active: "employee", "operation"
+2024-06-20 18:47:03,120 INFO  [main] org.springframework.cloud.context.scope.GenericScope.setSerializationId:282 BeanFactory id=46f9a785-015b-3dac-8d0c-b501958bfbeb
+2024-06-20 18:47:03,724 INFO  [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer.initialize:111 Tomcat initialized with port 8092 (http)
+2024-06-20 18:47:03,744 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Initializing ProtocolHandler ["http-nio-8092"]
+2024-06-20 18:47:03,756 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Starting service [Tomcat]
+2024-06-20 18:47:03,757 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Starting Servlet engine: [Apache Tomcat/10.1.24]
+2024-06-20 18:47:03,834 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Initializing Spring embedded WebApplicationContext
+2024-06-20 18:47:03,835 INFO  [main] org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.prepareWebApplicationContext:296 Root WebApplicationContext: initialization completed in 2494 ms
+2024-06-20 18:47:04,831 WARN  [main] com.pb.employee.opensearch.OpenSearchConfig.esClient:68 Not able to create index {} 
+2024-06-20 18:47:06,179 WARN  [main] org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration.checkTemplateLocationExists:101 Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+2024-06-20 18:47:06,399 INFO  [main] org.apache.juli.logging.DirectJDKLog.log:173 Starting ProtocolHandler ["http-nio-8092"]
+2024-06-20 18:47:06,411 INFO  [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer.start:243 Tomcat started on port 8092 (http) with context path '/ems'
+2024-06-20 18:47:06,439 INFO  [main] org.springframework.boot.StartupInfoLogger.logStarted:56 Started EmployeeApplication in 6.244 seconds (process running for 6.834)
+2024-06-20 18:49:03,420 INFO  [http-nio-8092-exec-1] org.apache.juli.logging.DirectJDKLog.log:173 Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-06-20 18:49:03,420 INFO  [http-nio-8092-exec-1] org.springframework.web.servlet.FrameworkServlet.initServletBean:532 Initializing Servlet 'dispatcherServlet'
+2024-06-20 18:49:03,422 INFO  [http-nio-8092-exec-1] org.springframework.web.servlet.FrameworkServlet.initServletBean:554 Completed initialization in 1 ms
+2024-06-20 18:51:47,179 INFO  [http-nio-8092-exec-5] com.pb.employee.config.RestFilter.doFilter:76 {path=http://localhost:9090/ems/token/validate, message=Success, data={sub=admin@pathbreaker.com, iat=1718889688, roles=[ems_admin], exp=1718891488}}
+2024-06-20 18:51:47,357 INFO  [http-nio-8092-exec-5] com.pb.employee.opensearch.OpenSearchOperations.getCompanyByData:156 Number of hits 0
+2024-06-20 18:52:11,512 INFO  [http-nio-8092-exec-5] com.pb.employee.opensearch.OpenSearchOperations.createIndex:51 creating index ems_CAP
+2024-06-20 18:52:30,518 ERROR [http-nio-8092-exec-5] com.pb.employee.opensearch.OpenSearchOperations.createIndex:55 Not able to create index Request failed: [invalid_index_name_exception] Invalid index name [ems_CAP], must be lowercase 
+2024-06-20 18:52:30,525 ERROR [http-nio-8092-exec-5] com.pb.employee.exception.ExceptionInterceptor.handleEmployeeExceptions:190 exception occured  
+com.pb.employee.exception.EmployeeException: Unable to create company database ems_CAP
+	at com.pb.employee.opensearch.OpenSearchOperations.createIndex(OpenSearchOperations.java:56)
+	at com.pb.employee.serviceImpl.CompanyServiceImpl.registerCompany(CompanyServiceImpl.java:78)
+	at com.pb.employee.controller.CompanyController.registerCompany(CompanyController.java:39)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:188)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:926)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:831)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at com.pb.employee.config.RestFilter.doFilter(RestFilter.java:98)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.servlet.resource.ResourceUrlEncodingFilter.doFilter(ResourceUrlEncodingFilter.java:66)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:389)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:896)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2024-06-20 18:52:44,000 INFO  [http-nio-8092-exec-6] com.pb.employee.config.RestFilter.doFilter:76 {path=http://localhost:9090/ems/token/validate, message=Success, data={sub=admin@pathbreaker.com, iat=1718889688, roles=[ems_admin], exp=1718891488}}
+2024-06-20 18:52:44,012 ERROR [http-nio-8092-exec-6] com.pb.employee.serviceImpl.CompanyServiceImpl.registerCompany:49 Company details existedCapgemin
+2024-06-20 18:52:44,013 ERROR [http-nio-8092-exec-6] com.pb.employee.exception.ExceptionInterceptor.handleEmployeeExceptions:190 exception occured  
+com.pb.employee.exception.EmployeeException: Company Capgemin already exists
+	at com.pb.employee.serviceImpl.CompanyServiceImpl.registerCompany(CompanyServiceImpl.java:50)
+	at com.pb.employee.controller.CompanyController.registerCompany(CompanyController.java:39)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:188)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:926)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:831)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at com.pb.employee.config.RestFilter.doFilter(RestFilter.java:98)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.servlet.resource.ResourceUrlEncodingFilter.doFilter(ResourceUrlEncodingFilter.java:66)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:389)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:896)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2024-06-20 18:53:10,711 INFO  [http-nio-8092-exec-7] com.pb.employee.config.RestFilter.doFilter:76 {path=http://localhost:9090/ems/token/validate, message=Success, data={sub=admin@pathbreaker.com, iat=1718889688, roles=[ems_admin], exp=1718891488}}
+2024-06-20 18:53:10,730 INFO  [http-nio-8092-exec-7] com.pb.employee.opensearch.OpenSearchOperations.getCompanyByData:156 Number of hits 1
+2024-06-20 18:53:10,731 ERROR [http-nio-8092-exec-7] com.pb.employee.serviceImpl.CompanyServiceImpl.registerCompany:66 Company with shortname deloitee already existed
+2024-06-20 18:53:10,732 ERROR [http-nio-8092-exec-7] com.pb.employee.exception.ExceptionInterceptor.handleEmployeeExceptions:190 exception occured  
+com.pb.employee.exception.EmployeeException: Company shortname cap already in use.
+	at com.pb.employee.serviceImpl.CompanyServiceImpl.registerCompany(CompanyServiceImpl.java:67)
+	at com.pb.employee.controller.CompanyController.registerCompany(CompanyController.java:39)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:188)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:926)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:831)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at com.pb.employee.config.RestFilter.doFilter(RestFilter.java:98)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.servlet.resource.ResourceUrlEncodingFilter.doFilter(ResourceUrlEncodingFilter.java:66)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:389)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:896)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+2024-06-20 18:53:18,213 INFO  [http-nio-8092-exec-8] com.pb.employee.config.RestFilter.doFilter:76 {path=http://localhost:9090/ems/token/validate, message=Success, data={sub=admin@pathbreaker.com, iat=1718889688, roles=[ems_admin], exp=1718891488}}
+2024-06-20 18:53:18,227 INFO  [http-nio-8092-exec-8] com.pb.employee.opensearch.OpenSearchOperations.getCompanyByData:156 Number of hits 0
+2024-06-20 18:53:30,878 INFO  [http-nio-8092-exec-8] com.pb.employee.opensearch.OpenSearchOperations.createIndex:51 creating index ems_de
+2024-06-20 18:53:41,907 INFO  [http-nio-8092-exec-8] com.pb.employee.serviceImpl.CompanyServiceImpl.registerCompany:80 Creating the employee of company admin
