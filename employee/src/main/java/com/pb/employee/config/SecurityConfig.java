@@ -1,3 +1,4 @@
+/*
 
 
 package com.pb.employee.config;
@@ -31,4 +32,4 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().requestMatchers("/v3/api-docs/**","/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html");
     }
-}
+}*/

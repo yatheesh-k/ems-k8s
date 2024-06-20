@@ -44,6 +44,15 @@ public class LoginController {
         return loginService.login(request);
     }
 
+    @PatchMapping("emsadmin/login")
+    @io.swagger.v3.oas.annotations.Operation(
+            summary = "${api.login.tag}", description = "${api.login.description}")
+    @ResponseStatus(HttpStatus.OK)
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
+    public ResponseEntity<?> updatePassword(@RequestBody @Valid LoginRequest request) throws IdentityException {
+        return loginService.updateEmsAdmin(request);
+    }
+
     @PostMapping("/token/validate")
     @io.swagger.v3.oas.annotations.Operation(
             summary = "${api.tokenvalidate.tag}", description = "${api.tokenvalidate.description}")

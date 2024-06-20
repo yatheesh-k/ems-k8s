@@ -94,15 +94,29 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public List<CompanyResponse> getCompanies() throws IOException {
+    public ResponseEntity<?> getCompanies() throws EmployeeException {
 
-        List<CompanyResponse> companyResponses = null;
-        return companyResponses;
+        List<CompanyEntity> companyEntities = null;
+        companyEntities = openSearchOperations.getCompanies();
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(companyEntities), HttpStatus.OK);
+
     }
 
     @Override
-    public CompanyResponse getCompanyById(String companyId){
-        return null;
+    public ResponseEntity<?> getCompanyById(String companyId)  throws EmployeeException{
+        log.info("getting details of {}", companyId);
+        CompanyEntity companyEntity = null;
+        try {
+            companyEntity = openSearchOperations.getCompanyById(companyId, null, Constants.INDEX_EMS);
+        } catch (Exception ex) {
+            log.error("Exception while fetching company details {}", ex);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_SAVE_COMPANY),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(companyEntity), HttpStatus.OK);
     }
 
     @Override

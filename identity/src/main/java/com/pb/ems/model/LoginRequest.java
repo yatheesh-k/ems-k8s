@@ -20,7 +20,7 @@ public class LoginRequest {
     private String username;
 
     @NotEmpty(message = "{user.password.missing.members}")
-    @Schema(required = true,  description = "${login.password.description}", example = "hitachi1")
+    @Schema(required = true,  description = "${login.password.description}", example = "password")
     @JsonProperty("password")
     private String password;
 }

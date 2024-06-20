@@ -7,6 +7,7 @@ import com.pb.ems.exception.IdentityErrorMessageKey;
 import com.pb.ems.exception.IdentityException;
 import com.pb.ems.model.*;
 import com.pb.ems.opensearch.OpenSearchOperations;
+import com.pb.ems.persistance.Entity;
 import com.pb.ems.service.LoginService;
 import com.pb.ems.util.Constants;
 import lombok.extern.slf4j.Slf4j;
@@ -107,5 +108,27 @@ public class LoginServiceImpl implements LoginService {
         Random random = new Random();
         Long otp = 100000 + random.nextLong(900000);
         return otp;
+    }
+
+    @Override
+    public ResponseEntity<?> updateEmsAdmin(LoginRequest request) throws IdentityException {
+        try{
+            EmployeeEntity user = openSearchOperations.getEMSAdminById(request.getUsername());
+            if(user == null ) {
+                throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_USERNAME),
+                        HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception ex ){
+            log.error("Exception while fetching user {}, {}", request.getUsername(), ex);
+            throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_USERNAME),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        String id = Constants.EMS_ADMIN+"_"+request.getUsername();
+        Entity entity = EmployeeEntity.builder().
+                emailId(request.getUsername()).
+                password(request.getPassword()).build();
+        openSearchOperations.saveEntity(entity, id, Constants.INDEX_EMS);
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
     }
 }
