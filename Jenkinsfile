@@ -1,12 +1,12 @@
 pipeline {
     agent any
-    stages {
-        stage('Build') {
-            steps {
-                sh 'echo "pipeline is working"'
-                sh 'echo "trigger status : green "'
-                sh 'echo "trigger without SCM 4"'
-                
+    tools{
+        maven : "maven"
+    }
+    stages{
+        stage('Build Frontend'){
+            when {
+                changeset "**/Frontend/payslip_react-main/**"
             }
         }
     }
