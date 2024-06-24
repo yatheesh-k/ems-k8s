@@ -27,7 +27,7 @@ import java.util.List;
 public class CompanyController {
     @Autowired
     private CompanyService companyService;
-    @RequestMapping(value = "", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.registerCompany.tag}", description = "${api.registerCompany.description}")
     @ResponseStatus(HttpStatus.CREATED)
@@ -39,7 +39,7 @@ public class CompanyController {
         return companyService.registerCompany(companyRequest);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET)
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.getCompanies.tag}", description = "${api.getCompanies.description}")
     @ResponseStatus(HttpStatus.OK)
@@ -59,7 +59,7 @@ public class CompanyController {
         return companyService.getCompanyById(companyId);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{companyId}", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.registerCompany.tag}", description = "${api.registerCompany.description}")
     @ResponseStatus(HttpStatus.ACCEPTED)
