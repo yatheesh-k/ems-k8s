@@ -11,14 +11,18 @@ public enum EmployeeErrorMessageKey {
     COMPANY_ALREADY_EXISTS("company.already.exists"),
     COMPANY_SHORT_NAME_ALREADY_EXISTS("company.shortname.already.exists"),
     UNABLE_SAVE_COMPANY("unable.save.company"),
+    UNABLE_DELETE_COMPANY("unable.delete.company"),
     UNABLE_GET_COMPANY("unable.get.company"),
+    UNABLE_UPLOAD_IMAGE("unable.upload.image"),
     UNABLE_TO_CREATE_COMPANY("unable.to.create.index"),
     INVALID_COMPANY("invalid.company"),
     INVALID_EMPLOYEE("invalid.employee"),
     EMPLOYEE_ID_ALREADY_EXISTS("employee.id.already.exists"),
     EMPLOYEE_EMAILID_ALREADY_EXISTS("employee.emailid.already.exists"),
     UNABLE_SAVE_EMPLOYEE("unable.save.employee"),
-       ;
+    UNABLE_DELETE_EMPLOYEE("unable.delete.employee"),
+
+    UNABLE_GET_EMPLOYEES("unable.get.employee");
 
     private final String key;
 
