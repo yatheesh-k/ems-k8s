@@ -7,14 +7,11 @@ import com.pb.employee.exception.EmployeeErrorMessageKey;
 import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.opensearch.OpenSearchOperations;
-import com.pb.employee.persistance.model.CompanyEntity;
 import com.pb.employee.persistance.model.EmployeeEntity;
 import com.pb.employee.persistance.model.Entity;
-import com.pb.employee.request.CompanyRequest;
 import com.pb.employee.request.CompanyUpdateRequest;
 import com.pb.employee.request.EmployeeRequest;
-import com.pb.employee.response.CompanyResponse;
-import com.pb.employee.service.CompanyService;
+import com.pb.employee.request.EmployeeUpdateRequest;
 import com.pb.employee.service.EmployeeService;
 import com.pb.employee.util.CompanyUtils;
 import com.pb.employee.util.Constants;
@@ -79,27 +76,93 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
-    @Override
-    public List<CompanyResponse> getCompanies() throws IOException {
 
-        List<CompanyResponse> companyResponses = null;
-        return companyResponses;
+    @Override
+    public ResponseEntity<?> getEmployees(String companyName) throws EmployeeException {
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+
+        List<EmployeeEntity> employeeEntities = null;
+        try {
+            employeeEntities = openSearchOperations.getCompanyEmployees(companyName);
+        } catch (Exception ex) {
+            log.error("Exception while fetching employees for company {}: {}", companyName, ex.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(employeeEntities), HttpStatus.OK);
+    }
+
+
+
+
+    @Override
+    public ResponseEntity<?> getEmployeeById(String companyName, String employeeId) throws EmployeeException {
+        log.info("getting details of {}", employeeId);
+        Object entity = null;
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+
+        try {
+            entity = openSearchOperations.getById(employeeId, null, index);
+
+        } catch (Exception ex) {
+
+            log.error("Exception while fetching company details {}", ex);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(entity), HttpStatus.OK);
     }
 
     @Override
-    public CompanyResponse getCompanyById(String companyId){
-        return null;
+    public ResponseEntity<?> updateEmployeeById(String companyName, String employeeId, EmployeeUpdateRequest employeeUpdateRequest) throws IOException, EmployeeException {
+        log.info("getting details of {}", employeeId);
+        EmployeeEntity user;
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+        try {
+            user = openSearchOperations.getEmployeeById(employeeId, null, index);
+
+            if (user == null) {
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_COMPANY),
+                        HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception ex) {
+
+            log.error("Exception while fetching company details {}", ex);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        Entity entity = CompanyUtils.maskEmployeeUpdateProperties(user, employeeUpdateRequest, employeeId);
+        openSearchOperations.saveEntity(entity, employeeId, index);
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
     }
 
-    @Override
-    public ResponseEntity<?> updateCompanyById(String companyId, CompanyUpdateRequest companyUpdateRequest, MultipartFile file) throws IOException {
-       return null;
-    }
-
 
     @Override
-    public ResponseEntity<?> deleteCompanyById(String companyId) {
-       return null;
+    public ResponseEntity<?> deleteEmployeeById(String employeeId, String companyName) throws EmployeeException {
+        log.info("getting details of {}", employeeId);
+        Object entity = null;
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+
+        try {
+            entity = openSearchOperations.getById(employeeId, null, index);
+
+            if (entity!=null) {
+                openSearchOperations.deleteEntity(employeeId,index);
+            }
+        } catch (Exception ex) {
+            log.error("Exception while fetching company details {}", ex);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_DELETE_EMPLOYEE),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(Constants.DELETED), HttpStatus.OK);
+
     }
 
 }

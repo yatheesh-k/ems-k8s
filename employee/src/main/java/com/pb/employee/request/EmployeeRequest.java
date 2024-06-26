@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmployeeRequest {
+
     private String companyName;
     private String employeeType;
     private String employeeId;

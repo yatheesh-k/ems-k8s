@@ -4,6 +4,7 @@ import com.pb.ems.exception.IdentityException;
 import com.pb.ems.model.EmployeeEntity;
 import com.pb.ems.persistance.Entity;
 import com.pb.ems.util.Constants;
+import com.pb.ems.util.ResourceUtils;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.Result;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
@@ -31,8 +32,8 @@ public class OpenSearchOperations {
         try {
             synchronized (entity){
                 indexResponse = esClient.index(builder -> builder.index(index)
-                                        .id(Id)
-                                        .document(entity));
+                        .id(Id)
+                        .document(entity));
             }
             logger.debug("Saved the entity. Response {}.Entity:{}",indexResponse, entity);
         } catch (IOException e) {
@@ -48,7 +49,7 @@ public class OpenSearchOperations {
         try {
             synchronized (Id){
                 deleteResponse = esClient.delete(b -> b.index(index)
-                                      .id(Id));
+                        .id(Id));
 
             }
             if(deleteResponse.result() == Result.NotFound) {
@@ -73,7 +74,8 @@ public class OpenSearchOperations {
     }
     public EmployeeEntity getEmployeeById(String user, String company) throws IOException {
         String index = Constants.INDEX_EMS+"_"+company;
-        GetRequest getRequest = new GetRequest.Builder().id(Constants.EMPLOYEE+"_"+user)
+        String username = ResourceUtils.generateCompanyResourceId(user);
+        GetRequest getRequest = new GetRequest.Builder().id(Constants.EMPLOYEE+"-"+username)
                 .index(index).build();
         GetResponse<EmployeeEntity> searchResponse = esClient.get(getRequest, EmployeeEntity.class);
         if(searchResponse != null && searchResponse.source() != null){
@@ -81,6 +83,7 @@ public class OpenSearchOperations {
         }
         return null;
     }
+
 
     public SearchResponse<Object> searchByQuery(BoolQuery.Builder query, String index, Class targetClass) throws IdentityException {
         SearchResponse searchResponse = null;

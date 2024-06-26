@@ -34,4 +34,8 @@ public class Constants {
 
     public static final String EMPLOYEE_ID = "employeeId";
     public static final String EMAIL_ID = "emailId";
+    public static final Object DELETED = "deleted";
+
+    public static final String DEPARTMENT = "department";
+    public static final String NAME = "name";
 }
