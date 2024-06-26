@@ -32,6 +32,10 @@ public class ResourceIdUtils {
         return generateGlobalResourceId(ResourceType.EMS_ADMIN, id);
     }
 
+    public static String generateDepartmentResourceId(String id) {
+        return generateGlobalResourceId(ResourceType.DEPARTMENT, id);
+    }
+
     /**
      * Generate a global resource ID based on the resource type
      *
@@ -47,6 +51,9 @@ public class ResourceIdUtils {
         }
         if (type == ResourceType.EMPLOYEE) {
             prefix = Constants.EMPLOYEE + "-";
+        }
+        if (type == ResourceType.DEPARTMENT) {
+            prefix = Constants.DEPARTMENT + "-";
         }
             StringBuilder md5Input = new StringBuilder();
             for (Object arg : args) {

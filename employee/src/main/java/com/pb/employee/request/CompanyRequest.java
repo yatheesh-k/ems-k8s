@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 public class CompanyRequest {
 
-    @NotBlank(message = "{compute.missing.address}")
+    @NotBlank(message = "{companyname.missing.message}")
     private String companyName;
     private String emailId;
     private String password;

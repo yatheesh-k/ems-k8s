@@ -21,8 +21,12 @@ public enum EmployeeErrorMessageKey {
     EMPLOYEE_EMAILID_ALREADY_EXISTS("employee.emailid.already.exists"),
     UNABLE_SAVE_EMPLOYEE("unable.save.employee"),
     UNABLE_DELETE_EMPLOYEE("unable.delete.employee"),
-
-    UNABLE_GET_EMPLOYEES("unable.get.employee");
+    UNABLE_GET_EMPLOYEES("unable.get.employee"),
+    DEPARTMENT_ID_ALREADY_EXISTS("department.id.already.exists"),
+    INVALID_DEPARTMENT("invalid.department"),
+    UNABLE_SAVE_DEPARTMENT("unable.save.department"),
+    UNABLE_GET_DEPARTMENT("unable.get.department"),
+    ;
 
     private final String key;
 
