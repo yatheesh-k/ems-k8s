@@ -3,6 +3,7 @@ package com.pb.employee.controller;
 
 import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.persistance.model.CompanyEntity;
+import com.pb.employee.request.CompanyImageUpdate;
 import com.pb.employee.request.CompanyRequest;
 import com.pb.employee.request.CompanyUpdateRequest;
 import com.pb.employee.response.CompanyResponse;
@@ -69,6 +70,19 @@ public class CompanyController {
                                                @PathVariable String companyId,
                                                @RequestBody @Valid CompanyUpdateRequest companyUpdateRequest) throws IOException, EmployeeException {
         return companyService.updateCompanyById(companyId,companyUpdateRequest);
+    }
+    @RequestMapping(value = "/image/{companyId}", method = RequestMethod.PATCH,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
+            summary = "${api.updateCompany.tag}", description = "${api.updateCompany.description}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "202", description= "Accepted")
+    public ResponseEntity<?> updateCompanyImageById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
+                                               @RequestHeader(Constants.AUTH_KEY) String authToken,
+                                               @PathVariable String companyId,
+                                               @ModelAttribute @Valid CompanyImageUpdate companyImageUpdate,
+                                                @RequestPart("file") MultipartFile file ) throws IOException, EmployeeException {
+
+        return companyService.updateCompanyImageById(companyId,companyImageUpdate, file);
     }
     @RequestMapping(value = "/{companyId}", method = RequestMethod.DELETE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },

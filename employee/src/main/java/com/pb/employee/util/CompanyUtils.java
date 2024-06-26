@@ -7,10 +7,7 @@ import com.pb.employee.model.ResourceType;
 import com.pb.employee.persistance.model.CompanyEntity;
 import com.pb.employee.persistance.model.EmployeeEntity;
 import com.pb.employee.persistance.model.Entity;
-import com.pb.employee.request.CompanyRequest;
-import com.pb.employee.request.CompanyUpdateRequest;
-import com.pb.employee.request.EmployeeRequest;
-import com.pb.employee.request.EmployeeUpdateRequest;
+import com.pb.employee.request.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,6 +92,40 @@ public class CompanyUtils {
         updatedEntity.setPfPercentage(pf);
         updatedEntity.setSpecialAllowance(spa);
         updatedEntity.setTravelAllowance(ta);
+        updatedEntity.setType(Constants.COMPANY);
+
+        return updatedEntity;
+    }
+    public static CompanyEntity maskCompanyImageUpdateProperties(CompanyEntity existingEntity, CompanyImageUpdate companyRequest, String id) {
+        ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        // Convert CompanyUpdateRequest to CompanyEntity to update specific fields
+        CompanyEntity updatedEntity = objectMapper.convertValue(companyRequest, CompanyEntity.class);
+
+        // Ensure existing fields are preserved if not updated
+        // Set common fields
+        updatedEntity.setId(id);
+        updatedEntity.setCompanyName(existingEntity.getCompanyName()); // Ensure companyName is preserved
+        updatedEntity.setEmailId(existingEntity.getEmailId());
+        updatedEntity.setPassword(existingEntity.getPassword());
+        updatedEntity.setCompanyAddress(existingEntity.getCompanyAddress());
+        updatedEntity.setCompanyRegNo(existingEntity.getCompanyRegNo());
+        updatedEntity.setMobileNo(existingEntity.getMobileNo());
+        updatedEntity.setLandNo(existingEntity.getLandNo());
+        updatedEntity.setGstNo(existingEntity.getGstNo());
+        updatedEntity.setPanNo(existingEntity.getPanNo());
+        updatedEntity.setName(existingEntity.getName());
+        updatedEntity.setPersonalMailId(existingEntity.getPersonalMailId());
+        updatedEntity.setPersonalMobileNo(existingEntity.getPersonalMobileNo());
+        updatedEntity.setAddress(existingEntity.getAddress());
+        updatedEntity.setCompanyType(existingEntity.getCompanyType());
+        updatedEntity.setCompanyBranch(existingEntity.getCompanyBranch());
+        updatedEntity.setCinNo(existingEntity.getCinNo());
+        updatedEntity.setShortName(existingEntity.getShortName());
+        updatedEntity.setHraPercentage(existingEntity.getHraPercentage());
+        updatedEntity.setPfPercentage(existingEntity.getPfPercentage());
+        updatedEntity.setSpecialAllowance(existingEntity.getSpecialAllowance());
+        updatedEntity.setTravelAllowance(existingEntity.getTravelAllowance());
         updatedEntity.setType(Constants.COMPANY);
 
         return updatedEntity;

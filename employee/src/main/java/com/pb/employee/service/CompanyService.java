@@ -3,6 +3,7 @@ package com.pb.employee.service;
 
 import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.persistance.model.CompanyEntity;
+import com.pb.employee.request.CompanyImageUpdate;
 import com.pb.employee.request.CompanyRequest;
 import com.pb.employee.request.CompanyUpdateRequest;
 import com.pb.employee.response.CompanyResponse;
@@ -17,6 +18,7 @@ public interface CompanyService {
     ResponseEntity<?> getCompanies() throws EmployeeException;
     ResponseEntity<?> getCompanyById(String companyId) throws EmployeeException;
     ResponseEntity<?> updateCompanyById(String companyId, CompanyUpdateRequest companyUpdateRequest) throws IOException, EmployeeException;
+    ResponseEntity<?> updateCompanyImageById(String companyId,  CompanyImageUpdate companyImageUpdate,MultipartFile multipartFile) throws EmployeeException, IOException;
     ResponseEntity<?> deleteCompanyById(String companyId) throws EmployeeException;
 
 }
