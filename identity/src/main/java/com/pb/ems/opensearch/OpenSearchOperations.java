@@ -5,6 +5,7 @@ import com.pb.ems.model.EmployeeEntity;
 import com.pb.ems.persistance.Entity;
 import com.pb.ems.util.Constants;
 import com.pb.ems.util.ResourceUtils;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.Result;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
@@ -16,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Component
 public class OpenSearchOperations {
@@ -75,6 +78,7 @@ public class OpenSearchOperations {
     public EmployeeEntity getEmployeeById(String user, String company) throws IOException {
         String index = Constants.INDEX_EMS+"_"+company;
         String username = ResourceUtils.generateCompanyResourceId(user);
+        String username = md5Hash(user);
         GetRequest getRequest = new GetRequest.Builder().id(Constants.EMPLOYEE+"-"+username)
                 .index(index).build();
         GetResponse<EmployeeEntity> searchResponse = esClient.get(getRequest, EmployeeEntity.class);
@@ -83,6 +87,25 @@ public class OpenSearchOperations {
         }
         return null;
     }
+    private String md5Hash(String user) {
+        try {
+            // Using Apache Commons Codec for MD5 hashing
+            return DigestUtils.md5Hex(user);
+        } catch (Exception e) {
+            // Handle exceptions, such as NoSuchAlgorithmException
+            e.printStackTrace();
+            return null; // Or throw an exception based on your error handling strategy
+        }
+    }
+    public void saveOtpToUser(EmployeeEntity user, Long otp, String company) throws IdentityException {
+        user.setOtp(otp);
+        user.setExpiryTime(Instant.now().plus(40, ChronoUnit.SECONDS).getEpochSecond()); // Set expiry time, for example, 5 minutes from now
+        String index =  Constants.INDEX_EMS +"_"+ company; // Use dynamic index
+        String id = Constants.EMPLOYEE+"-"+md5Hash(user.getEmailId());
+        saveEntity(user,id , index);  // Ensure this method saves the user entity to the correct index
+        logger.info("The otp and expiry time saved into the db for index: " + index);
+    }//save the entity
+
 
 
     public SearchResponse<Object> searchByQuery(BoolQuery.Builder query, String index, Class targetClass) throws IdentityException {
