@@ -1,24 +1,18 @@
 import React, { useState } from "react";
-// import "./Login.css";
 import { Envelope, Key, Lock, Unlock } from "react-bootstrap-icons";
-import { Bounce, toast } from "react-toastify";
-import axios from "axios";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
+import { loginApi } from "../Utils/Axios";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const EmsLogin = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
-  } = useForm({
-    defaultValues: {
-      emailId: "",
-      otp: "",
-      password: "",
-    },
-  });
+    reset,} = useForm({defaultValues: {username: "",password: "",},});
+    
   const navigate = useNavigate();
   const [user, setUser] = useState([]);
   const [otpSent, setOtpSent] = useState(false); // Track if OTP is sent
@@ -39,113 +33,19 @@ const EmsLogin = () => {
     }
   };
 
-  const sendOtp = (data) => {
-    const postData = {
-      emailId: data.emailId,
-      password: data.password,
-    };
-    axios
-      .post("http://192.168.1.163:8092/login/send-otp", postData)
-      .then((response) => {
-        if (response.status === 200) {
-          toast.success("OTP Sent Successfully", {
-            position: "top-right",
-            transition: Bounce,
-            hideProgressBar: true,
-            theme: "colored",
-            autoClose: 2000, // Close the toast after 2 seconds
-          });
-          setOtpSent(true); // Set OTP sent to true
-          setUser(response.data);
-        }
-      })
-      .catch((error) => {
-        handleErrors(error);
-      });
-  };
-
-  const handleErrors = (error) => {
-    if (error.response) {
-      const status = error.response.status;
-      let errorMessage = "";
-
-      switch (status) {
-        case 400:
-          errorMessage = "Email Does Not Exist!";
-          break;
-        case 401:
-          errorMessage = "Session Timed Out!";
-          break;
-        case 404:
-          errorMessage = "Resource Not Found!";
-          break;
-        case 406:
-          errorMessage = "Invalid Details!";
-          break;
-        case 500:
-          errorMessage = "Server Error!";
-          break;
-        default:
-          errorMessage = "An Error Occurred!";
-          break;
-      }
-
-      toast.error(errorMessage, {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
-    } else {
-      toast.error("Network Error!", {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
-    }
-
-    console.log(error);
-  };
-
-  const verifyOtpAndLogin = (data) => {
-    const postData = {
-      emailId: data.emailId,
-      otp: data.otp,
-    };
-    axios
-      .post("http://192.168.1.163:8092/login/validate-otp", postData)
-      .then((response) => {
-        if (response.status === 200) {
-          toast.success("Login Successful", {
-            position: "top-right",
-            transition: Bounce,
-            hideProgressBar: true,
-            theme: "colored",
-            autoClose: 2000, // Close the toast after 2 seconds
-          });
-          console.log(response.data)
-          sessionStorage.setItem('id',response.data.id)
-          sessionStorage.setItem('name', response.data.name);
-          sessionStorage.setItem('role', response.data.role);
-          sessionStorage.setItem('imageFile', response.data.ImageFile);
-          navigate("/main", { state: { emailId: data.emailId } }); // Navigate to main page
-        }
-      })
-      .catch((error) => {
-        handleErrors(error);
-      });
-  };
-
   const onSubmit = (data) => {
-    if (otpSent) {
-      verifyOtpAndLogin(data);
-    } else {
-      sendOtp(data);
-    }
+      loginApi(data)
+      .then(response => {
+        console.log(response.data);
+        // Handle successful login
+        navigate('/main'); // Update the path as per your routing
+
+      })
+      .catch(error => {
+        toast.error("Login failed. Please try again.");
+      });
   };
+
 
   return (
     <div>
@@ -167,7 +67,7 @@ const EmsLogin = () => {
                     placeholder="Email"
                     autoComplete="off"
                     onKeyDown={handleEmailChange}
-                    {...register("emailId", {
+                    {...register("username", {
                       required: "Email is Required.",
                       pattern: {
                         value: /^\S[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -175,14 +75,14 @@ const EmsLogin = () => {
                       },
                     })}
                   />
-                  {errors.emailId && (
+                  {errors.username && (
                     <p className="errorMsg" style={{ marginLeft: "44px" }}>
-                      {errors.emailId.message}
+                      {errors.username.message}
                     </p>
                   )}
                 </div>
 
-                {otpSent && (
+                {/* {otpSent && (
                   <div className="input_field">
                     <input
                        type={passwordShown ? "text" : "password"}
@@ -206,9 +106,9 @@ const EmsLogin = () => {
                       </p>
                     )}
                   </div>
-                )}
+                )} */}
 
-{!otpSent && (
+{/* {!otpSent && ( */}
                   <div className="input_field">
                     <input
                       name="password"
@@ -217,10 +117,14 @@ const EmsLogin = () => {
                       type={passwordShown ? "text" : "password"}
                       {...register("password", {
                         required: "Password is Required",
-                        pattern: {
-                          value: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s)(?=.*[!@#$*])/,
-                          message: "Please Check Password You Entered",
+                        minLength: {
+                          value: 6,
+                          message: "Password must be at least 6 characters long"
                         },
+                        // pattern: {
+                        //   value: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s)(?=.*[!@#$*])/,
+                        //   message: "Please Check Password You Entered",
+                        // },
                       })}
                     />
                     {errors.password && (
@@ -232,7 +136,7 @@ const EmsLogin = () => {
                       {passwordShown ? <Unlock size={20} /> : <Lock size={20} />}
                     </span>
                   </div>
-                )}
+                {/* )} */}
 
 
                 <button className="button" type="submit">

@@ -1,53 +1,77 @@
 import axios from 'axios';
-import React from 'react';
 
-const BASE_URL = 'http://192.168.1.163:8092';
+const BASE_URL = 'http://localhost:8092/ems';
+const Login_URL = 'http://localhost:9090/ems';
 
-export const sendOtpApi = () => {
-    return axios.post(`${BASE_URL}/login/ems`)
-        .then(response => response.json());
+
+const token=sessionStorage.getItem("token");
+
+// Create an Axios instance
+const axiosInstance = axios.create({
+    baseURL: BASE_URL,
+    headers: {
+        'Authorization':`Bearer ${token}`,
+        'Content-Type': 'application/json',
+    }
+});
+
+// Interceptor to add the token to headers
+// axiosInstance.interceptors.request.use(
+//     (config) => {
+//         const token = sessionStorage.getItem('token');
+//         if (token) {
+//             config.headers['Authorization'] = `Bearer ${token}`;
+//         }
+//         return Promise.resolve(config);
+//     },
+//     () => {
+//         return Promise.reject();
+//     }
+// );
+
+
+export const loginApi = (data) => {
+    return axios.post(`${Login_URL}/emsadmin/login`, data)
+        .then(response => {
+            const { token, refreshToken } = response.data.data;
+            // Store the token and refresh token in sessionStorage
+            sessionStorage.setItem('token', token);
+            sessionStorage.setItem('refreshToken', refreshToken);
+
+            // Update the token in the axios instance
+            axiosInstance.defaults.headers['Authorization'] = `Bearer ${token}`;
+            
+            return response.data;
+        })
+        .catch(error=>{
+            console.log(error);
+        });
+};
+export const CompanyloginApi = (data) => {
+    return axios.post(`${Login_URL}/company/login`, data)
+        .then(response => {
+            return response.data;
+        })
+        .catch(error=>{
+            console.log(error);
+        });
 };
 
-export const verifyOtpAndLoginApi = () => {
-    return axios.post(`${BASE_URL}/login/validate`)
-        .then(response => response.json());
-};
- 
-export const companyRegistationApi = () => {
-    return axios.post(`${BASE_URL}/login/`, FormData)
-        .then(response => response.json());
-};
-export const departmentApi = () => {
-    return axios.get(`${BASE_URL}/department/all`)
-        .then(response => response.json());
-};
+// Export your other APIs using the axiosInstance
+export const companyRegistationApi = () => axiosInstance.post('/company/');
 
-export const designationApi = () => {
-    return axios.get(`${BASE_URL}/designation/all`)
-        .then(response => response.json());
-};
+export const companyViewApi=()=>axiosInstance.get('/company/all')
 
-export const statusApi = () => {
-    return axios.get(`${BASE_URL}/status/all`)
-        .then(response => response.json());
-};
 
-export const roleApi = () => {
-    return axios.get(`${BASE_URL}/role/all`)
-        .then(response => response.json());
-};
+export const departmentApi = () => axiosInstance.get('/department/all');
 
-export const updateEmployeeApi = (employeeId,data) => {
-    return axios.put(`${BASE_URL}/employee/${employeeId}`, data)
-        .then(response => response.data());
-};
+export const designationApi = () =>axiosInstance.get('/designation/all');
 
-export const employeeRegistrationApi = (data) => {
-    return axios.post(`${BASE_URL}/employee/registration`, data)
-        .then(response => response.data());
-};
+export const roleApi = () => axiosInstance.get('/role/all');
 
-export const employeeIdApi = (employeeId) => {
-    return axios.get(`${BASE_URL}/employee/${employeeId}`)
-        .then(response => response.json());
-};
+export const updateEmployeeApi = (employeeId) =>axiosInstance.put(`/employee/${employeeId}`);
+
+export const employeeRegistrationApi = () =>axiosInstance.post('/employee/registration');
+
+export const employeeIdApi = (employeeId) =>axiosInstance.get(`/employee/${employeeId}`)
+
