@@ -34,7 +34,5 @@ public class EmployeeEntity implements Entity{
     private String ifscCode;
     private String bankName;
     private String type;
-    private Long otp;
-    private Long expiryTime;
 
 }

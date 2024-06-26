@@ -10,13 +10,19 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class OTPRequest extends LoginRequest{
+public class OTPRequest{
 
-    @NotEmpty(message = "{user.password.missing.members}")
-    @Schema(required = true,  description = "${login.password.description}", example = "password")
-    private String otp;
+    @NotEmpty(message = "{user.otp.message}")
+    @Schema(required = true,  description = "${login.otp.description}", example = "123456")
+    private Long otp;
 
-    public OTPRequest(@NotEmpty(message = "{user.username.missing.members}") String username, @NotEmpty(message = "{user.password.missing.members}") String password) {
-        super(username, password);
-    }
+    @NotEmpty(message = "{user.username.message}")
+    @Schema(required = true,  description = "${login.username.description}", example = "path@gmail.com")
+    private String username;
+
+    @NotEmpty(message = "{user.company.message}")
+    @Schema(required = true,  description = "${login.company.description}", example = "company")
+    private String company;
+
+
 }

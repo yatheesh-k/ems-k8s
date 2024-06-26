@@ -15,9 +15,13 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
@@ -26,17 +30,21 @@ public class LoginServiceImpl implements LoginService {
 
     @Autowired
     private OpenSearchOperations openSearchOperations;
+
+    @Autowired
+    private JavaMailSenderImpl javaMailSender;
+
     /**
      * @param request
      * @return
      */
     @Override
     public ResponseEntity<?> login(LoginRequest request) throws IdentityException {
-        try{
+        try {
             EmployeeEntity user = openSearchOperations.getEMSAdminById(request.getUsername());
-            if(user != null && user.getPassword() != null) {
+            if (user != null && user.getPassword() != null) {
                 String password = new String(Base64.getDecoder().decode(user.getPassword()), StandardCharsets.UTF_8);
-                if(request.getPassword().equals(password)) {
+                if (request.getPassword().equals(password)) {
                     log.debug("Successfully logged into ems portal for {}", request.getUsername());
                 } else {
                     log.error("Invalid credentials");
@@ -49,7 +57,7 @@ public class LoginServiceImpl implements LoginService {
                         HttpStatus.FORBIDDEN);
             }
         } catch (Exception e) {
-            log.error("Invalid creds {}", e.getMessage(),e);
+            log.error("Invalid creds {}", e.getMessage(), e);
             throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_CREDENTIALS),
                     HttpStatus.FORBIDDEN);
         }
@@ -63,18 +71,12 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public ResponseEntity<?> employeeLogin(EmployeeLoginRequest request) throws IdentityException {
         EmployeeEntity employee;
-        try{
-            employee = openSearchOperations.getEmployeeById(request.getUsername(), request.getCompany());
-            if(employee != null && employee.getPassword() != null) {
-
         String company = request.getCompany();
         try {
             employee = openSearchOperations.getEmployeeById(request.getUsername(), request.getCompany());
-            System.out.println("The employee details is : "+employee.getEmployeeId());
             if (employee != null && employee.getPassword() != null) {
-
                 String password = new String(Base64.getDecoder().decode(employee.getPassword()), StandardCharsets.UTF_8);
-                if(request.getPassword().equals(password)) {
+                if (request.getPassword().equals(password)) {
                     log.debug("Successfully logged into ems portal for {}", request.getUsername());
                 } else {
                     log.error("Invalid credentials");
@@ -87,16 +89,15 @@ public class LoginServiceImpl implements LoginService {
                         HttpStatus.FORBIDDEN);
             }
         } catch (Exception e) {
-            log.error("Invalid creds {}", e.getMessage(),e);
+            log.error("Invalid creds {}", e.getMessage(), e);
             throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_CREDENTIALS),
                     HttpStatus.FORBIDDEN);
         }
-
         Long otp = generateOtp();
         sendOtpByEmail(request.getUsername(), otp);
         openSearchOperations.saveOtpToUser(employee, otp,company);
         List<String> roles = new ArrayList<>();
-        if(employee != null && employee.getRoles() != null && employee.getRoles().size() > 0) {
+        if (employee != null && employee.getRoles() != null && employee.getRoles().size() > 0) {
             roles.addAll(employee.getRoles());
         } else {
             roles.add(Constants.COMPANY_ADMIN);
@@ -106,6 +107,7 @@ public class LoginServiceImpl implements LoginService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(new LoginResponse(token, null)), HttpStatus.OK);
     }
+
 
     public void sendOtpByEmail(String emailId, Long otp) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
@@ -128,55 +130,48 @@ public class LoginServiceImpl implements LoginService {
         return null;
     }
 
-
     @Override
     public ResponseEntity<?> validateCompanyOtp(OTPRequest request) throws IdentityException {
         EmployeeEntity user;
         try {
-            log.debug("Validating OTP for user: " + request.getUsername() + " and company: " + request.getCompany());
             user = openSearchOperations.getEmployeeById(request.getUsername(), request.getCompany());
-
             if (user == null) {
-                log.error("No user found for username: " + request.getUsername() + " and company: " + request.getCompany());
-            } else {
-                log.debug("User details: " + user.toString());
+                log.debug("checking the user details..");
+                throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.USER_NOTFOUND),
+                        HttpStatus.NOT_FOUND);
             }
-
             if (user != null && user.getOtp() != null) { //1718988801
                 Long otp = user.getOtp();
-                long currentTime = Instant.now().plus(0,ChronoUnit.SECONDS).getEpochSecond();
+                long currentTime = Instant.now().getEpochSecond();
+                log.debug("the user found checking the otp..");
 
                 if (!request.getOtp().equals(otp)) {
-                    log.error("Invalid OTP for user: " + request.getUsername());
+                    log.error("Invalid OTP for user.. ");
                     throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_OTP),
                             HttpStatus.FORBIDDEN);
                 }
 
                 if (currentTime > user.getExpiryTime()) {
-                    log.error("OTP expired for user: " + request.getUsername());
+                    log.error("OTP expired for user..." );
                     throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.OTP_EXPIRED),
                             HttpStatus.FORBIDDEN);
                 }
-                log.debug("OTP is valid for user: " + request.getUsername());
+                log.debug("OTP is valid for user.." );
             } else {
-                log.error("Invalid credentials for user: " + request.getUsername());
+                log.error("Invalid credentials for user..");
                 throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_CREDENTIALS),
                         HttpStatus.FORBIDDEN);
             }
         } catch (IdentityException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Error validating OTP for user: " + request.getUsername(), e);
+            log.error("Error validating OTP for user.." ,e.getMessage(), e);
             throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_CREDENTIALS),
                     HttpStatus.FORBIDDEN);
         }
-
         return new ResponseEntity<>(
-                ResponseBuilder.builder().build().createSuccessResponse(new LoginResponse()), HttpStatus.OK);
+                ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
     }
-
-
-
 
     private Long generateOtp() {
         Random random = new Random();

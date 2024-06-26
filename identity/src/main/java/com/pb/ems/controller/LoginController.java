@@ -37,7 +37,7 @@ public class LoginController {
 
     @PostMapping("emsadmin/login")
     @io.swagger.v3.oas.annotations.Operation(
-            summary = "${api.login.tag}", description = "${api.login.description}")
+            summary = "${api.login.tag}", description = "{api.login.description}")
     @ResponseStatus(HttpStatus.OK)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) throws IdentityException {
@@ -70,6 +70,15 @@ public class LoginController {
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description= "CREATED")
     public ResponseEntity<?> compayLogin(@RequestBody @Valid EmployeeLoginRequest request) throws IdentityException {
         return loginService.employeeLogin(request);
+    }
+
+    @PostMapping("validate")
+    @io.swagger.v3.oas.annotations.Operation(
+            summary = "${api.login.otp}", description = "${api.adminlogin.description}")
+    @ResponseStatus(HttpStatus.CREATED)
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description= "CREATED")
+    public ResponseEntity<?> validateCompanyOtp(@RequestBody @Valid OTPRequest request) throws IdentityException {
+        return loginService.validateCompanyOtp(request);
     }
 
 
