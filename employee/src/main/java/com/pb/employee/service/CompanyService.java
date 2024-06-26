@@ -16,7 +16,7 @@ public interface CompanyService {
     ResponseEntity<?> registerCompany(CompanyRequest companyRequest) throws EmployeeException;
     ResponseEntity<?> getCompanies() throws EmployeeException;
     ResponseEntity<?> getCompanyById(String companyId) throws EmployeeException;
-    ResponseEntity<?> updateCompanyById(String companyId, CompanyUpdateRequest companyUpdateRequest,MultipartFile multipartFile)throws IOException;
-    ResponseEntity<?> deleteCompanyById(String companyId);
+    ResponseEntity<?> updateCompanyById(String companyId, CompanyUpdateRequest companyUpdateRequest) throws IOException, EmployeeException;
+    ResponseEntity<?> deleteCompanyById(String companyId) throws EmployeeException;
 
 }
