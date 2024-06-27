@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Envelope, Key, Lock, Unlock } from "react-bootstrap-icons";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useForm } from "react-hook-form";
 import { loginApi } from "../Utils/Axios";
 import { toast } from "react-toastify";
@@ -11,8 +11,10 @@ const EmsLogin = () => {
     register,
     handleSubmit,
     formState: { errors },
-    reset,} = useForm({defaultValues: {username: "",password: "",},});
-    
+    reset,
+  } = useForm({ defaultValues: { username: "", password: "" } });
+
+  const { companyName } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState([]);
   const [otpSent, setOtpSent] = useState(false); // Track if OTP is sent
@@ -34,18 +36,20 @@ const EmsLogin = () => {
   };
 
   const onSubmit = (data) => {
-      loginApi(data)
-      .then(response => {
+    const payload = {
+      ...data,
+      companyName: companyName,
+    };
+    loginApi(payload)
+      .then((response) => {
         console.log(response.data);
-        // Handle successful login
-        navigate('/main'); // Update the path as per your routing
-
+        toast.success("Login Successfully");
+        navigate("/main");
       })
-      .catch(error => {
+      .catch((error) => {
         toast.error("Login failed. Please try again.");
       });
   };
-
 
   return (
     <div>
@@ -108,36 +112,38 @@ const EmsLogin = () => {
                   </div>
                 )} */}
 
-{/* {!otpSent && ( */}
-                  <div className="input_field">
-                    <input
-                      name="password"
-                      placeholder="Password"
-                      onChange={handleEmailChange}
-                      type={passwordShown ? "text" : "password"}
-                      {...register("password", {
-                        required: "Password is Required",
-                        minLength: {
-                          value: 6,
-                          message: "Password must be at least 6 characters long"
-                        },
-                        // pattern: {
-                        //   value: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s)(?=.*[!@#$*])/,
-                        //   message: "Please Check Password You Entered",
-                        // },
-                      })}
-                    />
-                    {errors.password && (
-                      <p className="errorMsg" style={{ marginLeft: "44px" }}>
-                        {errors.password.message}
-                      </p>
-                    )}
-                    <span onClick={togglePasswordVisiblity} style={{ marginTop: "3px" }}>
-                      {passwordShown ? <Unlock size={20} /> : <Lock size={20} />}
-                    </span>
-                  </div>
+                {/* {!otpSent && ( */}
+                <div className="input_field">
+                  <input
+                    name="password"
+                    placeholder="Password"
+                    onChange={handleEmailChange}
+                    type={passwordShown ? "text" : "password"}
+                    {...register("password", {
+                      required: "Password is Required",
+                      minLength: {
+                        value: 6,
+                        message: "Password must be at least 6 characters long",
+                      },
+                      // pattern: {
+                      //   value: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s)(?=.*[!@#$*])/,
+                      //   message: "Please Check Password You Entered",
+                      // },
+                    })}
+                  />
+                  {errors.password && (
+                    <p className="errorMsg" style={{ marginLeft: "44px" }}>
+                      {errors.password.message}
+                    </p>
+                  )}
+                  <span
+                    onClick={togglePasswordVisiblity}
+                    style={{ marginTop: "3px" }}
+                  >
+                    {passwordShown ? <Unlock size={20} /> : <Lock size={20} />}
+                  </span>
+                </div>
                 {/* )} */}
-
 
                 <button className="button" type="submit">
                   {otpSent ? "Verify OTP and Login" : "Send OTP"}

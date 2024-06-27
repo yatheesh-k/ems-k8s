@@ -40,6 +40,7 @@ const CompanyLogin = () => {
   };
 
   const sendOtp = (data) => {
+    
     setLoading(true);
     const payload = {
       username: data.username,

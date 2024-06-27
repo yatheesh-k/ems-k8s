@@ -9,26 +9,22 @@ const token=sessionStorage.getItem("token");
 // Create an Axios instance
 const axiosInstance = axios.create({
     baseURL: BASE_URL,
-    headers: {
-        'Authorization':`Bearer ${token}`,
-        'Content-Type': 'application/json',
-    }
 });
 
-// Interceptor to add the token to headers
-// axiosInstance.interceptors.request.use(
-//     (config) => {
-//         const token = sessionStorage.getItem('token');
-//         if (token) {
-//             config.headers['Authorization'] = `Bearer ${token}`;
-//         }
-//         return Promise.resolve(config);
-//     },
-//     () => {
-//         return Promise.reject();
-//     }
-// );
-
+// Intercept requests to add JWT token to headers
+axiosInstance.interceptors.request.use(
+    config => {
+      const token = localStorage.getItem('jwtToken');
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
+      return config;
+    },
+    error => {
+      return Promise.reject(error);
+    }
+  );
+  
 
 export const loginApi = (data) => {
     return axios.post(`${Login_URL}/emsadmin/login`, data)
@@ -37,19 +33,31 @@ export const loginApi = (data) => {
             // Store the token and refresh token in sessionStorage
             sessionStorage.setItem('token', token);
             sessionStorage.setItem('refreshToken', refreshToken);
-
-            // Update the token in the axios instance
-            axiosInstance.defaults.headers['Authorization'] = `Bearer ${token}`;
-            
             return response.data;
         })
         .catch(error=>{
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                const { path, error: { message } } = error.response.data;
+                console.log(`Error at ${path}: ${message}`);
+                return Promise.reject(message); // Optionally, you can reject with the message
+              } else if (error.request) {
+                // The request was made but no response was received
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
+              }
             console.log(error);
         });
 };
 export const CompanyloginApi = (data) => {
     return axios.post(`${Login_URL}/company/login`, data)
         .then(response => {
+             // Store the token and refresh token in sessionStorage
+             sessionStorage.setItem('token', token);
+            //  sessionStorage.setItem('refreshToken', reToken);
             return response.data;
         })
         .catch(error=>{
@@ -58,9 +66,106 @@ export const CompanyloginApi = (data) => {
 };
 
 // Export your other APIs using the axiosInstance
-export const companyRegistationApi = () => axiosInstance.post('/company/');
+export const CompanyRegistrationApi = async (data) => {
+    try {
+      const response = await axiosInstance.post('/company', data);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+export const companyViewApi= async () => {
+    try {
+      const response = await axiosInstance.get('/company/all');
+      return response.data;
+    } catch (error) {
+      throw error;
+    } 
+  };
 
-export const companyViewApi=()=>axiosInstance.get('/company/all')
+  export const companyViewByIdApi= async (companyId) => {
+    try {
+      const response = await axiosInstance.get(`/company/${companyId}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    } 
+  };
+
+  export const companyDeleteByIdApi= async (companyId) => {
+    try {
+      const response = await axiosInstance.delete(`/company/${companyId}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    } 
+  };
+
+  export const companyUpdateByIdApi= async (companyId) => {
+    try {
+      const response = await axiosInstance.put(`/company/${companyId}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    } 
+  };
+
+
+  export const employeeAddApi= async (data) => {
+    try {
+      const response = await axiosInstance.post('/employee', data);
+      return response.data;
+    } catch (error) {
+      throw error;
+    } 
+  };
+
+  export const employeeViewApi= async () => {
+    try {
+      const response = await axiosInstance.get('/employee/all');
+      return response.data;
+    } catch (error) {
+      throw error;
+    } 
+  };
+
+  export const employeeViewById= async (employeeId) => {
+    try {
+      const response = await axiosInstance.get(`/company/${employeeId}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    } 
+  };
+
+  export const employeeUpdateByIdApi= async (employeeId) => {
+    try {
+      const response = await axiosInstance.put(`/employee/${employeeId}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    } 
+  };
+
+  export const employeeDeleteByIdApi= async (employeeId) => {
+    try {
+      const response = await axiosInstance.delete(`/employee/${employeeId}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    } 
+  };
+
+  
+
+
+
+
+
+
+
+
+
 
 
 export const departmentApi = () => axiosInstance.get('/department/all');
