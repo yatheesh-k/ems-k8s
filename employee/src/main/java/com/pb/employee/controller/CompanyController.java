@@ -27,7 +27,7 @@ import java.util.List;
 public class CompanyController {
     @Autowired
     private CompanyService companyService;
-    @RequestMapping(value = "/", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.registerCompany.tag}", description = "${api.registerCompany.description}")
     @ResponseStatus(HttpStatus.CREATED)
@@ -39,13 +39,13 @@ public class CompanyController {
         return companyService.registerCompany(companyRequest);
     }
 
-    @RequestMapping(value = "/all", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.getCompanies.tag}", description = "${api.getCompanies.description}")
     @ResponseStatus(HttpStatus.OK)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
     public ResponseEntity<?> getCompanies(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
-                                                  @RequestHeader(Constants.AUTH_KEY) String authToken) throws EmployeeException {
+                                          @RequestHeader(Constants.AUTH_KEY) String authToken) throws EmployeeException {
         return companyService.getCompanies();
     }
 
@@ -54,25 +54,29 @@ public class CompanyController {
             summary = "${api.getCompany.tag}", description = "${api.getCompany.description}")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
     public ResponseEntity<?> getCompanyById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
-                                              @RequestHeader(Constants.AUTH_KEY) String authToken,
-                                          @PathVariable String companyId) throws EmployeeException {
+                                            @RequestHeader(Constants.AUTH_KEY) String authToken,
+                                            @PathVariable String companyId) throws EmployeeException {
         return companyService.getCompanyById(companyId);
     }
 
-    @RequestMapping(value = "/{companyId}", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{companyId}", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
-            summary = "${api.registerCompany.tag}", description = "${api.registerCompany.description}")
+            summary = "${api.updateCompany.tag}", description = "${api.updateCompany.description}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "202", description= "Accepted")
     public ResponseEntity<?> updateCompanyById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
-                                                   @RequestHeader(Constants.AUTH_KEY) String authToken,
+                                               @RequestHeader(Constants.AUTH_KEY) String authToken,
                                                @PathVariable String companyId,
-                                               @ModelAttribute CompanyUpdateRequest companyUpdateRequest,
-                                               @RequestPart("file") MultipartFile multipartFile)throws IOException{
-        return companyService.updateCompanyById(companyId,companyUpdateRequest,multipartFile);
+                                               @RequestBody @Valid CompanyUpdateRequest companyUpdateRequest) throws IOException, EmployeeException {
+        return companyService.updateCompanyById(companyId,companyUpdateRequest);
     }
-    @DeleteMapping("/{companyId}")
-    public ResponseEntity<?> deleteCompanyById(@PathVariable String companyId){
+    @RequestMapping(value = "/{companyId}", method = RequestMethod.DELETE)
+    @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
+            summary = "${api.deleteCompany.tag}", description = "${api.deleteCompany.description}")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
+    public ResponseEntity<?> deleteCompanyById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
+                                               @RequestHeader(Constants.AUTH_KEY) String authToken,
+                                               @PathVariable String companyId) throws EmployeeException {
         return companyService.deleteCompanyById(companyId);
     }
 }
