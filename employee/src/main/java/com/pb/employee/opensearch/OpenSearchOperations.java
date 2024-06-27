@@ -4,10 +4,7 @@ import com.pb.employee.exception.EmployeeErrorMessageKey;
 import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.model.UserEntity;
-import com.pb.employee.persistance.model.CompanyEntity;
-import com.pb.employee.persistance.model.DepartmentEntity;
-import com.pb.employee.persistance.model.EmployeeEntity;
-import com.pb.employee.persistance.model.Entity;
+import com.pb.employee.persistance.model.*;
 import com.pb.employee.util.Constants;
 import com.pb.employee.util.ResourceIdUtils;
 import org.opensearch.client.opensearch.OpenSearchClient;
@@ -322,7 +319,33 @@ public class OpenSearchOperations {
 
         return employeeEntities;
     }
+    public List<SalaryEntity> getSalaries(String companyName) throws EmployeeException{
+        logger.debug("Getting employees for salary details {}", companyName);
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        boolQueryBuilder = boolQueryBuilder
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.SALARY)));
+        BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
+        SearchResponse<SalaryEntity> searchResponse = null;
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
 
+        try {
+            // Adjust the type or field according to your index structure
+            searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                    .query(finalBoolQueryBuilder.build()._toQuery()), SalaryEntity.class);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            throw new EmployeeException("Unable to search ", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
+        List<Hit<SalaryEntity>> hits = searchResponse.hits().hits();
+        logger.info("Number of employee hits for company {}: {}", companyName, hits.size());
+
+        List<SalaryEntity> salaryEntities = new ArrayList<>();
+        for (Hit<SalaryEntity> hit : hits) {
+            salaryEntities.add(hit.source());
+        }
+
+        return salaryEntities;
+    }
 
 }

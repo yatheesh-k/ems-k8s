@@ -17,6 +17,7 @@ public enum ResourceType {
     COMPANY("company"),
     EMPLOYEE("employee"),
     DEPARTMENT("department"),
+    SALARY("salary")
     ;
 
     private final String value;

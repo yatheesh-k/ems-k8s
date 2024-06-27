@@ -24,6 +24,9 @@ public class ResourceIdUtils {
     public static String generateEmployeeResourceId(String id) {
         return generateGlobalResourceId(ResourceType.EMPLOYEE, id);
     }
+    public static String generateSalaryResourceId(String employeeId) {
+        return generateGlobalResourceId(ResourceType.SALARY,employeeId);
+    }
     public static String generateCompanyIndex(String name) {
         return Constants.INDEX_EMS+"_"+name;
     }
@@ -54,6 +57,9 @@ public class ResourceIdUtils {
         }
         if (type == ResourceType.DEPARTMENT) {
             prefix = Constants.DEPARTMENT + "-";
+        }
+        if (type == ResourceType.SALARY) {
+            prefix = Constants.SALARY+ "-";
         }
             StringBuilder md5Input = new StringBuilder();
             for (Object arg : args) {
