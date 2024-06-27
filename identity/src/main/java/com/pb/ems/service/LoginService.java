@@ -14,4 +14,6 @@ public interface LoginService {
     ResponseEntity<?> employeeLogin(EmployeeLoginRequest request) throws IdentityException;
 
     ResponseEntity<?> logout(OTPRequest loginRequest);
+
+    ResponseEntity<?> validateCompanyOtp(OTPRequest request) throws  IdentityException;
 }
