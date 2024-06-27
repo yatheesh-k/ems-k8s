@@ -9,21 +9,25 @@ const token=sessionStorage.getItem("token");
 // Create an Axios instance
 const axiosInstance = axios.create({
     baseURL: BASE_URL,
+    headers:{
+      Authorization:`Bearer ${token}`,
+
+    }
 });
 
 // Intercept requests to add JWT token to headers
-axiosInstance.interceptors.request.use(
-    config => {
-      const token = localStorage.getItem('jwtToken');
-      if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`;
-      }
-      return config;
-    },
-    error => {
-      return Promise.reject(error);
-    }
-  );
+// axiosInstance.interceptors.request.use(
+//     config => {
+//       const token = localStorage.getItem('jwtToken');
+//       if (token) {
+//         config.headers['Authorization'] = `Bearer ${token}`;
+//       }
+//       return config;
+//     },
+//     error => {
+//       return Promise.reject(error);
+//     }
+//   );
   
 
 export const loginApi = (data) => {
@@ -66,14 +70,17 @@ export const CompanyloginApi = (data) => {
 };
 
 // Export your other APIs using the axiosInstance
-export const CompanyRegistrationApi = async (data) => {
-    try {
-      const response = await axiosInstance.post('/company', data);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  };
+// export const CompanyRegistrationApi = async (data) => {
+//     try {
+//       const response = await axiosInstance.post('/company', data);
+//       return response.data;
+//     } catch (error) {
+//       throw error;
+//     }
+//   };
+
+export const CompanyRegistrationApi = () => axiosInstance.post('/company');
+
 export const companyViewApi= async () => {
     try {
       const response = await axiosInstance.get('/company/all');
