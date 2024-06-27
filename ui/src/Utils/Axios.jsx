@@ -11,23 +11,11 @@ const axiosInstance = axios.create({
     baseURL: BASE_URL,
     headers:{
       Authorization:`Bearer ${token}`,
+      "Access-Control-Allow-Origin":"*"
 
     }
 });
 
-// Intercept requests to add JWT token to headers
-// axiosInstance.interceptors.request.use(
-//     config => {
-//       const token = localStorage.getItem('jwtToken');
-//       if (token) {
-//         config.headers['Authorization'] = `Bearer ${token}`;
-//       }
-//       return config;
-//     },
-//     error => {
-//       return Promise.reject(error);
-//     }
-//   );
   
 
 export const loginApi = (data) => {
