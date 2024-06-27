@@ -15,7 +15,7 @@ public class ResourceUtils {
             return md5Hash(user);
         }
 
-        private static String md5Hash(String user) {
+        public static String md5Hash(String user) {
             try {
                 // Using Apache Commons Codec for MD5 hashing
                 return DigestUtils.md5Hex(user);
