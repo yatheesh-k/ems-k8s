@@ -140,7 +140,7 @@ public class LoginServiceImpl implements LoginService {
                 throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.USER_NOTFOUND),
                         HttpStatus.NOT_FOUND);
             }
-            if (user != null && user.getOtp() != null) { //1718988801
+            if (user != null && user.getOtp() != null) {
                 Long otp = user.getOtp();
                 long currentTime = Instant.now().getEpochSecond();
                 log.debug("the user found checking the otp..");
