@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 
-const Header = () => {
+const Header = ({toggleSidebar}) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-
+  const navigate=useNavigate();
+  
   const toggleNotification = () => {
     setIsNotificationOpen(!isNotificationOpen);
     setIsProfileOpen(false);
@@ -15,9 +17,14 @@ const Header = () => {
     setIsNotificationOpen(false);
   };
 
+  const handleLogOut=()=>{
+    sessionStorage.clear();
+    navigate('/')
+  }
+
   return (
     <nav className="navbar navbar-expand navbar-light navbar-bg">
-      <a className="sidebar-toggle js-sidebar-toggle" href>
+      <a className="sidebar-toggle js-sidebar-toggle" onClick={toggleSidebar} href>
         <i className="hamburger align-self-center"></i>
       </a>
       <div className="navbar-collapse collapse">
@@ -76,7 +83,7 @@ const Header = () => {
                   <i className="align-middle me-1 bi bi-gear"></i> Settings
                 </a>
                 <div className="dropdown-divider"></div>
-                <a className="dropdown-item" href>
+                <a className="dropdown-item" onClick={handleLogOut} href>
                   Log out
                 </a>
               </div>

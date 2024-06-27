@@ -2,30 +2,30 @@ import React from 'react'
 import { Route, Routes } from 'react-router';
 import EmsLogin from '../Login/EmsLogin';
 import CompanyLogin from '../Login/CompanyLogin';
-import CompanyRegistration from '../EMS Module/Company/CompanyRegistration';
+import CompanyRegistration from '../EMSModule/Company/CompanyRegistration';
 import Body from '../LayOut/Body';
-import CompanyView from '../EMS Module/Company/CompanyView';
-import Department from '../Company Module/Department/Department';
-import Designation from '../Company Module/Designation/Designation';
-import EmployeeRegistration from '../Company Module/Employee/EmployeeRegistration';
-import EmployeeView from '../Company Module/Employee/EmployeeView';
-import ExistsEmpRegistration from '../Company Module/Existing Process/ExistsEmpRegistration';
-import ExistsEmployeeView from '../Company Module/Existing Process/ExistsEmployesView';
-import EmployeeSalaryStructure from '../Company Module/PayRoll/EmployeeSalaryStructure';
-import GeneratePaySlip from '../Company Module/PayRoll/GeneratePaySlips';
-import ViewPaySlips from '../Company Module/PayRoll/ViewPaySlips';
-import AddIncrement from '../Company Module/PayRoll/Hike/AddIncrement';
-import ViewIncrement from '../Company Module/PayRoll/Hike/ViewIncrementList';
-import ManageAttendance from '../Company Module/Attendance/ManageAttendance';
-import AttendanceList from '../Company Module/Attendance/AttendanceList';
-import AttendanceReport from '../Company Module/Attendance/AttendanceReport';
-import EmployeePayslips from '../Employee Module/EmployeePayslips';
-import OfferLetter from '../Employee Module/OfferLetter';
-import PaySlipLetter from '../Employee Module/PaySlipLetter';
-import HikeLetter from '../Employee Module/HikeLetter';
-import ExistingLetter from '../Employee Module/ExistingLetter';
-import CompanySalaryStructure from '../Company Module/PayRoll/CompanySalaryStructure';
-import EmployeeSalaryList from '../Company Module/PayRoll/EmployeeSalaryList';
+import CompanyView from '../EMSModule/Company/CompanyView';
+import Department from '../CompanyModule/Department/Department';
+import Designation from '../CompanyModule/Designation/Designation';
+import EmployeeRegistration from '../CompanyModule/Employee/EmployeeRegistration';
+import EmployeeView from '../CompanyModule/Employee/EmployeeView';
+import ExistsEmpRegistration from '../CompanyModule/ExistingProcess/ExistsEmpRegistration';
+import ExistsEmployeeView from '../CompanyModule/ExistingProcess/ExistsEmployesView';
+import EmployeeSalaryStructure from '../CompanyModule/PayRoll/EmployeeSalaryStructure';
+import GeneratePaySlip from '../CompanyModule/PayRoll/GeneratePaySlips';
+import ViewPaySlips from '../CompanyModule/PayRoll/ViewPaySlips';
+import AddIncrement from '../CompanyModule/PayRoll/Hike/AddIncrement';
+import ViewIncrement from '../CompanyModule/PayRoll/Hike/ViewIncrementList';
+import ManageAttendance from '../CompanyModule/Attendance/ManageAttendance';
+import AttendanceList from '../CompanyModule/Attendance/AttendanceList';
+import AttendanceReport from '../CompanyModule/Attendance/AttendanceReport';
+import EmployeePayslips from '../EmployeeModule/EmployeePayslips';
+import OfferLetter from '../EmployeeModule/OfferLetter';
+import PaySlipLetter from '../EmployeeModule/PaySlipLetter';
+import HikeLetter from '../EmployeeModule/HikeLetter';
+import ExistingLetter from '../EmployeeModule/ExistingLetter';
+import CompanySalaryStructure from '../CompanyModule/PayRoll/CompanySalaryStructure';
+import EmployeeSalaryList from '../CompanyModule/PayRoll/EmployeeSalaryList';
 
 
 
@@ -34,7 +34,7 @@ const Rout = () => {
   return (
 <Routes>
     <Route path='/emsAdmin/login' element={<EmsLogin/>}></Route>
-    <Route path='/company/login' element={<CompanyLogin/>}></Route>
+    <Route path='/:companyName/login' element={<CompanyLogin/>}></Route>
     <Route path='/main' element={<Body/>}></Route>
     <Route path='/companyRegistration' element={<CompanyRegistration/>}></Route>
     <Route path='/companyView' element={<CompanyView/>}></Route>

@@ -5848,6 +5848,25 @@
 	top: 0;
 	z-index: 1020;
   }
+
+  .fixed-sideNav {
+	width: 250px;
+	transition: width 0.3s ease;
+  }
+  
+  .fixed-sideNav.hidden {
+	width: 0px;
+	overflow: hidden;
+  }
+  
+  .main {
+	flex-grow: 1;
+	transition: margin-left 0.3s ease;
+  }
+  
+  .main.full-width {
+	margin-left: 0;
+  }
   
   @media (min-width: 576px) {
 	.sticky-sm-top {
