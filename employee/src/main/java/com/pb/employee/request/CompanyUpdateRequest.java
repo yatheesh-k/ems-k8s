@@ -1,8 +1,12 @@
 package com.pb.employee.request;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CompanyUpdateRequest {
 
     private String password;
@@ -13,7 +17,6 @@ public class CompanyUpdateRequest {
     private String personalMailId;
     private String personalMobileNo;
     private String address;
-    private String imageFile;
     private String companyType;
     private String companyBranch;
     private Long pfPercentage;

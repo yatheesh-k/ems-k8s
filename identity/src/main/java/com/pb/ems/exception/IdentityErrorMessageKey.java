@@ -9,7 +9,9 @@ public enum IdentityErrorMessageKey {
     INVALID_CREDENTIALS("invalid.credentials"),
     INVALID_TOKEN("invalid.token"),
     INVALID_USERNAME("invalid.username"),
-       ;
+    INVALID_OTP("invalid.otp"),
+    OTP_EXPIRED("otp.expired"),
+    USER_NOTFOUND("user.notfound");
 
     private final String key;
 

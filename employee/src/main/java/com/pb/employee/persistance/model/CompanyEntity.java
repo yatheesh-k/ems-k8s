@@ -20,6 +20,7 @@ public class CompanyEntity implements Entity{
     private String landNo;
     private String gstNo;
     private String panNo;
+    private String name;
     private String personalMailId;
     private String personalMobileNo;
     private String address;

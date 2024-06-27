@@ -4,6 +4,7 @@ import com.pb.ems.exception.IdentityException;
 import com.pb.ems.model.EmployeeEntity;
 import com.pb.ems.persistance.Entity;
 import com.pb.ems.util.Constants;
+import com.pb.ems.util.ResourceUtils;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.Result;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
@@ -15,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Component
 public class OpenSearchOperations {
@@ -24,6 +27,9 @@ public class OpenSearchOperations {
 
     @Autowired
     private OpenSearchClient esClient;
+
+    @Autowired
+    private ResourceUtils resourceIdUtils;
 
 
     public Entity saveEntity(Entity entity, String Id, String index) throws IdentityException {
@@ -61,7 +67,6 @@ public class OpenSearchOperations {
         }
         return Id;
     }
-
     public EmployeeEntity getEMSAdminById(String user) throws IOException {
         GetRequest getRequest = new GetRequest.Builder().id(Constants.EMS_ADMIN+"_"+user)
                 .index(Constants.INDEX_EMS).build();
@@ -73,7 +78,8 @@ public class OpenSearchOperations {
     }
     public EmployeeEntity getEmployeeById(String user, String company) throws IOException {
         String index = Constants.INDEX_EMS+"_"+company;
-        GetRequest getRequest = new GetRequest.Builder().id(Constants.EMPLOYEE+"_"+user)
+        String username = resourceIdUtils.md5Hash(user);
+        GetRequest getRequest = new GetRequest.Builder().id(Constants.EMPLOYEE+"-"+username)
                 .index(index).build();
         GetResponse<EmployeeEntity> searchResponse = esClient.get(getRequest, EmployeeEntity.class);
         if(searchResponse != null && searchResponse.source() != null){
@@ -81,6 +87,16 @@ public class OpenSearchOperations {
         }
         return null;
     }
+
+    public void saveOtpToUser(EmployeeEntity user, Long otp, String company) throws IdentityException {
+        user.setOtp(otp);
+        user.setExpiryTime(Instant.now().plus(40, ChronoUnit.SECONDS).getEpochSecond()); // Set expiry time, for example, 5 minutes from now
+        String index =  Constants.INDEX_EMS +"_"+ company; // Use dynamic index
+        String id = Constants.EMPLOYEE+"-"+resourceIdUtils.md5Hash(user.getEmailId());
+        saveEntity(user,id , index);  // Ensure this method saves the user entity to the correct index
+        logger.info("The otp and expiry time saved into the db for index: " + index);
+    }//save the entity
+
 
     public SearchResponse<Object> searchByQuery(BoolQuery.Builder query, String index, Class targetClass) throws IdentityException {
         SearchResponse searchResponse = null;
@@ -93,4 +109,7 @@ public class OpenSearchOperations {
         }
         return searchResponse;
     }
+
+
+
 }

@@ -14,12 +14,12 @@ import lombok.Setter;
 @Builder
 public class LoginRequest {
 
-    @NotEmpty(message = "{user.username.missing.members}")
+    @NotEmpty(message = "{user.username.message}")
     @Schema(required = true,  description = "${login.username.description}", example = "admin")
     @JsonProperty("username")
     private String username;
 
-    @NotEmpty(message = "{user.password.missing.members}")
+    @NotEmpty(message = "{user.password.message}")
     @Schema(required = true,  description = "${login.password.description}", example = "password")
     @JsonProperty("password")
     private String password;

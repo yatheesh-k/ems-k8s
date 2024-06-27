@@ -9,8 +9,10 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ValidateLoginRequest {
+public class DepartmentRequest {
 
-    private String userName;
-    private String token;
+    @NotBlank(message = "{companyname.missing.message}")
+    private String companyName;
+    private int id;
+    private String name;
 }

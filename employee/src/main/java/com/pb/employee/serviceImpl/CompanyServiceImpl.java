@@ -12,7 +12,6 @@ import com.pb.employee.persistance.model.EmployeeEntity;
 import com.pb.employee.persistance.model.Entity;
 import com.pb.employee.request.CompanyRequest;
 import com.pb.employee.request.CompanyUpdateRequest;
-import com.pb.employee.response.CompanyResponse;
 import com.pb.employee.service.CompanyService;
 import com.pb.employee.util.CompanyUtils;
 import com.pb.employee.util.Constants;
@@ -24,6 +23,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
@@ -32,6 +33,8 @@ import java.util.List;
 @Slf4j
 public class CompanyServiceImpl implements CompanyService {
 
+    @Value("${file.upload.path}")
+    private String folderPath;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -118,16 +121,55 @@ public class CompanyServiceImpl implements CompanyService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(companyEntity), HttpStatus.OK);
     }
-
     @Override
-    public ResponseEntity<?> updateCompanyById(String companyId, CompanyUpdateRequest companyUpdateRequest, MultipartFile file) throws IOException {
-       return null;
+    public ResponseEntity<?> updateCompanyById(String companyId,  CompanyUpdateRequest companyUpdateRequest) throws EmployeeException, IOException {
+        CompanyEntity user;
+        try {
+            user = openSearchOperations.getCompanyById(companyId, null, Constants.INDEX_EMS);
+            if (user == null) {
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_COMPANY),
+                        HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception ex) {
+            log.error("Exception while fetching user {}, {}", companyId, ex);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_COMPANY),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        Entity entity = CompanyUtils.maskCompanyUpdateProperties(user, companyUpdateRequest, companyId);
+        openSearchOperations .saveEntity(entity, companyId, Constants.INDEX_EMS);
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
     }
 
-
-    @Override
-    public ResponseEntity<?> deleteCompanyById(String companyId) {
-       return null;
+    public void multiPartFileStore(MultipartFile file, CompanyEntity company) throws IOException, EmployeeException {
+        if(!file.isEmpty()){
+            String filename = folderPath+company.getCompanyName()+"_"+file.getOriginalFilename();
+            file.transferTo(new File(filename));
+            company.setImageFile(filename);
+            ResponseEntity.ok(filename);
+        }
     }
+    @Override
+    public ResponseEntity<?> deleteCompanyById(String companyId) throws EmployeeException {
+        log.info("getting details of {}", companyId);
+        CompanyEntity companyEntity = null;
+        try {
+            companyEntity = openSearchOperations.getCompanyById(companyId, null, Constants.INDEX_EMS);
+            if (companyEntity!=null) {
+                openSearchOperations.deleteEntity(companyEntity.getId(),Constants.INDEX_EMS);
+                System.out.println("THe conpany si i:"+companyEntity.getId());
+            }
+        } catch (Exception ex) {
+            log.error("Exception while fetching company details {}", ex);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_DELETE_COMPANY),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(Constants.DELETED), HttpStatus.OK);
+
+    }
+
 
 }

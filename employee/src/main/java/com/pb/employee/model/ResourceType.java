@@ -16,6 +16,7 @@ public enum ResourceType {
     EMS_ADMIN("ems_admin"),
     COMPANY("company"),
     EMPLOYEE("employee"),
+    DEPARTMENT("department"),
     ;
 
     private final String value;

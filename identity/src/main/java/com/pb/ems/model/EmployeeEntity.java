@@ -39,4 +39,7 @@ public class EmployeeEntity implements Entity {
     private String accountNo;
     private String ifscCode;
     private String bankName;
+
+    private Long otp;
+    private Long expiryTime;
 }
