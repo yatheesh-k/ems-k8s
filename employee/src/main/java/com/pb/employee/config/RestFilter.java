@@ -6,6 +6,7 @@ import com.pb.employee.auth.JwtTokenUtil;
 import com.pb.employee.common.ResponseErrorObject;
 import com.pb.employee.common.ResponseObject;
 import com.pb.employee.request.ValidateLoginRequest;
+import com.pb.employee.util.Constants;
 import feign.FeignException;
 import io.jsonwebtoken.*;
 import jakarta.servlet.*;
@@ -44,7 +45,7 @@ public class RestFilter implements Filter {
                             throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
-        String token = req.getHeader("Authorization");
+        String token = req.getHeader(Constants.AUTH_KEY);
         String uri = req.getRequestURI();
         Set<String> excludeAPIList = new HashSet<>();
         excludeAPIList.add("/ems/health");
