@@ -10,6 +10,7 @@ import com.pb.employee.opensearch.OpenSearchOperations;
 import com.pb.employee.persistance.model.CompanyEntity;
 import com.pb.employee.persistance.model.EmployeeEntity;
 import com.pb.employee.persistance.model.Entity;
+import com.pb.employee.request.CompanyImageUpdate;
 import com.pb.employee.request.CompanyRequest;
 import com.pb.employee.request.CompanyUpdateRequest;
 import com.pb.employee.service.CompanyService;
@@ -142,9 +143,32 @@ public class CompanyServiceImpl implements CompanyService {
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
     }
 
+    @Override
+    public ResponseEntity<?> updateCompanyImageById(String companyId,  CompanyImageUpdate companyImageUpdate, MultipartFile multipartFile) throws EmployeeException, IOException {
+        CompanyEntity user;
+        try {
+            user = openSearchOperations.getCompanyById(companyId, null, Constants.INDEX_EMS);
+            if (user == null) {
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_COMPANY),
+                        HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception ex) {
+            log.error("Exception while fetching user {}, {}", companyId, ex);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_COMPANY),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        Entity entity = CompanyUtils.maskCompanyImageUpdateProperties(user, companyImageUpdate, companyId);
+        if (!multipartFile.isEmpty()){
+            multiPartFileStore(multipartFile, (CompanyEntity) entity);
+        }
+        openSearchOperations .saveEntity(entity, companyId, Constants.INDEX_EMS);
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
+    }
     public void multiPartFileStore(MultipartFile file, CompanyEntity company) throws IOException, EmployeeException {
         if(!file.isEmpty()){
-            String filename = folderPath+company.getCompanyName()+"_"+file.getOriginalFilename();
+            String filename = folderPath+company.getShortName()+"_"+file.getOriginalFilename();
             file.transferTo(new File(filename));
             company.setImageFile(filename);
             ResponseEntity.ok(filename);

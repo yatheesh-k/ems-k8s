@@ -5,8 +5,15 @@ import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.model.UserEntity;
 import com.pb.employee.persistance.model.*;
+
+import com.pb.employee.persistance.model.CompanyEntity;
+import com.pb.employee.persistance.model.DepartmentEntity;
+import com.pb.employee.persistance.model.DesignationEntity;
+import com.pb.employee.persistance.model.EmployeeEntity;
+import com.pb.employee.persistance.model.Entity;
 import com.pb.employee.util.Constants;
 import com.pb.employee.util.ResourceIdUtils;
+import org.bouncycastle.asn1.DERBMPString;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.Result;
 import org.opensearch.client.opensearch._types.mapping.KeywordProperty;
@@ -138,18 +145,62 @@ public class OpenSearchOperations {
         }
         return null;
     }
-
     public DepartmentEntity getDepartmentById(String resourceId, String type, String index) throws IOException {
         if(type != null) {
             resourceId = type+"_"+resourceId;
         }
         GetRequest getRequest = new GetRequest.Builder().id(resourceId)
                 .index(index).build();
+
         GetResponse<DepartmentEntity> searchResponse = esClient.get(getRequest, DepartmentEntity.class);
         if(searchResponse != null && searchResponse.source() != null){
             return searchResponse.source();
         }
         return null;
+    }
+
+    public DesignationEntity getDesignationById(String resourceId, String type, String index) throws IOException {
+        if(type != null) {
+            resourceId = type+"_"+resourceId;
+        }
+        GetRequest getRequest = new GetRequest.Builder().id(resourceId)
+                .index(index).build();
+        GetResponse<DesignationEntity> searchResponse = esClient.get(getRequest, DesignationEntity.class);
+        if(searchResponse != null && searchResponse.source() != null){
+            return searchResponse.source();
+        }
+        return null;
+    }
+
+    public List<DesignationEntity> getCompanyDesignationByName(String companyName, String designationName) throws EmployeeException {
+        logger.debug("Getting the Resource by id {}", companyName, designationName);
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        boolQueryBuilder = boolQueryBuilder
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.DESIGNATION)));
+        if(designationName != null) {
+            boolQueryBuilder = boolQueryBuilder
+                    .filter(q -> q.matchPhrase(t -> t.field(Constants.NAME).query(designationName)));
+        }
+        BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
+        SearchResponse<DesignationEntity> searchResponse = null;
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+        try {
+            searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                    .query(finalBoolQueryBuilder.build()._toQuery()), DesignationEntity.class);
+        } catch (IOException e) {
+            e.getStackTrace();
+            logger.error(e.getMessage());
+            throw new EmployeeException("Unable to search ", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        List<Hit<DesignationEntity>> hits = searchResponse.hits().hits();
+        logger.info("Number of hits {}", hits.size());
+        List<DesignationEntity> designationEntities = new ArrayList<>();
+        if(hits.size() > 0) {
+            for(Hit<DesignationEntity> hit : hits){
+                designationEntities.add(hit.source());
+            }
+        }
+        return designationEntities;
     }
 
     public List<CompanyEntity> getCompanyByData(String companyName, String type, String shortName) throws EmployeeException {

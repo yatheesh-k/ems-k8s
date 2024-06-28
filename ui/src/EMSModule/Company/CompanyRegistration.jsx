@@ -28,7 +28,11 @@ const CompanyRegistration = () => {
 
   const onSubmit = async (data) => {
     try {
-      await CompanyRegistrationApi(data);
+      await CompanyRegistrationApi(data)
+      .then((response)=>{
+        console.log(response.data.data.message)
+        reset();
+      })
       // Handle successful registration
     } catch (error) {
       console.error('Registration failed:', error);
