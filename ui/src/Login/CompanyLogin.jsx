@@ -73,7 +73,7 @@ const CompanyLogin = () => {
 
   const verifyOtpAndCompanyLogin = (data) => {
     setLoading(true)
-    axios.post("http://192.168.1.163:8092/CompanyLogin/validate-otp", data)
+    axios.post("http://localhost:8092/CompanyLogin/validate-otp", data)
       .then((response) => {
         if (response.status === 200) {
           toast.success("CompanyLogin Successful", {

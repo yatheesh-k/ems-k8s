@@ -28,7 +28,7 @@ import java.util.List;
 public class CompanyController {
     @Autowired
     private CompanyService companyService;
-    @RequestMapping(value = "", method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "", method = RequestMethod.POST)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.registerCompany.tag}", description = "${api.registerCompany.description}")
     @ResponseStatus(HttpStatus.CREATED)

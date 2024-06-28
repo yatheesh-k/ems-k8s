@@ -11,8 +11,9 @@ const axiosInstance = axios.create({
     baseURL: BASE_URL,
     headers:{
       Authorization:`Bearer ${token}`,
-      "Access-Control-Allow-Origin":"*"
-
+      'Access-Control-Allow-Origin':'*/*',
+      'Content-Type':'application/json',
+      crossDomain:true
     }
 });
 
@@ -67,7 +68,9 @@ export const CompanyloginApi = (data) => {
 //     }
 //   };
 
-export const CompanyRegistrationApi = () => axiosInstance.post('/company');
+export const CompanyRegistrationApi = (data) => {
+    return axiosInstance.post('/company', data);
+    }
 
 export const companyViewApi= async () => {
     try {
