@@ -64,6 +64,23 @@ public class SalaryServiceImpl implements SalaryService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.CREATED);
     }
+
+    @Override
+    public ResponseEntity<?> getEmployeeSalary(String companyName,String employeeId) throws EmployeeException {
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+
+        List<SalaryEntity> salaryEntities = null;
+        try {
+            salaryEntities = openSearchOperations.getSalaries(companyName);
+        }
+        catch (Exception ex) {
+            log.error("Exception while fetching salaries for employees {}: {}", employeeId, ex.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(salaryEntities), HttpStatus.OK);
+    }
     @Override
     public ResponseEntity<?> getEmployeeSalaryById(String companyName, String employeeId,String salaryId) throws EmployeeException {
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
@@ -84,7 +101,7 @@ public class SalaryServiceImpl implements SalaryService {
     }
 
     @Override
-    public ResponseEntity<?> updateEmployeeSalaryById(String companyName, String employeeId, EmployeeUpdateRequest employeeUpdateRequest) {
+    public ResponseEntity<?> updateEmployeeSalaryById(String companyName, String employeeId,String salaryId,EmployeeUpdateRequest employeeUpdateRequest) {
         return null;
     }
 
@@ -94,8 +111,8 @@ public class SalaryServiceImpl implements SalaryService {
         List<SalaryEntity> salaryEntities = null;
         Object entity = null;
         try {
-            String employee = ResourceIdUtils.generateSalaryResourceId(employeeId);
-            entity = openSearchOperations.deleteEntity(employee, index);
+            String salaryResourceId = ResourceIdUtils.generateSalaryResourceId(employeeId);
+            entity = openSearchOperations.deleteEntity(salaryResourceId, index);
         }
         catch (Exception ex) {
             log.error("Exception while deleting salaries for employees {}: {}", salaryId, ex.getMessage());
@@ -107,24 +124,7 @@ public class SalaryServiceImpl implements SalaryService {
 
     }
 
-    @Override
-    public ResponseEntity<?> getEmployeeSalary(String companyName,String employeeId) throws EmployeeException {
-        String index = ResourceIdUtils.generateCompanyIndex(companyName);
 
-        List<SalaryEntity> salaryEntities = null;
-        Object entity = null;
-        try {
-            salaryEntities = openSearchOperations.getSalaries(companyName);
-            entity = openSearchOperations.getById(employeeId, null, index);
-        }
-        catch (Exception ex) {
-            log.error("Exception while fetching salaries for employees {}: {}", employeeId, ex.getMessage());
-            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<>(
-                ResponseBuilder.builder().build().createSuccessResponse(salaryEntities), HttpStatus.OK);
-    }
 
 
 

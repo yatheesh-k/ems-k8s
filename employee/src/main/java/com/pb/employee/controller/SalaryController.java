@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -49,7 +50,7 @@ public class SalaryController {
 
      @RequestMapping(value = "/{companyName}/employee/{employeeId}/{salaryId}", method = RequestMethod.GET)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
-            summary = "${api.getEmployee.tag}", description = "${api.getEmployee.description}")
+            summary = "${api.getSalary.tag}", description = "${api.getSalary.description}")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
     public ResponseEntity<?> getEmployeeSalaryById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                              @RequestHeader(Constants.AUTH_KEY) String authToken,
@@ -62,18 +63,19 @@ public class SalaryController {
 
     @RequestMapping(value = "/{companyName}/employee/{employeeId}/{salaryId}", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
-            summary = "${api.updateEmployee.tag}", description = "${api.updateEmployee.description}")
+            summary = "${api.updateSalary.tag}", description = "${api.updateSalary.description}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "202", description= "Accepted")
     public ResponseEntity<?> updateEmployeeSalaryById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                                @RequestHeader(Constants.AUTH_KEY) String authToken,
                                                @PathVariable String companyName, @PathVariable String employeeId,
+                                               @PathVariable String salaryId,
                                                @RequestBody @Valid  EmployeeUpdateRequest employeeUpdateRequest) throws IOException, EmployeeException {
-        return salaryService.updateEmployeeSalaryById(companyName,employeeId, employeeUpdateRequest);
+        return salaryService.updateEmployeeSalaryById(companyName,employeeId,salaryId, employeeUpdateRequest);
     }
     @RequestMapping(value = "/{companyName}/employee/{employeeId}/{salaryId}", method = RequestMethod.DELETE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
-            summary = "${api.deleteEmployee.tag}", description = "${api.deleteEmployee.description}")
+            summary = "${api.deleteSalary.tag}", description = "${api.deleteSalary.description}")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
     public ResponseEntity<?> deleteEmployeeSalaryById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                                 @RequestHeader(Constants.AUTH_KEY) String authToken,
