@@ -52,7 +52,7 @@ public class ResourceIdUtils {
      */
     public static String generateGlobalResourceId(ResourceType type, Object... args) {
         boolean isCaseSensitive = false;
-        String prefix = Constants.DEFAULT+"-";
+        String prefix = Constants.DEFAULT + "-";
         if (type == ResourceType.COMPANY) {
             prefix = Constants.COMPANY + "-";
         }
@@ -63,11 +63,12 @@ public class ResourceIdUtils {
             prefix = Constants.DEPARTMENT + "-";
         }
         if (type == ResourceType.SALARY) {
-            prefix = Constants.SALARY+ "-";
-        if (type == ResourceType.DESIGNATION) {
-            prefix = Constants.DESIGNATION + "-";
-
+            prefix = Constants.SALARY + "-";
         }
+            if (type == ResourceType.DESIGNATION) {
+                prefix = Constants.DESIGNATION + "-";
+
+            }
             StringBuilder md5Input = new StringBuilder();
             for (Object arg : args) {
                 if (arg != null) {

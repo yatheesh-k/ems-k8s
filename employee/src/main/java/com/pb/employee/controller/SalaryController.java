@@ -20,7 +20,7 @@ import java.io.IOException;
 
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/")
+@RequestMapping("")
 public class SalaryController {
     @Autowired
     private SalaryService salaryService;
