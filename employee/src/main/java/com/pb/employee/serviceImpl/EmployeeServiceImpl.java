@@ -118,10 +118,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public ResponseEntity<?> updateEmployeeById(String companyName, String employeeId, EmployeeUpdateRequest employeeUpdateRequest) throws IOException, EmployeeException {
+    public ResponseEntity<?> updateEmployeeById(String employeeId, EmployeeUpdateRequest employeeUpdateRequest) throws IOException, EmployeeException {
         log.info("getting details of {}", employeeId);
         EmployeeEntity user;
-        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+        String index = ResourceIdUtils.generateCompanyIndex(employeeUpdateRequest.getCompanyName());
         try {
             user = openSearchOperations.getEmployeeById(employeeId, null, index);
 

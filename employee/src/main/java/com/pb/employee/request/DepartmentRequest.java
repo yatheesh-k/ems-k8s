@@ -13,6 +13,5 @@ public class DepartmentRequest {
 
     @NotBlank(message = "{companyname.message}")
     private String companyName;
-    private int id;
     private String name;
 }

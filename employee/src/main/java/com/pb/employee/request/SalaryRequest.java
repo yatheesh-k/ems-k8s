@@ -13,9 +13,9 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SalaryRequest{
+    
 
-    private String salaryId;
-
+    @NotBlank(message = "{companyname.message}")
     private String companyName;
     private Double basicSalary;
     private Double fixedAmount;

@@ -10,7 +10,7 @@ public interface DesignationService {
 
     ResponseEntity<?> registerDesignation(DesignationRequest designationRequest) throws EmployeeException;
     ResponseEntity<?> getDesignationById(String companyName, String designationId) throws EmployeeException;
-    ResponseEntity<?> updateDesignationById(String companyName, String designationId, DesignationUpdateRequest designationUpdateRequest) throws EmployeeException;
+    ResponseEntity<?> updateDesignationById(String designationId, DesignationUpdateRequest designationUpdateRequest) throws EmployeeException;
     ResponseEntity<?> deleteDesignation(String companyName, String designationId) throws EmployeeException;
     ResponseEntity<?> getDesignation(String companyName) throws EmployeeException;
 

@@ -36,9 +36,9 @@ public class DepartmentServiceImpl implements DepartmentService {
     private OpenSearchOperations openSearchOperations;
 
     @Override
-    public ResponseEntity<?> registerDepartment(DepartmentRequest departmentRequest, String companyName) throws EmployeeException{
+    public ResponseEntity<?> registerDepartment(DepartmentRequest departmentRequest) throws EmployeeException{
         // Check if a company with the same short or company name already exists
-        log.debug("validating name {} Id {} exsited ", departmentRequest.getName(), departmentRequest.getId());
+        log.debug("validating name {} exsited ", departmentRequest.getName());
         String resourceId = ResourceIdUtils.generateDepartmentResourceId(departmentRequest.getName());
         Object entity = null;
         String index = ResourceIdUtils.generateCompanyIndex(departmentRequest.getCompanyName());
@@ -109,10 +109,10 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public ResponseEntity<?> updateDepartmentById(String companyName, String departmentId, DepartmentUpdateRequest departmentUpdateRequest) throws EmployeeException {
+    public ResponseEntity<?> updateDepartmentById(String departmentId, DepartmentUpdateRequest departmentUpdateRequest) throws EmployeeException {
         log.info("getting details of {}", departmentId);
         DepartmentEntity departmentEntity;
-        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+        String index = ResourceIdUtils.generateCompanyIndex(departmentUpdateRequest.getCompanyName());
         try {
             departmentEntity = openSearchOperations.getDepartmentById(departmentId, null, index);
             if (departmentEntity == null) {

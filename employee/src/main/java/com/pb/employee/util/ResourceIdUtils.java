@@ -64,11 +64,13 @@ public class ResourceIdUtils {
         }
         if (type == ResourceType.SALARY) {
             prefix = Constants.SALARY + "-";
-        }
-            if (type == ResourceType.DESIGNATION) {
-                prefix = Constants.DESIGNATION + "-";
 
-            }
+        }
+        if (type == ResourceType.DESIGNATION) {
+            prefix = Constants.DESIGNATION + "-";
+
+        }
+           
             StringBuilder md5Input = new StringBuilder();
             for (Object arg : args) {
                 if (arg != null) {

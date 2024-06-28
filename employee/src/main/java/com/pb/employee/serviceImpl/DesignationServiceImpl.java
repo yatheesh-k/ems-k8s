@@ -34,7 +34,7 @@ public class DesignationServiceImpl implements DesignationService {
     @Override
     public ResponseEntity<?> registerDesignation(DesignationRequest designationRequest) throws EmployeeException{
         // Check if a company with the same short or company name already exists
-        log.debug("validating name {} Id {} exsited ", designationRequest.getName(), designationRequest.getId());
+        log.debug("validating name {} existed ", designationRequest.getName());
 
         String resourceId = ResourceIdUtils.generateDesignationResourceId(designationRequest.getName());
         Object entity = null;
@@ -107,10 +107,10 @@ public class DesignationServiceImpl implements DesignationService {
     }
 
     @Override
-    public ResponseEntity<?> updateDesignationById(String companyName, String designationId, DesignationUpdateRequest designationUpdateRequest) throws EmployeeException {
+    public ResponseEntity<?> updateDesignationById(String designationId, DesignationUpdateRequest designationUpdateRequest) throws EmployeeException {
         log.info("getting details of {}", designationId);
         DesignationEntity designationEntity;
-        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+        String index = ResourceIdUtils.generateCompanyIndex(designationUpdateRequest.getCompanyName());
         try {
             designationEntity = openSearchOperations.getDesignationById(designationId, null, index);
             if (designationEntity == null) {
@@ -157,4 +157,3 @@ public class DesignationServiceImpl implements DesignationService {
 
     }
 }
-

@@ -16,9 +16,9 @@ public interface SalaryService {
 
     ResponseEntity<?> getEmployeeSalary(String companyName,String employeeId) throws EmployeeException;
 
-    ResponseEntity<?> getEmployeeSalaryById(String companyName, String employeeId,String salaryId)throws EmployeeException;
+    ResponseEntity<?> getEmployeeSalaryById(String companyName, String employeeId,String salaryId) throws EmployeeException, IOException;
 
-    ResponseEntity<?> updateEmployeeSalaryById(String companyName, String employeeId, String companyId,EmployeeUpdateRequest employeeUpdateRequest);
+    ResponseEntity<?> updateEmployeeSalaryById(String employeeId, SalaryRequest salaryRequest, String salaryId) throws EmployeeException;
 
-    ResponseEntity<?> deleteEmployeeSalaryById(String companyName,String employeeId,String salaryId)throws EmployeeException ;
+    public ResponseEntity<?> deleteEmployeeSalaryById(String companyNae,String employeeId, String salaryId) throws EmployeeException;
 }

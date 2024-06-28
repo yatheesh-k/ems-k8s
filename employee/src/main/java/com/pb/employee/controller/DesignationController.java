@@ -26,19 +26,19 @@ public class DesignationController {
             summary = "${api.registerDesignation.tag}", description = "${api.registerDesignation.description}")
     @ResponseStatus(HttpStatus.CREATED)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description= "CREATED")
-    public ResponseEntity<?> registerCompany(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
-                                             @RequestHeader(Constants.AUTH_KEY) String authToken,
-                                             @Parameter(required = true, description = "${api.registerDesignationPayload.description}")
-                                             @RequestBody @Valid DesignationRequest designationRequest) throws EmployeeException {
+    public ResponseEntity<?> registerDesignation(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
+                                                 @RequestHeader(Constants.AUTH_KEY) String authToken,
+                                                 @Parameter(required = true, description = "${api.registerDesignationPayload.description}")
+                                                 @RequestBody @Valid DesignationRequest designationRequest) throws EmployeeException {
         return designationService.registerDesignation(designationRequest);
     }
 
-    @RequestMapping(value = "/{companyName}/designation", method = RequestMethod.GET)
+    @RequestMapping(value = "/{companyName}/designations", method = RequestMethod.GET)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.getDesignation.tag}", description = "${api.getDesignation.description}")
     @ResponseStatus(HttpStatus.OK)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
-    public ResponseEntity<?> getDepartments(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
+    public ResponseEntity<?> getDesignation(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                             @RequestHeader(Constants.AUTH_KEY) String authToken,
                                             @PathVariable String companyName) throws EmployeeException {
         return designationService.getDesignation(companyName);
@@ -46,11 +46,11 @@ public class DesignationController {
 
     @RequestMapping(value = "/{companyName}/designation/{designationId}", method = RequestMethod.GET)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
-            summary = "${api.getDepartment.tag}", description = "${api.getDesignation.description}")
+            summary = "${api.getDesignation.tag}", description = "${api.getDesignation.description}")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
-    public ResponseEntity<?> getCompanyById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
-                                            @RequestHeader(Constants.AUTH_KEY) String authToken,
-                                            @PathVariable String companyName, @PathVariable String designationId) throws EmployeeException {
+    public ResponseEntity<?> getDesignationById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
+                                                @RequestHeader(Constants.AUTH_KEY) String authToken,
+                                                @PathVariable String companyName, @PathVariable String designationId) throws EmployeeException {
         return designationService.getDesignationById(companyName, designationId);
     }
 
@@ -59,22 +59,20 @@ public class DesignationController {
             summary = "${api.updateDesignation.tag}", description = "${api.updateDesignation.description}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "202", description= "Accepted")
-    public ResponseEntity<?> updateCompanyById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
-                                               @RequestHeader(Constants.AUTH_KEY) String authToken,
-                                               @PathVariable String companyName,
-                                               @PathVariable String designationId,
-                                               @RequestBody @Valid DesignationUpdateRequest departmentUpdateRequest) throws EmployeeException {
-        return designationService.updateDesignationById(companyName, designationId, departmentUpdateRequest);
+    public ResponseEntity<?> updateDesignationById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
+                                                   @RequestHeader(Constants.AUTH_KEY) String authToken,
+                                                   @PathVariable String designationId,
+                                                   @RequestBody @Valid DesignationUpdateRequest departmentUpdateRequest) throws EmployeeException {
+        return designationService.updateDesignationById(designationId, departmentUpdateRequest);
     }
-    @RequestMapping(value = "/{companyName}/designation/{designationId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/designation/{designationId}", method = RequestMethod.DELETE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
-            summary = "${api.deleteCompany.tag}", description = "${api.deleteCompany.description}")
+            summary = "${api.deleteDesignation.tag}", description = "${api.deleteCompany.description}")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
-    public ResponseEntity<?> deleteCompanyById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
+    public ResponseEntity<?> deleteDesignation(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                                @RequestHeader(Constants.AUTH_KEY) String authToken,
                                                @PathVariable String companyName,
                                                @PathVariable String designationId) throws EmployeeException {
         return designationService.deleteDesignation(companyName, designationId);
     }
 }
-

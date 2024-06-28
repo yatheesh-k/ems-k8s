@@ -10,8 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 public class DesignationRequest {
 
-    @NotBlank(message = "{companyname.missing.message}")
+    @NotBlank(message = "{companyname.message}")
     private String companyName;
-    private int id;
     private String name;
 }

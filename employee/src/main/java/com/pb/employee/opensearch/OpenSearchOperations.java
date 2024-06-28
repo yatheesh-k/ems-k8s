@@ -171,6 +171,18 @@ public class OpenSearchOperations {
         }
         return null;
     }
+    public SalaryEntity getSalaryById(String resourceId, String type, String index) throws IOException {
+        if(type != null) {
+            resourceId = type+"_"+resourceId;
+        }
+        GetRequest getRequest = new GetRequest.Builder().id(resourceId)
+                .index(index).build();
+        GetResponse<SalaryEntity> searchResponse = esClient.get(getRequest, SalaryEntity.class);
+        if(searchResponse != null && searchResponse.source() != null){
+            return searchResponse.source();
+        }
+        return null;
+    }
 
     public List<DesignationEntity> getCompanyDesignationByName(String companyName, String designationName) throws EmployeeException {
         logger.debug("Getting the Resource by id {}", companyName, designationName);
@@ -398,5 +410,6 @@ public class OpenSearchOperations {
 
         return salaryEntities;
     }
+
 
 }

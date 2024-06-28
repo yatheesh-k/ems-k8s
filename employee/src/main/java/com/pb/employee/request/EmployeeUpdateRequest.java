@@ -1,5 +1,6 @@
 package com.pb.employee.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.List;
@@ -9,7 +10,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmployeeUpdateRequest {
-
+    @NotBlank(message = "{companyname.message}")
+    private String companyName;
     private String employeeType;
     private String emailId;
     private String password;
