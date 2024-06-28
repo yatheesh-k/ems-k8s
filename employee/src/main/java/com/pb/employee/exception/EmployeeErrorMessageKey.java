@@ -7,6 +7,7 @@ public enum EmployeeErrorMessageKey {
      */
 
     INVALID_CREDENTIALS("invalid.credentials"),
+    EMPLOYEE_ID_IS_NULL("employee.id.isnull"),
     INVALID_RESOURCE_TYPE("invalid.resource"),
     COMPANY_ALREADY_EXISTS("company.already.exists"),
     COMPANY_SHORT_NAME_ALREADY_EXISTS("company.shortname.already.exists"),
@@ -27,6 +28,8 @@ public enum EmployeeErrorMessageKey {
     INVALID_DEPARTMENT("invalid.department"),
     UNABLE_SAVE_DEPARTMENT("unable.save.department"),
     UNABLE_GET_DEPARTMENT("unable.get.department"),
+    UNABLE_TO_SAVE_SALARY("unable.save.salary");
+
     DESIGNATION_ID_ALREADY_EXISTS("designation.id.already.exists"),
     INVALID_DESIGNATION("invalid.designation"),
     UNABLE_SAVE_DESIGNATION("unable.save.designation"),
