@@ -11,24 +11,24 @@ const Body = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    axios
-      .get("http://192.168.1.163:8092/dashboard/all")
-      .then((response) => {
-        console.log(response.data);
-        const formattedData = response.data.map((item) => ({
-          ...item,
-          employeesUpdatedDate: formatDate(item.employeesUpdatedDate),
-          updatedDate: formatDate(item.updatedDate),
-        }));
-        setData(formattedData);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data: ", error);
-        setLoading(false);
-      });
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get("http://192.168.1.163:8092/dashboard/all")
+  //     .then((response) => {
+  //       console.log(response.data);
+  //       const formattedData = response.data.map((item) => ({
+  //         ...item,
+  //         employeesUpdatedDate: formatDate(item.employeesUpdatedDate),
+  //         updatedDate: formatDate(item.updatedDate),
+  //       }));
+  //       setData(formattedData);
+  //       setLoading(false);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching data: ", error);
+  //       setLoading(false);
+  //     });
+  // }, []);
 
   const formatDate = (datetimeString) => {
     const date = new Date(datetimeString);

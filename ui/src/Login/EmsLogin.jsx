@@ -14,7 +14,7 @@ const EmsLogin = () => {
     reset,
   } = useForm({ defaultValues: { username: "", password: "" } });
 
-  const { companyName } = useParams();
+  const {company}=useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState([]);
   const [otpSent, setOtpSent] = useState(false); // Track if OTP is sent
@@ -38,7 +38,7 @@ const EmsLogin = () => {
   const onSubmit = (data) => {
     const payload = {
       ...data,
-      companyName: companyName,
+      company:company
     };
     loginApi(payload)
       .then((response) => {

@@ -14,15 +14,23 @@ const SideNav = () => {
   const [isPayrollOpen, setIsPayrollOpen] = useState(false); // State for managing PayRoll dropdown
   const [isAttendanceOpen, setIsAttendanceOpen] = useState(false); // State for managing Attendance dropdown
   const [isCompanyOpen, setIsCompanyOpen] = useState(false); // State for managing Company dropdown
+  const [roles,setRoles]=useState([]);
 
   const location = useLocation();
   const userImageBase64 = sessionStorage.getItem("imageFile"); // Assuming the base64 image is stored in sessionStorage
 
   const token = sessionStorage.getItem("token");
-  const decodedToken = jwtDecode(token);
 
-  // Extract roles from the decoded token
-  const roles = decodedToken?.roles || [];
+  useEffect(() => {
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      setRoles(decodedToken.roles || []);
+    }
+  }, [token]);
+
+
+  console.log(roles)
+  
 
   const togglePayroll = (e) => {
     e.preventDefault(); // Prevent default anchor behavior
@@ -140,7 +148,7 @@ const SideNav = () => {
               </li>
             </>
           )}
-          {roles === "Company" && (
+          {roles.includes("company_admin") && (
             <>
               <li
                 className={`sidebar-item ${

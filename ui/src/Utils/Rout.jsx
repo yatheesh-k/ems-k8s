@@ -32,11 +32,13 @@ import Message from '../LayOut/Message';
 
 
 const Rout = () => {
+  const companyName=sessionStorage.getItem('company')
+
   return (
     <Routes>
       <Route path='/' element={<Message />}></Route>
       <Route path='/emsAdmin/login' element={<EmsLogin />}></Route>
-      <Route path='/:companyName/login' element={<CompanyLogin />}></Route>
+      <Route path='/:company/login' element={<CompanyLogin />}></Route>
       <Route path='/main' element={<Body />}></Route>
       <Route path='/companyRegistration' element={<CompanyRegistration />}></Route>
       <Route path='/companyView' element={<CompanyView />}></Route>

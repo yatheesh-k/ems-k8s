@@ -6,6 +6,7 @@ import { Eye, EyeSlash, Handbag } from "react-bootstrap-icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 import LayOut from "../../LayOut/LayOut";
+import { DepartmentGetApi, DesignationGetApi, EmployeeGetApiById, EmployeePostApi, EmployeePutApiById, employeeUpdateByIdApi, employeeViewApi } from "../../Utils/Axios";
 
 const EmployeeRegistration = () => {
   const {
@@ -16,9 +17,10 @@ const EmployeeRegistration = () => {
     reset,
     setValue,
   } = useForm("");
+  const [view, setView] = useState([]);
   const [user, setUser] = useState([]);
-  const [dep, setDep] = useState([]);
-  const [des, setDes] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [designations, setDesignations] = useState([]);
   const [stat, setStat] = useState([]);
   const [role, setRole] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +28,7 @@ const EmployeeRegistration = () => {
   const [employeeId, setEmployeeId] = useState("");
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
   const [companyName, setCompanyName] = useState("");
-
+  const [pending, setPending] = useState(false)
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -49,7 +51,7 @@ const EmployeeRegistration = () => {
 
     // Prevent space character entry if the value is empty
     if (e.keyCode === 32) {
-      e.preventDefault();
+      e.preventDefault(); 
     }
   };
 
@@ -59,6 +61,20 @@ const EmployeeRegistration = () => {
     { value: "Trainee", label: "Trainee" },
     { value: "Support", label: "Support" },
   ];
+
+  const Roles = [
+    { value: "Employee", label: "Employee" },
+    { value: "Hr", label: "Hr" },
+    { value: "Manager", label: "Manager" },
+    { value: "Accountant", label: "Accountant" },
+  ];
+
+  const Status = [
+    { value: "0", label: "Active" },
+    { value: "1", label: "InActive" },
+    { value: "2", label: "Notice Period"},
+    { value: "3", label: "Relieved" }
+  ]
 
   useEffect(() => {
     // Retrieve companyName from session storage
@@ -81,91 +97,59 @@ const EmployeeRegistration = () => {
     return newEmployeeId;
   };
 
-  const getDepartment = () => {
-    return axios
-      .get(`http://192.168.1.163:8092/department/all`)
-      .then((response) => {
-        const formattedDepList = response.data.map((dep) => ({
-          label: dep.departmentTitle,
-          value: dep.departmentTitle,
-        }));
-        console.log("Department data:", formattedDepList); // Log department data
-        setDep(formattedDepList);
-      })
-      .catch((error) => {
-        console.error("Error fetching departments:", error);
-      });
+  const apiUrl = "http://localhost:8092/ems/departmet";
+  const token = sessionStorage.getItem("token");
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   };
-  const getDesignation = () => {
-    axios
-      .get(`http://192.168.1.163:8092/designation/all`)
-      .then((response) => {
-        console.log(response.data);
-        const formattedDesList = response.data.map((user) => ({
-          label: user.designationTitle,
-          value: user.designationTitle,
-        }));
-
-        setDes(formattedDesList);
-        console.log(formattedDesList);
-      })
-      .catch((errors) => {
-        console.log(errors);
-      });
-  };
-
-  const getStatus = () => {
-    axios
-      .get(`http://192.168.1.163:8092/status/all`)
-      .then((response) => {
-        const statusesToInclude = ["Active", "Notice Period"]; // List of status names to include
-
-        const filteredStatus = response.data.filter((role) =>
-          statusesToInclude.includes(role.statusInfo)
-        );
-
-        console.log("Filtered data:", filteredStatus);
-
-        console.log(response.data);
-        const formattedStatusList = filteredStatus.map((user) => ({
-          label: user.statusInfo,
-          value: user.status,
-        }));
-
-        setStat(formattedStatusList);
-        console.log(formattedStatusList);
-      })
-      .catch((errors) => {
-        console.log(errors);
-      });
-  };
-  const getRole = () => {
-    axios
-      .get(`http://192.168.1.163:8092/role/all`)
-      .then((response) => {
-        const filteredRoles = response.data.filter(
-          (role) => role.role !== "Admin"
-        );
-
-        const formattedRoleList = filteredRoles.map((role) => ({
-          label: role.role,
-          value: role.role,
-        }));
-        setRole(formattedRoleList); // Set the formatted role list to the state variable
-      })
-      .catch((error) => {
+ 
+    const fetchDepartments = async () => {
+      try {
+        const data = await DepartmentGetApi();
+        setDepartments(data);
+      } catch (error) {
         console.log(error);
-      });
-  };
-
-  useEffect(() => {
-    Promise.all([getDepartment(), getDesignation(), getStatus(), getRole()])
-      .then(() => setLoading(false))
-      .catch((error) => {
-        console.error("Error fetching data:", error);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    const fetchDesignations = async () => {
+      try {
+        const data = await DesignationGetApi();
+        setDesignations(data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    useEffect(() => {
+      if (location && location.state && location.state.id) {
+        const fetchData = async () => {
+          try {
+            const response = await EmployeeGetApiById(location.state.id);
+            console.log(response.data);
+            reset(response.data);
+          } catch (error) {
+            console.error('Error fetching company details:', error);
+          }
+        };
+    
+        fetchData();
+      }
+    }, [location.state]);
+
+    useEffect(() => {
+    fetchDepartments();
+    fetchDesignations();
   }, []);
+
+
+
 
   const toInputTitleCase = (e) => {
     let value = e.target.value;
@@ -182,141 +166,70 @@ const EmployeeRegistration = () => {
     e.target.value = value;
   };
 
-  const onSubmit = (data) => {
-    if (location && location.state && location.state.employeeId) {
-      axios
-        .put(
-          `http://192.168.1.163:8092/employee/${location.state.employeeId}`,
-          data
-        )
-        .then((res) => {
-          if (res.status === 200) {
-            toast.success(" Employee Updated Successfully", {
-              position: "top-right",
-              transition: Bounce,
-              hideProgressBar: true,
-              theme: "colored",
-              autoClose: 3000, // Close the toast after 3 seconds
-            });
-          }
-          console.log(res.data);
-          setUser(res.data);
-          navigate("/employeeview");
-        })
-        .catch((errors) => {
-          if (errors.response) {
-            const status = errors.response.status;
-            let errorMessage = "";
+  
 
-            switch (status) {
-              case 400:
-                errorMessage = " Data Already Exist";
-                break;
-              case 403:
-                errorMessage = "Session TImeOut !";
-                navigate("/");
-                break;
-              case 404:
-                errorMessage = "Resource Not Found !";
-                break;
-              case 406:
-                errorMessage = "Invalid Details !";
-                break;
-              case 500:
-                errorMessage = "Server Error !";
-                break;
-              default:
-                errorMessage = "An Error Occurred !";
-                break;
-            }
 
-            toast.error(errorMessage, {
-              position: "top-right",
-              transition: Bounce,
-              hideProgressBar: true,
-              theme: "colored",
-              autoClose: 3000,
-            });
-          } else {
-            toast.error("Network Error !", {
-              position: "top-right",
-              transition: Bounce,
-              hideProgressBar: true,
-              theme: "colored",
-              autoClose: 3000,
-            });
-          }
-          console.log(errors);
-        });
-    } else {
-      axios
-        .post("http://192.168.1.163:8092/employee/registration", data)
-        .then((response) => {
-          if (response.status === 200) {
-            toast.success("Employee Created Successfully", {
-              position: "top-right",
-              transition: Bounce,
-              hideProgressBar: true,
-              theme: "colored",
-              autoClose: 3000, // Close the toast after 3 seconds
-            });
-          }
-          if (companyName) {
-            const updatedEmployeeId = generateEmployeeId(companyName);
-            setEmployeeId(updatedEmployeeId);
-            setIsDataSubmitted(true);
-          }
-          console.log(response.data);
-          console.log(data);
-          navigate("/employeeview");
-        })
-        .catch((errors) => {
-          if (errors.response) {
-            const status = errors.response.status;
-            let errorMessage = "";
+  const onSubmit = async (data) => {
+    const company = sessionStorage.getItem('company');
+    // Constructing the payload
+    const payload = {
+      companyName:company,
+      employeeType: data.employeeType,
+      employeeId: data.employeeId,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      emailId: data.emailId,
+      password: data.password,
+      designation: data.designation,
+      dateOfHiring: data.dateOfHiring, // converting to timestamp
+      department: data.department,
+      location: data.location,
+      manager: data.manager,
+      roles: [data.role], // Assuming 'roles' is a single select, otherwise adjust accordingly
+      status: data.status,
+      panNo: data.panNo,
+      uanNo: data.uanNo,
+      dateOfBirth: data.dateOfBirth, // Assuming dateOfBirth field is added to the form
+      accountNo: data.accountNo,
+      ifscCode: data.ifscCode,
+      bankName: data.bankName
+    };
 
-            switch (status) {
-              case 400:
-                errorMessage = " Data Already Exist";
-                break;
-              case 403:
-                errorMessage = "Session TImeOut !";
-                navigate("/");
-                break;
-              case 404:
-                errorMessage = "Resource Not Found !";
-                break;
-              case 406:
-                errorMessage = "Invalid Details !";
-                break;
-              case 500:
-                errorMessage = "Server Error !";
-                break;
-              default:
-                errorMessage = "An Error Occurred !";
-                break;
-            }
+    try {
 
-            toast.error(errorMessage, {
-              position: "top-right",
-              transition: Bounce,
-              hideProgressBar: true,
-              theme: "colored",
-              autoClose: 3000,
-            });
-          } else {
-            toast.error("Network Error !", {
-              position: "top-right",
-              transition: Bounce,
-              hideProgressBar: true,
-              theme: "colored",
-              autoClose: 3000,
-            });
-          }
-          console.log(errors);
-        });
+      if (location.state && location.state.id) {
+        const response = await EmployeePutApiById(location.state.id, data);
+        console.log("Update successful", response.data);
+        toast.success("Employee updated successfully");
+        reset();
+      } else {
+        const response = await EmployeePostApi(payload);
+        console.log("Employee created", response.data);
+        toast.success("Employee created successfully");
+        reset();
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast.error("Failed to submit form");
     }
   };
+
+
+  useEffect(() => {
+    if (location && location.state && location.state.id) {
+      const fetchData = async () => {
+        try {
+          const response = await EmployeeGetApiById(location.state.id);
+          console.log(response.data);
+          reset(response.data.data);
+        } catch (error) {
+          console.error('Error fetching company details:', error);
+        }
+      };
+
+      fetchData();
+    }
+  }, [location.state]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -324,52 +237,47 @@ const EmployeeRegistration = () => {
     return formattedDate;
   };
 
-  useEffect(() => {
-    if (location && location.state && location.state.employeeId) {
-      // setIsUpdating(true);
-      axios
-        .get(`http://192.168.1.163:8092/employee/${location.state.employeeId}`)
-        .then((response) => {
-          console.log(response.data);
-          const formattedDateOfHiring = formatDate(response.data.dateOfHiring); // Format the date
-          response.data.dateOfHiring = formattedDateOfHiring; // Update the date field in the response object
-          reset(response.data);
-          setIsUpdating(true);
-        })
-        .catch((errors) => {
-          console.log(errors);
-        });
-    }
-  }, [location.state]);
+
 
   // set date of hiring date limit
   const nextThreeMonths = new Date();
   nextThreeMonths.setMonth(nextThreeMonths.getMonth() + 3);
-  const threeMonthsFromNow = nextThreeMonths.toISOString().split("T")[0];
-
+  
+  // Function to format date to dd/mm/yyyy
+  const formatDateToDDMMYYYY = (date) => {
+    const day = ("0" + date.getDate()).slice(-2);
+    const month = ("0" + (date.getMonth() + 1)).slice(-2);
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+  
+  const threeMonthsFromNow = formatDateToDDMMYYYY(nextThreeMonths);
+  
+  console.log(threeMonthsFromNow); // Output: dd/mm/yyyy
+  
   return (
     <LayOut>
       <div className="container-fluid p-0">
-      <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
-              <div className="col">
-              <h1 className="h3 mb-3"><strong>Employee Registration</strong> </h1>
-              </div>
-              <div className="col-auto">
-                <nav aria-label="breadcrumb">
-                  <ol className="breadcrumb mb-0">
-                    <li className="breadcrumb-item">
-                      <a href="/main">Home</a>
-                    </li>
-                    <li className="breadcrumb-item">
-                      <a href="/employeeView">Employee View</a>
-                    </li>
-                    <li className="breadcrumb-item active">
-                      Employee Registration
-                    </li>
-                  </ol>
-                </nav>
-              </div>
-            </div>
+        <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
+          <div className="col">
+            <h1 className="h3 mb-3"><strong>Employee Registration</strong> </h1>
+          </div>
+          <div className="col-auto">
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                  <a href="/main">Home</a>
+                </li>
+                <li className="breadcrumb-item">
+                  <a href="/employeeView">Employee View</a>
+                </li>
+                <li className="breadcrumb-item active">
+                  Employee Registration
+                </li>
+              </ol>
+            </nav>
+          </div>
+        </div>
         <div className="row">
           <div className="col-12">
             <div className="card">
@@ -447,7 +355,7 @@ const EmployeeRegistration = () => {
                         name="employeeId"
                         // value={employeeId} for auto generating
                         onKeyDown={handleEmailChange}
-                        value={employeeId}
+                        // value={employeeId}
                         // autoComplete='off' maxLength={10}
                         {...register("employeeId", {
                           required: "Employee Id Required",
@@ -557,21 +465,18 @@ const EmployeeRegistration = () => {
                         name="department"
                         control={control}
                         defaultValue=""
-                        rules={{ required: true }}
                         render={({ field }) => (
-                          <Select
-                            {...field}
-                            options={dep}
-                            value={dep.find(
-                              (option) => option.value === field.value
-                            )}
-                            onChange={(val) => {
-                              field.onChange(val.value); // Send only the value
-                            }}
-                            placeholder="Select Department"
-                          />
+                          <select {...field} className="form-select" >
+                            <option value="" disabled>Select a department</option>
+                            {departments.map(department => (
+                              <option key={department.id} value={department.id}>
+                                {department.name}
+                              </option>
+                            ))}
+                          </select>
                         )}
                       />
+
                       {errors && errors.department && (
                         <p className="errorMsg">Department Required</p>
                       )}
@@ -581,23 +486,36 @@ const EmployeeRegistration = () => {
                       <label className="form-label">Designation</label>
                       <Controller
                         name="designation"
-                        defaultValue="" // Set the default department value
                         control={control}
-                        rules={{ required: true }}
+                        defaultValue=""
                         render={({ field }) => (
-                          <Select
-                            {...field}
-                            options={des}
-                            value={des.find(
-                              (option) => option.value === field.value
-                            )}
-                            onChange={(val) => {
-                              field.onChange(val.value); // Send only the value
-                            }}
-                            placeholder="Select Designation"
-                          />
+                          <select {...field} className="form-select" >
+                            <option value="" disabled>Select a designation</option>
+                            {designations.map(designation => (
+                              <option key={designation.id} value={designation.id}>
+                                {designation.name}
+                              </option>
+                            ))}
+                          </select>
                         )}
                       />
+                      {/* <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter Designation"
+                        name="designation"
+                        onInput={toInputTitleCase}
+                        autoComplete="off"
+                        onKeyDown={handleEmailChange}
+                        {...register("designation", {
+                          required: "designation Required",
+                          pattern: {
+                            value: /^[A-Za-z ]+$/,
+                            message:
+                              "These fields accepts only Alphabetic Characters",
+                          },
+                        })}
+                      /> */}
                       {errors && errors.designation && (
                         <p className="errorMsg">Designation Required</p>
                       )}
@@ -687,55 +605,75 @@ const EmployeeRegistration = () => {
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Status</label>
+                      <label className="form-label">Date of Birth</label>
+                      <input
+                        type={isUpdating ? "date" : "date"}
+                        readOnly={isUpdating}
+                        name="dateOfBirth"
+                        placeholder="Enter Hiring Date"
+                        className="form-control"
+                        autoComplete="off"
+                        {...register("dateOfBirth", {
+                          required: true,
+                        })}
+                      />
+                      {errors.dateOfBirth && (
+                        <p className="errorMsg">Date of Hiring Required</p>
+                      )}
+                    </div>
+                   
+                    <div className="col-12 col-md-6 col-lg-5 mb-2">
+                      <label className="form-label mb-3">
+                        Select Employee Status
+                      </label>
                       <Controller
                         name="status"
                         control={control}
-                        defaultValue=""
                         rules={{ required: true }}
                         render={({ field }) => (
                           <Select
                             {...field}
-                            options={stat}
-                            value={stat.find(
-                              (option) => option.value === field.value
-                            )}
-                            onChange={(val) => {
-                              field.onChange(val.value); // Send only the value
-                            }}
-                            placeholder="Status Required"
+                            options={Status.map((s) => ({
+                              value: s.value,
+                              label: s.label,
+                            }))}
+                            value={Status.find((s) => s.value === field.value)}
+                            onChange={(val) => field.onChange(val.value)}
+                            placeholder=" Select Status"
                           />
                         )}
                       />
-                      {errors && errors.status && (
-                        <p className="errorMsg">Select Status</p>
+                      {errors.status && (
+                        <p className="errorMsg">Employee Status is Required</p>
                       )}
                     </div>
 
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
-                      <label className="form-label">Role</label>
+                      <label className="form-label mb-3">
+                        Select Employee Role
+                      </label>
                       <Controller
+                        className="form-select"
                         name="role"
+                        defaultValue=""
                         control={control}
-                        defaultValue={role}
                         rules={{ required: true }}
                         render={({ field }) => (
                           <Select
-                            {...field}
-                            options={role} // Ensure that role contains the correct data
-                            value={role.find(
-                              (option) => option.value === field.value
-                            )}
-                            onChange={(val) => {
-                              field.onChange(val.value); // Send only the value
-                            }}
-                            placeholder="Select Role"
-                          />
+                         {...field}
+                          options={Roles.map((r) => ({
+                            value: r.value,
+                            label: r.label,
+                          }))}
+                          value={Roles.find((r) => r.value === field.value)}
+                          onChange={(val) => field.onChange(val.value)}
+                          placeholder=" Select Status"
+                        />
                         )}
                       />
-                      {errors && errors.role && (
-                        <p className="errorMsg">Role Required</p>
+                      {errors.roles && (
+                        <p className="errorMsg">Employee Role is Required</p>
                       )}
                     </div>
                     <div className="col-lg-6"></div>
@@ -747,15 +685,15 @@ const EmployeeRegistration = () => {
                         type="text"
                         className="form-control"
                         placeholder="Enter account Number"
-                        name="ipAddress"
+                        name="accountNo"
                         onInput={toInputTitleCase}
                         autoComplete="off"
-                        {...register("ipAddress", {
-                          required: "Ip Address Required",
+                        {...register("accountNo", {
+                          required: "Account Number Required",
                         })}
                       />
-                      {errors.ipAddress && (
-                        <p className="errorMsg">{errors.ipAddress.message}</p>
+                      {errors.accountNo && (
+                        <p className="errorMsg">{errors.accountNo.message}</p>
                       )}
                     </div>
                     <div className="col-lg-1"></div>
@@ -765,15 +703,15 @@ const EmployeeRegistration = () => {
                         type="text"
                         className="form-control"
                         placeholder="Enter ifsc code"
-                        name="ipAddress"
+                        name="ifscCode"
                         onInput={toInputTitleCase}
                         autoComplete="off"
-                        {...register("ipAddress", {
-                          required: "Ip Address Required",
+                        {...register("ifscCode", {
+                          required: "IFSC Code Required",
                         })}
                       />
-                      {errors.ipAddress && (
-                        <p className="errorMsg">{errors.ipAddress.message}</p>
+                      {errors.ifscCode && (
+                        <p className="errorMsg">{errors.ifscCode.message}</p>
                       )}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
@@ -782,15 +720,15 @@ const EmployeeRegistration = () => {
                         type="text"
                         className="form-control"
                         placeholder="Enter bank name"
-                        name="ipAddress"
+                        name="bankName"
                         onInput={toInputTitleCase}
                         autoComplete="off"
-                        {...register("ipAddress", {
-                          required: "Ip Address Required",
+                        {...register("bankName", {
+                          required: "Bank Name  Required",
                         })}
                       />
-                      {errors.ipAddress && (
-                        <p className="errorMsg">{errors.ipAddress.message}</p>
+                      {errors.bankName && (
+                        <p className="errorMsg">{errors.bankName.message}</p>
                       )}
                     </div>
                     <div className="col-lg-1"></div>
@@ -811,7 +749,7 @@ const EmployeeRegistration = () => {
                         <p className="errorMsg">{errors.ipAddress.message}</p>
                       )}
                     </div>
-
+{/* 
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Aadhaar Number</label>
                       <input
@@ -828,7 +766,7 @@ const EmployeeRegistration = () => {
                       {errors.ipAddress && (
                         <p className="errorMsg">{errors.ipAddress.message}</p>
                       )}
-                    </div>
+                    </div> */}
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Uan Number</label>
@@ -836,15 +774,15 @@ const EmployeeRegistration = () => {
                         type="text"
                         className="form-control"
                         placeholder="Enter uan number"
-                        name="ipAddress"
+                        name="uanNo"
                         onInput={toInputTitleCase}
                         autoComplete="off"
-                        {...register("ipAddress", {
-                          required: "Ip Address Required",
+                        {...register("uanNo", {
+                          required: "Uan  Required",
                         })}
                       />
-                      {errors.ipAddress && (
-                        <p className="errorMsg">{errors.ipAddress.message}</p>
+                      {errors.uanNo && (
+                        <p className="errorMsg">{errors.uanNo.message}</p>
                       )}
                     </div>
                     <div className="col-lg-1"></div>
@@ -854,15 +792,15 @@ const EmployeeRegistration = () => {
                         type="text"
                         className="form-control"
                         placeholder="Enter pan number"
-                        name="ipAddress"
+                        name="panNo"
                         onInput={toInputTitleCase}
                         autoComplete="off"
-                        {...register("ipAddress", {
-                          required: "Ip Address Required",
+                        {...register("panNo", {
+                          required: "Pan Number Required",
                         })}
                       />
-                      {errors.ipAddress && (
-                        <p className="errorMsg">{errors.ipAddress.message}</p>
+                      {errors.panNo && (
+                        <p className="errorMsg">{errors.panNo.message}</p>
                       )}
                     </div>
 

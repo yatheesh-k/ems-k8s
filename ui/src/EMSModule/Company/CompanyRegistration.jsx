@@ -1,9 +1,11 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { useForm } from "react-hook-form";
 import LayOut from "../../LayOut/LayOut";
-import { CompanyRegistrationApi} from "../../Utils/Axios";
+import { CompanyRegistrationApi, companyUpdateByIdApi, companyViewByIdApi} from "../../Utils/Axios";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
+import { Eye, EyeSlash } from "react-bootstrap-icons";
 
 const CompanyRegistration = () => {
   const {
@@ -15,31 +17,89 @@ const CompanyRegistration = () => {
   const [postImage, setPostImage] = useState("");
   const [companyType, setCompanyType] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [passwordShown, setPasswordShown] = useState("");
+  const location=useLocation();
+
+  const togglePasswordVisiblity = () => {
+    setPasswordShown(!passwordShown);
+  };
+  const handlePasswordChange = (e) => {
+    setPasswordShown(e.target.value);
+  };
+
+  const handleEmailChange = (e) => {
+    // Get the current value of the input field
+    const value = e.target.value;
+
+    // Check if the value is empty
+    if (value.trim() !== "") {
+      return; // Allow space button
+    }
+
+    // Prevent space character entry if the value is empty
+    if (e.keyCode === 32) {
+      e.preventDefault();
+    }
+  };
 
   const handleCompanyTypeChange = (e) => {
     setCompanyType(e.target.value);
   };
 
   const onChangePicture = (e) => {
-    setPostImage(URL.createObjectURL(e.target.files[0]));
+    setPostImage(URL.createObjectURL(e.target.files[0])); 
   };
 
-  const token=sessionStorage.getItem("token");
-
-  const onSubmit = async (data) => {
+const onSubmit = async (data) => {
     try {
-      await CompanyRegistrationApi(data)
-      .then((response)=>{
-        console.log(response.data.data.message)
+      const updateData = {
+        password: data.password,
+        companyAddress: data.companyAddress,
+        mobileNo: data.mobileNo,
+        landNo: data.landNo,
+        name: data.name,
+        personalMailId: data.personalMailId,
+        personalMobileNo: data.personalMobileNo,
+        address: data.address,
+        companyType: data.companyType
+        // Add other fields as needed
+      };
+      if (location.state && location.state.id) {
+        const response = await companyUpdateByIdApi(location.state.id, updateData);
+        console.log("Update successful", response.data);
+        toast.success("Company updated successfully");
+        reset()
+      } else {
+        const response = await CompanyRegistrationApi(data);
+        console.log("Company created", response.data);
+        toast.success("Company created successfully");
         reset();
-      })
-      // Handle successful registration
+      }
     } catch (error) {
-      console.error('Registration failed:', error);
+      console.error("Error submitting form:", error);
+      toast.error("Failed to submit form");
     }
   };
+  
 
-  const toInputTitleCase = (e) => {
+useEffect(() => {
+    if (location && location.state && location.state.id) {
+      const fetchData = async () => {
+        try {
+          const response = await companyViewByIdApi(location.state.id);
+          console.log(response.data);
+          reset(response.data);
+        } catch (error) {
+          console.error('Error fetching company details:', error);
+          setErrorMsg('Failed to fetch company details');
+        }
+      };
+  
+      fetchData();
+    }
+  }, [location.state]);
+  
+const toInputTitleCase = (e) => {
     let value = e.target.value;
     // Split the value into an array of words
     const words = value.split(" ");
@@ -66,7 +126,8 @@ const CompanyRegistration = () => {
       };
     });
   };
-  const handleFileUpload = async (e) => {
+
+const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     const base64 = await convertToBase64(file);
     setPostImage(base64);
@@ -213,24 +274,36 @@ const CompanyRegistration = () => {
 
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">
-                        Password <span style={{ color: "red" }}>*</span>
-                      </label>
-                      <input
-                        type="password"
-                        className="form-control"
-                        placeholder="Enter Password"
-                        onInput={toInputTitleCase}
-                        autoComplete="off"
-                        {...register("password", {
-                          required: "Password is required",
-                          pattern: {
-                            value: /^[A-Za-z0-9+@ ]+$/,
-                            message:
-                              "Thse fileds accepct both Numbers & Alphabets",
-                          },
-                        })}
-                      />
+                      <label className="form-label">Password</label>
+                      <div className="col-sm-12 input-group">
+                        <input
+                          className="form-control"
+                          placeholder="Enter Password"
+                          onChange={handlePasswordChange}
+                          autoComplete="off"
+                          onKeyDown={handleEmailChange}
+                          type={passwordShown ? "text" : "password"}
+                          {...register("password", {
+                            required: "Password Required",
+                            pattern: {
+                              value:
+                                /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/,
+                              message: "Invalid Password",
+                            },
+                          })}
+                        />
+                        <i
+                          onClick={togglePasswordVisiblity}
+                          style={{ margin: "5px" }}
+                        >
+                          {" "}
+                          {passwordShown ? (
+                            <Eye size={17} />
+                          ) : (
+                            <EyeSlash size={17} />
+                          )}
+                        </i>
+                      </div>
                       {errors.password && (
                         <p className="errorMsg">{errors.password.message}</p>
                       )}

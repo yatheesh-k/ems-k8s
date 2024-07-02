@@ -25,10 +25,10 @@ function Message() {
         setCompanyName(event.target.value);
     };
 
-    const onSubmit = () => {
-        console.log('Company Name:', companyName);
-        closeModal();
-        navigate('/:companyName/login')
+    const onSubmit = (data) => {
+        closeModal()
+        const { companyName } = data;
+        navigate(`/${companyName}/login`);
     };
     
     return (
@@ -38,7 +38,7 @@ function Message() {
                     <div className="col-sm-10 col-md-7 col-lg-6 mx-auto d-table h-100">
                         <div className="d-table-cell align-middle">
                             <div className="text-center mt-2">
-                                <img src="assets/img/person.svg" alt="person" style={{ width: '800px', height: '300px', marginBottom: "40px" }} />
+                                <img src="assets/img/person-1.svg" alt="person" style={{ width: '800px', height: '300px', marginBottom: "40px" }} />
                                 <h1 className="lead" style={{ fontSize: "3rem", fontFamily: "Arial, sans-serif", fontWeight: 'bold', color: '#333', display: 'inline-block', whiteSpace: 'nowrap' }}>Welcome to Employee Management System </h1>
                                 <h3 style={{ fontFamily: "sans-serif", color: '#555' }}>Enter the path according to your company</h3>
                             </div>

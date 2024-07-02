@@ -6,9 +6,10 @@ import axios from "axios";
 import { Bounce, toast } from "react-toastify";
 import DeletePopup from "../../Utils/DeletePopup";
 import LayOut from "../../LayOut/LayOut";
+import { EmployeeDeleteApiById, EmployeeGetApi } from "../../Utils/Axios";
 
 const EmployeeView = () => {
-  const [view, setView] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
@@ -56,38 +57,37 @@ const EmployeeView = () => {
     return `${year}-${month}-${day}`;
   };
 
-  const getUser = () => {
-    axios
-      .get("http://192.168.1.163:8092/employee/all")
-      .then((response) => {
-        console.log(response.data);
-        const formattedData = response.data.map((item) => ({
-          ...item,
-          dateOfHiring: formatDate(item.dateOfHiring), // Format date here
-        }));
-        setView(formattedData);
-        setFilteredData(formattedData);
-      })
-      .catch((errors) => {
-        console.log(errors);
+  const token =sessionStorage.getItem("token")
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+      "Content-Type": "application/json", // Specify content type as JSON
+    },
+  };
+  const company=sessionStorage.getItem("company")
+    const apiUrl=`http://localhost:8092/ems/employee/${company}`
+
+    useEffect(() => {
+
+     EmployeeGetApi().then(data => {
+        setEmployees(data);
+        setFilteredData(data);
       });
-  };
-  console.log(view);
-  useEffect(() => {
-    getUser();
-  }, []);
+    }, []);
+    
+    
+console.log(filteredData);
 
-  const getData = (employeeId) => {
-    console.log(employeeId);
-    Navigate(`/employeeRegistration`, { state: { employeeId } }); //deleteuser/
+
+  const handleEdit = (id) => {
+    console.log(id);
+    Navigate(`/employeeRegistration`, { state: { id } }); //deleteuser/
   };
 
-  const handleConfirmDelete = async (employeeId) => {
+  const handleConfirmDelete = async () => {
     if (selectedItemId) {
       try {
-        // Make a DELETE request to the API with the given ID
-        await axios
-          .delete(`http://192.168.1.163:8092/employee/${employeeId}`)
+      await  EmployeeDeleteApiById(setSelectedItemId)
           .then((response) => {
             if (response.status === 200) {
               toast.success("Employee Deleted Succesfully", {
@@ -98,7 +98,7 @@ const EmployeeView = () => {
                 autoClose: 3000, // Close the toast after 3 seconds
               });
             }
-            getUser();
+            //getEmployees()
             handleCloseDeleteModal();
             console.log(response.data);
           });
@@ -149,7 +149,7 @@ const EmployeeView = () => {
   };
 
   const statusMappings = {
-    1: {
+    0: {
       label: (
         <b
           style={{
@@ -163,7 +163,36 @@ const EmployeeView = () => {
         </b>
       ),
     },
+    1: {
+      label: (
+        <b
+          style={{
+            backgroundColor: "orange",
+            color: "white",
+            borderRadius: "5px",
+            padding: "2px",
+          }}
+        >
+          InActive
+        </b>
+      ),
+    },
     2: {
+      label: (
+        <b
+          style={{
+            backgroundColor: "yellow",
+            color: "white",
+            borderRadius: "5px",
+            padding: "2px",
+          }}
+        >
+          Notice Period
+        </b>
+      ),
+      color: "orange",
+    },
+    3: {
       label: (
         <b
           style={{
@@ -176,21 +205,6 @@ const EmployeeView = () => {
           Relieved
         </b>
       ),
-      color: "orange",
-    },
-    3: {
-      label: (
-        <b
-          style={{
-            backgroundColor: "orange",
-            color: "white",
-            borderRadius: "5px",
-            padding: "2px",
-          }}
-        >
-          Notice Period
-        </b>
-      ),
       color: "red",
     },
     // Add more mappings as needed
@@ -199,131 +213,54 @@ const EmployeeView = () => {
   const paginationComponentOptions = {
     noRowsPerPage: true,
   };
+
+
   const columns = [
+   
     {
-      name: (
-        <h5>
-          <b>S No</b>
-        </h5>
-      ),
-      selector: (row, index) => index + 1,
-      width: "75px",
+      name: 'Name',
+      selector: row => `${row.firstName} ${row.lastName}`,
+      sortable: true,
     },
     {
-      name: (
-        <h5 style={{ paddingLeft: "0px" }}>
-          <b>Employee Id</b>
-        </h5>
-      ),
-      selector: (row) => row.employeeId,
+      name: 'Email',
+      selector:row=> row.emailId,
+      sortable: true,
     },
     {
-      name: (
-        <h5>
-          <b>Employee Name</b>
-        </h5>
-      ),
-      selector: (row) => `${row.firstName} ${row.lastName}`,
-      minWidth: "100px",
-      maxWidth: "150px",
-      wrap: true,
+      name: 'Department',
+      selector: row =>row.department,
+      sortable: true,
     },
-    {
-      name: (
-        <h5>
-          <b>Email</b>
-        </h5>
-      ),
-      selector: (row) => (
-        <div style={{ overflow: "visible" }}>{row.emailId}</div>
-      ),
-      minWidth: "180px",
-      maxWidth: "200px",
-      wrap: true,
-    },
-    {
-      name: (
-        <h5>
-          <b>Department</b>
-        </h5>
-      ),
-      selector: (row) => row.department,
-      width: "120px",
-      wrap: true,
-    },
-    {
-      name: (
-        <h5>
-          <b>Designation</b>
-        </h5>
-      ),
-      selector: (row) => row.designation,
-      width: "120px",
-      wrap: true,
-    },
-    {
-      name: (
-        <h5>
-          <b>Date of Hiring</b>
-        </h5>
-      ),
-      selector: (row) => row.dateOfHiring,
-    },
-    {
-      name: (
-        <h5>
-          <b>Status</b>
-        </h5>
-      ),
-      selector: (row) => (
-        <div style={{ color: statusMappings[row.status]?.color || "black" }}>
-          {statusMappings[row.status]?.label || "Unknown"}
-        </div>
-      ),
-    },
-    // {
-    //   name:<h5><b>Manager</b></h5>,
-    //    selector:(row)=>row.manager,
-
-    // },
 
     {
-      name: (
-        <h5>
-          <b>Action</b>
-        </h5>
-      ),
+      name: 'Date of Hiring',
+      selector:row=> row.dateOfHiring,
+      sortable: true,
+      format: row => new Date(row.dateOfHiring).toLocaleDateString(),
+    },
+    {
+      name: 'Status',
+      selector: row =>row.status,
+      sortable: true,
+      cell: (row) => statusMappings[row.status]?.label || "Unknown",
+    },
+    {
+      name: <h5><b>Action</b></h5>,
       cell: (row) => (
         <div>
-          {" "}
-          <button
-            className="btn btn-sm "
-            style={{
-              backgroundColor: "transparent",
-              border: "none",
-              padding: "0",
-              marginRight: "10px",
-            }}
-            onClick={() => getData(row.employeeId)}
-          >
-            <PencilSquare size={22} color="#2255a4" />
+          <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginRight: "10px" }} onClick={() => handleEdit(row.id)}>
+            <PencilSquare size={22} color='#2255a4' />
           </button>
-          <button
-            className="btn btn-sm "
-            style={{
-              backgroundColor: "transparent",
-              border: "none",
-              padding: "0",
-              marginLeft: "5px",
-            }}
-            onClick={() => handleShowDeleteModal(row.employeeId)}
-          >
-            <XSquareFill size={22} color="#da542e" />
+          <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }} onClick={() => handleShowDeleteModal(row.id)}>
+            <XSquareFill size={22} color='#da542e' />
           </button>
         </div>
-      ),
-    },
+      )
+    }
   ];
+  
+
 
   const dateFormatting = (dateString) => {
     const date = new Date(dateString);
@@ -336,40 +273,28 @@ const EmployeeView = () => {
 
   const getFilteredList = (searchTerm) => {
     setSearch(searchTerm);
-    const filtered = view.filter((item) => {
-      // Convert all fields to lowercase for case-insensitive search
-      const lowerCasedSearchTerm = searchTerm.toLowerCase();
-      const employeeId = item.employeeId.toString().toLowerCase();
-      const fullName = item.firstName.toLowerCase();
-      const lastName = item.lastName.toLowerCase();
+    const filtered = employees.filter((item) => {
+      const fullName = `${item.firstName} ${item.lastName}`.toLowerCase();
       const email = item.emailId.toLowerCase();
-      const department = item.department.toLowerCase();
-      const designation = item.designation.toLowerCase();
-      // const statusLabel = statusMappings[item.status]?.label?.toLowerCase();
-      const manager = item.manager.toLowerCase();
-      const dateOfHiring = formatDate(item.dateOfHiring).toLowerCase(); // Check if any field contains the search term
+      const dateOfHiring = new Date(item.dateOfHiring)
+        .toLocaleDateString()
+        .toLowerCase();
       return (
-        employeeId.includes(lowerCasedSearchTerm) ||
-        fullName.includes(lowerCasedSearchTerm) ||
-        lastName.includes(lowerCasedSearchTerm) ||
-        email.includes(lowerCasedSearchTerm) ||
-        department.includes(lowerCasedSearchTerm) ||
-        designation.includes(lowerCasedSearchTerm) ||
-        // (statusLabel && statusLabel.includes(searchTerm)) ||
-        manager.includes(lowerCasedSearchTerm) ||
-        dateOfHiring.includes(lowerCasedSearchTerm)
+        fullName.includes(searchTerm.toLowerCase()) ||
+        email.includes(searchTerm.toLowerCase()) ||
+        dateOfHiring.includes(searchTerm.toLowerCase())
       );
     });
     setFilteredData(filtered);
   };
+
   const filterByMonthYear = (selectedMonth, selectedYear) => {
     setSelectedMonth(selectedMonth);
     setSelectedYear(selectedYear);
-    const result = view.filter((data) => {
+    const result = employees.filter((data) => {
       const resignDate = new Date(data.dateOfHiring);
       const resignMonth = resignDate.getMonth() + 1;
       const resignYear = resignDate.getFullYear();
-
       return (
         (resignMonth === parseInt(selectedMonth) || !selectedMonth) &&
         (resignYear === parseInt(selectedYear) || !selectedYear)
@@ -377,6 +302,7 @@ const EmployeeView = () => {
     });
     setFilteredData(result);
   };
+
 
   return (
     <LayOut>
@@ -466,16 +392,15 @@ const EmployeeView = () => {
               <DataTable
                 columns={columns}
                 data={filteredData}
-                pagination
-                paginationComponentOptions={paginationComponentOptions}
+               
               />
             </div>
           </div>
           <DeletePopup
             show={showDeleteModal}
             handleClose={handleCloseDeleteModal}
-            handleConfirm={(employeeId) =>
-              handleConfirmDelete(employeeId) / console.log(employeeId)
+            handleConfirm={(id) =>
+              handleConfirmDelete(id) / console.log(id)
             } // Pass the id to handleConfirmDelete
             id={selectedItemId} // Pass the selectedItemId to DeletePopup
             pageName="Employee"

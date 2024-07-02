@@ -83,7 +83,7 @@ const Header = ({toggleSidebar}) => {
                   <i className="align-middle me-1 bi bi-gear"></i> Settings
                 </a>
                 <div className="dropdown-divider"></div>
-                <a className="dropdown-item" onClick={handleLogOut} href>
+                <a className="dropdown-item" onClick={handleLogOut} >
                   Log out
                 </a>
               </div>
