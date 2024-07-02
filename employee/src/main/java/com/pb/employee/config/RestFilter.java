@@ -1,3 +1,4 @@
+/*
 package com.pb.employee.config;
 
 
@@ -64,11 +65,13 @@ public class RestFilter implements Filter {
 
                 token = StringUtils.removeStartIgnoreCase(token,"Bearer ");
 
-                /*if (hasNoRoles()) {
+                */
+/*if (hasNoRoles()) {
                     logger.debug("No role assigned to the User.");
                     buildResponseObject(req, res, "No roles assigned to the User.", "Unauthorized Access", HttpStatus.UNAUTHORIZED);
                     return;
-                }*/
+                }*//*
+
                 try {
                     ValidateLoginRequest validateLoginRequest = ValidateLoginRequest.builder().
                             token(token).build();
@@ -118,10 +121,12 @@ public class RestFilter implements Filter {
     }
 
 
-    /**
+    */
+/**
      * @param uri
      * @return
-     */
+     *//*
+
     private boolean isInSwaggerUiWhiteList(String uri) {
         if(StringUtils.isNotBlank(uri)) {
             String prefix_swagger_ui_resources = "/ems/swagger-ui/";
@@ -130,3 +135,4 @@ public class RestFilter implements Filter {
         return false;
     }
 }
+*/

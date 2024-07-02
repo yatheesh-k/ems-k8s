@@ -34,9 +34,7 @@ public enum EmployeeErrorMessageKey {
     UNABLE_GET_DESIGNATION("unable.get.designation"),
     UNABLE_TO_SAVE_SALARY("unable.save.salary"),
     UNABLE_GET_EMPLOYEES_SALARY("unable.get.employee.salary"),
-    DESIGNATION_ID_ALREADY_EXISTS("designation.id.already.exists"),
-    INVALID_DESIGNATION("invalid.designation"),
-    
+   ;
 
 
 

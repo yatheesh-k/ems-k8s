@@ -252,7 +252,7 @@ public class CompanyUtils {
         entity.getDeductions().setIncomeTax(itax);
         entity.getDeductions().setTotalTax(ttax);
         entity.getDeductions().setTotalDeductions(tded);
-        entity.getDeductions().setNetSalary(net);
+        entity.setNetSalary(net);
         entity.setType(Constants.SALARY);
         return entity;
     }
