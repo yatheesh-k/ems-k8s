@@ -13,9 +13,11 @@ import com.pb.ems.util.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +34,13 @@ public class LoginServiceImpl implements LoginService {
     private OpenSearchOperations openSearchOperations;
 
     @Autowired
-    private JavaMailSenderImpl javaMailSender;
+    private JavaMailSender javaMailSender;
+
+    @Value("${mail.subject}")
+    private String subject;
+
+    @Value("${mail.text}")
+    private String text;
 
     /**
      * @param request
@@ -102,18 +110,16 @@ public class LoginServiceImpl implements LoginService {
         } else {
             roles.add(Constants.COMPANY_ADMIN);
         }
-
-        String token = JwtTokenUtil.generateToken(request.getUsername(), roles);
+        String token = JwtTokenUtil.generateEmployeeToken(employee.getResourceId(),roles,company);
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(new LoginResponse(token, null)), HttpStatus.OK);
     }
 
-
-    public void sendOtpByEmail(String emailId, Long otp) {
+    private void sendOtpByEmail(String emailId, Long otp) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(emailId);
-        mailMessage.setSubject("${mail.subject}");
-        String mailText = "${mail.text}";
+        mailMessage.setSubject(subject);
+        String mailText = text;
         String formattedText = mailText.replace("{emailId}", emailId).replace("{otp}", otp.toString());
 
         mailMessage.setText(formattedText);
@@ -156,7 +162,11 @@ public class LoginServiceImpl implements LoginService {
                     throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.OTP_EXPIRED),
                             HttpStatus.FORBIDDEN);
                 }
-                log.debug("OTP is valid for user.." );
+                // Clear OTP and expiry time
+                user.setOtp(null);
+                user.setExpiryTime(null);
+
+                openSearchOperations.updateEmployee(user,request.getCompany());
             } else {
                 log.error("Invalid credentials for user..");
                 throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_CREDENTIALS),

@@ -20,6 +20,6 @@ public class DeductionEntity implements Entity{
     private String pfTax;
     private String incomeTax;
     private String totalTax;
-    private String netSalary;
+
 
 }

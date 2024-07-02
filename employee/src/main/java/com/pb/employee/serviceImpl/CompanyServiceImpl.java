@@ -85,6 +85,7 @@ public class CompanyServiceImpl implements CompanyService {
         String index = ResourceIdUtils.generateCompanyIndex(companyRequest.getShortName());
         String employeeAdminId = ResourceIdUtils.generateEmployeeResourceId(companyRequest.getEmailId());
         EmployeeEntity employee = EmployeeEntity.builder().
+                id(employeeAdminId).
                 employeeType(Constants.EMPLOYEE_TYPE).
                 emailId(companyRequest.getEmailId()).
                 password(password).

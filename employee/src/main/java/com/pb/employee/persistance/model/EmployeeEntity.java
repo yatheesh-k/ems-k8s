@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,7 +26,7 @@ public class EmployeeEntity implements Entity{
     private String department;
     private String location;
     private String manager;
-    private String role;
+    private List<String> roles;
     private int status;
     private String panNo;
     private String uanNo;

@@ -1,15 +1,16 @@
 package com.pb.employee.request;
 
 
-import com.pb.employee.persistance.model.AllowanceEntity;
-import com.pb.employee.persistance.model.DeductionEntity;
-import com.pb.employee.persistance.model.Entity;
-import jakarta.validation.constraints.NotBlank;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
 
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SalaryRequest{

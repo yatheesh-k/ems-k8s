@@ -54,6 +54,25 @@ public class JwtTokenUtil {
                 .compact();
 
     }
+    public static String generateEmployeeToken(String username, List<String> roles,String company) {
+        String token= Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .claim(Constants.ROLES, roles)
+                .claim(Constants.COMPANY, company)
+                .setExpiration(new Date(System.currentTimeMillis() + 3600000))
+                .signWith(key)
+                .compact();
+        return  token;
+    }
+    public static Claims decodeToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
 
     public static Claims validateToken(String token) throws IdentityException{
         try {

@@ -25,6 +25,7 @@ public class Constants {
     public static final String EMPLOYEE_NAME = "EmployeeName";
     public static final String EMPLOYEE = "employee";
     public static final String SUCCESS = "success";
+    public static final String COMPANY = "company";
 }
 
 

@@ -60,14 +60,6 @@ export const CompanyloginApi = (data) => {
         });
 };
 
-
-      return response.data;
-    })
-    .catch((error) => {
-      console.log(error);
-      throw error;  // It is good practice to throw the error after logging it
-    });
-};
 export const CompanyRegistrationApi = (data) => {
   return axiosInstance.post("/company", data);
 };

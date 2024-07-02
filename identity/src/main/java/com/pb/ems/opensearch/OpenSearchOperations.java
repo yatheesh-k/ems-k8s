@@ -5,6 +5,7 @@ import com.pb.ems.model.EmployeeEntity;
 import com.pb.ems.persistance.Entity;
 import com.pb.ems.util.Constants;
 import com.pb.ems.util.ResourceUtils;
+import org.opensearch.client.RequestOptions;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.Result;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
@@ -18,6 +19,9 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class OpenSearchOperations {
@@ -83,14 +87,16 @@ public class OpenSearchOperations {
                 .index(index).build();
         GetResponse<EmployeeEntity> searchResponse = esClient.get(getRequest, EmployeeEntity.class);
         if(searchResponse != null && searchResponse.source() != null){
-            return searchResponse.source();
+            EmployeeEntity employee = searchResponse.source();
+            employee.setResourceId(searchResponse.id()); // Set the _id from the response
+            return employee;
         }
         return null;
     }
 
     public void saveOtpToUser(EmployeeEntity user, Long otp, String company) throws IdentityException {
         user.setOtp(otp);
-        user.setExpiryTime(Instant.now().plus(40, ChronoUnit.SECONDS).getEpochSecond()); // Set expiry time, for example, 5 minutes from now
+        user.setExpiryTime(Instant.now().plus(60, ChronoUnit.SECONDS).getEpochSecond()); // Set expiry time, for example, 1 minutes from now
         String index =  Constants.INDEX_EMS +"_"+ company; // Use dynamic index
         String id = Constants.EMPLOYEE+"-"+resourceIdUtils.md5Hash(user.getEmailId());
         saveEntity(user,id , index);  // Ensure this method saves the user entity to the correct index
@@ -110,6 +116,19 @@ public class OpenSearchOperations {
         return searchResponse;
     }
 
+    public void updateEmployee(EmployeeEntity employee,String company) throws IOException {
+        String index = Constants.INDEX_EMS + "_" + company;
+        String employeeId = employee.getResourceId();
 
+        IndexRequest<EmployeeEntity> request = new IndexRequest.Builder<EmployeeEntity>()
+                .index(index)
+                .id(employeeId)
+                .document(employee)
+                .build();
 
+        IndexResponse response = esClient.index(request);
+        if (response.result() != Result.Updated && response.result() != Result.Created) {
+            throw new IOException("Failed to update employee: " + employeeId);
+        }
+    }
 }

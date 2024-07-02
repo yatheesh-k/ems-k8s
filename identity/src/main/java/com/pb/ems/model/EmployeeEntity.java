@@ -17,6 +17,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EmployeeEntity implements Entity {
     private String resourceId;
+
     private String employeeType;
     private String type;
     private String emailId;
