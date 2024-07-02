@@ -33,9 +33,7 @@ public enum EmployeeErrorMessageKey {
     UNABLE_SAVE_DESIGNATION("unable.save.designation"),
     UNABLE_GET_DESIGNATION("unable.get.designation"),
     UNABLE_TO_SAVE_SALARY("unable.save.salary"),
-    UNABLE_GET_EMPLOYEES_SALARY("unable.get.employee.salary"),
-   ;
-
+    UNABLE_GET_EMPLOYEES_SALARY("unable.get.employee.salary");
 
 
     private final String key;

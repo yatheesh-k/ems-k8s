@@ -256,4 +256,8 @@ public class CompanyUtils {
         entity.setType(Constants.SALARY);
         return entity;
     }
+
+    public static Entity maskAttendanceProperties(AttendanceRequest attendanceRequest, String attendanceId, String employeeId) {
+        return null;
+    }
 }

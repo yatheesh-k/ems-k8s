@@ -91,4 +91,8 @@ public class ResourceIdUtils {
             }
             return prefix + md5Hash;
         }
+
+    public static String generateAttendanceId(String company, String employeeId) {
+        return null;
+    }
 }
