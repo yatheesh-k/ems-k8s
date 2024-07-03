@@ -37,7 +37,7 @@ public class SalaryController {
         return salaryService.addSalary(salaryRequest,employeeId);
     }
 
-    @RequestMapping(value = "/{companyName}/employee/{employeeId}/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/{companyName}/employee/{employeeId}/salaries", method = RequestMethod.GET)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.getSalary.tag}", description = "${api.getSalary.description}")
     @ResponseStatus(HttpStatus.OK)
@@ -48,7 +48,7 @@ public class SalaryController {
         return salaryService.getEmployeeSalary(companyName,employeeId);
     }
 
-    @RequestMapping(value = "/{companyName}/employee/{employeeId}/{salaryId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{companyName}/employee/{employeeId}/salary/{salaryId}", method = RequestMethod.GET)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.getSalary.tag}", description = "${api.getSalary.description}")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
@@ -61,7 +61,7 @@ public class SalaryController {
         return salaryService.getEmployeeSalaryById(companyName, employeeId, salaryId);
     }
 
-    @RequestMapping(value = "/employee/{employeeId}/{salaryId}", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/employee/{employeeId}/salary/{salaryId}", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.updateSalary.tag}", description = "${api.updateSalary.description}")
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -73,7 +73,7 @@ public class SalaryController {
                                                       @PathVariable String salaryId) throws EmployeeException {
         return salaryService.updateEmployeeSalaryById(employeeId, salaryUpdateRequest, salaryId);
     }
-    @RequestMapping(value = "/{companyName}/employee/{employeeId}/{salaryId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{companyName}/employee/{employeeId}/salary/{salaryId}", method = RequestMethod.DELETE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.deleteSalary.tag}", description = "${api.deleteSalary.description}")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")

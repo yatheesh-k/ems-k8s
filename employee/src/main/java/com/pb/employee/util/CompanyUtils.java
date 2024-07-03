@@ -44,17 +44,42 @@ public class CompanyUtils {
         entity.setType(Constants.COMPANY);
         return entity;
     }
+
+    public static Entity unmaskCompanyProperties(CompanyEntity companyEntity) {
+        String hra = null, pan = null, pf = null, spa = null, ta = null;
+        if(companyEntity.getHraPercentage() != null) {
+            hra = new String(Base64.getDecoder().decode(companyEntity.getHraPercentage().toString().getBytes()));
+        }
+        if(companyEntity.getPanNo() != null) {
+            pan = new String(Base64.getDecoder().decode(companyEntity.getPanNo().toString().getBytes()));
+        }
+        if(companyEntity.getPfPercentage() != null) {
+            pf = new String(Base64.getDecoder().decode(companyEntity.getPfPercentage().toString().getBytes()));
+        }
+        if(companyEntity.getSpecialAllowance() != null) {
+            spa = new String(Base64.getDecoder().decode(companyEntity.getSpecialAllowance().toString().getBytes()));
+        }
+        if(companyEntity.getTravelAllowance() != null) {
+            ta = new String(Base64.getDecoder().decode(companyEntity.getTravelAllowance().toString().getBytes()));
+        }
+
+        companyEntity.setHraPercentage(hra);
+        companyEntity.setPanNo(pan);
+        companyEntity.setPfPercentage(pf);
+        companyEntity.setSpecialAllowance(spa);
+        companyEntity.setTravelAllowance(ta);
+        companyEntity.setType(Constants.COMPANY);
+        return companyEntity;
+    }
+
     public static CompanyEntity maskCompanyUpdateProperties(CompanyEntity existingEntity, CompanyUpdateRequest companyRequest, String id) {
         ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         // Convert CompanyUpdateRequest to CompanyEntity to update specific fields
-        CompanyEntity updatedEntity = objectMapper.convertValue(companyRequest, CompanyEntity.class);
-
-        // Ensure existing fields are preserved if not updated
         if (companyRequest.getPassword() == null || companyRequest.getPassword().isEmpty()) {
-            updatedEntity.setPassword(existingEntity.getPassword());
+            existingEntity.setPassword(existingEntity.getPassword());
         } else {
-            updatedEntity.setPassword(Base64.getEncoder().encodeToString(companyRequest.getPassword().getBytes()));
+            existingEntity.setPassword(Base64.getEncoder().encodeToString(companyRequest.getPassword().getBytes()));
         }
         String hra = null, pf = null, spa = null, ta = null;
 
@@ -71,21 +96,47 @@ public class CompanyUtils {
             ta = Base64.getEncoder().encodeToString(companyRequest.getTravelAllowance().toString().getBytes());
         }
         // Set common fields
-        updatedEntity.setId(id);
-        updatedEntity.setCompanyName(existingEntity.getCompanyName()); // Ensure companyName is preserved
-        updatedEntity.setEmailId(existingEntity.getEmailId());
-        updatedEntity.setCompanyRegNo(existingEntity.getCompanyRegNo());
-        updatedEntity.setGstNo(existingEntity.getGstNo());
-        updatedEntity.setPanNo(existingEntity.getPanNo());
-        updatedEntity.setCinNo(existingEntity.getCinNo());
-        updatedEntity.setShortName(existingEntity.getShortName());
-        updatedEntity.setHraPercentage(hra);
-        updatedEntity.setPfPercentage(pf);
-        updatedEntity.setSpecialAllowance(spa);
-        updatedEntity.setTravelAllowance(ta);
-        updatedEntity.setType(Constants.COMPANY);
-
-        return updatedEntity;
+        if(companyRequest.getCompanyAddress() != null) {
+            existingEntity.setCompanyAddress(companyRequest.getCompanyAddress());
+        }
+        if(companyRequest.getMobileNo() != null) {
+            existingEntity.setMobileNo(companyRequest.getMobileNo());
+        }
+        if(companyRequest.getLandNo() != null) {
+            existingEntity.setLandNo(companyRequest.getLandNo());
+        }
+        if(companyRequest.getName() != null) {
+            existingEntity.setName(companyRequest.getName());
+        }
+        if(companyRequest.getPersonalMailId() != null) {
+            existingEntity.setPersonalMailId(companyRequest.getPersonalMailId());
+        }
+        if(companyRequest.getPersonalMobileNo() != null) {
+            existingEntity.setPersonalMobileNo(companyRequest.getPersonalMobileNo());
+        }
+        if(companyRequest.getAddress() != null) {
+            existingEntity.setAddress(companyRequest.getAddress());
+        }
+        if(companyRequest.getCompanyType() != null) {
+            existingEntity.setCompanyType(companyRequest.getCompanyType());
+        }
+        if(companyRequest.getCompanyBranch() != null) {
+            existingEntity.setCompanyBranch(companyRequest.getCompanyBranch());
+        }
+        if(pf != null) {
+            existingEntity.setPfPercentage(pf);
+        }
+        if(spa != null) {
+            existingEntity.setSpecialAllowance(spa);
+        }
+        if(ta != null) {
+            existingEntity.setTravelAllowance(ta);
+        }
+        if(hra != null) {
+            existingEntity.setHraPercentage(hra);
+        }
+        existingEntity.setType(Constants.COMPANY);
+        return existingEntity;
     }
     public static CompanyEntity maskCompanyImageUpdateProperties(CompanyEntity existingEntity, CompanyImageUpdate companyRequest, String id) {
         ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

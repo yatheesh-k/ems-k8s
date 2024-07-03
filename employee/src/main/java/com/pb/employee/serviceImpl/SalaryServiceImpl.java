@@ -90,9 +90,6 @@ public class SalaryServiceImpl implements SalaryService {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES_SALARY),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
-
-
             if (!entity.getEmployeeId().equals(employeeId)) {
                 log.error("Employee ID mismatch for salary {}: expected {}, found {}", salaryId, employeeId, entity.getEmployeeId());
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),

@@ -17,7 +17,7 @@ import java.io.IOException;
 
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/payslip")
+@RequestMapping("")
 public class PayslipController {
 
     @Autowired

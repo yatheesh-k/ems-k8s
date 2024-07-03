@@ -104,6 +104,9 @@ public class CompanyServiceImpl implements CompanyService {
 
         List<CompanyEntity> companyEntities = null;
         companyEntities = openSearchOperations.getCompanies();
+        for(CompanyEntity companyEntity : companyEntities) {
+            CompanyUtils.unmaskCompanyProperties(companyEntity);
+        }
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(companyEntities), HttpStatus.OK);
 
@@ -115,6 +118,7 @@ public class CompanyServiceImpl implements CompanyService {
         CompanyEntity companyEntity = null;
         try {
             companyEntity = openSearchOperations.getCompanyById(companyId, null, Constants.INDEX_EMS);
+            CompanyUtils.unmaskCompanyProperties(companyEntity);
         } catch (Exception ex) {
             log.error("Exception while fetching company details {}", ex);
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_SAVE_COMPANY),
@@ -140,7 +144,7 @@ public class CompanyServiceImpl implements CompanyService {
         }
 
         Entity entity = CompanyUtils.maskCompanyUpdateProperties(user, companyUpdateRequest, companyId);
-        openSearchOperations .saveEntity(entity, companyId, Constants.INDEX_EMS);
+        openSearchOperations.saveEntity(entity, companyId, Constants.INDEX_EMS);
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
     }
