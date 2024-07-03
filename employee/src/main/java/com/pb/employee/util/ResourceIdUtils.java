@@ -46,6 +46,9 @@ public class ResourceIdUtils {
     public static String generateDesignationResourceId(String id) {
         return generateGlobalResourceId(ResourceType.DESIGNATION, id);
     }
+    public static String generateAttendanceId(String company, String employeeId,String year,String month) {
+        return generateGlobalResourceId(ResourceType.ATTENDANCE,company,employeeId,year,month);
+    }
 
     /**
      * Generate a global resource ID based on the resource type
@@ -59,6 +62,9 @@ public class ResourceIdUtils {
         String prefix = Constants.DEFAULT + "-";
         if (type == ResourceType.COMPANY) {
             prefix = Constants.COMPANY + "-";
+        }
+        if (type == ResourceType.ATTENDANCE) {
+            prefix = Constants.ATTENDANCE + "-"+args[1]+"-"+args[2]+"-"+args[3];
         }
         if (type == ResourceType.EMPLOYEE) {
             prefix = Constants.EMPLOYEE + "-";
@@ -100,7 +106,4 @@ public class ResourceIdUtils {
             return prefix + md5Hash;
         }
 
-    public static String generateAttendanceId(String company, String employeeId) {
-        return null;
-    }
 }

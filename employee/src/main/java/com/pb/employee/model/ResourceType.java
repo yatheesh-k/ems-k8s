@@ -18,6 +18,7 @@ public enum ResourceType {
     EMPLOYEE("employee"),
     DEPARTMENT("department"),
     DESIGNATION("designation"),
+    ATTENDANCE("attendance"),
     SALARY("salary"),
     PAYSLIP("payslip");
 

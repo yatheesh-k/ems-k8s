@@ -2,6 +2,7 @@ package com.pb.employee.util;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pb.employee.model.ResourceType;
 import com.pb.employee.persistance.model.*;
 import com.pb.employee.request.*;
 import lombok.extern.slf4j.Slf4j;
@@ -308,6 +309,33 @@ public class CompanyUtils {
         return entity;
     }
 
+    public static Entity maskAttendanceProperties(AttendanceRequest attendanceRequest, String attendanceId, String employeeId) {
+        String month = null, year = null, totalWd = null, noOfWd = null;
 
+        if(attendanceRequest.getMonth() != null) {
+            month = (Base64.getEncoder().encodeToString(attendanceRequest.getMonth().toString().getBytes()));
+        }
+        if(attendanceRequest.getYear() != null) {
+            year = (Base64.getEncoder().encodeToString(attendanceRequest.getYear().toString().getBytes()));
+        } if(attendanceRequest.getTotalWorkingDays() != null) {
+            totalWd = (Base64.getEncoder().encodeToString(attendanceRequest.getTotalWorkingDays().toString().getBytes()));
+        }if(attendanceRequest.getNoOfWorkingDays()!= null) {
+            noOfWd = (Base64.getEncoder().encodeToString(attendanceRequest.getNoOfWorkingDays().toString().getBytes()));
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        AttendanceEntity entity = objectMapper.convertValue(attendanceRequest, AttendanceEntity.class);
+
+        entity.setAttendanceId(attendanceId);
+        entity.setEmployeeId(employeeId);
+        entity.setMonth(month);
+        entity.setYear(year);
+        entity.setTotalWorkingDays(totalWd);
+        entity.setNoOfWorkingDays(noOfWd);
+        entity.setType(Constants.ATTENDANCE);
+
+        return entity;
+    }
 
 }

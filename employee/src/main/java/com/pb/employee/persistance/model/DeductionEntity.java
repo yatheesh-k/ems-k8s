@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DeductionEntity implements Entity{
+public class DeductionEntity implements Entity {
 
 
     private String pfEmployee;
@@ -21,4 +21,5 @@ public class DeductionEntity implements Entity{
     private String pfTax;
     private String incomeTax;
     private String totalTax;
+
 }

@@ -33,11 +33,15 @@ public enum EmployeeErrorMessageKey {
     UNABLE_SAVE_DESIGNATION("unable.save.designation"),
     UNABLE_GET_DESIGNATION("unable.get.designation"),
     UNABLE_TO_SAVE_SALARY("unable.save.salary"),
+    UNABLE_TO_SAVE_ATTENDANCE("unable.save.attendance"),
+    UNABLE_GET_EMPLOYEES_SALARY("unable.get.employee.salary"),
+    ATTENDANCE_ALREADY_EXISTS("attendance.already.exists"),
+    INVALID_FORMAT("invalid.format"),
+    FAILED_TO_PROCESS("failed.process"),
+    EMPTY_FILE("file.empty"),
     EMPLOYEE_PAYSLIP_ALREADY_EXISTS("employee.payslip.already.exist"),
     EMPLOYEE_NOT_MATCHING("employee.not.matching"),
-    UNABLE_GET_EMPLOYEES_PAYSLIP("unable.get.employee.payslip"),
-    UNABLE_GET_EMPLOYEES_SALARY("unable.get.employee.salary");
-
+    UNABLE_GET_EMPLOYEES_PAYSLIP("unable.get.employee.payslip");
     private final String key;
 
     EmployeeErrorMessageKey(String keyVal) {

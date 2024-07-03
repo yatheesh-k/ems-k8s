@@ -20,6 +20,7 @@ public class Constants {
     public static final String EMS_ADMIN = "ems_admin";
     public static final String LOGIN_SUCCESS = "success";
     public static final String COMPANY = "company";
+    public static final String ATTENDANCE = "attendance";
     public static final String SALARY = "salary";
     public static final String DEFAULT = "default";
     public static final String TYPE = "type";
