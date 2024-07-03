@@ -3,6 +3,7 @@ package com.pb.employee.serviceImpl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pb.employee.common.ResponseBuilder;
+import com.pb.employee.common.ResponseObject;
 import com.pb.employee.exception.EmployeeErrorMessageKey;
 import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.exception.ErrorMessageHandler;
@@ -14,6 +15,7 @@ import com.pb.employee.request.SalaryRequest;
 import com.pb.employee.service.SalaryService;
 import com.pb.employee.util.CompanyUtils;
 import com.pb.employee.util.Constants;
+import com.pb.employee.util.EmployeeUtils;
 import com.pb.employee.util.ResourceIdUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,15 +44,28 @@ public class SalaryServiceImpl implements SalaryService {
     @Override
     public ResponseEntity<?> addSalary(SalaryRequest salaryRequest,String employeeId) throws EmployeeException{
         String salaryId = ResourceIdUtils.generateSalaryResourceId(employeeId);
-        ResponseEntity<?> entity = null;
+        EmployeeEntity entity = null;
         String index = ResourceIdUtils.generateCompanyIndex(salaryRequest.getCompanyName());
         try{
-            entity = employeeService.getEmployeeById(salaryRequest.getCompanyName(), employeeId);
+                entity = openSearchOperations.getEmployeeById(employeeId, null, index);
             if (entity!=null) {
                 Entity salaryEntity = CompanyUtils.maskEmployeeSalaryProperties(salaryRequest, salaryId,employeeId);
                 Entity result = openSearchOperations.saveEntity(salaryEntity, salaryId, index);
+            } else {
+                log.error("employee not found");
+                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_EMPLOYEE),
+                        HttpStatus.NOT_FOUND);
             }
-        }  catch (Exception exception) {
+        }  catch (EmployeeException exception) {
+            if(exception.getHttpStatus().equals(HttpStatus.NOT_FOUND)){
+                log.error("Unable to find the employee details {}", exception.getMessage());
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_EMPLOYEE),
+                        HttpStatus.NOT_FOUND);
+            }
+            log.error("Unable to save the employee salary details {}", exception.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SAVE_SALARY),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }  catch (IOException exception) {
             log.error("Unable to save the employee salary details {}", exception.getMessage());
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SAVE_SALARY),
                     HttpStatus.INTERNAL_SERVER_ERROR);
@@ -102,7 +117,10 @@ public class SalaryServiceImpl implements SalaryService {
         List<SalaryEntity> salaryEntities = null;
         Object entity = null;
         try {
-            salaryEntities = openSearchOperations.getSalaries(companyName);
+            salaryEntities = openSearchOperations.getSalaries(companyName, employeeId);
+            for(SalaryEntity salaryEntity : salaryEntities) {
+                EmployeeUtils.unMaskEmployeeSalaryProperties(salaryEntity);
+            }
             entity = openSearchOperations.getById(employeeId, null, index);
         }
         catch (Exception ex) {
@@ -125,8 +143,6 @@ public class SalaryServiceImpl implements SalaryService {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES_SALARY),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
-
             if (!entity.getEmployeeId().equals(employeeId)) {
                 log.error("Employee ID mismatch for salary {}: expected {}, found", salaryId, employeeId);
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
@@ -160,8 +176,6 @@ public class SalaryServiceImpl implements SalaryService {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
-
         } catch (Exception ex) {
             log.error("Exception while fetching user {}:", employeeId, ex);
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES_SALARY),

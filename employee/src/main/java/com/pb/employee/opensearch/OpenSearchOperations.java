@@ -395,11 +395,13 @@ public class OpenSearchOperations {
 
         return employeeEntities;
     }
-    public List<SalaryEntity> getSalaries(String companyName) throws EmployeeException{
+    public List<SalaryEntity> getSalaries(String companyName, String employeeId) throws EmployeeException{
         logger.debug("Getting employees for salary details {}", companyName);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         boolQueryBuilder = boolQueryBuilder
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.SALARY)));
+        boolQueryBuilder = boolQueryBuilder
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.EMPLOYEE_ID).query(employeeId)));
         BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
         SearchResponse<SalaryEntity> searchResponse = null;
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
