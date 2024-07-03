@@ -12,10 +12,10 @@ import lombok.*;
 public class AllowanceRequest {
 
 
-    private Double travelAllowance;
-    private Double pfContributionEmployee;
-    private Double hra;
-    private Double specialAllowance;
-    private Double otherAllowances;
+    private String travelAllowance;
+    private String pfContributionEmployee;
+    private String hra;
+    private String specialAllowance;
+    private String otherAllowances;
 
 }

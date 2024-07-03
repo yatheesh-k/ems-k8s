@@ -2,6 +2,9 @@ package com.pb.employee.request;
 
 
 import jakarta.validation.constraints.NotBlank;
+
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,6 +32,4 @@ public class SalaryRequest{
     private AllowanceRequest allowances;
     private DeductionRequest deductions;
     private int status;
-    private String type;
-
 }

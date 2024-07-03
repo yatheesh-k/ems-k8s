@@ -17,7 +17,6 @@ public class AllowanceEntity implements Entity{
     private String pfContributionEmployee;
     private String hra;
     private String specialAllowance;
-    private String totalEarnings;
     private String otherAllowances;
 
 }

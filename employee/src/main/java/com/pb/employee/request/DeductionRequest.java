@@ -12,16 +12,15 @@ import lombok.*;
 @AllArgsConstructor
 public class DeductionRequest {
 
-    @NotBlank(message = "{companyname.message}")
-    private String companyName;
-    private Double pfEmployee;
-    private Double pfEmployer;
-    private Double totalTax;
 
-    private Double lop;
-    private Double pfTax;
-    private Double incomeTax;
-    private Double totalDeductions;
+    private String pfEmployee;
+    private String pfEmployer;
+    private String lop;
+    private String totalDeductions;
+
+    private String pfTax;
+    private String totalTax;
+
 
 
 }

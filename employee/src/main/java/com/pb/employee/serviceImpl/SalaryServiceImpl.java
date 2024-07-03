@@ -51,7 +51,7 @@ public class SalaryServiceImpl implements SalaryService {
                 Entity result = openSearchOperations.saveEntity(salaryEntity, salaryId, index);
             }
         }  catch (Exception exception) {
-            log.error("Unable to save the employee salary details {} {}", salaryRequest.getType(),exception.getMessage());
+            log.error("Unable to save the employee salary details {}", exception.getMessage());
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SAVE_SALARY),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }

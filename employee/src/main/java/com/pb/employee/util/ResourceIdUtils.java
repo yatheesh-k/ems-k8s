@@ -27,6 +27,10 @@ public class ResourceIdUtils {
     public static String generateSalaryResourceId(String employeeId) {
         return generateGlobalResourceId(ResourceType.SALARY,employeeId);
     }
+
+    public static String generatePayslipId(String month, String year, String employeeId) {
+        return generateGlobalResourceId(ResourceType.PAYSLIP,month, year,employeeId);
+    }
     public static String generateCompanyIndex(String name) {
         return Constants.INDEX_EMS+"_"+name;
     }
@@ -68,6 +72,10 @@ public class ResourceIdUtils {
         }
         if (type == ResourceType.DESIGNATION) {
             prefix = Constants.DESIGNATION + "-";
+
+        }
+        if (type == ResourceType.PAYSLIP) {
+            prefix = Constants.PAYSLIP +"-"+ args[0] + "-"+args[1]+"-";
 
         }
            

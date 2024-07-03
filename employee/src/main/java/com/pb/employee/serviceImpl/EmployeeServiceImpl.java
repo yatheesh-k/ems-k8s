@@ -160,6 +160,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.DELETED), HttpStatus.OK);
 

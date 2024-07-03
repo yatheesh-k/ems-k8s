@@ -93,4 +93,14 @@ public class CompanyController {
                                                @PathVariable String companyId) throws EmployeeException {
         return companyService.deleteCompanyById(companyId);
     }
+    @RequestMapping(value = "/{companyId}/image", method = RequestMethod.GET)
+    @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
+            summary = "${api.getCompanyImage.tag}", description = "${api.getCompanyImage.description}")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
+    public ResponseEntity<?> getCompanyImage(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
+                                            @RequestHeader(Constants.AUTH_KEY) String authToken,
+                                            @PathVariable String companyId) throws EmployeeException {
+        return companyService.getCompanyImageById(companyId);
+    }
+
 }

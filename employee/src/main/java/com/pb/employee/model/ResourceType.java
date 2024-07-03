@@ -17,9 +17,10 @@ public enum ResourceType {
     COMPANY("company"),
     EMPLOYEE("employee"),
     DEPARTMENT("department"),
-    PAYSLIP("payslip"),
     DESIGNATION("designation"),
-    SALARY("salary");
+    SALARY("salary"),
+    PAYSLIP("payslip");
+
 
     private final String value;
     public String value() {return this.value;}

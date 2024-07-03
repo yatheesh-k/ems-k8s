@@ -21,4 +21,5 @@ public interface CompanyService {
     ResponseEntity<?> updateCompanyImageById(String companyId,  CompanyImageUpdate companyImageUpdate,MultipartFile multipartFile) throws EmployeeException, IOException;
     ResponseEntity<?> deleteCompanyById(String companyId) throws EmployeeException;
 
+    ResponseEntity<?> getCompanyImageById(String companyId)  throws EmployeeException;
 }

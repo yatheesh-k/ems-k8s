@@ -1,23 +1,13 @@
 package com.pb.employee.util;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pb.employee.model.ResourceType;
-import com.pb.employee.persistance.model.CompanyEntity;
-import com.pb.employee.persistance.model.EmployeeEntity;
-import com.pb.employee.persistance.model.Entity;
-import com.pb.employee.persistance.model.SalaryEntity;
+import com.pb.employee.persistance.model.*;
 import com.pb.employee.request.*;
-import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.Date;
 
 @Slf4j
 @Component
@@ -176,11 +166,11 @@ public class CompanyUtils {
         String var = null, fix = null, bas = null, gross = null;
         String hra = null, trav = null, pfc = null, other = null,spa=null;
         String te= null, pfE = null, pfEmployer =null, lop = null, tax = null, itax = null, ttax = null, tded = null, net = null;
-        if(salaryRequest.getVariableAmount() != null) {
-            var = Base64.getEncoder().encodeToString(salaryRequest.getVariableAmount().toString().getBytes());
-        }
         if(salaryRequest.getFixedAmount() != null) {
             fix = (Base64.getEncoder().encodeToString(salaryRequest.getFixedAmount().toString().getBytes()));
+        }
+        if(salaryRequest.getVariableAmount() != null) {
+            var = Base64.getEncoder().encodeToString(salaryRequest.getVariableAmount().toString().getBytes());
         }
         if(salaryRequest.getGrossAmount() != null) {
             gross = (Base64.getEncoder().encodeToString(salaryRequest.getGrossAmount().toString().getBytes()));
@@ -188,14 +178,15 @@ public class CompanyUtils {
         if(salaryRequest.getBasicSalary() != null) {
             bas = (Base64.getEncoder().encodeToString(salaryRequest.getBasicSalary().toString().getBytes()));
         }
-        if(salaryRequest.getAllowances().getHra() != null) {
-            hra =(Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getHra().toString().getBytes()));
-        }
+
         if(salaryRequest.getAllowances().getTravelAllowance() != null) {
             trav = (Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getTravelAllowance().toString().getBytes()));
         }
         if(salaryRequest.getAllowances().getPfContributionEmployee() != null) {
             pfc = (Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getPfContributionEmployee().toString().getBytes()));
+        }
+        if(salaryRequest.getAllowances().getHra() != null) {
+            hra =(Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getHra().toString().getBytes()));
         }
         if(salaryRequest.getAllowances().getOtherAllowances() != null) {
             other = (Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getOtherAllowances().toString().getBytes()));
@@ -203,9 +194,11 @@ public class CompanyUtils {
         if(salaryRequest.getAllowances().getSpecialAllowance() != null) {
             spa = (Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getSpecialAllowance().toString().getBytes()));
         }
+
         if(salaryRequest.getTotalEarnings() != null) {
             te = (Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getTravelAllowance().toString().getBytes()));
         }
+
         if(salaryRequest.getDeductions().getPfEmployee() != null) {
             pfE = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getPfEmployee().toString().getBytes()));
         }
@@ -215,16 +208,26 @@ public class CompanyUtils {
         if(salaryRequest.getDeductions().getLop() != null) {
             lop = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getPfEmployee().toString().getBytes()));
         }
+        if(salaryRequest.getDeductions().getTotalDeductions() != null) {
+            tded = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getTotalDeductions().toString().getBytes()));
+        }
+        if(salaryRequest.getDeductions().getTotalDeductions() != null) {
+            tded = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getTotalDeductions().toString().getBytes()));
+        }
+
         if(salaryRequest.getDeductions().getPfTax() != null) {
             tax = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getPfTax().toString().getBytes()));
         }
-        if(salaryRequest.getDeductions().getIncomeTax() != null) {
-            itax = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getIncomeTax().toString().getBytes()));
-        } if(salaryRequest.getDeductions().getTotalTax() != null) {
+        Double grossAmount =salaryRequest.getGrossAmount();
+        Double totalDeductions = Double.valueOf(salaryRequest.getDeductions().getTotalDeductions());
+        itax = String.valueOf(TaxCalculatorUtils.getOldTax( grossAmount-totalDeductions));
+        itax= (Base64.getEncoder().encodeToString(itax.getBytes()));
+
+
+        if(salaryRequest.getDeductions().getTotalTax() != null) {
             ttax = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getTotalTax().toString().getBytes()));
-        }if(salaryRequest.getDeductions().getTotalDeductions() != null) {
-            tded = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getTotalDeductions().toString().getBytes()));
         }
+
         if(salaryRequest.getNetSalary() != null) {
             net = (Base64.getEncoder().encodeToString(salaryRequest.getNetSalary().toString().getBytes()));
         }
@@ -244,7 +247,7 @@ public class CompanyUtils {
         entity.getAllowances().setTravelAllowance(trav);
         entity.getAllowances().setHra(hra);
         entity.getAllowances().setPfContributionEmployee(pfc);
-        entity.getAllowances().setTotalEarnings(te);
+        entity.setTotalEarnings(te);
         entity.getDeductions().setPfEmployee(pfE);
         entity.getDeductions().setPfEmployer(pfEmployer);
         entity.getDeductions().setLop(lop);
@@ -257,7 +260,6 @@ public class CompanyUtils {
         return entity;
     }
 
-    public static Entity maskAttendanceProperties(AttendanceRequest attendanceRequest, String attendanceId, String employeeId) {
-        return null;
-    }
+
+
 }

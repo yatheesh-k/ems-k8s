@@ -87,6 +87,7 @@ public class CompanyServiceImpl implements CompanyService {
         EmployeeEntity employee = EmployeeEntity.builder().
                 id(employeeAdminId).
                 employeeType(Constants.EMPLOYEE_TYPE).
+                id(employeeAdminId).
                 emailId(companyRequest.getEmailId()).
                 password(password).
                 type(Constants.EMPLOYEE).
@@ -195,6 +196,25 @@ public class CompanyServiceImpl implements CompanyService {
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.DELETED), HttpStatus.OK);
 
     }
+
+    @Override
+    public ResponseEntity<?> getCompanyImageById(String companyId)  throws EmployeeException{
+        log.info("getting details of {}", companyId);
+        CompanyEntity companyEntity = null;
+        String image = null;
+        try {
+            companyEntity = openSearchOperations.getCompanyById(companyId, null, Constants.INDEX_EMS);
+            image = companyEntity.getImageFile();
+        } catch (Exception ex) {
+            log.error("Exception while fetching company details {}", ex);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_SAVE_COMPANY),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(image), HttpStatus.OK);
+    }
+
 
 
 }

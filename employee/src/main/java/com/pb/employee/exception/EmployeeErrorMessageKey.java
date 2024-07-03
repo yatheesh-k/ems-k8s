@@ -33,8 +33,10 @@ public enum EmployeeErrorMessageKey {
     UNABLE_SAVE_DESIGNATION("unable.save.designation"),
     UNABLE_GET_DESIGNATION("unable.get.designation"),
     UNABLE_TO_SAVE_SALARY("unable.save.salary"),
+    EMPLOYEE_PAYSLIP_ALREADY_EXISTS("employee.payslip.already.exist"),
+    EMPLOYEE_NOT_MATCHING("employee.not.matching"),
+    UNABLE_GET_EMPLOYEES_PAYSLIP("unable.get.employee.payslip"),
     UNABLE_GET_EMPLOYEES_SALARY("unable.get.employee.salary");
-
 
     private final String key;
 

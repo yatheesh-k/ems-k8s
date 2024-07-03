@@ -38,7 +38,7 @@ public class EmployeeController {
         return employeeService.registerEmployee(employeeRequest);
     }
 
-    @RequestMapping(value = "{companyName}/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/{companyName}", method = RequestMethod.GET)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.getEmployees.tag}", description = "${api.getEmployees.description}")
     @ResponseStatus(HttpStatus.OK)

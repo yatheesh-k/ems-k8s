@@ -183,6 +183,19 @@ public class OpenSearchOperations {
         }
         return null;
     }
+    public PayslipEntity getPayslipById(String resourceId, String type, String index) throws IOException {
+        if(type != null) {
+            resourceId = type+"_"+resourceId;
+        }
+        GetRequest getRequest = new GetRequest.Builder().id(resourceId)
+                .index(index).build();
+        GetResponse<PayslipEntity> searchResponse = esClient.get(getRequest, PayslipEntity.class);
+        if(searchResponse != null && searchResponse.source() != null){
+            return searchResponse.source();
+        }
+        return null;
+    }
+
 
     public List<DesignationEntity> getCompanyDesignationByName(String companyName, String designationName) throws EmployeeException {
         logger.debug("Getting the Resource by id {}", companyName, designationName);
@@ -409,6 +422,47 @@ public class OpenSearchOperations {
         }
 
         return salaryEntities;
+    }
+
+    public List<PayslipEntity> getEmployeePayslip(String companyName, String employeeId) throws EmployeeException {
+        logger.debug("Getting payslips for employee {} in company {}", employeeId, companyName);
+
+        // Build the BoolQuery
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        boolQueryBuilder = boolQueryBuilder
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.PAYSLIP)));
+        BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
+        SearchResponse<PayslipEntity> searchResponse = null;
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+
+        try {
+            // Execute the search
+            searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                    .query(finalBoolQueryBuilder.build()._toQuery()), PayslipEntity.class);
+        } catch (IOException e) {
+            logger.error("Error executing search query: {}", e.getMessage());
+            throw new EmployeeException("Unable to search", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        // Get hits from the search response
+        List<Hit<PayslipEntity>> hits = searchResponse.hits().hits();
+        logger.info("Number of payslip hits for company {} and employee {}: {}", companyName, employeeId, hits.size());
+
+        // Filter payslips for the specific employee ID
+        List<PayslipEntity> payslipEntities = new ArrayList<>();
+        for (Hit<PayslipEntity> hit : hits) {
+            PayslipEntity payslip = hit.source();
+            if (payslip != null && employeeId.equals(payslip.getEmployeeId())) {
+                payslipEntities.add(payslip);
+            }
+        }
+
+        // Log if no payslips are found for the employee
+        if (payslipEntities.isEmpty()) {
+            logger.warn("No payslips found for employee {} in company {}", employeeId, companyName);
+        }
+
+        return payslipEntities;
     }
 
 
