@@ -1,12 +1,18 @@
 import React, { useState } from "react";
+import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
-
-const Header = ({toggleSidebar}) => {
+const Header = ({ toggleSidebar }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const navigate=useNavigate();
-  
+  const navigate = useNavigate();
+
+  const token = sessionStorage.getItem("token");
+  const decodedToken = jwtDecode(token);
+
+  // Extract roles from the decoded token
+  const roles = decodedToken?.roles || [];
+
   const toggleNotification = () => {
     setIsNotificationOpen(!isNotificationOpen);
     setIsProfileOpen(false);
@@ -17,14 +23,18 @@ const Header = ({toggleSidebar}) => {
     setIsNotificationOpen(false);
   };
 
-  const handleLogOut=()=>{
+  const handleLogOut = () => {
     sessionStorage.clear();
-    navigate('/')
-  }
+    navigate("/");
+  };
 
   return (
     <nav className="navbar navbar-expand navbar-light navbar-bg">
-      <a className="sidebar-toggle js-sidebar-toggle" onClick={toggleSidebar} href>
+      <a
+        className="sidebar-toggle js-sidebar-toggle"
+        onClick={toggleSidebar}
+        href
+      >
         <i className="hamburger align-self-center"></i>
       </a>
       <div className="navbar-collapse collapse">
@@ -62,13 +72,46 @@ const Header = ({toggleSidebar}) => {
               </div>
             )}
           </li>
+          {roles.includes("ems_admin") && ( 
+          <li className="nav-item">
+            <a
+              className="nav-link dropdown-toggle d-none d-sm-inline-block text-center"
+              href
+              onClick={toggleProfile}
+            >
+              <i
+                className="bi bi-person-circle"
+                style={{ fontSize: "22px" }}
+              ></i>
+            </a>
+            {isProfileOpen && (
+              <div
+                className="dropdown-menu dropdown-menu-end py-0 show"
+                aria-labelledby="profileDropdown"
+                style={{ left: "auto", right: "2%" }}
+              >
+                <a className="dropdown-item" href="/reset">
+                  <i className="align-middle me-1 bi bi-key"></i> Reset Password
+                </a>
+                <div className="dropdown-divider"></div>
+                <a className="dropdown-item" onClick={handleLogOut} href="/">
+                  Log out
+                </a>
+              </div>
+            )}
+          </li> 
+          )}
+          {roles.includes("company_admin") && (
           <li className="nav-item dropdown position-relative">
             <a
               className="nav-link dropdown-toggle d-none d-sm-inline-block text-center"
               href
               onClick={toggleProfile}
             >
-              <i className="bi bi-person-circle" style={{fontSize:"22px"}}></i>
+              <i
+                className="bi bi-person-circle"
+                style={{ fontSize: "22px" }}
+              ></i>
             </a>
             {isProfileOpen && (
               <div
@@ -76,19 +119,24 @@ const Header = ({toggleSidebar}) => {
                 aria-labelledby="profileDropdown"
                 style={{ left: "auto", right: "50%" }}
               >
-                <a className="dropdown-item" href="pages-profile.html">
+                <a className="dropdown-item" href="/profile">
                   <i className="align-middle me-1 bi bi-person"></i> Profile
+                </a>
+                <a className="dropdown-item" href="/reset">
+                  <i className="align-middle me-1 bi bi-key"></i> Reset Password
                 </a>
                 <a className="dropdown-item" href="index.html">
                   <i className="align-middle me-1 bi bi-gear"></i> Settings
                 </a>
                 <div className="dropdown-divider"></div>
-                <a className="dropdown-item" onClick={handleLogOut} >
+                <a className="dropdown-item" onClick={handleLogOut} href="/">
                   Log out
                 </a>
               </div>
+              // )}
             )}
           </li>
+          )}
         </ul>
       </div>
     </nav>

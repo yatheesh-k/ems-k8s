@@ -47,16 +47,20 @@ const Department = () => {
       e.preventDefault();
     }
   };
-
+  const company=sessionStorage.getItem("company")
   const onSubmit = async (data) => {
+    const postData={
+       companyName:company,
+       ...data
+    }
     try {
       setPending(true);
   
       if (editingUserId) {
-        const response = await DepartmentPutApiById(editingUserId, data);
+        const response = await DepartmentPutApiById(editingUserId, postData);
         toast.success("Department updated successfully");
       } else {
-        const response = await DepartmentPostApi(data);
+        const response = await DepartmentPostApi(postData);
         toast.success("Department created successfully");
       }
   
@@ -175,7 +179,7 @@ const Department = () => {
           <div className="col-12 col-lg-12 col-xxl-12 d-flex">
             <div className="card flex-fill">
               <div className="card-header">
-                <div className='row'>
+                <div className='row mb-2'>
                   <div className='col-12 col-md-6 col-lg-4'>
                     <button onClick={() => setAddDepartment(true)} className={editingUserId ? "btn btn-danger" : "btn btn-primary"} type='button'>{editingUserId ? "Update Department" : "Add Department"}</button>
                   </div>

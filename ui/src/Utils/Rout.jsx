@@ -27,6 +27,7 @@ import ExistingLetter from '../EmployeeModule/ExistingLetter';
 import CompanySalaryStructure from '../CompanyModule/PayRoll/CompanySalaryStructure';
 import EmployeeSalaryList from '../CompanyModule/PayRoll/EmployeeSalaryList';
 import Message from '../LayOut/Message';
+import Profile from '../LayOut/Profile';
 
 
 
@@ -39,6 +40,7 @@ const Rout = () => {
       <Route path='/' element={<Message />}></Route>
       <Route path='/emsAdmin/login' element={<EmsLogin />}></Route>
       <Route path='/:company/login' element={<CompanyLogin />}></Route>
+      <Route path='/profile' element={<Profile/>}></Route>
       <Route path='/main' element={<Body />}></Route>
       <Route path='/companyRegistration' element={<CompanyRegistration />}></Route>
       <Route path='/companyView' element={<CompanyView />}></Route>

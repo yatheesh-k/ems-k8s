@@ -68,16 +68,22 @@ const EmployeeView = () => {
     const apiUrl=`http://localhost:8092/ems/employee/${company}`
 
     useEffect(() => {
-
-     EmployeeGetApi().then(data => {
-        setEmployees(data);
-        setFilteredData(data);
+      EmployeeGetApi().then(data => {
+        const filteredData = data
+          .filter(employee => employee.employeeId !== null) // Exclude employees with null employeeId
+          .map(({ referenceId, ...rest }) => rest); // Exclude referenceId
+        setEmployees(filteredData);
+        setFilteredData(filteredData);
       });
     }, []);
     
     
 console.log(filteredData);
 
+
+  const handleSalary=(id)=>{
+    Navigate('/employeeSalaryList',{ state: { id } })
+  }
 
   const handleEdit = (id) => {
     console.log(id);
@@ -87,7 +93,7 @@ console.log(filteredData);
   const handleConfirmDelete = async () => {
     if (selectedItemId) {
       try {
-      await  EmployeeDeleteApiById(setSelectedItemId)
+      await  EmployeeDeleteApiById(selectedItemId)
           .then((response) => {
             if (response.status === 200) {
               toast.success("Employee Deleted Succesfully", {
@@ -244,6 +250,17 @@ console.log(filteredData);
       selector: row =>row.status,
       sortable: true,
       cell: (row) => statusMappings[row.status]?.label || "Unknown",
+    },
+    {
+      name: <h5><b>Action</b></h5>,
+      cell: (row) => (
+        <div>
+          <button className="btn btn-sm btn-primary" onClick={() => handleSalary(row.id)}>
+           Salary
+          </button>
+         
+        </div>
+      )
     },
     {
       name: <h5><b>Action</b></h5>,

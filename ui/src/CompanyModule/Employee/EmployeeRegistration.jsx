@@ -9,6 +9,7 @@ import LayOut from "../../LayOut/LayOut";
 import { DepartmentGetApi, DesignationGetApi, EmployeeGetApiById, EmployeePostApi, EmployeePutApiById, employeeUpdateByIdApi, employeeViewApi } from "../../Utils/Axios";
 
 const EmployeeRegistration = () => {
+
   const {
     register,
     handleSubmit,
@@ -16,7 +17,12 @@ const EmployeeRegistration = () => {
     formState: { errors },
     reset,
     setValue,
-  } = useForm("");
+  } = useForm({
+    defaultValues: {
+      status: "", // Initialize with default value or leave empty if fetching dynamically
+      roles: ''
+    }
+  });
   const [view, setView] = useState([]);
   const [user, setUser] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -51,7 +57,7 @@ const EmployeeRegistration = () => {
 
     // Prevent space character entry if the value is empty
     if (e.keyCode === 32) {
-      e.preventDefault(); 
+      e.preventDefault();
     }
   };
 
@@ -72,7 +78,7 @@ const EmployeeRegistration = () => {
   const Status = [
     { value: "0", label: "Active" },
     { value: "1", label: "InActive" },
-    { value: "2", label: "Notice Period"},
+    { value: "2", label: "Notice Period" },
     { value: "3", label: "Relieved" }
   ]
 
@@ -104,46 +110,46 @@ const EmployeeRegistration = () => {
       Authorization: `Bearer ${token}`,
     },
   };
- 
-    const fetchDepartments = async () => {
-      try {
-        const data = await DepartmentGetApi();
-        setDepartments(data);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    const fetchDesignations = async () => {
-      try {
-        const data = await DesignationGetApi();
-        setDesignations(data);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchDepartments = async () => {
+    try {
+      const data = await DepartmentGetApi();
+      setDepartments(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    useEffect(() => {
-      if (location && location.state && location.state.id) {
-        const fetchData = async () => {
-          try {
-            const response = await EmployeeGetApiById(location.state.id);
-            console.log(response.data);
-            reset(response.data);
-          } catch (error) {
-            console.error('Error fetching company details:', error);
-          }
-        };
-    
-        fetchData();
-      }
-    }, [location.state]);
+  const fetchDesignations = async () => {
+    try {
+      const data = await DesignationGetApi();
+      setDesignations(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    useEffect(() => {
+  useEffect(() => {
+    if (location && location.state && location.state.id) {
+      const fetchData = async () => {
+        try {
+          const response = await EmployeeGetApiById(location.state.id);
+          console.log(response.data);
+          reset(response.data);
+        } catch (error) {
+          console.error('Error fetching company details:', error);
+        }
+      };
+
+      fetchData();
+    }
+  }, [location.state]);
+
+  useEffect(() => {
     fetchDepartments();
     fetchDesignations();
   }, []);
@@ -166,14 +172,14 @@ const EmployeeRegistration = () => {
     e.target.value = value;
   };
 
-  
+
 
 
   const onSubmit = async (data) => {
     const company = sessionStorage.getItem('company');
     // Constructing the payload
     const payload = {
-      companyName:company,
+      companyName: company,
       employeeType: data.employeeType,
       employeeId: data.employeeId,
       firstName: data.firstName,
@@ -222,6 +228,12 @@ const EmployeeRegistration = () => {
           const response = await EmployeeGetApiById(location.state.id);
           console.log(response.data);
           reset(response.data.data);
+          setIsUpdating(true);
+          // Set individual fields if necessary
+          setValue('status', response.data.data.status.toString());
+
+          // Assuming roles is an array and setting the first role
+          setValue('roles', response.data.data.roles.length > 0 ? response.data.data.roles[0] : null);
         } catch (error) {
           console.error('Error fetching company details:', error);
         }
@@ -229,7 +241,7 @@ const EmployeeRegistration = () => {
 
       fetchData();
     }
-  }, [location.state]);
+  }, [location.state, reset, setValue]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -242,7 +254,7 @@ const EmployeeRegistration = () => {
   // set date of hiring date limit
   const nextThreeMonths = new Date();
   nextThreeMonths.setMonth(nextThreeMonths.getMonth() + 3);
-  
+
   // Function to format date to dd/mm/yyyy
   const formatDateToDDMMYYYY = (date) => {
     const day = ("0" + date.getDate()).slice(-2);
@@ -250,11 +262,11 @@ const EmployeeRegistration = () => {
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
-  
+
   const threeMonthsFromNow = formatDateToDDMMYYYY(nextThreeMonths);
-  
+
   console.log(threeMonthsFromNow); // Output: dd/mm/yyyy
-  
+
   return (
     <LayOut>
       <div className="container-fluid p-0">
@@ -469,7 +481,7 @@ const EmployeeRegistration = () => {
                           <select {...field} className="form-select" >
                             <option value="" disabled>Select a department</option>
                             {departments.map(department => (
-                              <option key={department.id} value={department.id}>
+                              <option key={department.id} value={department.name}>
                                 {department.name}
                               </option>
                             ))}
@@ -492,7 +504,7 @@ const EmployeeRegistration = () => {
                           <select {...field} className="form-select" >
                             <option value="" disabled>Select a designation</option>
                             {designations.map(designation => (
-                              <option key={designation.id} value={designation.id}>
+                              <option key={designation.id} value={designation.name}>
                                 {designation.name}
                               </option>
                             ))}
@@ -567,44 +579,54 @@ const EmployeeRegistration = () => {
                         <p className="errorMsg">{errors.location.message}</p>
                       )}
                     </div>
-                    <div className="col-lg-1"></div>
-                    <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Password</label>
-                      <div className="col-sm-12 input-group">
-                        <input
-                          className="form-control"
-                          placeholder="Enter Password"
-                          onChange={handlePasswordChange}
-                          autoComplete="off"
-                          onKeyDown={handleEmailChange}
-                          type={passwordShown ? "text" : "password"}
-                          {...register("password", {
-                            required: "Password Required",
-                            pattern: {
-                              value:
-                                /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/,
-                              message: "Invalid Password",
-                            },
-                          })}
-                        />
-                        <i
-                          onClick={togglePasswordVisiblity}
-                          style={{ margin: "5px" }}
-                        >
-                          {" "}
-                          {passwordShown ? (
-                            <Eye size={17} />
-                          ) : (
-                            <EyeSlash size={17} />
+                    {isUpdating && (
+                      <div className="col-lg-1"></div>
+                    )}
+                    {isUpdating ? (
+                      <></>
+                    ) : (
+                      <>
+                        <div className="col-12 col-md-6 col-lg-5 mb-3">
+                          <label className="form-label">Password</label>
+                          <div className="col-sm-12 input-group">
+                            <input
+                              className="form-control"
+                              placeholder="Enter Password"
+                              onChange={handlePasswordChange}
+                              autoComplete="off"
+                              onKeyDown={handleEmailChange}
+                              type={passwordShown ? "text" : "password"}
+                              {...register("password", {
+                                required: "Password Required",
+                                pattern: {
+                                  value:
+                                    /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/,
+                                  message: "Invalid Password",
+                                },
+                              })}
+                            />
+                            <i
+                              onClick={togglePasswordVisiblity}
+                              style={{ margin: "5px" }}
+                            >
+                              {" "}
+                              {passwordShown ? (
+                                <Eye size={17} />
+                              ) : (
+                                <EyeSlash size={17} />
+                              )}
+                            </i>
+                          </div>
+                          {errors.password && (
+                            <p className="errorMsg">{errors.password.message}</p>
                           )}
-                        </i>
-                      </div>
-                      {errors.password && (
-                        <p className="errorMsg">{errors.password.message}</p>
-                      )}
-                    </div>
-                    <div className="col-lg-1"></div>
-                    <div className="col-12 col-md-6 col-lg-5 mb-3">
+                        </div>
+
+                      </>
+                    )}
+                    {!isUpdating && (
+                      <div className="col-lg-1"></div>
+                    )}                    <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Date of Birth</label>
                       <input
                         type={isUpdating ? "date" : "date"}
@@ -621,11 +643,12 @@ const EmployeeRegistration = () => {
                         <p className="errorMsg">Date of Hiring Required</p>
                       )}
                     </div>
-                   
+                    {isUpdating && (
+                      <div className="col-lg-1"></div>
+                    )}
+
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
-                      <label className="form-label mb-3">
-                        Select Employee Status
-                      </label>
+                      <label className="form-label mb-3">Select Employee Status</label>
                       <Controller
                         name="status"
                         control={control}
@@ -633,49 +656,44 @@ const EmployeeRegistration = () => {
                         render={({ field }) => (
                           <Select
                             {...field}
-                            options={Status.map((s) => ({
-                              value: s.value,
-                              label: s.label,
-                            }))}
-                            value={Status.find((s) => s.value === field.value)}
+                            options={[
+                              { value: 0, label: "Active" },
+                              { value: 1, label: "Inactive" },
+                              { value: 2, label: "Notice Period" },
+                              { value: 3, label: "Relieved" }
+                            ]}
+                            value={{
+                              value: field.value,
+                              label: ["Active", "Inactive", "Notice Period", "Relieved"][field.value],
+                            }}
                             onChange={(val) => field.onChange(val.value)}
-                            placeholder=" Select Status"
+                            placeholder="Select Status"
                           />
                         )}
                       />
-                      {errors.status && (
-                        <p className="errorMsg">Employee Status is Required</p>
-                      )}
+                      {errors.status && <p className="errorMsg">Employee Status is Required</p>}
                     </div>
 
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
-                      <label className="form-label mb-3">
-                        Select Employee Role
-                      </label>
+                      <label className="form-label mb-3">Select Employee Role</label>
                       <Controller
-                        className="form-select"
-                        name="role"
-                        defaultValue=""
+                        name="roles"
                         control={control}
                         rules={{ required: true }}
                         render={({ field }) => (
                           <Select
-                         {...field}
-                          options={Roles.map((r) => ({
-                            value: r.value,
-                            label: r.label,
-                          }))}
-                          value={Roles.find((r) => r.value === field.value)}
-                          onChange={(val) => field.onChange(val.value)}
-                          placeholder=" Select Status"
-                        />
+                            {...field}
+                            options={Roles}
+                            value={Roles.find(option => option.value === field.value)}
+                            onChange={(val) => field.onChange(val.value)}
+                            placeholder="Select Role"
+                          />
                         )}
                       />
-                      {errors.roles && (
-                        <p className="errorMsg">Employee Role is Required</p>
-                      )}
+                      {errors.roles && <p className="errorMsg">Employee Role is Required</p>}
                     </div>
+
                     <div className="col-lg-6"></div>
                     <hr />
                     <h6 className="mt-2">Account Details</h6>
@@ -732,7 +750,7 @@ const EmployeeRegistration = () => {
                       )}
                     </div>
                     <div className="col-lg-1"></div>
-                    <div className="col-12 col-md-6 col-lg-5 mb-3">
+                    {/* <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Bank Address</label>
                       <textarea
                         type="text"
@@ -748,8 +766,8 @@ const EmployeeRegistration = () => {
                       {errors.ipAddress && (
                         <p className="errorMsg">{errors.ipAddress.message}</p>
                       )}
-                    </div>
-{/* 
+                    </div> */}
+                    {/* 
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Aadhaar Number</label>
                       <input
@@ -767,7 +785,7 @@ const EmployeeRegistration = () => {
                         <p className="errorMsg">{errors.ipAddress.message}</p>
                       )}
                     </div> */}
-                    <div className="col-lg-1"></div>
+
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Uan Number</label>
                       <input
@@ -789,7 +807,8 @@ const EmployeeRegistration = () => {
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">PAN Number</label>
                       <input
-                        type="text"
+                        type={isUpdating ? "text" : "text"}
+                        readOnly={isUpdating}
                         className="form-control"
                         placeholder="Enter pan number"
                         name="panNo"

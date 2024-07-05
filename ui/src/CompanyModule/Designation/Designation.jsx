@@ -115,9 +115,6 @@ const onSubmit = async (data) => {
     }
   };
 
-
-
-
   const fetchDesignation = async () => {
     try {
       const designations = await DesignationGetApi();
@@ -132,14 +129,12 @@ const onSubmit = async (data) => {
   fetchDesignation();
 }, []); // Dependency array is empty to run only once on mount
 
-
-
   const handleEmailChange = (e) => {
     // Get the current value of the input field
     const value = e.target.value;
 
     // Check if the value is empty
-    if (value.trim() !== '') {
+    if (value.trim() !== '') { 
       return; // Allow space button
     }
 
@@ -159,11 +154,6 @@ const onSubmit = async (data) => {
       selector: (row, index) => index + 1,
 
     },
-    //   {
-    //     name:"Id",
-    //      selector:(row)=>row.id,
-
-    //  },
     {
       name: <h5><b>Designation</b></h5>,
       selector: (row) => row.name,
@@ -174,7 +164,6 @@ const onSubmit = async (data) => {
       cell: (row) => <div> <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginRight: "10px" }} onClick={() => handleEdit(row.id)}><PencilSquare size={22} color='#2255a4' /></button>
         <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }} onClick={() => handleShowDeleteModal(row.id)}><XSquareFill size={22} color='#da542e' /></button>
       </div>
-
     }
   ]
 
@@ -244,7 +233,7 @@ const onSubmit = async (data) => {
           <div className="col-12 col-lg-12 col-xxl-12 d-flex">
             <div className="card flex-fill">
               <div className="card-header">
-                <div className='row'>
+                <div className='row mb-2'>
                   <div className='col-12 col-md-6 col-lg-4' >
                     <button onClick={() => setAddDesignation(true)} className={editingUserId ? "btn btn-danger" : "btn btn-primary"} type='submit'>{editingUserId ? "Update Designation" : "Add Designation"}</button>
                   </div>

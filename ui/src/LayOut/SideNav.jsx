@@ -31,6 +31,43 @@ const SideNav = () => {
 
   console.log(roles)
   
+  useEffect(() => {
+    if (
+      location.pathname === "/companyRegistration" ||
+      location.pathname.startsWith("/companyView")
+    ) {
+      setIsCompanyOpen(true);
+    } else {
+      setIsCompanyOpen(false);
+    }
+  }, [location]);
+  useEffect(() => {
+    if (
+      location.pathname === "/companySalaryStructure" ||
+      location.pathname === "/employeeSalaryStructure" ||
+      location.pathname === "/employeeSalaryList" ||
+      location.pathname === "/payslipGeneration" ||
+      location.pathname === "/payslipsList"||
+      location.pathname === "/increment" ||
+      location.pathname === "/incrementList"
+    ) {
+      setIsPayrollOpen(true);
+    } else {
+      setIsPayrollOpen(false);
+    }
+  }, [location]);
+  useEffect(() => {
+    if (
+      location.pathname === "/addAttendance" ||
+      location.pathname === "/attendanceList" ||
+      location.pathname === "/attendanceReport"
+    ) {
+      setIsAttendanceOpen(true);
+    } else {
+      setIsAttendanceOpen(false);
+    }
+  }, [location]);
+
 
   const togglePayroll = (e) => {
     e.preventDefault(); // Prevent default anchor behavior

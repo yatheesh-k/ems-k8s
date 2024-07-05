@@ -50,9 +50,10 @@ export const CompanyloginApi = (data) => {
 
     return axios.post(`${Login_URL}/company/login`, data)
         .then(response => {
-             // Store the token and refresh token in sessionStorage
-             sessionStorage.setItem('token', token);
-            //  sessionStorage.setItem('refreshToken', reToken);
+          const { token, refreshToken } = response.data.data;
+          // Store the token and refresh token in sessionStorage
+          sessionStorage.setItem("token", token);
+          sessionStorage.setItem("refreshToken", refreshToken);
             return response.data;
         })
         .catch(error=>{
@@ -99,8 +100,7 @@ export const DepartmentGetApi = () => {
     });
 }
 export const DepartmentPostApi = (data) => {
-  const company=sessionStorage.getItem("company")
-    return axiosInstance.post(`${company}/department`,data);
+    return axiosInstance.post("/department",data);
 }
 export const DepartmentGetApiById = (departmentId) => {
   const company=sessionStorage.getItem("company")
@@ -125,22 +125,17 @@ export const DepartmentDeleteApiById = (departmentId) => {
       throw error; 
     });
 }
-const config = {
-  headers: { 
-    Authorization: `Bearer ${token}`,
-  },
-};
 
 export const DepartmentPutApiById = (departmentId, data) => {
   const company = sessionStorage.getItem("company");
-  return axiosInstance.patch(`${company}/department/${departmentId}`, data,config)
+  return axiosInstance.patch(`${company}/department/${departmentId}`, data)
 };
 
 export const DesignationGetApi = () => {
   const company=sessionStorage.getItem("company")
-    return axiosInstance.get(`${company}/designation`)
+    return axiosInstance.get(`${company}/designations`)
     .then(response => {
-      return response.data.data; 
+      return response.data.data;  
     })
     .catch(error => {
       console.error('Error fetching company by ID:', error);
@@ -149,13 +144,12 @@ export const DesignationGetApi = () => {
 }
 
 export const DesignationPostApi = (data) => {
-  const company=sessionStorage.getItem("company")
     return axiosInstance.post('/designation',data);
 }
 
 export const DesignationGetApiById = (designationId) => {
   const company=sessionStorage.getItem("company")
-    return axiosInstance.get(`/designation/${designationId}`)
+    return axiosInstance.get(`${company}/designation/${designationId}`)
     .then(response => {
       return response.data; 
     })
@@ -217,16 +211,34 @@ export const EmployeeDeleteApiById = (employeeId) => {
 
 export const EmployeePutApiById = (employeeId, data) => {
   const company = sessionStorage.getItem("company");
-  return axios.patch(`/employee/${company}/${employeeId}`, data,config)
+  return axios.patch(`/employee/${company}/${employeeId}`, data)
 };
 
 export const roleApi = () =>{
   return axiosInstance.get("/role/all");
 }
 
-export const updateEmployeeApi = (employeeId) =>
-  axiosInstance.patch(`/employee/${employeeId}`);
-export const employeeRegistrationApi = () =>
-  axiosInstance.post("/employee/registration");
-export const employeeIdApi = (employeeId) =>
-  axiosInstance.get(`/employee/${employeeId}`);
+
+export const EmployeeSalaryPostApi=(employeeId,data)=>{
+  return axiosInstance.post(`/${employeeId}/salary`,data);
+}
+
+export const EmployeeSalaryGetApi=(employeeId)=>{
+  const company = sessionStorage.getItem("company")
+  return axiosInstance.get(`/${company}/employee/${employeeId}/salaries`);
+}
+
+export const EmployeeSalaryGetApiById=(employeeId,salaryId)=>{
+  const company = sessionStorage.getItem("company")
+  return axiosInstance.get(`/${company}/employee/${employeeId}/${salaryId}`);
+}
+
+export const EmployeeSalaryPatchApiById=(employeeId,salaryId,data)=>{
+  const company = sessionStorage.getItem("company")
+  return axiosInstance.patch(`/${company}/employee/${employeeId}/${salaryId}`,data);
+}
+
+export const EmployeeSalaryDeleteApiById=(employeeId,salaryId)=>{
+  const company = sessionStorage.getItem("company")
+  return axiosInstance.delete(`/${company}/employee/${employeeId}/${salaryId}`);
+}
