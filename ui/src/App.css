@@ -381,6 +381,7 @@
   [type="submit"],
   button {
 	-webkit-appearance: button;
+	
   }
   
   [type="button"]:not(:disabled),

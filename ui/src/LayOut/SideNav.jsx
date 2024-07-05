@@ -1,34 +1,36 @@
-import { jwtDecode } from "jwt-decode";
-import React, { useEffect, useState } from "react";
-import {
-  Diagram3Fill,
-  EraserFill,
-  FileMedicalFill,
-  PersonVcardFill,
-  Receipt,
-  Speedometer2,
-} from "react-bootstrap-icons";
-import { Link, useLocation } from "react-router-dom";
+  import { jwtDecode } from "jwt-decode";
+  import React, { useEffect, useState } from "react";
+  import {
+    Diagram3Fill,
+    EraserFill,
+    FileMedicalFill,
+    PersonVcardFill,
+    Receipt,
+    Speedometer2,
+  } from "react-bootstrap-icons";
+  import { Link, useLocation } from "react-router-dom";
 
-const SideNav = () => {
-  const [isPayrollOpen, setIsPayrollOpen] = useState(false); // State for managing PayRoll dropdown
-  const [isAttendanceOpen, setIsAttendanceOpen] = useState(false); // State for managing Attendance dropdown
-  const [isCompanyOpen, setIsCompanyOpen] = useState(false); // State for managing Company dropdown
-  const [roles,setRoles]=useState([]);
+  const SideNav = () => {
+    const [isPayrollOpen, setIsPayrollOpen] = useState(false); // State for managing PayRoll dropdown
+    const [isAttendanceOpen, setIsAttendanceOpen] = useState(false); // State for managing Attendance dropdown
+    const [isCompanyOpen, setIsCompanyOpen] = useState(false); // State for managing Company dropdown
+    const [roles, setRoles] = useState([]);
 
-  const location = useLocation();
-  const userImageBase64 = sessionStorage.getItem("imageFile"); // Assuming the base64 image is stored in sessionStorage
+    const location = useLocation();
+    const userImageBase64 = sessionStorage.getItem("imageFile"); // Assuming the base64 image is stored in sessionStorage
 
-  const token = sessionStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
-  useEffect(() => {
-    if (token) {
-      const decodedToken = jwtDecode(token);
-      setRoles(decodedToken.roles || []);
-    }
-  }, [token]);
+    useEffect(() => {
+      if (token) {
+        const decodedToken = jwtDecode(token);
+        setRoles(decodedToken.roles || []);
+      }
+    }, [token]);
 
+    console.log(roles);
 
+<<<<<<< HEAD
   console.log(roles)
   
   useEffect(() => {
@@ -68,124 +70,165 @@ const SideNav = () => {
     }
   }, [location]);
 
+=======
+    console.log(roles);
+>>>>>>> 396dd8f2b95b4f79375295c131098fc0add108bb
 
-  const togglePayroll = (e) => {
-    e.preventDefault(); // Prevent default anchor behavior
-    setIsPayrollOpen(!isPayrollOpen);
-    setIsCompanyOpen(false);
-    setIsAttendanceOpen(false);
-  };
+    useEffect(() => {
+      if (
+        location.pathname === "/companyRegistration" ||
+        location.pathname.startsWith("/companyView")
+      ) {
+        setIsCompanyOpen(true);
+      } else {
+        setIsCompanyOpen(false);
+      }
+    }, [location]);
 
-  const toggleCompany = (e) => {
-    e.preventDefault();
-    setIsCompanyOpen(!isCompanyOpen);
-    setIsAttendanceOpen(false);
-    setIsPayrollOpen(false);
-  };
+    useEffect(() => {
+      if (
+        location.pathname === "/companySalaryStructure" ||
+        location.pathname === "/employeeSalaryStructure" ||
+        location.pathname === "/employeeSalaryList" ||
+        location.pathname === "/payslipGeneration" ||
+        location.pathname === "/payslipsList"||
+        location.pathname === "/increment" ||
+        location.pathname === "/incrementList" 
+      ) {
+        setIsPayrollOpen(true);
+      } else {
+        setIsPayrollOpen(false);
+      }
+    }, [location]);
 
-  const toggleAttendance = (e) => {
-    e.preventDefault(); // Prevent default anchor behavior
-    setIsAttendanceOpen(!isAttendanceOpen);
-    setIsCompanyOpen(false);
-    setIsPayrollOpen(false);
-  };
+    useEffect(() => {
+      if (
+        location.pathname === "/addAttendance" ||
+        location.pathname === "/attendanceList" ||
+        location.pathname === "/attendanceReport"
+      ) {
+        setIsAttendanceOpen(true);
+      } else {
+        setIsAttendanceOpen(false);
+      }
+    }, [location]);
 
-  const getImageSrc = () => {
-    if (roles === "ems_admin") {
-      return "assets/img/pathbreaker_logo.png";
-    }
-    return userImageBase64
-      ? `data:image/png;base64,${userImageBase64}`
-      : "assets/img/pathbreaker_logo.png"; // Fallback to a default image if base64 is not available
-  };
-  return (
-    <nav id="sidebar" class="sidebar js-sidebar">
-      <div className="sidebar-content js-simplebar">
-        <a className="sidebar-brand" href="/main">
-          <span>
-            <img
-              className="align-middle"
-              src={getImageSrc()}
-              alt="Logo"
-              style={{ height: "80px", width: "180px" }}
-            />
-          </span>
-        </a>
-        <ul className="sidebar-nav mt-2">
-          {roles.includes("ems_admin") && (
-            <>
-              <li
-                className={`sidebar-item ${
-                  location.pathname === "/main" ? "active" : ""
-                }`}
-              >
-                <Link className="sidebar-link" to={"/main"}>
-                  <i
-                    class="bi bi-grid-1x2-fill"
-                    style={{ fontSize: "large" }}
-                  ></i>
-                  <span className="align-middle" style={{ fontSize: "large" }}>
-                    Dashboard
-                  </span>
-                </Link>
-              </li>
-              <li className="sidebar-item">
-                <a
-                  className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href
-                  onClick={toggleCompany}
-                  data-bs-target="#company"
-                  data-bs-toggle="collapse"
-                >
-                  <span className="align-middle">
-                    <i class="bi bi-building" style={{ fontSize: "large" }}></i>
-                  </span>{" "}
-                  <span className="align-middle" style={{ fontSize: "medium" }}>
-                    Company
-                  </span>
-                  <i
-                    className={`bi ${
-                      isCompanyOpen ? "bi-chevron-up" : "bi-chevron-down"
-                    } ms-auto`}
-                  ></i>
-                  {/* Add dropdown here */}
-                </a>
-                <ul
-                  id="company"
-                  className={`sidebar-dropDown list-unstyled collapse ${
-                    isCompanyOpen ? "show" : ""
+    const togglePayroll = (e) => {
+      e.preventDefault(); // Prevent default anchor behavior
+      setIsPayrollOpen(!isPayrollOpen);
+      setIsCompanyOpen(false);
+      setIsAttendanceOpen(false);
+    };
+
+    const toggleCompany = (e) => {
+      e.preventDefault();
+      setIsCompanyOpen(!isCompanyOpen);
+      setIsAttendanceOpen(false);
+      setIsPayrollOpen(false);
+    };
+
+    const toggleAttendance = (e) => {
+      e.preventDefault(); // Prevent default anchor behavior
+      setIsAttendanceOpen(!isAttendanceOpen);
+      setIsCompanyOpen(false);
+      setIsPayrollOpen(false);
+    };
+
+    const getImageSrc = () => {
+      if (roles === "ems_admin") {
+        return "assets/img/pathbreaker_logo.png";
+      }
+      return userImageBase64
+        ? `data:image/png;base64,${userImageBase64}`
+        : "assets/img/pathbreaker_logo.png"; // Fallback to a default image if base64 is not available
+    };
+    return (
+      <nav id="sidebar" class="sidebar js-sidebar">
+        <div className="sidebar-content js-simplebar">
+          <a className="sidebar-brand" href="/main">
+            <span>
+              <img
+                className="align-middle"
+                src={getImageSrc()}
+                alt="Logo"
+                style={{ height: "80px", width: "180px" }}
+              />
+            </span>
+          </a>
+          <ul className="sidebar-nav mt-2">
+            {roles.includes("ems_admin") && (
+              <>
+                <li
+                  className={`sidebar-item ${
+                    location.pathname === "/main" ? "active" : ""
                   }`}
-                  data-bs-parent="#sidebar"
                 >
-                  <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${
-                      location.pathname === "/companyRegistration"
-                        ? "active"
-                        : ""
-                    }`}
+                  <Link className="sidebar-link" to={"/main"}>
+                    <i
+                      class="bi bi-grid-1x2-fill"
+                      style={{ fontSize: "large" }}
+                    ></i>
+                    <span className="align-middle" style={{ fontSize: "large" }}>
+                      Dashboard
+                    </span>
+                  </Link>
+                </li>
+                <li className="sidebar-item">
+                  <a
+                    className="sidebar-link collapsed d-flex justify-content-between align-items-center"
+                    href
+                    onClick={toggleCompany}
+                    data-bs-target="#company"
+                    data-bs-toggle="collapse"
                   >
-                    <Link className="sidebar-link" to={"/companyRegistration"}>
-                      Company Registration
-                    </Link>
-                  </li>
-                  <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${
-                      location.pathname.startsWith("/companyView")
-                        ? "active"
-                        : ""
+                    <span className="align-middle">
+                      <i class="bi bi-building" style={{ fontSize: "large" }}></i>
+                    </span>{" "}
+                    <span className="align-middle" style={{ fontSize: "medium" }}>
+                      Company
+                    </span>
+                    <i
+                      className={`bi ${
+                        isCompanyOpen ? "bi-chevron-up" : "bi-chevron-down"
+                      } ms-auto`}
+                    ></i>
+                  </a>
+                  <ul
+                    id="company"
+                    className={`sidebar-dropDown list-unstyled collapse ${
+                      isCompanyOpen ? "show" : ""
                     }`}
+                    data-bs-parent="#sidebar"
                   >
-                    <Link className="sidebar-link" to={"/companyView"}>
-                      Company View
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-            </>
-          )}
-          {roles.includes("company_admin") && (
+                    <li
+                      style={{ paddingLeft: "40px" }}
+                      className={`sidebar-item ${
+                        location.pathname === "/companyRegistration"
+                          ? "active"
+                          : ""
+                      }`}
+                    >
+                      <Link className="sidebar-link" to={"/companyRegistration"}>
+                        Company Registration
+                      </Link>
+                    </li>
+                    <li
+                      style={{ paddingLeft: "40px" }}
+                      className={`sidebar-item ${
+                        location.pathname.startsWith("/companyView")
+                          ? "active"
+                          : ""
+                      }`}
+                    >
+                      <Link className="sidebar-link" to={"/companyView"}>
+                        Company View
+                      </Link>
+                    </li>
+                  </ul>
+                </li>
+              </>
+            )}
+            {roles.includes("company_admin") && (
             <>
               <li
                 className={`sidebar-item ${
@@ -248,22 +291,22 @@ const SideNav = () => {
                 </Link>
               </li>
               {/* <li
-                          className={`sidebar-item ${
-                            location.pathname.startsWith("/payslip") ? "active" : ""
-                          }`}
-                        >
-                          <Link className="sidebar-link" to={"/payslipview"}>
-                            <Receipt color="orange" size={25} />{" "}
-                            <i class="bi bi-file-earmark-medical-fill" style={{ fontSize: "large" }}></i>
-        
-                            <span
-                              className="align-middle"
-                              style={{ fontSize: "large" }}
-                            >
-                              PaySlips
-                            </span>
-                          </Link>
-                        </li> */}
+                            className={`sidebar-item ${
+                              location.pathname.startsWith("/payslip") ? "active" : ""
+                            }`}
+                          >
+                            <Link className="sidebar-link" to={"/payslipview"}>
+                              <Receipt color="orange" size={25} />{" "}
+                              <i class="bi bi-file-earmark-medical-fill" style={{ fontSize: "large" }}></i>
+          
+                              <span
+                                className="align-middle"
+                                style={{ fontSize: "large" }}
+                              >
+                                PaySlips
+                              </span>
+                            </Link>
+                          </li> */}
               <li
                 className={`sidebar-item ${
                   location.pathname.startsWith("/existing") ? "active" : ""
@@ -280,20 +323,20 @@ const SideNav = () => {
                 </Link>
               </li>
               {/* <li
-                          className={`sidebar-item ${
-                            location.pathname.startsWith("/users") ? "active" : ""
-                          }`}
-                        >
-                          <Link className="sidebar-link" to={"/usersView"}>
-                            <i class="bi bi-person-circle" style={{ fontSize: "large" }}></i>
-                            <span
-                              className="align-middle"
-                              style={{ fontSize: "large" }}
-                            >
-                              Users Summary
-                            </span>
-                          </Link>
-                        </li> */}
+                            className={`sidebar-item ${
+                              location.pathname.startsWith("/users") ? "active" : ""
+                            }`}
+                          >
+                            <Link className="sidebar-link" to={"/usersView"}>
+                              <i class="bi bi-person-circle" style={{ fontSize: "large" }}></i>
+                              <span
+                                className="align-middle"
+                                style={{ fontSize: "large" }}
+                              >
+                                Users Summary
+                              </span>
+                            </Link>
+                          </li> */}
 
               <li className="sidebar-item">
                 <a
@@ -371,19 +414,14 @@ const SideNav = () => {
                         : ""
                     }`}
                   >
-                    <Link
-                      className="sidebar-link"
-                      to={"/companySalaryStructure"}
-                    >
+                    <Link className="sidebar-link" to={"/companySalaryStructure"}>
                       Salary Structure
                     </Link>
                   </li>
                   <li
                     style={{ paddingLeft: "40px" }}
                     className={`sidebar-item ${
-                      location.pathname === "/employeeSalaryList"
-                        ? "active"
-                        : ""
+                      location.pathname === "/employeeSalaryList" ? "active" : ""
                     }`}
                   >
                     <Link className="sidebar-link" to={"/employeeSalaryList"}>
@@ -475,7 +513,7 @@ const SideNav = () => {
               </li>
             </>
           )}
-          {roles === "User" && (
+          {/* {roles === "User" && (
             <>
               <li
                 className={`sidebar-item ${
@@ -550,8 +588,8 @@ const SideNav = () => {
                 </Link>
               </li>
             </>
-          )}
-          {roles === "Employee" && (
+          )} */}
+        {roles.includes("Employee") && (
             <>
               <li
                 className={`sidebar-item ${
@@ -566,24 +604,25 @@ const SideNav = () => {
                 </Link>
               </li>
 
-              <li
-                className={`sidebar-item ${
-                  location.pathname.startsWith("/payslip") ? "active" : ""
-                }`}
-              >
-                <Link className="sidebar-link" to={"/emppayslip"}>
-                  <Receipt color="orange" size={25} />{" "}
-                  <span className="align-middle" style={{ fontSize: "large" }}>
-                    PaySlips
-                  </span>
-                </Link>
-              </li>
-            </>
-          )}
-        </ul>
-      </div>
-    </nav>
-  );
-};
 
-export default SideNav;
+                <li
+                  className={`sidebar-item ${
+                    location.pathname.startsWith("/payslip") ? "active" : ""
+                  }`}
+                >
+                  <Link className="sidebar-link" to={"/emppayslip"}>
+                    <Receipt color="orange" size={25} />{" "}
+                    <span className="align-middle" style={{ fontSize: "large" }}>
+                      PaySlips
+                    </span>
+                  </Link>
+                </li>
+              </>
+            )}
+          </ul>
+        </div>
+      </nav>
+    );
+  };
+
+  export default SideNav;

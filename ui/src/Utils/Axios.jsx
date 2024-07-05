@@ -80,6 +80,11 @@ export const companyViewByIdApi = (id) => {
     });
 };
 
+
+export const companyDetailsByIdApi = async (companyId) => {
+  return axiosInstance.get(`/company/${companyId}`);
+}
+
 export const companyDeleteByIdApi = async (companyId) => {
   return axiosInstance.delete(`/company/${companyId}`);
 };

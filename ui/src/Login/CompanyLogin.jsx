@@ -65,13 +65,13 @@ const CompanyLogin = () => {
       });
   };
 
-  const token=sessionStorage.getItem("token");
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
-      "Content-Type": "application/json", // Specify content type as JSON
-    },
-  };
+  // const token=sessionStorage.getItem("token");
+  // const config = {
+  //   headers: {
+  //     Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+  //     "Content-Type": "application/json", // Specify content type as JSON
+  //   },
+  // };
 
   const verifyOtpAndCompanyLogin = (data) => {
 
@@ -81,7 +81,7 @@ const CompanyLogin = () => {
       company: company
     };
     setLoading(true);
-    axios.post("http://localhost:9090/ems/validate", payload,config)
+    axios.post("http://localhost:9090/ems/validate", payload)
       .then((response) => {
         if (response.status === 200) {
           toast.success("CompanyLogin Successful", {
@@ -92,9 +92,9 @@ const CompanyLogin = () => {
             autoClose: 2000,
           });
 
-          sessionStorage.setItem('id', response.data.id);
-          sessionStorage.setItem('name', response.data.name);
-          sessionStorage.setItem('role', response.data.role);
+          // sessionStorage.setItem('id', response.data.id);
+          // sessionStorage.setItem('name', response.data.name);
+          // sessionStorage.setItem('role', response.data.role);
 
           if (response.data.imageFile) {
             sessionStorage.setItem('imageFile', response.data.imageFile);

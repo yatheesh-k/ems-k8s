@@ -16,15 +16,19 @@ const EmployeeSalaryStructure = () => {
     reset,
     formState: { errors },
   } = useForm();
+
   const [employes, setEmployes] = useState([]);
   const [grossAmount, setGrossAmount] = useState(0);    console.log(grossAmount);
   const [hra, setHra] = useState(0);
   const [basicSalary, setBasicSalary] = useState(0);   console.log(basicSalary);
+
   const [monthlySalary, setMonthlySalary] = useState(0);
   const [totalEarnings, setTotalEarnings] = useState(0); console.log(totalEarnings);
   const [totalTax, setTotalTax] = useState(0);
+
   const [totalAmount, setTotalAmount] = useState(0);  
   const [lossOfPayPerDay, setLossOfPayPerDay] = useState(0);   console.log(lossOfPayPerDay);
+
   const [totalPF, setTotalPF] = useState(0);
   const [showFields, setShowFields] = useState(false);
 
@@ -54,6 +58,7 @@ const EmployeeSalaryStructure = () => {
     setTotalPF(totalPFValue.toFixed(2));
     setValue("deductions.totalDeductions", totalPFValue.toFixed(2));
 
+
     const totalTaxValue = (parseFloat(incomeTax) || 0) + (parseFloat(pfTax) || 0);
     setTotalTax(totalTaxValue);
     setValue("deductions.totalTax", totalTaxValue); // Set the value in the form
@@ -63,6 +68,7 @@ const EmployeeSalaryStructure = () => {
     setTotalAmount(netSalary.toFixed(2));
     setValue("netSalary", netSalary.toFixed(2));
   }, [pfEmployee, pfEmployer, incomeTax, pfTax, totalEarnings, setValue]);
+
 
   useEffect(() => {
     // Calculate and set grossAmount when variableAmount or fixedAmount changes
@@ -83,6 +89,7 @@ const EmployeeSalaryStructure = () => {
     const specialAllowance =
       parseFloat(watch("allowances.specialAllowance")) || 0;
 
+
     const basicSalary = (grossAmount -
       (((hra / 100) * grossAmount) +
         travelAllowance +
@@ -92,6 +99,7 @@ const EmployeeSalaryStructure = () => {
     setBasicSalary(basicSalary);
     const totalEarnings = basicSalary + ((hra / 100) * grossAmount) + travelAllowance + pfContributionEmployee + otherAllowance + specialAllowance;
     setTotalEarnings(totalEarnings);
+
   }, [
     watch("grossAmount"),
     watch("allowances.hra"),
@@ -100,6 +108,7 @@ const EmployeeSalaryStructure = () => {
     watch("allowances.otherAllowances"),
     watch("allowances.specialAllowance"),
   ]);
+
   useEffect(() => {
     EmployeeGetApi().then(data => {
       const filteredData = data
@@ -115,6 +124,7 @@ const EmployeeSalaryStructure = () => {
   }, [])
 
   const companyName = sessionStorage.getItem("company")
+
 
   const onSubmit = (data) => {
     const companyName = sessionStorage.getItem("company");
@@ -156,6 +166,7 @@ const EmployeeSalaryStructure = () => {
   };
 
   return (
+
 
     <LayOut>
       <div className="container-fluid p-0">
@@ -202,6 +213,7 @@ const EmployeeSalaryStructure = () => {
                           <p className="errorMsg">Employee Name is required</p>
                         )}
                       </div>
+
                       <div className="col-6 col-md-6 col-lg-6 mt-5">
                         <button
                           type="button"
@@ -210,6 +222,7 @@ const EmployeeSalaryStructure = () => {
                         >
                           Go
                         </button>
+
                       </div>
                     </div>
                   </div>
@@ -644,12 +657,16 @@ const EmployeeSalaryStructure = () => {
                     </div>
                   </div>
                 </div>
+
               </>
             )}
+
           </div>
         </form>
       </div>
     </LayOut>
+
+
 
   );
 };
