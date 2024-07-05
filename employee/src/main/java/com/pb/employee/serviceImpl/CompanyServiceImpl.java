@@ -46,8 +46,10 @@ public class CompanyServiceImpl implements CompanyService {
         // Check if a company with the same short or company name already exists
         log.debug("validating shortname {} company name {} exsited ", companyRequest.getShortName(), companyRequest.getCompanyName());
         String resourceId = ResourceIdUtils.generateCompanyResourceId(companyRequest.getCompanyName());
+        String index = ResourceIdUtils.generateCompanyIndex(companyRequest.getShortName());
         Object entity = null;
         try{
+
             entity = openSearchOperations.getById(resourceId, null, Constants.INDEX_EMS);
             if(entity != null) {
                 log.error("Company details existed{}", companyRequest.getCompanyName());
@@ -60,11 +62,6 @@ public class CompanyServiceImpl implements CompanyService {
                     HttpStatus.BAD_REQUEST);
         }
 
-        if(entity != null) {
-            log.error("Company with name {} already existed", companyRequest.getCompanyName());
-            throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.COMPANY_ALREADY_EXISTS), companyRequest.getCompanyName()),
-                    HttpStatus.CONFLICT);
-        }
         List<CompanyEntity> shortNameEntity = openSearchOperations.getCompanyByData(null, Constants.COMPANY, companyRequest.getShortName());
         if(shortNameEntity !=null && shortNameEntity.size() > 0) {
             log.error("Company with shortname {} already existed", companyRequest.getCompanyName());
@@ -82,7 +79,7 @@ public class CompanyServiceImpl implements CompanyService {
         openSearchOperations.createIndex(companyRequest.getShortName());
         String password = Base64.getEncoder().encodeToString(companyRequest.getPassword().getBytes());
         log.info("Creating the employee of company admin");
-        String index = ResourceIdUtils.generateCompanyIndex(companyRequest.getShortName());
+
         String employeeAdminId = ResourceIdUtils.generateEmployeeResourceId(companyRequest.getEmailId());
         EmployeeEntity employee = EmployeeEntity.builder().
                 id(employeeAdminId).
@@ -185,11 +182,17 @@ public class CompanyServiceImpl implements CompanyService {
     public ResponseEntity<?> deleteCompanyById(String companyId) throws EmployeeException {
         log.info("getting details of {}", companyId);
         CompanyEntity companyEntity = null;
+
         try {
             companyEntity = openSearchOperations.getCompanyById(companyId, null, Constants.INDEX_EMS);
+            String index = ResourceIdUtils.generateCompanyIndex(companyEntity.getShortName());
+
             if (companyEntity!=null) {
                 openSearchOperations.deleteEntity(companyEntity.getId(),Constants.INDEX_EMS);
                 System.out.println("THe conpany si i:"+companyEntity.getId());
+
+                openSearchOperations.deleteIndex(index);
+                log.info("Index deleted for short name: {}", companyEntity.getShortName());
             }
         } catch (Exception ex) {
             log.error("Exception while fetching company details {}", ex);
@@ -201,6 +204,9 @@ public class CompanyServiceImpl implements CompanyService {
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.DELETED), HttpStatus.OK);
 
     }
+
+
+
 
     @Override
     public ResponseEntity<?> getCompanyImageById(String companyId)  throws EmployeeException{

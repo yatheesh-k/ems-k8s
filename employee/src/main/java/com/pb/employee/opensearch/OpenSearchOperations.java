@@ -14,22 +14,25 @@ import com.pb.employee.persistance.model.Entity;
 import com.pb.employee.util.Constants;
 import com.pb.employee.util.ResourceIdUtils;
 import org.bouncycastle.asn1.DERBMPString;
+import org.opensearch.client.Request;
+import org.opensearch.client.RequestOptions;
+import org.opensearch.client.Response;
+import org.opensearch.client.RestClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.Result;
 import org.opensearch.client.opensearch._types.mapping.KeywordProperty;
 import org.opensearch.client.opensearch._types.mapping.Property;
 import org.opensearch.client.opensearch._types.mapping.TypeMapping;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
-import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.*;
 import org.opensearch.client.opensearch.core.search.Hit;
-import org.opensearch.client.opensearch.indices.CreateIndexRequest;
-import org.opensearch.client.opensearch.indices.CreateIndexResponse;
+import org.opensearch.client.opensearch.indices.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +43,7 @@ public class OpenSearchOperations {
 
     private static final Integer SIZE_ELASTIC_SEARCH_MAX_VAL = 9999;
     Logger logger = LoggerFactory.getLogger(OpenSearchOperations.class);
+
 
     @Autowired
     private OpenSearchClient esClient;
@@ -466,6 +470,24 @@ public class OpenSearchOperations {
 
         return payslipEntities;
     }
+    public void deleteIndex(String index) throws EmployeeException {
+        try {
+            // Check if the index exists before attempting deletion
+            DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest.Builder().index(index).build();
+            DeleteIndexResponse deleteIndexResponse = esClient.indices().delete(deleteIndexRequest);
+           
+            if (!deleteIndexResponse.acknowledged()) {
+                throw new EmployeeException("Failed to delete index " + index, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            logger.debug("Index {} deleted successfully", index);
+        } catch (IOException e) {
+            logger.error("Exception while deleting index {}: {}", index, e.getMessage());
+            throw new EmployeeException("Failed to delete index " + index, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 
 
 }
