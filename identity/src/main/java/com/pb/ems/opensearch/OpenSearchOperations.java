@@ -88,7 +88,7 @@ public class OpenSearchOperations {
         GetResponse<EmployeeEntity> searchResponse = esClient.get(getRequest, EmployeeEntity.class);
         if(searchResponse != null && searchResponse.source() != null){
             EmployeeEntity employee = searchResponse.source();
-            employee.setResourceId(searchResponse.id()); // Set the _id from the response
+            employee.setId(searchResponse.id()); // Set the _id from the response
             return employee;
         }
         return null;
@@ -118,7 +118,7 @@ public class OpenSearchOperations {
 
     public void updateEmployee(EmployeeEntity employee,String company) throws IOException {
         String index = Constants.INDEX_EMS + "_" + company;
-        String employeeId = employee.getResourceId();
+        String employeeId = employee.getId();
 
         IndexRequest<EmployeeEntity> request = new IndexRequest.Builder<EmployeeEntity>()
                 .index(index)

@@ -12,6 +12,7 @@ import java.util.List;
 public class EmployeeUpdateRequest {
     @NotBlank(message = "{companyname.message}")
     private String companyName;
+
     private String employeeType;
     private String emailId;
     private String password;

@@ -143,7 +143,7 @@ public class CompanyServiceImpl implements CompanyService {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        Entity entity = CompanyUtils.maskCompanyUpdateProperties(user, companyUpdateRequest, companyId);
+        Entity entity = CompanyUtils.maskCompanyUpdateProperties(user, companyUpdateRequest);
         openSearchOperations.saveEntity(entity, companyId, Constants.INDEX_EMS);
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
@@ -164,9 +164,10 @@ public class CompanyServiceImpl implements CompanyService {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        Entity entity = CompanyUtils.maskCompanyImageUpdateProperties(user, companyImageUpdate, companyId);
+        CompanyEntity entity = CompanyUtils.maskCompanyImageUpdateProperties(user, companyImageUpdate, companyId);
         if (!multipartFile.isEmpty()){
-            multiPartFileStore(multipartFile, (CompanyEntity) entity);
+            multiPartFileStore(multipartFile, entity);
+
         }
         openSearchOperations .saveEntity(entity, companyId, Constants.INDEX_EMS);
         return new ResponseEntity<>(

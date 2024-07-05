@@ -179,7 +179,7 @@ public class SalaryServiceImpl implements SalaryService {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        Entity employeeSalaryProperties = CompanyUtils.maskEmployeeSalaryProperties(salaryUpdateRequest, salaryId, employeeId);
+        Entity employeeSalaryProperties = CompanyUtils.maskUpdateSalary(salaryUpdateRequest, entity);
         openSearchOperations.saveEntity(employeeSalaryProperties, salaryId, index);
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);

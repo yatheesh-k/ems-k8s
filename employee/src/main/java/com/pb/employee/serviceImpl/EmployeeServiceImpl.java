@@ -15,6 +15,7 @@ import com.pb.employee.request.EmployeeUpdateRequest;
 import com.pb.employee.service.EmployeeService;
 import com.pb.employee.util.CompanyUtils;
 import com.pb.employee.util.Constants;
+import com.pb.employee.util.EmployeeUtils;
 import com.pb.employee.util.ResourceIdUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +85,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<EmployeeEntity> employeeEntities = null;
         try {
             employeeEntities = openSearchOperations.getCompanyEmployees(companyName);
+            for (EmployeeEntity employee :employeeEntities){
+                EmployeeUtils.unmaskEmployeeProperties(employee);
+            }
         } catch (Exception ex) {
             log.error("Exception while fetching employees for company {}: {}", companyName, ex.getMessage());
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
@@ -100,11 +104,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public ResponseEntity<?> getEmployeeById(String companyName, String employeeId) throws EmployeeException {
         log.info("getting details of {}", employeeId);
-        Object entity = null;
+        EmployeeEntity entity = null;
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
 
         try {
-            entity = openSearchOperations.getById(employeeId, null, index);
+            entity = openSearchOperations.getEmployeeById(employeeId, null, index);
+            EmployeeUtils.unmaskEmployeeProperties( entity);
 
         } catch (Exception ex) {
 
@@ -135,7 +140,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Entity entity = CompanyUtils.maskEmployeeUpdateProperties(user, employeeUpdateRequest, employeeId);
+        Entity entity = CompanyUtils.maskEmployeeUpdateProperties(user, employeeUpdateRequest);
         openSearchOperations.saveEntity(entity, employeeId, index);
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);

@@ -4,4 +4,4 @@ employee/build/
 identity/.gradle/
 identity/.idea/
 identity/build/
-
+logs/*

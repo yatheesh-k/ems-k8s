@@ -110,7 +110,7 @@ public class LoginServiceImpl implements LoginService {
         } else {
             roles.add(Constants.COMPANY_ADMIN);
         }
-        String token = JwtTokenUtil.generateEmployeeToken(employee.getResourceId(),roles,company);
+        String token = JwtTokenUtil.generateEmployeeToken(employee.getId(),roles,company);
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(new LoginResponse(token, null)), HttpStatus.OK);
     }

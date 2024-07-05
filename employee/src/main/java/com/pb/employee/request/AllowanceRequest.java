@@ -13,6 +13,7 @@ public class AllowanceRequest {
 
 
     private String travelAllowance;
+    private String pfContributionEmployee;
     private String hra;
     private String specialAllowance;
     private String otherAllowances;

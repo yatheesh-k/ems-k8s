@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Base64;
+import java.util.Collections;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -73,8 +75,7 @@ public class CompanyUtils {
         return companyEntity;
     }
 
-    public static CompanyEntity maskCompanyUpdateProperties(CompanyEntity existingEntity, CompanyUpdateRequest companyRequest, String id) {
-        ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    public static CompanyEntity maskCompanyUpdateProperties(CompanyEntity existingEntity, CompanyUpdateRequest companyRequest) {
 
         // Convert CompanyUpdateRequest to CompanyEntity to update specific fields
         if (companyRequest.getPassword() == null || companyRequest.getPassword().isEmpty()) {
@@ -140,38 +141,11 @@ public class CompanyUtils {
         return existingEntity;
     }
     public static CompanyEntity maskCompanyImageUpdateProperties(CompanyEntity existingEntity, CompanyImageUpdate companyRequest, String id) {
-        ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        if(companyRequest.getImage() != null){
+            existingEntity.setImageFile(companyRequest.getImage());
+        }
 
-        // Convert CompanyUpdateRequest to CompanyEntity to update specific fields
-        CompanyEntity updatedEntity = objectMapper.convertValue(companyRequest, CompanyEntity.class);
-
-        // Ensure existing fields are preserved if not updated
-        // Set common fields
-        updatedEntity.setId(id);
-        updatedEntity.setCompanyName(existingEntity.getCompanyName()); // Ensure companyName is preserved
-        updatedEntity.setEmailId(existingEntity.getEmailId());
-        updatedEntity.setPassword(existingEntity.getPassword());
-        updatedEntity.setCompanyAddress(existingEntity.getCompanyAddress());
-        updatedEntity.setCompanyRegNo(existingEntity.getCompanyRegNo());
-        updatedEntity.setMobileNo(existingEntity.getMobileNo());
-        updatedEntity.setLandNo(existingEntity.getLandNo());
-        updatedEntity.setGstNo(existingEntity.getGstNo());
-        updatedEntity.setPanNo(existingEntity.getPanNo());
-        updatedEntity.setName(existingEntity.getName());
-        updatedEntity.setPersonalMailId(existingEntity.getPersonalMailId());
-        updatedEntity.setPersonalMobileNo(existingEntity.getPersonalMobileNo());
-        updatedEntity.setAddress(existingEntity.getAddress());
-        updatedEntity.setCompanyType(existingEntity.getCompanyType());
-        updatedEntity.setCompanyBranch(existingEntity.getCompanyBranch());
-        updatedEntity.setCinNo(existingEntity.getCinNo());
-        updatedEntity.setShortName(existingEntity.getShortName());
-        updatedEntity.setHraPercentage(existingEntity.getHraPercentage());
-        updatedEntity.setPfPercentage(existingEntity.getPfPercentage());
-        updatedEntity.setSpecialAllowance(existingEntity.getSpecialAllowance());
-        updatedEntity.setTravelAllowance(existingEntity.getTravelAllowance());
-        updatedEntity.setType(Constants.COMPANY);
-
-        return updatedEntity;
+        return existingEntity;
     }
 
 
@@ -191,27 +165,45 @@ public class CompanyUtils {
         return entity;
     }
 
-    public static Entity maskEmployeeUpdateProperties(EmployeeEntity user, EmployeeUpdateRequest employeeUpdateRequest, String id) {
-        ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        EmployeeEntity updatedEntity = objectMapper.convertValue(employeeUpdateRequest, EmployeeEntity.class);
 
-        String password = Base64.getEncoder().encodeToString(employeeUpdateRequest.getPassword().getBytes());
-        String hra = null,  pf = null, spa = null, ta = null;
+    public static Entity maskEmployeeUpdateProperties(EmployeeEntity user, EmployeeUpdateRequest employeeUpdateRequest) {
+        if(employeeUpdateRequest.getPassword() != null) {
+            String password = Base64.getEncoder().encodeToString(employeeUpdateRequest.getPassword().getBytes());
+            user.setPassword(password);
+        }
+        if (employeeUpdateRequest.getEmployeeType() != null){
+            user.setEmployeeType(employeeUpdateRequest.getEmployeeType());
+        }
+        if (employeeUpdateRequest.getDesignation() != null){
+            user.setDesignation(employeeUpdateRequest.getDesignation());
+        }
+        if (employeeUpdateRequest.getManager() != null){
+            user.setManager(employeeUpdateRequest.getManager());
+        }
+        if (employeeUpdateRequest.getRoles() != null){
+            user.setRoles(Collections.singletonList(String.valueOf(employeeUpdateRequest.getRoles())));
+        }
+        if (employeeUpdateRequest.getEmailId() != null){
+            user.setEmailId(employeeUpdateRequest.getEmailId());
+        }
+        if (employeeUpdateRequest.getLocation() != null){
+            user.setLocation(employeeUpdateRequest.getLocation());
+        }
+        if (employeeUpdateRequest.getBankName() != null){
+            user.setBankName(employeeUpdateRequest.getBankName());
+        }
+        if (employeeUpdateRequest.getAccountNo() != null){
+            user.setAccountNo(employeeUpdateRequest.getAccountNo());
+        }
+        if (employeeUpdateRequest.getIfscCode() != null){
+            user.setIfscCode(employeeUpdateRequest.getIfscCode());
+        }
+        if (employeeUpdateRequest.getStatus() != 0){
+            user.setStatus(employeeUpdateRequest.getStatus());
+        }
 
-        updatedEntity.setId(id);
-        updatedEntity.setEmployeeId(user.getEmployeeId());
-        updatedEntity.setPanNo(user.getPanNo());
-        updatedEntity.setDateOfBirth(user.getDateOfBirth());
-        updatedEntity.setDateOfHiring(user.getDateOfHiring());
-        updatedEntity.setFirstName(user.getFirstName());
-        updatedEntity.setLastName(user.getLastName());
-        updatedEntity.setDepartment(user.getDepartment());
-        updatedEntity.setUanNo(user.getUanNo());
-        updatedEntity.setPassword(password);
-        updatedEntity.setType(Constants.EMPLOYEE);
-        return updatedEntity;
+        return user;
     }
-
 
     public static Entity maskEmployeeSalaryProperties(SalaryRequest salaryRequest, String id,String employeeId) {
 
@@ -240,12 +232,15 @@ public class CompanyUtils {
         if(salaryRequest.getAllowances().getOtherAllowances() != null) {
             other = (Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getOtherAllowances().toString().getBytes()));
         }
+        if(salaryRequest.getAllowances().getPfContributionEmployee() != null) {
+            pfc = (Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getPfContributionEmployee().toString().getBytes()));
+        }
         if(salaryRequest.getAllowances().getSpecialAllowance() != null) {
             spa = (Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getSpecialAllowance().toString().getBytes()));
         }
 
         if(salaryRequest.getTotalEarnings() != null) {
-            te = (Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getTravelAllowance().toString().getBytes()));
+            te = (Base64.getEncoder().encodeToString(salaryRequest.getTotalEarnings().toString().getBytes()));
         }
 
         if(salaryRequest.getDeductions().getPfEmployee() != null) {
@@ -255,10 +250,7 @@ public class CompanyUtils {
             pfEmployer = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getPfEmployer().toString().getBytes()));
         }
         if(salaryRequest.getDeductions().getLop() != null) {
-            lop = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getPfEmployee().toString().getBytes()));
-        }
-        if(salaryRequest.getDeductions().getTotalDeductions() != null) {
-            tded = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getTotalDeductions().toString().getBytes()));
+            lop = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getLop().toString().getBytes()));
         }
         if(salaryRequest.getDeductions().getTotalDeductions() != null) {
             tded = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getTotalDeductions().toString().getBytes()));
@@ -307,6 +299,96 @@ public class CompanyUtils {
         entity.setNetSalary(net);
         entity.setType(Constants.SALARY);
         return entity;
+    }
+
+    public static Entity maskUpdateSalary(SalaryRequest salaryRequest, SalaryEntity salary) {
+
+        String var = null, fix = null, bas = null, gross = null;
+        String hra = null, trav = null, pfc = null, other = null,spa=null;
+        String te= null, pfE = null, pfEmployer =null, lop = null, tax = null, itax = null, ttax = null, tded = null, net = null;
+        if(salaryRequest.getFixedAmount() != null) {
+            fix = (Base64.getEncoder().encodeToString(salaryRequest.getFixedAmount().toString().getBytes()));
+        }
+        if(salaryRequest.getVariableAmount() != null) {
+            var = Base64.getEncoder().encodeToString(salaryRequest.getVariableAmount().toString().getBytes());
+        }
+        if(salaryRequest.getGrossAmount() != null) {
+            gross = (Base64.getEncoder().encodeToString(salaryRequest.getGrossAmount().toString().getBytes()));
+        }
+        if(salaryRequest.getBasicSalary() != null) {
+            bas = (Base64.getEncoder().encodeToString(salaryRequest.getBasicSalary().toString().getBytes()));
+        }
+
+        if(salaryRequest.getAllowances().getTravelAllowance() != null) {
+            trav = (Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getTravelAllowance().toString().getBytes()));
+        }
+        if(salaryRequest.getAllowances().getHra() != null) {
+            hra =(Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getHra().toString().getBytes()));
+        }
+        if(salaryRequest.getAllowances().getOtherAllowances() != null) {
+            other = (Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getOtherAllowances().toString().getBytes()));
+        }
+        if(salaryRequest.getAllowances().getPfContributionEmployee() != null) {
+            pfc = (Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getPfContributionEmployee().toString().getBytes()));
+        }
+        if(salaryRequest.getAllowances().getSpecialAllowance() != null) {
+            spa = (Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getSpecialAllowance().toString().getBytes()));
+        }
+
+        if(salaryRequest.getTotalEarnings() != null) {
+            te = (Base64.getEncoder().encodeToString(salaryRequest.getTotalEarnings().toString().getBytes()));
+        }
+
+        if(salaryRequest.getDeductions().getPfEmployee() != null) {
+            pfE = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getPfEmployee().toString().getBytes()));
+        }
+        if(salaryRequest.getDeductions().getPfEmployer() != null) {
+            pfEmployer = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getPfEmployer().toString().getBytes()));
+        }
+        if(salaryRequest.getDeductions().getLop() != null) {
+            lop = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getLop().toString().getBytes()));
+        }
+        if(salaryRequest.getDeductions().getTotalDeductions() != null) {
+            tded = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getTotalDeductions().toString().getBytes()));
+        }
+
+        if(salaryRequest.getDeductions().getPfTax() != null) {
+            tax = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getPfTax().toString().getBytes()));
+        }
+        Double grossAmount =salaryRequest.getGrossAmount();
+        Double totalDeductions = Double.valueOf(salaryRequest.getDeductions().getTotalDeductions());
+        itax = String.valueOf(TaxCalculatorUtils.getOldTax( grossAmount-totalDeductions));
+        itax= (Base64.getEncoder().encodeToString(itax.getBytes()));
+
+
+        if(salaryRequest.getDeductions().getTotalTax() != null) {
+            ttax = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getTotalTax().toString().getBytes()));
+        }
+
+        if(salaryRequest.getNetSalary() != null) {
+            net = (Base64.getEncoder().encodeToString(salaryRequest.getNetSalary().toString().getBytes()));
+        }
+
+        salary.setFixedAmount(fix);
+        salary.setGrossAmount(gross);
+        salary.setVariableAmount(var);
+        salary.setBasicSalary(bas);
+        salary.getAllowances().setSpecialAllowance(spa);
+        salary.getAllowances().setOtherAllowances(other);
+        salary.getAllowances().setTravelAllowance(trav);
+        salary.getAllowances().setHra(hra);
+        salary.getAllowances().setPfContributionEmployee(pfc);
+        salary.setTotalEarnings(te);
+        salary.getDeductions().setPfEmployee(pfE);
+        salary.getDeductions().setPfEmployer(pfEmployer);
+        salary.getDeductions().setLop(lop);
+        salary.getDeductions().setPfTax(tax);
+        salary.getDeductions().setIncomeTax(itax);
+        salary.getDeductions().setTotalTax(ttax);
+        salary.getDeductions().setTotalDeductions(tded);
+        salary.setNetSalary(net);
+        salary.setType(Constants.SALARY);
+        return salary;
     }
 
     public static Entity maskAttendanceProperties(AttendanceRequest attendanceRequest, String attendanceId, String employeeId) {

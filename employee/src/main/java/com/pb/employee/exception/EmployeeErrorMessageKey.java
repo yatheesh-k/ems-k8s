@@ -41,7 +41,10 @@ public enum EmployeeErrorMessageKey {
     EMPTY_FILE("file.empty"),
     EMPLOYEE_PAYSLIP_ALREADY_EXISTS("employee.payslip.already.exist"),
     EMPLOYEE_NOT_MATCHING("employee.not.matching"),
-    UNABLE_GET_EMPLOYEES_PAYSLIP("unable.get.employee.payslip");
+    UNABLE_GET_EMPLOYEES_PAYSLIP("unable.get.employee.payslip"),
+    UNABLE_TO_GENERATE_PAYSLIP("unable.to.generate.payslip"),
+
+    ;
     private final String key;
 
     EmployeeErrorMessageKey(String keyVal) {
