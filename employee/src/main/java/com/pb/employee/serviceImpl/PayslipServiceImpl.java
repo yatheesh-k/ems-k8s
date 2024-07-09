@@ -97,6 +97,7 @@ public class PayslipServiceImpl implements PayslipService {
 
         try {
             List<EmployeeEntity> employeeEntities = openSearchOperations.getCompanyEmployees(payslipRequest.getCompanyName());
+            List<PayslipEntity> generatedPayslips = new ArrayList<>();
 
             for (EmployeeEntity employee : employeeEntities) {
                 if (employee == null) {
@@ -106,11 +107,12 @@ public class PayslipServiceImpl implements PayslipService {
                 }
 
                 List<SalaryEntity> salaryEntities = openSearchOperations.getSalaries(payslipRequest.getCompanyName(), employee.getId());
-                if (salaryEntities==null){
-                    log.error("Employee  Salary with employeeId {}  is not found", employee.getId());
+                if (salaryEntities == null) {
+                    log.error("Employee Salary with employeeId {} is not found", employee.getId());
                     throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
                             HttpStatus.INTERNAL_SERVER_ERROR);
                 }
+
                 // Generate payslip ID based on month, year, and employee ID
                 String paySlipId = ResourceIdUtils.generatePayslipId(payslipRequest.getMonth(), payslipRequest.getYear(), employee.getId());
 
@@ -121,17 +123,18 @@ public class PayslipServiceImpl implements PayslipService {
                     throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_PAYSLIP_ALREADY_EXISTS), employee.getId()),
                             HttpStatus.CONFLICT);
                 }
-                for (SalaryEntity salary :salaryEntities) {
 
+                for (SalaryEntity salary : salaryEntities) {
                     Entity payslipProperties = PayslipUtils.maskEmployeePayslipProperties(salary, payslipRequest, paySlipId, employee.getId());
                     Entity maskedPayslip = PayslipUtils.maskEmployeePayslip((PayslipEntity) payslipProperties, salary);
                     Entity result = openSearchOperations.saveEntity(maskedPayslip, paySlipId, index);
+                    generatedPayslips.add((PayslipEntity) result);
                 }
             }
 
-            // Return success response after all payslips are generated
+            // Return success response with the list of generated payslips
             return new ResponseEntity<>(
-                    ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.CREATED);
+                    ResponseBuilder.builder().build().createSuccessResponse(generatedPayslips), HttpStatus.CREATED);
 
         } catch (IOException | EmployeeException ex) {
             log.error("Error generating payslips: {}", ex.getMessage());

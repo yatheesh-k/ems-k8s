@@ -18,6 +18,7 @@ public enum EmployeeErrorMessageKey {
     UNABLE_TO_CREATE_COMPANY("unable.to.create.index"),
     INVALID_COMPANY("invalid.company"),
     INVALID_EMPLOYEE("invalid.employee"),
+    INVALID_PASSWORD("invalid.password"),
     EMPLOYEE_ID_ALREADY_EXISTS("employee.id.already.exists"),
     EMPLOYEE_EMAILID_ALREADY_EXISTS("employee.emailid.already.exists"),
     UNABLE_SAVE_EMPLOYEE("unable.save.employee"),

@@ -65,7 +65,7 @@ public class DesignationController {
                                                    @RequestBody @Valid DesignationUpdateRequest departmentUpdateRequest) throws EmployeeException {
         return designationService.updateDesignationById(designationId, departmentUpdateRequest);
     }
-    @RequestMapping(value = "/designation/{designationId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{companyName}/designation/{designationId}", method = RequestMethod.DELETE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.deleteDesignation.tag}", description = "${api.deleteCompany.description}")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")

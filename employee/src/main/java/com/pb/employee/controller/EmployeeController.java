@@ -3,6 +3,7 @@ package com.pb.employee.controller;
 
 import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.request.CompanyUpdateRequest;
+import com.pb.employee.request.EmployeePasswordReset;
 import com.pb.employee.request.EmployeeRequest;
 import com.pb.employee.request.EmployeeUpdateRequest;
 import com.pb.employee.response.CompanyResponse;
@@ -79,5 +80,18 @@ public class EmployeeController {
                                                 @RequestHeader(Constants.AUTH_KEY) String authToken,
                                                 @PathVariable String employeeId, @PathVariable String companyName) throws EmployeeException {
         return employeeService.deleteEmployeeById(employeeId, companyName);
+    }
+
+    @RequestMapping(value = "/password/{employeeId}", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
+            summary = "${api.updatePassword.tag}", description = "${api.updatePassword.description}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "202", description= "Accepted")
+    public ResponseEntity<?> updatePassword(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
+                                            @RequestHeader(Constants.AUTH_KEY) String authToken,
+                                            @RequestBody EmployeePasswordReset employeePasswordReset,
+                                            @PathVariable String employeeId) throws IOException, EmployeeException {
+
+        return employeeService.passwordResetForEmployee(employeePasswordReset, employeeId);
     }
 }

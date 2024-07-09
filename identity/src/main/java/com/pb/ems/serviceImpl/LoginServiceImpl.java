@@ -11,19 +11,16 @@ import com.pb.ems.persistance.Entity;
 import com.pb.ems.service.LoginService;
 import com.pb.ems.util.Constants;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Service
@@ -42,6 +39,11 @@ public class LoginServiceImpl implements LoginService {
     @Value("${mail.text}")
     private String text;
 
+    @Value("${mail.subject.otp}")
+    private String otpSubject;
+
+    @Value("${mail.text.otp}")
+    private String otpText;
     /**
      * @param request
      * @return
@@ -120,6 +122,18 @@ public class LoginServiceImpl implements LoginService {
         mailMessage.setTo(emailId);
         mailMessage.setSubject(subject);
         String mailText = text;
+        String formattedText = mailText.replace("{emailId}", emailId).replace("{otp}", otp.toString());
+
+        mailMessage.setText(formattedText);
+        javaMailSender.send(mailMessage);
+        log.info("OTP sent successfully....");//otp is send succesfully...
+    }
+
+    private void sendOtpByEmailForPassword(String emailId, Long otp) {
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(emailId);
+        mailMessage.setSubject(otpSubject);
+        String mailText = otpText;
         String formattedText = mailText.replace("{emailId}", emailId).replace("{otp}", otp.toString());
 
         mailMessage.setText(formattedText);
@@ -210,4 +224,70 @@ public class LoginServiceImpl implements LoginService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
     }
+
+
+    @Override
+    public ResponseEntity<?> forgotPassword(EmployeePasswordRequest loginRequest) throws IdentityException {
+        EmployeeEntity user ;
+
+        try {
+            user = openSearchOperations.getEmployeeById(loginRequest.getUsername(), loginRequest.getCompany());
+            if (user == null) {
+                log.debug("checking the user details..");
+                throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.USER_NOTFOUND),
+                        HttpStatus.NOT_FOUND);
+            }
+
+
+            Long otp = generateOtp();
+            sendOtpByEmailForPassword(loginRequest.getUsername(), otp);
+            openSearchOperations.saveOtpToUser(user, otp, loginRequest.getCompany());
+
+        } catch (Exception ex) {
+            log.error("Exception while fetching user {}, {}", loginRequest.getUsername(), ex);
+            throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_USERNAME),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+
+
+        }
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<?> updatePasswordForForgot(EmployeePasswordforgot otpRequest) throws IdentityException {
+        EmployeeEntity user = null;
+
+
+        try {
+            user = openSearchOperations.getEmployeeById(otpRequest.getUsername(), otpRequest.getCompany());
+          CompanyEntity  employee = openSearchOperations.getCompanyById(otpRequest.getCompanyName());
+            if (user == null) {
+                log.debug("checking the user details..");
+                throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.USER_NOTFOUND),
+                        HttpStatus.NOT_FOUND);
+            }
+
+            String newPassword = Base64.getEncoder().encodeToString(otpRequest.getPassword().toString().getBytes());
+
+            if (employee !=null){
+                employee.setPassword(newPassword);
+                openSearchOperations.updateCompany(employee);
+            }
+            user.setPassword(newPassword);
+            openSearchOperations.updateEmployee(user,otpRequest.getCompany());
+
+
+        } catch (Exception ex) {
+            log.error("Exception while fetching user {}, {}", otpRequest.getUsername(), ex);
+            throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_USERNAME),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+
+
+        }
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
+    }
+
+
 }

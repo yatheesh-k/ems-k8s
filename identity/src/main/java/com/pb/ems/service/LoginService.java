@@ -1,9 +1,8 @@
 package com.pb.ems.service;
 
 import com.pb.ems.exception.IdentityException;
-import com.pb.ems.model.EmployeeLoginRequest;
-import com.pb.ems.model.LoginRequest;
-import com.pb.ems.model.OTPRequest;
+import com.pb.ems.model.*;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 
 
@@ -16,4 +15,8 @@ public interface LoginService {
     ResponseEntity<?> logout(OTPRequest loginRequest);
 
     ResponseEntity<?> validateCompanyOtp(OTPRequest request) throws  IdentityException;
+
+    ResponseEntity<?> forgotPassword(EmployeePasswordRequest loginRequest) throws IdentityException;
+
+    ResponseEntity<?> updatePasswordForForgot(@Valid EmployeePasswordforgot otpRequest) throws IdentityException;
 }

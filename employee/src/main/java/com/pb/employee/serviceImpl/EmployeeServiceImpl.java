@@ -9,7 +9,7 @@ import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.opensearch.OpenSearchOperations;
 import com.pb.employee.persistance.model.EmployeeEntity;
 import com.pb.employee.persistance.model.Entity;
-import com.pb.employee.request.CompanyUpdateRequest;
+import com.pb.employee.request.EmployeePasswordReset;
 import com.pb.employee.request.EmployeeRequest;
 import com.pb.employee.request.EmployeeUpdateRequest;
 import com.pb.employee.service.EmployeeService;
@@ -22,9 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 
@@ -169,6 +169,41 @@ public class EmployeeServiceImpl implements EmployeeService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.DELETED), HttpStatus.OK);
 
+    }
+
+    @Override
+    public ResponseEntity<?> passwordResetForEmployee(EmployeePasswordReset employeePasswordReset, String id) throws EmployeeException {
+        EmployeeEntity employee;
+        String index = ResourceIdUtils.generateCompanyIndex(employeePasswordReset.getCompanyName());
+        try {
+            employee = openSearchOperations.getEmployeeById(id, null, index);
+            if (employee == null){
+                log.error("CompanyAdmin details existed{}", employeePasswordReset.getCompanyName());
+                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.COMPANY_ALREADY_EXISTS), employeePasswordReset.getCompanyName()),
+                        HttpStatus.CONFLICT);
+            }
+
+            byte[] decodedBytes = Base64.getDecoder().decode(employee.getPassword());
+            String decodedPassword = new String(decodedBytes, StandardCharsets.UTF_8);
+            if (!decodedPassword.equals(employeePasswordReset.getPassword())){
+                log.debug("checking the given Password..");
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_PASSWORD),
+                        HttpStatus.NOT_FOUND);
+            }
+            String newPassword = Base64.getEncoder().encodeToString(employeePasswordReset.getNewPassword().toString().getBytes());
+            employee.setPassword(newPassword);
+
+            openSearchOperations.saveEntity(employee, id, index);
+
+        } catch (Exception ex) {
+            log.error("Exception while fetching user {}, {}", employeePasswordReset.getCompanyName(), ex);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_EMPLOYEE),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+
+
+        }
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
     }
 
 }

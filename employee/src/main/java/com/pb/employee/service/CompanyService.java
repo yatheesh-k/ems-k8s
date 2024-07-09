@@ -6,6 +6,7 @@ import com.pb.employee.persistance.model.CompanyEntity;
 import com.pb.employee.request.CompanyImageUpdate;
 import com.pb.employee.request.CompanyRequest;
 import com.pb.employee.request.CompanyUpdateRequest;
+import com.pb.employee.request.EmployeePasswordReset;
 import com.pb.employee.response.CompanyResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,4 +23,6 @@ public interface CompanyService {
     ResponseEntity<?> deleteCompanyById(String companyId) throws EmployeeException;
 
     ResponseEntity<?> getCompanyImageById(String companyId)  throws EmployeeException;
+
+    ResponseEntity<?> passwordResetForEmployee(EmployeePasswordReset employeePasswordReset, String id) throws EmployeeException;
 }

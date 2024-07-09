@@ -1,10 +1,12 @@
 package com.pb.ems.opensearch;
 
 import com.pb.ems.exception.IdentityException;
+import com.pb.ems.model.CompanyEntity;
 import com.pb.ems.model.EmployeeEntity;
 import com.pb.ems.persistance.Entity;
 import com.pb.ems.util.Constants;
 import com.pb.ems.util.ResourceUtils;
+import org.checkerframework.checker.units.qual.C;
 import org.opensearch.client.RequestOptions;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.Result;
@@ -82,7 +84,7 @@ public class OpenSearchOperations {
     }
     public EmployeeEntity getEmployeeById(String user, String company) throws IOException {
         String index = Constants.INDEX_EMS+"_"+company;
-        String username = resourceIdUtils.md5Hash(user);
+        String username = resourceIdUtils.generateCompanyResourceId(user);
         GetRequest getRequest = new GetRequest.Builder().id(Constants.EMPLOYEE+"-"+username)
                 .index(index).build();
         GetResponse<EmployeeEntity> searchResponse = esClient.get(getRequest, EmployeeEntity.class);
@@ -94,11 +96,25 @@ public class OpenSearchOperations {
         return null;
     }
 
+    public CompanyEntity getCompanyById(String user) throws IOException {
+        String index = Constants.INDEX_EMS;
+        String username = resourceIdUtils.generateCompanyResourceId(user);
+        GetRequest getRequest = new GetRequest.Builder().id(Constants.COMPANY+"-"+username)
+                .index(index).build();
+        GetResponse<CompanyEntity> searchResponse = esClient.get(getRequest, CompanyEntity.class);
+        if(searchResponse != null && searchResponse.source() != null){
+            CompanyEntity employee = searchResponse.source();
+            employee.setId(searchResponse.id()); // Set the _id from the response
+            return employee;
+        }
+        return null;
+    }
+
     public void saveOtpToUser(EmployeeEntity user, Long otp, String company) throws IdentityException {
         user.setOtp(otp);
         user.setExpiryTime(Instant.now().plus(60, ChronoUnit.SECONDS).getEpochSecond()); // Set expiry time, for example, 1 minutes from now
         String index =  Constants.INDEX_EMS +"_"+ company; // Use dynamic index
-        String id = Constants.EMPLOYEE+"-"+resourceIdUtils.md5Hash(user.getEmailId());
+        String id = Constants.EMPLOYEE+"-"+resourceIdUtils.generateCompanyResourceId(user.getEmailId());
         saveEntity(user,id , index);  // Ensure this method saves the user entity to the correct index
         logger.info("The otp and expiry time saved into the db for index: " + index);
     }//save the entity
@@ -129,6 +145,22 @@ public class OpenSearchOperations {
         IndexResponse response = esClient.index(request);
         if (response.result() != Result.Updated && response.result() != Result.Created) {
             throw new IOException("Failed to update employee: " + employeeId);
+        }
+    }
+
+    public void updateCompany(CompanyEntity company) throws IOException {
+        String index = Constants.INDEX_EMS;
+        String comapanyId = company.getId();
+
+        IndexRequest<CompanyEntity> request = new IndexRequest.Builder<CompanyEntity>()
+                .index(index)
+                .id(comapanyId)
+                .document(company)
+                .build();
+
+        IndexResponse response = esClient.index(request);
+        if (response.result() != Result.Updated && response.result() != Result.Created) {
+            throw new IOException("Failed to update employee: " + comapanyId);
         }
     }
 }

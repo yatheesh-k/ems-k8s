@@ -8,6 +8,7 @@ import com.pb.employee.request.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +51,8 @@ public class CompanyUtils {
 
     public static Entity unmaskCompanyProperties(CompanyEntity companyEntity) {
         String hra = null, pan = null, pf = null, spa = null, ta = null;
+        byte[] password = Base64.getDecoder().decode(companyEntity.getPassword().getBytes());
+        String decodedPassword = new String(password, StandardCharsets.UTF_8);
         if(companyEntity.getHraPercentage() != null) {
             hra = new String(Base64.getDecoder().decode(companyEntity.getHraPercentage().toString().getBytes()));
         }
@@ -65,7 +68,7 @@ public class CompanyUtils {
         if(companyEntity.getTravelAllowance() != null) {
             ta = new String(Base64.getDecoder().decode(companyEntity.getTravelAllowance().toString().getBytes()));
         }
-
+        companyEntity.setPassword(decodedPassword);
         companyEntity.setHraPercentage(hra);
         companyEntity.setPanNo(pan);
         companyEntity.setPfPercentage(pf);

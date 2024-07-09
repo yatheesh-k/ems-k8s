@@ -83,5 +83,23 @@ public class LoginController {
         return loginService.validateCompanyOtp(request);
     }
 
+    @PostMapping("forgot/password")
+    @io.swagger.v3.oas.annotations.Operation(
+            summary = "${api.forgotPassword.tag}", description = "${api.forgotPassword.description}")
+    @ResponseStatus(HttpStatus.CREATED)
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description= "CREATED")
+    public ResponseEntity<?> forgotPassword(@RequestBody @Valid EmployeePasswordRequest request) throws IdentityException {
+        return loginService.forgotPassword(request);
+    }
+
+    @PostMapping("update/password")
+    @io.swagger.v3.oas.annotations.Operation(
+            summary = "${api.updatePassword.otp}", description = "${api.updatePassword.description}")
+    @ResponseStatus(HttpStatus.CREATED)
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description= "CREATED")
+    public ResponseEntity<?> updatePassword(@RequestBody @Valid EmployeePasswordforgot request) throws IdentityException {
+        return loginService.updatePasswordForForgot(request);
+    }
+
 
 }

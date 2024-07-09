@@ -2,10 +2,7 @@ package com.pb.employee.service;
 
 
 import com.pb.employee.exception.EmployeeException;
-import com.pb.employee.request.CompanyRequest;
-import com.pb.employee.request.CompanyUpdateRequest;
-import com.pb.employee.request.EmployeeRequest;
-import com.pb.employee.request.EmployeeUpdateRequest;
+import com.pb.employee.request.*;
 import com.pb.employee.response.CompanyResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,4 +16,6 @@ public interface EmployeeService {
     ResponseEntity<?> getEmployeeById(String companyName, String employeeId) throws EmployeeException;
     ResponseEntity<?> updateEmployeeById(String employeeId, EmployeeUpdateRequest employeeUpdateRequest) throws IOException, EmployeeException;
     ResponseEntity<?> deleteEmployeeById(String companyId, String companyName) throws EmployeeException;
+
+    ResponseEntity<?> passwordResetForEmployee(EmployeePasswordReset employeePasswordReset, String id) throws EmployeeException;
 }

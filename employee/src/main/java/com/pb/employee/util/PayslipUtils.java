@@ -87,7 +87,6 @@ public class PayslipUtils {
         if (salaryRequest.getDeductions().getLop() != null) {
             byte[] decodedLop = Base64.getDecoder().decode(salaryRequest.getDeductions().getLop());
             lop = Double.parseDouble(new String(decodedLop));
-            lop= lop/12.0;
         }
         if (salaryRequest.getDeductions().getTotalDeductions() != null) {
             byte[] decodedTded = Base64.getDecoder().decode(salaryRequest.getDeductions().getTotalDeductions());

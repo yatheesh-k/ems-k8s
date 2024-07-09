@@ -10,6 +10,7 @@ import com.pb.employee.request.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @Slf4j
@@ -57,9 +58,12 @@ public class EmployeeUtils {
 
     public static Entity unmaskEmployeeProperties(EmployeeEntity employeeEntity) {
         String pan = null;
+        byte[] password = Base64.getDecoder().decode(employeeEntity.getPassword().getBytes());
+        String decodedPassword = new String(password, StandardCharsets.UTF_8);
         if(employeeEntity.getPanNo() != null) {
            pan = new String((Base64.getDecoder().decode(employeeEntity.getPanNo().toString().getBytes())));
         }
+        employeeEntity.setPassword(decodedPassword);
             employeeEntity.setPanNo(pan);
         return employeeEntity;
     }
