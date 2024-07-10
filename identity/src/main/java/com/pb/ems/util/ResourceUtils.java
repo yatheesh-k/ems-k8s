@@ -1,14 +1,14 @@
-    package com.pb.ems.util;
+package com.pb.ems.util;
 
-    import lombok.extern.slf4j.Slf4j;
-    import org.apache.commons.codec.digest.DigestUtils;
-    import org.springframework.stereotype.Component;
-    import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-    @Component
-    @Service
-    @Slf4j
-    public class ResourceUtils {
+@Component
+@Service
+@Slf4j
+public class ResourceUtils {
 
     public static String generateCompanyResourceId(String... args) {
         return md5Hash(args, true); // Case-sensitive for company names
@@ -45,4 +45,4 @@
 
 
     }
-    }
+}
