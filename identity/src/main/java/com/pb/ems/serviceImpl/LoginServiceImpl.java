@@ -111,11 +111,11 @@ public class LoginServiceImpl implements LoginService {
         String token= null;
         if (employee != null && employee.getRoles() != null && employee.getRoles().size() > 0) {
             roles.addAll(employee.getRoles());
-             token = JwtTokenUtil.generateEmployeeToken(employee.getId(), roles, request.getCompany());
+             token = JwtTokenUtil.generateEmployeeToken(employee.getId(), roles, request.getCompany(), request.getUsername());
 
         } else {
             roles.add(Constants.COMPANY_ADMIN);
-             token = JwtTokenUtil.generateEmployeeToken(employee.getCompanyId(), roles, request.getCompany());
+             token = JwtTokenUtil.generateEmployeeToken(employee.getId(), roles, request.getCompany(), request.getUsername());
 
         }
         return new ResponseEntity<>(
