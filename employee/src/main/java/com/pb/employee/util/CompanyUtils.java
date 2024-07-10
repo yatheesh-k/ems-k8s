@@ -398,27 +398,31 @@ public class CompanyUtils {
     }
 
     public static Entity maskAttendanceProperties(AttendanceRequest attendanceRequest, String attendanceId, String employeeId) {
-        String month = null, year = null, totalWd = null, noOfWd = null;
-
-        if(attendanceRequest.getMonth() != null) {
-            month = (Base64.getEncoder().encodeToString(attendanceRequest.getMonth().toString().getBytes()));
-        }
-        if(attendanceRequest.getYear() != null) {
-            year = (Base64.getEncoder().encodeToString(attendanceRequest.getYear().toString().getBytes()));
-        } if(attendanceRequest.getTotalWorkingDays() != null) {
-            totalWd = (Base64.getEncoder().encodeToString(attendanceRequest.getTotalWorkingDays().toString().getBytes()));
-        }if(attendanceRequest.getNoOfWorkingDays()!= null) {
-            noOfWd = (Base64.getEncoder().encodeToString(attendanceRequest.getNoOfWorkingDays().toString().getBytes()));
-        }
-
+        String totalWd = null, noOfWd = null;
         ObjectMapper objectMapper = new ObjectMapper();
-
         AttendanceEntity entity = objectMapper.convertValue(attendanceRequest, AttendanceEntity.class);
-
         entity.setAttendanceId(attendanceId);
         entity.setEmployeeId(employeeId);
-        entity.setMonth(month);
-        entity.setYear(year);
+       if(attendanceRequest.getTotalWorkingDays() != null) {
+            totalWd = (Base64.getEncoder().encodeToString(attendanceRequest.getTotalWorkingDays().getBytes()));
+           entity.setTotalWorkingDays(totalWd);
+        }if(attendanceRequest.getNoOfWorkingDays()!= null) {
+            noOfWd = (Base64.getEncoder().encodeToString(attendanceRequest.getNoOfWorkingDays().getBytes()));
+            entity.setNoOfWorkingDays(noOfWd);
+        }
+        entity.setType(Constants.ATTENDANCE);
+
+        return entity;
+    }
+
+    public static Entity unMaskAttendanceProperties(AttendanceEntity entity){
+        String totalWd = null, noOfWd = null;
+
+       if(entity.getTotalWorkingDays() != null) {
+            totalWd = new String(Base64.getDecoder().decode(entity.getTotalWorkingDays()));
+        }if(entity.getNoOfWorkingDays()!= null) {
+            noOfWd = new String(Base64.getDecoder().decode(entity.getNoOfWorkingDays()));
+        }
         entity.setTotalWorkingDays(totalWd);
         entity.setNoOfWorkingDays(noOfWd);
         entity.setType(Constants.ATTENDANCE);

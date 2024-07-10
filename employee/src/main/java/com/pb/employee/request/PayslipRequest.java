@@ -17,13 +17,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PayslipRequest {
-
-
-
     @NotBlank(message = "{companyname.message}")
     private String companyName;
-
     private String month;
     private String year;
-
 }

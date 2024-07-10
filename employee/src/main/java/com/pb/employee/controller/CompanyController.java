@@ -2,12 +2,10 @@ package com.pb.employee.controller;
 
 
 import com.pb.employee.exception.EmployeeException;
-import com.pb.employee.persistance.model.CompanyEntity;
 import com.pb.employee.request.CompanyImageUpdate;
 import com.pb.employee.request.CompanyRequest;
 import com.pb.employee.request.CompanyUpdateRequest;
 import com.pb.employee.request.EmployeePasswordReset;
-import com.pb.employee.response.CompanyResponse;
 import com.pb.employee.service.CompanyService;
 import com.pb.employee.util.Constants;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -81,7 +79,7 @@ public class CompanyController {
                                                @RequestHeader(Constants.AUTH_KEY) String authToken,
                                                @PathVariable String companyId,
                                                @ModelAttribute @Valid CompanyImageUpdate companyImageUpdate,
-                                                @RequestPart("file") MultipartFile file ) throws IOException, EmployeeException {
+                                               @RequestPart(Constants.FILE) MultipartFile file ) throws IOException, EmployeeException {
 
         return companyService.updateCompanyImageById(companyId,companyImageUpdate, file);
     }

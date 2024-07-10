@@ -6,8 +6,6 @@ import com.pb.ems.model.EmployeeEntity;
 import com.pb.ems.persistance.Entity;
 import com.pb.ems.util.Constants;
 import com.pb.ems.util.ResourceUtils;
-import org.checkerframework.checker.units.qual.C;
-import org.opensearch.client.RequestOptions;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.Result;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
@@ -21,9 +19,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Component
 public class OpenSearchOperations {
@@ -148,6 +143,33 @@ public class OpenSearchOperations {
         }
     }
 
+    public Object getById(String resourceId, String type, String index) throws IOException {
+        if(type != null) {
+            resourceId = type+"_"+resourceId;
+        }
+        GetRequest getRequest = new GetRequest.Builder().id(resourceId)
+                .index(index).build();
+        GetResponse<Object> searchResponse = esClient.get(getRequest, Object.class);
+        if(searchResponse != null && searchResponse.source() != null){
+            return searchResponse.source();
+        }
+        return null;
+    }
+
+
+    public EmployeeEntity getCompanyById(String username, String company) throws IOException {
+        String index = Constants.INDEX_EMS + "_" + company;
+        String user = resourceIdUtils.md5Hash(username);
+        GetRequest getRequest = new GetRequest.Builder().id(Constants.COMPANY + "-" + username)
+                .index(index).build();
+        GetResponse<EmployeeEntity> searchResponse = esClient.get(getRequest, EmployeeEntity.class);
+        if (searchResponse != null && searchResponse.source() != null) {
+            EmployeeEntity employee = searchResponse.source();
+            employee.setId(searchResponse.id()); // Set the _id from the response
+            return employee;
+        }
+        return null;
+    }
     public void updateCompany(CompanyEntity company) throws IOException {
         String index = Constants.INDEX_EMS;
         String comapanyId = company.getId();

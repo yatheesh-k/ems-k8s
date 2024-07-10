@@ -47,7 +47,7 @@ public class ResourceIdUtils {
         return generateGlobalResourceId(ResourceType.DESIGNATION, id);
     }
     public static String generateAttendanceId(String company, String employeeId,String year,String month) {
-        return generateGlobalResourceId(ResourceType.ATTENDANCE,company,employeeId,year,month);
+        return generateGlobalResourceId(ResourceType.ATTENDANCE,company,year,month,employeeId);
     }
 
     /**

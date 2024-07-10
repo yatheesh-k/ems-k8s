@@ -19,6 +19,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
@@ -79,9 +80,9 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public ResponseEntity<?> employeeLogin(EmployeeLoginRequest request) throws IdentityException {
+    public ResponseEntity<?> employeeLogin(EmployeeLoginRequest request) throws IdentityException, IOException {
         EmployeeEntity employee;
-        String company = request.getCompany();
+        Object entity = null;
         try {
             employee = openSearchOperations.getEmployeeById(request.getUsername(), request.getCompany());
             if (employee != null && employee.getPassword() != null) {
@@ -105,14 +106,18 @@ public class LoginServiceImpl implements LoginService {
         }
         Long otp = generateOtp();
         sendOtpByEmail(request.getUsername(), otp);
-        openSearchOperations.saveOtpToUser(employee, otp,company);
+        openSearchOperations.saveOtpToUser(employee, otp,request.getCompany());
         List<String> roles = new ArrayList<>();
+        String token= null;
         if (employee != null && employee.getRoles() != null && employee.getRoles().size() > 0) {
             roles.addAll(employee.getRoles());
+             token = JwtTokenUtil.generateEmployeeToken(employee.getId(), roles, request.getCompany());
+
         } else {
             roles.add(Constants.COMPANY_ADMIN);
+             token = JwtTokenUtil.generateEmployeeToken(employee.getCompanyId(), roles, request.getCompany());
+
         }
-        String token = JwtTokenUtil.generateEmployeeToken(employee.getId(),roles,company);
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(new LoginResponse(token, null)), HttpStatus.OK);
     }
@@ -157,7 +162,7 @@ public class LoginServiceImpl implements LoginService {
             user = openSearchOperations.getEmployeeById(request.getUsername(), request.getCompany());
             if (user == null) {
                 log.debug("checking the user details..");
-                throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.USER_NOTFOUND),
+                throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.USER_NOT_FOUND),
                         HttpStatus.NOT_FOUND);
             }
             if (user != null && user.getOtp() != null) {
@@ -234,7 +239,7 @@ public class LoginServiceImpl implements LoginService {
             user = openSearchOperations.getEmployeeById(loginRequest.getUsername(), loginRequest.getCompany());
             if (user == null) {
                 log.debug("checking the user details..");
-                throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.USER_NOTFOUND),
+                throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.USER_NOT_FOUND),
                         HttpStatus.NOT_FOUND);
             }
 
@@ -264,7 +269,7 @@ public class LoginServiceImpl implements LoginService {
           CompanyEntity  employee = openSearchOperations.getCompanyById(otpRequest.getCompanyName());
             if (user == null) {
                 log.debug("checking the user details..");
-                throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.USER_NOTFOUND),
+                throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.USER_NOT_FOUND),
                         HttpStatus.NOT_FOUND);
             }
 

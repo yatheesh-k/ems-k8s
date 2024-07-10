@@ -2,28 +2,27 @@
 package com.pb.employee.serviceImpl;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pb.employee.common.ResponseBuilder;
+import com.pb.employee.common.ResponseObject;
 import com.pb.employee.exception.EmployeeErrorMessageKey;
 import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.opensearch.OpenSearchOperations;
-import com.pb.employee.persistance.model.Entity;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import com.pb.employee.persistance.model.*;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.pb.employee.request.AttendanceRequest;
-import com.pb.employee.request.EmployeeUpdateRequest;
 import com.pb.employee.service.AttendanceService;
 import com.pb.employee.util.CompanyUtils;
 import com.pb.employee.util.Constants;
 import com.pb.employee.util.ResourceIdUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.util.StringUtils;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -35,14 +34,10 @@ import java.util.List;
 public class AttendanceServiceImpl implements AttendanceService {
 
     @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
     private OpenSearchOperations openSearchOperations;
-    @Autowired
-    private SalaryServiceImpl salaryService;
 
     @Override
-    public ResponseEntity<?> uploadAttendanceFile(MultipartFile file, String company) throws EmployeeException {
+    public ResponseEntity<?> uploadAttendanceFile(String company,MultipartFile file) throws EmployeeException {
         if (file.isEmpty()) {
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPTY_FILE), HttpStatus.BAD_REQUEST);
         }
@@ -60,23 +55,108 @@ public class AttendanceServiceImpl implements AttendanceService {
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.CREATED);
     }
 
+    @Override
+    public ResponseEntity<?> getAllEmployeeAttendance(String companyName, String employeeId, String month, String year) throws EmployeeException {
+        List<AttendanceEntity> attendanceEntities = null;
+        try {
+            // Call the method to get attendance based on whether the month is provided or not
+            if ((month != null && !month.isEmpty())||(year!= null && !year.isEmpty())) {
+                attendanceEntities = openSearchOperations.getAttendanceByMonthAndYear(companyName, employeeId, month, year);
+            }
+            // Unmask sensitive properties if required
+            for (AttendanceEntity attendanceEntity : attendanceEntities) {
+                CompanyUtils.unMaskAttendanceProperties(attendanceEntity);
+            }
+            // Return success response with the retrieved attendance records
+            return new ResponseEntity<>(ResponseBuilder.builder().build().createSuccessResponse(attendanceEntities), HttpStatus.OK);
+
+        } catch (Exception ex) {
+            log.error("Exception while fetching attendance for employees {}: {}", companyName, ex.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_GET_ATTENDANCE),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @Override
+    public ResponseEntity<?> deleteEmployeeAttendanceById(String companyName, String employeeId, String attendanceId) throws EmployeeException {
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+        AttendanceEntity entity = null;
+        try {
+            entity = openSearchOperations.getAttendanceById(employeeId, null, index);
+            if (entity==null){
+                log.error("Exception while fetching employee for the attendance {}", employeeId);
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            if (!entity.getEmployeeId().equals(employeeId)) {
+                log.error("Employee ID mismatch for attendance {}: expected {}, found", attendanceId, employeeId);
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            openSearchOperations.deleteEntity(attendanceId, index);
+        }
+        catch (Exception ex) {
+            log.error("Exception while deleting attendance for employees {}: {}", attendanceId, ex.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES_ATTENDANCE),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(Constants.DELETED), HttpStatus.OK);
+
+    }
+
+    @Override
+    public ResponseEntity<?> updateEmployeeAttendanceById(String company, String employeeId, String attendanceId, AttendanceRequest updateRequest) throws EmployeeException{
+        String index = ResourceIdUtils.generateCompanyIndex(company);
+        AttendanceEntity entity = null;
+        try {
+            entity = openSearchOperations.getAttendanceById(attendanceId, null, index);
+            if (entity==null){
+                log.error("Exception while fetching employee for attendance {}", employeeId);
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES_ATTENDANCE),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            if (!entity.getEmployeeId().equals(employeeId)) {
+                log.error("Employee ID mismatch for attendance details {}: expected {}, found", attendanceId, employeeId);
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } catch (Exception ex) {
+            log.error("Exception while fetching user {}:", employeeId, ex);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES_ATTENDANCE),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        Entity employeeAttendance = CompanyUtils.maskAttendanceProperties(updateRequest, attendanceId, employeeId);
+        openSearchOperations.saveEntity(employeeAttendance, attendanceId, index);
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
+    }
     private List<AttendanceRequest> parseExcelFile(MultipartFile file, String company) throws Exception {
         List<AttendanceRequest> attendanceRequests = new ArrayList<>();
         String fileName = file.getOriginalFilename();
 
         if (fileName != null && (fileName.endsWith(".xls") || fileName.endsWith(".xlsx"))) {
             try (InputStream excelIs = file.getInputStream()) {
-                Workbook wb = WorkbookFactory.create(excelIs);
-                Sheet sheet = wb.getSheetAt(0);
+                log.info("Successfully opened input stream for file: {}", fileName);
 
-                log.info("Sheet '{}' has {} rows.", sheet.getSheetName(), sheet.getPhysicalNumberOfRows());
+                Workbook wb = null;
+                try {
+                    wb = new XSSFWorkbook(excelIs);
+                } catch (Exception e) {
+                    log.error("Failed to create workbook for file: {}", e.getMessage(), e);
+                    throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.FAILED_TO_CREATE), HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+
+                Sheet sheet = wb.getSheetAt(0);
+                log.info("Successfully retrieved sheet: '{}', with {} rows.", sheet.getSheetName(), sheet.getPhysicalNumberOfRows());
 
                 Iterator<Row> rowIt = sheet.rowIterator();
 
                 if (!rowIt.hasNext()) {
                     log.warn("No rows found in the sheet '{}'", sheet.getSheetName());
                 }
-
                 while (rowIt.hasNext()) {
                     Row currentRow = rowIt.next();
                     log.info("Processing row number: {}", currentRow.getRowNum());
@@ -86,13 +166,30 @@ public class AttendanceServiceImpl implements AttendanceService {
                         continue;
                     }
 
+                    // Check if any critical cell is empty or null, skip if true
+                    if (StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(0)))
+                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(1)))
+                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(2)))
+                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(3)))
+                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(4)))) {
+                        log.warn("Skipping row {} as one or more critical cells are empty", currentRow.getRowNum());
+                        continue;
+                    }
+
                     AttendanceRequest attendanceRequest = new AttendanceRequest();
                     attendanceRequest.setCompany(company);
                     attendanceRequest.setEmployeeId(getCellValue(currentRow.getCell(0)));
                     attendanceRequest.setMonth(getCellValue(currentRow.getCell(1)));
-                    attendanceRequest.setYear(getCellValue(currentRow.getCell(2)));
-                    attendanceRequest.setTotalWorkingDays(getCellValue(currentRow.getCell(3)));
-                    attendanceRequest.setNoOfWorkingDays(getCellValue(currentRow.getCell(4)));
+
+                    // Handle parsing and setting year, totalWorkingDays, and noOfWorkingDays
+                    try {
+                        attendanceRequest.setYear(String.valueOf((int) Double.parseDouble(getCellValue(currentRow.getCell(2)))));
+                        attendanceRequest.setTotalWorkingDays(String.valueOf((int) Double.parseDouble(getCellValue(currentRow.getCell(3)))));
+                        attendanceRequest.setNoOfWorkingDays(String.valueOf((int) Double.parseDouble(getCellValue(currentRow.getCell(4)))));
+                    } catch (NumberFormatException e) {
+                        log.error("Error parsing numeric values from row {}: {}", currentRow.getRowNum(), e.getMessage());
+                        throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.NUMBER_EXCEPTION), HttpStatus.INTERNAL_SERVER_ERROR);
+                    }
 
                     attendanceRequests.add(attendanceRequest);
 
@@ -101,13 +198,14 @@ public class AttendanceServiceImpl implements AttendanceService {
                 wb.close();
             } catch (IOException e) {
                 log.error("Failed to process file: {}", e.getMessage(), e);
-                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.FAILED_TO_PROCESS),HttpStatus.CONFLICT);//"Failed to process file {} ", e
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.FAILED_TO_PROCESS), HttpStatus.CONFLICT);
             }
         } else {
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_FORMAT), HttpStatus.BAD_REQUEST);
         }
         return attendanceRequests;
     }
+
 
     private String getCellValue(Cell cell) {
         if (cell == null) {
@@ -126,8 +224,6 @@ public class AttendanceServiceImpl implements AttendanceService {
                 return String.valueOf(cell.getBooleanCellValue());
             case FORMULA:
                 return cell.getCellFormula();
-            case BLANK:
-                return "";
             default:
                 return "";
         }

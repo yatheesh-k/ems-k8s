@@ -29,7 +29,7 @@ public class EmployeeEntity implements Entity {
     private String firstName;
     private String lastName;
     private String designation;
-    private Date dateOfHiring;
+    private String dateOfHiring;
     private String department;
     private String location;
     private String manager;

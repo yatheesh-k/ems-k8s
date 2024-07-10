@@ -16,6 +16,7 @@ import java.util.List;
 public class EmployeeEntity implements Entity{
     private String id;
     private String employeeType;
+    private String companyId;
     private String employeeId;
     private String firstName;
     private String lastName;

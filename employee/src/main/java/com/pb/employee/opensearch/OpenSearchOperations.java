@@ -13,11 +13,6 @@ import com.pb.employee.persistance.model.EmployeeEntity;
 import com.pb.employee.persistance.model.Entity;
 import com.pb.employee.util.Constants;
 import com.pb.employee.util.ResourceIdUtils;
-import org.bouncycastle.asn1.DERBMPString;
-import org.opensearch.client.Request;
-import org.opensearch.client.RequestOptions;
-import org.opensearch.client.Response;
-import org.opensearch.client.RestClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.Result;
 import org.opensearch.client.opensearch._types.mapping.KeywordProperty;
@@ -36,6 +31,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Component
@@ -67,6 +63,7 @@ public class OpenSearchOperations {
                     HttpStatus.CONFLICT);
         }
     }
+
     public Entity saveEntity(Entity entity, String Id, String index) throws EmployeeException {
         IndexResponse indexResponse = null;
         try {
@@ -78,39 +75,27 @@ public class OpenSearchOperations {
             logger.debug("Saved the entity. Response {}.Entity:{}",indexResponse, entity);
         } catch (IOException e) {
             logger.error("Exception ",e);
-            throw new EmployeeException(String.format("Unable to save the entity {} ",entity.toString()), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_SAVE_EMPLOYEE_ATTENDANCE), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return entity;
     }
 
-    public String deleteEntity(String Id, String index) throws EmployeeException {
-        logger.debug("Deleting the Entity {}", Id);
+    public String deleteEntity(String id, String index) throws EmployeeException {
+        logger.debug("Deleting the Entity {}", id);
         DeleteResponse deleteResponse = null;
         try {
-            synchronized (Id){
+            synchronized (id){
                 deleteResponse = esClient.delete(b -> b.index(index)
-                        .id(Id));
-
+                        .id(id));
             }
             if(deleteResponse.result() == Result.NotFound) {
-                throw new EmployeeException(String.format("Entity Id not found",Id), HttpStatus.NOT_FOUND);
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_EMPLOYEE), HttpStatus.NOT_FOUND);
             }
-            logger.debug("Deleted the Entity {}, Delete response {}", Id, deleteResponse);
+            logger.debug("Deleted the Entity {}, Delete response {}", id, deleteResponse);
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new EmployeeException(String.format("Exception while deleting Entity {} .",Id), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EXCEPTION_OCCURRED),HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return Id;
-    }
-
-    public UserEntity getEMSAdminById(String user) throws IOException {
-        GetRequest getRequest = new GetRequest.Builder().id(Constants.EMS_ADMIN+"_"+user)
-                .index(Constants.INDEX_EMS).build();
-        GetResponse<UserEntity> searchResponse = esClient.get(getRequest, UserEntity.class);
-        if(searchResponse != null && searchResponse.source() != null){
-            return searchResponse.source();
-        }
-        return null;
+        return id;
     }
 
     public Object getById(String resourceId, String type, String index) throws IOException {
@@ -120,6 +105,19 @@ public class OpenSearchOperations {
         GetRequest getRequest = new GetRequest.Builder().id(resourceId)
                 .index(index).build();
         GetResponse<Object> searchResponse = esClient.get(getRequest, Object.class);
+        if(searchResponse != null && searchResponse.source() != null){
+            return searchResponse.source();
+        }
+        return null;
+    }
+    public AttendanceEntity getAttendanceById(String resourceId, String type, String index) throws IOException {
+        logger.debug("Getting attendence by Id {} of index {}", resourceId, index);
+        if(type != null) {
+            resourceId = type+"_"+resourceId;
+        }
+        GetRequest getRequest = new GetRequest.Builder().id(resourceId)
+                .index(index).build();
+        GetResponse<AttendanceEntity> searchResponse = esClient.get(getRequest, AttendanceEntity.class);
         if(searchResponse != null && searchResponse.source() != null){
             return searchResponse.source();
         }
@@ -202,7 +200,7 @@ public class OpenSearchOperations {
 
 
     public List<DesignationEntity> getCompanyDesignationByName(String companyName, String designationName) throws EmployeeException {
-        logger.debug("Getting the Resource by id {}", companyName, designationName);
+        logger.debug("Getting the Resource by id {} and :{}", companyName, designationName);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         boolQueryBuilder = boolQueryBuilder
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.DESIGNATION)));
@@ -215,11 +213,11 @@ public class OpenSearchOperations {
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
         try {
             searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
-                    .query(finalBoolQueryBuilder.build()._toQuery()), DesignationEntity.class);
+                    .query(finalBoolQueryBuilder.build().toQuery()), DesignationEntity.class);
         } catch (IOException e) {
             e.getStackTrace();
             logger.error(e.getMessage());
-            throw new EmployeeException("Unable to search ", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         List<Hit<DesignationEntity>> hits = searchResponse.hits().hits();
         logger.info("Number of hits {}", hits.size());
@@ -233,7 +231,7 @@ public class OpenSearchOperations {
     }
 
     public List<CompanyEntity> getCompanyByData(String companyName, String type, String shortName) throws EmployeeException {
-        logger.debug("Getting the Resource by name {}", companyName, type, shortName);
+        logger.debug("Getting the Resource by name {}, {},{}", companyName, type, shortName);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         boolQueryBuilder = boolQueryBuilder
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(type)));
@@ -253,7 +251,7 @@ public class OpenSearchOperations {
         } catch (IOException e) {
             e.getStackTrace();
             logger.error(e.getMessage());
-            throw new EmployeeException("Unable to search ", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         List<Hit<CompanyEntity>> hits = searchResponse.hits().hits();
         logger.info("Number of hits {}", hits.size());
@@ -267,7 +265,7 @@ public class OpenSearchOperations {
     }
 
     public List<EmployeeEntity> getCompanyEmployeeByData(String companyName, String empId, String emailId) throws EmployeeException {
-        logger.debug("Getting the Resource by emailId {}", companyName, empId, emailId);
+        logger.debug("Getting the Resource by  , companyName{} empId,{},emailId {}", companyName, empId, emailId);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         boolQueryBuilder = boolQueryBuilder
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.EMPLOYEE_ID).query(empId)));
@@ -284,7 +282,7 @@ public class OpenSearchOperations {
         } catch (IOException e) {
             e.getStackTrace();
             logger.error(e.getMessage());
-            throw new EmployeeException("Unable to search ", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         List<Hit<EmployeeEntity>> hits = searchResponse.hits().hits();
         logger.info("Number of hits {}", hits.size());
@@ -298,7 +296,7 @@ public class OpenSearchOperations {
     }
 
     public List<DepartmentEntity> getCompanyDepartmentByName(String companyName, String departmentName) throws EmployeeException {
-        logger.debug("Getting the Resource by id {}", companyName, departmentName);
+        logger.debug("Getting the Resource by id {} : {}", companyName, departmentName);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         boolQueryBuilder = boolQueryBuilder
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.DEPARTMENT)));
@@ -315,7 +313,7 @@ public class OpenSearchOperations {
         } catch (IOException e) {
             e.getStackTrace();
             logger.error(e.getMessage());
-            throw new EmployeeException("Unable to search ", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         List<Hit<DepartmentEntity>> hits = searchResponse.hits().hits();
         logger.info("Number of hits {}", hits.size());
@@ -343,7 +341,7 @@ public class OpenSearchOperations {
         } catch (IOException e) {
             e.getStackTrace();
             logger.error(e.getMessage());
-            throw new EmployeeException("Unable to search ", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         List<Hit<CompanyEntity>> hits = searchResponse.hits().hits();
         logger.info("Number of hits {}", hits.size());
@@ -365,7 +363,7 @@ public class OpenSearchOperations {
                     .query(query.build()._toQuery()), targetClass.getClass());
         } catch (IOException e) {
             e.printStackTrace();
-            throw new EmployeeException("Search operation Failed", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.FAILED_TO_PROCESS), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return searchResponse;
     }
@@ -386,7 +384,7 @@ public class OpenSearchOperations {
                     .query(finalBoolQueryBuilder.build()._toQuery()), EmployeeEntity.class);
         } catch (IOException e) {
             logger.error(e.getMessage());
-            throw new EmployeeException("Unable to search ", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         List<Hit<EmployeeEntity>> hits = searchResponse.hits().hits();
@@ -413,14 +411,14 @@ public class OpenSearchOperations {
         try {
             // Adjust the type or field according to your index structure
             searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
-                    .query(finalBoolQueryBuilder.build()._toQuery()), SalaryEntity.class);
+                    .query(finalBoolQueryBuilder.build().toQuery()), SalaryEntity.class);
         } catch (IOException e) {
             logger.error(e.getMessage());
-            throw new EmployeeException("Unable to search ", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         List<Hit<SalaryEntity>> hits = searchResponse.hits().hits();
-        logger.info("Number of employee hits for company {}: {}", companyName, hits.size());
+        logger.info("Number of employee hits for company is {}: {}", companyName, hits.size());
 
         List<SalaryEntity> salaryEntities = new ArrayList<>();
         for (Hit<SalaryEntity> hit : hits) {
@@ -447,7 +445,7 @@ public class OpenSearchOperations {
                     .query(finalBoolQueryBuilder.build()._toQuery()), PayslipEntity.class);
         } catch (IOException e) {
             logger.error("Error executing search query: {}", e.getMessage());
-            throw new EmployeeException("Unable to search", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         // Get hits from the search response
@@ -483,11 +481,44 @@ public class OpenSearchOperations {
             logger.debug("Index {} deleted successfully", index);
         } catch (IOException e) {
             logger.error("Exception while deleting index {}: {}", index, e.getMessage());
-            throw new EmployeeException("Failed to delete index " + index, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.FAILED_TO_DELETE), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
 
+    public List<AttendanceEntity> getAttendanceByMonthAndYear(String companyName, String employeeId, String month, String year) throws EmployeeException {
+        logger.debug("Getting attendance for employee {} for month {} and year {}", employeeId, month, year);
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        boolQueryBuilder = boolQueryBuilder
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.ATTENDANCE)))
+                .filter(q -> q.matchPhrase(t -> t.field("employeeId").query(employeeId)));
+        if(month!=null){
+            boolQueryBuilder=boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.MONTH).query(month)));
+        }
+        if(year!=null){
+            boolQueryBuilder=boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.YEAR).query(year)));
+        }
+        BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
+        SearchResponse<AttendanceEntity> searchResponse = null;
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
 
+        try {
+            searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                    .query(finalBoolQueryBuilder.build().toQuery()), AttendanceEntity.class);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        List<Hit<AttendanceEntity>> hits = searchResponse.hits().hits();
+        logger.info("Number of attendance hits for employee {}: {}", employeeId, hits.size());
+
+        List<AttendanceEntity> attendanceEntities = new ArrayList<>();
+
+        for (Hit<AttendanceEntity> hit : hits) {
+            attendanceEntities.add(hit.source());
+        }
+        return attendanceEntities;
+    }
 
 }

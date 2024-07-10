@@ -3,13 +3,13 @@ package com.pb.employee.config;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pb.employee.auth.JwtTokenUtil;
 import com.pb.employee.common.ResponseErrorObject;
 import com.pb.employee.common.ResponseObject;
 import com.pb.employee.request.ValidateLoginRequest;
 import com.pb.employee.util.Constants;
 import feign.FeignException;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,13 +19,14 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Component
 public class RestFilter implements Filter {
@@ -120,12 +121,6 @@ public class RestFilter implements Filter {
         return parsedToken.getBody().get("roles") == null;
     }
 
-
-    */
-/**
-     * @param uri
-     * @return
-     *//*
 
     private boolean isInSwaggerUiWhiteList(String uri) {
         if(StringUtils.isNotBlank(uri)) {

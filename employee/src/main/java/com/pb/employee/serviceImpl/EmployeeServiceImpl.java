@@ -148,7 +148,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
     @Override
-    public ResponseEntity<?> deleteEmployeeById(String employeeId, String companyName) throws EmployeeException {
+    public ResponseEntity<?> deleteEmployeeById(String companyName,String employeeId) throws EmployeeException {
         log.info("getting details of {}", employeeId);
         Object entity = null;
         String index = ResourceIdUtils.generateCompanyIndex(companyName);

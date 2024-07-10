@@ -11,7 +11,8 @@ public enum IdentityErrorMessageKey {
     INVALID_USERNAME("invalid.username"),
     INVALID_OTP("invalid.otp"),
     OTP_EXPIRED("otp.expired"),
-    USER_NOTFOUND("user.notfound");
+    USER_NOT_FOUND("user.not.found"),
+    INVALID_RESOURCE_TYPE("resource.type.invalid");
 
     private final String key;
 
