@@ -28,6 +28,8 @@ import CompanySalaryStructure from '../CompanyModule/PayRoll/CompanySalaryStruct
 import EmployeeSalaryList from '../CompanyModule/PayRoll/EmployeeSalaryList';
 import Message from '../LayOut/Message';
 import Profile from '../LayOut/Profile';
+import PaySlipDoc from '../Login/PayslipDoc';
+
 
 
 
@@ -58,13 +60,14 @@ const Rout = () => {
       <Route path='/payslipsList' element={<ViewPaySlips />}></Route>
       <Route path='/increment' element={<AddIncrement />}></Route>
       <Route path='/incrementList' element={<ViewIncrement />}></Route>
+      <Route path='/payslip' element={<PaySlipDoc/>}></Route>
       {/* </Route> */}
       {/* <Route path='/attendance'> */}
       <Route path='/addAttendance' element={<ManageAttendance />}></Route>
       <Route path='/attendanceList' element={<AttendanceList />}></Route>
       <Route path='/attendanceReport' element={<AttendanceReport />}></Route>
       {/* </Route> */}
-      <Route path='employeePayslip' element={<EmployeePayslips />}></Route>
+      <Route path='/employeePayslip' element={<EmployeePayslips />}></Route>
       <Route path='/offerLetter' element={<OfferLetter />}></Route>
       <Route path='/payslipLetter' element={<PaySlipLetter />}></Route>
       <Route path='/hikeLetter' element={<HikeLetter />}></Route>

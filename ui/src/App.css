@@ -6071,7 +6071,7 @@
   .d-flex {
 	display: flex !important;
 
-	background-color: #f5f5f5;
+	background-color: transparent;
 
 	/* background-color: whitesmoke; */
   }
@@ -16718,5 +16718,10 @@
     z-index: 1000; /* Adjust z-index as needed */
     overflow-y: auto; /* Enable vertical scrolling if needed */
 }
-
+.custom-modal .modal-content {
+	background-color: #ffcccc; /* Red background color */
+	border-radius: 8px; /* Optional: Rounded corners */
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Box shadow */
+  }
+  
   

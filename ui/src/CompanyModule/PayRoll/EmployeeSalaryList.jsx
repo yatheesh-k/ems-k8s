@@ -18,10 +18,10 @@ const EmployeeSalaryList = () => {
     }
   }, [id]);
 
+  
   const toggleExpand = (index) => {
     setExpanded(prevState => ({ ...prevState, [index]: !prevState[index] }));
   };
-
   return (
     <LayOut>
       <div className="container mt-4">
@@ -73,12 +73,12 @@ const EmployeeSalaryList = () => {
                         <input type="text" className="form-control" value={item.allowances.travelAllowance} readOnly />
                       </div>
                     </div>
-                    <div className="col mb-3">
+                    {/* <div className="col mb-3">
                       <div className="form-group">
                         <label>PF Contribution (Employee):</label>
                         <input type="text" className="form-control" value={item.allowances.pfContributionEmployee} readOnly />
                       </div>
-                    </div>
+                    </div> */}
                     <div className="col mb-3">
                       <div className="form-group">
                         <label>HRA:</label>
@@ -176,5 +176,26 @@ const EmployeeSalaryList = () => {
     </LayOut>
   );
 };
-
 export default EmployeeSalaryList;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -3,8 +3,7 @@ import { Envelope, Key, Lock, Unlock } from "react-bootstrap-icons";
 import { useNavigate, useParams } from "react-router";
 import { useForm } from "react-hook-form";
 import { loginApi } from "../Utils/Axios";
-import { toast } from "react-toastify";
-import axios from "axios";
+import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 
 const EmsLogin = () => {
   const {
@@ -14,18 +13,14 @@ const EmsLogin = () => {
     reset,
   } = useForm({ defaultValues: { username: "", password: "" } });
 
-  const {company}=useParams();
+  const { company } = useParams();
   const navigate = useNavigate();
-  const [user, setUser] = useState([]);
-  const [otpSent, setOtpSent] = useState(false); // Track if OTP is sent
   const [passwordShown, setPasswordShown] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false); // State for error modal
+  const [errorMessage, setErrorMessage] = useState(""); // State to hold error message
 
-  const togglePasswordVisiblity = () => {
+  const togglePasswordVisibility = () => {
     setPasswordShown(!passwordShown);
-  };
-
-  const handlePasswordChange = (e) => {
-    setPasswordShown(e.target.value);
   };
 
   const handleEmailChange = (e) => {
@@ -38,17 +33,33 @@ const EmsLogin = () => {
   const onSubmit = (data) => {
     const payload = {
       ...data,
-      company:company
+      company: company,
     };
     loginApi(payload)
       .then((response) => {
         console.log(response.data);
-        toast.success("Login Successfully");
+        // Handle successful login
         navigate("/main");
       })
       .catch((error) => {
-        toast.error("Login failed. Please try again.");
+        console.error("Login failed:", error);
+        if (error.response && error.response.data && error.response.data.error) {
+          // Extract error message from response
+          const errorMessage = error.response.data.error.message;
+          // Update error message state and show error modal
+          setErrorMessage(errorMessage);
+          setShowErrorModal(true);
+        } else {
+          // Default error message
+          setErrorMessage("Login failed. Please try again later.");
+          setShowErrorModal(true);
+        }
       });
+  };
+
+  const closeModal = () => {
+    setShowErrorModal(false);
+    setErrorMessage(""); // Clear error message when modal is closed
   };
 
   return (
@@ -56,7 +67,7 @@ const EmsLogin = () => {
       <div className="form_wrapper">
         <div className="form_container">
           <div className="title_container">
-            <h2>Login</h2>
+            <h2>Sign in</h2>
           </div>
           <div className="row clearfix">
             <div className>
@@ -86,33 +97,6 @@ const EmsLogin = () => {
                   )}
                 </div>
 
-                {/* {otpSent && (
-                  <div className="input_field">
-                    <input
-                       type={passwordShown ? "text" : "password"}
-                      name="otp"
-                      placeholder=" Enter OTP"
-                      {...register("otp", {
-                        required: "OTP is Required",
-
-                        pattern: {
-                          value: /^\d{6}$/,
-                          message: "OTP must be 6 digits.",
-                        },
-                      })}
-                    />
-                     <span onClick={togglePasswordVisiblity} style={{ marginTop: "3px" }}>
-                      {passwordShown ? <Key size={20} /> : <Key size={20} />}
-                    </span>
-                    {errors.otp && (
-                      <p className="errorMsg" style={{ marginLeft: "44px" }}>
-                        {errors.otp.message}
-                      </p>
-                    )}
-                  </div>
-                )} */}
-
-                {/* {!otpSent && ( */}
                 <div className="input_field">
                   <input
                     name="password"
@@ -125,10 +109,6 @@ const EmsLogin = () => {
                         value: 6,
                         message: "Password must be at least 6 characters long",
                       },
-                      // pattern: {
-                      //   value: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s)(?=.*[!@#$*])/,
-                      //   message: "Please Check Password You Entered",
-                      // },
                     })}
                   />
                   {errors.password && (
@@ -137,28 +117,29 @@ const EmsLogin = () => {
                     </p>
                   )}
                   <span
-                    onClick={togglePasswordVisiblity}
+                    onClick={togglePasswordVisibility}
                     style={{ marginTop: "3px" }}
                   >
                     {passwordShown ? <Unlock size={20} /> : <Lock size={20} />}
                   </span>
                 </div>
-                {/* )} */}
 
                 <button className="button" type="submit">
-                  {otpSent ? "Verify OTP and Login" : "Send OTP"}
+                  Log in
                 </button>
               </form>
             </div>
           </div>
         </div>
       </div>
-      <p className="credit">
-        Developed by{" "}
-        <a href="http://www.designtheway.com" target="_blank">
-          PathBreaker Technologies PVT.LTD
-        </a>
-      </p>
+
+      {/* Error Modal */}
+      <Modal show={showErrorModal} onHide={closeModal} centered style={{ zIndex: "1050" }} className="custom-modal" >
+        <ModalHeader closeButton>
+          <ModalTitle>Error</ModalTitle>
+        </ModalHeader>
+        <ModalBody>{errorMessage}</ModalBody>
+      </Modal>
     </div>
   );
 };

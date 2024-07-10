@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import LayOut from "../../LayOut/LayOut";
 import { CompanyRegistrationApi, companyUpdateByIdApi, companyViewByIdApi} from "../../Utils/Axios";
 import { toast } from "react-toastify";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Eye, EyeSlash } from "react-bootstrap-icons";
 
 const CompanyRegistration = () => {
@@ -19,6 +19,7 @@ const CompanyRegistration = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [passwordShown, setPasswordShown] = useState("");
   const location=useLocation();
+  const navigate= useNavigate();
 
   const togglePasswordVisiblity = () => {
     setPasswordShown(!passwordShown);
@@ -50,7 +51,7 @@ const CompanyRegistration = () => {
     setPostImage(URL.createObjectURL(e.target.files[0])); 
   };
 
-const onSubmit = async (data) => {
+  const onSubmit = async (data) => {
     try {
       const updateData = {
         password: data.password,
@@ -64,22 +65,42 @@ const onSubmit = async (data) => {
         companyType: data.companyType
         // Add other fields as needed
       };
+  
       if (location.state && location.state.id) {
         const response = await companyUpdateByIdApi(location.state.id, updateData);
-        console.log("Update successful", response.data);
-        toast.success("Company updated successfully");
-        reset()
+        if (response.status === 200) {
+          console.log("Update successful", response.data);
+          toast.success("Company updated successfully");
+          navigate("/companyView");
+          reset();
+        } else {
+          // Handle unsuccessful update (optional)
+          console.log("Update failed silently:", response.status, response.data);
+          // Optionally, you can toast or silently handle the failure
+          // toast.error("Failed to update company");
+          // Handle the failure silently without logging or displaying errors
+        }
       } else {
         const response = await CompanyRegistrationApi(data);
-        console.log("Company created", response.data);
-        toast.success("Company created successfully");
-        reset();
+        if (response.status === 200) {
+          console.log("Company created", response.data);
+          toast.success("Company created successfully");
+          navigate("/companyView");
+          reset();
+        } else {
+          // Handle unsuccessful company creation (optional)
+          console.log("Company creation failed silently:", response.status, response.data);
+          // Optionally, you can toast or silently handle the failure
+          // toast.error("Failed to create company");
+          // Handle the failure silently without logging or displaying errors
+        }
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
-      toast.error("Failed to submit form");
+      // Optionally, handle other error scenarios silently without logging or displaying errors
     }
   };
+  
+  
   
 
 useEffect(() => {
@@ -139,6 +160,18 @@ const handleFileUpload = async (e) => {
         <h1 className="h3 mb-3">
           <strong>Company Registration</strong>
         </h1>
+        <div className="col-auto" style={{paddingBottom:'20px'}}>
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                  <a href="/main">Home</a>
+                </li>
+                <li className="breadcrumb-item active">
+                  Comapny Registration
+                </li>
+              </ol>
+            </nav>
+          </div>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="row">
             <div className="col-12">

@@ -4,6 +4,10 @@
  * Copyright 2021 AdminKit 
  * Licensed under MIT (https://github.com/adminkit/adminkit/blob/master/LICENSE)
  */
+body{
+	font-family: italic;
+}
+
  :root {
 	--bs-blue: #3b7ddd;
 	--bs-indigo: #0a0a0a;
@@ -6051,9 +6055,9 @@
   .d-flex {
 	display: flex !important;
 
-	background-color: #f5f5f5;
+	background-color:transparent;
 
-	/* background-color: whitesmoke; */
+	/* background-color: transparent; */
   }
   
   .d-inline-flex {
@@ -16002,7 +16006,7 @@
   
   td:hover {
 	cursor: pointer;
-	background-color: gray;
+	/* background-color: gray; */
   }
   .calendar {
 	display: inline-block;
@@ -16280,3 +16284,20 @@
 
   
   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

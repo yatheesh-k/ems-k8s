@@ -28,6 +28,8 @@ const Header = ({ toggleSidebar }) => {
     navigate("/");
   };
 
+  const company = sessionStorage.getItem("company");
+
   return (
     <nav className="navbar navbar-expand navbar-light navbar-bg">
       <a
@@ -79,7 +81,7 @@ const Header = ({ toggleSidebar }) => {
               href
               onClick={toggleProfile}
             >
-              <i
+              <i 
                 className="bi bi-person-circle"
                 style={{ fontSize: "22px" }}
               ></i>
@@ -103,15 +105,18 @@ const Header = ({ toggleSidebar }) => {
           )}
           {roles.includes("company_admin") && (
           <li className="nav-item dropdown position-relative">
-            <a
+         
+            <a 
               className="nav-link dropdown-toggle d-none d-sm-inline-block text-center"
               href
               onClick={toggleProfile}
             >
+              <span class="text-dark p-2 mb-3">{company}</span>
               <i
                 className="bi bi-person-circle"
                 style={{ fontSize: "22px" }}
               ></i>
+            
             </a>
             {isProfileOpen && (
               <div
@@ -125,9 +130,9 @@ const Header = ({ toggleSidebar }) => {
                 <a className="dropdown-item" href="/reset">
                   <i className="align-middle me-1 bi bi-key"></i> Reset Password
                 </a>
-                <a className="dropdown-item" href="index.html">
+                {/* <a className="dropdown-item" href="/payslip">
                   <i className="align-middle me-1 bi bi-gear"></i> Settings
-                </a>
+                </a> */}
                 <div className="dropdown-divider"></div>
                 <a className="dropdown-item" onClick={handleLogOut} href="/">
                   Log out

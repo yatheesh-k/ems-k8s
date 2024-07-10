@@ -1,83 +1,88 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useForm } from "react-hook-form";
+import axios from "axios";
+import { Modal, Button, Toast } from "react-bootstrap";
+import { jwtDecode } from "jwt-decode";
 import LayOut from "./LayOut";
-import { ModalTitle } from "react-bootstrap";
 import { CameraFill } from "react-bootstrap-icons";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { companyViewByIdApi } from "../Utils/Axios";
-import { useLocation } from "react-router-dom";
 
 function Profile() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm();
+
+  const [companyData, setCompanyData] = useState({});
   const [postImage, setPostImage] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [error, setError] = useState();
-  const [value, setValue] = useState();
-  const [companyData, setCompanyData] = useState();
-  const [employeeSalaryView, setEmployeeSalaryView] = useState();
-  const location = useLocation();
-
-  const { id } = location.state || {};
-
-//   useEffect(() => {
-//     if (id) {
-//       companyViewByIdApi(id).then(response => {
-//         setEmployeeSalaryView(response.data.data);
-//       });
-//     }
-//   }, [id]);
-
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [error, setError] = useState(null);
+  const navigate= useNavigate();
 
   useEffect(() => {
-    const fetchCompanyData = async (Id) => {     console.log(Id);
+    const fetchCompanyData = async () => {
       const token = sessionStorage.getItem("token");
       try {
-        const response = await axios.get(
-          `http://localhost:8092/ems/company/${Id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setCompanyData(response.data);
-        Object.keys(response.data).forEach((key) => {
-          setValue(key, response.data[key]);
-        });
+        const decodedToken = jwtDecode(token);
+        const companyId = decodedToken.sub;
+        const response = await companyViewByIdApi(companyId)
+        const data = response.data;
+        setCompanyData(data);
       } catch (err) {
         setError(err);
       }
     };
+
     fetchCompanyData();
   }, [setValue]);
 
+
+
   const onChangePicture = (e) => {
-    setPostImage(URL.createObjectURL(e.target.files[0]));
+    const file = e.target.files[0];
+    if (file) {
+      setPostImage(URL.createObjectURL(file));
+    }
   };
 
-  const openModal = () => {
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-  };
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
 
   const handleRemoveLogo = () => {
-    setPostImage(null);
+    setPostImage("");
   };
 
   const onSubmit = async (data) => {
     const token = sessionStorage.getItem("token");
-    const response = await axios.get("companyViewByIdApi", data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    try {
+      const decodedToken = jwtDecode(token);
+      const companyId = decodedToken.sub;
+      const response = await axios.patch(
+        `http://localhost:8092/ems/company/${companyId}`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Updated successfully:", response.data);
+      setSuccessMessage("Profile updated successfully.");
+      toast.success("Company Details Updated Successfully");
+      setErrorMessage("");
+    navigate("/main");
+    } catch (err) {
+      console.error("Update error:", err);
+      setSuccessMessage("");
+      setErrorMessage("Failed to update profile.");
+      setError(err);
+    }
   };
 
   return (
@@ -86,19 +91,43 @@ function Profile() {
         <h1 className="h3 mb-3">
           <strong>Profile</strong>
         </h1>
+
+        {/* Success Message Modal */}
+        <Modal show={successMessage !== ""} onHide={() => setSuccessMessage("")}>
+          <Modal.Header closeButton>
+            <Modal.Title>Success</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>{successMessage}</Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setSuccessMessage("")}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* Error Message Modal */}
+        <Modal show={errorMessage !== ""} onHide={() => setErrorMessage("")}>
+          <Modal.Header closeButton>
+            <Modal.Title>Error</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>{errorMessage}</Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setErrorMessage("")}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
         <div className="row">
           <div className="col-12">
             <div className="card">
               <div className="card-header">
-                <h5 className="card-title"> Add Company Logo</h5>
-                <div
-                  className="dropdown-divider"
-                  style={{ borderTopColor: "#d7d9dd" }}
-                />
+                <h5 className="card-title">Add Company Logo</h5>
+                <hr />
               </div>
-              <div className="card-body" style={{ marginBottom: "-45px" }}>
+              <div className="card-body">
                 <div className="row">
-                  <div className="col-12 col-md-6 col-lg-6 mb-6">
+                  <div className="col-12 col-md-6 mb-3">
                     <div
                       style={{
                         position: "relative",
@@ -129,7 +158,7 @@ function Profile() {
                                 right: -10,
                                 borderRadius: "50%",
                               }}
-                              onClick={() => handleRemoveLogo()}
+                              onClick={handleRemoveLogo}
                             >
                               X
                             </button>
@@ -141,171 +170,335 @@ function Profile() {
                     </div>
                   </div>
                 </div>
+                <div className="d-flex justify-content-end">
+                  <button
+                    className="btn btn-primary btn-lg"
+                    type="submit"
+                    onClick={handleSubmit(onSubmit)}
+                  >
+                    Submit
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="container-fluid p-0">
-        <div className="row">
-          <div className="col-12">
-            <div className="card">
-              <div className="card-header">
-                <h5 className="card-title">Company Details</h5>
-                <div
-                  className="dropdown-divider"
-                  style={{ borderTopColor: "#d7d9dd" }}
-                />
-              </div>
-              <div className="card-body">
-                <div className="row">
-                  <div className="col-12 col-md-6 col-lg-5 mb-3">
-                    <p className="form-label">Company Type</p>
-                    <p className="form-control"></p>
-                  </div>
-                  <div className="col-lg-1"></div>
-                  <div className="col-12 col-md-6 col-lg-5 mb-3">
-                    <p className="form-label">Company CIN Number</p>
-                    <p className="form-control"></p>
-                  </div>
-                  <div className="col-12 col-md-6 col-lg-5 mb-3">
-                    <p className="form-label">Company Name</p>
-                    <p className="form-control"></p>
-                  </div>
-                  <div className="col-lg-1"></div>
-                  <div className="col-12 col-md-6 col-lg-5 mb-3">
-                    <p className="form-label">Company Mailid</p>
-                    <p className="form-control"></p>
-                  </div>
-                  <div className="col-12 col-md-6 col-lg-5 mb-3">
-                    <p className="form-label">Land Number</p>
-                    <p className="form-control"></p>
-                  </div>
-                  <div className="col-lg-1"></div>
-                  <div className="col-12 col-md-6 col-lg-5 mb-3">
-                    <p className="form-label">Mobile Number</p>
-                    <p className="form-control"></p>
-                  </div>
-                  <div className="col-12 col-md-6 col-lg-5 mb-3">
-                    <p className="form-label">Company Address</p>
-                    <p className="form-control"></p>
-                  </div>
-                  <div className="col-lg-1"></div>
-                  <div className="col-12 col-md-6 col-lg-5 mb-3">
-                    <p className="form-label">Company Register Number</p>
-                    <p className="form-control"></p>
-                  </div>
-                  <div className="col-12 col-md-6 col-lg-5 mb-3">
-                    <p className="form-label">Company GST Number</p>
-                    <p className="form-control"></p>
-                  </div>{" "}
-                  <div className="col-lg-1"></div>
-                  <div className="col-12 col-md-6 col-lg-5 mb-3">
-                    <p className="form-label">Company PAN Number</p>
-                    <p className="form-control"></p>
-                  </div>
-                  <div className="col-12 col-md-6 col-lg-5 mb-3">
-                    <p className="form-label">Company Register Number</p>
-                    <p className="form-control"></p>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="row mt-3">
+            <div className="col-12">
+              <div className="card">
+                <div className="card-header">
+                  <h5 className="card-title">Company Details</h5>
+                  <hr />
+                </div>
+                <div className="card-body">
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <label htmlFor="companyName" className="form-label">
+                          Company Name
+                        </label>
+                        <input
+                          type="text"
+                          id="companyName"
+                          className="form-control"
+                          {...register("companyName")}
+                          defaultValue={companyData.companyName}
+                          readOnly
+                        />
+                      </div>
+                      
+                      <div className="mb-3">
+                        <label htmlFor="companyMail" className="form-label">
+                          Company MailId
+                        </label>
+                        <input
+                          type="text"
+                          id="companyMail"
+                          className="form-control"
+                          {...register("emailId")}
+                          defaultValue={companyData.emailId}
+                          readOnly
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label
+                          htmlFor="companyPhoneNo"
+                          className="form-label"
+                        >
+                           Mobile Number
+                        </label>
+                        <input
+                          type="text"
+                          id="companyPhoneNo"
+                          className="form-control"
+                          {...register("mobileNo")}
+                          defaultValue={companyData.mobileNo}
+                          readOnly
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label
+                          htmlFor="companyAddress"
+                          className="form-label"
+                        >
+                          Company Address
+                        </label>
+                        <input
+                          type="text"
+                          id="companyAddress"
+                          className="form-control"
+                          {...register("companyAddress")}
+                          defaultValue={companyData.companyAddress}
+                          readOnly
+                        />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                    <div className="mb-3">
+                        <label htmlFor="companyName" className="form-label">
+                          Short Name
+                        </label>
+                        <input
+                          type="text"
+                          id="companyName"
+                          className="form-control"
+                          {...register("shortName")}
+                          defaultValue={companyData.shortName}
+                          readOnly
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label htmlFor="website" className="form-label">
+                          Password
+                        </label>
+                        <input
+                          type="text"
+                          id="website"
+                          className="form-control"
+                          {...register("password")}
+                          defaultValue={companyData.password}
+                          readOnly
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label
+                          htmlFor="companyAddress"
+                          className="form-label"
+                        >
+                          Land Number
+                        </label>
+                        <input
+                          type="text"
+                          id="companyAddress"
+                          className="form-control"
+                          {...register("landNo")}
+                          defaultValue={companyData.landNo}
+                          readOnly
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className="row">
-          <div className="col-12">
-            <div className="card">
-              <div className="card-header">
-                <h5 className="card-title">
-                  Authorized Contact Details Details
-                </h5>
-                <div
-                  className="dropdown-divider"
-                  style={{ borderTopColor: "#d7d9dd" }}
-                />
-              </div>
-              <div className="card-body">
-                <div className="row">
-                  <div className="col-12 col-md-6 col-lg-5 mb-3">
-                    <p className="form-label">Name</p>
-                    <p className="form-control"></p>
-                  </div>
-                  <div className="col-lg-1"></div>
-                  <div className="col-12 col-md-6 col-lg-5 mb-3">
-                    <p className="form-label">Personal MailId</p>
-                    <p className="form-control"></p>
-                  </div>
-                  <div className="col-12 col-md-6 col-lg-5 mb-3">
-                    <p className="form-label">Personal Mobile Number</p>
-                    <p className="form-control"></p>
-                  </div>
-                  <div className="col-lg-1"></div>
-                  <div className="col-12 col-md-6 col-lg-5 mb-3">
-                    <p className="form-label">Address</p>
-                    <p className="form-control"></p>
+
+          <div className="row mt-3">
+            <div className="col-12">
+              <div className="card">
+                <div className="card-header">
+                  <h5 className="card-title">Company Registration Details</h5>
+                  <hr />
+                </div>
+                <div className="card-body">
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <label htmlFor="name" className="form-label">
+                          Company CIN Number
+                        </label>
+                        <input
+                          type="text"
+                          id="name"
+                          className="form-control"
+                          {...register("cinNo")}
+                          defaultValue={companyData.cinNo}
+                          readOnly
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label
+                          htmlFor="personalMailId"
+                          className="form-label"
+                        >
+                          Company Register Number
+                        </label>
+                        <input
+                          type="text"
+                          id="personalMailId"
+                          className="form-control"
+                          {...register("companyRegNo")}
+                          defaultValue={companyData.companyRegNo}
+                          readOnly
+                        />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <label
+                          htmlFor="personalMobileNo"
+                          className="form-label"
+                        >
+                         Company GST Number
+                        </label>
+                        <input
+                          type="text"
+                          id="personalMobileNo"
+                          className="form-control"
+                          {...register("gstNo")}
+                          defaultValue={companyData.gstNo}
+                          readOnly
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label htmlFor="designation" className="form-label">
+                         Company PAN Number
+                        </label>
+                        <input
+                          type="text"
+                          id="designation"
+                          className="form-control"
+                          {...register("panNo")}
+                          defaultValue={companyData.panNo}
+                          readOnly
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+
+
+          <div className="row mt-3">
+            <div className="col-12">
+              <div className="card">
+                <div className="card-header">
+                  <h5 className="card-title">Personal Information</h5>
+                  <hr />
+                </div>
+                <div className="card-body">
+                  <div className="row">
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <label htmlFor="name" className="form-label">
+                          Name
+                        </label>
+                        <input
+                          type="text"
+                          id="name"
+                          className="form-control"
+                          {...register("name")}
+                          defaultValue={companyData.name}
+                          readOnly
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label
+                          htmlFor="personalMailId"
+                          className="form-label"
+                        >
+                          Personal Mail ID
+                        </label>
+                        <input
+                          type="text"
+                          id="personalMailId"
+                          className="form-control"
+                          {...register("personalMailId")}
+                          defaultValue={companyData.personalMailId}
+                          readOnly
+                        />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="mb-3">
+                        <label
+                          htmlFor="personalMobileNo"
+                          className="form-label"
+                        >
+                          Personal Mobile No
+                        </label>
+                        <input
+                          type="text"
+                          id="personalMobileNo"
+                          className="form-control"
+                          {...register("personalMobileNo")}
+                          defaultValue={companyData.personalMobileNo}
+                          readOnly
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label htmlFor="designation" className="form-label">
+                          Address
+                        </label>
+                        <input
+                          type="text"
+                          id="designation"
+                          className="form-control"
+                          {...register("address")}
+                          defaultValue={companyData.address}
+                          readOnly
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            className="col-12 d-flex justify-content-end mt-5"
+            style={{ background: "none" }}
+          >
+            <button
+              className="btn btn-primary btn-lg"
+              style={{ marginRight: "65px" }}
+              type="submit"
+            >
+              Submit
+            </button>
+            </div>
+        </form>
+
+        {/* Modal for Image Upload */}
+        <Modal show={showModal} onHide={closeModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Update Logo</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <input type="file" onChange={onChangePicture} />
+            {postImage && (
+              <div>
+                <img src={postImage} alt="Selected Logo" style={{ width: "100%" }} />
+              </div>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={closeModal}>
+              Close
+            </Button>
+            <Button variant="primary" onClick={handleSubmit(onSubmit)}>
+              Save Changes
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </div>
-      {showModal && (
-        <div
-          className="modal"
-          style={{
-            display: "block",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            position: "fixed",
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
-            zIndex: 9999,
-          }}
-        >
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <ModalTitle className="modal-title">Company Logo</ModalTitle>
-              </div>
-              <div className="modal-body">
-                <form onSubmit={handleSubmit(onSubmit)}>
-                  <input
-                    type="file"
-                    className="form-control"
-                    {...register("file", {
-                      required: "Company Logo is required",
-                    })}
-                    accept=".jpeg, .png, .jpg, .svg"
-                    onChange={onChangePicture}
-                  />
-                  {errors.file && (
-                    <p className="errorMsg">{errors.file.message}</p>
-                  )}
-                  <div className="modal-footer">
-                    <button type="submit" className="btn btn-primary">
-                      Submit
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={closeModal}
-                    >
-                      Close
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </LayOut>
   );
 }
 
 export default Profile;
-

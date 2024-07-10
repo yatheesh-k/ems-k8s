@@ -27,9 +27,6 @@
         setRoles(decodedToken.roles || []);
       }
     }, [token]);
-
-
-  console.log(roles)
   
   useEffect(() => {
     if (
@@ -41,6 +38,8 @@
       setIsCompanyOpen(false);
     }
   }, [location]);
+
+
   useEffect(() => {
     if (
       location.pathname === "/companySalaryStructure" ||
@@ -56,6 +55,47 @@
       setIsPayrollOpen(false);
     }
   }, [location]);
+
+  useEffect(() => {
+    if (
+      location.pathname === "/addAttendance" ||
+      location.pathname === "/attendanceList" ||
+      location.pathname === "/attendanceReport"
+    ) {
+      setIsAttendanceOpen(true);
+    } else {
+      setIsAttendanceOpen(false);
+    }
+  }, [location]);
+
+  
+  useEffect(() => {
+    if (
+      location.pathname === "/companyRegistration" ||
+      location.pathname.startsWith("/companyView")
+    ) {
+      setIsCompanyOpen(true);
+    } else {
+      setIsCompanyOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
+      location.pathname === "/companySalaryStructure" ||
+      location.pathname === "/employeeSalaryStructure" ||
+      location.pathname === "/employeeSalaryList" ||
+      location.pathname === "/payslipGeneration" ||
+      location.pathname === "/payslipsList"||
+      location.pathname === "/increment" ||
+      location.pathname === "/incrementList"
+    ) {
+      setIsPayrollOpen(true);
+    } else {
+      setIsPayrollOpen(false);
+    }
+  }, [location]);
+
   useEffect(() => {
     if (
       location.pathname === "/addAttendance" ||
@@ -176,6 +216,7 @@
         ? `data:image/png;base64,${userImageBase64}`
         : "assets/img/pathbreaker_logo.png"; // Fallback to a default image if base64 is not available
     };
+    
     return (
       <nav id="sidebar" class="sidebar js-sidebar">
         <div className="sidebar-content js-simplebar">
@@ -440,7 +481,7 @@
                       Generate PaySlips
                     </Link>
                   </li>
-                  <li
+                  {/* <li
                     style={{ paddingLeft: "40px" }}
                     className={`sidebar-item ${
                       location.pathname === "/companySalaryStructure"
@@ -461,7 +502,7 @@
                     <Link className="sidebar-link" to={"/employeeSalaryList"}>
                       Salary List
                     </Link>
-                  </li>
+                  </li> */}
                   <li
                     style={{ paddingLeft: "40px" }}
                     className={`sidebar-item ${
@@ -547,7 +588,9 @@
               </li>
             </>
           )}
-          {/* {roles === "User" && (
+
+          {/* {roles === "Employee" && (
+
             <>
               <li
                 className={`sidebar-item ${
@@ -623,7 +666,9 @@
               </li>
             </>
           )} */}
-        {roles.includes("Employee") && (
+
+          {roles.includes("Employee") && (
+
             <>
               <li
                 className={`sidebar-item ${
@@ -638,25 +683,43 @@
                 </Link>
               </li>
 
+              <li
+                className={`sidebar-item ${
+                  location.pathname.startsWith("/payslip") ? "active" : ""
+                }`}
+              >
+                <Link className="sidebar-link" to={"/emppayslip"}>
+                  {/* < color="orange" size={25} />{" "} */}
+                  <i
+                      class="bi bi-card-list"
+                      style={{ size: "25", color:"orange" }}
+                    ></i>
+                  <span className="align-middle " style={{ fontSize: "large" }}>
+                    SalaryList
+                  </span>
+                </Link>
+              </li>
+              <li
+                className={`sidebar-item ${
+                  location.pathname.startsWith("/payslip") ? "active" : ""
+                }`}
+              >
+                <Link className="sidebar-link" to={"/employeePayslip"}>
+                  <Receipt color="orange" size={25} />{" "}
+                  <span className="align-middle " style={{ fontSize: "large" }}>
+                    PaySlips
+                  </span>
+                </Link>
+              </li>
+            </>
+          )}
+        </ul>
+      </div>
+    </nav>
+  );
+};
 
-                <li
-                  className={`sidebar-item ${
-                    location.pathname.startsWith("/payslip") ? "active" : ""
-                  }`}
-                >
-                  <Link className="sidebar-link" to={"/emppayslip"}>
-                    <Receipt color="orange" size={25} />{" "}
-                    <span className="align-middle" style={{ fontSize: "large" }}>
-                      PaySlips
-                    </span>
-                  </Link>
-                </li>
-              </>
-            )}
-          </ul>
-        </div>
-      </nav>
-    );
-  };
+
+               
 
   export default SideNav;

@@ -180,7 +180,7 @@ const EmployeeRegistration = () => {
     // Constructing the payload
     const payload = {
       companyName: company,
-      employeeType: data.employeeType,
+      type: data.type,
       employeeId: data.employeeId,
       firstName: data.firstName,
       lastName: data.lastName,
@@ -207,11 +207,13 @@ const EmployeeRegistration = () => {
         const response = await EmployeePutApiById(location.state.id, data);
         console.log("Update successful", response.data);
         toast.success("Employee updated successfully");
+        navigate("/employeeView");
         reset();
       } else {
         const response = await EmployeePostApi(payload);
         console.log("Employee created", response.data);
         toast.success("Employee created successfully");
+        navigate("/employeeView");
         reset();
       }
     } catch (error) {
@@ -312,9 +314,9 @@ const EmployeeRegistration = () => {
                           type="text"
                           className="form-control"
                           placeholder="Enter Last Name"
-                          name="employeeType"
+                          name="type"
                           readOnly
-                          {...register("employeeType", {
+                          {...register("type", {
                             required: "Last Name Required",
                             pattern: {
                               value: /^[A-Za-z ]+$/,
@@ -323,9 +325,9 @@ const EmployeeRegistration = () => {
                             },
                           })}
                         />
-                        {errors.employeeType && (
+                        {errors.type && (
                           <p className="errorMsg">
-                            {errors.employeeType.message}
+                            {errors.type.message}
                           </p>
                         )}
                       </div>
@@ -336,7 +338,7 @@ const EmployeeRegistration = () => {
                         </label>
                         <Controller
                           className="form-select"
-                          name="employeeType"
+                          name="type"
                           defaultValue=""
                           control={control}
                           rules={{ required: true }}
@@ -345,13 +347,13 @@ const EmployeeRegistration = () => {
                               options={Employement}
                               value={Employement.find((c) => c.value === value)}
                               onChange={(val) => {
-                                setValue("employeeType", val.value);
+                                setValue("type", val.value);
                               }}
                               placeholder=" Select Employee Type "
                             />
                           )}
                         />
-                        {errors.employeeType && (
+                        {errors.type && (
                           <p className="errorMsg">Employee Type is Required</p>
                         )}
                       </div>
@@ -511,23 +513,6 @@ const EmployeeRegistration = () => {
                           </select>
                         )}
                       />
-                      {/* <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Enter Designation"
-                        name="designation"
-                        onInput={toInputTitleCase}
-                        autoComplete="off"
-                        onKeyDown={handleEmailChange}
-                        {...register("designation", {
-                          required: "designation Required",
-                          pattern: {
-                            value: /^[A-Za-z ]+$/,
-                            message:
-                              "These fields accepts only Alphabetic Characters",
-                          },
-                        })}
-                      /> */}
                       {errors && errors.designation && (
                         <p className="errorMsg">Designation Required</p>
                       )}
@@ -750,42 +735,6 @@ const EmployeeRegistration = () => {
                       )}
                     </div>
                     <div className="col-lg-1"></div>
-                    {/* <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Bank Address</label>
-                      <textarea
-                        type="text"
-                        className="form-control"
-                        placeholder="Enter address"
-                        name="ipAddress"
-                        onInput={toInputTitleCase}
-                        autoComplete="off"
-                        {...register("ipAddress", {
-                          required: "Ip Address Required",
-                        })}
-                      />
-                      {errors.ipAddress && (
-                        <p className="errorMsg">{errors.ipAddress.message}</p>
-                      )}
-                    </div> */}
-                    {/* 
-                    <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Aadhaar Number</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Enter aadhar Number"
-                        name="ipAddress"
-                        onInput={toInputTitleCase}
-                        autoComplete="off"
-                        {...register("ipAddress", {
-                          required: "Ip Address Required",
-                        })}
-                      />
-                      {errors.ipAddress && (
-                        <p className="errorMsg">{errors.ipAddress.message}</p>
-                      )}
-                    </div> */}
-
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Uan Number</label>
                       <input

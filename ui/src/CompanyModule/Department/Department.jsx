@@ -55,7 +55,6 @@ const Department = () => {
     }
     try {
       setPending(true);
-  
       if (editingUserId) {
         const response = await DepartmentPutApiById(editingUserId, postData);
         toast.success("Department updated successfully");
@@ -63,7 +62,6 @@ const Department = () => {
         const response = await DepartmentPostApi(postData);
         toast.success("Department created successfully");
       }
-  
       fetchDepartments(); // Update departments after submit
       reset();
       setEditingUserId(null);
@@ -75,7 +73,6 @@ const Department = () => {
       setPending(false);
     }
   };
-
   const fetchDepartments = async () => {
     try {
       const departments = await DepartmentGetApi();
@@ -88,8 +85,6 @@ const Department = () => {
       setPending(false); // Assuming you manage loading state with 'pending'
     }
   };
-  
-
   useEffect(() => {
     fetchDepartments();
   }, [selectedItemId]);
@@ -102,13 +97,12 @@ const Department = () => {
       setAddDepartment(true);
     }
   };
-
   const handleConfirmDelete = async (id) => {
     if (selectedItemId) {
       try {
         await DepartmentDeleteApiById(id);
         toast.success("Department Deleted Successfully");
-        fetchDepartments(); // Update departments after delete
+        fetchDepartments(); 
         handleCloseDeleteModal();
         reset();
       } catch (error) {
@@ -120,13 +114,16 @@ const Department = () => {
 
   const getFilteredList = (searchData) => {
     setSearch(searchData);
-    const result = departments.filter((data) => (
-      (data.id && data.id.toString().includes(searchData)) ||
-      (data.name.toLowerCase().includes(searchData.toLowerCase()))
-    ));
-    setFilteredData(result);
+    const filtered = departments.filter((item) => {
+      // Convert all fields to lowercase for case-insensitive search
+      const searchTerm = searchData.toLowerCase();
+      const id = item.id.toString().toLowerCase(); // Convert id to string and then to lowercase
+      const name = item.name.toLowerCase();
+      // Check if any field contains the search term
+      return id.includes(searchTerm) || name.includes(searchTerm);
+    });
+    setFilteredData(filtered);
   };
-
   const paginationComponentOptions = {
     noRowsPerPage: true,
   };
@@ -137,7 +134,7 @@ const Department = () => {
       selector: (row, index) => <div className='ml-5' style={{ marginLeft: "10px" }}>{index + 1}</div>,
     },
     {
-      name: <h5><b>Department Name</b></h5>,  
+      name: <h5><b>Department Name</b></h5>,
       selector: (row) => row.name,
     },
     {
@@ -145,16 +142,16 @@ const Department = () => {
       cell: (row) => (
         <div>
           <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginRight: "10px" }} onClick={() => handleEdit(row.id)}>
-            <PencilSquare size={22} color='#2255a4' />
+            <PencilSquare size={22} color='#2255A4' />
           </button>
           <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }} onClick={() => handleShowDeleteModal(row.id)}>
-            <XSquareFill size={22} color='#da542e' />
+            <XSquareFill size={22} color='#DA542E' />
           </button>
         </div>
       )
     }
   ];
-
+  
   return (
     <LayOut>
       <div className="container-fluid p-0">
@@ -191,11 +188,11 @@ const Department = () => {
                     />
                   </div>
                 </div>
-                <div className="dropdown-divider" style={{ borderTopColor: "#d7d9dd" }} />
+                <div className="dropdown-divider" style={{ borderTopColor: "#D7D9DD" }} />
               </div>
               <DataTable
                 columns={columns}
-                data={departments}
+                data={filteredData}
                 paginationComponentOptions={paginationComponentOptions}
               />
             </div>
@@ -250,5 +247,4 @@ const Department = () => {
     </LayOut>
   );
 };
-
 export default Department;

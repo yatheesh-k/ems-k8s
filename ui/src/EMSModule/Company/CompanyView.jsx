@@ -5,7 +5,7 @@ import { Bounce, toast } from "react-toastify";
 import DeletePopup from "../../Utils/DeletePopup";
 import LayOut from "../../LayOut/LayOut";
 import axios from "axios";
-import { companyDeleteByIdApi, companyViewApi } from "../../Utils/Axios";
+import { EmployeePayslipDeleteById, companyViewApi } from "../../Utils/Axios";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const CompanyView = () => {
@@ -16,10 +16,11 @@ const CompanyView = () => {
   const [selectedYear, setSelectedYear] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
+  const [showNoRecordsMessage, setShowNoRecordsMessage] = useState(false); // State for no records message
 
   const location = useLocation();
-  const Navigate=useNavigate();
- 
+  const Navigate = useNavigate();
+
   const apiUrl = "http://localhost:8092/ems/company";
   const token = sessionStorage.getItem("token");
   const config = {
@@ -37,7 +38,6 @@ const CompanyView = () => {
       // Handle error if needed
     }
   };
-
 
   const getData = (id) => {
     console.log(id);
@@ -57,7 +57,7 @@ const CompanyView = () => {
   const handleConfirmDelete = async () => {
     if (selectedItemId) {
       try {
-        const response = await companyDeleteByIdApi(selectedItemId);
+        const response = await EmployeePayslipDeleteById(selectedItemId);
         if (response.status === 200) {
           toast.success("Company Deleted Successfully", {
             position: "top-right",
@@ -95,41 +95,41 @@ const CompanyView = () => {
     getUser();
   }, []);
 
-
   const columns = [
     {
-      name: "S No",
+      name: <h6><b>S No</b></h6>,
       selector: (row, index) => index + 1,
       width: "75px",
     },
     {
-      name: "Company Name",
+      name: <h6><b>Company Name</b></h6>,
       selector: (row) => row.companyName,
       minWidth: "150px",
       maxWidth: "250px",
       wrap: true,
     },
     {
-      name: "Authorized Name",
+      name: <h6><b>Authorized Name</b></h6>,
       selector: (row) => row.name,
       minWidth: "150px",
       maxWidth: "250px",
       wrap: true,
     },
     {
-      name: "EmailId",
+      name: <h6><b>Email Id</b></h6>,
       selector: (row) => row.emailId,
-      width: "300px",
+      width: "250px",
       wrap: true,
     },
     {
-      name: "MobileNO",
+      name: <h6><b>Mobile No</b></h6>,
       selector: (row) => row.mobileNo,
-      width: "150px",
+      width: "220px",
       wrap: true,
     },
     {
-      name: "Action",
+      name:<h6><b>Action</b></h6>,
+      width: "130px",
       cell: (row) => (
         <div>
           <button
@@ -161,46 +161,17 @@ const CompanyView = () => {
     },
   ];
 
-  const getRecentYears = () => {
-    const currentYear = new Date().getFullYear();
-    const years = [];
-    for (let i = currentYear; i >= currentYear - 10; i--) {
-      years.push(i.toString());
-    }
-    return years;
-  };
-
-  const getMonthNames = () => {
-    return Array.from({ length: 12 }, (_, i) =>
-      (i + 1).toLocaleString("en-US", { minimumIntegerDigits: 2 })
-    );
-  };
-
   const getFilteredList = (searchTerm) => {
     setSearch(searchTerm);
     const filtered = view.filter((item) => {
       const lowerCasedSearchTerm = searchTerm.toLowerCase();
       return (
-        item.id.toLowerCase().includes(lowerCasedSearchTerm) ||
         item.companyName.toLowerCase().includes(lowerCasedSearchTerm) ||
-        item.emailId.toLowerCase().includes(lowerCasedSearchTerm) ||
-        item.mobileNo.toLowerCase().includes(lowerCasedSearchTerm)
+        item.name.toLowerCase().includes(lowerCasedSearchTerm)
       );
     });
     setFilteredData(filtered);
-  };
-
-  const filterByMonthYear = (selectedMonth, selectedYear) => {
-    setSelectedMonth(selectedMonth);
-    setSelectedYear(selectedYear);
-    const result = view.filter((data) => {
-      const date = new Date(data.dateOfHiring);
-      return (
-        (date.getMonth() + 1 === parseInt(selectedMonth) || !selectedMonth) &&
-        (date.getFullYear() === parseInt(selectedYear) || !selectedYear)
-      );
-    });
-    setFilteredData(result);
+    setShowNoRecordsMessage(filtered.length === 0); // Update state based on filtered data length
   };
 
   const handleSearch = () => {
@@ -213,65 +184,52 @@ const CompanyView = () => {
         <h1 className="h3 mb-3">
           <strong>Company List</strong>
         </h1>
+        <div className="col-auto" style={{paddingBottom:"20px"}}>
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                  <a href="/main">Home</a>
+                </li>
+                <li className="breadcrumb-item active">
+                  Comapny View
+                </li>
+              </ol>
+            </nav>
+          </div>
         <div className="row">
           <div className="col-12 col-lg-12 col-xxl-12 d-flex">
             <div className="card flex-fill">
-              <div className="card-header">
-                <h6>Search filters</h6>
-                <div className="row">
-                  <div className="col-12 col-md-6 col-lg-3 mt-3">
+              <div className="card-header d-flex justify-content-between align-items-center">
+                <h6></h6>
+                <div className="d-flex flex-wrap align-items-center">
+                  <div className="col-12 col-md-6 col-lg-9 mt-3">
                     <input
                       type="search"
                       className="form-control"
                       placeholder="Search...."
                       value={search}
-                      onChange={(e) => setSearch(e.target.value)}
+                      onChange={(e) => getFilteredList(e.target.value)}
                     />
                   </div>
-                  <div className="col-12 col-md-6 col-lg-3 mt-3">
-                    <select
-                      className="form-select"
-                      value={selectedYear}
-                      onChange={(e) => setSelectedYear(e.target.value)}
-                    >
-                      <option value="">Select Year</option>
-                      {getRecentYears().map((year) => (
-                        <option key={year} value={year}>
-                          {year}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="col-12 col-md-6 col-lg-3 mt-3">
-                    <select
-                      className="form-select"
-                      value={selectedMonth}
-                      onChange={(e) => setSelectedMonth(e.target.value)}
-                    >
-                      <option value="">Select Month</option>
-                      {getMonthNames().map((month, index) => (
-                        <option key={index} value={(index + 1).toString()}>
-                          {month}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="col-12 col-md-6 col-lg-3 mt-3">
-                    <button className="btn btn-primary" onClick={handleSearch}>
-                      Search
-                    </button>
-                  </div>
                   <div
-                    className="dropdown-divider"
-                    style={{ borderTopColor: "#D7D9DD" }}
+                    style={{
+                      borderTopColor: "#D7D9DD",
+                      height: "1px",
+                      width: "100%",
+                    }}
                   />
                 </div>
               </div>
-              <DataTable
-                columns={columns}
-                data={filteredData.length > 0 ? filteredData : view}
-                pagination
-              />
+              <hr style={{ marginBottom: "0" }}></hr>
+              {filteredData.length === 0 && showNoRecordsMessage ? (
+                <div className="p-4 text-center">No records found.</div>
+              ) : (
+                <DataTable
+                  columns={columns}
+                  data={filteredData.length > 0 ? filteredData : view}
+                  pagination
+                />
+              )}
             </div>
           </div>
           <DeletePopup
@@ -288,4 +246,3 @@ const CompanyView = () => {
 };
 
 export default CompanyView;
-

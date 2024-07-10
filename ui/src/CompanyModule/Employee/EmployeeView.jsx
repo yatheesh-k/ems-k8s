@@ -101,7 +101,7 @@ console.log(filteredData);
                 transition: Bounce,
                 hideProgressBar: true,
                 theme: "colored",
-                autoClose: 3000, // Close the toast after 3 seconds
+                autoClose: 3000, // Close the toast after 3 seconx  ds
               });
             }
             //getEmployees()
@@ -222,37 +222,41 @@ console.log(filteredData);
 
 
   const columns = [
-   
     {
-      name: 'Name',
+      name: <h6><b>S No</b></h6>,
+      selector: (row, index) => index + 1,
+      width: "75px",
+    },
+    {
+      name: <h6><b>Name</b></h6>,
       selector: row => `${row.firstName} ${row.lastName}`,
       sortable: true,
     },
     {
-      name: 'Email',
+      name: <h6><b>Email Id</b></h6>,
       selector:row=> row.emailId,
       sortable: true,
     },
     {
-      name: 'Department',
+      name: <h6><b>DepartMent</b></h6>,
       selector: row =>row.department,
       sortable: true,
     },
 
     {
-      name: 'Date of Hiring',
+      name: <h6><b>Date of Hiring</b></h6>,
       selector:row=> row.dateOfHiring,
       sortable: true,
       format: row => new Date(row.dateOfHiring).toLocaleDateString(),
     },
     {
-      name: 'Status',
+      name: <h6><b>Status</b></h6>,
       selector: row =>row.status,
       sortable: true,
       cell: (row) => statusMappings[row.status]?.label || "Unknown",
     },
     {
-      name: <h5><b>Action</b></h5>,
+      name: <h5><b>Salary</b></h5>,
       cell: (row) => (
         <div>
           <button className="btn btn-sm btn-primary" onClick={() => handleSalary(row.id)}>
