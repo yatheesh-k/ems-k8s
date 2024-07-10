@@ -20,11 +20,11 @@ import java.io.IOException;
 
 @RestController
 @CrossOrigin(origins = "*")
-@RequestMapping("/employee")
+@RequestMapping("/")
 public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(value = "employee", method = RequestMethod.POST)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.registerEmployee.tag}", description = "${api.registerEmployee.description}")
     @ResponseStatus(HttpStatus.CREATED)
@@ -36,7 +36,7 @@ public class EmployeeController {
         return employeeService.registerEmployee(employeeRequest);
     }
 
-    @RequestMapping(value = "/{companyName}", method = RequestMethod.GET)
+    @RequestMapping(value = "{companyName}/employee", method = RequestMethod.GET)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.getEmployees.tag}", description = "${api.getEmployees.description}")
     @ResponseStatus(HttpStatus.OK)
@@ -47,7 +47,7 @@ public class EmployeeController {
         return employeeService.getEmployees(companyName);
     }
 
-    @RequestMapping(value = "/{companyName}/employee/{employeeId}", method = RequestMethod.GET)
+    @RequestMapping(value = "{companyName}/employee/{employeeId}", method = RequestMethod.GET)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.getEmployee.tag}", description = "${api.getEmployee.description}")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
@@ -58,7 +58,7 @@ public class EmployeeController {
         return employeeService.getEmployeeById(companyName, employeeId);
     }
 
-    @RequestMapping(value = "/{employeeId}", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "{companyName}/employee/{employeeId}", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.updateEmployee.tag}", description = "${api.updateEmployee.description}")
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -66,10 +66,11 @@ public class EmployeeController {
     public ResponseEntity<?> updateCompanyById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                                @RequestHeader(Constants.AUTH_KEY) String authToken,
                                                @PathVariable String employeeId,
+                                               @PathVariable String companyName,
                                                @RequestBody @Valid  EmployeeUpdateRequest employeeUpdateRequest) throws IOException, EmployeeException {
         return employeeService.updateEmployeeById(employeeId, employeeUpdateRequest);
     }
-    @RequestMapping(value = "/{companyName}/employee/{employeeId}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "{companyName}/employee/{employeeId}", method = RequestMethod.DELETE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.deleteEmployee.tag}", description = "${api.deleteEmployee.description}")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
@@ -79,7 +80,7 @@ public class EmployeeController {
         return employeeService.deleteEmployeeById(companyName,employeeId);
     }
 
-    @RequestMapping(value = "/password/{employeeId}", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "{companyName}/employee/{employeeId}/password", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.updatePassword.tag}", description = "${api.updatePassword.description}")
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -87,6 +88,7 @@ public class EmployeeController {
     public ResponseEntity<?> updatePassword(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                             @RequestHeader(Constants.AUTH_KEY) String authToken,
                                             @RequestBody EmployeePasswordReset employeePasswordReset,
+                                            @PathVariable String companyName,
                                             @PathVariable String employeeId) throws IOException, EmployeeException {
 
         return employeeService.passwordResetForEmployee(employeePasswordReset, employeeId);

@@ -43,7 +43,7 @@ public class AttendanceController {
     }
 
 
-    @RequestMapping(value = "/{companyName}/employee/{employeeId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{companyName}/employee/{employeeId}/attendance", method = RequestMethod.GET)
     @io.swagger.v3.oas.annotations.Operation(security = {@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY)},
             summary = "${api.getAttendance.tag}", description = "${api.getAttendance.description}")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK")
