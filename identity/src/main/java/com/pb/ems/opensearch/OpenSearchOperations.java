@@ -156,20 +156,6 @@ public class OpenSearchOperations {
         return null;
     }
 
-
-    public EmployeeEntity getCompanyById(String username, String company) throws IOException {
-        String index = Constants.INDEX_EMS + "_" + company;
-        String user = resourceIdUtils.md5Hash(username);
-        GetRequest getRequest = new GetRequest.Builder().id(Constants.COMPANY + "-" + username)
-                .index(index).build();
-        GetResponse<EmployeeEntity> searchResponse = esClient.get(getRequest, EmployeeEntity.class);
-        if (searchResponse != null && searchResponse.source() != null) {
-            EmployeeEntity employee = searchResponse.source();
-            employee.setId(searchResponse.id()); // Set the _id from the response
-            return employee;
-        }
-        return null;
-    }
     public void updateCompany(CompanyEntity company) throws IOException {
         String index = Constants.INDEX_EMS;
         String comapanyId = company.getId();
