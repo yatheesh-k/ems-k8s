@@ -11,7 +11,7 @@ import { DepartmentDeleteApiById, DepartmentGetApi, DepartmentPostApi, Departmen
 
 const Department = () => {
   const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm();
-  const [departments, setDepartments] = useState([]);
+  const [depts, setDepts] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [search, setSearch] = useState('');
   const [editingUserId, setEditingUserId] = useState(null);
@@ -56,10 +56,10 @@ const Department = () => {
     try {
       setPending(true);
       if (editingUserId) {
-        const response = await DepartmentPutApiById(editingUserId, postData);
+         await DepartmentPutApiById(editingUserId, postData);
         toast.success("Department updated successfully");
       } else {
-        const response = await DepartmentPostApi(postData);
+         await DepartmentPostApi(postData);
         toast.success("Department created successfully");
       }
       fetchDepartments(); // Update departments after submit
@@ -76,8 +76,8 @@ const Department = () => {
   const fetchDepartments = async () => {
     try {
       const departments = await DepartmentGetApi();
-      setDepartments(departments);
-      setFilteredData(departments); // Optionally, you can keep filteredData updated as well
+      setDepts(departments);
+     // setFilteredData(departments); // Optionally, you can keep filteredData updated as well
     } catch (error) {
       console.error('Error fetching departments:', error);
       toast.error('Failed to fetch departments');
@@ -90,7 +90,7 @@ const Department = () => {
   }, [selectedItemId]);
 
   const handleEdit = (id) => {
-    const userToEdit = departments.find(user => user.id === id);
+    const userToEdit = depts.find(user => user.id === id);
     if (userToEdit) {
       setValue('name', userToEdit.name);
       setEditingUserId(id);
@@ -114,7 +114,7 @@ const Department = () => {
 
   const getFilteredList = (searchData) => {
     setSearch(searchData);
-    const filtered = departments.filter((item) => {
+    const filtered = depts.filter((item) => {
       // Convert all fields to lowercase for case-insensitive search
       const searchTerm = searchData.toLowerCase();
       const id = item.id.toString().toLowerCase(); // Convert id to string and then to lowercase

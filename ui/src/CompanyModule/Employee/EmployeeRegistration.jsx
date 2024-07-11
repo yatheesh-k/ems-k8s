@@ -174,37 +174,42 @@ const EmployeeRegistration = () => {
 
 
 
-
   const onSubmit = async (data) => {
     const company = sessionStorage.getItem('company');
     // Constructing the payload
-    const payload = {
+    let payload = {
       companyName: company,
-      type: data.type,
-      employeeId: data.employeeId,
-      firstName: data.firstName,
-      lastName: data.lastName,
+      employeeType: data.type,
       emailId: data.emailId,
       password: data.password,
       designation: data.designation,
-      dateOfHiring: data.dateOfHiring, // converting to timestamp
-      department: data.department,
       location: data.location,
       manager: data.manager,
       roles: [data.role], // Assuming 'roles' is a single select, otherwise adjust accordingly
       status: data.status,
-      panNo: data.panNo,
-      uanNo: data.uanNo,
-      dateOfBirth: data.dateOfBirth, // Assuming dateOfBirth field is added to the form
       accountNo: data.accountNo,
       ifscCode: data.ifscCode,
       bankName: data.bankName
     };
-
+  
+    // Add fields specific to creation (POST) request
+    if (!location.state || !location.state.id) {
+      payload = {
+        ...payload,
+        employeeId: data.employeeId,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        dateOfHiring: data.dateOfHiring,
+        department: data.department,
+        panNo: data.panNo,
+        uanNo: data.uanNo,
+        dateOfBirth: data.dateOfBirth
+      };
+    }
+  
     try {
-
       if (location.state && location.state.id) {
-        const response = await EmployeePutApiById(location.state.id, data);
+        const response = await EmployeePutApiById(location.state.id, payload);
         console.log("Update successful", response.data);
         toast.success("Employee updated successfully");
         navigate("/employeeView");
@@ -221,6 +226,7 @@ const EmployeeRegistration = () => {
       toast.error("Failed to submit form");
     }
   };
+  
 
 
   useEffect(() => {
@@ -663,7 +669,7 @@ const EmployeeRegistration = () => {
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
                       <label className="form-label mb-3">Select Employee Role</label>
                       <Controller
-                        name="roles"
+                        name="role"
                         control={control}
                         rules={{ required: true }}
                         render={({ field }) => (

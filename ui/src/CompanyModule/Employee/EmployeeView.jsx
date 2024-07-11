@@ -58,15 +58,6 @@ const EmployeeView = () => {
   };
 
   const token =sessionStorage.getItem("token")
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
-      "Content-Type": "application/json", // Specify content type as JSON
-    },
-  };
-  const company=sessionStorage.getItem("company")
-    const apiUrl=`http://localhost:8092/ems/employee/${company}`
-
     useEffect(() => {
       EmployeeGetApi().then(data => {
         const filteredData = data
@@ -77,9 +68,6 @@ const EmployeeView = () => {
       });
     }, []);
     
-    
-console.log(filteredData);
-
 
   const handleSalary=(id)=>{
     Navigate('/employeeSalaryList',{ state: { id } })
@@ -95,7 +83,7 @@ console.log(filteredData);
       try {
       await  EmployeeDeleteApiById(selectedItemId)
           .then((response) => {
-            if (response.status === 200) {
+           
               toast.success("Employee Deleted Succesfully", {
                 position: "top-right",
                 transition: Bounce,
@@ -103,7 +91,7 @@ console.log(filteredData);
                 theme: "colored",
                 autoClose: 3000, // Close the toast after 3 seconx  ds
               });
-            }
+         
             //getEmployees()
             handleCloseDeleteModal();
             console.log(response.data);

@@ -192,7 +192,7 @@ export const EmployeePostApi = (data) => {
 
 export const EmployeeGetApiById = (employeeId) => {
   const company=sessionStorage.getItem("company")
-    return axiosInstance.get(`/employee/${company}/${employeeId}`)
+    return axiosInstance.get(`/employee/${company}/employee/${employeeId}`)
     .then(response => {
       return response.data; 
     })
@@ -204,7 +204,7 @@ export const EmployeeGetApiById = (employeeId) => {
 
 export const EmployeeDeleteApiById = (employeeId) => {
   const company=sessionStorage.getItem("company")
-    return axiosInstance.delete(`/employee/${employeeId}/${company}`)
+    return axiosInstance.delete(`/employee/${company}/employee/${employeeId}`)
     .then(response => {
       return response.data; 
     })
@@ -216,7 +216,7 @@ export const EmployeeDeleteApiById = (employeeId) => {
 
 export const EmployeePutApiById = (employeeId, data) => {
   const company = sessionStorage.getItem("company");
-  return axios.patch(`/employee/${company}/${employeeId}`, data)
+  return axios.patch(`/employee/${employeeId}`, data)
 };
 
 export const roleApi = () =>{
@@ -235,22 +235,24 @@ export const EmployeeSalaryGetApi=(employeeId)=>{
 
 export const EmployeeSalaryGetApiById=(employeeId,salaryId)=>{
   const company = sessionStorage.getItem("company")
-  return axiosInstance.get(`/${company}/employee/${employeeId}/${salaryId}`);
+  return axiosInstance.get(`/${company}/employee/${employeeId}/salary/${salaryId}`);
 }
 
 export const EmployeeSalaryPatchApiById=(employeeId,salaryId,data)=>{
   const company = sessionStorage.getItem("company")
-  return axiosInstance.patch(`/${company}/employee/${employeeId}/${salaryId}`,data);
+  return axiosInstance.patch(`/employee/${employeeId}/salary/${salaryId}`,data);
 }
 
 export const EmployeeSalaryDeleteApiById=(employeeId,salaryId)=>{
   const company = sessionStorage.getItem("company")
-  return axiosInstance.delete(`/${company}/employee/${employeeId}/${salaryId}`);
+  return axiosInstance.delete(`/${company}/employee/${employeeId}/salary/${salaryId}`);
 }
 
-
-export const EmployeePayslipGenerationPostById=(employeeId,salaryId) =>{
-  return axiosInstance.post(`/${employeeId}/salary/${salaryId}`);
+export const EmployeePayslipGenerationPostById=(employeeId,salaryId,data) =>{
+  return axiosInstance.post(`/${employeeId}/salary/${salaryId}`,data);
+}
+export const EmployeePayslipGeneration=(data) =>{
+  return axiosInstance.post("/salary",data);
 }
 
 export const EmployeePayslipGetById=(employeeId,paysliId)=>{

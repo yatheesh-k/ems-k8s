@@ -200,7 +200,7 @@ const CompanyView = () => {
           <div className="col-12 col-lg-12 col-xxl-12 d-flex">
             <div className="card flex-fill">
               <div className="card-header d-flex justify-content-between align-items-center">
-                <h6></h6>
+                <h6>Company View</h6>
                 <div className="d-flex flex-wrap align-items-center">
                   <div className="col-12 col-md-6 col-lg-9 mt-3">
                     <input
