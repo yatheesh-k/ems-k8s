@@ -177,7 +177,7 @@ export const DesignationPutApiById = (designationId, data) => {
 
 export const EmployeeGetApi = () => {
   const company = sessionStorage.getItem("company");
-  return axiosInstance.get(`/employee/${company}`)
+  return axiosInstance.get(`${company}/employee`)
     .then(response => response.data.data) // Assuming response.data.data contains your employee data
     .catch(error => {
       console.error('Error fetching employee data:', error);
@@ -192,7 +192,7 @@ export const EmployeePostApi = (data) => {
 
 export const EmployeeGetApiById = (employeeId) => {
   const company=sessionStorage.getItem("company")
-    return axiosInstance.get(`/employee/${company}/employee/${employeeId}`)
+    return axiosInstance.get(`/${company}/employee/${employeeId}`)
     .then(response => {
       return response.data; 
     })
@@ -204,7 +204,7 @@ export const EmployeeGetApiById = (employeeId) => {
 
 export const EmployeeDeleteApiById = (employeeId) => {
   const company=sessionStorage.getItem("company")
-    return axiosInstance.delete(`/employee/${company}/employee/${employeeId}`)
+    return axiosInstance.delete(`/${company}/employee/${employeeId}`)
     .then(response => {
       return response.data; 
     })
@@ -263,7 +263,7 @@ export const EmployeePayslipGetById=(employeeId,paysliId)=>{
 
 export const EmployeePayslipsGet=(employeeId)=>{
   const company = sessionStorage.getItem("company")
-  return axiosInstance.get(`/${company}/employee/${employeeId}/all`);
+  return axiosInstance.get(`/${company}/employee/${employeeId}/payslips`);
 }
 
 export const EmployeePayslipDeleteById=(employeeId,payslipId)=>{

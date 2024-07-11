@@ -45,9 +45,10 @@ public class PayslipUtils {
             trav= Double.parseDouble(new String(decodedTrav));
             trav =  trav/12.0;
         }
-        if (salaryRequest.getAllowances().getPfContributionEmployee() != null) {
-            byte[] decodedPfc = Base64.getDecoder().decode(salaryRequest.getAllowances().getPfContributionEmployee());
-             pfc = Double.parseDouble(new String(decodedPfc));
+        if (salaryRequest.getDeductions().getPfEmployee() != null) {
+            byte[] decodedPfEmployee = Base64.getDecoder().decode(salaryRequest.getDeductions().getPfEmployee());
+            byte[] decodedPfEmployer = Base64.getDecoder().decode(salaryRequest.getDeductions().getPfEmployer());
+            pfc = Double.parseDouble(new String(decodedPfEmployee)) + Double.parseDouble(new String(decodedPfEmployer));
             pfc = pfc/12.0;
         }
         if (salaryRequest.getAllowances().getHra() != null) {

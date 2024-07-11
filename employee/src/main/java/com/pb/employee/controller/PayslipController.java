@@ -63,7 +63,7 @@ public class PayslipController {
         return payslipService.getPayslipById(companyName, employeeId, payslipId);
     }
 
-    @RequestMapping(value = "/{companyName}/employee/{employeeId}/all", method = RequestMethod.GET)
+    @RequestMapping(value = "/{companyName}/employee/{employeeId}/payslips", method = RequestMethod.GET)
     @io.swagger.v3.oas.annotations.Operation(security = {@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY)},
             summary = "${api.getPayslip.tag}", description = "${api.getPayslip.description}")
     @ResponseStatus(HttpStatus.OK)
