@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { EnvelopeFill, LockFill, UnlockFill } from "react-bootstrap-icons";
 import { Bounce, toast } from "react-toastify";
-import { CompanyloginApi } from "../Utils/Axios";
+import { CompanyloginApi, ValidateOtp } from "../Utils/Axios";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 
 const CompanyLogin = () => {
@@ -23,31 +23,31 @@ const CompanyLogin = () => {
 
   const { company } = useParams();
   const navigate = useNavigate();
-  const [user, setUser] = useState([]);
   const [passwordShown, setPasswordShown] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showOtpField, setShowOtpField] = useState(false);
-  const [showErrorModal, setShowErrorModal] = useState(false); 
-  const [errorMessage, setErrorMessage] = useState(""); 
-
-  const togglePasswordVisibility = () => {
-    setPasswordShown(!passwordShown);
-  };
-
-  const handlePasswordChange = (e) => {
-    setPasswordShown(e.target.value);
-  };
-
-  const handleEmailChange = (e) => {
-    if (e.keyCode === 32) {
-      e.preventDefault();
-    }
-  };
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [otpTimeLimit, setOtpTimeLimit] = useState(40); // Time limit for OTP in seconds
+  const [sessionTimeout, setSessionTimeout] = useState(false); // State for session timeout
 
   useEffect(() => {
     sessionStorage.setItem("company", company);
   }, [company]);
+
+  useEffect(() => {
+    // Countdown function for OTP time limit
+    const countdown = setTimeout(() => {
+      if (!otpSent) {
+        setShowOtpField(true); // Hide OTP field after timeout
+        setOtpTimeLimit(40); // Reset timer for next OTP request
+        setSessionTimeout(true); // Set session timeout state
+      }
+    }, otpTimeLimit * 1000);
+
+    return () => clearTimeout(countdown); // Clear timeout on component unmount or re-render
+  }, [otpSent, otpTimeLimit]);
 
   const sendOtp = (data) => {
     setLoading(true);
@@ -56,14 +56,17 @@ const CompanyLogin = () => {
       password: data.password,
       company: company,
     };
-  
+
     CompanyloginApi(payload)
       .then((response) => {
         console.log(response.data);
         toast.success("OTP sent Successfully");
         setLoading(false);
-        setShowOtpField(true); 
-        setOtpSent(true); 
+        setShowOtpField(true);
+        setOtpSent(true);
+        setSessionTimeout(false); // Reset session timeout state
+        // Start countdown for OTP time limit
+        setOtpTimeLimit(40); // Reset timer for each OTP request
       })
       .catch((error) => {
         console.error("Failed to send OTP:", error);
@@ -73,21 +76,11 @@ const CompanyLogin = () => {
           setErrorMessage(errorMessage);
           setShowErrorModal(true);
         } else {
-          setErrorMessage("Failed to send OTP. Please try again."); 
-          setShowErrorModal(true); 
+          setErrorMessage("Failed to send OTP. Please try again.");
+          setShowErrorModal(true);
         }
       });
   };
-  
-  
-
-  // const token=sessionStorage.getItem("token");
-  // const config = {
-  //   headers: {
-  //     Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
-  //     "Content-Type": "application/json", // Specify content type as JSON
-  //   },
-  // };
 
   const verifyOtpAndCompanyLogin = (data) => {
     const payload = {
@@ -96,8 +89,7 @@ const CompanyLogin = () => {
       company: company,
     };
     setLoading(true);
-    axios
-      .post("http://localhost:9090/ems/validate", payload)
+   ValidateOtp(payload)
       .then((response) => {
         if (response.status === 200) {
           toast.success("CompanyLogin Successful", {
@@ -113,12 +105,14 @@ const CompanyLogin = () => {
           } else {
             console.error("imageFile is undefined");
           }
-
-          navigate("/main", { state: { username: data.username } }); 
+          setTimeout(() => {
+            navigate("/main", { state: { username: data.username } });
+          }, 2000);
         }
       })
       .catch((error) => {
         console.error("Login failed:", error);
+        setLoading(false);
         if (error.response && error.response.data && error.response.data.error) {
           const errorMessage = error.response.data.error.message;
           setErrorMessage(errorMessage);
@@ -132,30 +126,29 @@ const CompanyLogin = () => {
 
   const closeModal = () => {
     setShowErrorModal(false);
-    setErrorMessage(""); 
+    setErrorMessage("");
   };
 
-  // const handleErrors = (error) => {
-  //   if (error.response && error.response.data && error.response.data.error) {
-  //     toast.error(error.response.data.error.message, {
-  //       position: "top-right",
-  //       transition: Bounce,
-  //       hideProgressBar: true,
-  //       theme: "colored",
-  //       autoClose: 2000,
-  //     });
-  //   } else {
-  //     toast.error("An unexpected error occurred.", {
-  //       position: "top-right",
-  //       transition: Bounce,
-  //       hideProgressBar: true,
-  //       theme: "colored",
-  //       autoClose: 2000,
-  //     });
-  //   }
-  // };
+  const togglePasswordVisibility = () => {
+    setPasswordShown(!passwordShown);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPasswordShown(e.target.value);
+  };
+
+  const handleEmailChange = (e) => {
+    if (e.keyCode === 32) {
+      e.preventDefault();
+    }
+  };
 
   const onSubmit = (data) => {
+    if (sessionTimeout) {
+      reset(); // Reset form fields
+      setSessionTimeout(false); // Reset session timeout state
+    }
+
     if (otpSent) {
       verifyOtpAndCompanyLogin(data);
     } else {
@@ -231,7 +224,7 @@ const CompanyLogin = () => {
                                 </span>
                                 <input
                                   className="form-control"
-                                  type={passwordShown ? "text" : "password"} 
+                                  type={passwordShown ? "text" : "password"}
                                   name="otp"
                                   id="otp"
                                   placeholder="Enter your OTP"
@@ -244,12 +237,12 @@ const CompanyLogin = () => {
                                     },
                                   })}
                                 />
-                                {errors.otp && (
-                                  <p className="errorMsg">
-                                    {errors.otp.message}
-                                  </p>
-                                )}
                               </div>
+                              {errors.otp && (
+                                <p className="errorMsg">
+                                  {errors.otp.message}
+                                </p>
+                              )}
                             </div>
                           ) : (
                             <>
@@ -301,15 +294,11 @@ const CompanyLogin = () => {
                           style={{ paddingTop: "10px" }}
                         >
                           <button
-                            className="btn btn-primary"
                             type="submit"
+                            className="btn btn-primary"
                             disabled={loading}
                           >
-                            {loading
-                              ? "Loading..."
-                              : otpSent
-                              ? "Verify OTP"
-                              : "Send OTP"}
+                            {loading ? "Loading..." : "Login"}
                           </button>
                         </div>
                       </form>
@@ -321,12 +310,11 @@ const CompanyLogin = () => {
           </div>
         </div>
       </main>
-         {/* Error Modal */}
-         <Modal show={showErrorModal} onHide={closeModal} centered style={{ zIndex: "1050" }} className="custom-modal" >
-        <ModalHeader closeButton>
-          <ModalTitle>Error</ModalTitle>
+      <Modal show={showErrorModal} onHide={closeModal} centered style={{ zIndex: "1050" }} className="custom-modal" >
+        <ModalHeader closeButton >
+          <ModalTitle className="text-center">Error</ModalTitle>
         </ModalHeader>
-        <ModalBody>{errorMessage}</ModalBody>
+        <ModalBody className="text-center fs-bold">{errorMessage}</ModalBody>
       </Modal>
     </div>
   );

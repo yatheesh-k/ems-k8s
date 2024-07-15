@@ -7,7 +7,7 @@ import LayOut from "./LayOut";
 import { CameraFill } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { companyViewByIdApi } from "../Utils/Axios";
+import { companyUpdateByIdApi, companyViewByIdApi } from "../Utils/Axios";
 
 function Profile() {
   const {
@@ -63,15 +63,7 @@ function Profile() {
     try {
       const decodedToken = jwtDecode(token);
       const companyId = decodedToken.sub;
-      const response = await axios.patch(
-        `http://localhost:8092/ems/company/${companyId}`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await companyUpdateByIdApi();
       console.log("Updated successfully:", response.data);
       setSuccessMessage("Profile updated successfully.");
       toast.success("Company Details Updated Successfully");

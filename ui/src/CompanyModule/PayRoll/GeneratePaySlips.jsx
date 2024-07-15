@@ -5,6 +5,8 @@ import axios from "axios";
 import { Bounce, toast } from "react-toastify";
 import DataTable from "react-data-table-component";
 import LayOut from "../../LayOut/LayOut";
+import { EmployeePayslipGeneration } from "../../Utils/Axios";
+import { useNavigate } from "react-router-dom";
 
 const GeneratePaySlip = () => {
   const {
@@ -17,6 +19,7 @@ const GeneratePaySlip = () => {
   const [selectedMonthYear, setSelectedMonthYear] = useState("");
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
+  const navigate=useNavigate();
 
   // Year and Month options for Select components
   const currentYear = new Date().getFullYear();
@@ -32,7 +35,6 @@ const GeneratePaySlip = () => {
     }),
   }));
 
-  const token = sessionStorage.getItem("token");
   const company = sessionStorage.getItem("company");
 
   const onSubmit = (data) => {
@@ -42,15 +44,9 @@ const GeneratePaySlip = () => {
       month: month.label.toLowerCase(),
       year: year.label,
     };
-
-    axios
-      .post(`http://localhost:8092/ems/salary`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+   EmployeePayslipGeneration(payload)
       .then((response) => {
-        if (response.status === 200) {
+       
           toast.success("PaySlip Generated Successfully", {
             position: "top-right",
             transition: Bounce,
@@ -62,7 +58,7 @@ const GeneratePaySlip = () => {
           setView(response.data); // Update view state with fetched data
           setSelectedMonthYear(`${month.label} ${year.label}`);
           setShow(true); // Show the DataTable component
-        }
+          navigate('/payslipsList')
       })
       .catch((error) => {
         console.error("Error generating payslip:", error);
@@ -95,7 +91,7 @@ const GeneratePaySlip = () => {
 
   const handleGeneratePaySlips = async () => {
     const promises = selectedEmployees.map((employeeId) =>
-      axios.post(`http://localhost:8092/ems/salary`, {
+      EmployeePayslipGeneration ({
         month: selectedMonthYear.split(" ")[0],
         year: selectedMonthYear.split(" ")[1],
         employeeId: employeeId,
@@ -104,7 +100,7 @@ const GeneratePaySlip = () => {
 
     try {
       await Promise.all(promises);
-      toast.success("All Payslips Generated Successfully", {
+      toast.success("Payslips Generated Successfully", {
         position: "top-right",
         transition: Bounce,
         hideProgressBar: true,

@@ -1,516 +1,267 @@
-// // import React, { useState, useEffect } from "react";
-// // import { XSquareFill, EyeFill, Download } from "react-bootstrap-icons";
-// // import DataTable from "react-data-table-component";
-// // import { Link, useNavigate, useParams } from "react-router-dom";
-// // import axios from "axios";
-// // import { Bounce, toast } from "react-toastify";
-// // import DeletePopup from "../Utils/DeletePopup";
-// // import LayOut from "../LayOut/LayOut";
+import React, { useState, useEffect } from "react";
+import Select from "react-select";
+import { Controller, useForm } from "react-hook-form";
+import LayOut from "../LayOut/LayOut";
+import { useNavigate } from "react-router-dom";
+import { Eye, XSquareFill } from "react-bootstrap-icons";
+import { toast, Bounce } from "react-toastify";
+import DataTable from "react-data-table-component";
+import DeletePopup from "../Utils/DeletePopup";
+import { EmployeePayslipGetById, EmployeePayslipDeleteById, EmployeePayslipsGet } from "../Utils/Axios";
+import { userId } from "../Utils/Auth";
 
-// // const EmployeePayslips = () => {
-// //   const [slip, setSlip] = useState([]);
-// //   const [filteredData, setFilteredData] = useState([]);
-// //   const [search, setSearch] = useState([]);
-// //   const [selectedMonth, setSelectedMonth] = useState("");
-// //   const [selectedYear, setSelectedYear] = useState("");
-// //   const navigate = useNavigate();
+const EmployeePayslips = () => {
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const [employees, setEmployees] = useState([]);
+  const [showFields, setShowFields] = useState(false);
+  const [employeeSalaryView, setEmployeeSalaryView] = useState([]);
+  const [selectedEmployeeDetails, setSelectedEmployeeDetails] = useState({});
+  const [showSpinner, setShowSpinner] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedPayslipId, setSelectedPayslipId] = useState("");
+  const [refreshData, setRefreshData] = useState(false);
 
-// //   const [showDeleteModal, setShowDeleteModal] = useState(false);
-// //   const [selectedItemId, setSelectedItemId] = useState(null); // State to store the ID of the item to be deleted
-// //   const [selectId, setSelectId] = useState(null);
+  const navigate = useNavigate();
+  const id = userId;
 
-// //   const handleCloseDeleteModal = () => {
-// //     setShowDeleteModal(false);
-// //     setSelectId(null);
-// //     setSelectedItemId(null); // Reset the selected item ID
-// //   };
+  useEffect(() => {
+    const fetchEmployeePayslips = async () => {
+      try {
+        const response = await EmployeePayslipsGet(id);
+        setEmployeeSalaryView(response.data);
+      } catch (error) {
+        handleApiErrors(error);
+      }
+    };
 
-// //   const handleShowDeleteModal = (employeeId, id) => {
-// //     setSelectId(employeeId);
-// //     setSelectedItemId(id); // Set the ID of the item to be deleted
-// //     setShowDeleteModal(true);
-// //   };
+    fetchEmployeePayslips();
+  }, [id, refreshData]);
 
-// //   const getMonthNames = () => {
-// //     return Array.from({ length: 12 }, (_, i) => {
-// //       const date = new Date(2000, i, 1); // Using 2000 as a dummy year
-// //       return date.toLocaleString("en-US", { month: "long" });
-// //     });
-// //   };
+  const handleGoClick = () => {
+    setShowSpinner(true);
 
-// //   // Function to get an array of recent years (adjust the range if needed)
-// //   const getRecentYears = () => {
-// //     const currentYear = new Date().getFullYear();
-// //     const years = [];
-// //     for (let i = currentYear; i >= currentYear - 10; i--) {
-// //       years.push(i.toString());
-// //     }
-// //     return years;
-// //   };
+    setTimeout(() => {
+      setShowFields(true);
+      setShowSpinner(false);
+    }, 2000);
+  };
 
-// //   const id = sessionStorage.getItem("id");
+  const handleViewSalary = async (employeeId, payslipId) => {
+    try {
+      const response = await EmployeePayslipGetById(employeeId, payslipId);
+      setSelectedEmployeeDetails(response.data);
+      navigate(`/payslip?employeeId=${employeeId}&payslipId=${payslipId}`, {
+        state: {
+          employeeDetails: response.data,
+        },
+      });
+    } catch (error) {
+      handleApiErrors(error);
+    }
+  };
 
-// //   const company = sessionStorage.getItem("company");
-// //   const employeeId = sessionStorage.getItem("employeeId");
-// //   const salaryId = sessionStorage.getItem("salaryId");
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setSelectedPayslipId("");
+  };
 
-// //   const getPaySlips = () => {
-// //     axios
-// //       .get(`http://192.168.1.163:8092//${company}/employee/${employeeId}/${salaryId}`)
-// //       .then((response) => {
-// //         setSlip(response.data);
-// //         setFilteredData(response.data);
-// //         console.log(response.data);
-// //       })
-// //       .catch((errors) => {
-// //         toast.error("Network Error", {
-// //           position: "top-right",
-// //           transition: Bounce,
-// //           hideProgressBar: true,
-// //           theme: "colored",
-// //           autoClose: 3000, // Close the toast after 3 seconds
-// //         });
-// //         console.log(errors);
-// //       });
-// //   };
+  const handleShowDeleteModal = (payslipId) => {
+    setSelectedPayslipId(payslipId);
+    setShowDeleteModal(true);
+  };
 
-// //   useEffect(() => {
-// //     getPaySlips();
-// //   }, []);
+  const handleDelete = async () => {
+    try {
+      await EmployeePayslipDeleteById(id, selectedPayslipId);
+      toast.success("Payslip deleted successfully!", {
+        position: "top-right",
+        transition: Bounce,
+        hideProgressBar: true,
+        theme: "colored",
+        autoClose: 3000,
+      });
+      handleCloseDeleteModal();
+      setRefreshData((prev) => !prev); // Toggle refreshData state
+    } catch (error) {
+      handleApiErrors(error);
+    }
+  };
 
-// //   const handleConfirmDelete = async (employeeId, id) => {
-// //     console.log(id);
-// //     if (selectId && selectedItemId) {
-// //       console.log(selectedItemId);
-// //       try {
-// //         // Make a DELETE request to the API with the given ID
-// //         await axios
-// //           .delete(`http://192.168.1.163:8092/payslip/${employeeId}/${id}`)
-// //           .then((response) => {
-// //             if (response.status === 200) {
-// //               toast.success("PaySlip Deleted Successfully", {
-// //                 position: "top-right",
-// //                 transition: Bounce,
-// //                 hideProgressBar: true,
-// //                 theme: "colored",
-// //                 autoClose: 3000, // Close the toast after 3 seconds
-// //               });
-// //             }
-// //             getPaySlips();
-// //             handleCloseDeleteModal();
-// //             console.log(response.data);
-// //           });
-// //       } catch (error) {
-// //         if (error.response) {
-// //           const status = error.response.status;
-// //           let errorMessage = "";
+  const handleApiErrors = (error) => {
+    if (error.response) {
+      const status = error.response.status;
+      let errorMessage = "";
 
-// //           switch (status) {
-// //             case 403:
-// //               errorMessage = "Session Timeout !";
-// //               navigate("/");
-// //               break;
-// //             case 404:
-// //               errorMessage = "Resource Not Found !";
-// //               break;
-// //             case 406:
-// //               errorMessage = "Already Exist !";
-// //               break;
-// //             case 500:
-// //               errorMessage = "Server Error !";
-// //               break;
-// //             default:
-// //               errorMessage = "An Error Occurred !";
-// //               break;
-// //           }
+      switch (status) {
+        case 403:
+          errorMessage = "Session TimeOut !";
+          navigate("/");
+          break;
+        case 404:
+          errorMessage = "Resource Not Found !";
+          break;
+        case 406:
+          errorMessage = "Invalid Details !";
+          break;
+        case 500:
+          errorMessage = "Server Error !";
+          break;
+        default:
+          errorMessage = "An Error Occurred !";
+          break;
+      }
 
-// //           toast.error(errorMessage, {
-// //             position: "top-right",
-// //             transition: Bounce,
-// //             hideProgressBar: true,
-// //             theme: "colored",
-// //             autoClose: 3000,
-// //           });
-// //         } else {
-// //           toast.error("Network Error !", {
-// //             position: "top-right",
-// //             transition: Bounce,
-// //             hideProgressBar: true,
-// //             theme: "colored",
-// //             autoClose: 3000,
-// //           });
-// //         }
-// //         // Log any errors that occur
-// //         console.error(error.response);
-// //       }
-// //     }
-// //   };
+      toast.error(errorMessage, {
+        position: "top-right",
+        transition: Bounce,
+        hideProgressBar: true,
+        theme: "colored",
+        autoClose: 3000,
+      });
+    } else {
+      toast.error("Network Error !", {
+        position: "top-right",
+        transition: Bounce,
+        hideProgressBar: true,
+        theme: "colored",
+        autoClose: 3000,
+      });
+    }
+    console.error(error.response);
+  };
 
-// //   const getView = (id) => {
-// //     const pdfImageUrl = `http://192.168.1.163:8092/payslip/view/${id} `;
-// //     window.open(pdfImageUrl, "_blank");
-// //   };
+  const columns = [
+    {
+      name: (
+        <h6>
+          <b>S No</b>
+        </h6>
+      ),
+      selector: (row, index) => index + 1,
+      width: "150px",
+    },
+    {
+      name: (
+        <h6>
+          <b>Net Amount</b>
+        </h6>
+      ),
+      selector: (row) => parseFloat(row.salary.netSalary).toFixed(2),
+      sortable: true,
+    },
+    {
+      name: (
+        <h6>
+          <b>Month</b>
+        </h6>
+      ),
+      selector: (row) => row.month,
+      sortable: true,
+    },
+    {
+      name: (
+        <h6>
+          <b>Year</b>
+        </h6>
+      ),
+      selector: (row) => row.year,
+      sortable: true,
+    },
+    {
+      name: (
+        <h6>
+          <b>Actions</b>
+        </h6>
+      ),
+      cell: (row) => (
+        <div>
+          <button
+            className="btn btn-sm"
+            style={{
+              backgroundColor: "transparent",
+              border: "none",
+              padding: "0",
+              marginLeft: "5px",
+            }}
+            onClick={() => handleViewSalary(row.employeeId, row.payslipId)}
+          >
+            <Eye size={22} color="green" />
+          </button>
+          <button
+            className="btn btn-sm"
+            style={{
+              backgroundColor: "transparent",
+              border: "none",
+              padding: "0",
+              marginLeft: "5px",
+            }}
+            onClick={() => handleShowDeleteModal(row.payslipId)}
+          >
+            <XSquareFill size={22} color="#da542e" />
+          </button>
+        </div>
+      ),
+    },
+  ];
 
-// //   const downloadFile = async (employeeId, id) => {
-// //     try {
-// //       const response = await axios.get(
-// //         `http://192.168.1.163:8092/payslip/download/${id}`,
-// //         {
-// //           responseType: "blob",
-// //         }
-// //       );
+  return (
+    <LayOut>
+      <div className="container-fluid p-0">
+        <h1 className="mb-4">Employee Payslip List</h1>
 
-// //       const downloadLink = document.createElement("a");
-// //       const url = window.URL.createObjectURL(new Blob([response.data]));
-// //       downloadLink.href = url;
-// //       downloadLink.setAttribute("download", `payslip_${employeeId}/${id}.pdf`); // Specify the filename
-// //       document.body.appendChild(downloadLink);
-// //       downloadLink.click();
-// //       document.body.removeChild(downloadLink);
-// //     } catch (error) {
-// //       if (error.response) {
-// //         const status = error.response.status;
-// //         let errorMessage = "";
+        {showFields && employeeSalaryView.length > 0 && (
+          <div className="card">
+            <div className="card-body">
+              <h5 className="card-title mt-2">
+                {" "}
+                Payslip Details:
+                {`${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName}`}{" "}
+              </h5>
+              <div
+                className="dropdown-divider"
+                style={{ borderTopColor: "#d7d9dd" }}
+              />
+              <DataTable
+                columns={columns}
+                data={employeeSalaryView}
+                pagination
+                highlightOnHover
+                pointerOnHover
+                fixedHeader
+                responsive
+                dense
+                noHeader
+              />
+            </div>
+          </div>
+        )}
 
-// //         switch (status) {
-// //           case 403:
-// //             errorMessage = "Session Timeout !";
-// //             navigate("/");
-// //             break;
-// //           case 404:
-// //             errorMessage = "Resource Not Found !";
-// //             break;
-// //           case 406:
-// //             errorMessage = "Invalid Details !";
-// //             break;
-// //           case 500:
-// //             errorMessage = "Server Error !";
-// //             break;
-// //           default:
-// //             errorMessage = "An Error Occurred !";
-// //             break;
-// //         }
+        {showFields && employeeSalaryView.length === 0 && (
+          <div className="alert alert-info mt-4">
+            No payslips found for this employee.
+          </div>
+        )}
 
-// //         toast.error(errorMessage, {
-// //           position: "top-right",
-// //           transition: Bounce,
-// //           hideProgressBar: true,
-// //           theme: "colored",
-// //           autoClose: 3000,
-// //         });
-// //       } else {
-// //         toast.error("Network Error !", {
-// //           position: "top-right",
-// //           transition: Bounce,
-// //           hideProgressBar: true,
-// //           theme: "colored",
-// //           autoClose: 3000,
-// //         });
-// //       }
-// //       console.error("Error downloading file:", error);
-// //     }
-// //   };
+        <DeletePopup
+          show={showDeleteModal}
+          handleClose={handleCloseDeleteModal}
+          handleConfirm={handleDelete}
+          id={selectedPayslipId}
+          pageName="Payslip"
+        />
 
-// //   const getData = (id) => {
-// //     console.log(id);
-// //     navigate(`/payslip/${id}`); //deleteuser/
-// //   };
+        {showSpinner && (
+          <div className="spinner-container">
+            <div className="spinner-border text-primary" role="status"></div>
+          </div>
+        )}
+      </div>
+    </LayOut>
+  );
+};
 
-// //   const paginationComponentOptions = {
-// //     noRowsPerPage: true,
-// //   };
-
-// //   const columns = [
-// //     {
-// //       name: (
-// //         <h5>
-// //           <b>S NO</b>
-// //         </h5>
-// //       ),
-// //       selector: (row, index) => index + 1,
-// //       width: "110px",
-// //     },
-// //     {
-// //       name: (
-// //         <h5>
-// //           <b>Employee ID</b>
-// //         </h5>
-// //       ),
-// //       selector: (row) => row.employeeId,
-// //     },
-// //     // {
-// //     //   name: <h5><b>Employee Name</b></h5>,
-// //     //   selector: (row) => row.employeeName,
-// //     // },
-// //     {
-// //       name: (
-// //         <h5>
-// //           <b>Month</b>
-// //         </h5>
-// //       ),
-// //       selector: (row) => row.month,
-// //     },
-// //     {
-// //       name: (
-// //         <h5>
-// //           <b>Year</b>
-// //         </h5>
-// //       ),
-// //       selector: (row) => row.year,
-// //     },
-// //     {
-// //       name: (
-// //         <h5>
-// //           <b>Action</b>
-// //         </h5>
-// //       ),
-// //       cell: (row) => (
-// //         <>
-// //           <button onClick={() => getView(row.id)}>View</button>
-// //           <button onClick={() => downloadFile(row.employeeId, row.id)}>Download</button>
-// //           <button onClick={() => handleShowDeleteModal(row.employeeId, row.id)}>Delete</button>
-// //         </>
-// //       ),
-// //     },
-// //   ];
-
-// //   return (
-// //     <LayOut>
-// //       <div className="container">
-// //         <h1>Employee Payslips</h1>
-// //         <div className="filters">
-// //           <select
-// //             value={selectedMonth}
-// //             onChange={(e) => setSelectedMonth(e.target.value)}
-// //           >
-// //             <option value="">Select Month</option>
-// //             {getMonthNames().map((month) => (
-// //               <option key={month} value={month}>
-// //                 {month}
-// //               </option>
-// //             ))}
-// //           </select>
-// //           <select
-// //             value={selectedYear}
-// //             onChange={(e) => setSelectedYear(e.target.value)}
-// //           >
-// //             <option value="">Select Year</option>
-// //             {getRecentYears().map((year) => (
-// //               <option key={year} value={year}>
-// //                 {year}
-// //               </option>
-// //             ))}
-// //           </select>
-// //         </div>
-// //         <DataTable
-// //           columns={columns}
-// //           data={filteredData}
-// //           pagination
-// //           paginationComponentOptions={paginationComponentOptions}
-// //         />
-// //       </div>
-// //       <DeletePopup
-// //         show={showDeleteModal}
-// //         handleClose={handleCloseDeleteModal}
-// //         handleConfirmDelete={handleConfirmDelete}
-// //         employeeId={selectId} // Pass the employeeId to DeletePopup
-// //         id={selectedItemId} // Pass the selectedItemId to DeletePopup
-// //       />
-// //     </LayOut>
-// //   );
-// // };
-
-// // export default EmployeePayslips;
-
-
-// import React, { useEffect, useState } from 'react';
-// import { EmployeeSalaryGetApiById } from '../Utils/Axios'; // Adjust the path to your API file
-// import { toast, Bounce } from 'react-toastify';
-// import DataTable from 'react-data-table-component';
-// import { Link, useNavigate } from 'react-router-dom';
-// import LayOut from '../LayOut/LayOut';
-// import { Download, EyeFill, XSquareFill } from 'react-bootstrap-icons';
-
-// const EmployeePayslips = () => {
-//   const [slip, setSlip] = useState([]);
-//   const [filteredData, setFilteredData] = useState([]);
-//   const [search, setSearch] = useState("");
-//   const [selectedMonth, setSelectedMonth] = useState("");
-//   const [selectedYear, setSelectedYear] = useState("");
-//   const [showDeleteModal, setShowDeleteModal] = useState(false);
-//   const [selectedItemId, setSelectedItemId] = useState(null);
-//   const [selectId, setSelectId] = useState(null);
-//   const navigate = useNavigate();
-
-//   const handleCloseDeleteModal = () => {
-//     setShowDeleteModal(false);
-//     setSelectId(null);
-//     setSelectedItemId(null);
-//   };
-
-//   const handleShowDeleteModal = (employeeId, id) => {
-//     setSelectId(employeeId);
-//     setSelectedItemId(id);
-//     setShowDeleteModal(true);
-//   };
-
-//   const getMonthNames = () => {
-//     return Array.from({ length: 12 }, (_, i) => {
-//       const date = new Date(2000, i, 1);
-//       return date.toLocaleString("en-US", { month: "long" });
-//     });
-//   };
-
-//   const getRecentYears = () => {
-//     const currentYear = new Date().getFullYear();
-//     const years = [];
-//     for (let i = currentYear; i >= currentYear - 10; i--) {
-//       years.push(i.toString());
-//     }
-//     return years;
-//   };
-//   useEffect(() => {
-//     if (id) {
-//       EmployeeSalaryGetApiById(id).then(response => {
-//         setEmployeeSalaryView(response.data.data);
-//       });
-//     }
-//   }, [id]);
-
-
-//   useEffect(() => {
-//     fetchPaySlips();
-//   }, []);
-
-//   const paginationComponentOptions = {
-//     noRowsPerPage: true,
-//   };
-
-//   const columns = [
-//     {
-//       name: <h5><b>S NO</b></h5>,
-//       selector: (row, index) => index + 1,
-//       width: "110px",
-//     },
-//     {
-//       name: <h5><b>Employee ID</b></h5>,
-//       selector: (row) => row.employeeId,
-//     },
-//     {
-//       name: <h5><b>Month</b></h5>,
-//       selector: (row) => row.month,
-//     },
-//     {
-//       name: <h5><b>Year</b></h5>,
-//       selector: (row) => row.year,
-//     },
-//     {
-//       name: <h5><b>Action</b></h5>,
-//       cell: (row) => (
-//         <div>
-//           <button
-//             className="btn btn-sm"
-//             style={{ backgroundColor: "transparent", border: "none", padding: "0" }}
-//           >
-//             <EyeFill size={22} color="#2255a4" />
-//           </button>
-//           <button
-//             className="btn btn-sm"
-//             style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "10px" }}
-//           >
-//             <Download size={22} color="orange" />
-//           </button>
-//           <button
-//             className="btn btn-sm"
-//             style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "10px" }}
-//             onClick={() => handleShowDeleteModal(row.employeeId, row.id)}
-//           >
-//             <XSquareFill size={22} color="red" />
-//           </button>
-//         </div>
-//       ),
-//     },
-//   ];
-
-//   return (
-//     <LayOut>
-//       <div className="d-sm-flex justify-content-between align-items-center mb-4">
-//         <h1 className="h3 mb-0 text-gray-800">Employee Pay Slips</h1>
-//         <Link
-//           to="/payslip/add"
-//           className="btn btn-primary btn-sm d-none d-sm-inline-block"
-//         >
-//           <i className="fas fa-plus fa-sm text-white-50"></i> Add Pay Slip
-//         </Link>
-//       </div>
-//       <div className="card shadow mb-4">
-//         <div className="card-header py-3">
-//           <div className="row">
-//             <div className="col-lg-4 mb-2">
-//               <input
-//                 type="text"
-//                 placeholder="Search by ID, Name, Year..."
-//                 className="form-control"
-//                 value={search}
-//               />
-//             </div>
-//             <div className="col-lg-3 mb-2">
-//               <select
-//                 className="form-control"
-//                 value={selectedMonth}
-//                 onChange={(e) => setSelectedMonth(e.target.value)}
-//               >
-//                 <option value="">Select Month</option>
-//                 {getMonthNames().map((month) => (
-//                   <option key={month} value={month}>
-//                     {month}
-//                   </option>
-//                 ))}
-//               </select>
-//             </div>
-//             <div className="col-lg-3 mb-2">
-//               <select
-//                 className="form-control"
-//                 value={selectedYear}
-//                 onChange={(e) => setSelectedYear(e.target.value)}
-//               >
-//                 <option value="">Select Year</option>
-//                 {getRecentYears().map((year) => (
-//                   <option key={year} value={year}>
-//                     {year}
-//                   </option>
-//                 ))}
-//               </select>
-//             </div>
-//             <div className="col-lg-2">
-//               <button
-//                 className="btn btn-primary btn-block"
-//                 onClick={() => {
-//                   setSelectedMonth("");
-//                   setSelectedYear("");
-//                   setSearch("");
-//                   setFilteredData(slip);
-//                 }}
-//               >
-//                 Clear
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//         <div className="card-body">
-//           <DataTable
-//             columns={columns}
-//             data={filteredData}
-//             pagination
-//             paginationComponentOptions={paginationComponentOptions}
-//             highlightOnHover
-//             striped
-//             pointerOnHover
-//           />
-//         </div>
-//       </div>
-//     </LayOut>
-//   );
-// };
-
-// export default EmployeePayslips;
+export default EmployeePayslips;

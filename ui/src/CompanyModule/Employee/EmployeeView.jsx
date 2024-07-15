@@ -57,21 +57,39 @@ const EmployeeView = () => {
     return `${year}-${month}-${day}`;
   };
 
-  const token =sessionStorage.getItem("token")
-    useEffect(() => {
-      EmployeeGetApi().then(data => {
-        const filteredData = data
-          .filter(employee => employee.employeeId !== null) // Exclude employees with null employeeId
-          .map(({ referenceId, ...rest }) => rest); // Exclude referenceId
-        setEmployees(filteredData);
-        setFilteredData(filteredData);
-      });
-    }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const data = await EmployeeGetApi(); // Assuming EmployeeGetApi is a function returning a Promise
+            const filteredData = data
+                .filter(employee => employee.employeeId !== null)
+                .map(({ referenceId, ...rest }) => rest);
+
+            // Log data to check for duplicates or unexpected entries
+            console.log('Fetched Data:', filteredData);
+
+            // Set state only if data is valid
+            if (Array.isArray(filteredData)) {
+                setEmployees(filteredData);
+                setFilteredData(filteredData);
+            } else {
+                console.error('Employee data is not an array:', data);
+            }
+        } catch (error) {
+            console.error('Error fetching employees:', error);
+        }
+    };
+
+    fetchData();
+}, []); // Ensure the dependency array is empty to run once on mount
+
+
     
 
-  const handleSalary=(id)=>{
-    Navigate('/employeeSalaryList',{ state: { id } })
-  }
+const handleSalary = (id) => {
+  Navigate(`/employeeSalaryList?id=${id}`);
+};
+
 
   const handleEdit = (id) => {
     console.log(id);

@@ -16,23 +16,13 @@ const CompanyView = () => {
   const [selectedYear, setSelectedYear] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
-  const [showNoRecordsMessage, setShowNoRecordsMessage] = useState(false); // State for no records message
-
-  const location = useLocation();
+  const [showNoRecordsMessage, setShowNoRecordsMessage] = useState(false); 
   const Navigate = useNavigate();
-
-  const apiUrl = "http://localhost:8092/ems/company";
-  const token = sessionStorage.getItem("token");
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
 
   const getUser = async () => {
     try {
       const response = await companyViewApi();
-      setView(response.data.data); // Assuming response.data.data is an array of company objects
+      setView(response.data.data); 
     } catch (error) {
       console.error("Failed to fetch data:", error);
       // Handle error if needed
@@ -181,46 +171,41 @@ const CompanyView = () => {
   return (
     <LayOut>
       <div className="container-fluid p-0">
-        <h1 className="h3 mb-3">
-          <strong>Company List</strong>
-        </h1>
-        <div className="col-auto" style={{paddingBottom:"20px"}}>
+      <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
+          <div className="col">
+            <h1 className="h3 mb-3"><strong>Company View</strong> </h1>
+          </div>
+          <div className="col-auto">
             <nav aria-label="breadcrumb">
               <ol className="breadcrumb mb-0">
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
                 <li className="breadcrumb-item active">
-                  Comapny View
+                  Company View
                 </li>
               </ol>
             </nav>
           </div>
+        </div>
         <div className="row">
           <div className="col-12 col-lg-12 col-xxl-12 d-flex">
             <div className="card flex-fill">
-              <div className="card-header d-flex justify-content-between align-items-center">
-                <h6>Company View</h6>
-                <div className="d-flex flex-wrap align-items-center">
-                  <div className="col-12 col-md-6 col-lg-9 mt-3">
-                    <input
-                      type="search"
-                      className="form-control"
-                      placeholder="Search...."
+            <div className="card-header">
+                <div className='row mb-2'>
+                  <div className='col-12 col-md-6 col-lg-4'>
+                    <p className="card-title"> Company View</p>
+                  </div>
+                  <div className='col-12 col-md-6 col-lg-4'></div>
+                  <div className='col-12 col-md-6 col-lg-4'>
+                    <input type='search' className="form-control" placeholder='Search....'
                       value={search}
                       onChange={(e) => getFilteredList(e.target.value)}
                     />
                   </div>
-                  <div
-                    style={{
-                      borderTopColor: "#D7D9DD",
-                      height: "1px",
-                      width: "100%",
-                    }}
-                  />
                 </div>
+                <div className="dropdown-divider" style={{ borderTopColor: "#D7D9DD" }} />
               </div>
-              <hr style={{ marginBottom: "0" }}></hr>
               {filteredData.length === 0 && showNoRecordsMessage ? (
                 <div className="p-4 text-center">No records found.</div>
               ) : (

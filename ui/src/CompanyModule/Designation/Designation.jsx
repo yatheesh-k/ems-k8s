@@ -65,7 +65,6 @@ const Designation = () => {
         await DesignationPostApi(formData);
         toast.success('Department created successfully');
       }
-
       // After CRUD operation, fetch designations again to update the list
       fetchDesignation();
       reset();
@@ -79,6 +78,14 @@ const Designation = () => {
       setPending(false);
     }
   };
+
+  React.useEffect(() => {
+    const timeout = setTimeout(() => {
+     fetchDesignation();
+      setPending(false);
+    }, 2000);
+    return () => clearTimeout(timeout);
+  }, []);
 
   const handleConfirmDelete = async (id) => {
     if (id) {

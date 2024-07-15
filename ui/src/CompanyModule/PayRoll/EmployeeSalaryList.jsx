@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { EmployeeSalaryGetApi } from '../../Utils/Axios';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import LayOut from '../../LayOut/LayOut';
 import { ChevronRight } from 'react-bootstrap-icons';
 
 const EmployeeSalaryList = () => {
   const [employeeSalaryView, setEmployeeSalaryView] = useState([]);
   const [expanded, setExpanded] = useState({});
+  const navigate=useNavigate();
   const location = useLocation();
-  const { id } = location.state || {};
+  const queryParams = new URLSearchParams(location.search);
+  const id = queryParams.get("employeeId");
 
   useEffect(() => {
     if (id) {
@@ -17,15 +19,38 @@ const EmployeeSalaryList = () => {
       });
     }
   }, [id]);
-
-  
+ 
   const toggleExpand = (index) => {
     setExpanded(prevState => ({ ...prevState, [index]: !prevState[index] }));
   };
+
+  const handleNavigateToRegister = () => {
+    navigate('/employeeSalaryStructure');
+  };
+
   return (
     <LayOut>
       <div className="container mt-4">
-        <h1 className="mb-4">Employee Salary List</h1>
+      <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
+          <div className="col">
+            <h1 className="h3 mb-3"><strong>Employee Salary List</strong> </h1>
+          </div>
+          <div className="col-auto">
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                  <a href="/main">Home</a>
+                </li>
+                <li className="breadcrumb-item">
+                  <a href="/employeeView">Employee View</a>
+                </li>
+                <li className="breadcrumb-item active">
+                  Employee Salary List
+                </li>
+              </ol>
+            </nav>
+          </div>
+        </div>
         {employeeSalaryView.length > 0 ? (
           employeeSalaryView.map((item, index) => (
             <div key={index} className="card mb-3">
@@ -170,32 +195,13 @@ const EmployeeSalaryList = () => {
             </div>
           ))
         ) : (
-          <p>No salary data available.</p>
+          <div className='text-center mt-5'>
+          <button className="btn btn-primary" onClick={handleNavigateToRegister}>Go to Salary Register</button>
+          <p className='mt-2 fw-bold'>No salary data available.</p>
+        </div>
         )}
       </div>
     </LayOut>
   );
 };
 export default EmployeeSalaryList;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

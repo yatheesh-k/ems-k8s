@@ -4,6 +4,8 @@ import Select from "react-select";
 import LayOut from "../../LayOut/LayOut";
 import { EmployeeGetApi, EmployeeSalaryPostApi } from "../../Utils/Axios";
 import { CurrencyRupee, QuestionCircle } from "react-bootstrap-icons";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const EmployeeSalaryStructure = () => {
   const [employes, setEmployes] = useState([]);
@@ -29,6 +31,7 @@ const EmployeeSalaryStructure = () => {
   const [otherAllowances, setOtherAllowances] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
   const [message, setMessage] = useState("");
+  const navigate=useNavigate();
 
   useEffect(() => {
     EmployeeGetApi().then((data) => {
@@ -200,12 +203,14 @@ const EmployeeSalaryStructure = () => {
 
     EmployeeSalaryPostApi(employeeId, postData)
       .then((response) => {
-        console.log(response.data);
-        // Reset form or do something after successful submission
+       toast.success(response.data.message)
         setErrorMessage(""); // Clear error message on success
+        setShowFields(false);
+        navigate('/employeeview')
       })
       .catch((error) => {
         console.error("Error:", error);
+        toast.error(error.response.data.message)
       });
   };
 

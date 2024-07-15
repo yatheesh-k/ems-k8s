@@ -18,6 +18,8 @@ const CompanyRegistration = () => {
   const [companyType, setCompanyType] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [passwordShown, setPasswordShown] = useState("");
+  const [editMode, setEditMode] = useState(false); // State to track edit mode
+
   const location=useLocation();
   const navigate= useNavigate();
 
@@ -65,38 +67,20 @@ const CompanyRegistration = () => {
         companyType: data.companyType
         // Add other fields as needed
       };
-  
+
       if (location.state && location.state.id) {
-        const response = await companyUpdateByIdApi(location.state.id, updateData);
-        if (response.status === 200) {
-          console.log("Update successful", response.data);
-          toast.success("Company updated successfully");
-          navigate("/companyView");
-          reset();
-        } else {
-          // Handle unsuccessful update (optional)
-          console.log("Update failed silently:", response.status, response.data);
-          // Optionally, you can toast or silently handle the failure
-          // toast.error("Failed to update company");
-          // Handle the failure silently without logging or displaying errors
-        }
+        await companyUpdateByIdApi(location.state.id, updateData);
+        toast.success("Company updated successfully");
+        navigate("/companyView");
+        reset();
       } else {
-        const response = await CompanyRegistrationApi(data);
-        if (response.status === 200) {
-          console.log("Company created", response.data);
-          toast.success("Company created successfully");
-          navigate("/companyView");
-          reset();
-        } else {
-          // Handle unsuccessful company creation (optional)
-          console.log("Company creation failed silently:", response.status, response.data);
-          // Optionally, you can toast or silently handle the failure
-          // toast.error("Failed to create company");
-          // Handle the failure silently without logging or displaying errors
-        }
+        await CompanyRegistrationApi(data);
+        toast.success("Company created successfully");
+        navigate("/companyView");
+        reset();
       }
     } catch (error) {
-      // Optionally, handle other error scenarios silently without logging or displaying errors
+      toast.error("An error occurred while processing the request.");
     }
   };
   
@@ -110,6 +94,7 @@ useEffect(() => {
           const response = await companyViewByIdApi(location.state.id);
           console.log(response.data);
           reset(response.data);
+          setEditMode(true);
         } catch (error) {
           console.error('Error fetching company details:', error);
           setErrorMsg('Failed to fetch company details');
@@ -157,21 +142,23 @@ const handleFileUpload = async (e) => {
   return (
     <LayOut>
       <div className="container-fluid p-0">
-        <h1 className="h3 mb-3">
-          <strong>Company Registration</strong>
-        </h1>
-        <div className="col-auto" style={{paddingBottom:'20px'}}>
+          <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
+          <div className="col">
+            <h1 className="h3 mb-3"><strong>Company Registration</strong> </h1>
+          </div>
+          <div className="col-auto">
             <nav aria-label="breadcrumb">
               <ol className="breadcrumb mb-0">
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
                 <li className="breadcrumb-item active">
-                  Comapny Registration
+                  Company Registration
                 </li>
               </ol>
             </nav>
           </div>
+        </div>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="row">
             <div className="col-12">
@@ -198,6 +185,7 @@ const handleFileUpload = async (e) => {
                             {...register("companyType", {
                                 required: "Please select your Company Type"
                               })}
+                              disabled={editMode}
                           />
                           Private Limited
                         </label>
@@ -215,6 +203,7 @@ const handleFileUpload = async (e) => {
                             {...register("companyType", {
                                 required: "Please select your Company Type"
                               })}
+                              disabled={editMode} 
                           />
                           Firm
                       </label>
@@ -254,6 +243,7 @@ const handleFileUpload = async (e) => {
                               "Thse fileds only accepct Alphabets & Numbers",
                           },
                         })}
+                        disabled={editMode}
                       />
                       {errors.companyName && (
                         <p className="errorMsg">{errors.companyName.message}</p>
@@ -274,9 +264,10 @@ const handleFileUpload = async (e) => {
                           pattern: {
                             value: /^[A-Za-z0-9 ]+$/,
                             message:
-                              "Thse fileds only accepct Alphabets & Numbers",
+                              "Thse fields only accepct Alphabets & Numbers",
                           },
                         })}
+                        disabled={editMode}
                       />
                       {errors.shortName && (
                         <p className="errorMsg">{errors.shortName.message}</p>
@@ -299,6 +290,7 @@ const handleFileUpload = async (e) => {
                               "Entered value does not match email format",
                           },
                         })}
+                        disabled={editMode}
                       />
                       {errors.emailId && (
                         <p className="errorMsg">{errors.emailId.message}</p>
@@ -435,7 +427,7 @@ const handleFileUpload = async (e) => {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Enter Company CIN Number"
+                        placeholder="Ex: L17110MH1973PLC019786"
                         onInput={toInputTitleCase}
                         autoComplete="off"
                         {...register("cinNo", {
@@ -446,6 +438,7 @@ const handleFileUpload = async (e) => {
                               "Thse fileds only accepct Alphabets & Numbers",
                           },
                         })}
+                        disabled={editMode}
                       />
                       {errors.cinNo && (
                         <p className="errorMsg">
@@ -462,7 +455,7 @@ const handleFileUpload = async (e) => {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Enter Company Register Number"
+                        placeholder="Ex: U1234567890IN"
                         autoComplete="off"
                         {...register("companyRegNo", {
                           required: "Company Register Number is required",
@@ -472,6 +465,7 @@ const handleFileUpload = async (e) => {
                               "Company Register Number should contain only letters and numbers",
                           },
                         })}
+                        disabled={editMode}
                       />
                       {errors.companyRegNo && (
                         <p className="errorMsg">
@@ -488,7 +482,7 @@ const handleFileUpload = async (e) => {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Enter Company GST Number"
+                        placeholder="Ex: 29GGGGG1314R9Z6"
                         autoComplete="off"
                         {...register("gstNo", {
                           required: "Company GST Number is required",
@@ -498,6 +492,7 @@ const handleFileUpload = async (e) => {
                               "Company GST Number should be exactly 15 characters long and alphanumeric",
                           },
                         })}
+                        disabled={editMode}
                       />
                       {errors.gstNo && (
                         <p className="errorMsg">{errors.gstNo.message}</p>
@@ -512,7 +507,7 @@ const handleFileUpload = async (e) => {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Enter Company Pan Number"
+                        placeholder="Ex: ABCDE1234F"
                         autoComplete="off"
                         {...register("panNo", {
                           required: "Company Pan Number is required",
@@ -522,6 +517,7 @@ const handleFileUpload = async (e) => {
                               "Company Pan Number should be in the format: ABCDE1234F",
                           },
                         })}
+                        disabled={editMode}
                       />
                       {errors.panNo && (
                         <p className="errorMsg">{errors.panNo.message}</p>

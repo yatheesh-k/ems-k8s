@@ -103,13 +103,6 @@ const EmployeeRegistration = () => {
     return newEmployeeId;
   };
 
-  const apiUrl = "http://localhost:8092/ems/departmet";
-  const token = sessionStorage.getItem("token");
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
 
   const fetchDepartments = async () => {
     try {
@@ -666,6 +659,31 @@ const EmployeeRegistration = () => {
                     </div>
 
                     <div className="col-lg-1"></div>
+                    {isUpdating ? (
+                      <div className="col-12 col-md-6 col-lg-5 mb-3">
+                        <label className="form-label">Role </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter Last Name"
+                          name="type"
+                          readOnly
+                          {...register("roles", {
+                            required: "Last Name Required",
+                            pattern: {
+                              value: /^[A-Za-z ]+$/,
+                              message:
+                                "These fields accepts only Alphabetic Characters",
+                            },
+                          })}
+                        />
+                        {errors.type && (
+                          <p className="errorMsg">
+                            {errors.type.message}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
                       <label className="form-label mb-3">Select Employee Role</label>
                       <Controller
@@ -684,7 +702,7 @@ const EmployeeRegistration = () => {
                       />
                       {errors.roles && <p className="errorMsg">Employee Role is Required</p>}
                     </div>
-
+                    )}
                     <div className="col-lg-6"></div>
                     <hr />
                     <h6 className="mt-2">Account Details</h6>

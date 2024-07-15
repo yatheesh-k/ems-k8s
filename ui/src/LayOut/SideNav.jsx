@@ -9,13 +9,14 @@
     Speedometer2,
   } from "react-bootstrap-icons";
   import { Link, useLocation } from "react-router-dom";
+  import { userRoles } from "../Utils/Auth";
 
   const SideNav = () => {
     const [isPayrollOpen, setIsPayrollOpen] = useState(false); // State for managing PayRoll dropdown
     const [isAttendanceOpen, setIsAttendanceOpen] = useState(false); // State for managing Attendance dropdown
     const [isCompanyOpen, setIsCompanyOpen] = useState(false); // State for managing Company dropdown
-    const [roles, setRoles] = useState([]);
-
+    const [roles,setRoles]=useState([]);
+   
     const location = useLocation();
     const userImageBase64 = sessionStorage.getItem("imageFile"); // Assuming the base64 image is stored in sessionStorage
 
@@ -146,7 +147,6 @@
         setIsAttendanceOpen(false);
       }
     }, [location]);
-    console.log(roles);
 
     useEffect(() => {
       if (

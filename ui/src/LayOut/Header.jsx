@@ -1,17 +1,41 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import {company } from "../Utils/Auth";
+import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 
 const Header = ({ toggleSidebar }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [roles,setRoles]=useState([]);
+  const [showErrorModal, setShowErrorModal] = useState(false);
   const navigate = useNavigate();
 
   const token = sessionStorage.getItem("token");
-  const decodedToken = jwtDecode(token);
+  useEffect(() => {
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      
+      // Extract roles from the decoded token
+      const roles = decodedToken?.roles || [];
+      setRoles(roles);
 
-  // Extract roles from the decoded token
-  const roles = decodedToken?.roles || [];
+      const currentTime = Date.now() / 1000; // Current time in seconds
+      const remainingTime = decodedToken.exp - currentTime;
+
+      if (remainingTime > 0) {
+        const timeoutId = setTimeout(() => {
+          handleLogOut();
+        }, remainingTime * 1000); // Convert remaining time to milliseconds
+
+        return () => clearTimeout(timeoutId); // Cleanup timeout if component unmounts
+      } else {
+        // Token is already expired, perform logout immediately
+        handleLogOut();
+      }
+    }
+  }, [token]);
+
 
   const toggleNotification = () => {
     setIsNotificationOpen(!isNotificationOpen);
@@ -25,10 +49,15 @@ const Header = ({ toggleSidebar }) => {
 
   const handleLogOut = () => {
     sessionStorage.clear();
+    setShowErrorModal(true);
+  };
+
+  const closeModal = () => {
+    setShowErrorModal(false);
     navigate("/");
   };
 
-  const company = sessionStorage.getItem("company");
+  const companyName = company;
 
   return (
     <nav className="navbar navbar-expand navbar-light navbar-bg">
@@ -74,7 +103,7 @@ const Header = ({ toggleSidebar }) => {
               </div>
             )}
           </li>
-          {roles.includes("ems_admin") && ( 
+          {roles.includes("ems_admin") ? ( 
           <li className="nav-item">
             <a
               className="nav-link dropdown-toggle d-none d-sm-inline-block text-center"
@@ -102,8 +131,7 @@ const Header = ({ toggleSidebar }) => {
               </div>
             )}
           </li> 
-          )}
-          {roles.includes("company_admin") && (
+          ):(
           <li className="nav-item dropdown position-relative">
          
             <a 
@@ -111,7 +139,7 @@ const Header = ({ toggleSidebar }) => {
               href
               onClick={toggleProfile}
             >
-              <span class="text-dark p-2 mb-3">{company}</span>
+              <span class="text-dark p-2 mb-3">{companyName}</span>
               <i
                 className="bi bi-person-circle"
                 style={{ fontSize: "22px" }}
@@ -144,6 +172,14 @@ const Header = ({ toggleSidebar }) => {
           )}
         </ul>
       </div>
+      <Modal show={showErrorModal} onHide={closeModal} centered style={{zIndex:"1050"}}>
+        <ModalHeader closeButton>
+          <ModalTitle className="text-center">Error</ModalTitle>
+        </ModalHeader>
+        <ModalBody className="text-center fs-bold">
+          Session Timeout! Please log in.
+        </ModalBody>
+      </Modal>
     </nav>
   );
 };

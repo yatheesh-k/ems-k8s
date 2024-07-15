@@ -48,24 +48,25 @@ const Department = () => {
     }
   };
   const company=sessionStorage.getItem("company")
+
   const onSubmit = async (data) => {
-    const postData={
-       companyName:company,
-       ...data
-    }
+    const postData = {
+      companyName: company,
+      ...data
+    };
     try {
       setPending(true);
       if (editingUserId) {
-         await DepartmentPutApiById(editingUserId, postData);
+        await DepartmentPutApiById(editingUserId, postData);
         toast.success("Department updated successfully");
       } else {
-         await DepartmentPostApi(postData);
+        await DepartmentPostApi(postData);
         toast.success("Department created successfully");
       }
-      fetchDepartments(); // Update departments after submit
-      reset();
-      setEditingUserId(null);
-      setAddDepartment(false);
+      reset(); 
+      fetchDepartments(); 
+      setEditingUserId(null); 
+      setAddDepartment(false); 
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error("Failed to submit form");
@@ -73,16 +74,17 @@ const Department = () => {
       setPending(false);
     }
   };
+  
   const fetchDepartments = async () => {
     try {
       const departments = await DepartmentGetApi();
       setDepts(departments);
-     // setFilteredData(departments); // Optionally, you can keep filteredData updated as well
+      setFilteredData(departments); 
     } catch (error) {
       console.error('Error fetching departments:', error);
       toast.error('Failed to fetch departments');
     } finally {
-      setPending(false); // Assuming you manage loading state with 'pending'
+      setPending(false);
     }
   };
   useEffect(() => {
@@ -90,27 +92,29 @@ const Department = () => {
   }, [selectedItemId]);
 
   const handleEdit = (id) => {
-    const userToEdit = depts.find(user => user.id === id);
-    if (userToEdit) {
-      setValue('name', userToEdit.name);
+    const departmentToEdit = depts.find(dept => dept.id === id);
+    if (departmentToEdit) {
+      setValue('name', departmentToEdit.name);
       setEditingUserId(id);
-      setAddDepartment(true);
+      setAddDepartment(true); // Display the modal form for editing
     }
   };
+  
+
   const handleConfirmDelete = async (id) => {
-    if (selectedItemId) {
-      try {
-        await DepartmentDeleteApiById(id);
-        toast.success("Department Deleted Successfully");
-        fetchDepartments(); 
-        handleCloseDeleteModal();
-        reset();
-      } catch (error) {
-        console.error('Error:', error);
-        toast.error('Failed to delete department');
-      }
+  if (selectedItemId) {
+    try {
+      await DepartmentDeleteApiById(id);
+      toast.success("Department Deleted Successfully");
+      fetchDepartments(); // Refresh departments after delete
+      handleCloseDeleteModal(); // Close the delete confirmation modal
+      reset(); // Reset form if necessary
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Failed to delete department');
     }
-  };
+  }
+};
 
   const getFilteredList = (searchData) => {
     setSearch(searchData);
