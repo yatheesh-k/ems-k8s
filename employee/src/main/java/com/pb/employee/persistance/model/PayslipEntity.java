@@ -15,7 +15,9 @@ public class PayslipEntity implements Entity  {
     private String payslipId;
     private String employeeId;
     private  String salaryId;
+    private String attendanceId;
     private SalaryEntity salary;
+    private AttendanceEntity attendance;
     private String month;
     private String year;
 

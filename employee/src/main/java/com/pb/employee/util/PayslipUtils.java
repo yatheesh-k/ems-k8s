@@ -1,6 +1,7 @@
 package com.pb.employee.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pb.employee.persistance.model.AttendanceEntity;
 import com.pb.employee.persistance.model.Entity;
 import com.pb.employee.persistance.model.PayslipEntity;
 import com.pb.employee.persistance.model.SalaryEntity;
@@ -16,10 +17,20 @@ import java.util.Base64;
 @Slf4j
 public class PayslipUtils {
 
-    public static PayslipEntity maskEmployeePayslipProperties(SalaryEntity salaryRequest, PayslipRequest payslipRequest, String id, String employeeId) {
+    public static PayslipEntity maskEmployeePayslipProperties(SalaryEntity salaryRequest, PayslipRequest payslipRequest, AttendanceEntity attendance, String id, String employeeId) {
         Double var = null, fix = null, bas = null, gross = null;
         Double hra = null, trav = null, pfc = null, other = null, spa = null;
         Double te = null, pfE = null, pfEmployer = null, lop = null, tax = null, itax = null, ttax = null, tded = null, net = null;
+        int totalWorkingDays = 0, noOfWorkingDays=0;
+
+        if (attendance.getNoOfWorkingDays() !=null){
+            byte[] decodedFix = Base64.getDecoder().decode(attendance.getNoOfWorkingDays());
+            noOfWorkingDays= Integer.parseInt(new String(decodedFix));
+        }
+        if (attendance.getTotalWorkingDays() !=null){
+            byte[] decodedFix = Base64.getDecoder().decode(attendance.getTotalWorkingDays());
+            totalWorkingDays= Integer.parseInt(new String(decodedFix));
+        }
 
         if (salaryRequest.getFixedAmount() != null) {
             byte[] decodedFix = Base64.getDecoder().decode(salaryRequest.getFixedAmount());
@@ -86,8 +97,14 @@ public class PayslipUtils {
             pfEmployer = pfEmployer/12.0;
         }
         if (salaryRequest.getDeductions().getLop() != null) {
-            byte[] decodedLop = Base64.getDecoder().decode(salaryRequest.getDeductions().getLop());
-            lop = Double.parseDouble(new String(decodedLop));
+
+            int noOfLeaves = totalWorkingDays-noOfWorkingDays;
+            if (noOfLeaves > 1){
+              double monthlySalary =  (gross/12.0);
+              double perDaySalary = monthlySalary/totalWorkingDays;
+              lop = noOfLeaves*perDaySalary;
+            }
+
         }
         if (salaryRequest.getDeductions().getTotalDeductions() != null) {
             byte[] decodedTded = Base64.getDecoder().decode(salaryRequest.getDeductions().getTotalDeductions());
@@ -126,10 +143,17 @@ public class PayslipUtils {
         PayslipEntity payslipEntity = objectMapper.convertValue(payslipRequest, PayslipEntity.class);
 
         payslipEntity.setPayslipId(id);
+        payslipEntity.setAttendanceId(attendance.getAttendanceId());
         payslipEntity.setMonth(payslipRequest.getMonth());
         payslipEntity.setYear(payslipRequest.getYear());
-        payslipEntity.setSalaryId(salaryRequest.getSalaryId());
         payslipEntity.setEmployeeId(employeeId);
+        payslipEntity.setSalaryId(salaryRequest.getSalaryId());
+
+        AttendanceEntity attendanceEntity = objectMapper.convertValue(attendance,AttendanceEntity.class);
+        attendanceEntity.setMonth(attendance.getMonth());
+        attendanceEntity.setYear(attendance.getYear());
+        attendanceEntity.setTotalWorkingDays(attendance.getTotalWorkingDays());
+        attendanceEntity.setNoOfWorkingDays(attendance.getNoOfWorkingDays());
 
         SalaryEntity salary = objectMapper.convertValue(salaryRequest,SalaryEntity.class);
         salary.setFixedAmount(String.valueOf(fix));
@@ -157,7 +181,7 @@ public class PayslipUtils {
         return payslipEntity;
     }
 
-    public static PayslipEntity maskEmployeePayslip(PayslipEntity payslipRequest, SalaryEntity salaryRequest) {
+    public static PayslipEntity maskEmployeePayslip(PayslipEntity payslipRequest, SalaryEntity salaryRequest, AttendanceEntity attendance) {
         String var = null, fix = null, bas = null, gross = null;
         String hra = null, trav = null, pfc = null, other = null, spa = null;
         String te = null, pfE = null, pfEmployer = null, lop = null, tax = null, itax = null, ttax = null, tded = null, net = null;
@@ -223,6 +247,11 @@ public class PayslipUtils {
 
 
         ObjectMapper objectMapper = new ObjectMapper();
+        AttendanceEntity attendanceEntity = objectMapper.convertValue(attendance,AttendanceEntity.class);
+        attendanceEntity.setMonth(attendance.getMonth());
+        attendanceEntity.setYear(attendance.getYear());
+        attendanceEntity.setTotalWorkingDays(attendance.getTotalWorkingDays());
+        attendanceEntity.setNoOfWorkingDays(attendance.getNoOfWorkingDays());
 
         PayslipEntity payslipEntity = objectMapper.convertValue(payslipRequest, PayslipEntity.class);
         SalaryEntity salary = objectMapper.convertValue(salaryRequest,SalaryEntity.class);
@@ -245,6 +274,7 @@ public class PayslipUtils {
         salary.getDeductions().setTotalDeductions(String.valueOf(tded));
         salary.setNetSalary(String.valueOf(net));
         payslipEntity.setSalary(salary);
+        payslipEntity.setAttendance(attendanceEntity);
         payslipEntity.setType(Constants.PAYSLIP);
 
 
