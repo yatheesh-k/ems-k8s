@@ -85,18 +85,18 @@ pipeline {
                 script {
                     
                     nexusArtifactUploader(
-                        nexusVersion: 'nexus3',
+                       nexusVersion: 'nexus3',
                         protocol: 'http',
                         nexusUrl: '122.175.43.71:9001/',
                         groupId: 'QA',
                         version: "${env.BUILD_ID}-${env.BUILD_TIMESTAMP}",
-                        repository: 'EMS_IDENTITY/',
+                        repository: 'EMS_EMPLOYEE/',
                         credentialsId: 'nexuslogin',
                         artifacts: [
-                            [artifactId: 'ems-fe',
+                            [artifactId: 'ems-be    ',
                             classifier: '',
-                            file: 'identity/build/libs/identity-1.0.0.jar',
-                            type: '.jar']
+                            file: 'identity/build/libs/employee-1.0.0.jar',
+                            type: '.jar']    
                         ]
                     )
                 }
