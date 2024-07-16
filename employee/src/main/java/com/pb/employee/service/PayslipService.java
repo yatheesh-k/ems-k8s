@@ -13,7 +13,7 @@ public interface PayslipService {
 
     ResponseEntity<?> generatePaySlipForAllEmployees(PayslipRequest payslipRequest) throws EmployeeException, IOException;
     ResponseEntity<?> getPayslipById(String companyName, String employeeId ,String payslipId) throws EmployeeException, IOException;
-    ResponseEntity<?> getEmployeePayslips(String companyName, String employeeId) throws EmployeeException;
+    ResponseEntity<?> getEmployeePayslips(String companyName, String employeeId,String month,String year) throws EmployeeException;
 
     ResponseEntity<?> deleteEmployeePayslipById(String companyName, String employeeId,String payslipId) throws EmployeeException;
 

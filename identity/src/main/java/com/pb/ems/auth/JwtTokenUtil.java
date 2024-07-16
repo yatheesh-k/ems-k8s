@@ -54,7 +54,7 @@ public class JwtTokenUtil {
                 .compact();
 
     }
-    public static String generateEmployeeToken(String username, List<String> roles,String company, String employee) {
+    public static String generateEmployeeToken(String username, List<String> roles,String company,String employee) {
         String token= Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())

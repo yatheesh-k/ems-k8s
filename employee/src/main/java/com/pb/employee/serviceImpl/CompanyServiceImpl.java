@@ -87,7 +87,7 @@ public class CompanyServiceImpl implements CompanyService {
         EmployeeEntity employee = EmployeeEntity.builder().
                 id(employeeAdminId).
                 employeeType(Constants.EMPLOYEE_TYPE).
-                id(employeeAdminId).
+                employeeId(employeeAdminId).
                 companyId(resourceId).
                 emailId(companyRequest.getEmailId()).
                 password(password).

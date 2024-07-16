@@ -47,6 +47,7 @@ public class EmployeeController {
         return employeeService.getEmployees(companyName);
     }
 
+
     @RequestMapping(value = "{companyName}/employee/{employeeId}", method = RequestMethod.GET)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.getEmployee.tag}", description = "${api.getEmployee.description}")
@@ -70,6 +71,7 @@ public class EmployeeController {
                                                @RequestBody @Valid  EmployeeUpdateRequest employeeUpdateRequest) throws IOException, EmployeeException {
         return employeeService.updateEmployeeById(employeeId, employeeUpdateRequest);
     }
+
     @RequestMapping(value = "{companyName}/employee/{employeeId}", method = RequestMethod.DELETE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.deleteEmployee.tag}", description = "${api.deleteEmployee.description}")

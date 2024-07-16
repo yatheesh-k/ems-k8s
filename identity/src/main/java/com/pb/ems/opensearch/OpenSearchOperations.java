@@ -155,7 +155,6 @@ public class OpenSearchOperations {
         }
         return null;
     }
-
     public void updateCompany(CompanyEntity company) throws IOException {
         String index = Constants.INDEX_EMS;
         String comapanyId = company.getId();

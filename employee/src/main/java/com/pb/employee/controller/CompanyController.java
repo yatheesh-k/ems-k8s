@@ -80,7 +80,6 @@ public class CompanyController {
                                                @PathVariable String companyId,
                                                @ModelAttribute @Valid CompanyImageUpdate companyImageUpdate,
                                                @RequestPart(Constants.FILE) MultipartFile file ) throws IOException, EmployeeException {
-
         return companyService.updateCompanyImageById(companyId,companyImageUpdate, file);
     }
 

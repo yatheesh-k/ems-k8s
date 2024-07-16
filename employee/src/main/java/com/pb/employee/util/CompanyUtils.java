@@ -8,7 +8,6 @@ import com.pb.employee.request.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
@@ -51,8 +50,6 @@ public class CompanyUtils {
 
     public static Entity unmaskCompanyProperties(CompanyEntity companyEntity) {
         String hra = null, pan = null, pf = null, spa = null, ta = null;
-        byte[] password = Base64.getDecoder().decode(companyEntity.getPassword().getBytes());
-        String decodedPassword = new String(password, StandardCharsets.UTF_8);
         if(companyEntity.getHraPercentage() != null) {
             hra = new String(Base64.getDecoder().decode(companyEntity.getHraPercentage().toString().getBytes()));
         }
@@ -68,7 +65,7 @@ public class CompanyUtils {
         if(companyEntity.getTravelAllowance() != null) {
             ta = new String(Base64.getDecoder().decode(companyEntity.getTravelAllowance().toString().getBytes()));
         }
-        companyEntity.setPassword(decodedPassword);
+
         companyEntity.setHraPercentage(hra);
         companyEntity.setPanNo(pan);
         companyEntity.setPfPercentage(pf);
@@ -219,9 +216,7 @@ public class CompanyUtils {
         if(salaryRequest.getVariableAmount() != null) {
             var = Base64.getEncoder().encodeToString(salaryRequest.getVariableAmount().toString().getBytes());
         }
-        if(salaryRequest.getGrossAmount() != null) {
-            gross = (Base64.getEncoder().encodeToString(salaryRequest.getGrossAmount().toString().getBytes()));
-        }
+
         if(salaryRequest.getBasicSalary() != null) {
             bas = (Base64.getEncoder().encodeToString(salaryRequest.getBasicSalary().toString().getBytes()));
         }
@@ -255,18 +250,23 @@ public class CompanyUtils {
         if(salaryRequest.getDeductions().getLop() != null) {
             lop = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getLop().toString().getBytes()));
         }
-        if(salaryRequest.getDeductions().getTotalDeductions() != null) {
-            tded = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getTotalDeductions().toString().getBytes()));
-        }
 
         if(salaryRequest.getDeductions().getPfTax() != null) {
             tax = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getPfTax().toString().getBytes()));
         }
-        Double grossAmount =salaryRequest.getGrossAmount();
-        Double totalDeductions = Double.valueOf(salaryRequest.getDeductions().getTotalDeductions());
-        itax = String.valueOf(TaxCalculatorUtils.getOldTax( grossAmount-totalDeductions));
+        String grossAmount = salaryRequest.getGrossAmount(); // Assuming gross is a valid number string
+        String totalDeductions = salaryRequest.getDeductions().getTotalDeductions(); // Assuming tded is a valid number string
+        // Convert strings to doubles
+        double grossAmountDouble = Double.parseDouble(grossAmount);
+        double totalDeductionsDouble = Double.parseDouble(totalDeductions);
+        itax = String.valueOf(TaxCalculatorUtils.getNewTax( grossAmountDouble-totalDeductionsDouble));
         itax= (Base64.getEncoder().encodeToString(itax.getBytes()));
-
+        if(salaryRequest.getGrossAmount() != null) {
+            gross = (Base64.getEncoder().encodeToString(salaryRequest.getGrossAmount().toString().getBytes()));
+        }
+        if(salaryRequest.getDeductions().getTotalDeductions() != null) {
+            tded = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getTotalDeductions().toString().getBytes()));
+        }
 
         if(salaryRequest.getDeductions().getTotalTax() != null) {
             ttax = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getTotalTax().toString().getBytes()));
@@ -399,22 +399,23 @@ public class CompanyUtils {
 
     public static Entity maskAttendanceProperties(AttendanceRequest attendanceRequest, String attendanceId, String employeeId) {
         String totalWd = null, noOfWd = null;
-        ObjectMapper objectMapper = new ObjectMapper();
-        AttendanceEntity entity = objectMapper.convertValue(attendanceRequest, AttendanceEntity.class);
-        entity.setAttendanceId(attendanceId);
-        entity.setEmployeeId(employeeId);
        if(attendanceRequest.getTotalWorkingDays() != null) {
             totalWd = (Base64.getEncoder().encodeToString(attendanceRequest.getTotalWorkingDays().getBytes()));
-           entity.setTotalWorkingDays(totalWd);
         }if(attendanceRequest.getNoOfWorkingDays()!= null) {
             noOfWd = (Base64.getEncoder().encodeToString(attendanceRequest.getNoOfWorkingDays().getBytes()));
-            entity.setNoOfWorkingDays(noOfWd);
         }
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        AttendanceEntity entity = objectMapper.convertValue(attendanceRequest, AttendanceEntity.class);
+
+        entity.setAttendanceId(attendanceId);
+        entity.setEmployeeId(employeeId);
+        entity.setTotalWorkingDays(totalWd);
+        entity.setNoOfWorkingDays(noOfWd);
         entity.setType(Constants.ATTENDANCE);
 
         return entity;
     }
-
     public static Entity unMaskAttendanceProperties(AttendanceEntity entity){
         String totalWd = null, noOfWd = null;
 

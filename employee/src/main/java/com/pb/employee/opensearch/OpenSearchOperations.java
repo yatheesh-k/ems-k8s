@@ -80,6 +80,7 @@ public class OpenSearchOperations {
         return entity;
     }
 
+
     public String deleteEntity(String id, String index) throws EmployeeException {
         logger.debug("Deleting the Entity {}", id);
         DeleteResponse deleteResponse = null;
@@ -97,6 +98,16 @@ public class OpenSearchOperations {
         }
         return id;
     }
+
+    public UserEntity getEMSAdminById(String user) throws IOException {
+        GetRequest getRequest = new GetRequest.Builder().id(Constants.EMS_ADMIN+"_"+user)
+                .index(Constants.INDEX_EMS).build();
+        GetResponse<UserEntity> searchResponse = esClient.get(getRequest, UserEntity.class);
+        if(searchResponse != null && searchResponse.source() != null){
+            return searchResponse.source();
+        }
+        return null;
+}
 
     public Object getById(String resourceId, String type, String index) throws IOException {
         if(type != null) {
@@ -123,6 +134,8 @@ public class OpenSearchOperations {
         }
         return null;
     }
+
+
     public EmployeeEntity getEmployeeById(String resourceId, String type, String index) throws IOException {
         if(type != null) {
             resourceId = type+"_"+resourceId;
@@ -401,8 +414,7 @@ public class OpenSearchOperations {
         logger.debug("Getting employees for salary details {}", companyName);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         boolQueryBuilder = boolQueryBuilder
-                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.SALARY)));
-        boolQueryBuilder = boolQueryBuilder
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.SALARY)))
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.EMPLOYEE_ID).query(employeeId)));
         BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
         SearchResponse<SalaryEntity> searchResponse = null;
@@ -428,13 +440,20 @@ public class OpenSearchOperations {
         return salaryEntities;
     }
 
-    public List<PayslipEntity> getEmployeePayslip(String companyName, String employeeId) throws EmployeeException {
+    public List<PayslipEntity> getEmployeePayslip(String companyName, String employeeId,String month, String year) throws EmployeeException {
         logger.debug("Getting payslips for employee {} in company {}", employeeId, companyName);
 
         // Build the BoolQuery
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         boolQueryBuilder = boolQueryBuilder
-                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.PAYSLIP)));
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.PAYSLIP)))
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.EMPLOYEE_ID).query(employeeId)));
+        if(year!=null){
+            boolQueryBuilder=boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.YEAR).query(year)));
+        }
+           if(month!=null){
+            boolQueryBuilder=boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.MONTH).query(month)));
+        }
         BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
         SearchResponse<PayslipEntity> searchResponse = null;
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
@@ -456,9 +475,7 @@ public class OpenSearchOperations {
         List<PayslipEntity> payslipEntities = new ArrayList<>();
         for (Hit<PayslipEntity> hit : hits) {
             PayslipEntity payslip = hit.source();
-            if (payslip != null && employeeId.equals(payslip.getEmployeeId())) {
                 payslipEntities.add(payslip);
-            }
         }
 
         // Log if no payslips are found for the employee
@@ -473,7 +490,7 @@ public class OpenSearchOperations {
             // Check if the index exists before attempting deletion
             DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest.Builder().index(index).build();
             DeleteIndexResponse deleteIndexResponse = esClient.indices().delete(deleteIndexRequest);
-           
+
             if (!deleteIndexResponse.acknowledged()) {
                 throw new EmployeeException("Failed to delete index " + index, HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -491,7 +508,7 @@ public class OpenSearchOperations {
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         boolQueryBuilder = boolQueryBuilder
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.ATTENDANCE)))
-                .filter(q -> q.matchPhrase(t -> t.field("employeeId").query(employeeId)));
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.EMPLOYEE_ID).query(employeeId)));
         if(month!=null){
             boolQueryBuilder=boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.MONTH).query(month)));
         }
