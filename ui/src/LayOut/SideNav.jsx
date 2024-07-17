@@ -667,7 +667,7 @@
             </>
           )} */}
 
-          {roles.includes("Employee") && (
+          {(roles.includes("Employee") || roles.includes("HR") || roles.includes("Manager") || roles.includes("Accountant")) && (
 
             <>
               <li
@@ -688,7 +688,7 @@
                   location.pathname.startsWith("/payslip") ? "active" : ""
                 }`}
               >
-                <Link className="sidebar-link" to={"/emppayslip"}>
+                <Link className="sidebar-link" to={"/employeeSalary"}>
                   {/* < color="orange" size={25} />{" "} */}
                   <i
                       class="bi bi-card-list"

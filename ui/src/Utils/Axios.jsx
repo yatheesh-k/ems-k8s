@@ -6,10 +6,6 @@ const hostname = window.location.hostname;
 const BASE_URL = `${protocol}//${hostname}:8092/ems`;
 const Login_URL = `${protocol}//${hostname}:9090/ems`;
 
-console.log('BASE_URL:', BASE_URL);
-console.log('Login_URL:', Login_URL);
-
-
 const token = sessionStorage.getItem("token");
 // Create an Axios instance
 const axiosInstance = axios.create({
@@ -72,6 +68,20 @@ export const CompanyloginApi = (data) => {
 export const ValidateOtp=(data)=>{
    return axiosInstance.post(`${Login_URL}/validate`,data);
 }
+
+export const forgotPasswordStep1=(data)=>{
+  return axios.post(`${Login_URL}/forgot/password`, data);
+}
+
+export const forgotPasswordStep2=(data)=>{
+  return axios.post(`${Login_URL}/update/password`, data);
+}
+
+export const resetPassword=(data,companyId)=>{
+  return axiosInstance.patch(`/company/password/${companyId}`, data);
+}
+
+
 
 export const CompanyRegistrationApi = (data) => {
   return axiosInstance.post("/company", data);
@@ -271,13 +281,23 @@ export const EmployeePayslipGeneration=(data) =>{
 export const EmployeePayslipGetById=(employeeId,paysliId)=>{
   const company = sessionStorage.getItem("company")
     return axiosInstance.get(`/${company}/employee/${employeeId}/payslip/${paysliId}`);
-  
 }
 
-export const EmployeePayslipsGet=(employeeId)=>{
-  const company = sessionStorage.getItem("company")
-  return axiosInstance.get(`/${company}/employee/${employeeId}/payslips`);
-}
+export const EmployeePayslipsGet = (employeeId,month,year) => {
+  const company = sessionStorage.getItem("company");
+  const url = `/${company}/employee/${employeeId}/payslips`;
+
+  // Construct params object based on year parameter
+  const params = {};
+  if (month) {
+    params.month = month;
+  }
+  if (year) {
+    params.year = year;
+  }
+  // Make GET request with axios and include params
+  return axiosInstance.get(url, { params });
+};
 
 export const EmployeePayslipDeleteById=(employeeId,payslipId)=>{
   const company = sessionStorage.getItem("company")

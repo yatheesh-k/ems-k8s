@@ -62,7 +62,7 @@ const EmployeeView = () => {
         try {
             const data = await EmployeeGetApi(); // Assuming EmployeeGetApi is a function returning a Promise
             const filteredData = data
-                .filter(employee => employee.employeeId !== null)
+                .filter(employee => employee.companyId === null)
                 .map(({ referenceId, ...rest }) => rest);
 
             // Log data to check for duplicates or unexpected entries

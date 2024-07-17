@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Select from "react-select";
-import { Controller, useForm } from "react-hook-form";
 import LayOut from "../LayOut/LayOut";
 import { useNavigate } from "react-router-dom";
 import { Eye, XSquareFill } from "react-bootstrap-icons";
@@ -11,44 +10,51 @@ import { EmployeePayslipGetById, EmployeePayslipDeleteById, EmployeePayslipsGet 
 import { userId } from "../Utils/Auth";
 
 const EmployeePayslips = () => {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-  const [employees, setEmployees] = useState([]);
-  const [showFields, setShowFields] = useState(false);
   const [employeeSalaryView, setEmployeeSalaryView] = useState([]);
   const [selectedEmployeeDetails, setSelectedEmployeeDetails] = useState({});
+  const [showFields, setShowFields] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPayslipId, setSelectedPayslipId] = useState("");
   const [refreshData, setRefreshData] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [selectedYear, setSelectedYear] = useState('');
 
   const navigate = useNavigate();
   const id = userId;
 
-  useEffect(() => {
-    const fetchEmployeePayslips = async () => {
-      try {
-        const response = await EmployeePayslipsGet(id);
+  // Year and Month options for Select components
+  const currentYear = new Date().getFullYear();
+  const startYear = 2000;
+  const years = Array.from(
+    { length: currentYear - startYear + 1 },
+    (_, index) => ({
+      value: (startYear + index).toString(), // Keep value if needed for other purposes
+      label: (startYear + index).toString(), // Use same value for label
+    })
+  ).reverse();  
+  const months = Array.from({ length: 12 }, (_, index) => ({
+    value: { value: (index + 1).toString().padStart(2, "0"), label: new Date(2000, index, 1).toLocaleString("default", { month: "long" }) },
+    label: new Date(2000, index, 1).toLocaleString("default", { month: "long" }),
+  }));
+  
+
+  const fetchEmployeePayslips = async () => {
+    try {
+      if (selectedYear && selectedMonth) {
+        const response = await EmployeePayslipsGet(id, selectedMonth.toLowerCase(), selectedYear); // Lowercase month name
         setEmployeeSalaryView(response.data);
-      } catch (error) {
-        handleApiErrors(error);
+        setShowFields(true); // Show fields after fetching data
       }
-    };
-
-    fetchEmployeePayslips();
-  }, [id, refreshData]);
-
-  const handleGoClick = () => {
-    setShowSpinner(true);
-
-    setTimeout(() => {
-      setShowFields(true);
+    } catch (error) {
+      handleApiErrors(error);
+    } finally {
       setShowSpinner(false);
-    }, 2000);
+    }
   };
+  
+
+  console.log(selectedYear);
 
   const handleViewSalary = async (employeeId, payslipId) => {
     try {
@@ -208,11 +214,60 @@ const EmployeePayslips = () => {
     },
   ];
 
+  const handleSubmit = () => {
+    setShowSpinner(true);
+    fetchEmployeePayslips();
+  };
+
   return (
     <LayOut>
       <div className="container-fluid p-0">
-        <h1 className="mb-4">Employee Payslip List</h1>
-
+        <h1 className="h3 mb-3">
+          <strong>PaySlips Form</strong>
+        </h1>
+        <div className="row">
+          <div className="col-12">
+            <div className="card">
+              <div className="card-header">
+                <div className="dropdown-divider" style={{ borderTopColor: "#D7D9DD" }} />
+              </div>
+              <div className="card-body">
+                <div className="row">
+                  <div className="col-12 col-md-6 col-lg-5 mb-3">
+                    <label className="form-label">Select Year</label>
+                    <Select
+  options={years}
+  value={years.find(option => option.value === selectedYear)}
+  onChange={(selectedOption) => setSelectedYear(selectedOption.value)}
+  placeholder="Select Year"
+  style={{ marginLeft: "10px" }}
+/>
+                    
+                  </div>
+                  <div className="col-12 col-md-6 col-lg-5 mb-3">
+                    <label className="form-label">Select Month</label>
+                    <Select
+  options={months}
+  value={months.find(option => option.label === selectedMonth)}
+  onChange={(selectedOption) => setSelectedMonth(selectedOption.label)}
+  placeholder="Select Month"
+/>
+                  </div>
+                  <div className="col-12 d-flex justify-content-end mt-5">
+                    <button
+                      className="btn btn-primary btn-lg"
+                      type="submit"
+                      style={{ marginRight: "65px" }}
+                      onClick={handleSubmit} // Call handleSubmit function on button click
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         {showFields && employeeSalaryView.length > 0 && (
           <div className="card">
             <div className="card-body">
@@ -223,42 +278,23 @@ const EmployeePayslips = () => {
               </h5>
               <div
                 className="dropdown-divider"
-                style={{ borderTopColor: "#d7d9dd" }}
+                style={{ borderTopColor: "#D7D9DD" }}
               />
               <DataTable
                 columns={columns}
                 data={employeeSalaryView}
                 pagination
-                highlightOnHover
-                pointerOnHover
-                fixedHeader
-                responsive
-                dense
-                noHeader
+                progressPending={showSpinner}
+                persistTableHead
               />
             </div>
           </div>
         )}
-
-        {showFields && employeeSalaryView.length === 0 && (
-          <div className="alert alert-info mt-4">
-            No payslips found for this employee.
-          </div>
-        )}
-
         <DeletePopup
           show={showDeleteModal}
-          handleClose={handleCloseDeleteModal}
-          handleConfirm={handleDelete}
-          id={selectedPayslipId}
-          pageName="Payslip"
+          onHide={handleCloseDeleteModal}
+          onDelete={handleDelete}
         />
-
-        {showSpinner && (
-          <div className="spinner-container">
-            <div className="spinner-border text-primary" role="status"></div>
-          </div>
-        )}
       </div>
     </LayOut>
   );

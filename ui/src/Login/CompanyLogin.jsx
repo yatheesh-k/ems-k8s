@@ -286,6 +286,9 @@ const CompanyLogin = () => {
                                   {errors.password.message}
                                 </p>
                               )}
+                              <small>
+            <a href="/forgotPassword">Forgot password?</a>
+          </small>
                             </>
                           )}
                         </div>

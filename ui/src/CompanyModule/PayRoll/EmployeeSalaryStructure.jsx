@@ -36,7 +36,7 @@ const EmployeeSalaryStructure = () => {
   useEffect(() => {
     EmployeeGetApi().then((data) => {
       const filteredData = data
-        .filter((employee) => employee.employeeId !== null)
+        .filter((employee) => employee.companyId === null)
         .map(({ referenceId, ...rest }) => rest);
       setEmployes(
         filteredData.map((employee) => ({

@@ -1,14 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import {company } from "../Utils/Auth";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
+import { useForm } from "react-hook-form";
+import { EnvelopeFill, LockFill, UnlockFill } from "react-bootstrap-icons";
+import Reset from "./Reset";
 
 const Header = ({ toggleSidebar }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [roles,setRoles]=useState([]);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+  const [companyName, setCompanyName] = useState(company);
+  const [passwordShown, setPasswordShown] = useState(false);
+  const profileDropdownRef = useRef(null);
+ 
   const navigate = useNavigate();
 
   const token = sessionStorage.getItem("token");
@@ -47,6 +55,22 @@ const Header = ({ toggleSidebar }) => {
     setIsNotificationOpen(false);
   };
 
+  const handleClickOutside = (event) => {
+    if (
+      profileDropdownRef.current &&
+      !profileDropdownRef.current.contains(event.target)
+    ) {
+      setIsProfileOpen(false);
+    }
+  };
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+
   const handleLogOut = () => {
     sessionStorage.clear();
     setShowErrorModal(true);
@@ -57,7 +81,10 @@ const Header = ({ toggleSidebar }) => {
     navigate("/");
   };
 
-  const companyName = company;
+  const handleResetPasswordClick = () => {
+    setShowResetPasswordModal(true);
+  };
+ 
 
   return (
     <nav className="navbar navbar-expand navbar-light navbar-bg">
@@ -117,11 +144,12 @@ const Header = ({ toggleSidebar }) => {
             </a>
             {isProfileOpen && (
               <div
+                 ref={profileDropdownRef}
                 className="dropdown-menu dropdown-menu-end py-0 show"
                 aria-labelledby="profileDropdown"
                 style={{ left: "auto", right: "2%" }}
               >
-                <a className="dropdown-item" href="/reset">
+                <a className="dropdown-item" href onClick={handleResetPasswordClick}>
                   <i className="align-middle me-1 bi bi-key"></i> Reset Password
                 </a>
                 <div className="dropdown-divider"></div>
@@ -155,7 +183,7 @@ const Header = ({ toggleSidebar }) => {
                 <a className="dropdown-item" href="/profile">
                   <i className="align-middle me-1 bi bi-person"></i> Profile
                 </a>
-                <a className="dropdown-item" href="/reset">
+                <a className="dropdown-item" href onClick={handleResetPasswordClick}>
                   <i className="align-middle me-1 bi bi-key"></i> Reset Password
                 </a>
                 {/* <a className="dropdown-item" href="/payslip">
@@ -172,6 +200,11 @@ const Header = ({ toggleSidebar }) => {
           )}
         </ul>
       </div>
+      <Reset
+        companyName={companyName} 
+        show={showResetPasswordModal}
+        onClose={() => setShowResetPasswordModal(false)}
+      />
       <Modal show={showErrorModal} onHide={closeModal} centered style={{zIndex:"1050"}}>
         <ModalHeader closeButton>
           <ModalTitle className="text-center">Error</ModalTitle>
@@ -180,6 +213,7 @@ const Header = ({ toggleSidebar }) => {
           Session Timeout! Please log in.
         </ModalBody>
       </Modal>
+      
     </nav>
   );
 };

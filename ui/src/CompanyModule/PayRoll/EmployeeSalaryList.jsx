@@ -10,8 +10,7 @@ const EmployeeSalaryList = () => {
   const navigate=useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const id = queryParams.get("employeeId");
-
+  const id = queryParams.get("id");
   useEffect(() => {
     if (id) {
       EmployeeSalaryGetApi(id).then(response => {

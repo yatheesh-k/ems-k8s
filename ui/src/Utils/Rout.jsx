@@ -30,19 +30,20 @@ import Message from '../LayOut/Message';
 import Profile from '../LayOut/Profile';
 import PaySlipDoc from '../Login/PayslipDoc';
 import EmployeeSalaryById from '../EmployeeModule/EmployeeSalaryById';
+import Reset from '../LayOut/Reset';
+import ForgotPassword from '../Login/ForgotPassword';
 
 
 
 
 
 const Rout = () => {
-  const companyName=sessionStorage.getItem('company')
-
   return (
     <Routes>
       <Route path='/' element={<Message />}></Route>
       <Route path='/emsAdmin/login' element={<EmsLogin />}></Route>
       <Route path='/:company/login' element={<CompanyLogin />}></Route>
+      <Route path='/resetPassword' element={<Reset/>}></Route>
       <Route path='/profile' element={<Profile/>}></Route>
       <Route path='/main' element={<Body />}></Route>
       <Route path='/companyRegistration' element={<CompanyRegistration />}></Route>
@@ -69,11 +70,12 @@ const Rout = () => {
       <Route path='/attendanceReport' element={<AttendanceReport />}></Route>
       {/* </Route> */}
       <Route path='/employeePayslip' element={<EmployeePayslips />}></Route>
-      <Route path='/employeeSalaryStructure' element={<EmployeeSalaryById/>}></Route>
+      <Route path= '/employeeSalary' element={<EmployeeSalaryById/>}></Route>
       <Route path='/offerLetter' element={<OfferLetter />}></Route>
       <Route path='/payslipLetter' element={<PaySlipLetter />}></Route>
       <Route path='/hikeLetter' element={<HikeLetter />}></Route>
       <Route path='/existingEmployee' element={<ExistingLetter />}></Route>
+      <Route path='/forgotPassword' element={<ForgotPassword/>}></Route>
     </Routes>
   )
 }

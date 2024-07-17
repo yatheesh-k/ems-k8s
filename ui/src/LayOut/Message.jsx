@@ -4,7 +4,7 @@ import { ModalTitle } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 
 function Message() {
-    const { register, handleSubmit, formState: { errors }, setValue } = useForm({
+    const { register, handleSubmit, formState: { errors }, reset } = useForm({
         defaultValues: {
             companyName: '',
         },
@@ -19,6 +19,7 @@ function Message() {
 
     const closeModal = () => {
         setShowModal(false);
+        reset();
     };
 
     const handleCompanyNameChange = (event) => {
@@ -28,7 +29,9 @@ function Message() {
     const onSubmit = (data) => {
         closeModal()
         const { companyName } = data;
+        reset();
         navigate(`/${companyName}/login`);
+       
     };
     
     return (
