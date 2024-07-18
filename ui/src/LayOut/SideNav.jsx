@@ -40,7 +40,6 @@
     }
   }, [location]);
 
-
   useEffect(() => {
     if (
       location.pathname === "/companySalaryStructure" ||
@@ -68,7 +67,6 @@
       setIsAttendanceOpen(false);
     }
   }, [location]);
-
   
   useEffect(() => {
     if (

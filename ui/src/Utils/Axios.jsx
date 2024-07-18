@@ -6,8 +6,17 @@ const hostname = window.location.hostname;
 const BASE_URL = `${protocol}//${hostname}:8092/ems`;
 const Login_URL = `${protocol}//${hostname}:9090/ems`;
 
+console.log('BASE_URL:', BASE_URL);
+console.log('Login_URL:', Login_URL);
+
+
 const token = sessionStorage.getItem("token");
-// Create an Axios instance
+// const decodedToken = jwtDecode(token);
+// const companyId = decodedToken.sub;
+
+// console.log('Decoded Token:', decodedToken);
+// console.log('Company ID:', companyId);
+
 const axiosInstance = axios.create({
 
     baseURL: BASE_URL,
@@ -81,8 +90,6 @@ export const resetPassword=(data,companyId)=>{
   return axiosInstance.patch(`/company/password/${companyId}`, data);
 }
 
-
-
 export const CompanyRegistrationApi = (data) => {
   return axiosInstance.post("/company", data);
 };
@@ -91,8 +98,8 @@ export const companyViewApi = async () => {
   return axiosInstance.get("/company");
 };
 
-export const companyViewByIdApi = (id) => {
-  return axiosInstance.get(`/company/${id}`)
+export const companyViewByIdApi = (companyId) => {
+  return axiosInstance.get(`/company/${companyId}`)
     .then(response => {
       return response.data; 
     })
@@ -114,6 +121,10 @@ export const companyDeleteByIdApi = async (companyId) => {
 export const companyUpdateByIdApi = async (companyId,data) => {
   axiosInstance.patch(`/company/${companyId}`,data);
 };
+
+export const companyPasswordUpdateById = async (companyId) => {
+  axiosInstance.path(`/company/password/${companyId}`);
+}
 
 export const DepartmentGetApi = () => {
   const company=sessionStorage.getItem("company")
@@ -236,7 +247,7 @@ export const EmployeeDeleteApiById = (employeeId) => {
     });
 }
 
-export const EmployeePutApiById = (employeeId, data) => {
+export const EmployeePatchApiById = (employeeId, data) => {
   const company = sessionStorage.getItem("company");
   return axiosInstance.patch(`/${company}/employee/${employeeId}`, data)
 };
@@ -281,26 +292,43 @@ export const EmployeePayslipGeneration=(data) =>{
 export const EmployeePayslipGetById=(employeeId,paysliId)=>{
   const company = sessionStorage.getItem("company")
     return axiosInstance.get(`/${company}/employee/${employeeId}/payslip/${paysliId}`);
+  
 }
 
-export const EmployeePayslipsGet = (employeeId,month,year) => {
-  const company = sessionStorage.getItem("company");
-  const url = `/${company}/employee/${employeeId}/payslips`;
-
-  // Construct params object based on year parameter
-  const params = {};
-  if (month) {
-    params.month = month;
-  }
-  if (year) {
-    params.year = year;
-  }
-  // Make GET request with axios and include params
-  return axiosInstance.get(url, { params });
-};
+export const EmployeePayslipsGet=(employeeId)=>{
+  const company = sessionStorage.getItem("company")
+  return axiosInstance.get(`/${company}/employee/${employeeId}/payslips`);
+}
 
 export const EmployeePayslipDeleteById=(employeeId,payslipId)=>{
   const company = sessionStorage.getItem("company")
   return axiosInstance.delete(`/${company}/employee/${employeeId}/payslip/${payslipId}`);
 }
+
+export const AttendanceManagementApi=(formData)=>{
+  const company = sessionStorage.getItem("company")
+  return axiosInstance.post(`/${company}/employee/attendance`,formData);
+}
+
+export const AttendanceReportApi=(employeeId,month,year)=>{
+  const company = sessionStorage.getItem("company")
+  return axiosInstance.get(`/${company}/employee/${employeeId}/attendance`,{
+    params:{month,year}
+  });
+}
+
+export const AttendancePatchById=(employeeId,attendanceId,data)=>{
+  const company = sessionStorage.getItem("company")
+  return axiosInstance.patch(`/${company}/employee/${employeeId}/attendance/${attendanceId}`,data);
+}
+
+export const AttendanceDeleteById=(employeeId,attendanceId)=>{
+  const company= sessionStorage.getItem("company")
+  return axiosInstance.delete(`/${company}/employee/${employeeId}/attendance/${attendanceId}`);
+}
+
+
+
+
+
 

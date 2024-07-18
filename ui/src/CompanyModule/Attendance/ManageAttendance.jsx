@@ -1,277 +1,99 @@
-import React, { useState, useEffect } from "react";
-import Select from "react-select";
-import { Controller, useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import LayOut from "../../LayOut/LayOut";
+import React, { useState } from 'react';
+import LayOut from '../../LayOut/LayOut';
+import { AttendanceManagementApi } from '../../Utils/Axios';
+import { toast } from 'react-toastify';
+import { useForm } from 'react-hook-form';
 
-const ManageAttendence = () => {
+const ManageAttendance = () => {
   const {
     register,
-    handleSubmit,
-    control,
-    setValue,
     formState: { errors },
-    reset,
-  } = useForm("");
-  const [view, setView] = useState([]);
-  const [fileName, setFileName] = useState("");
-  const navigate = useNavigate();
-  const [totalWorkingDays, setTotalWorkingDays] = useState(0);
-  const [numberOfLeaves, setNumberOfLeaves] = useState(0);
-  const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
+    reset
+  } = useForm();
+  const [selectedFile, setSelectedFile] = useState(null);
 
-  const getMonthNames = () => {
-    return Array.from({ length: 12 }, (_, i) => {
-      const date = new Date(2000, i, 1); // Using 2000 as a dummy year
-      return date.toLocaleString("en-US", { month: "long" });
-    });
+  const handleFileChange = (event) => {
+    setSelectedFile(event.target.files[0]);
   };
-  // Function to get an array of recent years (adjust the range if needed)
-  const getRecentYears = () => {
-    const currentYear = new Date().getFullYear();
-    const years = [];
-    for (let i = currentYear; i >= currentYear - 10; i--) {
-      years.push(i.toString());
+
+  const handleSubmit = async () => {
+    if (!selectedFile) {
+      return;
     }
-    return years;
-  };
 
-  const toInputTitleCase = (e) => {
-    let value = e.target.value;
-    // Split the value into an array of words
-    const words = value.split(" ");
-    // Capitalize the first letter of each word
-    const capitalizedWords = words.map((word) => {
-      // Capitalize the first letter of the word
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    });
-    // Join the capitalized words back into a single string
-    value = capitalizedWords.join(" ");
-    // Set the modified value to the input field
-    e.target.value = value;
-  };
+    const formData = new FormData();
+    formData.append('file', selectedFile);
 
-  useEffect(() => {
-    axios
-      .get(`http://192.168.1.163:8092/employee/all`)
-      .then((response) => {
-        const filteredEmployees = response.data.filter((user) => {
-          const statusString = String(user.status);
-          return !statusString.includes("2");
-        });
-        const formattedEmployeeList = filteredEmployees.map((user) => ({
-          label: `${user.firstName} ${user.lastName}`,
-          value: user.employeeId,
-          name: user.employeeId,
-        }));
-        setView(formattedEmployeeList);
-      })
-      .catch((errors) => {
-        console.log(errors);
-      });
-  }, []);
-
-  const onSubmit = (data) => {
-    const employeeId = data.employeeId;
-    const payload = {
-      ...data,
-      month: selectedMonth,
-      year: selectedYear,
-    };
-    axios
-      .post(`http://192.168.1.163:8092/attendance/${employeeId}`, payload)
-      .then((response) => {
-        console.log(response.data);
-        reset();
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  };
-
-  const calculateWorkingDays = () => {
-    return totalWorkingDays - numberOfLeaves;
+    try {
+      const response = await AttendanceManagementApi(formData);
+      toast.success('Attandance added Successfully.');
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast.error('Failed to Add Attandence.');
+    }
   };
 
   return (
     <LayOut>
       <div className="container-fluid p-0">
-        <h1 className="h3 mb-3">
-          <strong>Attandance Management</strong>{" "}
-        </h1>
+        <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
+          <div className="col">
+            <h1 className="h3 mb-3">
+              <strong>Attendance Management</strong>
+            </h1>
+          </div>
+          <div className="col-auto" style={{ paddingBottom: '20px' }}>
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                  <a href="/main">Home</a>
+                </li>
+                <li className="breadcrumb-item active">Attendance</li>
+                <li className="breadcrumb-item active">Manage Attendance</li>
+              </ol>
+            </nav>
+          </div>
+        </div>
         <div className="row">
           <div className="col-12">
             <div className="card">
               <div className="card-header">
-                <h5 className="card-title ">Manage Attandance</h5>
-                <div
-                  className="dropdown-divider"
-                  style={{ borderTopColor: "#d7d9dd" }}
-                />
-              </div>
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="card-body">
-                  <div className="row">
-                    <div className="col-12 col-md-6 col-lg-5 mb-2">
-                      <label className="form-label">Select Employee Name</label>
-                      <Controller
-                        name="employeeId"
-                        control={control}
-                        defaultValue=""
-                        rules={{ required: true }}
-                        render={({ field }) => (
-                          <Select
-                            {...field}
-                            options={view}
-                            value={view.find(
-                              (option) => option.value === field.value
-                            )}
-                            onChange={(val) => {
-                              field.onChange(val.value);
-                            }}
-                            placeholder="Select Employee Name"
-                          />
+                <h5 className="card-title">Manage Attendance</h5>
+                <div className="dropdown-divider" style={{ borderTopColor: '#d7d9dd' }} />
+                <div className="card-body" style={{ padding: '0 0 0 25%' }}>
+                  <div className="mb-4">
+                    <div className="row align-items-center">
+                      <div className="col-6 col-md-6 col-lg-6 mt-3" style={{ width: '400px' }}>
+                        <label className="form-label">Select Attendance File</label>
+                        <input
+                          className="form-control"
+                          type="file"
+                          accept=".xlsx" // Only allow .xlsx files
+                          onChange={handleFileChange}
+                          // {...register("attendanceFile", { // Changed from "firstName" to "attendanceFile"
+                          //   required: "Attendance file is required",
+                          //   validate: {
+                          //     isValidFile: (value) => {
+                          //       const file = value[0]; // Access the first file
+                          //       return file && file.name.endsWith('.xlsx') || "Please upload a valid .xlsx file";
+                          //     }
+                          //   },
+                          // })}
+                        />
+                        {errors.attendanceFile && ( 
+                          <p className="errorMsg">{errors.attendanceFile.message}</p>
                         )}
-                      />
-                      {errors && errors.employeeId && (
-                        <p className="errorMsg">Employee Name Required</p>
-                      )}
-                    </div>
-                    <div className="col-lg-1"></div>{" "}
-                    <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Total Working Days</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Enter Total of working days"
-                        onInput={toInputTitleCase}
-                        autoComplete="off"
-                        {...register("totalWorkingDays", {
-                          required: "Total of Working Days is Required",
-                          min: 0,
-                          pattern: {
-                            value: /^[0-9]+$/,
-                            message: "These fields Accepts only numbers",
-                          },
-                        })}
-                        onChange={(e) =>
-                          setTotalWorkingDays(parseFloat(e.target.value))
-                        }
-                      />
-                      {errors && errors.numberOfWorkingDays && (
-                        <p className="errorMsg">
-                          {errors && errors.numberOfWorkingDays.message}
-                        </p>
-                      )}
-                    </div>
-                    <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Select Month</label>
+                      </div>
 
-                      <select
-                        className="form-select"
-                        value={selectedMonth}
-                        onChange={(e) => {
-                          const selectedMonthValue = e.target.value;
-                          console.log("Selected Month:", selectedMonthValue); // Log selected month value
-                          setSelectedMonth(selectedMonthValue);
-                        }}
-                      >
-                        <option value="">Select Month</option>
-                        {getMonthNames().map((month, index) => (
-                          <option key={index} value={month}>
-                            {month}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.employeeType && (
-                        <p className="errorMsg">Employee Type is required</p>
-                      )}
-                    </div>
-                    <div className="col-lg-1"></div>{" "}
-                    <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Number of Leaves</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Enter number of leaves"
-                        onInput={toInputTitleCase}
-                        autoComplete="off"
-                        {...register("lop", {
-                          required: "Number of Leaves is Required",
-                          min: 0,
-                          pattern: {
-                            value: /^[0-9]+$/,
-                            message: "These fields Accepct only Numbers",
-                          },
-                        })}
-                        onChange={(e) =>
-                          setNumberOfLeaves(parseFloat(e.target.value))
-                        }
-                      />
-                      {errors && errors.numberOfWorkingDays && (
-                        <p className="errorMsg">
-                          {errors && errors.numberOfWorkingDays.message}
-                        </p>
-                      )}
-                    </div>
-                    <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">
-                        Select Financial Year
-                      </label>
-
-                      <select
-                        className="form-select"
-                        value={selectedYear}
-                        onChange={(e) => {
-                          setSelectedYear(e.target.value);
-                        }}
-                      >
-                        <option value="">Select Year</option>
-                        {getRecentYears().map((year) => (
-                          <option key={year} value={year}>
-                            {year}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.employeeType && (
-                        <p className="errorMsg">Employee Type is required</p>
-                      )}
-                    </div>
-                    <div className="col-lg-1"></div>{" "}
-                    <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">
-                        Number of Working Days
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={calculateWorkingDays()}
-                        readOnly
-                      />
-                      {errors && errors.numberOfWorkingDays && (
-                        <p className="errorMsg">
-                          {errors && errors.numberOfWorkingDays.message}
-                        </p>
-                      )}
-                    </div>
-                    <div className="col-lg-1"></div>
-                    <div
-                      className="col-12  d-flex justify-content-end mt-5 "
-                      style={{ background: "none" }}
-                    >
-                      <button
-                        className="btn btn-primary btn-lg"
-                        style={{ marginRight: "65px" }}
-                        type="submit"
-                      >
-                        Submit
-                      </button>
+                      <div className="col-6 col-md-6 col-lg-6 mt-5">
+                        <button type="button" className="btn btn-primary" onClick={handleSubmit}>
+                          Submit
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </form>
+              </div>
             </div>
           </div>
         </div>
@@ -280,4 +102,4 @@ const ManageAttendence = () => {
   );
 };
 
-export default ManageAttendence;
+export default ManageAttendance;

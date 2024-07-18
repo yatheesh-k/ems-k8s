@@ -6,7 +6,7 @@ import { Eye, EyeSlash, Handbag } from "react-bootstrap-icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 import LayOut from "../../LayOut/LayOut";
-import { DepartmentGetApi, DesignationGetApi, EmployeeGetApiById, EmployeePostApi, EmployeePutApiById, employeeUpdateByIdApi, employeeViewApi } from "../../Utils/Axios";
+import { DepartmentGetApi, DesignationGetApi, EmployeeGetApiById, EmployeePatchApiById, EmployeePostApi, EmployeePutApiById, employeeUpdateByIdApi, employeeViewApi } from "../../Utils/Axios";
 
 const EmployeeRegistration = () => {
 
@@ -202,7 +202,7 @@ const EmployeeRegistration = () => {
   
     try {
       if (location.state && location.state.id) {
-        const response = await EmployeePutApiById(location.state.id, payload);
+        const response = await EmployeePatchApiById(location.state.id, payload);
         console.log("Update successful", response.data);
         toast.success("Employee updated successfully");
         navigate("/employeeView");
