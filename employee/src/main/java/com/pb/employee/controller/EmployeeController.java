@@ -81,18 +81,4 @@ public class EmployeeController {
                                                 @PathVariable String companyName,@PathVariable String employeeId) throws EmployeeException {
         return employeeService.deleteEmployeeById(companyName,employeeId);
     }
-
-    @RequestMapping(value = "{companyName}/employee/{employeeId}/password", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)
-    @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
-            summary = "${api.updatePassword.tag}", description = "${api.updatePassword.description}")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "202", description= "Accepted")
-    public ResponseEntity<?> updatePassword(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
-                                            @RequestHeader(Constants.AUTH_KEY) String authToken,
-                                            @RequestBody EmployeePasswordReset employeePasswordReset,
-                                            @PathVariable String companyName,
-                                            @PathVariable String employeeId) throws IOException, EmployeeException {
-
-        return employeeService.passwordResetForEmployee(employeePasswordReset, employeeId);
-    }
 }

@@ -171,39 +171,4 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
-    @Override
-    public ResponseEntity<?> passwordResetForEmployee(EmployeePasswordReset employeePasswordReset, String id) throws EmployeeException {
-        EmployeeEntity employee;
-        String index = ResourceIdUtils.generateCompanyIndex(employeePasswordReset.getCompanyName());
-        try {
-            employee = openSearchOperations.getEmployeeById(id, null, index);
-            if (employee == null){
-                log.error("CompanyAdmin details existed{}", employeePasswordReset.getCompanyName());
-                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.COMPANY_ALREADY_EXISTS), employeePasswordReset.getCompanyName()),
-                        HttpStatus.CONFLICT);
-            }
-
-            byte[] decodedBytes = Base64.getDecoder().decode(employee.getPassword());
-            String decodedPassword = new String(decodedBytes, StandardCharsets.UTF_8);
-            if (!decodedPassword.equals(employeePasswordReset.getPassword())){
-                log.debug("checking the given Password..");
-                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_PASSWORD),
-                        HttpStatus.NOT_FOUND);
-            }
-            String newPassword = Base64.getEncoder().encodeToString(employeePasswordReset.getNewPassword().toString().getBytes());
-            employee.setPassword(newPassword);
-
-            openSearchOperations.saveEntity(employee, id, index);
-
-        } catch (Exception ex) {
-            log.error("Exception while fetching user {}, {}", employeePasswordReset.getCompanyName(), ex);
-            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_EMPLOYEE),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-
-
-        }
-        return new ResponseEntity<>(
-                ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
-    }
-
 }

@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,16 +98,10 @@ public class PayslipServiceImpl implements PayslipService {
             List<PayslipEntity> generatedPayslips = new ArrayList<>();
 
             for (EmployeeEntity employee : employeeEntities) {
-                if (employee == null) {
-                    log.error("Employee with ID {} is not found", employee.getId());
-                    throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
-                            HttpStatus.INTERNAL_SERVER_ERROR);
-                }
                 List<SalaryEntity> salaryEntities = openSearchOperations.getSalaries(payslipRequest.getCompanyName(), employee.getId());
                 if (salaryEntities == null) {
                     log.error("Employee Salary with employeeId {} is not found", employee.getId());
                     throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
-
                             HttpStatus.INTERNAL_SERVER_ERROR);
                 }
 
@@ -130,14 +123,13 @@ public class PayslipServiceImpl implements PayslipService {
                     continue; // Skip to the next employee if payslip already exists
                 }
                 for (SalaryEntity salary : salaryEntities) {
-
                     PayslipEntity payslipProperties = PayslipUtils.unMaskEmployeePayslipProperties(salary, payslipRequest, paySlipId, employee.getId(),attendanceEntities);
                     PayslipUtils.formatNumericalFields(payslipProperties);
                     payslipProperties  = PayslipUtils.maskEmployeePayslip(payslipProperties,salary,attendanceEntities);
+                    generatedPayslips.add(payslipProperties);
                     openSearchOperations.saveEntity(payslipProperties, paySlipId, index);
                 }
             }
-            // Return success response after all payslips are generated
             return new ResponseEntity<>(
                     ResponseBuilder.builder().build().createSuccessResponse(generatedPayslips), HttpStatus.CREATED);
 
@@ -151,6 +143,7 @@ public class PayslipServiceImpl implements PayslipService {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @Override
     public ResponseEntity<?> getPayslipById(String companyName, String employeeId, String payslipId) throws EmployeeException, IOException {
@@ -221,6 +214,7 @@ public class PayslipServiceImpl implements PayslipService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(allPayslips), HttpStatus.OK);
     }
+
 
     @Override
     public ResponseEntity<?> deleteEmployeePayslipById(String companyName, String employeeId,String payslipId) throws EmployeeException{

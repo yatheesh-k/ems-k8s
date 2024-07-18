@@ -219,10 +219,12 @@ public class LoginServiceImpl implements LoginService {
             throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_USERNAME),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        String newPassword = Base64.getEncoder().encodeToString(request.getPassword().toString().getBytes());
+
         String id = Constants.EMS_ADMIN+"_"+request.getUsername();
         Entity entity = EmployeeEntity.builder().
                 emailId(request.getUsername()).
-                password(request.getPassword()).build();
+                password(newPassword).build();
         openSearchOperations.saveEntity(entity, id, Constants.INDEX_EMS);
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);

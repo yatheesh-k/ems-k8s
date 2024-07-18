@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -113,20 +114,29 @@ public class SalaryServiceImpl implements SalaryService {
 
         List<SalaryEntity> salaryEntities = null;
         Object entity = null;
+        List<SalaryEntity> salaryEntityList;
         try {
             salaryEntities = openSearchOperations.getSalaries(companyName, employeeId);
-            for(SalaryEntity salaryEntity : salaryEntities) {
-                EmployeeUtils.unMaskEmployeeSalaryProperties(salaryEntity);
+            salaryEntityList = new ArrayList<>();
+            for (SalaryEntity salaryEntity : salaryEntities) {
+                SalaryEntity salary = EmployeeUtils.unMaskEmployeeSalaryProperties(salaryEntity);
+                salaryEntityList.add(salary);
+                entity = openSearchOperations.getById(salary.getEmployeeId(), null, index);
+                if (entity == null){
+                    log.error("Employee ID mismatch for salary {}: expected {}, found {}", salary.getSalaryId(), employeeId, salary.getEmployeeId());
+                    throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+                            HttpStatus.INTERNAL_SERVER_ERROR);
+                }
             }
-            entity = openSearchOperations.getById(employeeId, null, index);
-        }
-        catch (Exception ex) {
+
+
+        } catch (Exception ex) {
             log.error("Exception while fetching salaries for employees {}: {}", employeeId, ex.getMessage());
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(
-                ResponseBuilder.builder().build().createSuccessResponse(salaryEntities), HttpStatus.OK);
+                ResponseBuilder.builder().build().createSuccessResponse(salaryEntityList), HttpStatus.OK);
     }
 
     @Override

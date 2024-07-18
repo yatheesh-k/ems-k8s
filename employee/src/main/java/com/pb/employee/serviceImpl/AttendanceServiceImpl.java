@@ -9,6 +9,7 @@ import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.opensearch.OpenSearchOperations;
 import com.pb.employee.persistance.model.*;
+import com.pb.employee.request.AttendanceUpdateRequest;
 import org.apache.poi.ss.usermodel.*;
 import com.pb.employee.request.AttendanceRequest;
 import com.pb.employee.service.AttendanceService;
@@ -83,7 +84,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
         AttendanceEntity entity = null;
         try {
-            entity = openSearchOperations.getAttendanceById(employeeId, null, index);
+            entity = openSearchOperations.getAttendanceById(attendanceId, null, index);
             if (entity==null){
                 log.error("Exception while fetching employee for the attendance {}", employeeId);
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
@@ -107,7 +108,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public ResponseEntity<?> updateEmployeeAttendanceById(String company, String employeeId, String attendanceId, AttendanceRequest updateRequest) throws EmployeeException{
+    public ResponseEntity<?> updateEmployeeAttendanceById(String company, String employeeId, String attendanceId, AttendanceUpdateRequest updateRequest) throws EmployeeException{
         String index = ResourceIdUtils.generateCompanyIndex(company);
         AttendanceEntity entity = null;
         try {
@@ -128,7 +129,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        Entity employeeAttendance = CompanyUtils.maskAttendanceProperties(updateRequest, attendanceId, employeeId);
+        Entity employeeAttendance = CompanyUtils.maskAttendanceUpdateProperties(updateRequest, entity);
         openSearchOperations.saveEntity(employeeAttendance, attendanceId, index);
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);

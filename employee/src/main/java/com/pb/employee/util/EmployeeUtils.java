@@ -68,7 +68,7 @@ public class EmployeeUtils {
         return employeeEntity;
     }
 
-    public static Entity unMaskEmployeeSalaryProperties(SalaryEntity salaryEntity) {
+    public static SalaryEntity unMaskEmployeeSalaryProperties(SalaryEntity salaryEntity) {
 
         String var = null, fix = null, bas = null, gross = null;
         String hra = null, trav = null, pfc = null, other = null,spa=null;

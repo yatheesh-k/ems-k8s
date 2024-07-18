@@ -416,6 +416,21 @@ public class CompanyUtils {
 
         return entity;
     }
+
+    public static Entity maskAttendanceUpdateProperties(AttendanceUpdateRequest attendanceRequest, AttendanceEntity attendance) {
+        String totalWd = null, noOfWd = null;
+
+        if(attendanceRequest.getTotalWorkingDays() != null) {
+            totalWd = (Base64.getEncoder().encodeToString(attendanceRequest.getTotalWorkingDays().getBytes()));
+            attendance.setTotalWorkingDays(totalWd);
+
+        }if(attendanceRequest.getNoOfWorkingDays()!= null) {
+            noOfWd = (Base64.getEncoder().encodeToString(attendanceRequest.getNoOfWorkingDays().getBytes()));
+            attendance.setNoOfWorkingDays(noOfWd);
+
+        }
+        return attendance;
+    }
     public static Entity unMaskAttendanceProperties(AttendanceEntity entity){
         String totalWd = null, noOfWd = null;
 

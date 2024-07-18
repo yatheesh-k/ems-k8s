@@ -1,5 +1,6 @@
 package com.pb.employee.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Getter
@@ -9,9 +10,9 @@ import lombok.*;
 @AllArgsConstructor
 public class EmployeePasswordReset {
 
-
-
+    @NotBlank(message = "{companyname.message}")
     private String companyName;
+
     private String password;
     private String newPassword;
 }

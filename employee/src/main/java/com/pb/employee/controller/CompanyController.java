@@ -83,7 +83,7 @@ public class CompanyController {
         return companyService.updateCompanyImageById(companyId,companyImageUpdate, file);
     }
 
-    @RequestMapping(value = "/password/{companyId}", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/employee/{employeeId}/password", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.updatePassword.tag}", description = "${api.updatePassword.description}")
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -91,9 +91,9 @@ public class CompanyController {
     public ResponseEntity<?> passwordResetForEmployee(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                                     @RequestHeader(Constants.AUTH_KEY) String authToken,
                                                     @RequestBody EmployeePasswordReset employeePasswordReset,
-                                            @PathVariable String companyId) throws IOException, EmployeeException {
+                                            @PathVariable String employeeId) throws IOException, EmployeeException {
 
-        return companyService.passwordResetForEmployee(employeePasswordReset, companyId);
+        return companyService.passwordResetForEmployee(employeePasswordReset, employeeId);
     }
     @RequestMapping(value = "/{companyId}", method = RequestMethod.DELETE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },

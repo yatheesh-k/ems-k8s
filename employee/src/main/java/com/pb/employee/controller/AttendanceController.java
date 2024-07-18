@@ -3,6 +3,7 @@ package com.pb.employee.controller;
 
 import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.request.AttendanceRequest;
+import com.pb.employee.request.AttendanceUpdateRequest;
 import com.pb.employee.service.AttendanceService;
 import com.pb.employee.util.Constants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,7 +66,7 @@ public class AttendanceController {
                                                           @PathVariable String company,
                                                           @PathVariable String employeeId,
                                                           @PathVariable String attendanceId,
-                                                          @RequestBody @Valid AttendanceRequest updateRequest) throws EmployeeException {
+                                                          @RequestBody @Valid AttendanceUpdateRequest updateRequest) throws EmployeeException {
         return attendanceService.updateEmployeeAttendanceById(company,employeeId, attendanceId,updateRequest);
     }
 

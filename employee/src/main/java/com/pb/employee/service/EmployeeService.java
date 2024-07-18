@@ -16,5 +16,4 @@ public interface EmployeeService {
     ResponseEntity<?> getEmployeeById(String companyName, String employeeId) throws EmployeeException;
     ResponseEntity<?> updateEmployeeById(String employeeId, EmployeeUpdateRequest employeeUpdateRequest) throws IOException, EmployeeException;
     ResponseEntity<?> deleteEmployeeById( String companyName,String employeeId) throws EmployeeException;
-    ResponseEntity<?> passwordResetForEmployee(EmployeePasswordReset employeePasswordReset, String id) throws EmployeeException;
 }

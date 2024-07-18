@@ -1,10 +1,12 @@
 package com.pb.employee.request;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
@@ -12,10 +14,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttendanceRequest{
+public class AttendanceUpdateRequest {
 
-    private String company;
-    private String employeeId;
     private String month;
     private String year;
 
@@ -28,9 +28,4 @@ public class AttendanceRequest{
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty("noOfWorkingDays")
     private String noOfWorkingDays;
-
-    private String type;
-
-
-
 }

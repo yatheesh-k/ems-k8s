@@ -50,6 +50,7 @@ public class PayslipController {
         return payslipService.generatePaySlipForAllEmployees(payslipRequest);
     }
 
+
     @RequestMapping(value = "/{companyName}/employee/{employeeId}/payslip/{payslipId}", method = RequestMethod.GET)
     @io.swagger.v3.oas.annotations.Operation(security = {@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY)},
             summary = "${api.getPayslip.tag}", description = "${api.getPayslip.description}")
