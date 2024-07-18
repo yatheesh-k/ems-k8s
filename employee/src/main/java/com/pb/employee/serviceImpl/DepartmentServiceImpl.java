@@ -114,17 +114,26 @@ public class DepartmentServiceImpl implements DepartmentService {
         DepartmentEntity departmentEntity;
         String index = ResourceIdUtils.generateCompanyIndex(departmentUpdateRequest.getCompanyName());
         try {
+
             departmentEntity = openSearchOperations.getDepartmentById(departmentId, null, index);
             if (departmentEntity == null) {
                 log.error("unable to find the department");
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_DEPARTMENT),
                         HttpStatus.NOT_FOUND);
             }
+
         } catch (Exception ex) {
 
             log.error("Exception while fetching department details {}", ex);
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_DEPARTMENT),
                     HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        List<DepartmentEntity> department = openSearchOperations.getCompanyDepartmentByName(departmentUpdateRequest.getCompanyName(), departmentUpdateRequest.getName());
+        if(department !=null && department.size() > 0) {
+            log.error("Department with name {} already existed", departmentUpdateRequest.getName());
+            throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.DEPARTMENT_ID_ALREADY_EXISTS),  departmentUpdateRequest.getName()),
+                    HttpStatus.CONFLICT);
+
         }
         Entity entity = DepartmentEntity.builder().id(departmentId).name(departmentUpdateRequest.getName())
                 .type(Constants.DEPARTMENT).build();

@@ -217,6 +217,7 @@ public class OpenSearchOperations {
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         boolQueryBuilder = boolQueryBuilder
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.DESIGNATION)));
+
         if(designationName != null) {
             boolQueryBuilder = boolQueryBuilder
                     .filter(q -> q.matchPhrase(t -> t.field(Constants.NAME).query(designationName)));
@@ -256,6 +257,7 @@ public class OpenSearchOperations {
             boolQueryBuilder = boolQueryBuilder
                     .filter(q -> q.matchPhrase(t -> t.field(Constants.SHORT_NAME).query(shortName)));
         }
+
         BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
         SearchResponse<CompanyEntity> searchResponse = null;
         try {
@@ -276,6 +278,8 @@ public class OpenSearchOperations {
         }
         return subscriberEntities;
     }
+
+
 
     public List<EmployeeEntity> getCompanyEmployeeByData(String companyName, String empId, String emailId) throws EmployeeException {
         logger.debug("Getting the Resource by  , companyName{} empId,{},emailId {}", companyName, empId, emailId);

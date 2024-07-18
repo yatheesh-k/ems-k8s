@@ -124,6 +124,13 @@ public class DesignationServiceImpl implements DesignationService {
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_DESIGNATION),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        List<DesignationEntity> designationEntities = openSearchOperations.getCompanyDesignationByName(designationUpdateRequest.getCompanyName(), designationUpdateRequest.getName());
+        if(designationEntities !=null && designationEntities.size() > 0) {
+            log.error("Designation with name {} already existed", designationUpdateRequest.getName());
+            throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.DESIGNATION_ID_ALREADY_EXISTS), designationUpdateRequest.getName()),
+                    HttpStatus.CONFLICT);
+        }
+
         Entity entity = DesignationEntity.builder().id(designationId).name(designationUpdateRequest.getName())
                 .type(Constants.DESIGNATION).build();
         openSearchOperations.saveEntity(entity, designationId, index);

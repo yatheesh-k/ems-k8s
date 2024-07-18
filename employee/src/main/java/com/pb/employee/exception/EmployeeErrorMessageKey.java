@@ -51,7 +51,8 @@ public enum EmployeeErrorMessageKey {
     EXCEPTION_OCCURRED("exception.occurred"),
     NUMBER_EXCEPTION("number.exception"),
     UNABLE_TO_SEARCH("unable.to.search"),
-    FAILED_TO_DELETE("failed.to.delete");
+    FAILED_TO_DELETE("failed.to.delete"),
+    ;
     private final String key;
 
     EmployeeErrorMessageKey(String keyVal) {
