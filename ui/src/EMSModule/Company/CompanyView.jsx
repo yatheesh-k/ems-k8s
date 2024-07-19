@@ -5,7 +5,7 @@ import { Bounce, toast } from "react-toastify";
 import DeletePopup from "../../Utils/DeletePopup";
 import LayOut from "../../LayOut/LayOut";
 import axios from "axios";
-import { EmployeePayslipDeleteById, companyViewApi } from "../../Utils/Axios";
+import { companyDeleteByIdApi, companyViewApi } from "../../Utils/Axios";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const CompanyView = () => {
@@ -47,7 +47,7 @@ const CompanyView = () => {
   const handleConfirmDelete = async () => {
     if (selectedItemId) {
       try {
-        const response = await EmployeePayslipDeleteById(selectedItemId);
+        const response = await companyDeleteByIdApi(selectedItemId);
         if (response.status === 200) {
           toast.success("Company Deleted Successfully", {
             position: "top-right",

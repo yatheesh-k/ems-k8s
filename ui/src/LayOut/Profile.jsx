@@ -4,7 +4,7 @@ import axios from "axios";
 import { Modal, Button, Toast } from "react-bootstrap";
 import { jwtDecode } from "jwt-decode";
 import LayOut from "./LayOut";
-import { CameraFill } from "react-bootstrap-icons";
+import { CameraFill, Eye, EyeSlash } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { companyUpdateByIdApi, companyViewByIdApi } from "../Utils/Axios";
@@ -23,7 +23,12 @@ function Profile() {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [error, setError] = useState(null);
-  const navigate= useNavigate();
+  const [passwordShown, setPasswordShown] = useState(false);
+  const navigate = useNavigate();
+
+  const togglePasswordVisiblity = () => {
+    setPasswordShown(!passwordShown);
+  };
 
   useEffect(() => {
     const fetchCompanyData = async () => {
@@ -68,7 +73,7 @@ function Profile() {
       setSuccessMessage("Profile updated successfully.");
       toast.success("Company Details Updated Successfully");
       setErrorMessage("");
-    navigate("/main");
+      navigate("/main");
     } catch (err) {
       console.error("Update error:", err);
       setSuccessMessage("");
@@ -200,7 +205,7 @@ function Profile() {
                           readOnly
                         />
                       </div>
-                      
+
                       <div className="mb-3">
                         <label htmlFor="companyMail" className="form-label">
                           Company MailId
@@ -219,7 +224,7 @@ function Profile() {
                           htmlFor="companyPhoneNo"
                           className="form-label"
                         >
-                           Mobile Number
+                          Mobile Number
                         </label>
                         <input
                           type="text"
@@ -227,28 +232,11 @@ function Profile() {
                           className="form-control"
                           {...register("mobileNo")}
                           defaultValue={companyData.mobileNo}
-                          readOnly
-                        />
-                      </div>
-                      <div className="mb-3">
-                        <label
-                          htmlFor="companyAddress"
-                          className="form-label"
-                        >
-                          Company Address
-                        </label>
-                        <input
-                          type="text"
-                          id="companyAddress"
-                          className="form-control"
-                          {...register("companyAddress")}
-                          defaultValue={companyData.companyAddress}
-                          readOnly
                         />
                       </div>
                     </div>
                     <div className="col-md-6">
-                    <div className="mb-3">
+                      <div className="mb-3">
                         <label htmlFor="companyName" className="form-label">
                           Short Name
                         </label>
@@ -261,17 +249,44 @@ function Profile() {
                           readOnly
                         />
                       </div>
-                      <div className="mb-3">
+                      {/* <div className="col-12 col-md-6 col-lg-5 mb-3"> 
                         <label htmlFor="website" className="form-label">
                           Password
                         </label>
+                        <div className="col-sm-12 input-group">
                         <input
-                          type="text"
+                          type={passwordShown ? "text" : "password"}
                           id="website"
                           className="form-control"
                           {...register("password")}
                           defaultValue={companyData.password}
-                          readOnly
+                        />
+                        <i
+                          onClick={togglePasswordVisiblity}
+                          style={{ margin: "5px" }}
+                        >
+                          {" "}
+                          {passwordShown ? (
+                            <Eye size={17} />
+                          ) : (
+                            <EyeSlash size={17} />
+                          )}
+                        </i>
+                        </div>
+                      </div> */}
+                        <div className="mb-3">
+                        <label
+                          htmlFor="companyAddress"
+                          className="form-label"
+                        >
+                          Company Address
+                        </label>
+                        <input
+                          type="text"
+                          id="companyAddress"
+                          className="form-control"
+                          {...register("companyAddress")}
+                          defaultValue={companyData.companyAddress}
                         />
                       </div>
                       <div className="mb-3">
@@ -287,7 +302,6 @@ function Profile() {
                           className="form-control"
                           {...register("landNo")}
                           defaultValue={companyData.landNo}
-                          readOnly
                         />
                       </div>
                     </div>
@@ -343,7 +357,7 @@ function Profile() {
                           htmlFor="personalMobileNo"
                           className="form-label"
                         >
-                         Company GST Number
+                          Company GST Number
                         </label>
                         <input
                           type="text"
@@ -356,7 +370,7 @@ function Profile() {
                       </div>
                       <div className="mb-3">
                         <label htmlFor="designation" className="form-label">
-                         Company PAN Number
+                          Company PAN Number
                         </label>
                         <input
                           type="text"
@@ -395,7 +409,6 @@ function Profile() {
                           className="form-control"
                           {...register("name")}
                           defaultValue={companyData.name}
-                          readOnly
                         />
                       </div>
                       <div className="mb-3">
@@ -411,7 +424,6 @@ function Profile() {
                           className="form-control"
                           {...register("personalMailId")}
                           defaultValue={companyData.personalMailId}
-                          readOnly
                         />
                       </div>
                     </div>
@@ -429,7 +441,6 @@ function Profile() {
                           className="form-control"
                           {...register("personalMobileNo")}
                           defaultValue={companyData.personalMobileNo}
-                          readOnly
                         />
                       </div>
                       <div className="mb-3">
@@ -442,7 +453,6 @@ function Profile() {
                           className="form-control"
                           {...register("address")}
                           defaultValue={companyData.address}
-                          readOnly
                         />
                       </div>
                     </div>
@@ -463,7 +473,7 @@ function Profile() {
             >
               Submit
             </button>
-            </div>
+          </div>
         </form>
 
         {/* Modal for Image Upload */}

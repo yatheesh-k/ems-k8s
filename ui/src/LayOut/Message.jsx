@@ -25,15 +25,42 @@ function Message() {
     const handleCompanyNameChange = (event) => {
         setCompanyName(event.target.value);
     };
+    const toInputLowerCase = (e) => {
+        const inputValue = e.target.value;
+        let newValue = "";
+        for (let i = 0; i < inputValue.length; i++) {
+          const char = inputValue.charAt(i);
+          if (char.match(/[a-z]/)) {
+            // Only allow lowercase letters
+            newValue += char;
+          }
+        }
+          e.target.value = newValue;
+      };
 
     const onSubmit = (data) => {
         closeModal()
         const { companyName } = data;
         reset();
         navigate(`/${companyName}/login`);
-       
+
     };
+
+    const handleEmailChange = (e) => {
+        // Get the current value of the input field
+        const value = e.target.value;
     
+        // Check if the value is empty
+        if (value.trim() !== "") {
+          return; // Allow space button
+        }
+    
+        // Prevent space character entry if the value is empty
+        if (e.keyCode === 32) {
+          e.preventDefault();
+        }
+      };
+
     return (
         <main className="d-flex w-100" style={{ background: '#fff' }}>
             <div className="container d-flex flex-column" style={{ background: '#fff' }}>
@@ -71,20 +98,24 @@ function Message() {
                                 <form onSubmit={handleSubmit(onSubmit)}>
                                     <input
                                         type="text"
-                                        name='companyName'
+                                        name="companyName"
                                         className="form-control"
                                         onChange={handleCompanyNameChange}
+                                        onInput={toInputLowerCase}
+                                        onKeyDown={handleEmailChange}
                                         placeholder="Enter company Short name"
                                         {...register("companyName", {
                                             required: "Company Short Name is Required",
                                             pattern: {
-                                                value: /^[A-Za-z ]+$/,
-                                                message: "This Field accepts only Alphabetic Characters",
-                                            }
+                                                value: /^[a-z]+$/,
+                                                message: "This field accepts only lowercase alphabetic characters without spaces",
+                                            },
                                         })}
                                     />
-                                    {errors.companyName && (<p className='errorMsg'>{errors.companyName.message}</p>)}
-                                    < div className="modal-footer" >
+                                    {errors.companyName && (
+                                        <p className='errorMsg'>{errors.companyName.message}</p>
+                                    )}
+                                    <div className="modal-footer">
                                         <button type="submit" className="btn btn-primary">Submit</button>
                                         <button type="button" className="btn btn-secondary" onClick={closeModal}>Close</button>
                                     </div>

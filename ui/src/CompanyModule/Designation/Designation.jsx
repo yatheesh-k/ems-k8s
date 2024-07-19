@@ -46,7 +46,7 @@ const Designation = () => {
       toast.error('Failed to fetch departments');
     }
   };
-
+  
   useEffect(() => {
     fetchDesignation();
   }, []);
@@ -161,6 +161,8 @@ const Designation = () => {
 
   const toInputTitleCase = (e) => {
     let value = e.target.value;
+    const titleCaseValue = value.replace(/^\s+/g, ''); // Remove leading spaces
+    e.target.value = titleCaseValue;
     // Split the value into an array of words
     const words = value.split(" ");
     // Capitalize the first letter of each word
@@ -173,6 +175,20 @@ const Designation = () => {
     // Set the modified value to the input field
     e.target.value = value;
   };  
+  const handleEmailChange = (e) => {
+    // Get the current value of the input field
+    const value = e.target.value;
+    
+    // Check if the value is empty
+    if (value.trim() !== '') {
+        return; // Allow space button
+    }
+
+    // Prevent space character entry if the value is empty
+    if (e.keyCode === 32) {
+        e.preventDefault();
+    }
+};
 
   return (
     <LayOut>
@@ -263,12 +279,21 @@ const Designation = () => {
                                 name='name'
                                 id='designation'
                                 onInput={toInputTitleCase}
+                                onKeyDown={handleEmailChange}
                                 autoComplete='off'
                                 {...register("name", {
                                   required: "Designation Required",
                                   pattern: {
                                     value: /^[A-Za-z ]+$/,
                                     message: "This Field accepts only Alphabetic Characters",
+                                  },
+                                  minLength:{
+                                    value:2,
+                                    message:"Designation must be at least 2 characters long"
+                                  },
+                                  maxLength:{
+                                    value:20,
+                                    message:"Designation must be at most 20 characters long"
                                   }
                                 })}
                               />

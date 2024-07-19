@@ -19,7 +19,15 @@ const CompanyLogin = () => {
       password: "",
       otp: "",
     },
+    mode:"onChange"
   });
+
+  const validateEmail = (value) => {
+    if (/[^a-zA-Z0-9@._-]{3,}/.test(value)) {
+      return "Please enter a valid Email Id .";
+    }
+    return true;
+  };
 
   const { company } = useParams();
   const navigate = useNavigate();
@@ -39,8 +47,8 @@ const CompanyLogin = () => {
   useEffect(() => {
     // Countdown function for OTP time limit
     const countdown = setTimeout(() => {
-      if (!otpSent) {
-        setShowOtpField(true); // Hide OTP field after timeout
+      if (otpSent && !showOtpField) {
+        setShowOtpField(true); // Show OTP field after timeout
         setOtpTimeLimit(40); // Reset timer for next OTP request
         setSessionTimeout(true); // Set session timeout state
       }
@@ -89,7 +97,7 @@ const CompanyLogin = () => {
       company: company,
     };
     setLoading(true);
-   ValidateOtp(payload)
+    ValidateOtp(payload)
       .then((response) => {
         if (response.status === 200) {
           toast.success("CompanyLogin Successful", {
@@ -147,6 +155,7 @@ const CompanyLogin = () => {
     if (sessionTimeout) {
       reset(); // Reset form fields
       setSessionTimeout(false); // Reset session timeout state
+      setShowOtpField(false); // Reset OTP field visibility
     }
 
     if (otpSent) {
@@ -189,12 +198,14 @@ const CompanyLogin = () => {
                               placeholder="Enter your email"
                               autoComplete="off"
                               onKeyDown={handleEmailChange}
+                              readOnly={otpSent}
                               {...register("username", {
                                 required: "Email is Required.",
                                 pattern: {
                                   value: /^\S[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                                  message: "Email is not valid.",
+                                  message: "Please enter a valid email address.",
                                 },
+                                validate: validateEmail,
                               })}
                             />
                           </div>
@@ -272,6 +283,10 @@ const CompanyLogin = () => {
                                       message:
                                         "Password must be at least 6 characters long",
                                     },
+                                    pattern: {
+                                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
+                                      message: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+                                    },
                                   })}
                                 />
                               </div>
@@ -287,8 +302,8 @@ const CompanyLogin = () => {
                                 </p>
                               )}
                               <small>
-            <a href="/forgotPassword">Forgot password?</a>
-          </small>
+                                <a href="/forgotPassword">Forgot password?</a>
+                              </small>
                             </>
                           )}
                         </div>
@@ -301,7 +316,7 @@ const CompanyLogin = () => {
                             className="btn btn-primary"
                             disabled={loading}
                           >
-                            {loading ? "Loading..." : "Login"}
+                            {loading ? 'Loading...' : otpSent ? 'Login' : 'Send OTP'}
                           </button>
                         </div>
                       </form>
@@ -313,8 +328,14 @@ const CompanyLogin = () => {
           </div>
         </div>
       </main>
-      <Modal show={showErrorModal} onHide={closeModal} centered style={{ zIndex: "1050" }} className="custom-modal" >
-        <ModalHeader closeButton >
+      <Modal
+        show={showErrorModal}
+        onHide={closeModal}
+        centered
+        style={{ zIndex: "1050" }}
+        className="custom-modal"
+      >
+        <ModalHeader closeButton>
           <ModalTitle className="text-center">Error</ModalTitle>
         </ModalHeader>
         <ModalBody className="text-center fs-bold">{errorMessage}</ModalBody>
