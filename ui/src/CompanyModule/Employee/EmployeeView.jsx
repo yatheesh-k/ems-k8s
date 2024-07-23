@@ -165,6 +165,20 @@ const handleSalary = (id) => {
       label: (
         <b
           style={{
+            backgroundColor: "blue",
+            color: "white",
+            borderRadius: "5px",
+            padding: "2px",
+          }}
+        >
+         OnBoarding
+        </b>
+      ),
+    },
+    1: {
+      label: (
+        <b
+          style={{
             backgroundColor: "green",
             color: "white",
             borderRadius: "5px",
@@ -175,7 +189,7 @@ const handleSalary = (id) => {
         </b>
       ),
     },
-    1: {
+    2: {
       label: (
         <b
           style={{
@@ -189,7 +203,7 @@ const handleSalary = (id) => {
         </b>
       ),
     },
-    2: {
+    3: {
       label: (
         <b
           style={{
@@ -204,7 +218,7 @@ const handleSalary = (id) => {
       ),
       color: "orange",
     },
-    3: {
+    4: {
       label: (
         <b
           style={{
@@ -234,6 +248,11 @@ const handleSalary = (id) => {
       width: "75px",
     },
     {
+      name: <h6><b>ID</b></h6>,
+      selector: row=> row.employeeId,
+      width: "100px",
+    },
+    {
       name: <h6><b>Name</b></h6>,
       selector: row => `${row.firstName} ${row.lastName}`,
       sortable: true,
@@ -244,22 +263,26 @@ const handleSalary = (id) => {
       sortable: true,
     },
     {
-      name: <h6><b>DepartMent</b></h6>,
+      name: <h6><b>Department</b></h6>,
       selector: row =>row.department,
       sortable: true,
+      width:"150px"
     },
 
     {
-      name: <h6><b>Date of Hiring</b></h6>,
+      name: <h6><b>Hired Date</b></h6>,
       selector:row=> row.dateOfHiring,
       sortable: true,
       format: row => new Date(row.dateOfHiring).toLocaleDateString(),
+      width:'120px'
     },
+
     {
       name: <h6><b>Status</b></h6>,
       selector: row =>row.status,
       sortable: true,
       cell: (row) => statusMappings[row.status]?.label || "Unknown",
+      width:"150px"
     },
     {
       name: <h5><b>Salary</b></h5>,
@@ -270,7 +293,8 @@ const handleSalary = (id) => {
           </button>
          
         </div>
-      )
+      ),
+      width:'100px'
     },
     {
       name: <h5><b>Action</b></h5>,
@@ -303,17 +327,22 @@ const handleSalary = (id) => {
     const filtered = employees.filter((item) => {
       const fullName = `${item.firstName} ${item.lastName}`.toLowerCase();
       const email = item.emailId.toLowerCase();
+      const department = item.department.toLowerCase();
       const dateOfHiring = new Date(item.dateOfHiring)
         .toLocaleDateString()
         .toLowerCase();
+        const employeeId = item.employeeId.toString().toLowerCase()
       return (
         fullName.includes(searchTerm.toLowerCase()) ||
         email.includes(searchTerm.toLowerCase()) ||
-        dateOfHiring.includes(searchTerm.toLowerCase())
+        department.includes(searchTerm.toLowerCase()) ||
+        dateOfHiring.includes(searchTerm.toLowerCase())||
+        employeeId.includes(searchTerm.toLowerCase())
       );
     });
     setFilteredData(filtered);
   };
+  console.log(filteredData)
 
   const filterByMonthYear = (selectedMonth, selectedYear) => {
     setSelectedMonth(selectedMonth);

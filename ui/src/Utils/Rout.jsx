@@ -31,7 +31,7 @@ import Profile from '../LayOut/Profile';
 import PaySlipDoc from '../Login/PayslipDoc';
 import EmployeeSalaryById from '../EmployeeModule/EmployeeSalaryById';
 import Reset from '../LayOut/Reset';
-import ForgotPassword from '../Login/ForgotPassword';
+import ForgotPassword from '../Login/ForgotPassword'
 
 
 

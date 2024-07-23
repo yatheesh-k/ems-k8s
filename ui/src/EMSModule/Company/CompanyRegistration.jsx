@@ -1,8 +1,12 @@
 import axios from "axios";
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import LayOut from "../../LayOut/LayOut";
-import { CompanyRegistrationApi, companyUpdateByIdApi, companyViewByIdApi} from "../../Utils/Axios";
+import {
+  CompanyRegistrationApi,
+  companyUpdateByIdApi,
+  companyViewByIdApi,
+} from "../../Utils/Axios";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Eye, EyeSlash } from "react-bootstrap-icons";
@@ -11,17 +15,17 @@ const CompanyRegistration = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
-    reset
-  } = useForm();
+    formState: { errors},
+    reset,
+  } = useForm({mode:'onChange'});
   const [postImage, setPostImage] = useState("");
   const [companyType, setCompanyType] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [passwordShown, setPasswordShown] = useState("");
   const [editMode, setEditMode] = useState(false); // State to track edit mode
 
-  const location=useLocation();
-  const navigate= useNavigate();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const togglePasswordVisiblity = () => {
     setPasswordShown(!passwordShown);
@@ -31,15 +35,10 @@ const CompanyRegistration = () => {
   };
 
   const handleEmailChange = (e) => {
-    // Get the current value of the input field
     const value = e.target.value;
-
-    // Check if the value is empty
     if (value.trim() !== "") {
-      return; // Allow space button
+      return; 
     }
-
-    // Prevent space character entry if the value is empty
     if (e.keyCode === 32) {
       e.preventDefault();
     }
@@ -50,7 +49,7 @@ const CompanyRegistration = () => {
   };
 
   const onChangePicture = (e) => {
-    setPostImage(URL.createObjectURL(e.target.files[0])); 
+    setPostImage(URL.createObjectURL(e.target.files[0]));
   };
 
   const onSubmit = async (data) => {
@@ -64,7 +63,7 @@ const CompanyRegistration = () => {
         personalMailId: data.personalMailId,
         personalMobileNo: data.personalMobileNo,
         address: data.address,
-        companyType: data.companyType
+        companyType: data.companyType,
         // Add other fields as needed
       };
 
@@ -83,11 +82,8 @@ const CompanyRegistration = () => {
       toast.error("An error occurred while processing the request.");
     }
   };
-  
-  
-  
 
-useEffect(() => {
+  useEffect(() => {
     if (location && location.state && location.state.id) {
       const fetchData = async () => {
         try {
@@ -96,30 +92,86 @@ useEffect(() => {
           reset(response.data);
           setEditMode(true);
         } catch (error) {
-          console.error('Error fetching company details:', error);
-          setErrorMsg('Failed to fetch company details');
+          console.error("Error fetching company details:", error);
+          setErrorMsg("Failed to fetch company details");
         }
       };
-  
+
       fetchData();
     }
   }, [location.state]);
+
+  const toInputTitleCase = (e) => {
+    const inputValue = e.target.value;
+    let newValue = "";
+    let capitalizeNext = true;
   
-const toInputTitleCase = (e) => {
-    let value = e.target.value;
-    // Split the value into an array of words
-    const words = value.split(" ");
-    // Capitalize the first letter of each word
-    const capitalizedWords = words.map((word) => {
-      // Capitalize the first letter of the word
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    });
-    // Join the capitalized words back into a single string
-    value = capitalizedWords.join(" ");
-    // Set the modified value to the input field
-    e.target.value = value;
+    for (let i = 0; i < inputValue.length; i++) {
+      const char = inputValue.charAt(i);
+  
+      if (char === " ") {
+        // Allow spaces if they are not leading spaces
+        if (newValue.length > 0) {
+          newValue += " ";
+          capitalizeNext = true; // Next character should be capitalized
+        }
+      } else if (capitalizeNext) {
+        // Capitalize the first letter of each word
+        newValue += char.toUpperCase();
+        capitalizeNext = false;
+      } else {
+        // Preserve lowercase characters in between words
+        newValue += char.toLowerCase();
+      }
+    }
+    // Update the input field value
+    e.target.value = newValue;
   };
 
+
+  const toInputLowerCase = (e) => {
+    const inputValue = e.target.value;
+    let newValue = "";
+  
+    for (let i = 0; i < inputValue.length; i++) {
+      const char = inputValue.charAt(i);
+  
+      if (char.match(/[a-z]/)) {
+        // Only allow lowercase letters
+        newValue += char;
+      }
+    }
+      e.target.value = newValue;
+  };
+
+  const toInputSpaceCase = (e) => {
+    let inputValue = e.target.value;
+    let newValue = "";
+  
+    // Remove spaces from the beginning of inputValue
+    inputValue = inputValue.trim();
+  
+    // Track if we've encountered any non-space character yet
+    let encounteredNonSpace = false;
+  
+    for (let i = 0; i < inputValue.length; i++) {
+      const char = inputValue.charAt(i);
+  
+      if (char.match(/[a-zA-Z0-9]/) || (encounteredNonSpace && char === " ")) {
+        // Allow any alphabetic characters (both lowercase and uppercase)
+        // Allow numbers and spaces only after encountering non-space characters
+        if (char !== " ") {
+          encounteredNonSpace = true;
+        }
+        newValue += char;
+      }
+    }
+  
+    e.target.value = newValue.toLowerCase(); // Convert to lowercase (if needed)
+  };
+  
+  
+  
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
@@ -133,7 +185,7 @@ const toInputTitleCase = (e) => {
     });
   };
 
-const handleFileUpload = async (e) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     const base64 = await convertToBase64(file);
     setPostImage(base64);
@@ -142,9 +194,11 @@ const handleFileUpload = async (e) => {
   return (
     <LayOut>
       <div className="container-fluid p-0">
-          <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
+        <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
-            <h1 className="h3 mb-3"><strong>Company Registration</strong> </h1>
+            <h1 className="h3 mb-3">
+              <strong>Company Registration</strong>{" "}
+            </h1>
           </div>
           <div className="col-auto">
             <nav aria-label="breadcrumb">
@@ -152,9 +206,7 @@ const handleFileUpload = async (e) => {
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
-                <li className="breadcrumb-item active">
-                  Company Registration
-                </li>
+                <li className="breadcrumb-item active">Company Registration</li>
               </ol>
             </nav>
           </div>
@@ -163,29 +215,36 @@ const handleFileUpload = async (e) => {
           <div className="row">
             <div className="col-12">
               <div className="card">
-                <div className="card-header">
-                  <h5 className="card-title">Company Type</h5>
-                  <div
+                <div className="card-header ">
+                  <div className="d-flex justify-content-start align-items-start">
+                    <h5 className="card-title me-2">Company Type</h5>
+                    <span className="text-danger">
+                      {errors.companyType && (
+                        <p className="mb-0">{errors.companyType.message}</p>
+                      )}
+                    </span>
+                  </div>
+                  <hr
                     className="dropdown-divider"
-                    style={{ borderTopColor: "#d7d9dd" }}
+                    style={{ borderTopColor: "#d7d9dd", width: "100%" }}
                   />
                 </div>
+
                 <div className="card-body">
                   <div className="row">
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      {/* <label className="form-label">Company Type</label> */}
                       <div>
                         <label>
                           <input
                             type="radio"
-                            label='Private Limited'
+                            label="Private Limited"
                             name="companyType"
                             value="Private Limited"
                             style={{ marginRight: "10px" }}
                             {...register("companyType", {
-                                required: "Please select your Company Type"
-                              })}
-                              disabled={editMode}
+                              required: "Please select your Company Type",
+                            })}
+                            disabled={editMode}
                           />
                           Private Limited
                         </label>
@@ -194,18 +253,18 @@ const handleFileUpload = async (e) => {
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="ml-3">
-                      <input
-                            type="radio"
-                            label='Firm'
-                            name="companyType"
-                            value="Firm"
-                            style={{ marginRight: "10px" }}
-                            {...register("companyType", {
-                                required: "Please select your Company Type"
-                              })}
-                              disabled={editMode} 
-                          />
-                          Firm
+                        <input
+                          type="radio"
+                          label="Firm"
+                          name="companyType"
+                          value="Firm"
+                          style={{ marginRight: "10px" }}
+                          {...register("companyType", {
+                            required: "Please select your Company Type",
+                          })}
+                          disabled={editMode}
+                        />
+                        Firm
                       </label>
                     </div>
                   </div>
@@ -238,9 +297,9 @@ const handleFileUpload = async (e) => {
                         {...register("companyName", {
                           required: "Company Name is required",
                           pattern: {
-                            value: /^[A-Za-z0-9 ]+$/,
+                            value: /^[A-Za-z\s]+$/,
                             message:
-                              "Thse fileds only accepct Alphabets & Numbers",
+                              "These fields only accept Alphabets No Spaces allowed Intially",
                           },
                         })}
                         disabled={editMode}
@@ -257,14 +316,15 @@ const handleFileUpload = async (e) => {
                       <input
                         type="text"
                         className="form-control"
+                        onInput={toInputLowerCase}
                         placeholder="Enter Short Name"
                         autoComplete="off"
                         {...register("shortName", {
                           required: "Short Name is required",
                           pattern: {
-                            value: /^[A-Za-z0-9 ]+$/,
+                            value: /^[a-z]+$/,
                             message:
-                              "Thse fields only accepct Alphabets & Numbers",
+                              "No Spaces allowed ,These fields only accept small Cases only.",
                           },
                         })}
                         disabled={editMode}
@@ -282,12 +342,13 @@ const handleFileUpload = async (e) => {
                         className="form-control"
                         placeholder="Enter Company MailId"
                         autoComplete="off"
+                        onKeyDown={handleEmailChange}
                         {...register("emailId", {
                           required: "Company MailId is required",
                           pattern: {
                             value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                             message:
-                              "Entered value does not match email format",
+                              "No Spaces allowed Entered value does not match email format",
                           },
                         })}
                         disabled={editMode}
@@ -299,7 +360,7 @@ const handleFileUpload = async (e) => {
 
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Password</label>
+                      <label className="form-label">Password  <span style={{ color: "red" }}>*</span></label>
                       <div className="col-sm-12 input-group">
                         <input
                           className="form-control"
@@ -307,13 +368,14 @@ const handleFileUpload = async (e) => {
                           onChange={handlePasswordChange}
                           autoComplete="off"
                           onKeyDown={handleEmailChange}
+                          maxLength={16}
                           type={passwordShown ? "text" : "password"}
                           {...register("password", {
                             required: "Password Required",
                             pattern: {
                               value:
-                                /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/,
-                              message: "Invalid Password",
+                                /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{6,16}$/,
+                              message: "Password must contain at least 6 characters, including one uppercase letter, one lowercase letter, one number, and one special character.",
                             },
                           })}
                         />
@@ -342,12 +404,13 @@ const handleFileUpload = async (e) => {
                         className="form-control"
                         placeholder="Enter Land Number"
                         autoComplete="off"
+                        onKeyDown={handleEmailChange}
                         {...register("landNo", {
                           required: "Land Number is required",
                           pattern: {
                             value: /^[0-9]{10}$/,
                             message:
-                              "Land Number should contain only 10 numbers",
+                              "Land Number should contain only 10 numbers No Spaces allowed ",
                           },
                         })}
                       />
@@ -366,6 +429,7 @@ const handleFileUpload = async (e) => {
                         className="form-control"
                         placeholder="Enter Mobile Number"
                         autoComplete="off"
+                        onKeyDown={handleEmailChange}
                         {...register("mobileNo", {
                           required: "Mobile Number is required",
                           pattern: {
@@ -393,9 +457,13 @@ const handleFileUpload = async (e) => {
                         {...register("companyAddress", {
                           required: "Company Address is required",
                           pattern: {
-                            value:  /^[a-zA-Z0-9\s#./-]*$/,
+                            value: /^[a-zA-Z0-9\s#./-]*$/,
                             message:
                               "Thse fileds only accepct Alphabets & Numbers",
+                          },
+                          maxLength: {
+                            value: 100,
+                            message: "Company Address must not exceed 100 characters",
                           },
                         })}
                       />
@@ -428,12 +496,17 @@ const handleFileUpload = async (e) => {
                         type="text"
                         className="form-control"
                         placeholder="Ex: L17110MH1973PLC019786"
-                        onInput={toInputTitleCase}
+                        onKeyDown={handleEmailChange}
                         autoComplete="off"
+                        maxLength={21}
                         {...register("cinNo", {
                           required: "Company CIN Number is required",
+                          maxLength: {
+                            value: 21,
+                            message: "CIN Number must not exceed 21 characters",
+                          },
                           pattern: {
-                            value: /^[A-Za-z0-9 ]+$/,
+                            value: /^[A-Z]{1}[A-Z0-9]{4}[0-9]{4}[A-Z]{1}[A-Z0-9]{6}[A-Z0-9]{3}$/,
                             message:
                               "Thse fileds only accepct Alphabets & Numbers",
                           },
@@ -441,10 +514,9 @@ const handleFileUpload = async (e) => {
                         disabled={editMode}
                       />
                       {errors.cinNo && (
-                        <p className="errorMsg">
-                          {errors.cinNo.message}
-                        </p>
+                        <p className="errorMsg">{errors.cinNo.message}</p>
                       )}
+
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
@@ -456,13 +528,19 @@ const handleFileUpload = async (e) => {
                         type="text"
                         className="form-control"
                         placeholder="Ex: U1234567890IN"
+                        onKeyDown={handleEmailChange}
                         autoComplete="off"
+                        maxLength={21}
                         {...register("companyRegNo", {
                           required: "Company Register Number is required",
+                          maxLength: {
+                            value: 21,
+                            message: "Registration Number must not exceed 21 characters",
+                          },
                           pattern: {
-                            value: /^[0-9a-zA-Z]+$/,
+                            value: /^[A-Z]{1}[0-9]{5}[A-Z]{2}[0-9]{4}[A-Z]{3}[0-9]{6}$/,
                             message:
-                              "Company Register Number should contain only letters and numbers",
+                              "Invalid Registration Number",
                           },
                         })}
                         disabled={editMode}
@@ -484,12 +562,18 @@ const handleFileUpload = async (e) => {
                         className="form-control"
                         placeholder="Ex: 29GGGGG1314R9Z6"
                         autoComplete="off"
+                        onKeyDown={handleEmailChange}
+                        maxLength={15}
                         {...register("gstNo", {
                           required: "Company GST Number is required",
+                          maxLength: {
+                            value: 15,
+                            message: "GST Number must not exceed 15 characters",
+                          },
                           pattern: {
-                            value: /^[0-9A-Za-z]{15}$/i,
+                            value: /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[1-9A-Z]{1}\dZ\d$/,
                             message:
-                              "Company GST Number should be exactly 15 characters long and alphanumeric",
+                              "InValid Gst Number",
                           },
                         })}
                         disabled={editMode}
@@ -509,12 +593,18 @@ const handleFileUpload = async (e) => {
                         className="form-control"
                         placeholder="Ex: ABCDE1234F"
                         autoComplete="off"
+                        onKeyDown={handleEmailChange}
+                        maxLength={10}
                         {...register("panNo", {
                           required: "Company Pan Number is required",
+                          maxLength: {
+                            value: 10,
+                            message: "Pan Number must not exceed 10 characters",
+                          },
                           pattern: {
                             value: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
                             message:
-                              "Company Pan Number should be in the format: ABCDE1234F",
+                              "Pan Number should be in the format: ABCDE1234F",
                           },
                         })}
                         disabled={editMode}
@@ -548,9 +638,15 @@ const handleFileUpload = async (e) => {
                         type="text"
                         className="form-control"
                         placeholder="Enter Authorized Name"
+                        onKeyDown={handleEmailChange}
+                        maxLength={20}
                         autoComplete="off"
                         {...register("name", {
                           required: "Name is required",
+                          maxLength: {
+                            value: 20,
+                            message: "Name must not exceed 20 characters",
+                          },
                           pattern: {
                             value: /^[a-zA-Z\s]*$/,
                             message: "Name should contain only alphabets",
@@ -575,7 +671,7 @@ const handleFileUpload = async (e) => {
                         {...register("personalMailId", {
                           required: "MailId is required",
                           pattern: {
-                            value: /^\S+@\S+$/i,
+                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                             message:
                               "Entered value does not match email format",
                           },
@@ -597,6 +693,8 @@ const handleFileUpload = async (e) => {
                         className="form-control"
                         placeholder="Enter Mobile Number"
                         autoComplete="off"
+                        onKeyDown={handleEmailChange}
+                        maxLength={10}
                         {...register("personalMobileNo", {
                           required: "Mobile Number is required",
                           pattern: {
@@ -623,12 +721,17 @@ const handleFileUpload = async (e) => {
                         className="form-control"
                         placeholder="Enter Address"
                         autoComplete="off"
+                        onKeyDown={handleEmailChange}
+                        maxLength={100}
                         {...register("address", {
                           required: "Address is required",
+                          maxLength: {
+                            value: 100,
+                            message: "Name must not exceed 100 characters",
+                          },
                           pattern: {
-                            value:  /^[a-zA-Z0-9\s#,@./-]*$/,
-                            message:
-                              "Please enter Valid Address",
+                            value: /^[a-zA-Z0-9\s#,@./-]*$/,
+                            message: "Please enter Valid Address",
                           },
                         })}
                       />
