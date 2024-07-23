@@ -259,8 +259,9 @@ public class CompanyUtils {
         // Convert strings to doubles
         double grossAmountDouble = Double.parseDouble(grossAmount);
         double totalDeductionsDouble = Double.parseDouble(totalDeductions);
-        itax = String.valueOf(TaxCalculatorUtils.getNewTax( grossAmountDouble-totalDeductionsDouble));
-        itax= (Base64.getEncoder().encodeToString(itax.getBytes()));
+        itax = String.valueOf(TaxCalculatorUtils.getNewTax( grossAmountDouble));
+
+
         if(salaryRequest.getGrossAmount() != null) {
             gross = (Base64.getEncoder().encodeToString(salaryRequest.getGrossAmount().toString().getBytes()));
         }
@@ -269,8 +270,11 @@ public class CompanyUtils {
         }
 
         if(salaryRequest.getDeductions().getTotalTax() != null) {
-            ttax = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getTotalTax().toString().getBytes()));
+            int pftax = Integer.parseInt(salaryRequest.getDeductions().getPfTax());
+            ttax =pftax+itax;
+            ttax=(Base64.getEncoder().encodeToString(ttax.getBytes()));
         }
+        itax= (Base64.getEncoder().encodeToString(itax.getBytes()));
 
         if(salaryRequest.getNetSalary() != null) {
             net = (Base64.getEncoder().encodeToString(salaryRequest.getNetSalary().toString().getBytes()));
@@ -399,7 +403,7 @@ public class CompanyUtils {
 
     public static Entity maskAttendanceProperties(AttendanceRequest attendanceRequest, String attendanceId, String employeeId) {
         String totalWd = null, noOfWd = null;
-       if(attendanceRequest.getTotalWorkingDays() != null) {
+        if(attendanceRequest.getTotalWorkingDays() != null) {
             totalWd = (Base64.getEncoder().encodeToString(attendanceRequest.getTotalWorkingDays().getBytes()));
         }if(attendanceRequest.getNoOfWorkingDays()!= null) {
             noOfWd = (Base64.getEncoder().encodeToString(attendanceRequest.getNoOfWorkingDays().getBytes()));
@@ -434,7 +438,7 @@ public class CompanyUtils {
     public static Entity unMaskAttendanceProperties(AttendanceEntity entity){
         String totalWd = null, noOfWd = null;
 
-       if(entity.getTotalWorkingDays() != null) {
+        if(entity.getTotalWorkingDays() != null) {
             totalWd = new String(Base64.getDecoder().decode(entity.getTotalWorkingDays()));
         }if(entity.getNoOfWorkingDays()!= null) {
             noOfWd = new String(Base64.getDecoder().decode(entity.getNoOfWorkingDays()));

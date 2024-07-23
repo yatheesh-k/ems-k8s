@@ -20,6 +20,6 @@ public class PayslipEntity implements Entity  {
     private AttendanceEntity attendance;
     private String month;
     private String year;
-
+    private String inWords;
     private String type;
 }

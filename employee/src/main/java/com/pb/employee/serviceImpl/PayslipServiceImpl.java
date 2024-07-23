@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -93,26 +95,29 @@ public class PayslipServiceImpl implements PayslipService {
     public ResponseEntity<?> generatePaySlipForAllEmployees(PayslipRequest payslipRequest) throws EmployeeException, IOException {
         String index = ResourceIdUtils.generateCompanyIndex(payslipRequest.getCompanyName());
         AttendanceEntity attendanceEntities = null;
+        List<PayslipEntity> generatedPayslips = new ArrayList<>();
+        List<String> employeesWithoutAttendance = new ArrayList<>();
+
         try {
             List<EmployeeEntity> employeeEntities = openSearchOperations.getCompanyEmployees(payslipRequest.getCompanyName());
-            List<PayslipEntity> generatedPayslips = new ArrayList<>();
 
             for (EmployeeEntity employee : employeeEntities) {
                 List<SalaryEntity> salaryEntities = openSearchOperations.getSalaries(payslipRequest.getCompanyName(), employee.getId());
-                if (salaryEntities == null) {
+                if (salaryEntities == null ) {
                     log.error("Employee Salary with employeeId {} is not found", employee.getId());
-                    throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+                    throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES_SALARY),
                             HttpStatus.INTERNAL_SERVER_ERROR);
                 }
 
-                String attendanceId = ResourceIdUtils.generateAttendanceId(payslipRequest.getCompanyName(), employee.getId(), payslipRequest.getYear(),payslipRequest.getMonth());
+                String attendanceId = ResourceIdUtils.generateAttendanceId(payslipRequest.getCompanyName(), employee.getId(), payslipRequest.getYear(), payslipRequest.getMonth());
 
                 attendanceEntities = openSearchOperations.getAttendanceById(attendanceId, null, index);
                 if (attendanceEntities == null) {
-                    log.error("Employee Attendance is not found fot {} employee", employee.getId());
-                    throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_GET_ATTENDANCE),
-                            HttpStatus.INTERNAL_SERVER_ERROR);
+                    log.error("Employee Attendance is not found for employee {}", employee.getId());
+                    employeesWithoutAttendance.add(employee.getId());
+                    continue; // Skip to the next employee if attendance is not found
                 }
+
                 // Generate payslip ID based on month, year, and employee ID
                 String paySlipId = ResourceIdUtils.generatePayslipId(payslipRequest.getMonth(), payslipRequest.getYear(), employee.getEmployeeId());
 
@@ -122,16 +127,30 @@ public class PayslipServiceImpl implements PayslipService {
                     log.error("Payslip already exists for employee with ID {}", employee.getEmployeeId());
                     continue; // Skip to the next employee if payslip already exists
                 }
+
+                // Generate and save payslip for the current employee
+                List<PayslipEntity> payslipPropertiesList = new ArrayList<>();
                 for (SalaryEntity salary : salaryEntities) {
-                    PayslipEntity payslipProperties = PayslipUtils.unMaskEmployeePayslipProperties(salary, payslipRequest, paySlipId, employee.getId(),attendanceEntities);
+                    PayslipEntity payslipProperties = PayslipUtils.unMaskEmployeePayslipProperties(salary, payslipRequest, paySlipId, employee.getId(), attendanceEntities);
                     PayslipUtils.formatNumericalFields(payslipProperties);
-                    payslipProperties  = PayslipUtils.maskEmployeePayslip(payslipProperties,salary,attendanceEntities);
+                    payslipProperties = PayslipUtils.maskEmployeePayslip(payslipProperties, salary, attendanceEntities);
                     generatedPayslips.add(payslipProperties);
+                    payslipPropertiesList.add(payslipProperties);
+                }
+
+                // Save all payslips for the current employee
+                for (PayslipEntity payslipProperties : payslipPropertiesList) {
                     openSearchOperations.saveEntity(payslipProperties, paySlipId, index);
                 }
             }
+
+            // Return response with generated payslips and employees without attendance
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("generatedPayslips", generatedPayslips);
+            responseBody.put("employeesWithoutAttendance", employeesWithoutAttendance);
+
             return new ResponseEntity<>(
-                    ResponseBuilder.builder().build().createSuccessResponse(generatedPayslips), HttpStatus.CREATED);
+                    ResponseBuilder.builder().build().createSuccessResponse(responseBody), HttpStatus.CREATED);
 
         } catch (IOException | EmployeeException ex) {
             log.error("Error generating payslips: {}", ex.getMessage());
@@ -143,7 +162,6 @@ public class PayslipServiceImpl implements PayslipService {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     @Override
     public ResponseEntity<?> getPayslipById(String companyName, String employeeId, String payslipId) throws EmployeeException, IOException {
