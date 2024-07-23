@@ -18,6 +18,9 @@ public class AttendanceRequest{
     private String employeeId;
     private String month;
     private String year;
+    private String emailId;
+    private String firstName;
+    private String lastName;
 
     @NotEmpty(message = "{total.working.days}")
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)

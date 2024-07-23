@@ -123,9 +123,13 @@ public class EmployeeUtils {
         if(salaryEntity.getDeductions().getPfTax() != null) {
             tax = new String((Base64.getDecoder().decode(salaryEntity.getDeductions().getPfTax().toString().getBytes())));
         }
-        Double grossAmount = Double.parseDouble(gross);
-        Double totalDeductions = Double.valueOf(tded);
-        itax = String.valueOf(TaxCalculatorUtils.getNewTax( grossAmount-totalDeductions));
+//        Double grossAmount = Double.parseDouble(gross);
+//        Double totalDeductions = Double.valueOf(tded);
+//        itax = String.valueOf(TaxCalculatorUtils.getNewTax( grossAmount-totalDeductions));
+
+        if (salaryEntity.getDeductions().getIncomeTax() != null){
+            itax = new String((Base64.getDecoder().decode(salaryEntity.getDeductions().getIncomeTax().toString().getBytes())));
+        }
 
         if(salaryEntity.getDeductions().getTotalTax() != null) {
             ttax = new String((Base64.getDecoder().decode(salaryEntity.getDeductions().getTotalTax().toString().getBytes())));

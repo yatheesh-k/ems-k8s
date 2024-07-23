@@ -96,6 +96,8 @@ public class SalaryServiceImpl implements SalaryService {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
+            entity= EmployeeUtils.unMaskEmployeeSalaryProperties(entity);
+
 
         }
         catch (Exception ex) {

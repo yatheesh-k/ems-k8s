@@ -31,6 +31,7 @@ public class EmployeeEntity implements Entity{
     private int status;
     private String panNo;
     private String uanNo;
+    private String aadhaarId;
     private String dateOfBirth;
     private String accountNo;
     private String ifscCode;

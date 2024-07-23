@@ -59,10 +59,20 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public ResponseEntity<?> getAllEmployeeAttendance(String companyName, String employeeId, String month, String year) throws EmployeeException {
         List<AttendanceEntity> attendanceEntities = null;
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+
         try {
+            // Fetch the actual employeeId from the database based on the generatedEmployeeId
+            EmployeeEntity employee = openSearchOperations.getEmployeeById(employeeId,null,index);
+
+            // Check if employee exists
+            if (employee == null) {
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+                        HttpStatus.NOT_FOUND);
+            }
             // Call the method to get attendance based on whether the month is provided or not
             if ((month != null && !month.isEmpty())||(year!= null && !year.isEmpty())) {
-                attendanceEntities = openSearchOperations.getAttendanceByMonthAndYear(companyName, employeeId, month, year);
+                attendanceEntities = openSearchOperations.getAttendanceByMonthAndYear(companyName,employeeId, month, year);
             }
             // Unmask sensitive properties if required
             for (AttendanceEntity attendanceEntity : attendanceEntities) {
@@ -77,7 +87,6 @@ public class AttendanceServiceImpl implements AttendanceService {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     @Override
     public ResponseEntity<?> deleteEmployeeAttendanceById(String companyName, String employeeId, String attendanceId) throws EmployeeException {
@@ -167,12 +176,14 @@ public class AttendanceServiceImpl implements AttendanceService {
                         continue;
                     }
 
-                    // Check if any critical cell is empty or null, skip if true
                     if (StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(0)))
                             || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(1)))
                             || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(2)))
                             || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(3)))
-                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(4)))) {
+                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(4)))
+                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(5)))
+                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(6)))
+                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(7)))) {
                         log.warn("Skipping row {} as one or more critical cells are empty", currentRow.getRowNum());
                         continue;
                     }
@@ -181,6 +192,9 @@ public class AttendanceServiceImpl implements AttendanceService {
                     attendanceRequest.setCompany(company);
                     attendanceRequest.setEmployeeId(getCellValue(currentRow.getCell(0)));
                     attendanceRequest.setMonth(getCellValue(currentRow.getCell(1)));
+                    attendanceRequest.setFirstName(getCellValue(currentRow.getCell(5)));
+                    attendanceRequest.setLastName(getCellValue(currentRow.getCell(6)));
+                    attendanceRequest.setEmailId(getCellValue(currentRow.getCell(7)));
 
                     // Handle parsing and setting year, totalWorkingDays, and noOfWorkingDays
                     try {
@@ -231,9 +245,24 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
     private ResponseEntity<?> addAttendanceOfEmployees(AttendanceRequest attendanceRequest) throws EmployeeException {
         log.debug("Attendance adding method is started ..");
-        String attendanceId = ResourceIdUtils.generateAttendanceId(attendanceRequest.getCompany(),attendanceRequest.getEmployeeId(),attendanceRequest.getYear(),attendanceRequest.getMonth());
-        Object object = null;
         String index = ResourceIdUtils.generateCompanyIndex(attendanceRequest.getCompany());
+        String employeeId = ResourceIdUtils.generateEmployeeResourceId(attendanceRequest.getEmailId());
+        EmployeeEntity employee = null;
+        try {
+            employee = openSearchOperations.getEmployeeById(employeeId, null, index);
+            if (employee ==  null){
+                log.error("The employee details are not found {}", employeeId);
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+                        HttpStatus.NOT_FOUND);
+            }
+        }catch (Exception exception) {
+            log.error("Unable to save the employee attendance details {} {}", attendanceRequest.getType(), exception.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SAVE_ATTENDANCE),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        String attendanceId = ResourceIdUtils.generateAttendanceId(attendanceRequest.getCompany(),employee.getId(),attendanceRequest.getYear(),attendanceRequest.getMonth());
+        Object object = null;
 
         try {
             object = openSearchOperations.getById(attendanceId, null, index);
@@ -243,7 +272,8 @@ public class AttendanceServiceImpl implements AttendanceService {
                         HttpStatus.NOT_ACCEPTABLE);
             }
             // Create a new AttendanceEntity
-            Entity attendanceEntity = CompanyUtils.maskAttendanceProperties(attendanceRequest, attendanceId, attendanceRequest.getEmployeeId());
+            Entity attendanceEntity = CompanyUtils.maskAttendanceProperties(attendanceRequest, attendanceId, employeeId);
+
             // Save the attendance entity
             openSearchOperations.saveEntity(attendanceEntity, attendanceId, index);
 
@@ -256,4 +286,5 @@ public class AttendanceServiceImpl implements AttendanceService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.CREATED);
     }
+
 }

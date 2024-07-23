@@ -52,7 +52,9 @@ public enum EmployeeErrorMessageKey {
     NUMBER_EXCEPTION("number.exception"),
     UNABLE_TO_SEARCH("unable.to.search"),
     FAILED_TO_DELETE("failed.to.delete"),
+    EMPLOYEE_NOT_FOUND("employee.not.found"),
     ;
+
     private final String key;
 
     EmployeeErrorMessageKey(String keyVal) {

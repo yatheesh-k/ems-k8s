@@ -251,15 +251,17 @@ public class CompanyUtils {
             lop = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getLop().toString().getBytes()));
         }
 
-        if(salaryRequest.getDeductions().getPfTax() != null) {
-            tax = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getPfTax().toString().getBytes()));
-        }
+//        if(salaryRequest.getDeductions().getPfTax() != null) {
+//            tax = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getPfTax().toString().getBytes()));
+//        }
+
         String grossAmount = salaryRequest.getGrossAmount(); // Assuming gross is a valid number string
         String totalDeductions = salaryRequest.getDeductions().getTotalDeductions(); // Assuming tded is a valid number string
         // Convert strings to doubles
         double grossAmountDouble = Double.parseDouble(grossAmount);
         double totalDeductionsDouble = Double.parseDouble(totalDeductions);
         itax = String.valueOf(TaxCalculatorUtils.getNewTax( grossAmountDouble));
+        tax = String.valueOf(TaxCalculatorUtils.getPfTax(grossAmountDouble/12));
 
 
         if(salaryRequest.getGrossAmount() != null) {
@@ -269,12 +271,13 @@ public class CompanyUtils {
             tded = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getTotalDeductions().toString().getBytes()));
         }
 
-        if(salaryRequest.getDeductions().getTotalTax() != null) {
-            int pftax = Integer.parseInt(salaryRequest.getDeductions().getPfTax());
-            ttax =pftax+itax;
+            double pftax = Double.parseDouble(tax);
+            double incomTax = Double.parseDouble(itax);
+            ttax = String.valueOf(pftax+incomTax);
             ttax=(Base64.getEncoder().encodeToString(ttax.getBytes()));
-        }
+
         itax= (Base64.getEncoder().encodeToString(itax.getBytes()));
+        tax= (Base64.getEncoder().encodeToString(tax.getBytes()));
 
         if(salaryRequest.getNetSalary() != null) {
             net = (Base64.getEncoder().encodeToString(salaryRequest.getNetSalary().toString().getBytes()));
@@ -324,6 +327,12 @@ public class CompanyUtils {
         if(salaryRequest.getGrossAmount() != null) {
             gross = (Base64.getEncoder().encodeToString(salaryRequest.getGrossAmount().toString().getBytes()));
             salary.setGrossAmount(gross);
+           double income = TaxCalculatorUtils.getNewTax(Double.parseDouble(gross));
+           double pfTax = TaxCalculatorUtils.getPfTax(Double.parseDouble(gross)/12);
+            ttax = String.valueOf(pfTax+income);
+            salary.getDeductions().setTotalTax(ttax);
+            salary.getDeductions().setIncomeTax(String.valueOf(income));
+            salary.getDeductions().setPfTax(String.valueOf(pfTax));
         }
         if(salaryRequest.getBasicSalary() != null) {
             bas = (Base64.getEncoder().encodeToString(salaryRequest.getBasicSalary().toString().getBytes()));
@@ -380,17 +389,6 @@ public class CompanyUtils {
             salary.getDeductions().setTotalDeductions(tded);
 
         }
-
-        if(salaryRequest.getDeductions().getPfTax() != null) {
-            tax = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getPfTax().toString().getBytes()));
-            salary.getDeductions().setPfTax(tax);
-
-        }
-
-        if(salaryRequest.getDeductions().getTotalTax() != null) {
-            ttax = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getTotalTax().toString().getBytes()));
-            salary.getDeductions().setTotalTax(ttax);
-        }
         if(salaryRequest.getNetSalary() != null) {
             net = (Base64.getEncoder().encodeToString(salaryRequest.getNetSalary().toString().getBytes()));
             salary.setNetSalary(net);
@@ -402,11 +400,20 @@ public class CompanyUtils {
     }
 
     public static Entity maskAttendanceProperties(AttendanceRequest attendanceRequest, String attendanceId, String employeeId) {
-        String totalWd = null, noOfWd = null;
+        String totalWd = null, noOfWd = null,fn=null,email=null,ln=null;
         if(attendanceRequest.getTotalWorkingDays() != null) {
             totalWd = (Base64.getEncoder().encodeToString(attendanceRequest.getTotalWorkingDays().getBytes()));
         }if(attendanceRequest.getNoOfWorkingDays()!= null) {
             noOfWd = (Base64.getEncoder().encodeToString(attendanceRequest.getNoOfWorkingDays().getBytes()));
+        }
+        if(attendanceRequest.getEmailId()!= null) {
+            email = (Base64.getEncoder().encodeToString(attendanceRequest.getEmailId().getBytes()));
+        }
+        if(attendanceRequest.getFirstName()!= null) {
+            fn = (Base64.getEncoder().encodeToString(attendanceRequest.getFirstName().getBytes()));
+        }
+        if(attendanceRequest.getLastName()!= null) {
+            ln = (Base64.getEncoder().encodeToString(attendanceRequest.getLastName().getBytes()));
         }
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -416,6 +423,9 @@ public class CompanyUtils {
         entity.setEmployeeId(employeeId);
         entity.setTotalWorkingDays(totalWd);
         entity.setNoOfWorkingDays(noOfWd);
+        entity.setFirstName(fn);
+        entity.setLastName(ln);
+        entity.setEmailId(email);
         entity.setType(Constants.ATTENDANCE);
 
         return entity;
@@ -436,15 +446,27 @@ public class CompanyUtils {
         return attendance;
     }
     public static Entity unMaskAttendanceProperties(AttendanceEntity entity){
-        String totalWd = null, noOfWd = null;
+        String totalWd = null, noOfWd = null,email=null,fn=null,ln=null;
 
         if(entity.getTotalWorkingDays() != null) {
             totalWd = new String(Base64.getDecoder().decode(entity.getTotalWorkingDays()));
         }if(entity.getNoOfWorkingDays()!= null) {
             noOfWd = new String(Base64.getDecoder().decode(entity.getNoOfWorkingDays()));
         }
+        if(entity.getEmailId()!= null) {
+            email = new String(Base64.getDecoder().decode(entity.getEmailId()));
+        }
+        if(entity.getFirstName()!= null) {
+            fn = new String(Base64.getDecoder().decode(entity.getFirstName()));
+        }
+        if(entity.getLastName()!= null) {
+            ln = new String(Base64.getDecoder().decode(entity.getLastName()));
+        }
         entity.setTotalWorkingDays(totalWd);
         entity.setNoOfWorkingDays(noOfWd);
+        entity.setEmailId(email);
+        entity.setFirstName(fn);
+        entity.setLastName(ln);
         entity.setType(Constants.ATTENDANCE);
 
         return entity;

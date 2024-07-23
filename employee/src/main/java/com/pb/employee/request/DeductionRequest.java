@@ -18,8 +18,8 @@ public class DeductionRequest {
     private String lop;
     private String totalDeductions;
 
-    private String pfTax;
-    private String totalTax;
+//    private String pfTax;
+//    private String totalTax;
 
 
 

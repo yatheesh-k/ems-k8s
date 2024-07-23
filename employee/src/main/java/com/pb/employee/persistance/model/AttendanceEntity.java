@@ -22,6 +22,9 @@ public class AttendanceEntity implements Entity{
     private String month;
     private String year;
     private String type;
+    private String emailId;
+    private String firstName;
+    private String lastName;
     private String totalWorkingDays;
     private String noOfWorkingDays;
 

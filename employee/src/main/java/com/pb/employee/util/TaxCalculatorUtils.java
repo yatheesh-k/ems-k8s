@@ -51,4 +51,18 @@ public class TaxCalculatorUtils {
                 + (250000 * 0.15) + (250000 * 0.2)
                 + (250000 * 0.25) + (salary - 1500000) * 0.3;
     }
+
+    public static double getPfTax(double salary) {
+        if (salary <= 15000) {
+            // Return 0 if salary is less than or equal to 15000
+            return 0;
+        } else if (salary <= 20000) {
+            // Return a fixed amount or percentage for salary between 15001 and 20000
+            return 150*12;
+        } else {
+            // Return a different fixed amount or percentage for salary above 20000
+            return 200*12;
+        }
+    }
+
 }
