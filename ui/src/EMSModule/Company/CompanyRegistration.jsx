@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import LayOut from "../../LayOut/LayOut";
@@ -20,7 +19,6 @@ const CompanyRegistration = () => {
   } = useForm({mode:'onChange'});
   const [postImage, setPostImage] = useState("");
   const [companyType, setCompanyType] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
   const [passwordShown, setPasswordShown] = useState("");
   const [editMode, setEditMode] = useState(false); // State to track edit mode
 
@@ -79,7 +77,7 @@ const CompanyRegistration = () => {
         reset();
       }
     } catch (error) {
-      toast.error("An error occurred while processing the request.");
+      handleApiErrors(error)
     }
   };
 
@@ -92,14 +90,24 @@ const CompanyRegistration = () => {
           reset(response.data);
           setEditMode(true);
         } catch (error) {
-          console.error("Error fetching company details:", error);
-          setErrorMsg("Failed to fetch company details");
+         handleApiErrors(error);
         }
       };
 
       fetchData();
     }
   }, [location.state]);
+
+
+  const handleApiErrors = (error) => {
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
+    } else {
+      toast.error("Network Error !");
+    }
+    console.error(error.response);
+  };
 
   const toInputTitleCase = (e) => {
     const inputValue = e.target.value;
@@ -127,6 +135,7 @@ const CompanyRegistration = () => {
     // Update the input field value
     e.target.value = newValue;
   };
+
 
 
   const toInputLowerCase = (e) => {
@@ -299,7 +308,11 @@ const CompanyRegistration = () => {
                           pattern: {
                             value: /^[A-Za-z\s]+$/,
                             message:
-                              "These fields only accept Alphabets No Spaces allowed Intially",
+                              "These fields only accept Alphabets",
+                          },
+                          minLength: {
+                            value: 2,
+                            message: "minimum 2 characters required",
                           },
                         })}
                         disabled={editMode}
@@ -324,7 +337,11 @@ const CompanyRegistration = () => {
                           pattern: {
                             value: /^[a-z]+$/,
                             message:
-                              "No Spaces allowed ,These fields only accept small Cases only.",
+                              "These fields only accept small Cases only.",
+                          },
+                          minLength: {
+                            value: 2,
+                            message: "minimum 2 characters required",
                           },
                         })}
                         disabled={editMode}
@@ -348,7 +365,7 @@ const CompanyRegistration = () => {
                           pattern: {
                             value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                             message:
-                              "No Spaces allowed Entered value does not match email format",
+                              "Entered value does not match email format",
                           },
                         })}
                         disabled={editMode}
@@ -377,6 +394,14 @@ const CompanyRegistration = () => {
                                 /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{6,16}$/,
                               message: "Password must contain at least 6 characters, including one uppercase letter, one lowercase letter, one number, and one special character.",
                             },
+                            minLength: {
+                              value: 6,
+                              message: "minimum 2 characters required",
+                            },
+                            maxLength: {
+                              value: 2,
+                              message: "maximum 16 characters allowed",
+                            },
                           })}
                         />
                         <i
@@ -397,7 +422,7 @@ const CompanyRegistration = () => {
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
-                        Land Number <span style={{ color: "red" }}>*</span>
+                        Contact Number <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
                         type="tel"
@@ -410,7 +435,7 @@ const CompanyRegistration = () => {
                           pattern: {
                             value: /^[0-9]{10}$/,
                             message:
-                              "Land Number should contain only 10 numbers No Spaces allowed ",
+                              "Contact Number should contain only 10 numbers. ",
                           },
                         })}
                       />
@@ -422,7 +447,7 @@ const CompanyRegistration = () => {
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
                       <label className="form-label">
-                        Mobile Number <span style={{ color: "red" }}>*</span>
+                        Alternate Number <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
                         type="tel"
@@ -435,7 +460,7 @@ const CompanyRegistration = () => {
                           pattern: {
                             value: /^[0-9]{10}$/,
                             message:
-                              "Mobile Number should contain only 10 numbers",
+                              "Alternate Number should contain only 10 numbers",
                           },
                         })}
                       />
@@ -457,13 +482,13 @@ const CompanyRegistration = () => {
                         {...register("companyAddress", {
                           required: "Company Address is required",
                           pattern: {
-                            value: /^[a-zA-Z0-9\s#./-]*$/,
+                            value: /^[a-zA-Z0-9\s,'#,&*()^\-/.]*$/,
                             message:
                               "Thse fileds only accepct Alphabets & Numbers",
                           },
                           maxLength: {
                             value: 100,
-                            message: "Company Address must not exceed 100 characters",
+                            message: "maximum 100 characters allowed",
                           },
                         })}
                       />
@@ -495,7 +520,7 @@ const CompanyRegistration = () => {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Ex: L17110MH1973PLC019786"
+                        placeholder="Enter Company CIN number"
                         onKeyDown={handleEmailChange}
                         autoComplete="off"
                         maxLength={21}
@@ -506,7 +531,8 @@ const CompanyRegistration = () => {
                             message: "CIN Number must not exceed 21 characters",
                           },
                           pattern: {
-                            value: /^[A-Z]{1}[A-Z0-9]{4}[0-9]{4}[A-Z]{1}[A-Z0-9]{6}[A-Z0-9]{3}$/,
+                            value: /^([LUu]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$/,
+
                             message:
                               "Thse fileds only accepct Alphabets & Numbers",
                           },
@@ -522,12 +548,12 @@ const CompanyRegistration = () => {
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Company Register Number{" "}
-                        <span style={{ color: "red" }}>*</span>
+                        {/* <span style={{ color: "red" }}>*</span> */}
                       </label>
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Ex: U1234567890IN"
+                        placeholder="Enter Company Registration Number"
                         onKeyDown={handleEmailChange}
                         autoComplete="off"
                         maxLength={21}
@@ -538,7 +564,8 @@ const CompanyRegistration = () => {
                             message: "Registration Number must not exceed 21 characters",
                           },
                           pattern: {
-                            value: /^[A-Z]{1}[0-9]{5}[A-Z]{2}[0-9]{4}[A-Z]{3}[0-9]{6}$/,
+                            value: /^([LUu]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$/,
+
                             message:
                               "Invalid Registration Number",
                           },
@@ -555,12 +582,12 @@ const CompanyRegistration = () => {
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Company GST Number{" "}
-                        <span style={{ color: "red" }}>*</span>
+                        {/* <span style={{ color: "red" }}>*</span> */}
                       </label>
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Ex: 29GGGGG1314R9Z6"
+                        placeholder="Enter Company GST number"
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         maxLength={15}
@@ -571,7 +598,8 @@ const CompanyRegistration = () => {
                             message: "GST Number must not exceed 15 characters",
                           },
                           pattern: {
-                            value: /^\d{2}[A-Z]{5}\d{4}[A-Z]{1}[1-9A-Z]{1}\dZ\d$/,
+                            value: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
+
                             message:
                               "InValid Gst Number",
                           },
@@ -591,7 +619,7 @@ const CompanyRegistration = () => {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Ex: ABCDE1234F"
+                        placeholder="Enter Company Pan number"
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         maxLength={10}
@@ -730,7 +758,7 @@ const CompanyRegistration = () => {
                             message: "Name must not exceed 100 characters",
                           },
                           pattern: {
-                            value: /^[a-zA-Z0-9\s#,@./-]*$/,
+                            value: /^[a-zA-Z0-9\s,'#,&*()^\-/.]*$/,
                             message: "Please enter Valid Address",
                           },
                         })}

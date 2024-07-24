@@ -39,37 +39,43 @@ const GeneratePaySlip = () => {
 
   const onSubmit = (data) => {
     const { month, year } = data;
+  
+    // Capitalize the first letter of the month label
+    const capitalizedMonth = month.label.charAt(0).toUpperCase() + month.label.slice(1);
+  
     const payload = {
       companyName: company,
-      month: month.label.toLowerCase(),
+      month: capitalizedMonth, // Use the capitalized month
       year: year.label,
     };
-   EmployeePayslipGeneration(payload)
+  
+    EmployeePayslipGeneration(payload)
       .then((response) => {
-       
-          toast.success("PaySlip Generated Successfully", {
-            position: "top-right",
-            transition: Bounce,
-            hideProgressBar: true,
-            theme: "colored",
-            autoClose: 3000,
-          });
-
-          setView(response.data); // Update view state with fetched data
-          setSelectedMonthYear(`${month.label} ${year.label}`);
-          setShow(true); // Show the DataTable component
-          navigate('/payslipsList')
-      })
-      .catch((error) => {
-        console.error("Error generating payslip:", error);
-        toast.error("Error Generating Payslip", {
+        toast.success("PaySlip Generated Successfully", {
           position: "top-right",
           transition: Bounce,
           hideProgressBar: true,
           theme: "colored",
           autoClose: 3000,
         });
+  
+        setView(response.data); // Update view state with fetched data
+        setSelectedMonthYear(`${capitalizedMonth} ${year.label}`); // Update selected month-year
+        setShow(true); // Show the DataTable component
+        navigate('/payslipsList'); // Navigate to payslips list page
+      })
+      .catch((error) => {
+      handleApiErrors(error);
       });
+  };
+  const handleApiErrors = (error) => {
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
+    } else {
+      toast.error("Network Error !");
+    }
+    console.error(error.response);
   };
 
   const handleCheckboxChange = (employeeId) => {
@@ -108,13 +114,7 @@ const GeneratePaySlip = () => {
         autoClose: 3000,
       });
     } catch (error) {
-      toast.error("Error Generating Some Payslips", {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
+      handleApiErrors(error);
     }
   };
 

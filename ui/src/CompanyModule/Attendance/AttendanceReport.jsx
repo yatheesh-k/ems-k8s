@@ -49,6 +49,7 @@ const AttendanceReport = () => {
     setSelectedAttendanceId(row.attendanceId);
     setShowDeleteModal(true);
   };
+
   const handleShowEditModal = (row) => {
     setSelectedAttendance(row);
     setSelectedEmployeeId(row.employeeId);
@@ -63,6 +64,77 @@ const AttendanceReport = () => {
   const handleCloseEditModal = () => {
     setShowEditModal(false);
     setSelectedAttendance({});
+  };
+
+  const filterByMonthYear = () => {
+    if (employeeId && selectedMonth && selectedYear) {
+      fetchAttendanceData(employeeId, selectedMonth, selectedYear);
+    } else {
+      alert("Please select employee, month, and year.");
+    }
+  };
+
+  const fetchAttendanceData = async (empId, month, year) => {
+    try {
+      const monthNames = getMonthNames();
+      const monthName = monthNames[month - 1];
+      const response = await AttendanceReportApi(empId, monthName, year);
+      setAttendanceData(response.data.data);
+      setEmployeeAttendance(response.data.data);
+      setShowFields(true);
+      reset(response.data.data)
+    } catch (error) {
+      console.error("Error fetching attendance data:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const data = await EmployeeGetApi();
+        const formattedData = data
+          .filter((employee) => employee.companyId === null)
+          .map(({ id, firstName, lastName }) => ({
+            label: `${firstName} ${lastName}`,
+            value: id,
+            firstName,
+            lastName,
+          }));
+        setEmployees(formattedData);
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+      }
+    };
+
+    fetchEmployees();
+  }, []);
+
+  const getMonthNames = () => {
+    return Array.from({ length: 12 }, (_, i) =>
+      new Date(0, i).toLocaleString("en-US", { month: "long" })
+    );
+  };
+
+  const getRecentYears = () => {
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: 11 }, (_, i) => (currentYear - i).toString());
+  };
+
+  const handleDelete = async () => {
+    try {
+      await AttendanceDeleteById(selectedEmployeeId, selectedAttendanceId);
+      toast.success("Attendance record deleted successfully!", {
+        position: "top-right",
+        transition: Bounce,
+        hideProgressBar: true,
+        theme: "colored",
+        autoClose: 3000,
+      });
+      handleCloseDeleteModal();
+      setRefreshData((prev) => !prev);
+    } catch (error) {
+      handleApiErrors(error);
+    }
   };
 
   const onSubmit = async (data) => {
@@ -84,126 +156,13 @@ const AttendanceReport = () => {
   };
 
   const handleApiErrors = (error) => {
-    if (error.response) {
-      const status = error.response.status;
-      let errorMessage = "";
-
-      switch (status) {
-        case 403:
-          errorMessage = "Session TimeOut !";
-          navigate("/");
-          break;
-        case 404:
-          errorMessage = "Resource Not Found !";
-          break;
-        case 406:
-          errorMessage = "Invalid Details !";
-          break;
-        case 500:
-          errorMessage = "Server Error !";
-          break;
-        default:
-          errorMessage = "An Error Occurred !";
-          break;
-      }
-
-      toast.error(errorMessage, {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
     } else {
-      toast.error("Network Error !", {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
+      toast.error("Network Error !");
     }
     console.error(error.response);
-  };
-
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const data = await EmployeeGetApi(); // Assuming EmployeeGetApi is defined and returns an array of employees
-        const formattedData = data
-          .filter((employee) => employee.employeeId !== null)
-          .map(({ id, firstName, lastName }) => ({
-            label: `${firstName} ${lastName}`,
-            value: id,
-            firstName,
-            lastName,
-          }));
-        setEmployees(formattedData); // Assuming setEmployees is a state update function for employees
-      } catch (error) {
-        console.error("Error fetching employees:", error);
-        // Handle error state or display error message
-      }
-    };
-
-    fetchEmployees();
-  }, []); // Empty dependency array to run effect only once on mount
-
-
-  const getMonthNames = () => {
-    return Array.from({ length: 12 }, (_, i) =>
-      new Date(0, i).toLocaleString("en-US", { month: "long" })
-    );
-  };
-
-  const getRecentYears = () => {
-    const currentYear = new Date().getFullYear();
-    return Array.from({ length: 11 }, (_, i) => (currentYear - i).toString());
-  };
-
-
-  const fetchAttendanceData = async () => {
-    try {
-      const monthNames = getMonthNames();
-      const monthName = monthNames[selectedMonth - 1];
-      const response = await AttendanceReportApi(employeeId, monthName, selectedYear);
-      setAttendanceData(response.data.data);
-      setEmployeeAttendance(response.data.data);
-      setShowFields(true);
-      reset(response.data.data)
-    } catch (error) {
-      console.error("Error fetching attendance data:", error);
-    }
-
-
-  };
-  useEffect(() => {
-    fetchAttendanceData();
-  }, [reset])
-
-  const filterByMonthYear = () => {
-    if (employeeId && selectedMonth && selectedYear) {
-      fetchAttendanceData();
-    } else {
-      alert("Please select employee, month, and year.");
-    }
-  };
-
-
-  const handleDelete = async () => {
-    try {
-      await AttendanceDeleteById(selectedEmployeeId, selectedAttendanceId);
-      toast.success("Attendance record deleted successfully!", {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
-      handleCloseDeleteModal();
-      setRefreshData((prev) => !prev);
-    } catch (error) {
-      handleApiErrors(error);
-    }
   };
 
   const columns = [
@@ -280,10 +239,9 @@ const AttendanceReport = () => {
           <div className="col-12">
             <div className="card">
               <div className="card-header">
-                <h5 className="card-title">Attendance Report</h5>
                 <hr />
-                <div className="row d-flex align-items-center justify-content-around">
-                  <div className="col-md-4">
+                <div className="row d-flex align-items-center justify-content-between">
+                  <div className="col-md-3">
                     <Select
                       options={employees}
                       onChange={handleEmployeeChange}
@@ -300,7 +258,7 @@ const AttendanceReport = () => {
                       placeholder="Select Month"
                     />
                   </div>
-                  <div className="col-md-2">
+                  <div className="col-md-3">
                     <Select
                       options={getRecentYears().map((year) => ({
                         label: year,
@@ -310,7 +268,7 @@ const AttendanceReport = () => {
                       placeholder="Select Year"
                     />
                   </div>
-                  <div className="col-md-2">
+                  <div className="col-md-3">
                     <button
                       className="btn btn-primary"
                       onClick={filterByMonthYear}
@@ -327,7 +285,6 @@ const AttendanceReport = () => {
                     <h5 className="card-title mt-2">
                       Attendance Details for {`${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName}`}
                     </h5>
-
                     <hr />
                     <div>
                       <DataTable
@@ -386,8 +343,7 @@ const AttendanceReport = () => {
                         type="number"
                         name='noOfWorkingDays'
                         className="form-control"
-                        {...register("noOfWorkingDays",
-                          { required: true })}
+                        {...register("noOfWorkingDays", { required: true })}
                       />
                       {errors.noOfWorkingDays && <span>This field is required</span>}
                     </div>

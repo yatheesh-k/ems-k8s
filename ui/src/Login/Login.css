@@ -14,7 +14,7 @@ body {
   
   .form_wrapper {
     background: #fffff0;
-    width: 400px;
+    width: 500px;
     max-width: 100%;
     box-sizing: border-box;
     padding: 25px;
@@ -273,6 +273,10 @@ body {
   .credit a {
     color: #e1a70a;
   }
+
+  .fw-lighter {
+    font-size: 0.4em;
+    }
   
   @-webkit-keyframes check {
     0% {

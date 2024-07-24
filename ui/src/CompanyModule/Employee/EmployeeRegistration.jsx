@@ -108,9 +108,9 @@ const EmployeeRegistration = () => {
   const fetchDepartments = async () => {
     try {
       const data = await DepartmentGetApi();
-      setDepartments(data);
+      setDepartments(data.data.data);
     } catch (error) {
-      console.log(error);
+      handleApiErrors(error)
     } finally {
       setLoading(false);
     }
@@ -121,7 +121,7 @@ const EmployeeRegistration = () => {
       const data = await DesignationGetApi();
       setDesignations(data);
     } catch (error) {
-      console.log(error);
+      handleApiErrors(error)
     } finally {
       setLoading(false);
     }
@@ -199,7 +199,7 @@ const EmployeeRegistration = () => {
         toast.success("Employee updated successfully");
         setTimeout(() => {
           navigate("/employeeView");
-        }, 2000); // Adjust the delay time as needed (in milliseconds)
+        }, 1000); // Adjust the delay time as needed (in milliseconds)
     
         reset();
       } else {
@@ -208,14 +208,24 @@ const EmployeeRegistration = () => {
         toast.success("Employee created successfully");
         setTimeout(() => {
           navigate("/employeeView");
-        }, 2000); // Adjust the delay time as needed (in milliseconds)
+        }, 1000); // Adjust the delay time as needed (in milliseconds)
             reset();
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
-      toast.error("Failed to submit form");
+     handleApiErrors(error);
     }
   };
+
+  const handleApiErrors = (error) => {
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
+    } else {
+      toast.error("Network Error !");
+    }
+    console.error(error.response);
+  };
+
 
   useEffect(() => {
     if (location && location.state && location.state.id) {
@@ -236,7 +246,7 @@ const EmployeeRegistration = () => {
             setValue('roles', null); // Or set default value as needed
           }
         } catch (error) {
-          console.error('Error fetching company details:', error);
+          handleApiErrors(error);
         }
       };
   
@@ -369,7 +379,7 @@ const EmployeeRegistration = () => {
                         className="form-control"
                         placeholder="Enter Employee ID"
                         name="employeeId"
-                        minLength={6}  maxLength={10}
+                        minLength={1}  maxLength={10}
                         onKeyDown={handleEmailChange}
                          autoComplete='off' 
                         {...register("employeeId", {
@@ -379,12 +389,12 @@ const EmployeeRegistration = () => {
                             message: "Characters are Not Allowed",
                           },
                           minLength: {
-                            value: 6,
-                            message: "Company Address must not exceed 6 characters",
+                            value: 1,
+                            message: "minimum 1 character Required",
                           },
                           maxLength: {
                             value: 10,
-                            message: "Company Address must not exceed 10 characters",
+                            message: "not exceed 10 characters",
                           },
                         })}
                       />
@@ -412,7 +422,7 @@ const EmployeeRegistration = () => {
                           },
                           minLength: {
                             value: 2,
-                            message: "Company Address must exceed min 2 characters",
+                            message: "minimum 1 characters required",
                           },
                         })}
                       />
@@ -428,7 +438,7 @@ const EmployeeRegistration = () => {
                         className="form-control"
                         placeholder="Enter Last Name"
                         name="lastName"
-                        minLength={2}
+                        minLength={1}
                         onInput={toInputTitleCase}
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
@@ -440,8 +450,8 @@ const EmployeeRegistration = () => {
                               "These fields accepts only Alphabetic Characters",
                           },
                           minLength: {
-                            value: 2,
-                            message: "Company Address must exceed min 2 characters",
+                            value: 1,
+                            message: "minimum 1 characters required",
                           },
                         })}
                       />
@@ -464,7 +474,7 @@ const EmployeeRegistration = () => {
                           pattern: {
                             value:
                             /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                            message:"No Spaces allowed Entered value does not match email format",
+                            message:"Entered value does not match email format",
                           },
                         })}
                       />
@@ -546,7 +556,7 @@ const EmployeeRegistration = () => {
                         className="form-control"
                         placeholder="Enter Manager"
                         onInput={toInputTitleCase}
-                        autoComplete="off"   minLength={2}
+                        autoComplete="off"   minLength={1}
                         onKeyDown={handleEmailChange}
                         {...register("manager", {
                           required: "Manager Required",
@@ -556,8 +566,8 @@ const EmployeeRegistration = () => {
                               "These fields accepts only Alphabetic Characters",
                           },
                           minLength: {
-                            value: 2,
-                            message: "Company Address must exceed min 2 characters",
+                            value: 1,
+                            message: "minimum 1 character required",
                           },
                         })}
                       />
@@ -578,13 +588,13 @@ const EmployeeRegistration = () => {
                         {...register("location", {
                           required: "Location Required",
                           pattern: {
-                            value: /^[A-Za-z ]+$/,
+                            value: /^[a-zA-Z0-9\s,'#,&*()^\-/]*$/,
                             message:
-                              "These fields accepts only Alphabetic Characters",
+                              "Do not allow '!,@,$,%' special characters",
                           },
                           minLength: {
                             value: 2,
-                            message: "Location must exceed min 2 characters",
+                            message: "minimum 2 characters required",
                           },
                         })}
                       />
@@ -617,12 +627,12 @@ const EmployeeRegistration = () => {
                                   message: "Invalid Password",
                                 },
                                 minLength: {
-                                  value: 2,
-                                  message: "Password must exceed min 2 characters",
+                                  value: 6,
+                                  message: "minimum 6 characters are required",
                                 },
                                 maxLength: {
                                   value: 16,
-                                  message: "Password must not exceed 2 characters",
+                                  message: "maximum 16 characters!",
                                 },
                               })}
                             />
@@ -665,7 +675,7 @@ const EmployeeRegistration = () => {
                         })}
                       />
                       {errors.dateOfBirth && (
-                        <p className="errorMsg">Date of Hiring Required</p>
+                        <p className="errorMsg">DOB Required</p>
                       )}
                     </div>
                     {isUpdating && (
@@ -750,7 +760,7 @@ const EmployeeRegistration = () => {
                     <hr />
                     <h4 className="m-2 mb-3">Account Details <span style={{ color: "red" }}>*</span></h4>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Account Number <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">Bank Account Number <span style={{ color: "red" }}>*</span></label>
                       <input
                         type="text"
                         className="form-control"
@@ -766,10 +776,10 @@ const EmployeeRegistration = () => {
                             message:
                               "These fields accepts only Integers.No Spaces Allowed",
                           },
-                          // minLength: {
-                          //   value: 9,
-                          //   message: "Account Number must exceed min 9 numbers",
-                          // },
+                          minLength: {
+                            value: 9,
+                            message: "Account Number minimum 9 numbers required",
+                          },
                           maxLength: {
                             value: 18,
                             message: "Account Number must not exceed 18 characters",
@@ -782,7 +792,7 @@ const EmployeeRegistration = () => {
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Ifsc Code <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">Bank IFSC Code <span style={{ color: "red" }}>*</span></label>
                       <input
                         type="text"
                         className="form-control"

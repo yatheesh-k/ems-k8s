@@ -4,6 +4,7 @@ import { EnvelopeFill, UnlockFill, LockFill } from "react-bootstrap-icons"; // M
 import { Modal } from "react-bootstrap";
 import { resetPassword } from "../Utils/Axios";
 import { company, employeeId } from "../Utils/Auth";
+import { toast } from "react-toastify";
 
 const Reset = ({ companyName, onClose,show}) => {
   const { register, handleSubmit, formState: { errors },getValues } = useForm();
@@ -28,13 +29,20 @@ console.log(formData);
       setLoading(false);
       onClose(); // Close modal or handle success state
     } catch (error) {
-      console.error('Error resetting password:', error);
-      // Handle error, show error message, etc.
+     handleApiErrors(error);
       setLoading(false);
     }
   };
-
-
+  
+  const handleApiErrors = (error) => {
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
+    } else {
+      toast.error("Network Error !");
+    }
+    console.error(error.response);
+  };
   return (
     <Modal show={show} onHide={onClose} centered style={{zIndex:"1050"}}>
     <Modal.Header closeButton>

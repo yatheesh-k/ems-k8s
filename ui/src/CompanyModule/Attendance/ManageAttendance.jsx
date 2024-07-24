@@ -1,36 +1,66 @@
-import React, { useState } from 'react';
-import LayOut from '../../LayOut/LayOut';
-import { AttendanceManagementApi } from '../../Utils/Axios';
-import { toast } from 'react-toastify';
-import { useForm } from 'react-hook-form';
+import React, { useState } from "react";
+import LayOut from "../../LayOut/LayOut";
+import { AttendanceManagementApi } from "../../Utils/Axios";
+import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { Download } from "react-bootstrap-icons";
+import * as XLSX from "xlsx";
 
 const ManageAttendance = () => {
   const {
     register,
+    handleSubmit,
     formState: { errors },
-    reset
+    reset,
   } = useForm();
+
   const [selectedFile, setSelectedFile] = useState(null);
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
-  };
+  };  
 
-  const handleSubmit = async () => {
-    if (!selectedFile) {
-      return;
-    }
-
+  const onSubmit = async (data) => {
     const formData = new FormData();
-    formData.append('file', selectedFile);
-
+    formData.append("file", data.attendanceFile[0]); // Assuming single file upload
     try {
       const response = await AttendanceManagementApi(formData);
-      toast.success('Attandance added Successfully.');
+
+      if (response.data.path) {
+        toast.success(response.data.message);
+        reset(); // Reset form after successful submission
+      } else {
+        toast.error(response.data.error.message);
+      }
     } catch (error) {
-      console.error('Error uploading file:', error);
-      toast.error('Failed to Add Attandence.');
+     handleApiErrors(error);
     }
+  };
+
+  const handleApiErrors = (error) => {
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
+    } else {
+      toast.error("Network Error !");
+    }
+    console.error(error.response);
+  };
+  const exportToExcel = () => {
+    const headers = [
+      "EmployeeId",
+      "month",
+      "year",
+      "totalWorkingDays",
+      "noOfWorkingDays",
+    ];
+    const data = [headers];
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    XLSX.utils.book_append_sheet(wb, ws, "Attendance Data");
+
+    XLSX.writeFile(wb, "attendance_data.xlsx");
   };
 
   return (
@@ -42,13 +72,12 @@ const ManageAttendance = () => {
               <strong>Attendance Management</strong>
             </h1>
           </div>
-          <div className="col-auto" style={{ paddingBottom: '20px' }}>
+          <div className="col-auto" style={{ paddingBottom: "20px" }}>
             <nav aria-label="breadcrumb">
               <ol className="breadcrumb mb-0">
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
-                <li className="breadcrumb-item active">Attendance</li>
                 <li className="breadcrumb-item active">Manage Attendance</li>
               </ol>
             </nav>
@@ -57,42 +86,47 @@ const ManageAttendance = () => {
         <div className="row">
           <div className="col-12">
             <div className="card">
-              <div className="card-header">
+              <div className="card-header d-flex justify-content-between align-items-center">
                 <h5 className="card-title">Manage Attendance</h5>
-                <div className="dropdown-divider" style={{ borderTopColor: '#d7d9dd' }} />
-                <div className="card-body" style={{ padding: '0 0 0 25%' }}>
-                  <div className="mb-4">
-                    <div className="row align-items-center">
-                      <div className="col-6 col-md-6 col-lg-6 mt-3" style={{ width: '400px' }}>
-                        <label className="form-label">Select Attendance File</label>
-                        <input
-                          className="form-control"
-                          type="file"
-                          accept=".xlsx" // Only allow .xlsx files
-                          onChange={handleFileChange}
-                          // {...register("attendanceFile", { // Changed from "firstName" to "attendanceFile"
-                          //   required: "Attendance file is required",
-                          //   validate: {
-                          //     isValidFile: (value) => {
-                          //       const file = value[0]; // Access the first file
-                          //       return file && file.name.endsWith('.xlsx') || "Please upload a valid .xlsx file";
-                          //     }
-                          //   },
-                          // })}
-                        />
-                        {errors.attendanceFile && ( 
-                          <p className="errorMsg">{errors.attendanceFile.message}</p>
-                        )}
-                      </div>
-
-                      <div className="col-6 col-md-6 col-lg-6 mt-5">
-                        <button type="button" className="btn btn-primary" onClick={handleSubmit}>
-                          Submit
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  className="btn btn-outline-primary"
+                  onClick={exportToExcel}
+                >
+                  Download Sample Attendance <Download size={20} className="ml-1" />
+                </button>
+              </div>
+              <div className="dropdown-divider" style={{ borderTopColor: "#d7d9dd" }} />
+              <div className="card-body">
+              <form onSubmit={handleSubmit(onSubmit)}>
+      <div className="mb-4">
+        <div className="row d-flex justify-content-center">
+          <div className="col-6 col-md-6 col-lg-6 mt-3" style={{ maxWidth: "400px" }}>
+            <label className="form-label">Select Attendance File</label>
+            <input
+              className="form-control"
+              type="file"
+              accept=".xlsx"
+             
+              {...register("attendanceFile", {
+                required: "Upload Attendance file",
+              })}
+            />
+            {errors.attendanceFile && (
+              <p className="errorMsg">{errors.attendanceFile.message}</p>
+            )}
+          </div>
+          <div className="col-4 col-md-4 col-lg-4 mt-5">
+            <button
+              type="submit" // Change type to submit to trigger form onSubmit
+              className="btn btn-primary"
+            >
+              Submit
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
               </div>
             </div>
           </div>

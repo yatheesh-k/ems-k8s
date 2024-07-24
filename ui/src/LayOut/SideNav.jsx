@@ -258,7 +258,7 @@
                       <i class="bi bi-building" style={{ fontSize: "large" }}></i>
                     </span>{" "}
                     <span className="align-middle" style={{ fontSize: "medium" }}>
-                      Company
+                      Employer
                     </span>
                     <i
                       className={`bi ${
@@ -282,7 +282,7 @@
                       }`}
                     >
                       <Link className="sidebar-link" to={"/companyRegistration"}>
-                        Company Registration
+                        Registration
                       </Link>
                     </li>
                     <li
@@ -294,7 +294,7 @@
                       }`}
                     >
                       <Link className="sidebar-link" to={"/companyView"}>
-                        Company View
+                        Summary
                       </Link>
                     </li>
                   </ul>

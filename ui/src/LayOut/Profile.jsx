@@ -7,7 +7,7 @@ import LayOut from "./LayOut";
 import { CameraFill, Eye, EyeSlash } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { companyUpdateByIdApi, companyViewByIdApi } from "../Utils/Axios";
+import { companyUpdateByIdApi, companyViewByIdApi, resetPassword } from "../Utils/Axios";
 
 function Profile() {
   const {
@@ -68,10 +68,9 @@ function Profile() {
     try {
       const decodedToken = jwtDecode(token);
       const companyId = decodedToken.sub;
-      const response = await companyUpdateByIdApi();
-      console.log("Updated successfully:", response.data);
+      const response = await companyUpdateByIdApi(companyId);
       setSuccessMessage("Profile updated successfully.");
-      toast.success("Company Details Updated Successfully");
+      toast.success(response.data.data);
       setErrorMessage("");
       navigate("/main");
     } catch (err) {
@@ -81,6 +80,16 @@ function Profile() {
       setError(err);
     }
   };
+  const handleApiErrors = (error) => {
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
+    } else {
+      toast.error("Network Error !");
+    }
+    console.error(error.response);
+  };
+
 
   return (
     <LayOut>

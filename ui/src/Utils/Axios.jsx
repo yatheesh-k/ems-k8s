@@ -123,33 +123,20 @@ export const companyUpdateByIdApi = async (companyId,data) => {
 };
 
 export const companyPasswordUpdateById = async (companyId) => {
-  axiosInstance.path(`/company/password/${companyId}`);
+  axiosInstance.patch(`/company/password/${companyId}`);
 }
 
 export const DepartmentGetApi = () => {
   const company=sessionStorage.getItem("company")
-    return axiosInstance.get(`${company}/department`)
-    .then(response => {
-      return response.data.data; 
-    })
-    .catch(error => {
-      console.error('Error fetching company by ID:', error);
-      throw error; 
-    });
+    return axiosInstance.get(`${company}/department`);
 }
+
 export const DepartmentPostApi = (data) => {
     return axiosInstance.post("/department",data);
 }
 export const DepartmentGetApiById = (departmentId) => {
   const company=sessionStorage.getItem("company")
     return axiosInstance.get(`${company}/department/${departmentId}`)
-    .then(response => {
-      return response.data; 
-    })
-    .catch(error => {
-      console.error('Error fetching company by ID:', error);
-      throw error; 
-    });
 }
 
 export const DepartmentDeleteApiById = (departmentId) => {
@@ -289,15 +276,25 @@ export const EmployeePayslipGeneration=(data) =>{
   return axiosInstance.post("/salary",data);
 }
 
-export const EmployeePayslipGetById=(employeeId,paysliId)=>{
-  const company = sessionStorage.getItem("company")
-    return axiosInstance.get(`/${company}/employee/${employeeId}/payslip/${paysliId}`);
-  
-}
+export const EmployeePayslipGetById = (employeeId, payslipId, month, year) => {
+  const company = sessionStorage.getItem("company");
+  return axiosInstance.get(`/${company}/employee/${employeeId}/payslip/${payslipId}`, {
+    params: {
+      month: month,
+      year: year
+    }
+  });
+};
 
-export const EmployeePayslipsGet=(employeeId)=>{
+
+export const EmployeePayslipsGet=(employeeId, month, year)=>{
   const company = sessionStorage.getItem("company")
-  return axiosInstance.get(`/${company}/employee/${employeeId}/payslips`);
+  return axiosInstance.get(`/${company}/employee/${employeeId}/payslips`,{
+    params: {
+      month: month,
+      year: year
+    }
+  });
 }
 
 export const EmployeePayslipDeleteById=(employeeId,payslipId)=>{

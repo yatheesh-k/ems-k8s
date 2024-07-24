@@ -73,7 +73,7 @@ const Header = ({ toggleSidebar }) => {
 
   const handleLogOut = () => {
     sessionStorage.clear();
-    setShowErrorModal(true);
+    navigate("/");
   };
 
   const closeModal = () => {

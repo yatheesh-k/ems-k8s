@@ -18,19 +18,20 @@ const EmployeePayslips = () => {
   const [selectedPayslipId, setSelectedPayslipId] = useState("");
   const [refreshData, setRefreshData] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState('');
-  const [selectedYear, setSelectedYear] = useState('');
+  const [selectedYear, setSelectedYear] = useState(''); 
 
   const navigate = useNavigate();
+  console.log("userId:",userId);
   const id = userId;
+  console.log(id);
 
-  // Year and Month options for Select components
   const currentYear = new Date().getFullYear();
   const startYear = 2000;
   const years = Array.from(
     { length: currentYear - startYear + 1 },
     (_, index) => ({
-      value: (startYear + index).toString(), // Keep value if needed for other purposes
-      label: (startYear + index).toString(), // Use same value for label
+      value: (startYear + index).toString(), 
+      label: (startYear + index).toString(), 
     })
   ).reverse();  
   const months = Array.from({ length: 12 }, (_, index) => ({
@@ -42,9 +43,10 @@ const EmployeePayslips = () => {
   const fetchEmployeePayslips = async () => {
     try {
       if (selectedYear && selectedMonth) {
-        const response = await EmployeePayslipsGet(id, selectedMonth.toLowerCase(), selectedYear); // Lowercase month name
+        const capitalizedMonth = selectedMonth.charAt(0).toUpperCase() + selectedMonth.slice(1); // Capitalize first letter
+        const response = await EmployeePayslipsGet(id, capitalizedMonth, selectedYear);
         setEmployeeSalaryView(response.data);
-        setShowFields(true); // Show fields after fetching data
+        setShowFields(true);
       }
     } catch (error) {
       handleApiErrors(error);
@@ -52,6 +54,9 @@ const EmployeePayslips = () => {
       setShowSpinner(false);
     }
   };
+  
+  
+  
   
 
   console.log(selectedYear);
@@ -98,44 +103,11 @@ const EmployeePayslips = () => {
   };
 
   const handleApiErrors = (error) => {
-    if (error.response) {
-      const status = error.response.status;
-      let errorMessage = "";
-
-      switch (status) {
-        case 403:
-          errorMessage = "Session TimeOut !";
-          navigate("/");
-          break;
-        case 404:
-          errorMessage = "Resource Not Found !";
-          break;
-        case 406:
-          errorMessage = "Invalid Details !";
-          break;
-        case 500:
-          errorMessage = "Server Error !";
-          break;
-        default:
-          errorMessage = "An Error Occurred !";
-          break;
-      }
-
-      toast.error(errorMessage, {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
     } else {
-      toast.error("Network Error !", {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
+      toast.error("Network Error !");
     }
     console.error(error.response);
   };

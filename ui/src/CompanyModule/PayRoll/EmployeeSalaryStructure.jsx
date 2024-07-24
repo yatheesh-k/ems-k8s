@@ -47,6 +47,16 @@ const EmployeeSalaryStructure = () => {
     });
   }, []);
 
+  const handleApiErrors = (error) => {
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
+    } else {
+      toast.error("Network Error !");
+    }
+    console.error(error.response);
+  };
+
   const handleGoClick = () => {
     if (!employeeId) {
       setMessage("Please select an employee.");
@@ -209,8 +219,7 @@ const EmployeeSalaryStructure = () => {
         navigate('/employeeview')
       })
       .catch((error) => {
-        console.error("Error:", error);
-        toast.error(error.response.data.message)
+       handleApiErrors(error)
       });
   };
 

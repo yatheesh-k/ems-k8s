@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { PencilSquare, XSquareFill } from "react-bootstrap-icons";
+import { HandbagFill, PencilSquare, XSquareFill } from "react-bootstrap-icons";
 import DataTable from "react-data-table-component";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -76,14 +76,22 @@ const EmployeeView = () => {
                 console.error('Employee data is not an array:', data);
             }
         } catch (error) {
-            console.error('Error fetching employees:', error);
+            handleApiErrors(error);
         }
     };
 
     fetchData();
 }, []); // Ensure the dependency array is empty to run once on mount
 
-
+const handleApiErrors = (error) => {
+  if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+    const errorMessage = error.response.data.error.message;
+    toast.error(errorMessage);
+  } else {
+    toast.error("Network Error !");
+  }
+  console.error(error.response);
+};
     
 
 const handleSalary = (id) => {
@@ -112,50 +120,9 @@ const handleSalary = (id) => {
          
             //getEmployees()
             handleCloseDeleteModal();
-            console.log(response.data);
           });
       } catch (error) {
-        if (error.response) {
-          const status = error.response.status;
-          let errorMessage = "";
-
-          switch (status) {
-            case 403:
-              errorMessage = "Session TImeOut !";
-              Navigate("/");
-              break;
-            case 404:
-              errorMessage = "Resource Not Found !";
-              break;
-            case 406:
-              errorMessage = "Invalid Details !";
-              break;
-            case 500:
-              errorMessage = "Server Error !";
-              break;
-            default:
-              errorMessage = "An Error Occurred !";
-              break;
-          }
-
-          toast.error(errorMessage, {
-            position: "top-right",
-            transition: Bounce,
-            hideProgressBar: true,
-            theme: "colored",
-            autoClose: 3000,
-          });
-        } else {
-          toast.error("Network Error !", {
-            position: "top-right",
-            transition: Bounce,
-            hideProgressBar: true,
-            theme: "colored",
-            autoClose: 3000,
-          });
-        }
-        // Log any errors that occur
-        console.error(error.response);
+         handleApiErrors(error)
       }
     }
   };

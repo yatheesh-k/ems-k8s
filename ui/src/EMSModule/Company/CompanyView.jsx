@@ -24,8 +24,7 @@ const CompanyView = () => {
       const response = await companyViewApi();
       setView(response.data.data); 
     } catch (error) {
-      console.error("Failed to fetch data:", error);
-      // Handle error if needed
+     handleApiErrors(error);
     }
   };
 
@@ -68,15 +67,7 @@ const CompanyView = () => {
           });
         }
       } catch (error) {
-        // Handle delete error
-        console.error("Failed to delete company:", error);
-        toast.error("Failed to delete company. Please try again.", {
-          position: "top-right",
-          transition: Bounce,
-          hideProgressBar: true,
-          theme: "colored",
-          autoClose: 3000,
-        });
+        handleApiErrors(error)
       }
     }
   };
@@ -84,6 +75,16 @@ const CompanyView = () => {
   useEffect(() => {
     getUser();
   }, []);
+
+  const handleApiErrors = (error) => {
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
+    } else {
+      toast.error("Network Error !");
+    }
+    console.error(error.response);
+  };
 
   const columns = [
     {

@@ -3,6 +3,7 @@ import { EmployeeSalaryGetApi } from '../../Utils/Axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import LayOut from '../../LayOut/LayOut';
 import { ChevronRight } from 'react-bootstrap-icons';
+import { toast } from 'react-toastify';
 
 const EmployeeSalaryList = () => {
   const [employeeSalaryView, setEmployeeSalaryView] = useState([]);
@@ -15,9 +16,19 @@ const EmployeeSalaryList = () => {
     if (id) {
       EmployeeSalaryGetApi(id).then(response => {
         setEmployeeSalaryView(response.data.data);
-      });
+      })
     }
   }, [id]);
+
+  const handleApiErrors = (error) => {
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
+    } else {
+      toast.error("Network Error !");
+    }
+    console.error(error.response);
+  };
  
   const toggleExpand = (index) => {
     setExpanded(prevState => ({ ...prevState, [index]: !prevState[index] }));

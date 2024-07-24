@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { forgotPasswordStep1, forgotPasswordStep2, ValidateOtp } from '../Utils/Axios';
 import { company } from '../Utils/Auth';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const ForgotPassword = () => {
   const { register, handleSubmit,watch, formState: { errors, isSubmitting } } = useForm();
@@ -27,8 +28,7 @@ const ForgotPassword = () => {
       setEmail(data.email); // Update email state here
       setStep(2); // Move to Step 2 if successful
     } catch (error) {
-      console.error('Forgot Password Step 1 Error:', error);
-      // Handle error, show message, etc.
+     handleApiErrors(error);
     } finally {
       setLoading(false);
     }
@@ -46,8 +46,7 @@ const ForgotPassword = () => {
       console.log(response.data); // Handle API response as needed
       setStep(3); // Move to Step 3 if OTP validation successful
     } catch (error) {
-      console.error('OTP Validation Error:', error);
-      // Handle error, show message, etc.
+     handleApiErrors(error);
     } finally {
       setLoading(false);
     }
@@ -66,11 +65,21 @@ const ForgotPassword = () => {
       console.log(response.data); // Handle API response as needed
       navigate('/:company/login')
     } catch (error) {
-      console.error('Update Password Error:', error);
-      // Handle error, show message, etc.
+      handleApiErrors(error);
     } finally {
       setLoading(false);
     }
+  };
+
+
+  const handleApiErrors = (error) => {
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
+    } else {
+      toast.error("Network Error !");
+    }
+    console.error(error.response);
   };
 
   const renderStep = () => {

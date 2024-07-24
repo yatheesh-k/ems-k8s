@@ -26,6 +26,8 @@ const ViewPaySlips = () => {
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
   const [selectedEmployeeDetails, setSelectedEmployeeDetails] = useState({});
   const [showSpinner, setShowSpinner] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPayslipId, setSelectedPayslipId] = useState("");
   const [refreshData, setRefreshData] = useState(false);
@@ -51,33 +53,60 @@ const ViewPaySlips = () => {
     fetchEmployees();
   }, []);
 
+  const currentYear = new Date().getFullYear();
+  const startYear = 2000;
+  const years = Array.from(
+    { length: currentYear - startYear + 1 },
+    (_, index) => ({
+      value: (startYear + index).toString(),
+      label: (startYear + index).toString(),
+    })
+  ).reverse();
+  const months = Array.from({ length: 12 }, (_, index) => ({
+    value: {
+      value: (index + 1).toString().padStart(2, "0"),
+      label: new Date(2000, index, 1).toLocaleString("default", {
+        month: "long",
+      }),
+    },
+    label: new Date(2000, index, 1).toLocaleString("default", {
+      month: "long",
+    }),
+  }));
+
   useEffect(() => {
-   const fetchData = async () => {
-  try {
-    if (selectedEmployeeId) {
-      const [employeeDetailsResponse, payslipsResponse] = await Promise.all([
-        EmployeeGetApiById(selectedEmployeeId),
-        EmployeePayslipsGet(selectedEmployeeId),
-      ]);
-      setSelectedEmployeeDetails(employeeDetailsResponse.data);
-      setEmployeeSalaryView(payslipsResponse.data.data);
-    } else {
-      setSelectedEmployeeDetails({});
-      setEmployeeSalaryView([]);
-    }
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    setSelectedEmployeeDetails({});
-    setEmployeeSalaryView([]);
-  }
-};
-      fetchData();
-    }, [selectedEmployeeId, refreshData]);
-    
+    const fetchData = async () => {
+      try {
+        if (selectedEmployeeId) {
+          const [employeeDetailsResponse, payslipsResponse] = await Promise.all(
+            [
+              EmployeeGetApiById(selectedEmployeeId),
+              EmployeePayslipsGet(
+                selectedEmployeeId,
+                selectedMonth,
+                selectedYear
+              ),
+            ]
+          );
+          setSelectedEmployeeDetails(employeeDetailsResponse.data);
+          setEmployeeSalaryView(payslipsResponse.data.data);
+        } else {
+          setSelectedEmployeeDetails({});
+          setEmployeeSalaryView([]);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setSelectedEmployeeDetails({});
+        setEmployeeSalaryView([]);
+      }
+    };
+
+    fetchData();
+  }, [selectedEmployeeId, selectedMonth, selectedYear, refreshData]);
 
   const handleGoClick = () => {
+    if(selectedEmployeeId||selectedMonth||selectedYear)
     setShowSpinner(true);
-
     setTimeout(() => {
       setShowFields(true);
       setShowSpinner(false);
@@ -91,7 +120,6 @@ const ViewPaySlips = () => {
       },
     });
   };
-  
 
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
@@ -119,47 +147,18 @@ const ViewPaySlips = () => {
       handleApiErrors(error);
     }
   };
-  
 
   const handleApiErrors = (error) => {
-    if (error.response) {
-      const status = error.response.status;
-      let errorMessage = "";
-
-      switch (status) {
-        case 403:
-          errorMessage = "Session TimeOut !";
-          navigate("/");
-          break;
-        case 404:
-          errorMessage = "Resource Not Found !";
-          break;
-        case 406:
-          errorMessage = "Invalid Details !";
-          break;
-        case 500:
-          errorMessage = "Server Error !";
-          break;
-        default:
-          errorMessage = "An Error Occurred !";
-          break;
-      }
-
-      toast.error(errorMessage, {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
+    if (
+      error.response &&
+      error.response.data &&
+      error.response.data.error &&
+      error.response.data.error.message
+    ) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
     } else {
-      toast.error("Network Error !", {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
+      toast.error("Network Error !");
     }
     console.error(error.response);
   };
@@ -241,90 +240,112 @@ const ViewPaySlips = () => {
   return (
     <LayOut>
       <div className="container-fluid p-0">
-          <h1 className="mb-4">Employee Payslip List</h1>
-          <div className="card mb-3">
-            <div className="card-body" style={{ paddingLeft: "20px" }}>
-              <div className="row align-items-center">
-                <div
-                  className="col-6 col-md-6 col-lg-6 mt-3"
-                  style={{ padding: "0 0 0 25%" }}
-                >
-                  <label className="form-label">Select Employee Name</label>
-                  <Controller
-                    name="employeeId"
-                    control={control}
-                    defaultValue=""
-                    rules={{ required: true }}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        options={employees}
-                        value={
-                          employees.find(
-                            (option) => option.value === field.value
-                          ) || ""
-                        }
-                        onChange={(val) => {
-                          field.onChange(val.value);
-                          setSelectedEmployeeId(val.value);
-                        }}
-                        placeholder="Select Employee Name"
-                      />
-                    )}
-                  />
-                  {errors.employeeId && (
-                    <p className="errorMsg">Employee Name is required</p>
-                  )}
-                </div>
-                <div className="col-6 col-md-6 col-lg-6 mt-5">
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={handleGoClick}
-                    disabled={!selectedEmployeeId}
-                  >
-                    Go
-                  </button>
-                </div>
-              </div>
+        <h1 className="mb-4">Employee Payslip List</h1>
+        <div className="card mb-3">
+          <div className="card-body" style={{ paddingLeft: "20px" }}>
+          <div className="row d-flex align-items-center justify-content-between">
+  <div className="col-12 col-md-3">
+    <div className="form-group">
+      <label className="form-label">Select Employee Name</label>
+      <Controller
+        name="employeeId"
+        control={control}
+        defaultValue=""
+        rules={{ required: true }}
+        render={({ field }) => (
+          <Select
+            {...field}
+            options={employees}
+            value={employees.find((option) => option.value === field.value) || ""}
+            onChange={(val) => {
+              field.onChange(val.value);
+              setSelectedEmployeeId(val.value);
+            }}
+            placeholder="Select Employee Name"
+          />
+        )}
+      />
+      {errors.employeeId && (
+        <p className="errorMsg">Employee Name is required</p>
+      )}
+    </div>
+  </div>
+  
+  <div className="col-12 col-md-3">
+    <div className="form-group">
+      <label className="form-label">Select Year</label>
+      <Select
+        options={years}
+        value={years.find((option) => option.value === selectedYear)}
+        onChange={(selectedOption) => setSelectedYear(selectedOption.value)}
+        placeholder="Select Year"
+      />
+    </div>
+  </div>
+  
+  <div className="col-12 col-md-3">
+    <div className="form-group">
+      <label className="form-label">Select Month</label>
+      <Select
+        options={months}
+        value={months.find((option) => option.label === selectedMonth)}
+        onChange={(selectedOption) => setSelectedMonth(selectedOption.label)}
+        placeholder="Select Month"
+      />
+    </div>
+  </div>
+  
+  <div className="col-12 col-md-3 mt-4">
+    <div className="form-group">
+      <button
+        type="button"
+        className="btn btn-primary btn-block"
+        onClick={handleGoClick}
+        disabled={!selectedEmployeeId || !selectedMonth || !selectedYear}
+      >
+        Go
+      </button>
+    </div>
+  </div>
+</div>
+
+          </div>
+        </div>
+
+        {showFields && employeeSalaryView.length > 0 && (
+          <div className="card">
+            <div className="card-body">
+              <h5 className="card-title mt-2">
+                {" "}
+                Payslip Details:
+                {`${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName}`}{" "}
+              </h5>
+              <div
+                className="dropdown-divider"
+                style={{ borderTopColor: "#d7d9dd" }}
+              />
+              <DataTable
+                columns={columns}
+                data={employeeSalaryView}
+                pagination
+                highlightOnHover
+                pointerOnHover
+                fixedHeader
+                responsive
+                dense
+                noHeader
+              />
             </div>
           </div>
+        )}
 
-          {showFields && employeeSalaryView.length > 0 && (
-            <div className="card">
-              <div className="card-body">
-                <h5 className="card-title mt-2">
-                  {" "} Payslip Details:
-                  {`${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName}`}{" "}
-                 
-                </h5>
-                <div
-                  className="dropdown-divider"
-                  style={{ borderTopColor: "#d7d9dd" }}
-                />
-                <DataTable
-                  columns={columns}
-                  data={employeeSalaryView}
-                  pagination
-                  highlightOnHover
-                  pointerOnHover
-                  fixedHeader
-                  responsive
-                  dense
-                  noHeader
-                />
-              </div>
-            </div>
-          )}
+        {showFields && employeeSalaryView.length === 0 && (
+          <div className="alert alert-info mt-4">
+            No payslips found for this employee.
+          </div>
+        )}
 
-          {showFields && employeeSalaryView.length === 0 && (
-            <div className="alert alert-info mt-4">
-              No payslips found for this employee.
-            </div>
-          )}
-       
-
-       <DeletePopup
+        <DeletePopup
           show={showDeleteModal}
           handleClose={handleCloseDeleteModal}
           handleConfirm={handleDelete}

@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
-import { EnvelopeFill, LockFill, UnlockFill } from "react-bootstrap-icons";
+import {
+  EnvelopeFill,
+  LockFill,
+  UnlockFill,
+} from "react-bootstrap-icons";
 import { Bounce, toast } from "react-toastify";
 import { CompanyloginApi, ValidateOtp } from "../Utils/Axios";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
@@ -19,7 +23,7 @@ const CompanyLogin = () => {
       password: "",
       otp: "",
     },
-    mode:"onChange"
+    mode: "onChange",
   });
 
   const validateEmail = (value) => {
@@ -32,12 +36,12 @@ const CompanyLogin = () => {
   const { company } = useParams();
   const navigate = useNavigate();
   const [passwordShown, setPasswordShown] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
+  const [otpSent, setOtpSent] = useState(false); // Initially set to false
   const [loading, setLoading] = useState(false);
-  const [showOtpField, setShowOtpField] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [otpTimeLimit, setOtpTimeLimit] = useState(40); // Time limit for OTP in seconds
+  const [otpTimeLimit, setOtpTimeLimit] = useState(56); // Time limit for OTP in seconds
+  const [otpExpired, setOtpExpired] = useState(false); // State for OTP expiration
   const [sessionTimeout, setSessionTimeout] = useState(false); // State for session timeout
 
   useEffect(() => {
@@ -45,17 +49,16 @@ const CompanyLogin = () => {
   }, [company]);
 
   useEffect(() => {
-    // Countdown function for OTP time limit
-    const countdown = setTimeout(() => {
-      if (otpSent && !showOtpField) {
-        setShowOtpField(true); // Show OTP field after timeout
-        setOtpTimeLimit(40); // Reset timer for next OTP request
-        setSessionTimeout(true); // Set session timeout state
-      }
-    }, otpTimeLimit * 1000);
-
-    return () => clearTimeout(countdown); // Clear timeout on component unmount or re-render
-  }, [otpSent, otpTimeLimit]);
+    if (otpTimeLimit > 0) {
+      const timer = setTimeout(() => {
+        setOtpTimeLimit((prevTime) => prevTime - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setOtpExpired(true);
+      setOtpSent(false);
+    }
+  }, [otpTimeLimit]);
 
   const sendOtp = (data) => {
     setLoading(true);
@@ -70,11 +73,10 @@ const CompanyLogin = () => {
         console.log(response.data);
         toast.success("OTP sent Successfully");
         setLoading(false);
-        setShowOtpField(true);
         setOtpSent(true);
+        setOtpExpired(false); // Reset OTP expiration state
         setSessionTimeout(false); // Reset session timeout state
-        // Start countdown for OTP time limit
-        setOtpTimeLimit(40); // Reset timer for each OTP request
+        setOtpTimeLimit(55); // Reset timer for each OTP request
       })
       .catch((error) => {
         console.error("Failed to send OTP:", error);
@@ -99,6 +101,7 @@ const CompanyLogin = () => {
     setLoading(true);
     ValidateOtp(payload)
       .then((response) => {
+        setLoading(false);
         if (response.status === 200) {
           toast.success("CompanyLogin Successful", {
             position: "top-right",
@@ -119,7 +122,6 @@ const CompanyLogin = () => {
         }
       })
       .catch((error) => {
-        console.error("Login failed:", error);
         setLoading(false);
         if (error.response && error.response.data && error.response.data.error) {
           const errorMessage = error.response.data.error.message;
@@ -127,6 +129,12 @@ const CompanyLogin = () => {
           setShowErrorModal(true);
         } else {
           setErrorMessage("Login failed. Please try again later.");
+          setShowErrorModal(true);
+        }
+        // Check if error indicates OTP expired
+        if (otpTimeLimit <= 0) {
+          setOtpExpired(true);
+          setErrorMessage("OTP Expired. Please Login Again");
           setShowErrorModal(true);
         }
       });
@@ -155,10 +163,9 @@ const CompanyLogin = () => {
     if (sessionTimeout) {
       reset(); // Reset form fields
       setSessionTimeout(false); // Reset session timeout state
-      setShowOtpField(false); // Reset OTP field visibility
     }
 
-    if (otpSent) {
+    if (otpSent && !otpExpired) {
       verifyOtpAndCompanyLogin(data);
     } else {
       sendOtp(data);
@@ -180,10 +187,7 @@ const CompanyLogin = () => {
                   </div>
                   <div className="card-body" style={{ padding: "6px" }}>
                     <div className="m-sm-2">
-                      <form
-                        onSubmit={handleSubmit(onSubmit)}
-                        className="align-items-center"
-                      >
+                      <form onSubmit={handleSubmit(onSubmit)} className="align-items-center">
                         <label className="form-label">Email Id</label>
                         <>
                           <div className="input-group">
@@ -210,23 +214,58 @@ const CompanyLogin = () => {
                             />
                           </div>
                           {errors.username && (
-                            <p
-                              className="errorMsg p-0"
-                              style={{ marginLeft: "45px" }}
-                            >
+                            <p className="errorMsg p-0" style={{ marginLeft: "45px" }}>
                               {errors.username.message}
                             </p>
                           )}
                         </>
                         <div className="mt-3">
-                          {showOtpField ? (
+                          {(!otpSent || otpExpired) &&(
+                            <>
+                              <label className="form-label">Password</label>
+                              <div className="input-group">
+                                <span className="input-group-text" onClick={togglePasswordVisibility}>
+                                  {passwordShown ? (
+                                    <UnlockFill size={20} color="#4C489D" />
+                                  ) : (
+                                    <LockFill size={20} color="#4C489D" />
+                                  )}
+                                </span>
+                                <input
+                                  className="form-control"
+                                  name="password"
+                                  id="password"
+                                  placeholder="Enter your password"
+                                  onChange={handlePasswordChange}
+                                  type={passwordShown ? "text" : "password"}
+                                  {...register("password", {
+                                    required: "Password is Required",
+                                    minLength: {
+                                      value: 6,
+                                      message: "Password must be at least 6 characters long",
+                                    },
+                                    pattern: {
+                                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
+                                      message: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+                                    },
+                                  })}
+                                />
+                              </div>
+                              {errors.password && (
+                                <p className="errorMsg" style={{ marginLeft: "45px", marginBottom: "0" }}>
+                                  {errors.password.message}
+                                </p>
+                              )}
+                              <medium>
+                                <a href="/forgotPassword">Forgot password?</a>
+                              </medium>
+                            </>
+                          )}
+                          {otpSent && !otpExpired && (
                             <div>
                               <label className="form-label">OTP</label>
                               <div className="mb-3 input-group">
-                                <span
-                                  className="input-group-text"
-                                  onClick={togglePasswordVisibility}
-                                >
+                                <span className="input-group-text" onClick={togglePasswordVisibility}>
                                   {passwordShown ? (
                                     <UnlockFill size={20} color="#4C489D" />
                                   ) : (
@@ -250,77 +289,38 @@ const CompanyLogin = () => {
                                 />
                               </div>
                               {errors.otp && (
-                                <p className="errorMsg">
-                                  {errors.otp.message}
-                                </p>
+                                <p className="errorMsg">{errors.otp.message}</p>
                               )}
                             </div>
-                          ) : (
-                            <>
-                              <label className="form-label">Password</label>
-                              <div className="input-group">
-                                <span
-                                  className="input-group-text"
-                                  onClick={togglePasswordVisibility}
-                                >
-                                  {passwordShown ? (
-                                    <UnlockFill size={20} color="#4C489D" />
-                                  ) : (
-                                    <LockFill size={20} color="#4C489D" />
-                                  )}
-                                </span>
-                                <input
-                                  className="form-control"
-                                  name="password"
-                                  id="password"
-                                  placeholder="Enter your password"
-                                  onChange={handlePasswordChange}
-                                  type={passwordShown ? "text" : "password"}
-                                  {...register("password", {
-                                    required: "Password is Required",
-                                    minLength: {
-                                      value: 6,
-                                      message:
-                                        "Password must be at least 6 characters long",
-                                    },
-                                    pattern: {
-                                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-                                      message: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
-                                    },
-                                  })}
-                                />
-                              </div>
-                              {errors.password && (
-                                <p
-                                  className="errorMsg"
-                                  style={{
-                                    marginLeft: "45px",
-                                    marginBottom: "0",
-                                  }}
-                                >
-                                  {errors.password.message}
-                                </p>
-                              )}
-                              <small>
-                                <a href="/forgotPassword">Forgot password?</a>
-                              </small>
-                            </>
                           )}
+                         {otpExpired && <div className="text-center"><p className="errorMsg">OTP Expired. Please login again.</p></div>}
                         </div>
-                        <div
-                          className="text-center mt-4"
-                          style={{ paddingTop: "10px" }}
-                        >
+
+                        <div className="text-center mt-4" style={{ paddingTop: "10px" }}>
                           <button
                             type="submit"
                             className="btn btn-primary"
                             disabled={loading}
                           >
-                            {loading ? 'Loading...' : otpSent ? 'Login' : 'Send OTP'}
+                            {loading
+                              ? "Loading..."
+                              : otpSent
+                              ? "Login"
+                              : "Send OTP"}
                           </button>
                         </div>
                       </form>
+                     
                     </div>
+                  </div>
+                </div>
+                <div className="row">
+                  {/* Social media links */}
+                  <div className="text-center text-small mt-1">
+                    <span>
+                      Copyright &copy;2024 PATHBREAKER TECHNOLOGIES PVT.LTD. All
+                      Rights Reserved{" "}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -328,6 +328,7 @@ const CompanyLogin = () => {
           </div>
         </div>
       </main>
+      {/* Error modal */}
       <Modal
         show={showErrorModal}
         onHide={closeModal}
@@ -338,7 +339,10 @@ const CompanyLogin = () => {
         <ModalHeader closeButton>
           <ModalTitle className="text-center">Error</ModalTitle>
         </ModalHeader>
-        <ModalBody className="text-center fs-bold">{errorMessage}</ModalBody>
+        <ModalBody className="text-center fs-bold">
+          {errorMessage}
+          {otpExpired && <p>OTP Expired. Please login again.</p>}
+        </ModalBody>
       </Modal>
     </div>
   );

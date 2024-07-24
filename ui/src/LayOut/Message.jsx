@@ -92,7 +92,7 @@ function Message() {
                     <div className="modal-dialog modal-dialog-centered">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <ModalTitle className="modal-title">Company Short Name</ModalTitle>
+                                <ModalTitle className="modal-title">Company Service Name</ModalTitle>
                             </div>
                             <div className="modal-body">
                                 <form onSubmit={handleSubmit(onSubmit)}>
@@ -101,11 +101,11 @@ function Message() {
                                         name="companyName"
                                         className="form-control"
                                         onChange={handleCompanyNameChange}
+                                        placeholder="Enter company service name"
                                         onInput={toInputLowerCase}
                                         onKeyDown={handleEmailChange}
-                                        placeholder="Enter company Short name"
                                         {...register("companyName", {
-                                            required: "Company Short Name is Required",
+                                            required: "Company Service Name is Required",
                                             pattern: {
                                                 value: /^[a-z]+$/,
                                                 message: "This field accepts only lowercase alphabetic characters without spaces",

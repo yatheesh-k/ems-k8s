@@ -24,7 +24,7 @@ const Designation = () => {
   const [addDesignation, setAddDesignation] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null); // State to store the ID of the item to be deleted
-  const navigate = useNavigate();
+  const company = sessionStorage.getItem("company");
 
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
@@ -42,8 +42,7 @@ const Designation = () => {
       setDesignations(designations);
       setFilteredData(designations);
     } catch (error) {
-      console.error('Error fetching departments:', error);
-      toast.error('Failed to fetch departments');
+      handleApiErrors(error);
     }
   };
   
@@ -55,50 +54,60 @@ const Designation = () => {
     setPending(true);
     try {
       const formData = {
-        companyName: sessionStorage.getItem('company'),
+        companyName: company,
         name: data.name
       };
       if (editingUserId) {
         await DesignationPutApiById(editingUserId, formData);
-        toast.success('Department updated successfully');
+        setTimeout(() => {
+          toast.success('Designation updated successfully');
+            fetchDesignation(); // Fetch updated list of departments after delay
+            setAddDesignation(false);
+          }, 900);
+      
       } else {
         await DesignationPostApi(formData);
-        toast.success('Department created successfully');
+       
+        setTimeout(() => {
+          toast.success('Designation created successfully');
+          fetchDesignation(); // Fetch updated list of departments after delay
+          setAddDesignation(false);
+          }, 800);
       }
-      // After CRUD operation, fetch designations again to update the list
-      fetchDesignation();
+      console.log("data:",designations);
       reset();
       setEditingUserId(null);
-      setAddDesignation(false);
       reset();
     } catch (error) {
-      console.error('Error submitting form:', error);
-      toast.error('Failed to perform operation');
+      handleApiErrors(error);
     } finally {
       setPending(false);
     }
   };
 
-  React.useEffect(() => {
-    const timeout = setTimeout(() => {
-     fetchDesignation();
-      setPending(false);
-    }, 2000);
-    return () => clearTimeout(timeout);
-  }, []);
-
   const handleConfirmDelete = async (id) => {
     if (id) {
       try {
-        await DesignationDeleteApiById(id);
-        toast.success('Designation Deleted Successfully');
-        fetchDesignation(); // Refresh the list after deletion
+        await DesignationDeleteApiById(id)
+        setTimeout(() => {
+          toast.success("Designation Deleted Successfully");
+            fetchDesignation(); // Fetch updated list of departments after delay
+          }, 800);
         handleCloseDeleteModal(); // Close the delete confirmation modal
       } catch (error) {
-        console.error('Error:', error);
-        toast.error('Failed to delete designation');
+        handleApiErrors(error);
       }
+    } 
+  };
+
+  const handleApiErrors = (error) => {
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
+    } else {
+      toast.error("Network Error !");
     }
+    console.error(error.response);
   };
   
 
@@ -222,7 +231,7 @@ const Designation = () => {
                       className={editingUserId ? "btn btn-danger" : "btn btn-primary"}
                       type='submit'
                     >
-                      {editingUserId ? "Update Designation" : "Add Designation"}
+                    {pending ? "Loading..." : (editingUserId ? "Update Designation" : "Add Designation")}
                     </button>
                   </div>
                   <div className='col-12 col-md-6 col-lg-4'></div>
@@ -305,8 +314,11 @@ const Designation = () => {
                           <button
                             className={editingUserId ? "btn btn-danger" : "btn btn-primary"}
                             type='submit'
+                            disabled={pending}
                           >
-                            {editingUserId ? "Update Designation" : "Add Designation"}
+                            
+                            {pending ? "Loading..." : (editingUserId ? "Update Designation" : "Add Designation")}
+
                           </button>
                           <button
                             type='button'

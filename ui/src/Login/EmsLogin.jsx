@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Envelope, Key, Lock, Unlock } from "react-bootstrap-icons";
+import { Envelope, Facebook, Google, Instagram, Key, Linkedin, Lock, Unlock } from "react-bootstrap-icons";
 import { useNavigate, useParams } from "react-router";
 import { useForm } from "react-hook-form";
 import { loginApi } from "../Utils/Axios";
@@ -130,6 +130,28 @@ const EmsLogin = () => {
               </form>
             </div>
           </div>
+          <div className="row">
+                  {/* <div className="d-flex justify-content-center mt-1">
+                    <a href="/" className="me-1">
+                      <Facebook size={16} />
+                    </a>
+                    <a href="/" className="me-1">
+                      <Linkedin size={16} />
+                    </a>
+                    <a href="/" className="me-1" style={{ color: "#34A853" }}>
+                      <Google size={16} />
+                    </a>
+                    <a href="/" className="me-1" style={{ color: "#E1306C" }}>
+                      <Instagram size={16} />
+                    </a>
+                  </div> */}
+                  <div>
+                    <span style={{fontSize:"0.8em"}}>
+                      Copyright &copy;2024 PATHBREAKER TECHNOLOGIES PVT.LTD. All
+                      Rights Reserved{" "}
+                    </span>
+                  </div>
+                </div>
         </div>
       </div>
 

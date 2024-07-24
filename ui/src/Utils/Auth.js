@@ -30,3 +30,6 @@ export const userRoles = decodedToken ? decodedToken.roles : null;
 export const company = decodedToken ? decodedToken.company : null;
 export const employeeId = decodedToken ? decodedToken.employee : null;
 
+
+console.log("Auth:",userId)
+
