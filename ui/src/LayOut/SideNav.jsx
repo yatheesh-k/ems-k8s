@@ -1,345 +1,372 @@
-import { jwtDecode } from "jwt-decode";
-import React, { useEffect, useState } from "react";
-import {
-  Receipt,
-  Speedometer2,
-} from "react-bootstrap-icons";
-import { Link, useLocation } from "react-router-dom";
+  import { jwtDecode } from "jwt-decode";
+  import React, { useEffect, useState } from "react";
+  import {
+    Receipt,
+    Speedometer2,
+  } from "react-bootstrap-icons";
+  import { Link, useLocation } from "react-router-dom";
 import { CompanyImageGetApi, EmployeeGetApiById } from "../Utils/Axios";
-import { userId } from "../Utils/Auth";
 import { toast } from "react-toastify";
+import { useAuth } from "../Context/AuthContext";
 
-const SideNav = () => {
-  const [isPayrollOpen, setIsPayrollOpen] = useState(false); // State for managing PayRoll dropdown
-  const [isAttendanceOpen, setIsAttendanceOpen] = useState(false); // State for managing Attendance dropdown
-  const [isCompanyOpen, setIsCompanyOpen] = useState(false); // State for managing Company dropdown
-  const [roles, setRoles] = useState([]);
-  const [logoFileName, setLogoFileName] = useState(null);
-  const [id, setId] = useState([]);
-  const location = useLocation();
-  const token = sessionStorage.getItem("token");
+  const SideNav = () => {
+    const {authData,isInitialized}=useAuth();
+    const [isPayrollOpen, setIsPayrollOpen] = useState(false); // State for managing PayRoll dropdown
+    const [isAttendanceOpen, setIsAttendanceOpen] = useState(false); // State for managing Attendance dropdown
+    const [isCompanyOpen, setIsCompanyOpen] = useState(false); // State for managing Company dropdown
+    const [roles,setRoles]=useState([]);
+    const [logoFileName, setLogoFileName] = useState(null);
+    const [id,setId]=useState([]);
+    const location = useLocation();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const token = sessionStorage.getItem("token");
+
+    useEffect(() => {
+      if (token) {
+        const decodedToken = jwtDecode(token);
+        setRoles(decodedToken.roles || []);
+      }
+    }, [token]);
+
+    useEffect(() => {
+      if (!isInitialized) return; // Wait until initialization is complete
+      if (!authData) return;
+      const fetchData = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          console.log("userId:",authData.userId)
+          const response = await EmployeeGetApiById(authData.userId);
+          console.log("userId@:",authData.userId)
+          const companyId = response.data.companyId;
+          await fetchCompanyLogo(companyId);
+        } catch (error) {
+          console.log(error);
+          setError("Failed to fetch data");
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      const fetchCompanyLogo = async (companyId) => {
+        try {
+          const logoResponse = await CompanyImageGetApi(companyId);
+          if (logoResponse && logoResponse.data && logoResponse.data.data) {
+            const logoPath = logoResponse.data.data;
+            const fileName = logoPath.split('\\').pop();
+            setLogoFileName(fileName);
+            console.log("fileName:",fileName)
+          } else {
+            console.error("Response or data is missing");
+            setError("Logo not found");
+          }
+        } catch (err) {
+          console.error("Error fetching company logo:", err);
+          setError("Error fetching logo");
+        }
+      };
+  
+      fetchData();
+    }, [authData, isInitialized]);
+  
+    
+  
+  useEffect(() => {
+    if (
+      location.pathname === "/companyRegistration" ||
+      location.pathname.startsWith("/companyView")
+    ) {
+      setIsCompanyOpen(true);
+    } else {
+      setIsCompanyOpen(false);
+    }
+  }, [location]);
 
   useEffect(() => {
-    if (token) {
-      const decodedToken = jwtDecode(token);
-      setRoles(decodedToken.roles || []);
+    if (
+      location.pathname === "/companySalaryStructure" ||
+      location.pathname === "/employeeSalaryStructure" ||
+      location.pathname === "/employeeSalaryList" ||
+      location.pathname === "/payslipGeneration" ||
+      location.pathname === "/payslipsList"||
+      location.pathname === "/increment" ||
+      location.pathname === "/incrementList"
+    ) {
+      setIsPayrollOpen(true);
+    } else {
+      setIsPayrollOpen(false);
     }
-  }, [token]);
+  }, [location]);
 
-  const fetchCompanyLogo = async (companyId) => {
-    try {
-      const logoResponse = await CompanyImageGetApi(companyId);
-      console.log("Full logo response:", logoResponse.data.data);
-      if (logoResponse && logoResponse.data && logoResponse.data.data) {
-        const logoPath = logoResponse.data.data;
-        // Extracting filename from path
-        const fileName = logoPath.split('\\').pop();
-        // Set state with filename
-        setLogoFileName(fileName);
-        console.log("fileName", fileName);
+  useEffect(() => {
+    if (
+      location.pathname === "/addAttendance" ||
+      location.pathname === "/attendanceList" ||
+      location.pathname === "/attendanceReport"
+    ) {
+      setIsAttendanceOpen(true);
+    } else {
+      setIsAttendanceOpen(false);
+    }
+  }, [location]);
+  
+  useEffect(() => {
+    if (
+      location.pathname === "/companyRegistration" ||
+      location.pathname.startsWith("/companyView")
+    ) {
+      setIsCompanyOpen(true);
+    } else {
+      setIsCompanyOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
+      location.pathname === "/companySalaryStructure" ||
+      location.pathname === "/employeeSalaryStructure" ||
+      location.pathname === "/employeeSalaryList" ||
+      location.pathname === "/payslipGeneration" ||
+      location.pathname === "/payslipsList"||
+      location.pathname === "/increment" ||
+      location.pathname === "/incrementList"
+    ) {
+      setIsPayrollOpen(true);
+    } else {
+      setIsPayrollOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
+      location.pathname === "/addAttendance" ||
+      location.pathname === "/attendanceList" ||
+      location.pathname === "/attendanceReport"
+    ) {
+      setIsAttendanceOpen(true);
+    } else {
+      setIsAttendanceOpen(false);
+    }
+  }, [location]);
+
+    useEffect(() => {
+      if (
+        location.pathname === "/companyRegistration" ||
+        location.pathname.startsWith("/companyView")
+      ) {
+        setIsCompanyOpen(true);
       } else {
-        console.error("Response or data is missing");
+        setIsCompanyOpen(false);
       }
-    } catch (err) {
-      console.error("Error fetching company logo:", err);
-    }
-  };
+    }, [location]);
 
-
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await EmployeeGetApiById(userId);
-        // Extract companyId from response
-        console.log(response.data.companyId)
-        const companyId = response.data.companyId;
-        console.log(companyId);
-        fetchCompanyLogo(companyId);
-      } catch (error) {
-        // handleApiErrors(error);
+    useEffect(() => {
+      if (
+        location.pathname === "/companySalaryStructure" ||
+        location.pathname === "/employeeSalaryStructure" ||
+        location.pathname === "/employeeSalaryList" ||
+        location.pathname === "/payslipGeneration" ||
+        location.pathname === "/payslipsList"||
+        location.pathname === "/increment" ||
+        location.pathname === "/incrementList" 
+      ) {
+        setIsPayrollOpen(true);
+      } else {
+        setIsPayrollOpen(false);
       }
+    }, [location]);
+
+    useEffect(() => {
+      if (
+        location.pathname === "/addAttendance" ||
+        location.pathname === "/attendanceList" ||
+        location.pathname === "/attendanceReport"
+      ) {
+        setIsAttendanceOpen(true);
+      } else {
+        setIsAttendanceOpen(false);
+      }
+    }, [location]);
+
+    useEffect(() => {
+      if (
+        location.pathname === "/companyRegistration" ||
+        location.pathname.startsWith("/companyView")
+      ) {
+        setIsCompanyOpen(true);
+      } else {
+        setIsCompanyOpen(false);
+      }
+    }, [location]);
+
+    useEffect(() => {
+      if (
+        location.pathname === "/companySalaryStructure" ||
+        location.pathname === "/employeeSalaryStructure" ||
+        location.pathname === "/employeeSalaryList" ||
+        location.pathname === "/payslipGeneration" ||
+        location.pathname === "/payslipsList"||
+        location.pathname === "/increment" ||
+        location.pathname === "/incrementList" 
+      ) {
+        setIsPayrollOpen(true);
+      } else {
+        setIsPayrollOpen(false);
+      }
+    }, [location]);
+
+    useEffect(() => {
+      if (
+        location.pathname === "/addAttendance" ||
+        location.pathname === "/attendanceList" ||
+        location.pathname === "/attendanceReport"
+      ) {
+        setIsAttendanceOpen(true);
+      } else {
+        setIsAttendanceOpen(false);
+      }
+    }, [location]);
+
+    const togglePayroll = (e) => {
+      e.preventDefault(); // Prevent default anchor behavior
+      setIsPayrollOpen(!isPayrollOpen);
+      setIsCompanyOpen(false);
+      setIsAttendanceOpen(false);
     };
-    fetchData();
-  }, [userId]);
 
-
-  useEffect(() => {
-    if (
-      location.pathname === "/companyRegistration" ||
-      location.pathname.startsWith("/companyView")
-    ) {
-      setIsCompanyOpen(true);
-    } else {
-      setIsCompanyOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/companySalaryStructure" ||
-      location.pathname === "/employeeSalaryStructure" ||
-      location.pathname === "/employeeSalaryList" ||
-      location.pathname === "/payslipGeneration" ||
-      location.pathname === "/payslipsList" ||
-      location.pathname === "/increment" ||
-      location.pathname === "/incrementList"
-    ) {
-      setIsPayrollOpen(true);
-    } else {
-      setIsPayrollOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/addAttendance" ||
-      location.pathname === "/attendanceList" ||
-      location.pathname === "/attendanceReport"
-    ) {
-      setIsAttendanceOpen(true);
-    } else {
+    const toggleCompany = (e) => {
+      e.preventDefault();
+      setIsCompanyOpen(!isCompanyOpen);
       setIsAttendanceOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/companyRegistration" ||
-      location.pathname.startsWith("/companyView")
-    ) {
-      setIsCompanyOpen(true);
-    } else {
-      setIsCompanyOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/companySalaryStructure" ||
-      location.pathname === "/employeeSalaryStructure" ||
-      location.pathname === "/employeeSalaryList" ||
-      location.pathname === "/payslipGeneration" ||
-      location.pathname === "/payslipsList" ||
-      location.pathname === "/increment" ||
-      location.pathname === "/incrementList"
-    ) {
-      setIsPayrollOpen(true);
-    } else {
       setIsPayrollOpen(false);
-    }
-  }, [location]);
+    };
 
-  useEffect(() => {
-    if (
-      location.pathname === "/addAttendance" ||
-      location.pathname === "/attendanceList" ||
-      location.pathname === "/attendanceReport"
-    ) {
-      setIsAttendanceOpen(true);
-    } else {
-      setIsAttendanceOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/companyRegistration" ||
-      location.pathname.startsWith("/companyView")
-    ) {
-      setIsCompanyOpen(true);
-    } else {
+    const toggleAttendance = (e) => {
+      e.preventDefault(); // Prevent default anchor behavior
+      setIsAttendanceOpen(!isAttendanceOpen);
       setIsCompanyOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/companySalaryStructure" ||
-      location.pathname === "/employeeSalaryStructure" ||
-      location.pathname === "/employeeSalaryList" ||
-      location.pathname === "/payslipGeneration" ||
-      location.pathname === "/payslipsList" ||
-      location.pathname === "/increment" ||
-      location.pathname === "/incrementList"
-    ) {
-      setIsPayrollOpen(true);
-    } else {
       setIsPayrollOpen(false);
+    };
+
+    if (!isInitialized) {
+      return <div>Loading context...</div>; // Show a loading message or spinner until context is initialized
     }
-  }, [location]);
 
-  useEffect(() => {
-    if (
-      location.pathname === "/addAttendance" ||
-      location.pathname === "/attendanceList" ||
-      location.pathname === "/attendanceReport"
-    ) {
-      setIsAttendanceOpen(true);
-    } else {
-      setIsAttendanceOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/companyRegistration" ||
-      location.pathname.startsWith("/companyView")
-    ) {
-      setIsCompanyOpen(true);
-    } else {
-      setIsCompanyOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/companySalaryStructure" ||
-      location.pathname === "/employeeSalaryStructure" ||
-      location.pathname === "/employeeSalaryList" ||
-      location.pathname === "/payslipGeneration" ||
-      location.pathname === "/payslipsList" ||
-      location.pathname === "/increment" ||
-      location.pathname === "/incrementList"
-    ) {
-      setIsPayrollOpen(true);
-    } else {
-      setIsPayrollOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/addAttendance" ||
-      location.pathname === "/attendanceList" ||
-      location.pathname === "/attendanceReport"
-    ) {
-      setIsAttendanceOpen(true);
-    } else {
-      setIsAttendanceOpen(false);
-    }
-  }, [location]);
-
-  const togglePayroll = (e) => {
-    e.preventDefault(); // Prevent default anchor behavior
-    setIsPayrollOpen(!isPayrollOpen);
-    setIsCompanyOpen(false);
-    setIsAttendanceOpen(false);
-  };
-
-  const toggleCompany = (e) => {
-    e.preventDefault();
-    setIsCompanyOpen(!isCompanyOpen);
-    setIsAttendanceOpen(false);
-    setIsPayrollOpen(false);
-  };
-
-  const toggleAttendance = (e) => {
-    e.preventDefault(); // Prevent default anchor behavior
-    setIsAttendanceOpen(!isAttendanceOpen);
-    setIsCompanyOpen(false);
-    setIsPayrollOpen(false);
-  };
-
-  const emsAdminLogoPath = "assets/img/pathbreaker_logo.png";
-
-  return (
-    <nav id="sidebar" className="sidebar js-sidebar">
-      <div className="sidebar-content js-simplebar">
-        <a className="sidebar-brand" href="/main">
-          <span>
-            {roles.includes("ems_admin") ? (
+    const emsAdminLogoPath = "assets/img/pathbreaker_logo.png";
+    
+    return (
+      <nav id="sidebar" className="sidebar js-sidebar">
+        <div className="sidebar-content js-simplebar">
+          <a className="sidebar-brand" href="/main">
+          {loading ? (
+        <img
+          className="align-middle"
+          src=""
+          alt="Loading Logo"
+          style={{ height: "80px", width: "180px",color:"black" }}
+        />
+      ):(
+        <span>
+          {roles.includes("ems_admin") ? (
+            <img
+              className="align-middle"
+              src={emsAdminLogoPath}
+              alt="EMS Admin Logo"
+              style={{ height: "80px", width: "180px" }}
+            />
+          ) : (
+            logoFileName && (
               <img
                 className="align-middle"
-                src={emsAdminLogoPath}
-                alt="EMS Admin Logo"
+                src={`CompanyLogos/${logoFileName}`} // Dynamic source based on logoFileName
+                alt="Company Logo"
                 style={{ height: "80px", width: "180px" }}
               />
-            ) : (
-              logoFileName && (
-                <img
-                  className="align-middle"
-                  src={`CompanyLogos/${logoFileName}`} // Dynamic source based on logoFileName
-                  alt="Logo"
-                  style={{ height: "80px", width: "180px" }}
-                />
-              )
-            )}
-          </span>
-        </a>
-        <ul className="sidebar-nav mt-2">
-          {roles.includes("ems_admin") && (
-            <>
-              <li
-                className={`sidebar-item ${location.pathname === "/main" ? "active" : ""
-                  }`}
-              >
-                <Link className="sidebar-link" to={"/main"}>
-                  <i
-                    className="bi bi-grid-1x2-fill"
-                    style={{ fontSize: "large" }}
-                  ></i>
-                  <span className="align-middle" style={{ fontSize: "large" }}>
-                    Dashboard
-                  </span>
-                </Link>
-              </li>
-              <li className="sidebar-item">
-                <a
-                  className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href
-                  onClick={toggleCompany}
-                  data-bs-target="#company"
-                  data-bs-toggle="collapse"
-                >
-                  <span className="align-middle">
-                    <i className="bi bi-building" style={{ fontSize: "large" }}></i>
-                  </span>{" "}
-                  <span className="align-middle" style={{ fontSize: "medium" }}>
-                    Employer
-                  </span>
-                  <i
-                    className={`bi ${isCompanyOpen ? "bi-chevron-up" : "bi-chevron-down"
-                      } ms-auto`}
-                  ></i>
-                </a>
-                <ul
-                  id="company"
-                  className={`sidebar-dropDown list-unstyled collapse ${isCompanyOpen ? "show" : ""
-                    }`}
-                  data-bs-parent="#sidebar"
-                >
-                  <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${location.pathname === "/companyRegistration"
-                      ? "active"
-                      : ""
-                      }`}
-                  >
-                    <Link className="sidebar-link" to={"/companyRegistration"}>
-                      Registration
-                    </Link>
-                  </li>
-                  <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${location.pathname.startsWith("/companyView")
-                      ? "active"
-                      : ""
-                      }`}
-                  >
-                    <Link className="sidebar-link" to={"/companyView"}>
-                      Summary
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-            </>
+            )
           )}
-          {roles.includes("company_admin") && (
+        </span>
+      )}
+          </a>
+          <ul className="sidebar-nav mt-2">
+            {roles.includes("ems_admin") && (
+              <>
+                <li
+                  className={`sidebar-item ${
+                    location.pathname === "/main" ? "active" : ""
+                  }`}
+                >
+                  <Link className="sidebar-link" to={"/main"}>
+                    <i
+                      className="bi bi-grid-1x2-fill"
+                      style={{ fontSize: "large" }}
+                    ></i>
+                    <span className="align-middle" style={{ fontSize: "large" }}>
+                      Dashboard
+                    </span>
+                  </Link>
+                </li>
+                <li className="sidebar-item">
+                  <a
+                    className="sidebar-link collapsed d-flex justify-content-between align-items-center"
+                    href
+                    onClick={toggleCompany}
+                    data-bs-target="#company"
+                    data-bs-toggle="collapse"
+                  >
+                    <span className="align-middle">
+                      <i className="bi bi-building" style={{ fontSize: "large" }}></i>
+                    </span>{" "}
+                    <span className="align-middle" style={{ fontSize: "medium" }}>
+                      Employer
+                    </span>
+                    <i
+                      className={`bi ${
+                        isCompanyOpen ? "bi-chevron-up" : "bi-chevron-down"
+                      } ms-auto`}
+                    ></i>
+                  </a>
+                  <ul
+                    id="company"
+                    className={`sidebar-dropDown list-unstyled collapse ${
+                      isCompanyOpen ? "show" : ""
+                    }`}
+                    data-bs-parent="#sidebar"
+                  >
+                    <li
+                      style={{ paddingLeft: "40px" }}
+                      className={`sidebar-item ${
+                        location.pathname === "/companyRegistration"
+                          ? "active"
+                          : ""
+                      }`}
+                    >
+                      <Link className="sidebar-link" to={"/companyRegistration"}>
+                        Registration
+                      </Link>
+                    </li>
+                    <li
+                      style={{ paddingLeft: "40px" }}
+                      className={`sidebar-item ${
+                        location.pathname.startsWith("/companyView")
+                          ? "active"
+                          : ""
+                      }`}
+                    >
+                      <Link className="sidebar-link" to={"/companyView"}>
+                        Summary
+                      </Link>
+                    </li>
+                  </ul>
+                </li>
+              </>
+            )}
+            {roles.includes("company_admin") && (
             <>
               <li
-                className={`sidebar-item ${location.pathname === "/main" ? "active" : ""
-                  }`}
+                className={`sidebar-item ${
+                  location.pathname === "/main" ? "active" : ""
+                }`}
               >
                 <Link className="sidebar-link" to={"/main"}>
                   <i
@@ -352,8 +379,9 @@ const SideNav = () => {
                 </Link>
               </li>
               <li
-                className={`sidebar-item ${location.pathname === "/department" ? "active" : ""
-                  }`}
+                className={`sidebar-item ${
+                  location.pathname === "/department" ? "active" : ""
+                }`}
               >
                 <Link className="sidebar-link" to={"/department"}>
                   <i
@@ -366,8 +394,9 @@ const SideNav = () => {
                 </Link>
               </li>
               <li
-                className={`sidebar-item ${location.pathname === "/designation" ? "active" : ""
-                  }`}
+                className={`sidebar-item ${
+                  location.pathname === "/designation" ? "active" : ""
+                }`}
               >
                 <Link className="sidebar-link" to={"/designation"}>
                   <i
@@ -380,8 +409,9 @@ const SideNav = () => {
                 </Link>
               </li>
               <li
-                className={`sidebar-item ${location.pathname.startsWith("/employee") ? "active" : ""
-                  }`}
+                className={`sidebar-item ${
+                  location.pathname.startsWith("/employee") ? "active" : ""
+                }`}
               >
                 <Link className="sidebar-link" to={"/employeeview"}>
                   <i
@@ -410,20 +440,21 @@ const SideNav = () => {
                               </span>
                             </Link>
                           </li> */}
-               {/* <li
-                className={`sidebar-item ${location.pathname.startsWith("/existing") ? "active" : ""
-                  }`}
+              <li
+                className={`sidebar-item ${
+                  location.pathname.startsWith("/existing") ? "active" : ""
+                }`}
               >
-               <Link className="sidebar-link" to={"/existingList"}>
+                <Link className="sidebar-link" to={"/existingList"}>
                   <i
                     className="bi bi-person-x-fill"
                     style={{ fontSize: "large" }}
                   ></i>
                   <span className="align-middle" style={{ fontSize: "large" }}>
-                    Exit Process
+                    Existing Process
                   </span>
-                </Link> 
-              </li>*/}
+                </Link>
+              </li>
               {/* <li
                             className={`sidebar-item ${
                               location.pathname.startsWith("/users") ? "active" : ""
@@ -458,23 +489,26 @@ const SideNav = () => {
                     PayRoll
                   </span>
                   <i
-                    className={`bi ${isPayrollOpen ? "bi-chevron-up" : "bi-chevron-down"
-                      } ms-auto`}
+                    className={`bi ${
+                      isPayrollOpen ? "bi-chevron-up" : "bi-chevron-down"
+                    } ms-auto`}
                   ></i>
                   {/* Add dropdown here */}
                 </a>
                 <ul
                   id="payroll"
-                  className={`sidebar-dropDown list-unstyled collapse ${isPayrollOpen ? "show" : ""
-                    }`}
+                  className={`sidebar-dropDown list-unstyled collapse ${
+                    isPayrollOpen ? "show" : ""
+                  }`}
                   data-bs-parent="#sidebar"
                 >
                   <li
                     style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${location.pathname === "/employeeSalaryStructure"
-                      ? "active"
-                      : ""
-                      }`}
+                    className={`sidebar-item ${
+                      location.pathname === "/employeeSalaryStructure"
+                        ? "active"
+                        : ""
+                    }`}
                   >
                     <Link
                       className="sidebar-link"
@@ -485,10 +519,11 @@ const SideNav = () => {
                   </li>
                   <li
                     style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${location.pathname.startsWith("/payslipsList")
-                      ? "active"
-                      : ""
-                      }`}
+                    className={`sidebar-item ${
+                      location.pathname.startsWith("/payslipsList")
+                        ? "active"
+                        : ""
+                    }`}
                   >
                     <Link className="sidebar-link" to={"/payslipsList"}>
                       PaySlips
@@ -496,8 +531,9 @@ const SideNav = () => {
                   </li>
                   <li
                     style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${location.pathname === "/payslipGeneration" ? "active" : ""
-                      }`}
+                    className={`sidebar-item ${
+                      location.pathname === "/payslipGeneration" ? "active" : ""
+                    }`}
                   >
                     <Link className="sidebar-link" to={"/payslipGeneration"}>
                       Generate PaySlips
@@ -525,10 +561,11 @@ const SideNav = () => {
                       Salary List
                     </Link>
                   </li> */}
-                  {/* <li
+                  <li
                     style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${location.pathname === "/increment" ? "active" : ""
-                      }`}
+                    className={`sidebar-item ${
+                      location.pathname === "/increment" ? "active" : ""
+                    }`}
                   >
                     <Link className="sidebar-link" to={"/increment"}>
                       Increments
@@ -536,13 +573,14 @@ const SideNav = () => {
                   </li>
                   <li
                     style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${location.pathname === "/incrementList" ? "active" : ""
-                      }`}
+                    className={`sidebar-item ${
+                      location.pathname === "/incrementList" ? "active" : ""
+                    }`}
                   >
                     <Link className="sidebar-link" to={"/incrementList"}>
                       Increment List
                     </Link>
-                  </li> */}
+                  </li>
                 </ul>
               </li>
               <li className="sidebar-item has-dropdown">
@@ -563,19 +601,22 @@ const SideNav = () => {
                     Attendance
                   </span>
                   <i
-                    className={`bi ${isAttendanceOpen ? "bi-chevron-up" : "bi-chevron-down"
-                      } ms-auto`}
+                    className={`bi ${
+                      isAttendanceOpen ? "bi-chevron-up" : "bi-chevron-down"
+                    } ms-auto`}
                   ></i>
                 </a>
                 <ul
                   id="attendenceManagement"
-                  className={`sidebar-dropDown list-unstyled collapse ${isAttendanceOpen ? "show" : ""
-                    }`}
+                  className={`sidebar-dropDown list-unstyled collapse ${
+                    isAttendanceOpen ? "show" : ""
+                  }`}
                 >
                   <li
                     style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${location.pathname === "/addAttendance" ? "active" : ""
-                      }`}
+                    className={`sidebar-item ${
+                      location.pathname === "/addAttendance" ? "active" : ""
+                    }`}
                   >
                     <Link className="sidebar-link" to={"/addAttendance"}>
                       Manage Attendance
@@ -583,22 +624,24 @@ const SideNav = () => {
                   </li>
                   <li
                     style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${location.pathname === "/attendanceReport" ? "active" : ""
-                      }`}
+                    className={`sidebar-item ${
+                      location.pathname === "/attendanceReport" ? "active" : ""
+                    }`}
                   >
                     <Link className="sidebar-link" to={"/attendanceReport"}>
                       Attendance Report
                     </Link>
                   </li>
-                  {/* <li
+                  <li
                     style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${location.pathname === "/attendanceList" ? "active" : ""
-                      }`}
+                    className={`sidebar-item ${
+                      location.pathname === "/attendanceList" ? "active" : ""
+                    }`}
                   >
                     <Link className="sidebar-link" to={"/attendanceList"}>
                       Attendance List
                     </Link>
-                  </li> */}
+                  </li>
                 </ul>
               </li>
             </>
@@ -686,8 +729,9 @@ const SideNav = () => {
 
             <>
               <li
-                className={`sidebar-item ${location.pathname === "/main" ? "active" : ""
-                  }`}
+                className={`sidebar-item ${
+                  location.pathname === "/main" ? "active" : ""
+                }`}
               >
                 <Link className="sidebar-link" to={"/main"}>
                   <Speedometer2 color="orange" size={25} />{" "}
@@ -698,23 +742,25 @@ const SideNav = () => {
               </li>
 
               <li
-                className={`sidebar-item ${location.pathname.startsWith("/payslip") ? "active" : ""
-                  }`}
+                className={`sidebar-item ${
+                  location.pathname.startsWith("/payslip") ? "active" : ""
+                }`}
               >
                 <Link className="sidebar-link" to={"/employeeSalary"}>
                   {/* < color="orange" size={25} />{" "} */}
                   <i
-                    className="bi bi-card-list"
-                    style={{ size: "25", color: "orange" }}
-                  ></i>
+                      className="bi bi-card-list"
+                      style={{ size: "25", color:"orange" }}
+                    ></i>
                   <span className="align-middle " style={{ fontSize: "large" }}>
                     SalaryList
                   </span>
                 </Link>
               </li>
               <li
-                className={`sidebar-item ${location.pathname.startsWith("/payslip") ? "active" : ""
-                  }`}
+                className={`sidebar-item ${
+                  location.pathname.startsWith("/payslip") ? "active" : ""
+                }`}
               >
                 <Link className="sidebar-link" to={"/employeePayslip"}>
                   <Receipt color="orange" size={25} />{" "}
@@ -730,4 +776,8 @@ const SideNav = () => {
     </nav>
   );
 };
-export default SideNav;
+
+
+               
+
+  export default SideNav;

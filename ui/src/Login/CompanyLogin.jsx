@@ -119,7 +119,7 @@ const CompanyLogin = () => {
           }
           setTimeout(() => {
             navigate("/main", { state: { username: data.username } });
-          }, 2000);
+          }, 3000);
         }
       })
       .catch((error) => {

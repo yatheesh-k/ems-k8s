@@ -174,8 +174,6 @@ const EmployeeSalaryStructure = () => {
       specialAllowance === 0 &&
       otherAllowances === 0 &&
       hra === 0 &&
-      incomeTax === 0 &&
-      pfTax === 0 &&
       pfEmployee === 0 &&
       pfEmployer === 0 &&
       grossAmount === 0
@@ -202,10 +200,7 @@ const EmployeeSalaryStructure = () => {
       deductions: {
         pfEmployee: parseFloat(pfEmployee),
         pfEmployer: parseFloat(pfEmployer),
-        lop: parseFloat(lossOfPayPerDay),
         totalDeductions: parseFloat(totalPF),
-        pfTax: parseFloat(pfTax),
-        totalTax: parseFloat(totalTax),
       },
       status: 0,
     };
@@ -411,7 +406,7 @@ const EmployeeSalaryStructure = () => {
                           readOnly
                         />
                       </div>
-                      <div className="col-12 mt-2">
+                      {/* <div className="col-12 mt-2">
                         <label className="form-label">
                           Loss of Pay (per Day)
                         </label>
@@ -421,7 +416,7 @@ const EmployeeSalaryStructure = () => {
                           value={lossOfPayPerDay}
                           readOnly
                         />
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 </div>
@@ -430,7 +425,7 @@ const EmployeeSalaryStructure = () => {
                     <div className="card-header">
                       <h5 className="card-title"> Deductions </h5>
                       <hr />
-                      <div className="col-12" style={{ marginTop: "10px" }}>
+                      {/* <div className="col-12" style={{ marginTop: "10px" }}>
                         <label className="form-label">Professional Tax<span style={{color:"red", fontSize:"20px"}}><QuestionCircle/></span></label>
                         <input
                           type="text"
@@ -450,7 +445,7 @@ const EmployeeSalaryStructure = () => {
                           readOnly
                           onChange={handleTotalTaxChange}
                         />
-                      </div>
+                      </div> */}
                       <h5 className="card-title mt-3"> PF Contibution </h5>
                       <div className="col-12" style={{ marginTop: "10px" }}>
                         <label className="form-label">
@@ -487,8 +482,7 @@ const EmployeeSalaryStructure = () => {
                       </div>
                     </div>
                   </div>
-                </div>
-                <div className="col-12">
+                  <div className="col-12">
                   <div className="card">
                     <div className="card-header">
                       <h5 className="card-title"> Net Salary </h5>
@@ -505,11 +499,14 @@ const EmployeeSalaryStructure = () => {
                     </div>
                   </div>
                 </div>
-                <div className="col-12 text-end">
+                <div className="col-12 text-end" style={{marginTop:"60px"}}>
                   <button type="submit" className="btn btn-primary">
                     Submit
                   </button>
                 </div>
+                </div>
+                
+               
               </>
             )}
           </div>

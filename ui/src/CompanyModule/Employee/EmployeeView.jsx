@@ -128,13 +128,13 @@ const handleSalary = (id) => {
       label: (
         <b
           style={{
-            backgroundColor: "blue",
+            backgroundColor: "green",
             color: "white",
             borderRadius: "5px",
-            padding: "2px",
+            padding: "3px",
           }}
         >
-         OnBoarding
+        Active
         </b>
       ),
     },
@@ -142,61 +142,16 @@ const handleSalary = (id) => {
       label: (
         <b
           style={{
-            backgroundColor: "green",
+            backgroundColor: "red",
             color: "white",
             borderRadius: "5px",
-            padding: "2px",
-          }}
-        >
-          Active
-        </b>
-      ),
-    },
-    2: {
-      label: (
-        <b
-          style={{
-            backgroundColor: "orange",
-            color: "white",
-            borderRadius: "5px",
-            padding: "2px",
+            padding: "3px",
           }}
         >
           InActive
         </b>
       ),
     },
-    3: {
-      label: (
-        <b
-          style={{
-            backgroundColor: "yellow",
-            color: "white",
-            borderRadius: "5px",
-            padding: "2px",
-          }}
-        >
-          Notice Period
-        </b>
-      ),
-      color: "orange",
-    },
-    4: {
-      label: (
-        <b
-          style={{
-            backgroundColor: "red",
-            color: "white",
-            borderRadius: "5px",
-            padding: "2px",
-          }}
-        >
-          Relieved
-        </b>
-      ),
-      color: "red",
-    },
-    // Add more mappings as needed
   };
 
   const paginationComponentOptions = {

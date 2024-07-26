@@ -1,10 +1,12 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom'
+import { useAuth } from '../Context/AuthContext';
+
 
 
 const Protected = () => {
-  const token=sessionStorage.getItem('userId');
-let auth={token}
-return auth.token?<Outlet/>:<Navigate to={'/'}/>
+  const {userId}=useAuth();
+let auth={userId}
+return auth.userId?<Outlet/>:<Navigate to={'/'}/>
 }
 export default Protected;

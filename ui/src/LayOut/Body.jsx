@@ -1,8 +1,11 @@
 import React from "react";
 import LayOut from "./LayOut";
+import { useAuth } from "../Context/AuthContext";
 import { userRoles } from "../Utils/Auth";
 
 const Body = () => {
+  //const {userRoles}=useAuth();
+  
   // Check if userRoles is defined and if 'ems_admin' role is included
   const isAdmin = userRoles && userRoles.includes('ems_admin');
 
