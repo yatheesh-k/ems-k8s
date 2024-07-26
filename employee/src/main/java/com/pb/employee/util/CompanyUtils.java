@@ -67,6 +67,7 @@ public class CompanyUtils {
         }
 
         companyEntity.setHraPercentage(hra);
+        companyEntity.setPassword("**********");
         companyEntity.setPanNo(pan);
         companyEntity.setPfPercentage(pf);
         companyEntity.setSpecialAllowance(spa);

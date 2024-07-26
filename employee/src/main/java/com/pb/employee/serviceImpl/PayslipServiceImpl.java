@@ -145,12 +145,6 @@ public class PayslipServiceImpl implements PayslipService {
             }
 
             // Return response with generated payslips and employees without attendance
-            Map<String, Object> responseBody = new HashMap<>();
-            responseBody.put("generatedPayslips", generatedPayslips);
-            responseBody.put("employeesWithoutAttendance", employeesWithoutAttendance);
-
-            return new ResponseEntity<>(
-                    ResponseBuilder.builder().build().createSuccessResponse(responseBody), HttpStatus.CREATED);
 
         } catch (IOException | EmployeeException ex) {
             log.error("Error generating payslips: {}", ex.getMessage());
@@ -161,6 +155,16 @@ public class PayslipServiceImpl implements PayslipService {
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_SAVE_EMPLOYEE),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("generatedPayslips", generatedPayslips);
+        responseBody.put("employeesWithoutAttendance", employeesWithoutAttendance);
+        if (generatedPayslips.size() == 0){
+            log.error("attendance are not found for the employees {}", employeesWithoutAttendance);
+            throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_GET_ATTENDANCE), employeesWithoutAttendance),
+                    HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(responseBody), HttpStatus.CREATED);
     }
 
     @Override
