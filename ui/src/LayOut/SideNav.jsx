@@ -1,25 +1,22 @@
   import { jwtDecode } from "jwt-decode";
   import React, { useEffect, useState } from "react";
   import {
-    Diagram3Fill,
-    EraserFill,
-    FileMedicalFill,
-    PersonVcardFill,
     Receipt,
     Speedometer2,
   } from "react-bootstrap-icons";
   import { Link, useLocation } from "react-router-dom";
-  import { userRoles } from "../Utils/Auth";
+import { CompanyImageGetApi, EmployeeGetApiById } from "../Utils/Axios";
+import { userId } from "../Utils/Auth";
+import { toast } from "react-toastify";
 
   const SideNav = () => {
     const [isPayrollOpen, setIsPayrollOpen] = useState(false); // State for managing PayRoll dropdown
     const [isAttendanceOpen, setIsAttendanceOpen] = useState(false); // State for managing Attendance dropdown
     const [isCompanyOpen, setIsCompanyOpen] = useState(false); // State for managing Company dropdown
     const [roles,setRoles]=useState([]);
-   
+    const [logoFileName, setLogoFileName] = useState(null);
+    const [id,setId]=useState([]);
     const location = useLocation();
-    const userImageBase64 = sessionStorage.getItem("imageFile"); // Assuming the base64 image is stored in sessionStorage
-
     const token = sessionStorage.getItem("token");
 
     useEffect(() => {
@@ -28,6 +25,57 @@
         setRoles(decodedToken.roles || []);
       }
     }, [token]);
+
+   
+    
+    const handleApiErrors = (error) => {
+      if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+        const errorMessage = error.response.data.error.message;
+        toast.error(errorMessage);
+      } else {
+        toast.error("Network Error !");
+      }
+      console.error(error.response);
+    };
+
+    const fetchCompanyLogo = async (companyId) => {
+      try {
+        const logoResponse = await CompanyImageGetApi(companyId);
+        console.log("Full logo response:", logoResponse.data.data);
+        if (logoResponse && logoResponse.data && logoResponse.data.data) {
+          const logoPath = logoResponse.data.data;
+          // Extracting filename from path
+          const fileName = logoPath.split('\\').pop(); 
+          // Set state with filename
+          setLogoFileName(fileName);
+          console.log("fileName", fileName);
+        } else {
+          console.error("Response or data is missing");
+        }
+      } catch (err) {
+        console.error("Error fetching company logo:", err);
+      }
+    };
+    
+    
+
+      useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const response = await EmployeeGetApiById(userId);          
+            // Extract companyId from response
+            console.log(response.data.companyId)
+            const companyId = response.data.companyId;
+            console.log(companyId);
+             fetchCompanyLogo(companyId);
+          } catch (error) {
+            handleApiErrors(error);
+          }
+        };
+      
+        fetchData();
+      }, [userId]); 
+    
   
   useEffect(() => {
     if (
@@ -206,26 +254,30 @@
       setIsPayrollOpen(false);
     };
 
-    const getImageSrc = () => {
-      if (roles === "ems_admin") {
-        return "assets/img/pathbreaker_logo.png";
-      }
-      return userImageBase64
-        ? `data:image/png;base64,${userImageBase64}`
-        : "assets/img/pathbreaker_logo.png"; // Fallback to a default image if base64 is not available
-    };
+    const emsAdminLogoPath = "assets/img/pathbreaker_logo.png";
     
     return (
-      <nav id="sidebar" class="sidebar js-sidebar">
+      <nav id="sidebar" className="sidebar js-sidebar">
         <div className="sidebar-content js-simplebar">
           <a className="sidebar-brand" href="/main">
             <span>
+            {roles.includes("ems_admin") ? (
               <img
                 className="align-middle"
-                src={getImageSrc()}
-                alt="Logo"
+                src={emsAdminLogoPath}
+                alt="EMS Admin Logo"
                 style={{ height: "80px", width: "180px" }}
               />
+            ) : (
+              logoFileName && (
+                <img
+                  className="align-middle"
+                  src={`CompanyLogos/${logoFileName}`} // Dynamic source based on logoFileName
+                  alt="Logo"
+                  style={{ height: "80px", width: "180px" }}
+                />
+              )
+            )}
             </span>
           </a>
           <ul className="sidebar-nav mt-2">
@@ -238,7 +290,7 @@
                 >
                   <Link className="sidebar-link" to={"/main"}>
                     <i
-                      class="bi bi-grid-1x2-fill"
+                      className="bi bi-grid-1x2-fill"
                       style={{ fontSize: "large" }}
                     ></i>
                     <span className="align-middle" style={{ fontSize: "large" }}>
@@ -255,7 +307,7 @@
                     data-bs-toggle="collapse"
                   >
                     <span className="align-middle">
-                      <i class="bi bi-building" style={{ fontSize: "large" }}></i>
+                      <i className="bi bi-building" style={{ fontSize: "large" }}></i>
                     </span>{" "}
                     <span className="align-middle" style={{ fontSize: "medium" }}>
                       Employer
@@ -310,7 +362,7 @@
               >
                 <Link className="sidebar-link" to={"/main"}>
                   <i
-                    class="bi bi-grid-1x2-fill"
+                    className="bi bi-grid-1x2-fill"
                     style={{ fontSize: "large" }}
                   ></i>
                   <span className="align-middle" style={{ fontSize: "large" }}>
@@ -325,7 +377,7 @@
               >
                 <Link className="sidebar-link" to={"/department"}>
                   <i
-                    class="bi bi-diagram-3-fill"
+                    className="bi bi-diagram-3-fill"
                     style={{ fontSize: "large" }}
                   ></i>
                   <span className="align-middle" style={{ fontSize: "large" }}>
@@ -340,7 +392,7 @@
               >
                 <Link className="sidebar-link" to={"/designation"}>
                   <i
-                    class="bi bi-file-earmark-medical-fill"
+                    className="bi bi-file-earmark-medical-fill"
                     style={{ fontSize: "large" }}
                   ></i>
                   <span className="align-middle" style={{ fontSize: "large" }}>
@@ -355,7 +407,7 @@
               >
                 <Link className="sidebar-link" to={"/employeeview"}>
                   <i
-                    class="bi bi-person-plus-fill"
+                    className="bi bi-person-plus-fill"
                     style={{ fontSize: "large" }}
                   ></i>
                   <span className="align-middle" style={{ fontSize: "large" }}>
@@ -370,7 +422,7 @@
                           >
                             <Link className="sidebar-link" to={"/payslipview"}>
                               <Receipt color="orange" size={25} />{" "}
-                              <i class="bi bi-file-earmark-medical-fill" style={{ fontSize: "large" }}></i>
+                              <i className="bi bi-file-earmark-medical-fill" style={{ fontSize: "large" }}></i>
           
                               <span
                                 className="align-middle"
@@ -387,7 +439,7 @@
               >
                 <Link className="sidebar-link" to={"/existingList"}>
                   <i
-                    class="bi bi-person-x-fill"
+                    className="bi bi-person-x-fill"
                     style={{ fontSize: "large" }}
                   ></i>
                   <span className="align-middle" style={{ fontSize: "large" }}>
@@ -401,7 +453,7 @@
                             }`}
                           >
                             <Link className="sidebar-link" to={"/usersView"}>
-                              <i class="bi bi-person-circle" style={{ fontSize: "large" }}></i>
+                              <i className="bi bi-person-circle" style={{ fontSize: "large" }}></i>
                               <span
                                 className="align-middle"
                                 style={{ fontSize: "large" }}
@@ -421,7 +473,7 @@
                 >
                   <span className="align-middle">
                     <i
-                      class="bi bi-receipt-cutoff"
+                      className="bi bi-receipt-cutoff"
                       style={{ fontSize: "large" }}
                     ></i>
                   </span>{" "}
@@ -528,12 +580,12 @@
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
                   data-bs-target="#attendenceManagement"
                   data-bs-toggle="collapse"
-                  href=" "
+                  href
                   onClick={toggleAttendance}
                 >
                   <span className="align-middle">
                     <i
-                      class="bi bi-calendar-check-fill"
+                      className="bi bi-calendar-check-fill"
                       style={{ fontSize: "medium" }}
                     ></i>
                   </span>{" "}
@@ -689,7 +741,7 @@
                 <Link className="sidebar-link" to={"/employeeSalary"}>
                   {/* < color="orange" size={25} />{" "} */}
                   <i
-                      class="bi bi-card-list"
+                      className="bi bi-card-list"
                       style={{ size: "25", color:"orange" }}
                     ></i>
                   <span className="align-middle " style={{ fontSize: "large" }}>

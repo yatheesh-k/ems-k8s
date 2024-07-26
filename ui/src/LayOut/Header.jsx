@@ -3,8 +3,6 @@ import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import {company } from "../Utils/Auth";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
-import { useForm } from "react-hook-form";
-import { EnvelopeFill, LockFill, UnlockFill } from "react-bootstrap-icons";
 import Reset from "./Reset";
 
 const Header = ({ toggleSidebar }) => {
@@ -14,7 +12,6 @@ const Header = ({ toggleSidebar }) => {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
   const [companyName, setCompanyName] = useState(company);
-  const [passwordShown, setPasswordShown] = useState(false);
   const profileDropdownRef = useRef(null);
  
   const navigate = useNavigate();
@@ -167,7 +164,7 @@ const Header = ({ toggleSidebar }) => {
               href
               onClick={toggleProfile}
             >
-              <span class="text-dark p-2 mb-3">{companyName}</span>
+              <span className="text-dark p-2 mb-3">{companyName}</span>
               <i
                 className="bi bi-person-circle"
                 style={{ fontSize: "22px" }}

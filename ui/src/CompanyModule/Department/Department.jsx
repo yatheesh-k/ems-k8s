@@ -63,8 +63,9 @@ const Department = () => {
         setTimeout(() => {
           toast.success('Department created successfully');
           fetchDepartments();
+          }, 1000);
           setAddDeparment(false);
-          }, 800);
+
       }
       reset();
       setEditingId(null);
@@ -83,7 +84,9 @@ const Department = () => {
         setTimeout(() => {
           toast.success("Department Deleted Successfully");
             fetchDepartments(); // Fetch updated list of departments after delay
-          }, 800);
+
+          }, 900);
+
         handleCloseDeleteModal(); // Close the delete confirmation modal
       } catch (error) {
         handleApiErrors(error);
@@ -218,7 +221,8 @@ const Department = () => {
                      className={editingId ? "btn btn-danger" : "btn btn-primary"}
                      type='submit'
                    >
-                           {loading ? "Loading..." : (editingId ? "Update Department" : "Add Department")}
+                     {loading ? "Loading..." : (editingId ? "Update Department" : "Add Department")}
+
                    </button>
                  </div>
                  <div className='col-12 col-md-6 col-lg-4'></div>

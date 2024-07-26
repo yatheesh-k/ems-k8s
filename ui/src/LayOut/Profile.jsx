@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import axios from "axios";
-import { Modal, Button, Toast } from "react-bootstrap";
-import { jwtDecode } from "jwt-decode";
+import { Modal, Button, Toast, ModalHeader, ModalTitle, ModalBody, ModalFooter } from "react-bootstrap";
 import LayOut from "./LayOut";
 import { CameraFill, Eye, EyeSlash } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { companyUpdateByIdApi, companyViewByIdApi, resetPassword } from "../Utils/Axios";
+import { CompanyImagePatchApi, companyUpdateByIdApi, companyViewByIdApi } from "../Utils/Axios";
+import { jwtDecode } from "jwt-decode";
 
 function Profile() {
   const {
@@ -36,9 +35,24 @@ function Profile() {
       try {
         const decodedToken = jwtDecode(token);
         const companyId = decodedToken.sub;
-        const response = await companyViewByIdApi(companyId)
+        const response = await companyViewByIdApi(companyId);
         const data = response.data;
         setCompanyData(data);
+        // Set form values with the fetched data
+        setValue("companyName", data.companyName);
+        setValue("emailId", data.emailId);
+        setValue("mobileNo", data.mobileNo);
+        setValue("shortName", data.shortName);
+        setValue("companyAddress", data.companyAddress);
+        setValue("landNo", data.landNo);
+        setValue("cinNo", data.cinNo);
+        setValue("companyRegNo", data.companyRegNo);
+        setValue("gstNo", data.gstNo);
+        setValue("panNo", data.panNo);
+        setValue("name", data.name);
+        setValue("personalMailId", data.personalMailId);
+        setValue("personalMobileNo", data.personalMobileNo);
+        setValue("address", data.address);
       } catch (err) {
         setError(err);
       }
@@ -47,12 +61,51 @@ function Profile() {
     fetchCompanyData();
   }, [setValue]);
 
-
+  const handleDetailsSubmit = async (data) => {
+    const token = sessionStorage.getItem("token");
+    try {
+      const decodedToken = jwtDecode(token);
+      const companyId = decodedToken.sub;
+      await companyUpdateByIdApi(companyId, data);
+      setSuccessMessage("Profile updated successfully.");
+      toast.success("Company Details Updated Successfully");
+      setErrorMessage("");
+      navigate("/main");
+    } catch (err) {
+      console.error("Details update error:", err);
+      setSuccessMessage("");
+      setErrorMessage("Failed to update profile details.");
+      setError(err);
+    }
+  };
 
   const onChangePicture = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setPostImage(URL.createObjectURL(file));
+      setPostImage(file);
+    }
+  };
+
+  const handleLogoSubmit = async () => {
+    const token = sessionStorage.getItem("token");
+    try {
+      const decodedToken = jwtDecode(token);
+      const companyId = decodedToken.sub;
+      if (postImage) {
+        const formData = new FormData();
+        formData.append("file", postImage);
+        await CompanyImagePatchApi(companyId, formData);
+        setPostImage("");
+        setSuccessMessage("Logo updated successfully.");
+        toast.success("Company Logo Updated Successfully");
+        setErrorMessage("");
+        closeModal();
+      }
+    } catch (err) {
+      console.error("Logo update error:", err);
+      setSuccessMessage("");
+      setErrorMessage("Failed to update logo.");
+      setError(err);
     }
   };
 
@@ -68,9 +121,10 @@ function Profile() {
     try {
       const decodedToken = jwtDecode(token);
       const companyId = decodedToken.sub;
-      const response = await companyUpdateByIdApi(companyId);
+      const response = await companyUpdateByIdApi();
+      console.log("Updated successfully:", response.data);
       setSuccessMessage("Profile updated successfully.");
-      toast.success(response.data.data);
+      toast.success("Company Details Updated Successfully");
       setErrorMessage("");
       navigate("/main");
     } catch (err) {
@@ -80,16 +134,6 @@ function Profile() {
       setError(err);
     }
   };
-  const handleApiErrors = (error) => {
-    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
-      const errorMessage = error.response.data.error.message;
-      toast.error(errorMessage);
-    } else {
-      toast.error("Network Error !");
-    }
-    console.error(error.response);
-  };
-
 
   return (
     <LayOut>
@@ -99,29 +143,41 @@ function Profile() {
         </h1>
 
         {/* Success Message Modal */}
-        <Modal show={successMessage !== ""} onHide={() => setSuccessMessage("")}>
-          <Modal.Header closeButton>
-            <Modal.Title>Success</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>{successMessage}</Modal.Body>
-          <Modal.Footer>
+        <Modal 
+        show={successMessage !== ""} 
+        onHide={() => setSuccessMessage("")}
+        centered
+        style={{ zIndex: "1050" }}
+        className="custom-modal"
+        >
+          <ModalHeader closeButton>
+            <ModalTitle>Success</ModalTitle>
+          </ModalHeader>
+          <ModalBody>{successMessage}</ModalBody>
+          <ModalFooter>
             <Button variant="secondary" onClick={() => setSuccessMessage("")}>
               Close
             </Button>
-          </Modal.Footer>
+          </ModalFooter>
         </Modal>
 
         {/* Error Message Modal */}
-        <Modal show={errorMessage !== ""} onHide={() => setErrorMessage("")}>
-          <Modal.Header closeButton>
-            <Modal.Title>Error</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>{errorMessage}</Modal.Body>
-          <Modal.Footer>
+        <Modal 
+        show={errorMessage !== ""} 
+        onHide={() => setErrorMessage("")}
+        centered
+        style={{ zIndex: "1050" }}
+        className="custom-modal"
+        >
+          <ModalHeader closeButton>
+            <ModalTitle>Error</ModalTitle>
+          </ModalHeader>
+          <ModalBody>{errorMessage}</ModalBody>
+          <ModalFooter>
             <Button variant="secondary" onClick={() => setErrorMessage("")}>
               Close
             </Button>
-          </Modal.Footer>
+          </ModalFooter>
         </Modal>
 
         <div className="row">
@@ -176,7 +232,7 @@ function Profile() {
                     </div>
                   </div>
                 </div>
-                <div className="d-flex justify-content-end">
+                {/* <div className="d-flex justify-content-end">
                   <button
                     className="btn btn-primary btn-lg"
                     type="submit"
@@ -184,13 +240,13 @@ function Profile() {
                   >
                     Submit
                   </button>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(handleDetailsSubmit)}>
           <div className="row mt-3">
             <div className="col-12">
               <div className="card">
@@ -479,33 +535,39 @@ function Profile() {
               className="btn btn-primary btn-lg"
               style={{ marginRight: "65px" }}
               type="submit"
-            >
+            > 
               Submit
             </button>
           </div>
         </form>
 
         {/* Modal for Image Upload */}
-        <Modal show={showModal} onHide={closeModal}>
-          <Modal.Header closeButton>
-            <Modal.Title>Update Logo</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
+        <Modal 
+        show={showModal}
+         onHide={closeModal}
+         centered
+         style={{ zIndex: "1050" }}
+         className="custom-modal"
+         >
+          <ModalHeader closeButton>
+            <ModalTitle>Update Logo</ModalTitle>
+          </ModalHeader>
+          <ModalBody>
             <input type="file" onChange={onChangePicture} />
             {postImage && (
               <div>
-                <img src={postImage} alt="Selected Logo" style={{ width: "100%" }} />
+                <img src={postImage} alt="Logo" style={{ width: "100%" }} />
               </div>
             )}
-          </Modal.Body>
-          <Modal.Footer>
+          </ModalBody>
+          <ModalFooter>
             <Button variant="secondary" onClick={closeModal}>
               Close
             </Button>
-            <Button variant="primary" onClick={handleSubmit(onSubmit)}>
+            <Button variant="primary" onClick={handleSubmit(handleLogoSubmit)}>
               Save Changes
             </Button>
-          </Modal.Footer>
+          </ModalFooter>
         </Modal>
       </div>
     </LayOut>

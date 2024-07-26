@@ -72,7 +72,8 @@ const Designation = () => {
           toast.success('Designation created successfully');
           fetchDesignation(); // Fetch updated list of departments after delay
           setAddDesignation(false);
-          }, 800);
+          }, 900);
+
       }
       console.log("data:",designations);
       reset();
@@ -231,7 +232,7 @@ const Designation = () => {
                       className={editingUserId ? "btn btn-danger" : "btn btn-primary"}
                       type='submit'
                     >
-                    {pending ? "Loading..." : (editingUserId ? "Update Designation" : "Add Designation")}
+                    {editingUserId ? "Update Designation" : "Add Designation"}
                     </button>
                   </div>
                   <div className='col-12 col-md-6 col-lg-4'></div>
@@ -316,9 +317,7 @@ const Designation = () => {
                             type='submit'
                             disabled={pending}
                           >
-                            
-                            {pending ? "Loading..." : (editingUserId ? "Update Designation" : "Add Designation")}
-
+                            {editingUserId ? "Update Designation" : "Add Designation"}
                           </button>
                           <button
                             type='button'

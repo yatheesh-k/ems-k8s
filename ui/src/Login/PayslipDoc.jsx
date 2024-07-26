@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { companyViewByIdApi, EmployeePayslipGetById} from "../Utils/Axios"; // Ensure these functions are correctly defined in your Utils/Axios file
+import { CompanyImageGetApi, companyViewByIdApi, EmployeeGetApiById, EmployeePayslipGetById} from "../Utils/Axios"; // Ensure these functions are correctly defined in your Utils/Axios file
 import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
+import LayOut from "../LayOut/LayOut";
+import { userId } from "../Utils/Auth";
 
 const PayslipDoc = () => {
   const [companyData,setCompanyData]=useState([])
@@ -11,14 +13,33 @@ const PayslipDoc = () => {
   const employeeId = queryParams.get("employeeId");
   const payslipId = queryParams.get("payslipId");
   const { employeeDetails } = location.state || {};
-
   const [payslipData, setPayslipData] = useState(null);
-  useEffect(()=>{
-  const fetchCompanyData = async () => {
-    const token = sessionStorage.getItem("token");
+  const [logoFileName,setLogoFileName]=useState([]);
+  const [id,setId]=useState('');
+  const token = sessionStorage.getItem("token");
+
+
+  const fetchCompanyLogo = async (companyId) => {
     try {
-      const decodedToken = jwtDecode(token);
-      const companyId = decodedToken.sub;
+      const logoResponse = await CompanyImageGetApi(companyId);
+      console.log("Full logo response:", logoResponse.data.data);
+      if (logoResponse && logoResponse.data && logoResponse.data.data) {
+        const logoPath = logoResponse.data.data;
+        // Extracting filename from path
+        const fileName = logoPath.split('\\').pop(); 
+        // Set state with filename
+        setLogoFileName(fileName);
+        console.log("fileName", fileName);
+      } else {
+        console.error("Response or data is missing");
+      }
+    } catch (err) {
+      console.error("Error fetching company logo:", err);
+    }
+  };
+  
+  const fetchCompanyData = async (companyId) => {
+    try {
       const response = await companyViewByIdApi(companyId)
       setCompanyData(response.data);
       
@@ -26,8 +47,39 @@ const PayslipDoc = () => {
       console.log(err)
     }
   };
-    fetchCompanyData();
-  },[])
+
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const response = await EmployeeGetApiById(userId);          
+          // Extract companyId from response
+          console.log(response.data.companyId)
+          const companyId = response.data.companyId;
+          console.log(companyId);
+           fetchCompanyLogo(companyId);
+           fetchCompanyData(companyId)
+        } catch (error) {
+          handleApiErrors(error);
+        }
+      };
+    
+      fetchData();
+    }, [userId]); 
+
+
+  // useEffect(() => {
+  //   if (token) {
+  //     const decodedToken = jwtDecode(token);
+  //     const userId = decodedToken.sub || null;
+  //     setId(userId);
+
+  //     // Call functions with id
+  //     if (userId) {
+  //       fetchCompanyLogo(userId);
+  //       fetchCompanyData(userId);
+  //     }
+  //   }
+  // }, [token]);
 
   useEffect(() => {
     const fetchPayslipData = async () => {
@@ -59,7 +111,26 @@ const PayslipDoc = () => {
   };
 
   return (
-    <div className="container mt-2">
+    <LayOut>
+        <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
+          <div className="col">
+            <h1 className="h3 mb-3">
+              <strong>PaySlip</strong>
+            </h1>
+          </div>
+          <div className="col-auto" style={{ paddingBottom: '20px' }}>
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                  <a href="/main">Home</a>
+                </li>
+                <li className="breadcrumb-item"><a href="/payslipsList">Payslip View</a></li>
+                <li className="breadcrumb-item active">PaySlipForm</li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+    <div className="container mt-2" style={{pointerEvents: "none" }}>
       <div className="card">
         <div className="card-header mt-2">
           <div
@@ -73,17 +144,24 @@ const PayslipDoc = () => {
           >
             <div>
               <p>
-                Pay Slip for the month of : {payslipData.month},{" "}
+                Pay Slip for the month of : <b> 
+                {payslipData.month} {" "}
                 {payslipData.year}
+                </b>
               </p>
-              <p>Employee Name: {employeeDetails.firstName} {employeeDetails.lastName}</p>
+              <p>Employee Name: <b>{employeeDetails.firstName} {employeeDetails.lastName}</b></p>
             </div>
             <div>
-              <img
-                src="/path/to/your/logo.png"
-                alt="Company Logo"
-                style={{ maxWidth: "100px", maxHeight: "100px" }}
-              />
+        { logoFileName ? (
+                <img
+                  className="align-middle"
+                  src={`CompanyLogos/${logoFileName}`} // Dynamic source based on logoFileName
+                  alt="Logo"
+                  style={{ height: "80px", width: "180px" }}
+                />
+              ):(
+                <p>Logo</p>
+              )}
             </div>
           </div>
         </div>
@@ -92,7 +170,7 @@ const PayslipDoc = () => {
             className="payslip-details"
             style={{ border: "1px solid black" }}
           >
-            <div className="employee-details" style={{ padding: "20px"}}>
+            <div  style={{ padding: "20px"}}>
               <table
                 style={{
                   borderCollapse: "collapse",
@@ -239,7 +317,7 @@ const PayslipDoc = () => {
                     >
                       Total Working Days
                     </th>
-                    <td style={{ padding: "4px", textAlign: "left" }}>0</td>{" "}
+                    <td style={{ padding: "4px", textAlign: "left" }}> {payslipData.attendance.totalWorkingDays || 0}</td>{" "}
                     {/**{totalWorkingDays} */}
                     <th
                       style={{
@@ -251,7 +329,7 @@ const PayslipDoc = () => {
                     >
                       Working Days
                     </th>
-                    <td style={{ padding: "4px", textAlign: "left" }}>0</td>{" "}
+                    <td style={{ padding: "4px", textAlign: "left" }}>{payslipData.attendance.noOfWorkingDays || 0}</td>{" "}
                     {/**{workingDays} */}
                     <th
                       style={{
@@ -261,9 +339,9 @@ const PayslipDoc = () => {
                         backgroundColor: "rgb(230, 230, 230)",
                       }}
                     >
-                      LOP
+                      Total Leaves
                     </th>
-                    <td style={{ padding: "4px", textAlign: "left" }}>0</td>
+                    <td style={{ padding: "4px", textAlign: "left" }}>{payslipData.attendance.totalWorkingDays-payslipData.attendance.noOfWorkingDays || 0}</td>
                     {/**{lop} */}
                   </tr>
                 </tbody>
@@ -370,10 +448,10 @@ const PayslipDoc = () => {
                         backgroundColor: "rgb(230, 230, 230)",
                       }}
                     >
-                      Gross Amount (per annum)
+                      Gross Amount (per Annum)
                     </th>
                     <td className="gross-earnings">
-                      {payslipData.salary.grossAmount || 0}
+                     <b>{payslipData.salary.grossAmount || 0}</b> 
                     </td>
                     <th
                       className="total-deductions"
@@ -387,7 +465,7 @@ const PayslipDoc = () => {
                       Net Salary (A-B-C){" "}
                     </th>
                     <td className="total-deductions">
-                      {payslipData.salary.netSalary}
+                      <b>{payslipData.salary.netSalary}</b> 
                     </td>
                   </tr>
                 </tbody>
@@ -405,7 +483,7 @@ const PayslipDoc = () => {
              
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <h5>
-                  Net Pay (in words): {payslipData?.netSalaryInWords || ""}
+                  Net Pay (in words): <b>{payslipData.inWords || ""}</b>
                 </h5>
               </div>
             </div>
@@ -455,6 +533,7 @@ const PayslipDoc = () => {
         </div>
       </div>
     </div>
+    </LayOut>
   );
 };
 

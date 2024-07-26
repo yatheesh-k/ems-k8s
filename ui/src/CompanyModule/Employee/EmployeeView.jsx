@@ -62,12 +62,8 @@ const EmployeeView = () => {
         try {
             const data = await EmployeeGetApi(); // Assuming EmployeeGetApi is a function returning a Promise
             const filteredData = data
-                .filter(employee => employee.companyId === null)
+                .filter(employee => employee.firstName !== null)
                 .map(({ referenceId, ...rest }) => rest);
-
-            // Log data to check for duplicates or unexpected entries
-            console.log('Fetched Data:', filteredData);
-
             // Set state only if data is valid
             if (Array.isArray(filteredData)) {
                 setEmployees(filteredData);
@@ -240,7 +236,13 @@ const handleSalary = (id) => {
       name: <h6><b>Hired Date</b></h6>,
       selector:row=> row.dateOfHiring,
       sortable: true,
-      format: row => new Date(row.dateOfHiring).toLocaleDateString(),
+      format: row => {
+        const date = new Date(row.dateOfHiring);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+      },
       width:'120px'
     },
 

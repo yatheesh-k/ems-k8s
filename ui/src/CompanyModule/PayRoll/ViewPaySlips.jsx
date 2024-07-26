@@ -39,7 +39,7 @@ const ViewPaySlips = () => {
       try {
         const data = await EmployeeGetApi();
         const filteredData = data
-          .filter((employee) => employee.employeeId !== null)
+          .filter((employee) => employee.firstName !== null)
           .map(({ id, firstName, lastName }) => ({
             label: `${firstName} ${lastName}`,
             value: id,

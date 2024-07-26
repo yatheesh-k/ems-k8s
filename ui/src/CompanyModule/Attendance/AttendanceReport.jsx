@@ -93,7 +93,7 @@ const AttendanceReport = () => {
       try {
         const data = await EmployeeGetApi();
         const formattedData = data
-          .filter((employee) => employee.companyId === null)
+          .filter((employee) => employee.firstName !== null)
           .map(({ id, firstName, lastName }) => ({
             label: `${firstName} ${lastName}`,
             value: id,
@@ -239,16 +239,17 @@ const AttendanceReport = () => {
           <div className="col-12">
             <div className="card">
               <div className="card-header">
-                <hr />
-                <div className="row d-flex align-items-center justify-content-between">
-                  <div className="col-md-3">
+                <div className="row d-flex align-items-center justify-content-around">
+                  <div className="col-md-3 mt-3">
+                  <label className="form-label">Select Employee Name</label>
                     <Select
                       options={employees}
                       onChange={handleEmployeeChange}
                       placeholder="Select Employee"
                     />
                   </div>
-                  <div className="col-md-3">
+                  <div className="col-md-3 mt-3">
+                  <label className="form-label">Select Month</label>
                     <Select
                       options={getMonthNames().map((month, index) => ({
                         label: month,
@@ -258,7 +259,8 @@ const AttendanceReport = () => {
                       placeholder="Select Month"
                     />
                   </div>
-                  <div className="col-md-3">
+                  <div className="col-md-3 mt-3">
+                  <label className="form-label">Select Year</label>
                     <Select
                       options={getRecentYears().map((year) => ({
                         label: year,
@@ -268,7 +270,7 @@ const AttendanceReport = () => {
                       placeholder="Select Year"
                     />
                   </div>
-                  <div className="col-md-3">
+                  <div className="col-md-3 mt-5">
                     <button
                       className="btn btn-primary"
                       onClick={filterByMonthYear}

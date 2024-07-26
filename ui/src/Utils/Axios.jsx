@@ -1,4 +1,5 @@
 import axios from "axios";
+import { userId } from "./Auth";
 
 const protocol = window.location.protocol;
 const hostname = window.location.hostname;
@@ -6,19 +7,9 @@ const hostname = window.location.hostname;
 const BASE_URL = `${protocol}//${hostname}:8092/ems`;
 const Login_URL = `${protocol}//${hostname}:9090/ems`;
 
-console.log('BASE_URL:', BASE_URL);
-console.log('Login_URL:', Login_URL);
-
-
 const token = sessionStorage.getItem("token");
-// const decodedToken = jwtDecode(token);
-// const companyId = decodedToken.sub;
-
-// console.log('Decoded Token:', decodedToken);
-// console.log('Company ID:', companyId);
 
 const axiosInstance = axios.create({
-
     baseURL: BASE_URL,
     headers:{
       Authorization:`Bearer ${token}`,
@@ -26,7 +17,6 @@ const axiosInstance = axios.create({
       // 'Content-Type':'application/json',
       // crossDomain:true
     }
-
 });
 
 export const loginApi = (data) => {
@@ -34,26 +24,22 @@ export const loginApi = (data) => {
     .post(`${Login_URL}/emsadmin/login`, data)
     .then((response) => {
       const { token, refreshToken } = response.data.data;
-      // Store the token and refresh token in sessionStorage
       sessionStorage.setItem("token", token);
       sessionStorage.setItem("refreshToken", refreshToken);
       return response.data;
     })
     .catch((error) => {
       if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
         const {
           path,
           error: { message },
         } = error.response.data;
         console.log(`Error at ${path}: ${message}`);
-        return Promise.reject(message); // Optionally, you can reject with the message
+        return Promise.reject(message); 
       } else if (error.request) {
         // The request was made but no response was received
         console.log(error.request);
       } else {
-        // Something happened in setting up the request that triggered an Error
         console.log("Error", error.message);
       }
       console.log(error);
@@ -89,6 +75,7 @@ export const forgotPasswordStep2=(data)=>{
 export const resetPassword=(data,companyId)=>{
   return axiosInstance.patch(`/company/password/${companyId}`, data);
 }
+
 
 export const CompanyRegistrationApi = (data) => {
   return axiosInstance.post("/company", data);
@@ -291,7 +278,7 @@ export const EmployeePayslipsGet=(employeeId, month, year)=>{
   const company = sessionStorage.getItem("company")
   return axiosInstance.get(`/${company}/employee/${employeeId}/payslips`,{
     params: {
-      month: month,
+      // month: month,
       year: year
     }
   });
@@ -323,7 +310,13 @@ export const AttendanceDeleteById=(employeeId,attendanceId)=>{
   const company= sessionStorage.getItem("company")
   return axiosInstance.delete(`/${company}/employee/${employeeId}/attendance/${attendanceId}`);
 }
+export const CompanyImagePatchApi=(companyId,formData)=>{
+  axiosInstance.patch(`/company/image/${companyId}`,formData);
+}
 
+export const CompanyImageGetApi=(companyId)=>{
+ return axiosInstance.get(`/company/${companyId}/image`);
+}
 
 
 

@@ -342,6 +342,12 @@ const CompanyRegistration = () => {
                           minLength: {
                             value: 2,
                             message: "minimum 2 characters required",
+
+                          },
+                          maxLength: {
+                            value: 16,
+                            message: "minimum 2 and maximum 16 characters allowed",
+
                           },
                         })}
                         disabled={editMode}
@@ -385,10 +391,9 @@ const CompanyRegistration = () => {
                           onChange={handlePasswordChange}
                           autoComplete="off"
                           onKeyDown={handleEmailChange}
-                          maxLength={16}
                           type={passwordShown ? "text" : "password"}
                           {...register("password", {
-                            required: "Password Required",
+                            required: "Password is Required",
                             pattern: {
                               value:
                                 /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{6,16}$/,
@@ -396,11 +401,12 @@ const CompanyRegistration = () => {
                             },
                             minLength: {
                               value: 6,
-                              message: "minimum 2 characters required",
+                              message: "minimum 6 characters required",
                             },
                             maxLength: {
-                              value: 2,
-                              message: "maximum 16 characters allowed",
+                              value: 16,
+                              message: "minimum 6 & maximum 16 characters allowed",
+
                             },
                           })}
                         />
@@ -477,14 +483,14 @@ const CompanyRegistration = () => {
                         type="text"
                         className="form-control"
                         placeholder="Enter Company Address"
-                        onInput={toInputTitleCase}
-                        autoComplete="off"
+                        onKeyDown={handleEmailChange}
+                          autoComplete="off"
                         {...register("companyAddress", {
                           required: "Company Address is required",
                           pattern: {
                             value: /^[a-zA-Z0-9\s,'#,&*()^\-/.]*$/,
                             message:
-                              "Thse fileds only accepct Alphabets & Numbers",
+                              "Please enter valid Address",
                           },
                           maxLength: {
                             value: 100,
@@ -534,7 +540,7 @@ const CompanyRegistration = () => {
                             value: /^([LUu]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$/,
 
                             message:
-                              "Thse fileds only accepct Alphabets & Numbers",
+                              "Invalid CIN Number format",
                           },
                         })}
                         disabled={editMode}
@@ -567,7 +573,7 @@ const CompanyRegistration = () => {
                             value: /^([LUu]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$/,
 
                             message:
-                              "Invalid Registration Number",
+                              "Invalid Registration Number format",
                           },
                         })}
                         disabled={editMode}
@@ -601,7 +607,7 @@ const CompanyRegistration = () => {
                             value: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
 
                             message:
-                              "InValid Gst Number",
+                              "Invalid GST Number",
                           },
                         })}
                         disabled={editMode}
@@ -613,13 +619,13 @@ const CompanyRegistration = () => {
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
-                        Company Pan Number{" "}
+                        Company PAN Number{" "}
                         <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Enter Company Pan number"
+                        placeholder="Enter Company PAN number"
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         maxLength={10}
@@ -627,12 +633,12 @@ const CompanyRegistration = () => {
                           required: "Company Pan Number is required",
                           maxLength: {
                             value: 10,
-                            message: "Pan Number must not exceed 10 characters",
+                            message: "PAN Number must not exceed 10 characters",
                           },
                           pattern: {
                             value: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
                             message:
-                              "Pan Number should be in the format: ABCDE1234F",
+                              "PAN Number should be in the format: ABCDE1234F",
                           },
                         })}
                         disabled={editMode}
@@ -650,7 +656,7 @@ const CompanyRegistration = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title">Authorized Contact Details</h5>
+                  <h5 className="card-title">Authorized Details</h5>
                   <div
                     className="dropdown-divider"
                     style={{ borderTopColor: "#d7d9dd" }}
@@ -759,7 +765,7 @@ const CompanyRegistration = () => {
                           },
                           pattern: {
                             value: /^[a-zA-Z0-9\s,'#,&*()^\-/.]*$/,
-                            message: "Please enter Valid Address",
+                            message: "Please enter valid Address",
                           },
                         })}
                       />
