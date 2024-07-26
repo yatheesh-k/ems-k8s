@@ -38,7 +38,6 @@ public class EmployeeUtils {
         ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         EmployeeEntity updatedEntity = objectMapper.convertValue(employeeUpdateRequest, EmployeeEntity.class);
 
-        String password = Base64.getEncoder().encodeToString(employeeUpdateRequest.getPassword().getBytes());
         String hra = null,  pf = null, spa = null, ta = null;
 
         updatedEntity.setId(id);
@@ -50,7 +49,6 @@ public class EmployeeUtils {
         updatedEntity.setLastName(user.getLastName());
         updatedEntity.setDepartment(user.getDepartment());
         updatedEntity.setUanNo(user.getUanNo());
-        updatedEntity.setPassword(password);
         updatedEntity.setType(Constants.EMPLOYEE);
         return updatedEntity;
     }

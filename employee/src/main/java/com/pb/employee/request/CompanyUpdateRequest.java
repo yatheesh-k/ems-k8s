@@ -9,7 +9,6 @@ import lombok.*;
 @AllArgsConstructor
 public class CompanyUpdateRequest {
 
-    private String password;
     private String companyAddress;
     private String mobileNo;
     private String landNo;

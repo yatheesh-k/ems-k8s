@@ -42,9 +42,26 @@ public class AttendanceServiceImpl implements AttendanceService {
         if (file.isEmpty()) {
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPTY_FILE), HttpStatus.BAD_REQUEST);
         }
+        List<AttendanceRequest> attendanceRequests = null;
+
         try {
-            List<AttendanceRequest> attendanceRequests = parseExcelFile(file, company);
+             attendanceRequests = parseExcelFile(file, company);
             for (AttendanceRequest attendanceRequest : attendanceRequests) {
+                String index = ResourceIdUtils.generateCompanyIndex(attendanceRequest.getCompany());
+
+                String employeeId = ResourceIdUtils.generateEmployeeResourceId(attendanceRequest.getEmailId());
+                EmployeeEntity employee = null;
+
+                employee = openSearchOperations.getEmployeeById(employeeId, null, index);
+
+                if ("InActive".equals(employee.getStatus())) {
+                    log.error("The employee is inactive {}", employeeId);
+                    return new ResponseEntity<>(
+                            ResponseBuilder.builder().build().createFailureResponse(
+                                    new Exception("Employee is inactive"),
+                                    ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_INACTIVE)),
+                            HttpStatus.CONFLICT);
+                }
                 addAttendanceOfEmployees(attendanceRequest);
             }
         } catch (Exception e) {
@@ -243,38 +260,35 @@ public class AttendanceServiceImpl implements AttendanceService {
                 return "";
         }
     }
-    private ResponseEntity<?> addAttendanceOfEmployees(AttendanceRequest attendanceRequest) throws EmployeeException {
+    private ResponseEntity<?> addAttendanceOfEmployees(AttendanceRequest attendanceRequest) throws EmployeeException, IOException {
         log.debug("Attendance adding method is started ..");
         String index = ResourceIdUtils.generateCompanyIndex(attendanceRequest.getCompany());
         String employeeId = ResourceIdUtils.generateEmployeeResourceId(attendanceRequest.getEmailId());
         EmployeeEntity employee = null;
+
         try {
+            // Fetch the employee details
             employee = openSearchOperations.getEmployeeById(employeeId, null, index);
-            if (employee ==  null){
-                log.error("The employee details are not found {}", employeeId);
+
+            if (employee == null) {
+                log.error("Employee not found for ID: {}", employeeId);
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
                         HttpStatus.NOT_FOUND);
             }
-        }catch (Exception exception) {
-            log.error("Unable to save the employee attendance details {} {}", attendanceRequest.getType(), exception.getMessage());
-            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SAVE_ATTENDANCE),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-        }
 
-        String attendanceId = ResourceIdUtils.generateAttendanceId(attendanceRequest.getCompany(),employee.getId(),attendanceRequest.getYear(),attendanceRequest.getMonth());
-        Object object = null;
 
-        try {
-            object = openSearchOperations.getById(attendanceId, null, index);
+            // Generate attendance ID and check if it already exists
+            String attendanceId = ResourceIdUtils.generateAttendanceId(attendanceRequest.getCompany(), employee.getId(), attendanceRequest.getYear(), attendanceRequest.getMonth());
+            Object object = openSearchOperations.getById(attendanceId, null, index);
+
             if (object != null) {
-                log.error("The Attendance Id already exists {}", attendanceId);
+                log.error("Attendance ID already exists {}", attendanceId);
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.ATTENDANCE_ALREADY_EXISTS),
                         HttpStatus.NOT_ACCEPTABLE);
             }
-            // Create a new AttendanceEntity
-            Entity attendanceEntity = CompanyUtils.maskAttendanceProperties(attendanceRequest, attendanceId, employeeId);
 
-            // Save the attendance entity
+            // Create and save the new AttendanceEntity
+            Entity attendanceEntity = CompanyUtils.maskAttendanceProperties(attendanceRequest, attendanceId, employeeId);
             openSearchOperations.saveEntity(attendanceEntity, attendanceId, index);
 
         } catch (Exception exception) {

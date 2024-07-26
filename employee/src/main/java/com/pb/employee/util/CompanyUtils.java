@@ -78,12 +78,6 @@ public class CompanyUtils {
 
     public static CompanyEntity maskCompanyUpdateProperties(CompanyEntity existingEntity, CompanyUpdateRequest companyRequest) {
 
-        // Convert CompanyUpdateRequest to CompanyEntity to update specific fields
-        if (companyRequest.getPassword() == null || companyRequest.getPassword().isEmpty()) {
-            existingEntity.setPassword(existingEntity.getPassword());
-        } else {
-            existingEntity.setPassword(Base64.getEncoder().encodeToString(companyRequest.getPassword().getBytes()));
-        }
         String hra = null, pf = null, spa = null, ta = null;
 
         if(companyRequest.getHraPercentage() != null) {
@@ -169,10 +163,7 @@ public class CompanyUtils {
 
 
     public static Entity maskEmployeeUpdateProperties(EmployeeEntity user, EmployeeUpdateRequest employeeUpdateRequest) {
-        if(employeeUpdateRequest.getPassword() != null) {
-            String password = Base64.getEncoder().encodeToString(employeeUpdateRequest.getPassword().getBytes());
-            user.setPassword(password);
-        }
+
         if (employeeUpdateRequest.getEmployeeType() != null){
             user.setEmployeeType(employeeUpdateRequest.getEmployeeType());
         }
@@ -200,7 +191,7 @@ public class CompanyUtils {
         if (employeeUpdateRequest.getIfscCode() != null){
             user.setIfscCode(employeeUpdateRequest.getIfscCode());
         }
-        if (employeeUpdateRequest.getStatus() != 0){
+        if (employeeUpdateRequest.getStatus() != null){
             user.setStatus(employeeUpdateRequest.getStatus());
         }
 

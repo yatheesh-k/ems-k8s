@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.ws.rs.WebApplicationException;
@@ -75,4 +76,5 @@ public class ResponseBuilder {
                 .data(object)
                 .build();
     }
+    
 }
