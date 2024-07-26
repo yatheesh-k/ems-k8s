@@ -546,7 +546,7 @@ function Profile() {
           </ModalBody>
           <ModalFooter>
             <Button variant="secondary" onClick={closeModal}>
-              Close
+              Cancle
             </Button>
             <Button variant="primary" onClick={handleSubmit(handleLogoSubmit)}>
               Upload

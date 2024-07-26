@@ -13641,7 +13641,7 @@
   
   .navbar {
 	border-bottom: 0;
-	box-shadow: 0 0 2rem 0 rgba(33, 37, 41, 0.1);
+	/* box-shadow: 0 0 2rem 0 rgba(33, 37, 41, 0.1); */
   }
   
   @media (max-width: 767.98px) {
@@ -16722,7 +16722,7 @@
     overflow-y: auto; /* Enable vertical scrolling if needed */
 }
 .custom-modal .modal-content {
-	background-color: #ffcccc; /* Red background color */
+	/* background-color: #ffcccc;  */
 	border-radius: 8px; /* Optional: Rounded corners */
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Box shadow */
   }

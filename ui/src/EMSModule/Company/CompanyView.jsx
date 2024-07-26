@@ -96,23 +96,35 @@ const CompanyView = () => {
     },
     {
       name: <h6><b>Company Name</b></h6>,
-      selector: (row) => row.companyName,
+      selector: row => (
+        <div title={row.companyName}>
+          {row.companyName.slice(0, 12)}
+        </div>
+      ),
       minWidth: "150px",
       maxWidth: "250px",
       wrap: true,
     },
     {
       name: <h6><b>Authorized Name</b></h6>,
-      selector: (row) => row.name,
+      selector: row => (
+        <div title={row.name}>
+          {row.name.slice(0, 8)}
+        </div>
+      ),
       minWidth: "150px",
       maxWidth: "250px",
       wrap: true,
     },
     {
       name: <h6><b>Email Id</b></h6>,
-      selector: (row) => row.emailId,
+      selector: row => (
+        <div title={row.emailId}>
+          {row.emailId.slice(0, 15)}
+        </div>
+      ),
+      sortable: true,
       width: "250px",
-      wrap: true,
     },
     {
       name: <h6><b>Mobile No</b></h6>,

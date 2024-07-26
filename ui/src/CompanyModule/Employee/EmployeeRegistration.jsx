@@ -15,7 +15,7 @@ const EmployeeRegistration = () => {
     handleSubmit,
     control,
     formState: { errors },
-    
+
     reset,
     setValue,
   } = useForm({
@@ -76,11 +76,9 @@ const EmployeeRegistration = () => {
   ];
 
   const Status = [
-    { value: "0", label: "Active" },
-    { value: "1", label: "InActive" },
-    { value: "2", label: "Notice Period" },
-    { value: "3", label: "Relieved" }
-  ]
+    { value: "Active", label: "Active" },
+    { value: "InActive", label: "InActive" },
+  ];
 
   useEffect(() => {
     // Retrieve companyName from session storage
@@ -272,7 +270,7 @@ const EmployeeRegistration = () => {
 
     return `${year}-${month}-${day}`;
   };
-  
+
   return (
     <LayOut>
       <div className="container-fluid p-0">
@@ -290,7 +288,7 @@ const EmployeeRegistration = () => {
                   <a href="/employeeView">Employee</a>
                 </li>
                 <li className="breadcrumb-item active">
-                   Registration
+                  Registration
                 </li>
               </ol>
             </nav>
@@ -338,7 +336,7 @@ const EmployeeRegistration = () => {
                     ) : (
                       <div className="col-12 col-md-6 col-lg-5 mb-2">
                         <label className="form-label mb-3">
-                          Select Employee Type
+                          Select Employee Type<span style={{ color: "red" }}>*</span>
                         </label>
                         <Controller
                           className="form-select"
@@ -398,13 +396,12 @@ const EmployeeRegistration = () => {
                       <label className="form-label">First Name <span style={{ color: "red" }}>*</span></label>
                       <input
                         type="text"
+                        readOnly={isUpdating}
                         className="form-control"
                         placeholder="Enter First Name"
                         name="firstName"
-                        readOnly={isUpdating}
                         onInput={toInputTitleCase}
                         minLength={2}
-                        readOnly={isUpdating}
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         {...register("firstName", {
@@ -436,18 +433,16 @@ const EmployeeRegistration = () => {
                         minLength={1}
                         onInput={toInputTitleCase}
                         autoComplete="off"
-                        readOnly={isUpdating}
                         onKeyDown={handleEmailChange}
                         {...register("lastName", {
                           required: "Last Name Required",
                           pattern: {
                             value: /^[A-Za-z ]+$/,
-                            message:
-                              "These fields accepts only Alphabetic Characters",
+                            message: "These fields accept only alphabetic characters",
                           },
                           minLength: {
                             value: 1,
-                            message: "minimum 1 characters required",
+                            message: "Minimum 1 character required",
                           },
                         })}
                       />
@@ -764,7 +759,7 @@ const EmployeeRegistration = () => {
                       </div>
                     ) : (
                       <div className="col-12 col-md-6 col-lg-5 mb-2">
-                        <label className="form-label mb-3">Select Employee Role</label>
+                        <label className="form-label mb-3">Select Employee Role<span style={{ color: "red" }}>*</span></label>
                         <Controller
                           name="roles"
                           control={control}
@@ -866,7 +861,7 @@ const EmployeeRegistration = () => {
                             message: "Bank Name must not exceed 50 characters",
                           },
                         })}
-                        // disabled={editMode}
+                      // disabled={editMode}
                       />
                       {errors.bankName && (
                         <p className="errorMsg">{errors.bankName.message}</p>

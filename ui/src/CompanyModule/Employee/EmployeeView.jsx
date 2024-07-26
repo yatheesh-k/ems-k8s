@@ -124,7 +124,7 @@ const handleSalary = (id) => {
   };
 
   const statusMappings = {
-    0: {
+    Active: {
       label: (
         <b
           style={{
@@ -138,7 +138,7 @@ const handleSalary = (id) => {
         </b>
       ),
     },
-    1: {
+    InActive: {
       label: (
         <b
           style={{
@@ -217,13 +217,21 @@ const handleSalary = (id) => {
     },
     {
       name: <h6><b>Name</b></h6>,
-      selector: row => `${row.firstName} ${row.lastName}`,
+      selector: row => (
+        <div title={`${row.firstName} ${row.lastName}`}>
+          {`${row.firstName.slice(0, 6)} ${row.lastName.slice(0, 6)}`}
+        </div>
+      ),
       sortable: true,
       width: "130px",
     },
     {
       name: <h6><b>Email Id</b></h6>,
-      selector:row=> row.emailId,
+      selector: row => (
+        <div title={row.emailId}>
+          {row.emailId.slice(0, 8)}
+        </div>
+      ),
       sortable: true,
       width: "180px",
     },

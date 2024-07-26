@@ -230,8 +230,8 @@ const ViewPaySlips = () => {
           </div>
         </div>
         <div className="card mb-3">
-          <div className="card-body" style={{ paddingLeft: "20px" }}>
-            <div className="row d-flex align-items-center justify-content-between">
+          <div className="card-body justify-content-around">
+            <div className="row d-flex justify-content-around">
               <div className="col-12 col-md-3">
                 <div className="form-group">
                   <label className="form-label">Select Employee Name</label>
@@ -287,6 +287,7 @@ const ViewPaySlips = () => {
                 <div className="form-group">
                   <button
                     type="button"
+                    style={{marginTop:"10px"}}
                     className="btn btn-primary btn-block"
                     onClick={handleGoClick}
                     disabled={!selectedEmployeeId || !selectedMonth || !selectedYear}

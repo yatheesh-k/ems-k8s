@@ -50,13 +50,13 @@ const ManageAttendance = () => {
   const exportToExcel = () => {
     const headers = [
       "EmployeeId",
-      "Month",
-      "Year",
-      "Total Working Days",
-      "No:of Working Days",
       "First Name",
       "Last Name",
       "EmailId",
+      "Month",
+      "Year",
+      "No of Working Days",
+      "Total Working Days",
     ];
     const data = [headers];
 
