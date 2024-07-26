@@ -18,6 +18,8 @@ const ManageAttendance = () => {
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
+  };
+
 
   const onSubmit = async (data) => {
     const formData = new FormData();
@@ -32,9 +34,7 @@ const ManageAttendance = () => {
         toast.error(response.data.error.message);
       }
     } catch (error) {
-
       handleApiErrors(error);
-
     }
   };
 
@@ -80,6 +80,7 @@ const ManageAttendance = () => {
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
+                <li className="breadcrumb-item active">Attendance</li>
                 <li className="breadcrumb-item active">Manage Attendance</li>
               </ol>
             </nav>
@@ -100,7 +101,6 @@ const ManageAttendance = () => {
               </div>
               <div className="dropdown-divider" style={{ borderTopColor: "#d7d9dd" }} />
               <div className="card-body">
-
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="mb-4">
                     <div className="row d-flex justify-content-center">
@@ -129,7 +129,8 @@ const ManageAttendance = () => {
                       </div>
                     </div>
                   </div>
-                </form
+
+                </form>
               </div>
             </div>
           </div>

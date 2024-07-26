@@ -11,7 +11,7 @@ const EmsLogin = () => {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm({ defaultValues: { username: "", password: "" } });
+  } = useForm({ defaultValues: { username: "", password: "" }, mode:"onChange" });
 
   const { company } = useParams();
   const navigate = useNavigate();

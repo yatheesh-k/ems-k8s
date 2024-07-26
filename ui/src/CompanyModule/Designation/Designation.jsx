@@ -315,7 +315,6 @@ const Designation = () => {
                           <button
                             className={editingUserId ? "btn btn-danger" : "btn btn-primary"}
                             type='submit'
-                            disabled={pending}
                           >
                             {editingUserId ? "Update Designation" : "Add Designation"}
                           </button>

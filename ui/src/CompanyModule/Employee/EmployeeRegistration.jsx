@@ -215,7 +215,7 @@ const EmployeeRegistration = () => {
       const errorMessage = error.response.data.error.message;
       toast.error(errorMessage);
     } else {
-      toast.error("Network Error !");
+      // toast.error("Network Error !");
     }
     console.error(error.response);
   };
@@ -318,10 +318,10 @@ const EmployeeRegistration = () => {
                           type="text"
                           className="form-control"
                           placeholder="Enter Last Name"
-                          name="type"
+                          name="employeeType"
                           readOnly
-                          {...register("type", {
-                            required: "Last Name Required",
+                          {...register("employeeType", {
+                            required: "employeeType Required",
                             pattern: {
                               value: /^[A-Za-z ]+$/,
                               message:
@@ -329,9 +329,9 @@ const EmployeeRegistration = () => {
                             },
                           })}
                         />
-                        {errors.type && (
+                        {errors.employeeType && (
                           <p className="errorMsg">
-                            {errors.type.message}
+                            {errors.employeeType.message}
                           </p>
                         )}
                       </div>
@@ -342,7 +342,7 @@ const EmployeeRegistration = () => {
                         </label>
                         <Controller
                           className="form-select"
-                          name="type"
+                          name="employeeType"
                           defaultValue=""
                           control={control}
                           rules={{ required: true }}
@@ -351,7 +351,7 @@ const EmployeeRegistration = () => {
                               options={Employement}
                               value={Employement.find((c) => c.value === value)}
                               onChange={(val) => {
-                                setValue("type", val.value);
+                                setValue("employeeType", val.value);
                               }}
                               placeholder=" Select Employee Type "
                             />
@@ -403,6 +403,7 @@ const EmployeeRegistration = () => {
                         name="firstName"
                         onInput={toInputTitleCase}
                         minLength={2}
+                        readOnly={isUpdating}
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         {...register("firstName", {
@@ -433,6 +434,7 @@ const EmployeeRegistration = () => {
                         minLength={1}
                         onInput={toInputTitleCase}
                         autoComplete="off"
+                        readOnly={isUpdating}
                         onKeyDown={handleEmailChange}
                         {...register("lastName", {
                           required: "Last Name Required",
@@ -846,6 +848,7 @@ const EmployeeRegistration = () => {
                         className="form-control"
                         placeholder="Enter uan number"
                         name="uanNo"
+                        readOnly={isUpdating}
                         onInput={toInputTitleCase}
                         autoComplete="off"
                         onKeyDown={handleEmailChange}

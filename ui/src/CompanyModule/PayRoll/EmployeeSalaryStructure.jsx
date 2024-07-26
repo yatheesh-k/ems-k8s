@@ -228,9 +228,24 @@ const EmployeeSalaryStructure = () => {
     <LayOut>
       <div className="container-fluid p-0">
         <form className="m-3" onSubmit={onSubmit}>
-          <h1 className="h3 mb-3">
+        <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
+          <div className="col">
+            <h1 className="h3 mb-3">
             <strong>Manage Salary</strong>
           </h1>
+          </div>
+          <div className="col-auto" style={{ paddingBottom: '20px' }}>
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                  <a href="/main">Home</a>
+                </li>
+                <li className="breadcrumb-item active">PayRoll</li>
+                <li className="breadcrumb-item active">Manage Salary</li>
+              </ol>
+            </nav>
+          </div>
+        </div>
           <div className="row">
             <div className="col-12">
               <div className="card">
