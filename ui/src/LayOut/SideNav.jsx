@@ -26,18 +26,6 @@ const SideNav = () => {
     }
   }, [token]);
 
-
-
-  const handleApiErrors = (error) => {
-    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
-      const errorMessage = error.response.data.error.message;
-      toast.error(errorMessage);
-    } else {
-      toast.error("Network Error !");
-    }
-    console.error(error.response);
-  };
-
   const fetchCompanyLogo = async (companyId) => {
     try {
       const logoResponse = await CompanyImageGetApi(companyId);
@@ -69,10 +57,9 @@ const SideNav = () => {
         console.log(companyId);
         fetchCompanyLogo(companyId);
       } catch (error) {
-        handleApiErrors(error);
+        // handleApiErrors(error);
       }
     };
-
     fetchData();
   }, [userId]);
 

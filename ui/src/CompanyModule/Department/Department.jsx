@@ -42,39 +42,38 @@ const Department = () => {
   }, []);
 
   const onSubmit = async (data) => {
-    setLoading(true); 
+    setLoading(true);
     try {
       const formData = {
         companyName: company,
-        name: data.name
+        name: data.name,
       };
+  
       if (editingId) {
         await DepartmentPutApiById(editingId, formData);
         setTimeout(() => {
           toast.success('Department updated successfully');
-            fetchDepartments(); // Fetch updated list of departments after delay
-            setAddDeparment(false);
-          }, 800);
-      
+          fetchDepartments(); // Fetch updated list of departments after delay
+          setAddDeparment(false);
+        }, 1000);
       } else {
         await DepartmentPostApi(formData);
-       
         setTimeout(() => {
           toast.success('Department created successfully');
           fetchDepartments();
-          }, 1000);
           setAddDeparment(false);
-          }, 1000);
+        }, 1000);
       }
+  
       reset();
       setEditingId(null);
-      reset();
     } catch (error) {
       handleApiErrors(error);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
+  
 
   const handleConfirmDelete = async (id) => {
     if (id) {

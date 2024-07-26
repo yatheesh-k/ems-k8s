@@ -5,18 +5,13 @@ import LayOut from "./LayOut";
 import { CameraFill, Eye, EyeSlash } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { userId } from "../Utils/Auth";
 import { CompanyImagePatchApi, companyUpdateByIdApi, companyViewByIdApi, EmployeeGetApiById } from "../Utils/Axios";
-import jwtDecode from "jwt-decode"; 
+import { userId } from "../Utils/Auth";
 
 function Profile() {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
 
+  const [companyId, setCompanyId] = useState(null);
   const [companyData, setCompanyData] = useState({});
   const [postImage, setPostImage] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -24,7 +19,6 @@ function Profile() {
   const [errorMessage, setErrorMessage] = useState("");
   const [error, setError] = useState(null);
   const [passwordShown, setPasswordShown] = useState(false);
-  const [companyId, setCompanyId] = useState(""); // State to store companyId
   const navigate = useNavigate();
 
   const togglePasswordVisiblity = () => {
@@ -32,7 +26,8 @@ function Profile() {
   };
 
   useEffect(() => {
-    const fetchCompanyData = async (companyId) => {
+    const fetchCompanyData = async () => {
+      if (!companyId) return;
       try {
         const response = await companyViewByIdApi(companyId);
         const data = response.data;
@@ -57,21 +52,24 @@ function Profile() {
       }
     };
 
+    fetchCompanyData();
+  }, [setValue, companyId]);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await EmployeeGetApiById(userId);
-        const fetchedCompanyId = response.data.companyId;
-        setCompanyId(fetchedCompanyId); // Set the companyId in state
-        await fetchCompanyData(fetchedCompanyId); // Fetch company data using companyId
+        const companyId = response.data.companyId;
+        setCompanyId(companyId);
       } catch (error) {
-        handleApiErrors(error);
+        setError(error);
       }
     };
-
     fetchData();
-  }, [userId, setValue]);
+  }, []);
 
   const handleDetailsSubmit = async (data) => {
+    if (!companyId) return;
     try {
       await companyUpdateByIdApi(companyId, data);
       setSuccessMessage("Profile updated successfully.");
@@ -94,12 +92,13 @@ function Profile() {
   };
 
   const handleLogoSubmit = async () => {
+    if (!companyId) return;
     try {
       if (postImage) {
         const formData = new FormData();
-        formData.append('file', postImage);
-        await CompanyImagePatchApi(companyId, formData); // Adjusted to send FormData
-        setPostImage(null);
+        formData.append("file", postImage);
+        await CompanyImagePatchApi(companyId, formData);
+        setPostImage("");
         setSuccessMessage("Logo updated successfully.");
         toast.success("Company Logo Updated Successfully");
         setErrorMessage("");
@@ -113,16 +112,6 @@ function Profile() {
     }
   };
 
-  const handleApiErrors = (error) => {
-    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
-      const errorMessage = error.response.data.error.message;
-      toast.error(errorMessage);
-    } else {
-      toast.error("Network Error!");
-    }
-    console.error(error.response);
-  };
-
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
 
@@ -130,23 +119,7 @@ function Profile() {
     setPostImage("");
   };
 
-  const onSubmit = async (data) => {
-    try {
-      const response = await companyUpdateByIdApi(companyId, data);
-      console.log("Updated successfully:", response.data);
-      setSuccessMessage("Profile updated successfully.");
-      toast.success("Company Details Updated Successfully");
-      setErrorMessage("");
-      navigate("/main");
-    } catch (err) {
-      console.error("Update error:", err);
-      setSuccessMessage("");
-      setErrorMessage("Failed to update profile.");
-      setError(err);
-    }
-  };
-
- return (
+  return (
     <LayOut>
       <div className="container-fluid p-0">
         <h1 className="h3 mb-3">
@@ -243,6 +216,15 @@ function Profile() {
                     </div>
                   </div>
                 </div>
+                {/* <div className="d-flex justify-content-end">
+                  <button
+                    className="btn btn-primary btn-lg"
+                    type="submit"
+                    onClick={handleSubmit(onSubmit)}
+                  >
+                    Submit
+                  </button>
+                </div> */}
               </div>
             </div>
           </div>
@@ -316,6 +298,31 @@ function Profile() {
                           readOnly
                         />
                       </div>
+                      {/* <div className="col-12 col-md-6 col-lg-5 mb-3"> 
+                        <label htmlFor="website" className="form-label">
+                          Password
+                        </label>
+                        <div className="col-sm-12 input-group">
+                        <input
+                          type={passwordShown ? "text" : "password"}
+                          id="website"
+                          className="form-control"
+                          {...register("password")}
+                          defaultValue={companyData.password}
+                        />
+                        <i
+                          onClick={togglePasswordVisiblity}
+                          style={{ margin: "5px" }}
+                        >
+                          {" "}
+                          {passwordShown ? (
+                            <Eye size={17} />
+                          ) : (
+                            <EyeSlash size={17} />
+                          )}
+                        </i>
+                        </div>
+                      </div> */}
                         <div className="mb-3">
                         <label
                           htmlFor="companyAddress"
@@ -323,7 +330,6 @@ function Profile() {
                         >
                           Company Address
                         </label>
-                        <div className="col-sm-12 input-group">
                         <input
                           type="text"
                           id="companyAddress"
@@ -534,7 +540,7 @@ function Profile() {
             <input type="file" onChange={onChangePicture} />
             {postImage && (
               <div>
-                <img src={postImage} alt="Logo" style={{ width: "100%" }} />
+                <image src={postImage} alt="Selected Logo" style={{ width: "100%" }} />
               </div>
             )}
           </ModalBody>
@@ -543,7 +549,7 @@ function Profile() {
               Close
             </Button>
             <Button variant="primary" onClick={handleSubmit(handleLogoSubmit)}>
-              Save Changes
+              Upload
             </Button>
           </ModalFooter>
         </Modal>
@@ -552,4 +558,4 @@ function Profile() {
   );
 }
 
-export default Profile;
+export default Profile;
