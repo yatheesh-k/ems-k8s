@@ -177,7 +177,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
     public void multiPartFileStore(MultipartFile file, CompanyEntity company) throws IOException, EmployeeException {
         if(!file.isEmpty()){
-            String filename = folderPath+company.getShortName()+"_"+file.getOriginalFilename();
+            String filename = company.getShortName()+"_"+file.getOriginalFilename();
             file.transferTo(new File(filename));
             company.setImageFile(filename);
             ResponseEntity.ok(filename);
@@ -211,10 +211,8 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
 
-
-
     @Override
-    public ResponseEntity<?> getCompanyImageById(String companyId)  throws EmployeeException{
+    public ResponseEntity<?> getCompanyImageById(String companyId) throws EmployeeException {
         log.info("getting details of {}", companyId);
         CompanyEntity companyEntity = null;
         String image = null;
@@ -223,13 +221,18 @@ public class CompanyServiceImpl implements CompanyService {
             image = companyEntity.getImageFile();
         } catch (Exception ex) {
             log.error("Exception while fetching company details {}", ex);
-            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_SAVE_COMPANY),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new EmployeeException(
+                    ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_SAVE_COMPANY),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
 
         return new ResponseEntity<>(
-                ResponseBuilder.builder().build().createSuccessResponse(image), HttpStatus.OK);
+                ResponseBuilder.builder().build().createSuccessResponse(image),
+                HttpStatus.OK
+        );
     }
+
 
 
     @Override
