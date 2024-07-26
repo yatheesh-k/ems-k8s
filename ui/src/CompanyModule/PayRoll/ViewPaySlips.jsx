@@ -186,7 +186,8 @@ const ViewPaySlips = () => {
               padding: "0",
               marginLeft: "5px",
             }}
-            onClick={() => handleViewSalary(row.payslipId)}
+            onClick={() => handleViewSalary(row.employeeId, row.payslipId)}
+            title="View Payslip"
           >
             <Eye size={22} color="green" />
           </button>
@@ -199,6 +200,7 @@ const ViewPaySlips = () => {
               marginLeft: "5px",
             }}
             onClick={() => handleShowDeleteModal(row.payslipId)}
+            title="Delete"
           >
             <XSquareFill size={22} color="#DA542E" />
           </button>

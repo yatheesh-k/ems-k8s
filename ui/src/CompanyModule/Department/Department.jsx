@@ -172,6 +172,7 @@ const Department = () => {
             className="btn btn-sm"
             style={{ backgroundColor: "transparent", border: "none", padding: "0", marginRight: "10px" }}
             onClick={() => handleEdit(row.id, row.name)}
+            title='Edit'
           >
             <PencilSquare size={22} color='#2255a4' />
           </button>
@@ -179,6 +180,7 @@ const Department = () => {
             className="btn btn-sm"
             style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }}
             onClick={() => handleShowDeleteModal(row.id)}
+            title='Delete'
             disabled={loading}
           >
             <XSquareFill size={22} color='#da542e' />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { HandbagFill, PencilSquare, XSquareFill } from "react-bootstrap-icons";
+import { HandbagFill, PencilSquare, Wallet, XSquareFill } from "react-bootstrap-icons";
 import DataTable from "react-data-table-component";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -219,11 +219,13 @@ const handleSalary = (id) => {
       name: <h6><b>Name</b></h6>,
       selector: row => `${row.firstName} ${row.lastName}`,
       sortable: true,
+      width: "130px",
     },
     {
       name: <h6><b>Email Id</b></h6>,
       selector:row=> row.emailId,
       sortable: true,
+      width: "180px",
     },
     {
       name: <h6><b>Department</b></h6>,
@@ -243,7 +245,7 @@ const handleSalary = (id) => {
         const year = date.getFullYear();
         return `${day}-${month}-${year}`;
       },
-      width:'120px'
+      width:'150px'
     },
 
     {
@@ -254,25 +256,16 @@ const handleSalary = (id) => {
       width:"150px"
     },
     {
-      name: <h5><b>Salary</b></h5>,
-      cell: (row) => (
-        <div>
-          <button className="btn btn-sm btn-primary" onClick={() => handleSalary(row.id)}>
-           Salary
-          </button>
-         
-        </div>
-      ),
-      width:'100px'
-    },
-    {
       name: <h5><b>Action</b></h5>,
       cell: (row) => (
         <div>
-          <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginRight: "10px" }} onClick={() => handleEdit(row.id)}>
+           <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginRight: "10px" }} onClick={() => handleSalary(row.id)}  title="View Salary">
+            <Wallet size={22} color='#d116dd' />
+          </button>
+          <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginRight: "10px" }} onClick={() => handleEdit(row.id)} title="Edit">
             <PencilSquare size={22} color='#2255a4' />
           </button>
-          <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }} onClick={() => handleShowDeleteModal(row.id)}>
+          <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }} onClick={() => handleShowDeleteModal(row.id)}  title="Delete">
             <XSquareFill size={22} color='#da542e' />
           </button>
         </div>
@@ -344,7 +337,7 @@ const handleSalary = (id) => {
                     </li>
                    
                     <li className="breadcrumb-item active">
-                      Employees Summary
+                      Employees 
                     </li>
                   </ol>
                 </nav>

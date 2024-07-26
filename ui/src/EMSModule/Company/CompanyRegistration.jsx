@@ -428,11 +428,11 @@ const CompanyRegistration = () => {
                       <input
                         type="tel"
                         className="form-control"
-                        placeholder="Enter Land Number"
+                        placeholder="Enter Contact Number"
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         {...register("landNo", {
-                          required: "Land Number is required",
+                          required: "Contact Number is required",
                           pattern: {
                             value: /^[0-9]{10}$/,
                             message:

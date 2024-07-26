@@ -311,7 +311,7 @@ export const AttendanceDeleteById=(employeeId,attendanceId)=>{
   return axiosInstance.delete(`/${company}/employee/${employeeId}/attendance/${attendanceId}`);
 }
 export const CompanyImagePatchApi=(companyId,formData)=>{
-  axiosInstance.patch(`/company/image/${companyId}`,formData);
+  return axiosInstance.patch(`/company/image/${companyId}`,formData);
 }
 
 export const CompanyImageGetApi=(companyId)=>{

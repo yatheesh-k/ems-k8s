@@ -171,27 +171,31 @@ const AttendanceReport = () => {
     {
       name: <h6><b>S No</b></h6>,
       selector: (row, index) => index + 1,
-      width: "150px",
+      width: "100px",
     },
     {
       name: <h6><b>Month</b></h6>,
       selector: (row) => row.month,
       sortable: true,
+      width: "150px",
     },
     {
       name: <h6><b>Year</b></h6>,
       selector: (row) => row.year,
       sortable: true,
+      width: "120px",
     },
     {
       name: <h6><b>Total Working Days</b></h6>,
       selector: (row) => row.totalWorkingDays,
       sortable: true,
+      width: "250px",
     },
     {
       name: <h6><b>No. Of Working Days</b></h6>,
       selector: (row) => row.noOfWorkingDays,
       sortable: true,
+      width: "250px",
     },
     {
       name: <h6><b>Actions</b></h6>,
@@ -201,6 +205,7 @@ const AttendanceReport = () => {
             className="btn btn-sm"
             style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }}
             onClick={() => handleShowEditModal(row)}
+            title='Edit'
           >
             <PencilSquare size={22} color="#2255a4" />
           </button>
@@ -208,6 +213,7 @@ const AttendanceReport = () => {
             className="btn btn-sm"
             style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }}
             onClick={() => handleShowDeleteModal(row)}
+            title='Delete'
           >
             <XSquareFill size={22} color="#da542e" />
           </button>

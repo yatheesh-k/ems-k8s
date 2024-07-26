@@ -145,6 +145,7 @@ const Designation = () => {
             className="btn btn-sm"
             style={{ backgroundColor: "transparent", border: "none", padding: "0", marginRight: "10px" }}
             onClick={() => handleEdit(row.id)}
+            title='Edit'
           >
             <PencilSquare size={22} color='#2255a4' />
           </button>
@@ -152,6 +153,7 @@ const Designation = () => {
             className="btn btn-sm"
             style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }}
             onClick={() => handleShowDeleteModal(row.id)}
+            title='Delete'
           >
             <XSquareFill size={22} color='#da542e' />
           </button>

@@ -5,8 +5,9 @@ import LayOut from "./LayOut";
 import { CameraFill, Eye, EyeSlash } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { CompanyImagePatchApi, companyUpdateByIdApi, companyViewByIdApi, resetPassword } from "../Utils/Axios";
-import { jwtDecode } from "jwt-decode";
+import { userId } from "../Utils/Auth";
+import { CompanyImagePatchApi, companyUpdateByIdApi, companyViewByIdApi, EmployeeGetApiById } from "../Utils/Axios";
+import jwtDecode from "jwt-decode"; 
 
 function Profile() {
   const {
@@ -23,6 +24,7 @@ function Profile() {
   const [errorMessage, setErrorMessage] = useState("");
   const [error, setError] = useState(null);
   const [passwordShown, setPasswordShown] = useState(false);
+  const [companyId, setCompanyId] = useState(""); // State to store companyId
   const navigate = useNavigate();
 
   const togglePasswordVisiblity = () => {
@@ -30,11 +32,8 @@ function Profile() {
   };
 
   useEffect(() => {
-    const fetchCompanyData = async () => {
-      const token = sessionStorage.getItem("token");
+    const fetchCompanyData = async (companyId) => {
       try {
-        const decodedToken = jwtDecode(token);
-        const companyId = decodedToken.sub;
         const response = await companyViewByIdApi(companyId);
         const data = response.data;
         setCompanyData(data);
@@ -58,14 +57,22 @@ function Profile() {
       }
     };
 
-    fetchCompanyData();
-  }, [setValue]);
+    const fetchData = async () => {
+      try {
+        const response = await EmployeeGetApiById(userId);
+        const fetchedCompanyId = response.data.companyId;
+        setCompanyId(fetchedCompanyId); // Set the companyId in state
+        await fetchCompanyData(fetchedCompanyId); // Fetch company data using companyId
+      } catch (error) {
+        handleApiErrors(error);
+      }
+    };
+
+    fetchData();
+  }, [userId, setValue]);
 
   const handleDetailsSubmit = async (data) => {
-    const token = sessionStorage.getItem("token");
     try {
-      const decodedToken = jwtDecode(token);
-      const companyId = decodedToken.sub;
       await companyUpdateByIdApi(companyId, data);
       setSuccessMessage("Profile updated successfully.");
       toast.success("Company Details Updated Successfully");
@@ -87,15 +94,12 @@ function Profile() {
   };
 
   const handleLogoSubmit = async () => {
-    const token = sessionStorage.getItem("token");
     try {
-      const decodedToken = jwtDecode(token);
-      const companyId = decodedToken.sub;
       if (postImage) {
         const formData = new FormData();
-        formData.append("file", postImage);
-        await CompanyImagePatchApi(companyId, formData);
-        setPostImage("");
+        formData.append('file', postImage);
+        await CompanyImagePatchApi(companyId, formData); // Adjusted to send FormData
+        setPostImage(null);
         setSuccessMessage("Logo updated successfully.");
         toast.success("Company Logo Updated Successfully");
         setErrorMessage("");
@@ -109,6 +113,16 @@ function Profile() {
     }
   };
 
+  const handleApiErrors = (error) => {
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
+    } else {
+      toast.error("Network Error!");
+    }
+    console.error(error.response);
+  };
+
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
 
@@ -117,11 +131,8 @@ function Profile() {
   };
 
   const onSubmit = async (data) => {
-    const token = sessionStorage.getItem("token");
     try {
-      const decodedToken = jwtDecode(token);
-      const companyId = decodedToken.sub;
-      const response = await companyUpdateByIdApi();
+      const response = await companyUpdateByIdApi(companyId, data);
       console.log("Updated successfully:", response.data);
       setSuccessMessage("Profile updated successfully.");
       toast.success("Company Details Updated Successfully");
@@ -135,7 +146,7 @@ function Profile() {
     }
   };
 
-  return (
+ return (
     <LayOut>
       <div className="container-fluid p-0">
         <h1 className="h3 mb-3">

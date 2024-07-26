@@ -23,7 +23,7 @@ const EmployeeRegistration = () => {
       status: "", // Initialize with default value or leave empty if fetching dynamically
       roles: ''
     },
-  mode:"onChange",
+    mode: "onChange",
   });
   const [view, setView] = useState([]);
   const [user, setUser] = useState([]);
@@ -150,10 +150,10 @@ const EmployeeRegistration = () => {
     const company = sessionStorage.getItem('company');
     let roles = data.roles;
 
-  // Convert roles to an array if it's not already
-  if (!Array.isArray(roles)) {
-    roles = [roles];
-  }
+    // Convert roles to an array if it's not already
+    if (!Array.isArray(roles)) {
+      roles = [roles];
+    }
     // Constructing the payload
     let payload = {
       companyName: company,
@@ -163,13 +163,13 @@ const EmployeeRegistration = () => {
       designation: data.designation,
       location: data.location,
       manager: data.manager,
-      roles: roles, 
+      roles: roles,
       status: data.status,
       accountNo: data.accountNo,
       ifscCode: data.ifscCode,
       bankName: data.bankName
     };
-  
+
     // Add fields specific to POST request
     if (!location.state || !location.state.id) {
       payload = {
@@ -182,7 +182,7 @@ const EmployeeRegistration = () => {
         panNo: data.panNo,
         uanNo: data.uanNo,
         dateOfBirth: data.dateOfBirth,
-        roles:roles
+        roles: roles
       };
     }
 
@@ -194,7 +194,7 @@ const EmployeeRegistration = () => {
         setTimeout(() => {
           navigate("/employeeView");
         }, 1000); // Adjust the delay time as needed (in milliseconds)
-    
+
         reset();
       } else {
         const response = await EmployeePostApi(payload);
@@ -203,10 +203,10 @@ const EmployeeRegistration = () => {
         setTimeout(() => {
           navigate("/employeeView");
         }, 1000); // Adjust the delay time as needed (in milliseconds)
-            reset();
+        reset();
       }
     } catch (error) {
-     handleApiErrors(error);
+      handleApiErrors(error);
     }
   };
 
@@ -229,10 +229,10 @@ const EmployeeRegistration = () => {
           console.log(response.data);
           reset(response.data);
           setIsUpdating(true);
-  
+
           // Assuming roles is an array and setting the first role
           setValue('status', response.data.data.status.toString());
-  
+
           // Check if roles array has any items
           if (response.data.data.roles && response.data.data.roles.length > 0) {
             setValue('roles', response.data.data.roles[0]);
@@ -243,12 +243,12 @@ const EmployeeRegistration = () => {
           handleApiErrors(error);
         }
       };
-  
+
       fetchData();
     }
-  }, [location.state,reset,setValue]);
-  
-  
+  }, [location.state, reset, setValue]);
+
+
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -262,14 +262,14 @@ const EmployeeRegistration = () => {
     const year = today.getFullYear();
     let month = today.getMonth() + 1;
     let day = today.getDate();
-  
+
     if (month < 10) {
       month = `0${month}`;
     }
     if (day < 10) {
       day = `0${day}`;
     }
-  
+
     return `${year}-${month}-${day}`;
   };
   
@@ -287,10 +287,10 @@ const EmployeeRegistration = () => {
                   <a href="/main">Home</a>
                 </li>
                 <li className="breadcrumb-item">
-                  <a href="/employeeView">Employee View</a>
+                  <a href="/employeeView">Employee</a>
                 </li>
                 <li className="breadcrumb-item active">
-                  Employee Registration
+                   Registration
                 </li>
               </ol>
             </nav>
@@ -321,7 +321,7 @@ const EmployeeRegistration = () => {
                           name="employeeType"
                           readOnly
                           {...register("employeeType", {
-                            required: "employeeType Required",
+                            required: "Employee Type Required",
                             pattern: {
                               value: /^[A-Za-z ]+$/,
                               message:
@@ -357,7 +357,7 @@ const EmployeeRegistration = () => {
                             />
                           )}
                         />
-                        {errors.type && (
+                        {errors.employeeType && (
                           <p className="errorMsg">Employee Type is Required</p>
                         )}
                       </div>
@@ -371,9 +371,9 @@ const EmployeeRegistration = () => {
                         className="form-control"
                         placeholder="Enter Employee ID"
                         name="employeeId"
-                        minLength={1}  maxLength={10}
+                        minLength={1} maxLength={10}
                         onKeyDown={handleEmailChange}
-                         autoComplete='off' 
+                        autoComplete='off'
                         {...register("employeeId", {
                           required: "Employee Id Required",
                           pattern: {
@@ -401,6 +401,7 @@ const EmployeeRegistration = () => {
                         className="form-control"
                         placeholder="Enter First Name"
                         name="firstName"
+                        readOnly={isUpdating}
                         onInput={toInputTitleCase}
                         minLength={2}
                         readOnly={isUpdating}
@@ -414,8 +415,8 @@ const EmployeeRegistration = () => {
                               "These fields accepts only Alphabetic Characters",
                           },
                           minLength: {
-                            value: 2,
-                            message: "minimum 1 characters required",
+                            value: 3,
+                            message: "minimum 3 characters required",
                           },
                         })}
                       />
@@ -431,6 +432,7 @@ const EmployeeRegistration = () => {
                         className="form-control"
                         placeholder="Enter Last Name"
                         name="lastName"
+                        readOnly={isUpdating}
                         minLength={1}
                         onInput={toInputTitleCase}
                         autoComplete="off"
@@ -457,7 +459,6 @@ const EmployeeRegistration = () => {
                       <label className="form-label">Email Id <span style={{ color: "red" }}>*</span></label>
                       <input
                         type={isUpdating ? "email" : "email"}
-                        readOnly={isUpdating}
                         className="form-control"
                         placeholder="Enter Email"
                         name="emailId"
@@ -467,8 +468,8 @@ const EmployeeRegistration = () => {
                           required: "Email Id Required",
                           pattern: {
                             value:
-                            /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                            message:"Entered value does not match email format",
+                              /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                            message: "Entered value does not match email format",
                           },
                         })}
                       />
@@ -496,28 +497,59 @@ const EmployeeRegistration = () => {
                       )}
                     </div>
                     <div className="col-lg-1"></div>
-                    <div className="col-12 col-md-6 col-lg-5 mb-2">
-                      <label className="form-label">Department <span style={{ color: "red" }}>*</span></label>
-                      <Controller
-                        name="department"
-                        control={control}
-                        defaultValue=""
-                        rules={{ required: true }} 
-                        render={({ field }) => (
-                          <select {...field} className="form-select" >
-                            <option value="" disabled>Select a department</option>
-                            {departments.map(department => (
-                              <option key={department.id} value={department.name}>
-                                {department.name}
-                              </option>
-                            ))}
-                          </select>
+                    {isUpdating ? (
+                      <div className="col-12 col-md-6 col-lg-5 mb-3">
+                        <label className="form-label">
+                          Department <span style={{ color: "red" }}>*</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter Employee Type"
+                          name="department"
+                          readOnly
+                          {...register("department", {
+                            required: "Department Required",
+                            pattern: {
+                              value: /^[A-Za-z ]+$/,
+                              message: "This field accepts only alphabetic characters",
+                            },
+                          })}
+                        />
+                        {errors.department && (
+                          <p className="errorMsg">
+                            {errors.department.message}
+                          </p>
                         )}
-                      />
-                      {errors && errors.department && (
-                        <p className="errorMsg">Department Required</p>
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      <div className="col-12 col-md-6 col-lg-5 mb-3">
+                        <label className="form-label">
+                          Department <span style={{ color: "red" }}>*</span>
+                        </label>
+                        <Controller
+                          name="department"
+                          control={control}
+                          defaultValue=""
+                          rules={{ required: "Department Required" }}
+                          render={({ field }) => (
+                            <select {...field} className="form-select">
+                              <option value="" disabled>Select a department</option>
+                              {departments.map(department => (
+                                <option key={department.id} value={department.name}>
+                                  {department.name}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        />
+                        {errors.department && (
+                          <p className="errorMsg">
+                            {errors.department.message}
+                          </p>
+                        )}
+                      </div>
+                    )}
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
                       <label className="form-label">Designation <span style={{ color: "red" }}>*</span></label>
@@ -525,7 +557,7 @@ const EmployeeRegistration = () => {
                         name="designation"
                         control={control}
                         defaultValue=""
-                        rules={{ required: true }} 
+                        rules={{ required: true }}
                         render={({ field }) => (
                           <select {...field} className="form-select" >
                             <option value="" disabled>Select a designation</option>
@@ -550,7 +582,7 @@ const EmployeeRegistration = () => {
                         className="form-control"
                         placeholder="Enter Manager"
                         onInput={toInputTitleCase}
-                        autoComplete="off"   minLength={1}
+                        autoComplete="off" minLength={1}
                         onKeyDown={handleEmailChange}
                         {...register("manager", {
                           required: "Manager Required",
@@ -577,7 +609,7 @@ const EmployeeRegistration = () => {
                         className="form-control"
                         placeholder="Enter Location"
                         onInput={toInputTitleCase}
-                        autoComplete="off"  minLength={2}
+                        autoComplete="off" minLength={2}
                         onKeyDown={handleEmailChange}
                         {...register("location", {
                           required: "Location Required",
@@ -663,7 +695,7 @@ const EmployeeRegistration = () => {
                         {...register("dateOfBirth", {
                           required: true,
                         })}
-                        max={getCurrentDate() }
+                        max={getCurrentDate()}
                         {...register("dateOfBirth", {
                           required: true,
                         })}
@@ -695,7 +727,7 @@ const EmployeeRegistration = () => {
                             ]}
                             value={{
                               value: field.value,
-                              label: ["OnBoarding","Active", "Inactive", "Notice Period", "Relieved"][field.value],
+                              label: ["OnBoarding", "Active", "Inactive", "Notice Period", "Relieved"][field.value],
                             }}
                             onChange={(val) => field.onChange(val.value)}
                             placeholder="Select Status"
@@ -731,24 +763,24 @@ const EmployeeRegistration = () => {
                         )}
                       </div>
                     ) : (
-                    <div className="col-12 col-md-6 col-lg-5 mb-2">
-                      <label className="form-label mb-3">Select Employee Role</label>
-                      <Controller
-                        name="roles"
-                        control={control}
-                        rules={{ required: true }}
-                        render={({ field }) => (
-                          <Select
-                            {...field}
-                            options={Roles}
-                            value={Roles.find(option => option.value === field.value)}
-                            onChange={(val) => field.onChange(val.value)}
-                            placeholder="Select Role"
-                          />
-                        )}
-                      />
-                      {errors.roles && <p className="errorMsg">Employee Role is Required</p>}
-                    </div>
+                      <div className="col-12 col-md-6 col-lg-5 mb-2">
+                        <label className="form-label mb-3">Select Employee Role</label>
+                        <Controller
+                          name="roles"
+                          control={control}
+                          rules={{ required: true }}
+                          render={({ field }) => (
+                            <Select
+                              {...field}
+                              options={Roles}
+                              value={Roles.find(option => option.value === field.value)}
+                              onChange={(val) => field.onChange(val.value)}
+                              placeholder="Select Role"
+                            />
+                          )}
+                        />
+                        {errors.roles && <p className="errorMsg">Employee Role is Required</p>}
+                      </div>
                     )}
                     <div className="col-lg-6"></div>
                     <hr />
