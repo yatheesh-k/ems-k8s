@@ -72,8 +72,7 @@ const Designation = () => {
           toast.success('Designation created successfully');
           fetchDesignation(); // Fetch updated list of departments after delay
           setAddDesignation(false);
-          }, 900);
-
+          }, 1000);
       }
       console.log("data:",designations);
       reset();
@@ -93,7 +92,8 @@ const Designation = () => {
         setTimeout(() => {
           toast.success("Designation Deleted Successfully");
             fetchDesignation(); // Fetch updated list of departments after delay
-          }, 800);
+          }, 900);
+
         handleCloseDeleteModal(); // Close the delete confirmation modal
       } catch (error) {
         handleApiErrors(error);
@@ -232,7 +232,7 @@ const Designation = () => {
                       className={editingUserId ? "btn btn-danger" : "btn btn-primary"}
                       type='submit'
                     >
-                    {editingUserId ? "Update Designation" : "Add Designation"}
+                   {editingUserId ? "Update Designation" : "Add Designation"}
                     </button>
                   </div>
                   <div className='col-12 col-md-6 col-lg-4'></div>

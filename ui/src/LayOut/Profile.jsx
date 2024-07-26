@@ -5,7 +5,7 @@ import LayOut from "./LayOut";
 import { CameraFill, Eye, EyeSlash } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { CompanyImagePatchApi, companyUpdateByIdApi, companyViewByIdApi } from "../Utils/Axios";
+import { CompanyImagePatchApi, companyUpdateByIdApi, companyViewByIdApi, resetPassword } from "../Utils/Axios";
 import { jwtDecode } from "jwt-decode";
 
 function Profile() {
@@ -232,15 +232,6 @@ function Profile() {
                     </div>
                   </div>
                 </div>
-                {/* <div className="d-flex justify-content-end">
-                  <button
-                    className="btn btn-primary btn-lg"
-                    type="submit"
-                    onClick={handleSubmit(onSubmit)}
-                  >
-                    Submit
-                  </button>
-                </div> */}
               </div>
             </div>
           </div>
@@ -314,31 +305,6 @@ function Profile() {
                           readOnly
                         />
                       </div>
-                      {/* <div className="col-12 col-md-6 col-lg-5 mb-3"> 
-                        <label htmlFor="website" className="form-label">
-                          Password
-                        </label>
-                        <div className="col-sm-12 input-group">
-                        <input
-                          type={passwordShown ? "text" : "password"}
-                          id="website"
-                          className="form-control"
-                          {...register("password")}
-                          defaultValue={companyData.password}
-                        />
-                        <i
-                          onClick={togglePasswordVisiblity}
-                          style={{ margin: "5px" }}
-                        >
-                          {" "}
-                          {passwordShown ? (
-                            <Eye size={17} />
-                          ) : (
-                            <EyeSlash size={17} />
-                          )}
-                        </i>
-                        </div>
-                      </div> */}
                         <div className="mb-3">
                         <label
                           htmlFor="companyAddress"
@@ -346,6 +312,7 @@ function Profile() {
                         >
                           Company Address
                         </label>
+                        <div className="col-sm-12 input-group">
                         <input
                           type="text"
                           id="companyAddress"

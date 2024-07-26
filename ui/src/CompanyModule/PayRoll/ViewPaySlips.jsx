@@ -9,17 +9,12 @@ import {
   EmployeePayslipsGet,
   EmployeePayslipDeleteById,
 } from "../../Utils/Axios";
-import { Eye, XSquareFill } from "react-bootstrap-icons";
+import { Eye, XSquareFill } from "react-bootstrap-icons"; 
 import { toast, Bounce } from "react-toastify";
 import DataTable from "react-data-table-component";
 import DeletePopup from "../../Utils/DeletePopup";
-
 const ViewPaySlips = () => {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const { control, formState: { errors } } = useForm();
   const [employees, setEmployees] = useState([]);
   const [showFields, setShowFields] = useState(false);
   const [employeeSalaryView, setEmployeeSalaryView] = useState([]);
@@ -31,7 +26,6 @@ const ViewPaySlips = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPayslipId, setSelectedPayslipId] = useState("");
   const [refreshData, setRefreshData] = useState(false);
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,7 +43,6 @@ const ViewPaySlips = () => {
         console.error("Error fetching employees:", error);
       }
     };
-
     fetchEmployees();
   }, []);
 
@@ -105,8 +98,8 @@ const ViewPaySlips = () => {
   }, [selectedEmployeeId, selectedMonth, selectedYear, refreshData]);
 
   const handleGoClick = () => {
-    if(selectedEmployeeId||selectedMonth||selectedYear)
-    setShowSpinner(true);
+    if (selectedEmployeeId || selectedMonth || selectedYear)
+      setShowSpinner(true);
     setTimeout(() => {
       setShowFields(true);
       setShowSpinner(false);
@@ -125,12 +118,10 @@ const ViewPaySlips = () => {
     setShowDeleteModal(false);
     setSelectedPayslipId("");
   };
-
   const handleShowDeleteModal = (payslipId) => {
     setSelectedPayslipId(payslipId);
     setShowDeleteModal(true);
   };
-
   const handleDelete = async () => {
     try {
       await EmployeePayslipDeleteById(selectedEmployeeId, selectedPayslipId);
@@ -142,7 +133,7 @@ const ViewPaySlips = () => {
         autoClose: 3000,
       });
       handleCloseDeleteModal();
-      setRefreshData((prev) => !prev); // Toggle refreshData state
+      setRefreshData(prev => !prev);
     } catch (error) {
       handleApiErrors(error);
     }
@@ -162,51 +153,30 @@ const ViewPaySlips = () => {
     }
     console.error(error.response);
   };
-
   const columns = [
     {
-      name: (
-        <h6>
-          <b>S No</b>
-        </h6>
-      ),
+      name: <h6><b>S No</b></h6>,
       selector: (row, index) => index + 1,
       width: "150px",
     },
     {
-      name: (
-        <h6>
-          <b>Net Amount</b>
-        </h6>
-      ),
-      selector: (row) => parseFloat(row.salary.netSalary).toFixed(2),
+      name: <h6><b>Net Amount</b></h6>,
+      selector: row => parseFloat(row.salary.netSalary).toFixed(2),
       sortable: true,
     },
     {
-      name: (
-        <h6>
-          <b>Month</b>
-        </h6>
-      ),
-      selector: (row) => row.month,
+      name: <h6><b>Month</b></h6>,
+      selector: row => row.month,
       sortable: true,
     },
     {
-      name: (
-        <h6>
-          <b>Year</b>
-        </h6>
-      ),
-      selector: (row) => row.year,
+      name: <h6><b>Year</b></h6>,
+      selector: row => row.year,
       sortable: true,
     },
     {
-      name: (
-        <h6>
-          <b>Actions</b>
-        </h6>
-      ),
-      cell: (row) => (
+      name: <h6><b>Actions</b></h6>,
+      cell: row => (
         <div>
           <button
             className="btn btn-sm"
@@ -216,7 +186,7 @@ const ViewPaySlips = () => {
               padding: "0",
               marginLeft: "5px",
             }}
-            onClick={() => handleViewSalary(row.employeeId, row.payslipId)}
+            onClick={() => handleViewSalary(row.payslipId)}
           >
             <Eye size={22} color="green" />
           </button>
@@ -230,84 +200,83 @@ const ViewPaySlips = () => {
             }}
             onClick={() => handleShowDeleteModal(row.payslipId)}
           >
-            <XSquareFill size={22} color="#da542e" />
+            <XSquareFill size={22} color="#DA542E" />
           </button>
         </div>
       ),
     },
   ];
-
   return (
     <LayOut>
       <div className="container-fluid p-0">
         <h1 className="mb-4">Employee Payslip List</h1>
         <div className="card mb-3">
           <div className="card-body" style={{ paddingLeft: "20px" }}>
-          <div className="row d-flex align-items-center justify-content-between">
-  <div className="col-12 col-md-3">
-    <div className="form-group">
-      <label className="form-label">Select Employee Name</label>
-      <Controller
-        name="employeeId"
-        control={control}
-        defaultValue=""
-        rules={{ required: true }}
-        render={({ field }) => (
-          <Select
-            {...field}
-            options={employees}
-            value={employees.find((option) => option.value === field.value) || ""}
-            onChange={(val) => {
-              field.onChange(val.value);
-              setSelectedEmployeeId(val.value);
-            }}
-            placeholder="Select Employee Name"
-          />
-        )}
-      />
-      {errors.employeeId && (
-        <p className="errorMsg">Employee Name is required</p>
-      )}
-    </div>
-  </div>
-  
-  <div className="col-12 col-md-3">
-    <div className="form-group">
-      <label className="form-label">Select Year</label>
-      <Select
-        options={years}
-        value={years.find((option) => option.value === selectedYear)}
-        onChange={(selectedOption) => setSelectedYear(selectedOption.value)}
-        placeholder="Select Year"
-      />
-    </div>
-  </div>
-  
-  <div className="col-12 col-md-3">
-    <div className="form-group">
-      <label className="form-label">Select Month</label>
-      <Select
-        options={months}
-        value={months.find((option) => option.label === selectedMonth)}
-        onChange={(selectedOption) => setSelectedMonth(selectedOption.label)}
-        placeholder="Select Month"
-      />
-    </div>
-  </div>
-  
-  <div className="col-12 col-md-3 mt-4">
-    <div className="form-group">
-      <button
-        type="button"
-        className="btn btn-primary btn-block"
-        onClick={handleGoClick}
-        disabled={!selectedEmployeeId || !selectedMonth || !selectedYear}
-      >
-        Go
-      </button>
-    </div>
-  </div>
-</div>
+            <div className="row d-flex align-items-center justify-content-between">
+              <div className="col-12 col-md-3">
+                <div className="form-group">
+                  <label className="form-label">Select Employee Name</label>
+                  <Controller
+                    name="employeeId"
+                    control={control}
+                    defaultValue=""
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        options={employees}
+                        value={employees.find((option) => option.value === field.value) || ""}
+                        onChange={(val) => {
+                          field.onChange(val.value);
+                          setSelectedEmployeeId(val.value);
+                        }}
+                        placeholder="Select Employee Name"
+                      />
+                    )}
+                  />
+                  {errors.employeeId && (
+                    <p className="errorMsg">Employee Name is required</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="col-12 col-md-3">
+                <div className="form-group">
+                  <label className="form-label">Select Year</label>
+                  <Select
+                    options={years}
+                    value={years.find((option) => option.value === selectedYear)}
+                    onChange={(selectedOption) => setSelectedYear(selectedOption.value)}
+                    placeholder="Select Year"
+                  />
+                </div>
+              </div>
+
+              <div className="col-12 col-md-3">
+                <div className="form-group">
+                  <label className="form-label">Select Month</label>
+                  <Select
+                    options={months}
+                    value={months.find((option) => option.label === selectedMonth)}
+                    onChange={(selectedOption) => setSelectedMonth(selectedOption.label)}
+                    placeholder="Select Month"
+                  />
+                </div>
+              </div>
+
+              <div className="col-12 col-md-3 mt-4">
+                <div className="form-group">
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-block"
+                    onClick={handleGoClick}
+                    disabled={!selectedEmployeeId || !selectedMonth || !selectedYear}
+                  >
+                    Go
+                  </button>
+                </div>
+              </div>
+            </div>
 
           </div>
         </div>
@@ -344,7 +313,6 @@ const ViewPaySlips = () => {
             No payslips found for this employee.
           </div>
         )}
-
         <DeletePopup
           show={showDeleteModal}
           handleClose={handleCloseDeleteModal}
@@ -352,7 +320,6 @@ const ViewPaySlips = () => {
           id={selectedPayslipId}
           pageName="Payslip"
         />
-
         {showSpinner && (
           <div className="spinner-container" style={{ margin: "15% 0 0 45%" }}>
             <div className="spinner-border text-primary" role="status"></div>
@@ -362,5 +329,4 @@ const ViewPaySlips = () => {
     </LayOut>
   );
 };
-
 export default ViewPaySlips;

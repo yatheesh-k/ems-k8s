@@ -195,6 +195,7 @@ const EmployeeSalaryStructure = () => {
       allowances: {
         travelAllowance: parseFloat(travelAllowance),
         hra: parseFloat(hra),
+        pfContributionEmployee:parseFloat(pfEmployee),
         specialAllowance: parseFloat(specialAllowance),
         otherAllowances: parseFloat(otherAllowances),
       },

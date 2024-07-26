@@ -48,12 +48,14 @@ const CompanyView = () => {
       try {
         const response = await companyDeleteByIdApi(selectedItemId);
         if (response.status === 200) {
+          setTimeout(() => {
           toast.success("Company Deleted Successfully", {
             position: "top-right",
             transition: Bounce,
             hideProgressBar: true,
             theme: "colored",
             autoClose: 3000,
+          },1500);
           });
           getUser(); // Refresh the list after deletion
           handleCloseDeleteModal();

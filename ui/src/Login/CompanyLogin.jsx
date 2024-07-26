@@ -38,6 +38,7 @@ const CompanyLogin = () => {
   const [passwordShown, setPasswordShown] = useState(false);
   const [otpSent, setOtpSent] = useState(false); // Initially set to false
   const [loading, setLoading] = useState(false);
+  const [ShowOtpField, setShowOtpField] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [otpTimeLimit, setOtpTimeLimit] = useState(56); // Time limit for OTP in seconds
@@ -163,6 +164,7 @@ const CompanyLogin = () => {
     if (sessionTimeout) {
       reset(); // Reset form fields
       setSessionTimeout(false); // Reset session timeout state
+      setShowOtpField(false); // Reset OTP field visibility
     }
 
     if (otpSent && !otpExpired) {

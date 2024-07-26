@@ -147,9 +147,11 @@ const AttendanceReport = () => {
         hideProgressBar: true,
         theme: "colored",
         autoClose: 3000,
+       
       });
       handleCloseEditModal();
       setRefreshData((prev) => !prev);
+      navigate("/attendanceReport");
     } catch (error) {
       handleApiErrors(error);
     }

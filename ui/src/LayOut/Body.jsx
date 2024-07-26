@@ -28,5 +28,4 @@ const Body = () => {
     </LayOut>
   );
 };
-
 export default Body;

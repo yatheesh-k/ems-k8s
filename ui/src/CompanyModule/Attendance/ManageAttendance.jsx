@@ -18,7 +18,6 @@ const ManageAttendance = () => {
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
-  };  
 
   const onSubmit = async (data) => {
     const formData = new FormData();
@@ -33,7 +32,9 @@ const ManageAttendance = () => {
         toast.error(response.data.error.message);
       }
     } catch (error) {
-     handleApiErrors(error);
+
+      handleApiErrors(error);
+
     }
   };
 
@@ -48,13 +49,14 @@ const ManageAttendance = () => {
   };
   const exportToExcel = () => {
     const headers = [
-      "Employee Id",
-    	"First Name",	
-      "Last Name",	
-      "Email Id",	
-      "Month	Year",	
-      "No Of Working Days",	
-      "Total Working Days"
+      "EmployeeId",
+      "Month",
+      "Year",
+      "Total Working Days",
+      "No:of Working Days",
+      "First Name",
+      "Last Name",
+      "EmailId",
     ];
     const data = [headers];
 
@@ -70,9 +72,7 @@ const ManageAttendance = () => {
       <div className="container-fluid p-0">
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
-            <h1 className="h3 mb-3">
-              <strong>Attendance Management</strong>
-            </h1>
+            <h1 className="h3 mb-3"><strong>Attendance Management</strong></h1>
           </div>
           <div className="col-auto" style={{ paddingBottom: "20px" }}>
             <nav aria-label="breadcrumb">
@@ -100,35 +100,36 @@ const ManageAttendance = () => {
               </div>
               <div className="dropdown-divider" style={{ borderTopColor: "#d7d9dd" }} />
               <div className="card-body">
-              <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="mb-4">
-        <div className="row d-flex justify-content-center">
-          <div className="col-6 col-md-6 col-lg-6 mt-3" style={{ maxWidth: "400px" }}>
-            <label className="form-label">Select Attendance File</label>
-            <input
-              className="form-control"
-              type="file"
-              accept=".xlsx"
-             
-              {...register("attendanceFile", {
-                required: "Upload Attendance file",
-              })}
-            />
-            {errors.attendanceFile && (
-              <p className="errorMsg">{errors.attendanceFile.message}</p>
-            )}
-          </div>
-          <div className="col-4 col-md-4 col-lg-4 mt-5">
-            <button
-              type="submit" // Change type to submit to trigger form onSubmit
-              className="btn btn-primary"
-            >
-              Submit
-            </button>
-          </div>
-        </div>
-      </div>
-    </form>
+
+                <form onSubmit={handleSubmit(onSubmit)}>
+                  <div className="mb-4">
+                    <div className="row d-flex justify-content-center">
+                      <div className="col-6 col-md-6 col-lg-6 mt-3" style={{ maxWidth: "400px" }}>
+                        <label className="form-label">Select Attendance File</label>
+                        <input
+                          className="form-control"
+                          type="file"
+                          accept=".xlsx"
+
+                          {...register("attendanceFile", {
+                            required: "Upload Attendance file",
+                          })}
+                        />
+                        {errors.attendanceFile && (
+                          <p className="errorMsg">{errors.attendanceFile.message}</p>
+                        )}
+                      </div>
+                      <div className="col-4 col-md-4 col-lg-4 mt-5">
+                        <button
+                          type="submit" // Change type to submit to trigger form onSubmit
+                          className="btn btn-primary"
+                        >
+                          Submit
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form
               </div>
             </div>
           </div>

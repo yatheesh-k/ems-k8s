@@ -14,9 +14,9 @@ const CompanyRegistration = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors},
+    formState: { errors },
     reset,
-  } = useForm({mode:'onChange'});
+  } = useForm({ mode: 'onChange' });
   const [postImage, setPostImage] = useState("");
   const [companyType, setCompanyType] = useState("");
   const [passwordShown, setPasswordShown] = useState("");
@@ -31,11 +31,10 @@ const CompanyRegistration = () => {
   const handlePasswordChange = (e) => {
     setPasswordShown(e.target.value);
   };
-
   const handleEmailChange = (e) => {
     const value = e.target.value;
     if (value.trim() !== "") {
-      return; 
+      return;
     }
     if (e.keyCode === 32) {
       e.preventDefault();
@@ -66,15 +65,20 @@ const CompanyRegistration = () => {
       };
 
       if (location.state && location.state.id) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
         await companyUpdateByIdApi(location.state.id, updateData);
+        setTimeout(() => {
         toast.success("Company updated successfully");
         navigate("/companyView");
         reset();
+        }, 900);
       } else {
         await CompanyRegistrationApi(data);
+        setTimeout(() => {
         toast.success("Company created successfully");
         navigate("/companyView");
         reset();
+        },1000);
       }
     } catch (error) {
       handleApiErrors(error)
@@ -88,9 +92,10 @@ const CompanyRegistration = () => {
           const response = await companyViewByIdApi(location.state.id);
           console.log(response.data);
           reset(response.data);
+          setCompanyType(response.data.companyType);
           setEditMode(true);
         } catch (error) {
-         handleApiErrors(error);
+          handleApiErrors(error);
         }
       };
 
@@ -113,10 +118,9 @@ const CompanyRegistration = () => {
     const inputValue = e.target.value;
     let newValue = "";
     let capitalizeNext = true;
-  
+
     for (let i = 0; i < inputValue.length; i++) {
       const char = inputValue.charAt(i);
-  
       if (char === " ") {
         // Allow spaces if they are not leading spaces
         if (newValue.length > 0) {
@@ -141,31 +145,28 @@ const CompanyRegistration = () => {
   const toInputLowerCase = (e) => {
     const inputValue = e.target.value;
     let newValue = "";
-  
     for (let i = 0; i < inputValue.length; i++) {
       const char = inputValue.charAt(i);
-  
       if (char.match(/[a-z]/)) {
         // Only allow lowercase letters
         newValue += char;
       }
     }
-      e.target.value = newValue;
+    e.target.value = newValue;
   };
 
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
     let newValue = "";
-  
+    
     // Remove spaces from the beginning of inputValue
     inputValue = inputValue.trim();
-  
+
     // Track if we've encountered any non-space character yet
     let encounteredNonSpace = false;
-  
+
     for (let i = 0; i < inputValue.length; i++) {
       const char = inputValue.charAt(i);
-  
       if (char.match(/[a-zA-Z0-9]/) || (encounteredNonSpace && char === " ")) {
         // Allow any alphabetic characters (both lowercase and uppercase)
         // Allow numbers and spaces only after encountering non-space characters
@@ -175,12 +176,10 @@ const CompanyRegistration = () => {
         newValue += char;
       }
     }
-  
+    
     e.target.value = newValue.toLowerCase(); // Convert to lowercase (if needed)
   };
-  
-  
-  
+
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
@@ -246,12 +245,11 @@ const CompanyRegistration = () => {
                         <label>
                           <input
                             type="radio"
-                            label="Private Limited"
                             name="companyType"
                             value="Private Limited"
                             style={{ marginRight: "10px" }}
                             {...register("companyType", {
-                              required: "Please select your Company Type",
+                              required: !editMode ? "Please select your Company Type" : false,
                             })}
                             disabled={editMode}
                           />
@@ -264,12 +262,11 @@ const CompanyRegistration = () => {
                       <label className="ml-3">
                         <input
                           type="radio"
-                          label="Firm"
                           name="companyType"
                           value="Firm"
                           style={{ marginRight: "10px" }}
                           {...register("companyType", {
-                            required: "Please select your Company Type",
+                            required: !editMode ? "Please select your Company Type" : false,
                           })}
                           disabled={editMode}
                         />
@@ -306,9 +303,8 @@ const CompanyRegistration = () => {
                         {...register("companyName", {
                           required: "Company Name is required",
                           pattern: {
-                            value: /^[A-Za-z\s]+$/,
-                            message:
-                              "These fields only accept Alphabets",
+                            value: /^[a-zA-Z\s,.'\-\/]*$/,
+                            message: "Field accepts only alphabets and special characters:( , ' -  . /)",
                           },
                           minLength: {
                             value: 2,
@@ -337,7 +333,7 @@ const CompanyRegistration = () => {
                           pattern: {
                             value: /^[a-z]+$/,
                             message:
-                              "These fields only accept small Cases only.",
+                              "No Spaces allowed. These fields only accept small cases only.",
                           },
                           minLength: {
                             value: 2,
@@ -347,7 +343,6 @@ const CompanyRegistration = () => {
                           maxLength: {
                             value: 16,
                             message: "minimum 2 and maximum 16 characters allowed",
-
                           },
                         })}
                         disabled={editMode}
@@ -371,7 +366,7 @@ const CompanyRegistration = () => {
                           pattern: {
                             value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                             message:
-                              "Entered value does not match email format",
+                              "No Spaces allowed Entered value does not match email format",
                           },
                         })}
                         disabled={editMode}
@@ -406,7 +401,6 @@ const CompanyRegistration = () => {
                             maxLength: {
                               value: 16,
                               message: "minimum 6 & maximum 16 characters allowed",
-
                             },
                           })}
                         />
@@ -425,6 +419,7 @@ const CompanyRegistration = () => {
                       {errors.password && (
                         <p className="errorMsg">{errors.password.message}</p>
                       )}
+                      
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
@@ -484,7 +479,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Company Address"
                         onKeyDown={handleEmailChange}
-                          autoComplete="off"
+                        autoComplete="off"
                         {...register("companyAddress", {
                           required: "Company Address is required",
                           pattern: {
@@ -522,7 +517,7 @@ const CompanyRegistration = () => {
                 <div className="card-body">
                   <div className="row">
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Company CIN Number </label>
+                      <label className="form-label">Company CIN Number</label>
                       <input
                         type="text"
                         className="form-control"
@@ -550,7 +545,9 @@ const CompanyRegistration = () => {
                       )}
 
                     </div>
+
                     <div className="col-lg-1"></div>
+
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Company Register Number{" "}
@@ -579,9 +576,7 @@ const CompanyRegistration = () => {
                         disabled={editMode}
                       />
                       {errors.companyRegNo && (
-                        <p className="errorMsg">
-                          {errors.companyRegNo.message}
-                        </p>
+                        <p className="errorMsg">{errors.companyRegNo.message}</p>
                       )}
                     </div>
 
@@ -612,9 +607,7 @@ const CompanyRegistration = () => {
                         })}
                         disabled={editMode}
                       />
-                      {errors.gstNo && (
-                        <p className="errorMsg">{errors.gstNo.message}</p>
-                      )}
+                      {errors.gstNo && <p className="errorMsg">{errors.gstNo.message}</p>}
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
@@ -702,6 +695,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter MailId"
                         autoComplete="off"
+                        onKeyDown={handleEmailChange}
                         {...register("personalMailId", {
                           required: "MailId is required",
                           pattern: {
@@ -779,21 +773,16 @@ const CompanyRegistration = () => {
             </div>
           </div>
           <div className="col-lg-1"></div>
-          <div
-            className="col-12 d-flex justify-content-end mt-5"
+          <div className="col-12 d-flex justify-content-end mt-5"
             style={{ background: "none" }}
           >
-            <button
-              className="btn btn-primary btn-lg"
-              style={{ marginRight: "65px" }}
-              type="submit"
-            >
-              Submit
+            <button type="submit" className="btn btn-primary btn-lg" style={{ marginRight: "65px" }}>
+              {editMode ? 'Update Company' : 'Submit'}
             </button>
           </div>
         </form>
-      </div>
-    </LayOut>
+      </div >
+    </LayOut >
   );
 };
 

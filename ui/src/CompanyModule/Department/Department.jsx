@@ -37,7 +37,6 @@ const Department = () => {
       handleApiErrors(error);
     }
   };
-
   useEffect(() => {
     fetchDepartments();
   }, []);
@@ -65,7 +64,7 @@ const Department = () => {
           fetchDepartments();
           }, 1000);
           setAddDeparment(false);
-
+          }, 1000);
       }
       reset();
       setEditingId(null);
@@ -84,9 +83,7 @@ const Department = () => {
         setTimeout(() => {
           toast.success("Department Deleted Successfully");
             fetchDepartments(); // Fetch updated list of departments after delay
-
           }, 900);
-
         handleCloseDeleteModal(); // Close the delete confirmation modal
       } catch (error) {
         handleApiErrors(error);
@@ -123,6 +120,9 @@ const Department = () => {
 
   const toInputTitleCase = (e) => {
     let value = e.target.value;
+    const titleCaseValue = value.replace(/^\s+/g, ''); // Remove leading spaces
+    e.target.value = titleCaseValue;
+
     // Split the value into an array of words
     const words = value.split(" ");
     // Capitalize the first letter of each word

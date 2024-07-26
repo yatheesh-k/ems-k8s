@@ -15,6 +15,7 @@ const EmployeeRegistration = () => {
     handleSubmit,
     control,
     formState: { errors },
+    
     reset,
     setValue,
   } = useForm({
@@ -50,12 +51,10 @@ const EmployeeRegistration = () => {
   const handleEmailChange = (e) => {
     // Get the current value of the input field
     const value = e.target.value;
-
     // Check if the value is empty
     if (value.trim() !== "") {
       return; // Allow space button
     }
-
     // Prevent space character entry if the value is empty
     if (e.keyCode === 32) {
       e.preventDefault();
@@ -127,15 +126,10 @@ const EmployeeRegistration = () => {
     }
   };
 
-
-
   useEffect(() => {
     fetchDepartments();
     fetchDesignations();
   }, []);
-
-
-
 
   const toInputTitleCase = (e) => {
     let value = e.target.value;
@@ -191,7 +185,7 @@ const EmployeeRegistration = () => {
         roles:roles
       };
     }
-  
+
     try {
       if (location.state && location.state.id) {
         const response = await EmployeePatchApiById(location.state.id, payload);
@@ -279,8 +273,6 @@ const EmployeeRegistration = () => {
     return `${year}-${month}-${day}`;
   };
   
-
-
   return (
     <LayOut>
       <div className="container-fluid p-0">
@@ -774,7 +766,7 @@ const EmployeeRegistration = () => {
                           pattern: {
                             value: /^\d{9,18}$/,
                             message:
-                              "These fields accepts only Integers.No Spaces Allowed",
+                              "These fields accepts only Integers",
                           },
                           minLength: {
                             value: 9,
@@ -806,7 +798,7 @@ const EmployeeRegistration = () => {
                           pattern: {
                             value: /^[A-Za-z]{4}0[A-Z0-9]{6}$/,
                             message:
-                              "Please enter a valid IFSC code.Spaces Not Allowed ",
+                              "Please enter a valid IFSC code ",
                           },
                           maxLength: {
                             value: 11,
@@ -827,18 +819,20 @@ const EmployeeRegistration = () => {
                         name="bankName"
                         onInput={toInputTitleCase}
                         autoComplete="off"
+                        onKeyDown={handleEmailChange}
                         {...register("bankName", {
                           required: "Bank Name  Required",
                           pattern: {
                             value: /^[A-Za-z&'(),./\- ]{1,100}$/,
                             message:
-                              "Allows only Alphabets and special Characters",
+                              "Invalid Bank Name format",
                           },
                           maxLength: {
                             value: 50,
                             message: "Bank Name must not exceed 50 characters",
                           },
                         })}
+                        // disabled={editMode}
                       />
                       {errors.bankName && (
                         <p className="errorMsg">{errors.bankName.message}</p>
@@ -854,6 +848,7 @@ const EmployeeRegistration = () => {
                         name="uanNo"
                         onInput={toInputTitleCase}
                         autoComplete="off"
+                        onKeyDown={handleEmailChange}
                         {...register("uanNo", {
                           required: "Uan Required",
                           pattern: {
@@ -882,6 +877,7 @@ const EmployeeRegistration = () => {
                         name="panNo"
                         onInput={toInputTitleCase}
                         autoComplete="off"
+                        onKeyDown={handleEmailChange}
                         {...register("panNo", {
                           required: "Pan Number Required",
                           maxLength: {
@@ -891,7 +887,7 @@ const EmployeeRegistration = () => {
                           pattern: {
                             value: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
                             message:
-                              "Pan Number should be in the format: ABCDE1234F.Spaces are not allowed",
+                              "Pan Number should be in the format: ABCDE1234F",
                           },
                         })}
                       />
