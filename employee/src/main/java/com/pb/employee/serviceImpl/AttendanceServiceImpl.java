@@ -191,16 +191,16 @@ public class AttendanceServiceImpl implements AttendanceService {
                     AttendanceRequest attendanceRequest = new AttendanceRequest();
                     attendanceRequest.setCompany(company);
                     attendanceRequest.setEmployeeId(getCellValue(currentRow.getCell(0)));
-                    attendanceRequest.setMonth(getCellValue(currentRow.getCell(1)));
-                    attendanceRequest.setFirstName(getCellValue(currentRow.getCell(5)));
-                    attendanceRequest.setLastName(getCellValue(currentRow.getCell(6)));
-                    attendanceRequest.setEmailId(getCellValue(currentRow.getCell(7)));
+                    attendanceRequest.setMonth(getCellValue(currentRow.getCell(4)));
+                    attendanceRequest.setFirstName(getCellValue(currentRow.getCell(1)));
+                    attendanceRequest.setLastName(getCellValue(currentRow.getCell(2)));
+                    attendanceRequest.setEmailId(getCellValue(currentRow.getCell(3)));
 
                     // Handle parsing and setting year, totalWorkingDays, and noOfWorkingDays
                     try {
-                        attendanceRequest.setYear(String.valueOf((int) Double.parseDouble(getCellValue(currentRow.getCell(2)))));
-                        attendanceRequest.setTotalWorkingDays(String.valueOf((int) Double.parseDouble(getCellValue(currentRow.getCell(3)))));
-                        attendanceRequest.setNoOfWorkingDays(String.valueOf((int) Double.parseDouble(getCellValue(currentRow.getCell(4)))));
+                        attendanceRequest.setYear(String.valueOf((int) Double.parseDouble(getCellValue(currentRow.getCell(5)))));
+                        attendanceRequest.setTotalWorkingDays(String.valueOf((int) Double.parseDouble(getCellValue(currentRow.getCell(7)))));
+                        attendanceRequest.setNoOfWorkingDays(String.valueOf((int) Double.parseDouble(getCellValue(currentRow.getCell(6)))));
                     } catch (NumberFormatException e) {
                         log.error("Error parsing numeric values from row {}: {}", currentRow.getRowNum(), e.getMessage());
                         throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.NUMBER_EXCEPTION), HttpStatus.INTERNAL_SERVER_ERROR);
