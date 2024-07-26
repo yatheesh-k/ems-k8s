@@ -149,7 +149,7 @@ public class CompanyUtils {
     }
 
 
-    public static Entity maskEmployeeProperties(EmployeeRequest employeeRequest, String id) {
+    public static Entity maskEmployeeProperties(EmployeeRequest employeeRequest, String id, String companyId) {
         String password = Base64.getEncoder().encodeToString(employeeRequest.getPassword().getBytes());
         String hra = null, pan = null, pf = null, spa = null, ta = null;
         if(employeeRequest.getPanNo() != null) {
@@ -161,6 +161,7 @@ public class CompanyUtils {
         entity.setId(id);
         entity.setPassword(password);
         entity.setPanNo(pan);
+        entity.setCompanyId(companyId);
         entity.setType(Constants.EMPLOYEE);
         return entity;
     }

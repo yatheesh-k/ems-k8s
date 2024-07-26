@@ -20,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Slf4j
@@ -35,8 +37,9 @@ public class DesignationServiceImpl implements DesignationService {
     public ResponseEntity<?> registerDesignation(DesignationRequest designationRequest) throws EmployeeException{
         // Check if a company with the same short or company name already exists
         log.debug("validating name {} existed ", designationRequest.getName());
-
-        String resourceId = ResourceIdUtils.generateDesignationResourceId(designationRequest.getName());
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        String timestamp = currentDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        String resourceId = ResourceIdUtils.generateDesignationResourceId(designationRequest.getName(), timestamp);
         Object entity = null;
         String index = ResourceIdUtils.generateCompanyIndex(designationRequest.getCompanyName());
         try{

@@ -39,12 +39,12 @@ public class ResourceIdUtils {
         return generateGlobalResourceId(ResourceType.EMS_ADMIN, id);
     }
 
-    public static String generateDepartmentResourceId(String id) {
-        return generateGlobalResourceId(ResourceType.DEPARTMENT, id);
+    public static String generateDepartmentResourceId(String id, String timestamp) {
+        return generateGlobalResourceId(ResourceType.DEPARTMENT, id, timestamp);
     }
 
-    public static String generateDesignationResourceId(String id) {
-        return generateGlobalResourceId(ResourceType.DESIGNATION, id);
+    public static String generateDesignationResourceId(String id, String timestamp) {
+        return generateGlobalResourceId(ResourceType.DESIGNATION, id, timestamp);
     }
     public static String generateAttendanceId(String company, String employeeId,String year,String month) {
         return generateGlobalResourceId(ResourceType.ATTENDANCE,company,year,month,employeeId);

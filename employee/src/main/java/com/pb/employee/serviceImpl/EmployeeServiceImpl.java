@@ -7,6 +7,7 @@ import com.pb.employee.exception.EmployeeErrorMessageKey;
 import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.opensearch.OpenSearchOperations;
+import com.pb.employee.persistance.model.CompanyEntity;
 import com.pb.employee.persistance.model.EmployeeEntity;
 import com.pb.employee.persistance.model.Entity;
 import com.pb.employee.request.EmployeePasswordReset;
@@ -65,7 +66,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                     HttpStatus.CONFLICT);
         }
         try{
-            Entity companyEntity = CompanyUtils.maskEmployeeProperties(employeeRequest, resourceId);
+            List<CompanyEntity> shortNameEntity = openSearchOperations.getCompanyByData(null, Constants.COMPANY, employeeRequest.getCompanyName());
+
+            Entity companyEntity = CompanyUtils.maskEmployeeProperties(employeeRequest, resourceId, shortNameEntity.getFirst().getId());
             Entity result = openSearchOperations.saveEntity(companyEntity, resourceId, index);
         } catch (Exception exception) {
             log.error("Unable to save the employee details {} {}", employeeRequest.getEmailId(),exception.getMessage());

@@ -17,6 +17,7 @@ import com.pb.employee.service.DepartmentService;
 import com.pb.employee.util.CompanyUtils;
 import com.pb.employee.util.Constants;
 import com.pb.employee.util.ResourceIdUtils;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -39,7 +42,9 @@ public class DepartmentServiceImpl implements DepartmentService {
     public ResponseEntity<?> registerDepartment(DepartmentRequest departmentRequest) throws EmployeeException{
         // Check if a company with the same short or company name already exists
         log.debug("validating name {} exsited ", departmentRequest.getName());
-        String resourceId = ResourceIdUtils.generateDepartmentResourceId(departmentRequest.getName());
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        String timestamp = currentDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        String resourceId = ResourceIdUtils.generateDepartmentResourceId(departmentRequest.getName(), timestamp);
         Object entity = null;
         String index = ResourceIdUtils.generateCompanyIndex(departmentRequest.getCompanyName());
         try{
