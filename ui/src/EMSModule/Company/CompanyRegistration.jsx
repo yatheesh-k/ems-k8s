@@ -68,17 +68,17 @@ const CompanyRegistration = () => {
         await new Promise(resolve => setTimeout(resolve, 2000));
         await companyUpdateByIdApi(location.state.id, updateData);
         setTimeout(() => {
-        toast.success("Company updated successfully");
-        navigate("/companyView");
-        reset();
+          toast.success("Company updated successfully");
+          navigate("/companyView");
+          reset();
         }, 900);
       } else {
         await CompanyRegistrationApi(data);
         setTimeout(() => {
-        toast.success("Company created successfully");
-        navigate("/companyView");
-        reset();
-        },1000);
+          toast.success("Company created successfully");
+          navigate("/companyView");
+          reset();
+        }, 1000);
       }
     } catch (error) {
       handleApiErrors(error)
@@ -158,7 +158,7 @@ const CompanyRegistration = () => {
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
     let newValue = "";
-    
+
     // Remove spaces from the beginning of inputValue
     inputValue = inputValue.trim();
 
@@ -176,7 +176,7 @@ const CompanyRegistration = () => {
         newValue += char;
       }
     }
-    
+
     e.target.value = newValue.toLowerCase(); // Convert to lowercase (if needed)
   };
 
@@ -375,53 +375,10 @@ const CompanyRegistration = () => {
                         <p className="errorMsg">{errors.emailId.message}</p>
                       )}
                     </div>
-
-                    <div className="col-lg-1"></div>
-                    <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Password  <span style={{ color: "red" }}>*</span></label>
-                      <div className="col-sm-12 input-group">
-                        <input
-                          className="form-control"
-                          placeholder="Enter Password"
-                          onChange={handlePasswordChange}
-                          autoComplete="off"
-                          onKeyDown={handleEmailChange}
-                          type={passwordShown ? "text" : "password"}
-                          {...register("password", {
-                            required: "Password is Required",
-                            pattern: {
-                              value:
-                                /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{6,16}$/,
-                              message: "Password must contain at least 6 characters, including one uppercase letter, one lowercase letter, one number, and one special character.",
-                            },
-                            minLength: {
-                              value: 6,
-                              message: "minimum 6 characters required",
-                            },
-                            maxLength: {
-                              value: 16,
-                              message: "minimum 6 & maximum 16 characters allowed",
-                            },
-                          })}
-                        />
-                        <i
-                          onClick={togglePasswordVisiblity}
-                          style={{ margin: "5px" }}
-                        >
-                          {" "}
-                          {passwordShown ? (
-                            <Eye size={17} />
-                          ) : (
-                            <EyeSlash size={17} />
-                          )}
-                        </i>
-                      </div>
-                      {errors.password && (
-                        <p className="errorMsg">{errors.password.message}</p>
-                      )}
-                      
-                    </div>
-                    <div className="col-12 col-md-6 col-lg-5 mb-3">
+                    {editMode ? (
+                      <> 
+                      <div className="col-lg-1"></div>
+                      <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Contact Number <span style={{ color: "red" }}>*</span>
                       </label>
@@ -444,8 +401,79 @@ const CompanyRegistration = () => {
                         <p className="errorMsg">{errors.landNo.message}</p>
                       )}
                     </div>
+                    </>
+                    ) : (
+                      <>
+                        <div className="col-lg-1"></div>
+                        <div className="col-12 col-md-6 col-lg-5 mb-3">
+                          <label className="form-label">
+                            Password <span style={{ color: "red" }}>*</span>
+                          </label>
+                          <div className="col-sm-12 input-group">
+                            <input
+                              className="form-control"
+                              placeholder="Enter Password"
+                              onChange={handlePasswordChange}
+                              autoComplete="off"
+                              onKeyDown={handleEmailChange}
+                              type={passwordShown ? "text" : "password"}
+                              {...register("password", {
+                                required: "Password is Required",
+                                pattern: {
+                                  value: /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{6,16}$/,
+                                  message:
+                                    "Password must contain at least 6 characters, including one uppercase letter, one lowercase letter, one number, and one special character.",
+                                },
+                                minLength: {
+                                  value: 6,
+                                  message: "Minimum 6 characters required",
+                                },
+                                maxLength: {
+                                  value: 16,
+                                  message: "Minimum 6 & maximum 16 characters allowed",
+                                },
+                              })}
+                            />
+                            <i onClick={togglePasswordVisiblity} style={{ margin: "5px" }}>
+                              {passwordShown ? <Eye size={17} /> : <EyeSlash size={17} />}
+                            </i>
+                          </div>
+                          {errors.password && (
+                            <p className="errorMsg">{errors.password.message}</p>
+                          )}
+                        </div>
+                      </>
+                    )}
+                    {!editMode &&(
+                      <>
+    <div className="col-12 col-md-6 col-lg-5 mb-3">
+    <label className="form-label">
+      Contact Number <span style={{ color: "red" }}>*</span>
+    </label>
+    <input
+      type="tel"
+      className="form-control"
+      placeholder="Enter Contact Number"
+      autoComplete="off"
+      onKeyDown={handleEmailChange}
+      {...register("landNo", {
+        required: "Contact Number is required",
+        pattern: {
+          value: /^[0-9]{10}$/,
+          message:
+            "Contact Number should contain only 10 numbers. ",
+        },
+      })}
+    />
+    {errors.landNo && (
+      <p className="errorMsg">{errors.landNo.message}</p>
+    )}
+  </div>
 
-                    <div className="col-lg-1"></div>
+  <div className="col-lg-1"></div>
+  </>
+                    )}
+                
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
                       <label className="form-label">
                         Alternate Number <span style={{ color: "red" }}>*</span>
@@ -469,6 +497,10 @@ const CompanyRegistration = () => {
                         <p className="errorMsg">{errors.mobileNo.message}</p>
                       )}
                     </div>
+                    {editMode &&(
+                       <div className="col-lg-1"></div>
+
+                    )}
 
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">

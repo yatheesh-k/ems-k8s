@@ -714,15 +714,12 @@ const EmployeeRegistration = () => {
                           <Select
                             {...field}
                             options={[
-                              { value: 0, label: "OnBoarding" },
-                              { value: 1, label: "Active" },
-                              { value: 2, label: "Inactive" },
-                              { value: 3, label: "Notice Period" },
-                              { value: 4, label: "Relieved" }
+                              { value: "Active", label: "Active" },
+                              { value: "InActive", label: "InActive" },
                             ]}
                             value={{
                               value: field.value,
-                              label: ["OnBoarding", "Active", "Inactive", "Notice Period", "Relieved"][field.value],
+                              label: ["Active", "InActive"].includes(field.value) ? field.value : "Select Status",
                             }}
                             onChange={(val) => field.onChange(val.value)}
                             placeholder="Select Status"

@@ -247,24 +247,13 @@ const AttendanceReport = () => {
           <div className="col-12">
             <div className="card">
               <div className="card-header">
-                <div className="row d-flex align-items-center justify-content-around">
+                <div className="row d-flex justify-content-center" style={{paddingLeft:'50px'}}>
                   <div className="col-md-3 mt-3">
                   <label className="form-label">Select Employee Name</label>
                     <Select
                       options={employees}
                       onChange={handleEmployeeChange}
                       placeholder="Select Employee"
-                    />
-                  </div>
-                  <div className="col-md-3 mt-3">
-                  <label className="form-label">Select Month</label>
-                    <Select
-                      options={getMonthNames().map((month, index) => ({
-                        label: month,
-                        value: index + 1,
-                      }))}
-                      onChange={(selectedOption) => setSelectedMonth(selectedOption.value)}
-                      placeholder="Select Month"
                     />
                   </div>
                   <div className="col-md-3 mt-3">
@@ -276,6 +265,17 @@ const AttendanceReport = () => {
                       }))}
                       onChange={(selectedOption) => setSelectedYear(selectedOption.value)}
                       placeholder="Select Year"
+                    />
+                  </div>
+                  <div className="col-md-3 mt-3">
+                  <label className="form-label">Select Month</label>
+                    <Select
+                      options={getMonthNames().map((month, index) => ({
+                        label: month,
+                        value: index + 1,
+                      }))}
+                      onChange={(selectedOption) => setSelectedMonth(selectedOption.value)}
+                      placeholder="Select Month"
                     />
                   </div>
                   <div className="col-md-3 mt-5">

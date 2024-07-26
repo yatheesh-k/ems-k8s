@@ -395,7 +395,7 @@ const PayslipDoc = () => {
                   </tr>
                   <tr>
                     <td className="earnings" style={{ padding: "4px", textAlign: "center" }}>Other Allowance</td>
-                    <td className="earnings">{payslipData.salary.allowances.otherAllowance || 0}</td>
+                    <td className="earnings">{payslipData.salary.allowances.otherAllowances || 0}</td>
                     <td className="taxes" style={{ padding: "4px", textAlign: "center" }}>Income Tax</td>
                     <td className="taxes">{payslipData.salary.deductions.incomeTax || 0}</td>
                   </tr>
