@@ -10,6 +10,7 @@ import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.opensearch.OpenSearchOperations;
 import com.pb.employee.persistance.model.*;
 import com.pb.employee.request.AttendanceUpdateRequest;
+import com.pb.employee.request.EmployeeStatus;
 import org.apache.poi.ss.usermodel.*;
 import com.pb.employee.request.AttendanceRequest;
 import com.pb.employee.service.AttendanceService;
@@ -53,15 +54,13 @@ public class AttendanceServiceImpl implements AttendanceService {
                 EmployeeEntity employee = null;
 
                 employee = openSearchOperations.getEmployeeById(employeeId, null, index);
-
-                if ("InActive".equals(employee.getStatus())) {
+                if (EmployeeStatus.INACTIVE.getStatus().equals(employee.getStatus())) {
                     log.error("The employee is inactive {}", employeeId);
                     return new ResponseEntity<>(
-                            ResponseBuilder.builder().build().createFailureResponse(
-                                    new Exception("Employee is inactive"),
-                                    ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_INACTIVE)),
+                            ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_INACTIVE)))),
                             HttpStatus.CONFLICT);
                 }
+
                 addAttendanceOfEmployees(attendanceRequest);
             }
         } catch (Exception e) {

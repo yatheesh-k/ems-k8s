@@ -188,7 +188,7 @@ const handleSalary = (id) => {
         </div>
       ),
       sortable: true,
-      width: "180px",
+      width: "150px",
     },
     {
       name: <h6><b>Department</b></h6>,

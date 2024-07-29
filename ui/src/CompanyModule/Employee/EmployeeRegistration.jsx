@@ -719,7 +719,7 @@ const EmployeeRegistration = () => {
                             ]}
                             value={{
                               value: field.value,
-                              label: ["Active", "InActive"].includes(field.value) ? field.value : "Select Status",
+                              label: ["OnBoarding", "Active", "Inactive", "Notice Period", "Relieved"][field.value],
                             }}
                             onChange={(val) => field.onChange(val.value)}
                             placeholder="Select Status"

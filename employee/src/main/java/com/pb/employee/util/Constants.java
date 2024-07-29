@@ -44,4 +44,6 @@ public class Constants {
     public static final String FILE = "file";
     public static final String MONTH = "month";
     public static final String YEAR = "year";
+    public static final String GENERATE_PAYSLIP = "generatePayslip";
+    public static final String EMPLOYEE_WITHOUT_ATTENDANCE = "employeesWithoutAttendance";
 }

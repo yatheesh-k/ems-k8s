@@ -156,8 +156,8 @@ public class PayslipServiceImpl implements PayslipService {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
         Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("generatedPayslips", generatedPayslips);
-        responseBody.put("employeesWithoutAttendance", employeesWithoutAttendance);
+        responseBody.put(Constants.GENERATE_PAYSLIP, generatedPayslips);
+        responseBody.put(Constants.EMPLOYEE_WITHOUT_ATTENDANCE, employeesWithoutAttendance);
         if (generatedPayslips.size() == 0){
             log.error("attendance are not found for the employees {}", employeesWithoutAttendance);
             throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_GET_ATTENDANCE), employeesWithoutAttendance),
