@@ -115,7 +115,6 @@ public class PayslipUtils {
             pfEmployer = pfEmployer/12.0;
             salary.getDeductions().setPfEmployer(String.valueOf(pfEmployer));
         }
-        if (salaryRequest.getDeductions().getLop() != null) {
 
             int noOfLeaves = totalWorkingDays - noOfWorkingDays;
             if (noOfLeaves > 1) {
@@ -127,7 +126,7 @@ public class PayslipUtils {
             }
             salary.getDeductions().setLop(String.valueOf(lop));
 
-        }
+
         if (salaryRequest.getDeductions().getTotalDeductions() != null) {
             if (lop != null) {
                 tded = lop + pfEmployer + pfE;
