@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 const EmployeeSalaryList = () => {
   const [employeeSalaryView, setEmployeeSalaryView] = useState([]);
   const [expanded, setExpanded] = useState({});
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const id = queryParams.get("id");
@@ -29,7 +29,7 @@ const EmployeeSalaryList = () => {
     }
     console.error(error.response);
   };
- 
+
   const toggleExpand = (index) => {
     setExpanded(prevState => ({ ...prevState, [index]: !prevState[index] }));
   };
@@ -41,7 +41,7 @@ const EmployeeSalaryList = () => {
   return (
     <LayOut>
       <div className="container mt-4">
-      <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
+        <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3"><strong>Employee Salary List</strong> </h1>
           </div>
@@ -95,14 +95,14 @@ const EmployeeSalaryList = () => {
                       </div>
                     </div>
                   </div>
-                  <hr/>
+                  <hr />
                   <div className="row mb-3">
                     <div className="col mb-1">
                       <h3>Allowances</h3>
                     </div>
                   </div>
                   <div className="row">
-                  <div className="col mb-3">
+                    <div className="col mb-3">
                       <div className="form-group">
                         <label>Basic Salary:</label>
                         <input type="text" className="form-control" value={item.basicSalary} readOnly />
@@ -147,7 +147,7 @@ const EmployeeSalaryList = () => {
                       </div>
                     </div>
                   </div>
-                  <hr/>
+                  <hr />
                   <div className="row mt-4 mb-3">
                     <div className="col mb-1">
                       <h3>Deductions</h3>
@@ -193,7 +193,7 @@ const EmployeeSalaryList = () => {
                       </div>
                     </div>
                   </div>
-                  <hr/>
+                  <hr />
                   <div className="row mt-4 mb-3">
                     <div className="col mb-1">
                       <h3>Net Amount</h3>
@@ -212,9 +212,9 @@ const EmployeeSalaryList = () => {
           ))
         ) : (
           <div className='text-center mt-5'>
-          <button className="btn btn-primary" onClick={handleNavigateToRegister}>Go to Salary Register</button>
-          <p className='mt-2 fw-bold'>No salary data available.</p>
-        </div>
+            <button className="btn btn-primary" onClick={handleNavigateToRegister}>Go to Salary Register</button>
+            <p className='mt-2 fw-bold'>No salary data available.</p>
+          </div>
         )}
       </div>
     </LayOut>

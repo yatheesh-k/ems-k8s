@@ -28,7 +28,7 @@ const EmployeeSalaryById = () => {
       <div className="container mt-4">
       <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
-            <h1 className="h3 mb-3"><strong>Employee Salary List</strong> </h1>
+            <h1 className="h3 mb-3"><strong>Salary List</strong> </h1>
           </div>
           <div className="col-auto">
             <nav aria-label="breadcrumb">
@@ -36,11 +36,8 @@ const EmployeeSalaryById = () => {
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
-                <li className="breadcrumb-item">
-                  <a href="/employeeView">Employee View</a>
-                </li>
                 <li className="breadcrumb-item active">
-                  Employee Salary List
+                   Salary List
                 </li>
               </ol>
             </nav>
@@ -87,6 +84,12 @@ const EmployeeSalaryById = () => {
                     </div>
                   </div>
                   <div className="row">
+                  <div className="col mb-3">
+                      <div className="form-group">
+                        <label>Basic Salary:</label>
+                        <input type="text" className="form-control" value={item.basicSalary} readOnly />
+                      </div>
+                    </div>
                     <div className="col mb-3">
                       <div className="form-group">
                         <label>Travel Allowance:</label>

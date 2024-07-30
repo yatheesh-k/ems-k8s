@@ -114,30 +114,26 @@ const CompanyRegistration = () => {
     console.error(error.response);
   };
 
-  const toInputTitleCase = (e) => {
-    const inputValue = e.target.value;
-    let newValue = "";
-    let capitalizeNext = true;
-
-    for (let i = 0; i < inputValue.length; i++) {
-      const char = inputValue.charAt(i);
-      if (char === " ") {
-        // Allow spaces if they are not leading spaces
-        if (newValue.length > 0) {
-          newValue += " ";
-          capitalizeNext = true; // Next character should be capitalized
-        }
-      } else if (capitalizeNext) {
-        // Capitalize the first letter of each word
-        newValue += char.toUpperCase();
-        capitalizeNext = false;
-      } else {
-        // Preserve lowercase characters in between words
-        newValue += char.toLowerCase();
-      }
+  const  toInputTitleCase = (e) => {
+    const input = e.target;
+    let value = input.value;
+    // Remove leading spaces
+    value = value.replace(/^\s+/g, '');
+    // Initially disallow spaces
+    if (!/\S/.test(value)) {
+      // If no non-space characters are present, prevent spaces
+      value = value.replace(/\s+/g, '');
+    } else {
+      // Allow spaces if there are non-space characters
+      value = value.replace(/^\s+/g, ''); // Remove leading spaces
+      const words = value.split(' ');
+      const capitalizedWords = words.map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      });
+      value = capitalizedWords.join(' ');
     }
-    // Update the input field value
-    e.target.value = newValue;
+    // Update input value
+    input.value = value;
   };
 
 
@@ -205,7 +201,7 @@ const CompanyRegistration = () => {
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3">
-              <strong>Company Registration</strong>{" "}
+              <strong>Registration</strong>{" "}
             </h1>
           </div>
           <div className="col-auto">
@@ -214,7 +210,7 @@ const CompanyRegistration = () => {
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
-                <li className="breadcrumb-item active">Company Registration</li>
+                <li className="breadcrumb-item active">Registration</li>
               </ol>
             </nav>
           </div>

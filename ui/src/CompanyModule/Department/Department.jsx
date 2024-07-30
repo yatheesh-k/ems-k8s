@@ -9,12 +9,12 @@ import { ModalBody, ModalHeader, ModalTitle } from 'react-bootstrap';
 import { DepartmentDeleteApiById, DepartmentGetApi, DepartmentPostApi, DepartmentPutApiById } from '../../Utils/Axios';
 
 const Department = () => {
-  const { register, handleSubmit, reset, setValue,formState:{errors} } = useForm();
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm({mode:"onChange"});
   const [departments, setDepartments] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [addDepartment, setAddDeparment] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState(null); 
+  const [selectedItemId, setSelectedItemId] = useState(null);
   const [search, setSearch] = useState('');
   const [filteredDepartments, setFilteredDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -48,7 +48,7 @@ const Department = () => {
         companyName: company,
         name: data.name,
       };
-  
+
       if (editingId) {
         await DepartmentPutApiById(editingId, formData);
         setTimeout(() => {
@@ -64,7 +64,7 @@ const Department = () => {
           setAddDeparment(false);
         }, 1000);
       }
-  
+
       reset();
       setEditingId(null);
     } catch (error) {
@@ -73,7 +73,7 @@ const Department = () => {
       setLoading(false);
     }
   };
-  
+
 
   const handleConfirmDelete = async (id) => {
     if (id) {
@@ -81,13 +81,13 @@ const Department = () => {
         await DepartmentDeleteApiById(id)
         setTimeout(() => {
           toast.success("Department Deleted Successfully");
-            fetchDepartments(); // Fetch updated list of departments after delay
-          }, 900);
+          fetchDepartments(); // Fetch updated list of departments after delay
+        }, 900);
         handleCloseDeleteModal(); // Close the delete confirmation modal
       } catch (error) {
         handleApiErrors(error);
       }
-    } 
+    }
   };
 
   const handleApiErrors = (error) => {
@@ -100,10 +100,11 @@ const Department = () => {
     console.error(error.response);
   };
 
-  useEffect(()=>{
-    fetchDepartments();
-  },[])
   
+  useEffect(() => {
+    fetchDepartments();
+  }, [])
+
   useEffect(() => {
     setFilteredDepartments(departments);
   }, [departments]);
@@ -117,23 +118,27 @@ const Department = () => {
     }
   };
 
-  const toInputTitleCase = (e) => {
-    let value = e.target.value;
-    const titleCaseValue = value.replace(/^\s+/g, ''); // Remove leading spaces
-    e.target.value = titleCaseValue;
-
-    // Split the value into an array of words
-    const words = value.split(" ");
-    // Capitalize the first letter of each word
-    const capitalizedWords = words.map((word) => {
-      // Capitalize the first letter of the word
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    });
-    // Join the capitalized words back into a single string
-    value = capitalizedWords.join(" ");
-    // Set the modified value to the input field
-    e.target.value = value;
-  };  
+  const  toInputTitleCase = (e) => {
+    const input = e.target;
+    let value = input.value;
+    // Remove leading spaces
+    value = value.replace(/^\s+/g, '');
+    // Initially disallow spaces
+    if (!/\S/.test(value)) {
+      // If no non-space characters are present, prevent spaces
+      value = value.replace(/\s+/g, '');
+    } else {
+      // Allow spaces if there are non-space characters
+      value = value.replace(/^\s+/g, ''); // Remove leading spaces
+      const words = value.split(' ');
+      const capitalizedWords = words.map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      });
+      value = capitalizedWords.join(' ');
+    }
+    // Update input value
+    input.value = value;
+  };
 
 
 
@@ -141,7 +146,7 @@ const Department = () => {
     setSearch(searchTerm);
     if (searchTerm === '') {
       console.log(departments)
-      setFilteredDepartments(departments); 
+      setFilteredDepartments(departments);
     } else {
       const filteredList = departments.filter(department =>
         department.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -151,7 +156,7 @@ const Department = () => {
   };
 
   console.log(filteredDepartments);
-  
+
 
 
   const columns = [
@@ -189,140 +194,164 @@ const Department = () => {
     }
   ];
 
+  const handleEmailChange = (e) => {
+    // Get the current value of the input field
+    const value = e.target.value;
+    
+    // Check if the value is empty
+    if (value.trim() !== '') {
+        return; // Allow space button
+    }
+
+    // Prevent space character entry if the value is empty
+    if (e.keyCode === 32) {
+        e.preventDefault();
+    }
+};
+
   return (
 
-     <LayOut>
-     <div className="container-fluid p-0">
-       <div className="row d-flex align-items-center justify-content-between mt-1">
-         <div className="col">
-           <h1 className="h3 mb-3"><strong>Department</strong> </h1>
-         </div>
-         <div className="col-auto">
-           <nav aria-label="breadcrumb">
-             <ol className="breadcrumb mb-0">
-               <li className="breadcrumb-item">
-                 <a href="/main">Home</a>
-               </li>
-               <li className="breadcrumb-item active">
-                 Department
-               </li>
-             </ol>
-           </nav>
-         </div>
-       </div>
+    <LayOut>
+      <div className="container-fluid p-0">
+        <div className="row d-flex align-items-center justify-content-between mt-1">
+          <div className="col">
+            <h1 className="h3 mb-3"><strong>Department</strong> </h1>
+          </div>
+          <div className="col-auto">
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                  <a href="/main">Home</a>
+                </li>
+                <li className="breadcrumb-item active">
+                  Department
+                </li>
+              </ol>
+            </nav>
+          </div>
+        </div>
 
-       <div className="row">
-         <div className="col-12 col-lg-12 col-xxl-12 d-flex">
-           <div className="card flex-fill">
-             <div className="card-header">
-               <div className='row mb-2'>
-                 <div className='col-12 col-md-6 col-lg-4'>
-                   <button
-                     onClick={() => setAddDeparment(true)}
-                     className={editingId ? "btn btn-danger" : "btn btn-primary"}
-                     type='submit'
-                   >
-                     {loading ? "Loading..." : (editingId ? "Update Department" : "Add Department")}
+        <div className="row">
+          <div className="col-12 col-lg-12 col-xxl-12 d-flex">
+            <div className="card flex-fill">
+              <div className="card-header">
+                <div className='row mb-2'>
+                  <div className='col-12 col-md-6 col-lg-4'>
+                    <button
+                      onClick={() => setAddDeparment(true)}
+                      className={editingId ? "btn btn-danger" : "btn btn-primary"}
+                      type='submit'
+                    >
+                      {loading ? "Loading..." : (editingId ? "Update Department" : "Add Department")}
 
-                   </button>
-                 </div>
-                 <div className='col-12 col-md-6 col-lg-4'></div>
-                 <div className='col-12 col-md-6 col-lg-4'>
-                   <input
-                     type='search'
-                     className="form-control"
-                     placeholder='Search....'
-                     value={search}
-                     onChange={(e) => getFilteredList(e.target.value)}
-                   />
-                 </div>
-               </div>
-               <div className="dropdown-divider" style={{ borderTopColor: "#d7d9dd" }} />
-             </div>
-             <DataTable
-        columns={columns}
-        data={filteredDepartments}
-        pagination
-        highlightOnHover
-        striped
-        noHeader
-      />
-           </div>
+                    </button>
+                  </div>
+                  <div className='col-12 col-md-6 col-lg-4'></div>
+                  <div className='col-12 col-md-6 col-lg-4'>
+                    <input
+                      type='search'
+                      className="form-control"
+                      placeholder='Search....'
+                      value={search}
+                      onChange={(e) => getFilteredList(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="dropdown-divider" style={{ borderTopColor: "#d7d9dd" }} />
+              </div>
+              <DataTable
+                columns={columns}
+                data={filteredDepartments}
+                pagination
+                highlightOnHover
+                striped
+                noHeader
+              />
+            </div>
 
-           <DeletePopup
-             show={showDeleteModal}
-             handleClose={handleCloseDeleteModal}
-             handleConfirm={() => handleConfirmDelete(selectedItemId)}
-             id={selectedItemId} 
+            <DeletePopup
+              show={showDeleteModal}
+              handleClose={handleCloseDeleteModal}
+              handleConfirm={() => handleConfirmDelete(selectedItemId)}
+              id={selectedItemId}
               pageName="Department"
-           />
+            />
 
-           {addDepartment && (
-             <div
-               role='dialog'
-               aria-modal="true"
-               className='fade modal show'
-               tabIndex="-1"
-               style={{ zIndex: "9999", display: "block" }}
-             >
-               <div className="modal-dialog modal-dialog-centered">
-                 <div className="modal-content">
-                   <ModalHeader>
-                     <ModalTitle>{editingId ? "Update Department" : "Add Department"}</ModalTitle>
-                   </ModalHeader>
-                   <ModalBody>
-                     <form onSubmit={handleSubmit(onSubmit)} id='designationForm'>
-                       <div className="card-body" style={{ width: "1060px", paddingBottom: "0px" }}>
-                         <div className='row'>
-                           <div className='col-12 col-md-6 col-lg-4 mb-2'>
-                             <input 
-                               type="text"
-                               className="form-control"
-                               placeholder="Enter Department"
-                               name='name'
-                               id='designation'
-                               onInput={toInputTitleCase}
-                               autoComplete='off'
-                               {...register("name", {
-                                 required: "Department Required",
-                                 pattern: {
-                                   value: /^[A-Za-z ]+$/,
-                                   message: "This Field accepts only Alphabetic Characters",
-                                 }
-                               })}
-                             />
-                             {errors.name && (<p className='errorMsg'>{errors.name.message}</p>)}
-                           </div>
-                         </div>
-                       </div>
-                       <div className='modal-footer'>
-                         <button
-                           className={editingId ? "btn btn-danger" : "btn btn-primary"}
-                           type='submit'
-                           disabled={loading}
-                         >
-                           {loading ? "Loading..." : (editingId ? "Update Department" : "Add Department")}
-                         </button>
-                         <button
-                           type='button'
-                           className="btn btn-secondary"
-                           onClick={() => setAddDeparment(false)}
-                         >
-                           Cancel
-                         </button>
-                       </div>
-                     </form>
-                   </ModalBody>
-                 </div>
-               </div>
-             </div>
-           )}
+            {addDepartment && (
+              <div
+                role='dialog'
+                aria-modal="true"
+                className='fade modal show'
+                tabIndex="-1"
+                style={{ zIndex: "9999", display: "block" }}
+              >
+                <div className="modal-dialog modal-dialog-centered">
+                  <div className="modal-content">
+                    <ModalHeader>
+                      <ModalTitle>{editingId ? "Update Department" : "Add Department"}</ModalTitle>
+                    </ModalHeader>
+                    <ModalBody>
+                      <form onSubmit={handleSubmit(onSubmit)} id='designationForm'>
+                        <div className="card-body" style={{ width: "1060px", paddingBottom: "0px" }}>
+                          <div className='row'>
+                            <div className='col-12 col-md-6 col-lg-4 mb-2'>
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Enter Department"
+                                name='name'
+                                id='designation'
+                                onInput={toInputTitleCase}
+                                onKeyDown={handleEmailChange}
+                                autoComplete='off'
+                                {...register("name", {
+                                  required: "Department Required",
+                                  pattern: {
+                                    value: /^[A-Za-z ]+$/,
+                                    message: "This Field accepts only Alphabetic Characters",
+                                  },
+                                  minLength:{
+                                    value:2,
+                                    message:"Minimun 2 characters required"
+                                  },
+                                  maxLength:{
+                                    value:20,
+                                    message:"Maximum 20 characters required"
+                                  }
+                                })}
+                              />
+                              {errors.name && (<p className='errorMsg'>{errors.name.message}</p>)}
+                            </div>
+                          </div>
+                        </div>
+                        <div className='modal-footer'>
+                          <button
+                            className={editingId ? "btn btn-danger" : "btn btn-primary"}
+                            type='submit'
+                            disabled={loading}
+                          >
+                            {loading ? "Loading..." : (editingId ? "Update Department" : "Add Department")}
+                          </button>
+                          <button
+                            type='button'
+                            className="btn btn-secondary"
+                            onClick={() => setAddDeparment(false)}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    </ModalBody>
+                  </div>
+                </div>
+              </div>
+            )}
 
-         </div>
-       </div>
+          </div>
+        </div>
 
-     </div>
-   </LayOut>
+      </div>
+    </LayOut>
   );
 };
 

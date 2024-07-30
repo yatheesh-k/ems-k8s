@@ -15,7 +15,7 @@ import {
 } from '../../Utils/Axios';
 
 const Designation = () => {
-  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm('');
+  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm({mode:"onChange"});
   const [designations, setDesignations] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [search, setSearch] = useState('');
@@ -171,22 +171,27 @@ const Designation = () => {
     }
   };
 
-  const toInputTitleCase = (e) => {
-    let value = e.target.value;
-    const titleCaseValue = value.replace(/^\s+/g, ''); // Remove leading spaces
-    e.target.value = titleCaseValue;
-    // Split the value into an array of words
-    const words = value.split(" ");
-    // Capitalize the first letter of each word
-    const capitalizedWords = words.map((word) => {
-      // Capitalize the first letter of the word
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    });
-    // Join the capitalized words back into a single string
-    value = capitalizedWords.join(" ");
-    // Set the modified value to the input field
-    e.target.value = value;
-  };  
+  const  toInputTitleCase = (e) => {
+    const input = e.target;
+    let value = input.value;
+    // Remove leading spaces
+    value = value.replace(/^\s+/g, '');
+    // Initially disallow spaces
+    if (!/\S/.test(value)) {
+      // If no non-space characters are present, prevent spaces
+      value = value.replace(/\s+/g, '');
+    } else {
+      // Allow spaces if there are non-space characters
+      value = value.replace(/^\s+/g, ''); // Remove leading spaces
+      const words = value.split(' ');
+      const capitalizedWords = words.map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      });
+      value = capitalizedWords.join(' ');
+    }
+    // Update input value
+    input.value = value;
+  };
   const handleEmailChange = (e) => {
     // Get the current value of the input field
     const value = e.target.value;
@@ -301,11 +306,11 @@ const Designation = () => {
                                   },
                                   minLength:{
                                     value:2,
-                                    message:"Designation must be at least 2 characters long"
+                                    message:"Minimun 2 characters required"
                                   },
                                   maxLength:{
                                     value:20,
-                                    message:"Designation must be at most 20 characters long"
+                                    message:"Maximum 20 characters required"
                                   }
                                 })}
                               />

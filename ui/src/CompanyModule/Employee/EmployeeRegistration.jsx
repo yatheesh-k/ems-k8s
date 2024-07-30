@@ -129,19 +129,26 @@ const EmployeeRegistration = () => {
     fetchDesignations();
   }, []);
 
-  const toInputTitleCase = (e) => {
-    let value = e.target.value;
-    // Split the value into an array of words
-    const words = value.split(" ");
-    // Capitalize the first letter of each word
-    const capitalizedWords = words.map((word) => {
-      // Capitalize the first letter of the word
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    });
-    // Join the capitalized words back into a single string
-    value = capitalizedWords.join(" ");
-    // Set the modified value to the input field
-    e.target.value = value;
+  const  toInputTitleCase = (e) => {
+    const input = e.target;
+    let value = input.value;
+    // Remove leading spaces
+    value = value.replace(/^\s+/g, '');
+    // Initially disallow spaces
+    if (!/\S/.test(value)) {
+      // If no non-space characters are present, prevent spaces
+      value = value.replace(/\s+/g, '');
+    } else {
+      // Allow spaces if there are non-space characters
+      value = value.replace(/^\s+/g, ''); // Remove leading spaces
+      const words = value.split(' ');
+      const capitalizedWords = words.map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      });
+      value = capitalizedWords.join(' ');
+    }
+    // Update input value
+    input.value = value;
   };
 
   const onSubmit = async (data) => {
@@ -715,11 +722,12 @@ const EmployeeRegistration = () => {
                             {...field}
                             options={[
                               { value: "Active", label: "Active" },
-                              { value: "InActive", label: "InActive" },
+                              { value: "Inactive", label: "Inactive" },
                             ]}
                             value={{
                               value: field.value,
-                              label: ["OnBoarding", "Active", "Inactive", "Notice Period", "Relieved"][field.value],
+                              label: [ "Active", "Inactive"][field.value],
+
                             }}
                             onChange={(val) => field.onChange(val.value)}
                             placeholder="Select Status"
@@ -922,7 +930,35 @@ const EmployeeRegistration = () => {
                         <p className="errorMsg">{errors.panNo.message}</p>
                       )}
                     </div>
-
+                    <div className="col-lg-1"></div>
+                    <div className="col-12 col-md-6 col-lg-5 mb-3">
+                      <label className="form-label">Aadhar Number <span style={{ color: "red" }}>*</span></label>
+                      <input
+                        type="text"
+                        readOnly={isUpdating}
+                        className="form-control"
+                        placeholder="Enter Aadhar number"
+                        name="aadhaarId"
+                        onInput={toInputTitleCase}
+                        autoComplete="off"
+                        onKeyDown={handleEmailChange}
+                        {...register("aadhaarId", {
+                          required: "Aadhar number Required",
+                          pattern: {
+                            value: /^\d{12}$/,
+                            message:
+                              "Allows only Integers",
+                          },
+                          maxLength: {
+                            value: 12,
+                            message: "Aadhar Number must not exceed 12 characters",
+                          },
+                        })}
+                      />
+                      {errors.aadhaarId && (
+                        <p className="errorMsg">{errors.aadhaarId.message}</p>
+                      )}
+                    </div>
                     <div
                       className="col-12 mt-4  d-flex justify-content-end"
                       style={{ background: "none" }}

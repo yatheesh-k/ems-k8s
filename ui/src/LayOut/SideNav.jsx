@@ -28,50 +28,7 @@ import { useAuth } from "../Context/AuthContext";
         setRoles(decodedToken.roles || []);
       }
     }, [token]);
-
-    useEffect(() => {
-      if (!isInitialized) return; // Wait until initialization is complete
-      if (!authData) return;
-      const fetchData = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-          console.log("userId:",authData.userId)
-          const response = await EmployeeGetApiById(authData.userId);
-          console.log("userId@:",authData.userId)
-          const companyId = response.data.companyId;
-          await fetchCompanyLogo(companyId);
-        } catch (error) {
-          console.log(error);
-          setError("Failed to fetch data");
-        } finally {
-          setLoading(false);
-        }
-      };
-  
-      const fetchCompanyLogo = async (companyId) => {
-        try {
-          const logoResponse = await CompanyImageGetApi(companyId);
-          if (logoResponse && logoResponse.data && logoResponse.data.data) {
-            const logoPath = logoResponse.data.data;
-            const fileName = logoPath.split('\\').pop();
-            setLogoFileName(fileName);
-            console.log("fileName:",fileName)
-          } else {
-            console.error("Response or data is missing");
-            setError("Logo not found");
-          }
-        } catch (err) {
-          console.error("Error fetching company logo:", err);
-          setError("Error fetching logo");
-        }
-      };
-  
-      fetchData();
-    }, [authData, isInitialized]);
-  
-    
-  
+ 
   useEffect(() => {
     if (
       location.pathname === "/companyRegistration" ||
@@ -269,7 +226,7 @@ import { useAuth } from "../Context/AuthContext";
       ):(
         <span>
           {roles.includes("ems_admin") ? (
-            <img
+            <imgx
               className="align-middle"
               src={emsAdminLogoPath}
               alt="EMS Admin Logo"

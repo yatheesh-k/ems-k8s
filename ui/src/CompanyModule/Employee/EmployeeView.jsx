@@ -122,7 +122,6 @@ const handleSalary = (id) => {
       }
     }
   };
-
   const statusMappings = {
     Active: {
       label: (
@@ -131,24 +130,24 @@ const handleSalary = (id) => {
             backgroundColor: "green",
             color: "white",
             borderRadius: "5px",
-            padding: "3px",
+            padding: "2px",
           }}
         >
-        Active
+          Active
         </b>
       ),
     },
-    InActive: {
+    Inactive: {
       label: (
         <b
           style={{
             backgroundColor: "red",
             color: "white",
             borderRadius: "5px",
-            padding: "3px",
+            padding: "2px",
           }}
         >
-          InActive
+          Inactive
         </b>
       ),
     },

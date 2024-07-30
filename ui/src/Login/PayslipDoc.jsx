@@ -507,11 +507,11 @@ const PayslipDoc = () => {
 
             </div>
             {/* <p style={{ textAlign: "end"}}>This is a computer-generated payslip.</p> */}
-            <div style={{ display: "flex", justifyContent: "flex-end", marginRight: "40px" }}>
+            {/* <div style={{ display: "flex", justifyContent: "flex-end", marginRight: "40px" }}>
               <h5>
                 Stamp & Sign
               </h5>
-            </div>
+            </div> */}
 
             <div className="bottom"
               style={{
@@ -521,7 +521,7 @@ const PayslipDoc = () => {
                 paddingBottom: "3px",
               }}>
               <div className="line">
-                <hr />
+                {/* <hr /> */}
               </div>
               <div className="company-details text-center" style={{ padding: "3px" }}>
                 <p> {companyData.companyName},</p>

@@ -1,26 +1,55 @@
 import React, { useEffect, useRef, useState } from "react";
-import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
-import {company } from "../Utils/Auth";
+import { company } from "../Utils/Auth";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 import Reset from "./Reset";
+import { useAuth } from "../Context/AuthContext";
+import { EmployeeGetApiById } from "../Utils/Axios";
+import { jwtDecode } from "jwt-decode";
 
 const Header = ({ toggleSidebar }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [roles,setRoles]=useState([]);
+  const [roles, setRoles] = useState([]);
+  const { authData, isInitialized } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
   const [companyName, setCompanyName] = useState(company);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const profileDropdownRef = useRef(null);
- 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isInitialized) return; // Wait until initialization is complete
+    if (!authData) return;
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        console.log("userId:", authData.userId)
+        const response = await EmployeeGetApiById(authData.userId);
+        console.log("userId@:", authData.userId);
+        const companyId = response.data.companyId;
+        setFirstName(response.data.firstName);
+        setLastName(response.data.lastName);
+      } catch (error) {
+        console.log(error);
+        setError("Failed to fetch data");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [authData, isInitialized]);
 
   const token = sessionStorage.getItem("token");
   useEffect(() => {
     if (token) {
       const decodedToken = jwtDecode(token);
-      
+
       // Extract roles from the decoded token
       const roles = decodedToken?.roles || [];
       setRoles(roles);
@@ -41,7 +70,6 @@ const Header = ({ toggleSidebar }) => {
     }
   }, [token]);
 
-
   const toggleNotification = () => {
     setIsNotificationOpen(!isNotificationOpen);
     setIsProfileOpen(false);
@@ -60,13 +88,13 @@ const Header = ({ toggleSidebar }) => {
       setIsProfileOpen(false);
     }
   };
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
 
   const handleLogOut = () => {
     sessionStorage.clear();
@@ -81,7 +109,6 @@ const Header = ({ toggleSidebar }) => {
   const handleResetPasswordClick = () => {
     setShowResetPasswordModal(true);
   };
- 
 
   return (
     <nav className="navbar navbar-expand navbar-light navbar-bg">
@@ -127,82 +154,112 @@ const Header = ({ toggleSidebar }) => {
               </div>
             )}
           </li>
-          {roles.includes("ems_admin") ? ( 
-          <li className="nav-item">
-            <a
-              className="nav-link dropdown-toggle d-none d-sm-inline-block text-center"
-              href
-              onClick={toggleProfile}
-            >
-              <i 
-                className="bi bi-person-circle"
-                style={{ fontSize: "22px" }}
-              ></i>
-            </a>
-            {isProfileOpen && (
-              <div
-                 ref={profileDropdownRef}
-                className="dropdown-menu dropdown-menu-end py-0 show"
-                aria-labelledby="profileDropdown"
-                style={{ left: "auto", right: "2%" }}
+          {roles.includes("ems_admin") && (
+            <li className="nav-item">
+              <a
+                className="nav-link dropdown-toggle d-none d-sm-inline-block text-center"
+                href
+                onClick={toggleProfile}
               >
-                <a className="dropdown-item" href onClick={handleResetPasswordClick}>
-                  <i className="align-middle me-1 bi bi-key"></i> Reset Password
-                </a>
-                <div className="dropdown-divider"></div>
-                <a className="dropdown-item" onClick={handleLogOut} href="/">
-                  Log out
-                </a>
-              </div>
-            )}
-          </li> 
-          ):(
-          <li className="nav-item dropdown position-relative">
-         
-            <a 
-              className="nav-link dropdown-toggle d-none d-sm-inline-block text-center"
-              href
-              onClick={toggleProfile}
-            >
-              <span className="text-dark p-2 mb-3">{companyName}</span>
-              <i
-                className="bi bi-person-circle"
-                style={{ fontSize: "22px" }}
-              ></i>
-            
-            </a>
-            {isProfileOpen && (
-              <div
-                className="dropdown-menu dropdown-menu-end py-0 show"
-                aria-labelledby="profileDropdown"
-                style={{ left: "auto", right: "50%" }}
+                <i
+                  className="bi bi-person-circle"
+                  style={{ fontSize: "22px" }}
+                ></i>
+              </a>
+              {isProfileOpen && (
+                <div
+                  ref={profileDropdownRef}
+                  className="dropdown-menu dropdown-menu-end py-0 show"
+                  aria-labelledby="profileDropdown"
+                  style={{ left: "auto", right: "2%" }}
+                >
+                  <a className="dropdown-item" href onClick={handleResetPasswordClick}>
+                    <i className="align-middle me-1 bi bi-key"></i> Reset Password
+                  </a>
+                  <div className="dropdown-divider"></div>
+                  <a className="dropdown-item" onClick={handleLogOut} href="/">
+                    Log out
+                  </a>
+                </div>
+              )}
+            </li>
+          )}
+          {roles.includes("company_admin") && (
+            <li className="nav-item dropdown position-relative">
+              <a
+                className="nav-link dropdown-toggle d-none d-sm-inline-block text-center"
+                href
+                onClick={toggleProfile}
               >
-                <a className="dropdown-item" href="/profile">
-                  <i className="align-middle me-1 bi bi-person"></i> Profile
-                </a>
-                <a className="dropdown-item" href onClick={handleResetPasswordClick}>
-                  <i className="align-middle me-1 bi bi-key"></i> Reset Password
-                </a>
-                {/* <a className="dropdown-item" href="/payslip">
-                  <i className="align-middle me-1 bi bi-gear"></i> Settings
-                </a> */}
-                <div className="dropdown-divider"></div>
-                <a className="dropdown-item" onClick={handleLogOut} href="/">
-                  Log out
-                </a>
-              </div>
-              // )}
-            )}
-          </li>
+                <span className="text-dark p-2 mb-3">{companyName}</span>
+                <i
+                  className="bi bi-person-circle"
+                  style={{ fontSize: "22px" }}
+                ></i>
+              </a>
+              {isProfileOpen && (
+                <div
+                  ref={profileDropdownRef}
+                  className="dropdown-menu dropdown-menu-end py-0 show"
+                  aria-labelledby="profileDropdown"
+                  style={{ left: "auto", right: "2%" }}
+                >
+                  <a className="dropdown-item" href="/profile">
+                    <i className="align-middle me-1 bi bi-person"></i> Profile
+                  </a>
+                  <a className="dropdown-item" href onClick={handleResetPasswordClick}>
+                    <i className="align-middle me-1 bi bi-key"></i> Reset Password
+                  </a>
+                  <div className="dropdown-divider"></div>
+                  <a className="dropdown-item" onClick={handleLogOut} href="/">
+                    Log out
+                  </a>
+                </div>
+              )}
+            </li>
+          )}
+          {roles.includes("Employee") && (
+            <li className="nav-item dropdown position-relative">
+              <a
+                className="nav-link dropdown-toggle d-none d-sm-inline-block text-center"
+                href
+                onClick={toggleProfile}
+              >
+                <span className="text-dark p-2 mb-3">{firstName} {lastName}</span>
+                <i
+                  className="bi bi-person-circle"
+                  style={{ fontSize: "22px" }}
+                ></i>
+              </a>
+              {isProfileOpen && (
+                <div
+                  ref={profileDropdownRef}
+                  className="dropdown-menu dropdown-menu-end py-0 show"
+                  aria-labelledby="profileDropdown"
+                  style={{ left: "auto", right: "2%" }}
+                >
+                  {/* <a className="dropdown-item" href="/profile">
+                    <i className="align-middle me-1 bi bi-person"></i> Profile
+                  </a> */}
+                  <a className="dropdown-item" href onClick={handleResetPasswordClick}>
+                    <i className="align-middle me-1 bi bi-key"></i> Reset Password
+                  </a>
+                  <div className="dropdown-divider"></div>
+                  <a className="dropdown-item" onClick={handleLogOut} href="/">
+                    Log out
+                  </a>
+                </div>
+              )}
+            </li>
           )}
         </ul>
       </div>
       <Reset
-        companyName={companyName} 
+        companyName={companyName}
         show={showResetPasswordModal}
         onClose={() => setShowResetPasswordModal(false)}
       />
-      <Modal show={showErrorModal} onHide={closeModal} centered style={{zIndex:"1050"}}>
+      <Modal show={showErrorModal} onHide={closeModal} centered style={{ zIndex: "1050" }}>
         <ModalHeader closeButton>
           <ModalTitle className="text-center">Error</ModalTitle>
         </ModalHeader>
@@ -210,7 +267,6 @@ const Header = ({ toggleSidebar }) => {
           Session Timeout! Please log in.
         </ModalBody>
       </Modal>
-      
     </nav>
   );
 };
