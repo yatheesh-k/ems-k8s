@@ -397,7 +397,7 @@ import { useAuth } from "../Context/AuthContext";
                               </span>
                             </Link>
                           </li> */}
-              <li
+              {/* <li
                 className={`sidebar-item ${
                   location.pathname.startsWith("/existing") ? "active" : ""
                 }`}
@@ -408,10 +408,10 @@ import { useAuth } from "../Context/AuthContext";
                     style={{ fontSize: "large" }}
                   ></i>
                   <span className="align-middle" style={{ fontSize: "large" }}>
-                    Existing Process
+                    Exit Process
                   </span>
                 </Link>
-              </li>
+              </li> */}
               {/* <li
                             className={`sidebar-item ${
                               location.pathname.startsWith("/users") ? "active" : ""
@@ -477,6 +477,16 @@ import { useAuth } from "../Context/AuthContext";
                   <li
                     style={{ paddingLeft: "40px" }}
                     className={`sidebar-item ${
+                      location.pathname === "/payslipGeneration" ? "active" : ""
+                    }`}
+                  >
+                    <Link className="sidebar-link" to={"/payslipGeneration"}>
+                      Generate PaySlips
+                    </Link>
+                  </li>
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${
                       location.pathname.startsWith("/payslipsList")
                         ? "active"
                         : ""
@@ -486,16 +496,7 @@ import { useAuth } from "../Context/AuthContext";
                       PaySlips
                     </Link>
                   </li>
-                  <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${
-                      location.pathname === "/payslipGeneration" ? "active" : ""
-                    }`}
-                  >
-                    <Link className="sidebar-link" to={"/payslipGeneration"}>
-                      Generate PaySlips
-                    </Link>
-                  </li>
+                  
                   {/* <li
                     style={{ paddingLeft: "40px" }}
                     className={`sidebar-item ${
@@ -518,7 +519,7 @@ import { useAuth } from "../Context/AuthContext";
                       Salary List
                     </Link>
                   </li> */}
-                  <li
+                  {/* <li
                     style={{ paddingLeft: "40px" }}
                     className={`sidebar-item ${
                       location.pathname === "/increment" ? "active" : ""
@@ -537,7 +538,7 @@ import { useAuth } from "../Context/AuthContext";
                     <Link className="sidebar-link" to={"/incrementList"}>
                       Increment List
                     </Link>
-                  </li>
+                  </li> */}
                 </ul>
               </li>
               <li className="sidebar-item has-dropdown">
@@ -589,7 +590,7 @@ import { useAuth } from "../Context/AuthContext";
                       Attendance Report
                     </Link>
                   </li>
-                  <li
+                  {/* <li
                     style={{ paddingLeft: "40px" }}
                     className={`sidebar-item ${
                       location.pathname === "/attendanceList" ? "active" : ""
@@ -598,7 +599,7 @@ import { useAuth } from "../Context/AuthContext";
                     <Link className="sidebar-link" to={"/attendanceList"}>
                       Attendance List
                     </Link>
-                  </li>
+                  </li> */}
                 </ul>
               </li>
             </>

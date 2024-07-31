@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Envelope, Facebook, Google, Instagram, Key, Linkedin, Lock, Unlock } from "react-bootstrap-icons";
 import { useNavigate, useParams } from "react-router";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import { loginApi } from "../Utils/Axios";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 
@@ -38,7 +39,7 @@ const EmsLogin = () => {
     loginApi(payload)
       .then((response) => {
         console.log(response.data);
-        // Handle successful login
+        toast.success("Login successful!");
         navigate("/main");
       })
       .catch((error) => {
@@ -91,7 +92,7 @@ const EmsLogin = () => {
                     })}
                   />
                   {errors.username && (
-                    <p className="errorMsg" style={{ marginLeft: "44px" }}>
+                    <p className="errorMsg" style={{ marginLeft: "35px" }}>
                       {errors.username.message}
                     </p>
                   )}
@@ -112,7 +113,7 @@ const EmsLogin = () => {
                     })}
                   />
                   {errors.password && (
-                    <p className="errorMsg" style={{ marginLeft: "44px" }}>
+                    <p className="errorMsg" style={{ marginLeft: "35px" }}>
                       {errors.password.message}
                     </p>
                   )}

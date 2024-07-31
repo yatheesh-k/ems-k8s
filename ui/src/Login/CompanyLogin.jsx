@@ -72,7 +72,7 @@ const CompanyLogin = () => {
     CompanyloginApi(payload)
       .then((response) => {
         console.log(response.data);
-        toast.success("OTP sent Successfully");
+        toast.success("OTP Sent Successfully");
         setLoading(false);
         setOtpSent(true);
         setOtpExpired(false); // Reset OTP expiration state
@@ -104,7 +104,7 @@ const CompanyLogin = () => {
       .then((response) => {
         setLoading(false);
         if (response.status === 200) {
-          toast.success("CompanyLogin Successful", {
+          toast.success("Company Login Successful", {
             position: "top-right",
             transition: Bounce,
             hideProgressBar: true,
@@ -118,6 +118,7 @@ const CompanyLogin = () => {
             console.error("imageFile is undefined");
           }
           setTimeout(() => {
+            
             navigate("/main", { state: { username: data.username } });
           }, 3000);
         }
@@ -184,7 +185,7 @@ const CompanyLogin = () => {
                 <div className="card">
                   <div className="card-header">
                     <div className="text-center mt-2">
-                      <p className="lead">Sign in</p>
+                      <p className="lead">Login   </p>
                     </div>
                   </div>
                   <div className="card-body" style={{ padding: "6px" }}>
@@ -216,7 +217,7 @@ const CompanyLogin = () => {
                             />
                           </div>
                           {errors.username && (
-                            <p className="errorMsg p-0" style={{ marginLeft: "45px" }}>
+                            <p className="errorMsg p-0" style={{ marginLeft: "55px" }}>
                               {errors.username.message}
                             </p>
                           )}
@@ -254,7 +255,7 @@ const CompanyLogin = () => {
                                 />
                               </div>
                               {errors.password && (
-                                <p className="errorMsg" style={{ marginLeft: "45px", marginBottom: "0" }}>
+                                <p className="errorMsg" style={{ marginLeft: "55px", marginBottom: "0" }}>
                                   {errors.password.message}
                                 </p>
                               )}

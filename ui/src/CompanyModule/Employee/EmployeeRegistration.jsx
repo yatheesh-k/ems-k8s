@@ -162,7 +162,7 @@ const EmployeeRegistration = () => {
     // Constructing the payload
     let payload = {
       companyName: company,
-      employeeType: data.type,
+      employeeType: data.employeeType,
       emailId: data.emailId,
       password: data.password,
       designation: data.designation,
@@ -283,7 +283,7 @@ const EmployeeRegistration = () => {
       <div className="container-fluid p-0">
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
-            <h1 className="h3 mb-3"><strong>Employee Registration</strong> </h1>
+            <h1 className="h3 mb-3"><strong>Registration</strong> </h1>
           </div>
           <div className="col-auto">
             <nav aria-label="breadcrumb">
@@ -303,7 +303,7 @@ const EmployeeRegistration = () => {
         </div>
         <div className="row">
           <div className="col-12">
-            <div className="card">
+            <div className="card">  
               <div className="card-header">
                 <h5 className="card-title ">
                   {isUpdating ? "Employee Data" : "Employee Registration"}
@@ -316,21 +316,22 @@ const EmployeeRegistration = () => {
               <div className="card-body">
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="row ">
-                    {isUpdating ? (
+                      {isUpdating ? (
                       <div className="col-12 col-md-6 col-lg-5 mb-3">
-                        <label className="form-label">Employement Type <span style={{ color: "red" }}>*</span></label>
+                        <label className="form-label">
+                           Employee Type <span style={{ color: "red" }}>*</span>
+                        </label>
                         <input
                           type="text"
                           className="form-control"
-                          placeholder="Enter Last Name"
+                          placeholder="Enter Employee Type"
                           name="employeeType"
                           readOnly
                           {...register("employeeType", {
                             required: "Employee Type Required",
                             pattern: {
                               value: /^[A-Za-z ]+$/,
-                              message:
-                                "These fields accepts only Alphabetic Characters",
+                              message: "This field accepts only alphabetic characters",
                             },
                           })}
                         />
@@ -341,29 +342,28 @@ const EmployeeRegistration = () => {
                         )}
                       </div>
                     ) : (
-                      <div className="col-12 col-md-6 col-lg-5 mb-2">
-                        <label className="form-label mb-3">
-                          Select Employee Type<span style={{ color: "red" }}>*</span>
+                      <div className="col-12 col-md-6 col-lg-5 mb-3">
+                        <label className="form-label">
+                          Select Employee Type <span style={{ color: "red" }}>*</span>
                         </label>
                         <Controller
-                          className="form-select"
                           name="employeeType"
-                          defaultValue=""
                           control={control}
                           rules={{ required: true }}
-                          render={({ value }) => (
+                          render={({ field }) => (
                             <Select
+                              {...field}
                               options={Employement}
-                              value={Employement.find((c) => c.value === value)}
-                              onChange={(val) => {
-                                setValue("employeeType", val.value);
-                              }}
-                              placeholder=" Select Employee Type "
+                              value={Employement.find(option => option.value === field.value)}
+                              onChange={(val) => field.onChange(val.value)}
+                              placeholder="Select Employee Type"
                             />
                           )}
                         />
                         {errors.employeeType && (
-                          <p className="errorMsg">Employee Type is Required</p>
+                          <p className="errorMsg">
+                            {errors.employeeType.message}
+                          </p>
                         )}
                       </div>
                     )}
@@ -420,7 +420,11 @@ const EmployeeRegistration = () => {
                           },
                           minLength: {
                             value: 3,
-                            message: "minimum 3 characters required",
+                            message: "Minimum 3 characters required",
+                          },
+                          maxLength: {
+                            value: 60,
+                            message: "Maximum 60 characters required",
                           },
                         })}
                       />
@@ -451,6 +455,10 @@ const EmployeeRegistration = () => {
                             value: 1,
                             message: "Minimum 1 character required",
                           },
+                          maxLength: {
+                            value: 60,
+                            message: "Maximum 60 characters required",
+                          },
                         })}
                       />
                       {errors.lastName && (
@@ -462,9 +470,10 @@ const EmployeeRegistration = () => {
                       <input
                         type={isUpdating ? "email" : "email"}
                         className="form-control"
-                        placeholder="Enter Email"
+                        placeholder="Enter Email Id"
                         name="emailId"
                         autoComplete="off"
+                        onInput={toInputTitleCase}
                         onKeyDown={handleEmailChange}
                         {...register("emailId", {
                           required: "Email Id Required",
@@ -536,7 +545,7 @@ const EmployeeRegistration = () => {
                           rules={{ required: "Department Required" }}
                           render={({ field }) => (
                             <select {...field} className="form-select">
-                              <option value="" disabled>Select a department</option>
+                              <option value="" disabled>Select a Department</option>
                               {departments.map(department => (
                                 <option key={department.id} value={department.name}>
                                   {department.name}
@@ -562,7 +571,7 @@ const EmployeeRegistration = () => {
                         rules={{ required: true }}
                         render={({ field }) => (
                           <select {...field} className="form-select" >
-                            <option value="" disabled>Select a designation</option>
+                            <option value="" disabled>Select a Designation</option>
                             {designations.map(designation => (
                               <option key={designation.id} value={designation.name}>
                                 {designation.name}
@@ -594,8 +603,12 @@ const EmployeeRegistration = () => {
                               "These fields accepts only Alphabetic Characters",
                           },
                           minLength: {
-                            value: 1,
-                            message: "minimum 1 character required",
+                            value: 3,
+                            message: "minimum 3 character required",
+                          },
+                          maxLength: {
+                            value: 60,
+                            message: "Maximum 60 characters required",
                           },
                         })}
                       />
@@ -621,8 +634,12 @@ const EmployeeRegistration = () => {
                               "Do not allow '!,@,$,%' special characters",
                           },
                           minLength: {
-                            value: 2,
-                            message: "minimum 2 characters required",
+                            value: 3,
+                            message: "minimum 3 characters required",
+                          },
+                          maxLength: {
+                            value: 200,
+                            message: "Maximum 200 characters required",
                           },
                         })}
                       />
@@ -790,7 +807,7 @@ const EmployeeRegistration = () => {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Enter account Number"
+                        placeholder="Enter Account Number"
                         name="accountNo"
                         onInput={toInputTitleCase}
                         onKeyDown={handleEmailChange}
@@ -822,7 +839,7 @@ const EmployeeRegistration = () => {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Enter ifsc code"
+                        placeholder="Enter IFSC Code"
                         name="ifscCode"
                         onInput={toInputTitleCase}
                         onKeyDown={handleEmailChange}
@@ -830,7 +847,7 @@ const EmployeeRegistration = () => {
                         {...register("ifscCode", {
                           required: "IFSC Code Required",
                           pattern: {
-                            value: /^[A-Za-z]{4}0[A-Z0-9]{6}$/,
+                            value: /^[A-Z]{4}0[A-Z0-9]{6}$/,
                             message:
                               "Please enter a valid IFSC code ",
                           },
@@ -849,7 +866,7 @@ const EmployeeRegistration = () => {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Enter bank name"
+                        placeholder="Enter Bank Name"
                         name="bankName"
                         onInput={toInputTitleCase}
                         autoComplete="off"
@@ -862,8 +879,12 @@ const EmployeeRegistration = () => {
                               "Invalid Bank Name format",
                           },
                           maxLength: {
+                            value: 3,
+                            message: "Minimum 3 characters Required",
+                          },
+                          maxLength: {
                             value: 50,
-                            message: "Bank Name must not exceed 50 characters",
+                            message: "Maximum 50 characters Required",
                           },
                         })}
                       // disabled={editMode}
@@ -874,11 +895,11 @@ const EmployeeRegistration = () => {
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Uan Number <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">UAN Number <span style={{ color: "red" }}>*</span></label>
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Enter uan number"
+                        placeholder="Enter UAN Number"
                         name="uanNo"
                         readOnly={isUpdating}
                         onInput={toInputTitleCase}
@@ -908,7 +929,7 @@ const EmployeeRegistration = () => {
                         type={isUpdating ? "text" : "text"}
                         readOnly={isUpdating}
                         className="form-control"
-                        placeholder="Enter pan number"
+                        placeholder="Enter PAN Number"
                         name="panNo"
                         onInput={toInputTitleCase}
                         autoComplete="off"

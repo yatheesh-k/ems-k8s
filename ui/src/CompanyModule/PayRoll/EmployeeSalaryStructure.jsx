@@ -6,8 +6,15 @@ import { EmployeeGetApi, EmployeeSalaryPostApi } from "../../Utils/Axios";
 import { CurrencyRupee, QuestionCircle } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
 
 const EmployeeSalaryStructure = () => {
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm({ mode: 'onChange' });
   const [employes, setEmployes] = useState([]);
   const [grossAmount, setGrossAmount] = useState(0);
   const [hra, setHra] = useState(0);
@@ -31,7 +38,7 @@ const EmployeeSalaryStructure = () => {
   const [otherAllowances, setOtherAllowances] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
   const [message, setMessage] = useState("");
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     EmployeeGetApi().then((data) => {
@@ -73,10 +80,12 @@ const EmployeeSalaryStructure = () => {
 
   const handleVariableAmountChange = (e) => {
     setVariableAmount(parseFloat(e.target.value) || 0);
+    setValue("variableAmount", e.target.value, { shouldValidate: true });
   };
 
   const handleFixedAmountChange = (e) => {
     setFixedAmount(parseFloat(e.target.value) || 0);
+    setValue("fixedAmount", e.target.value, { shouldValidate: true });
   };
 
   const handleIncomeTaxChange = (e) => {
@@ -92,14 +101,22 @@ const EmployeeSalaryStructure = () => {
 
   const handlePfEmployeeChange = (e) => {
     setPfEmployee(parseFloat(e.target.value) || 0);
+    setValue("pfEmployee", e.target.value, { shouldValidate: true });
   };
 
   const handlePfEmployerChange = (e) => {
     setPfEmployer(parseFloat(e.target.value) || 0);
+    setValue("pfEmployer", e.target.value, { shouldValidate: true });
+  };
+
+  const handleHraChange = (e) => {
+    setHra(parseFloat(e.target.value) || 0);
+    setValue("hra", e.target.value, { shouldValidate: true });
   };
 
   const handleTravelAllowanceChange = (e) => {
     setTravelAllowance(parseFloat(e.target.value) || 0);
+    setValue("travelAllowance", e.target.value, { shouldValidate: true });
   };
 
   const handleSpecialAllowanceChange = (e) => {
@@ -166,7 +183,6 @@ const EmployeeSalaryStructure = () => {
   const companyName = sessionStorage.getItem("company");
 
   const onSubmit = (e) => {
-    e.preventDefault();
     if (
       variableAmount === 0 &&
       fixedAmount === 0 &&
@@ -178,7 +194,7 @@ const EmployeeSalaryStructure = () => {
       pfEmployer === 0 &&
       grossAmount === 0
     ) {
-      setErrorMessage("Please fill the fields.");
+      // setErrorMessage("Please fill the fields.");
       return;
     }
 
@@ -193,7 +209,7 @@ const EmployeeSalaryStructure = () => {
       allowances: {
         travelAllowance: parseFloat(travelAllowance),
         hra: parseFloat(hra),
-        pfContributionEmployee:parseFloat(pfEmployee),
+        pfContributionEmployee: parseFloat(pfEmployee),
         specialAllowance: parseFloat(specialAllowance),
         otherAllowances: parseFloat(otherAllowances),
       },
@@ -209,38 +225,38 @@ const EmployeeSalaryStructure = () => {
 
     EmployeeSalaryPostApi(employeeId, postData)
       .then((response) => {
-       toast.success(response.data.message)
+        toast.success(response.data.message)
         setErrorMessage(""); // Clear error message on success
         setShowFields(false);
         navigate('/employeeview')
       })
       .catch((error) => {
-       handleApiErrors(error)
+        handleApiErrors(error)
       });
   };
 
   return (
     <LayOut>
       <div className="container-fluid p-0">
-        <form className="m-3" onSubmit={onSubmit}>
-        <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
-          <div className="col">
-            <h1 className="h3 mb-3">
-            <strong>Manage Salary</strong>
-          </h1>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
+            <div className="col">
+              <h1 className="h3 mb-3">
+                <strong>Manage Salary</strong>
+              </h1>
+            </div>
+            <div className="col-auto" style={{ paddingBottom: '20px' }}>
+              <nav aria-label="breadcrumb">
+                <ol className="breadcrumb mb-0">
+                  <li className="breadcrumb-item">
+                    <a href="/main">Home</a>
+                  </li>
+                  <li className="breadcrumb-item active">PayRoll</li>
+                  <li className="breadcrumb-item active">Manage Salary</li>
+                </ol>
+              </nav>
+            </div>
           </div>
-          <div className="col-auto" style={{ paddingBottom: '20px' }}>
-            <nav aria-label="breadcrumb">
-              <ol className="breadcrumb mb-0">
-                <li className="breadcrumb-item">
-                  <a href="/main">Home</a>
-                </li>
-                <li className="breadcrumb-item active">PayRoll</li>
-                <li className="breadcrumb-item active">Manage Salary</li>
-              </ol>
-            </nav>
-          </div>
-        </div>
           <div className="row">
             <div className="col-12">
               <div className="card">
@@ -253,30 +269,32 @@ const EmployeeSalaryStructure = () => {
                 </div>
                 <div className="card-body" style={{ padding: "0 0 0 25%" }}>
                   <div className="mb-4">
-                    <div className="row  align-items-center">
-                      <div
-                        className="col-6 col-md-6 col-lg-6 mt-3"
-                        style={{ width: "400px" }}
-                      >
-                        <label className="form-label">
-                          Select Employee Name
-                        </label>
-                        <Select
-                          options={employes}
-                          onChange={handleEmployeeChange}
-                          placeholder="Select Employee Name"
-                        />
-                      </div>
-                      <div className="col-6 col-md-6 col-lg-6 mt-5">
-                        <button
-                          type="button"
-                          className="btn btn-primary"
-                          onClick={handleGoClick}
+                    <div className="row align-items-center">
+                      <div className="col-12 d-flex align-items-center">
+                        <div
+                          className="mt-3"
+                          style={{ flex: "1 1 auto", maxWidth: "400px" }}
                         >
-                          Go
-                        </button>
+                          <label className="form-label">Select Employee Name</label>
+                          <Select
+                            options={employes}
+                            onChange={handleEmployeeChange}
+                            placeholder="Select Employee Name"
+                          />
+                        </div>
+                        <div style={{marginTop:"27px"}}>
+                        <div className="mt-3 ml-3" style={{marginLeft:"20px"}}>
+                          <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={handleGoClick}
+                          >
+                            Go
+                          </button>
+                        </div>
+                        </div>
                       </div>
-                      {message && <div className="text-danger">{message}</div>}
+                      {message && <div className="text-danger mt-2" style={{ marginLeft: '10px' }}>{message}</div>}
                     </div>
                   </div>
                 </div>
@@ -288,22 +306,31 @@ const EmployeeSalaryStructure = () => {
                   <div className="card">
                     <div className="card-header">
                       <h5 className="card-title"> Salary Details </h5>
-                      {errorMessage && (
-                        <div className="alert alert-danger" role="alert">
-                          {errorMessage}
-                        </div>
-                      )}
                       <hr />
                       <div className="row">
                         <div className="col-md-5 mb-3">
                           <label className="form-label">Variable Amount</label>
                           <input
+                            id="variableAmount"
                             type="text"
                             className="form-control"
                             autoComplete="off"
+                            {...register("variableAmount", {
+                              required: "Variable amount is required",
+                              pattern: {
+                                value: /^[0-9]+$/,
+                                message: "These filed accepcts only Integers",
+                              },
+                              validate: {
+                                notZero: value => value !== "0" || "Value cannot be 0"
+                              }
+                            })}
                             value={variableAmount}
                             onChange={handleVariableAmountChange}
                           />
+                          {errors.variableAmount && (
+                            <p className="text-danger">{errors.variableAmount.message}</p>
+                          )}
                         </div>
                         <div className="col-md-1 mb-3"></div>
                         <div className="col-md-5 mb-3">
@@ -312,9 +339,22 @@ const EmployeeSalaryStructure = () => {
                             type="text"
                             className="form-control"
                             autoComplete="off"
+                            {...register("fixedAmount", {
+                              required: "Fixed amount is required",
+                              pattern: {
+                                value: /^[0-9]+$/,
+                                message: "These filed accepcts only Integers",
+                              },
+                              validate: {
+                                notZero: value => value !== "0" || "Value cannot be 0"
+                              }
+                            })}
                             value={fixedAmount}
                             onChange={handleFixedAmountChange}
                           />
+                          {errors.fixedAmount && (
+                            <p className="text-danger">{errors.fixedAmount.message}</p>
+                          )}
                         </div>
                         <div className="col-md-5 mb-3">
                           <label className="form-label">Gross Amount</label>
@@ -363,22 +403,48 @@ const EmployeeSalaryStructure = () => {
                           type="text"
                           className="form-control"
                           autoComplete="off"
+                          {...register("hra", {
+                            required: "Hra is required",
+                            pattern: {
+                              value: /^[0-9]+$/,
+                              message: "These filed accepcts only Integers",
+                            },
+                            validate: {
+                              notZero: value => value !== "0" || "Value cannot be 0"
+                            }
+                          })}
                           value={hra}
-                          onChange={(e) => setHra(e.target.value)}
+                          onChange={handleHraChange}
                         />
+                        {errors.hra && (
+                          <p className="text-danger">{errors.hra.message}</p>
+                        )}
                       </div>
                       <div className="col-12" style={{ marginTop: "10px" }}>
-                        <label className="form-label">Travel Allowance:<span>(<CurrencyRupee/>)</span></label>
+                        <label className="form-label">Travel Allowance:<span style={{color:"red"}}>(<CurrencyRupee />)</span></label>
                         <input
                           type="text"
                           className="form-control"
                           autoComplete="off"
+                          {...register("travelAllowance", {
+                            required: "Travel Allowance is required",
+                            pattern: {
+                              value: /^[0-9]+$/,
+                              message: "These filed accepcts only Integers",
+                            },
+                            validate: {
+                              notZero: value => value !== "0" || "Value cannot be 0"
+                            }
+                          })}
                           value={travelAllowance}
                           onChange={handleTravelAllowanceChange}
                         />
+                        {errors.travelAllowance && (
+                          <p className="text-danger">{errors.travelAllowance.message}</p>
+                        )}
                       </div>
                       <div className="col-12" style={{ marginTop: "10px" }}>
-                        <label className="form-label">Special Allowance:<span>(<CurrencyRupee/>)</span></label>
+                        <label className="form-label">Special Allowance:<span style={{color:"red"}}>(<CurrencyRupee />)</span></label>
                         <input
                           type="text"
                           className="form-control"
@@ -388,7 +454,7 @@ const EmployeeSalaryStructure = () => {
                         />
                       </div>
                       <div className="col-12" style={{ marginTop: "10px" }}>
-                        <label className="form-label">Other Allowances:<span>(<CurrencyRupee/>)</span></label>
+                        <label className="form-label">Other Allowances:<span style={{color:"red"}}>(<CurrencyRupee />)</span></label>
                         <input
                           type="text"
                           className="form-control"
@@ -454,10 +520,23 @@ const EmployeeSalaryStructure = () => {
                         <input
                           type="text"
                           className="form-control"
-                          value={pfEmployee}
                           autoComplete="off"
+                          {...register("pfEmployee", {
+                            required: "EMployee's PF Contribution is required",
+                            pattern: {
+                              value: /^[0-9]+$/,
+                              message: "These filed accepcts only Integers",
+                            },
+                            validate: {
+                              notZero: value => value !== "0" || "Value cannot be 0"
+                            }
+                          })}
+                          value={pfEmployee}
                           onChange={handlePfEmployeeChange}
                         />
+                        {errors.pfEmployee && (
+                          <p className="text-danger">{errors.pfEmployee.message}</p>
+                        )}
                       </div>
                       <div className="col-12" style={{ marginTop: "10px" }}>
                         <label className="form-label">
@@ -466,10 +545,23 @@ const EmployeeSalaryStructure = () => {
                         <input
                           type="text"
                           className="form-control"
-                          value={pfEmployer}
                           autoComplete="off"
+                          {...register("pfEmployer", {
+                            required: "Employer's PF Contribution is required",
+                            pattern: {
+                              value: /^[0-9]+$/,
+                              message: "These filed accepcts only Integers",
+                            },
+                            validate: {
+                              notZero: value => value !== "0" || "Value cannot be 0"
+                            }
+                          })}
+                          value={pfEmployer}
                           onChange={handlePfEmployerChange}
                         />
+                        {errors.pfEmployer && (
+                          <p className="text-danger">{errors.pfEmployer.message}</p>
+                        )}
                       </div>
                       <div className="col-12" style={{ marginTop: "10px" }}>
                         <label className="form-label">Total PF</label>
@@ -483,30 +575,28 @@ const EmployeeSalaryStructure = () => {
                     </div>
                   </div>
                   <div className="col-12">
-                  <div className="card">
-                    <div className="card-header">
-                      <h5 className="card-title"> Net Salary </h5>
-                      <hr />
-                      <div className="col-12">
-                        <label className="form-label">Total Amount</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={totalAmount}
-                          readOnly
-                        />
+                    <div className="card">
+                      <div className="card-header">
+                        <h5 className="card-title"> Net Salary </h5>
+                        <hr />
+                        <div className="col-12">
+                          <label className="form-label">Total Amount</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={totalAmount}
+                            readOnly
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
+                  <div className="col-12 text-end" style={{ marginTop: "60px" }}>
+                    <button type="submit" className="btn btn-primary">
+                      Submit
+                    </button>
+                  </div>
                 </div>
-                <div className="col-12 text-end" style={{marginTop:"60px"}}>
-                  <button type="submit" className="btn btn-primary">
-                    Submit
-                  </button>
-                </div>
-                </div>
-                
-               
               </>
             )}
           </div>

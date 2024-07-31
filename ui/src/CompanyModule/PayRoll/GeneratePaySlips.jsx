@@ -184,7 +184,7 @@ const GeneratePaySlip = () => {
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3">
-          <strong>PaySlips Form</strong>
+          <strong>Generate Payslips</strong>
         </h1>
         </div>
         <div className="col-auto" style={{ paddingBottom: '20px' }}>
@@ -194,7 +194,7 @@ const GeneratePaySlip = () => {
                   <a href="/main">Home</a>
                 </li>
                 <li className="breadcrumb-item active">PayRoll</li>
-                <li className="breadcrumb-item active">PaySlips Form</li>
+                <li className="breadcrumb-item active">Generate Payslips</li>
               </ol>
             </nav>
           </div>

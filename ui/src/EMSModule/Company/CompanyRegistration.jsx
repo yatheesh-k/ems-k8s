@@ -316,13 +316,13 @@ const CompanyRegistration = () => {
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
-                        Short Name <span style={{ color: "red" }}>*</span>
+                        Service Name <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
                         type="text"
                         className="form-control"
                         onInput={toInputLowerCase}
-                        placeholder="Enter Short Name"
+                        placeholder="Enter Service Name"
                         autoComplete="off"
                         {...register("shortName", {
                           required: "Short Name is required",
@@ -372,32 +372,32 @@ const CompanyRegistration = () => {
                       )}
                     </div>
                     {editMode ? (
-                      <> 
-                      <div className="col-lg-1"></div>
-                      <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">
-                        Contact Number <span style={{ color: "red" }}>*</span>
-                      </label>
-                      <input
-                        type="tel"
-                        className="form-control"
-                        placeholder="Enter Contact Number"
-                        autoComplete="off"
-                        onKeyDown={handleEmailChange}
-                        {...register("landNo", {
-                          required: "Contact Number is required",
-                          pattern: {
-                            value: /^[0-9]{10}$/,
-                            message:
-                              "Contact Number should contain only 10 numbers. ",
-                          },
-                        })}
-                      />
-                      {errors.landNo && (
-                        <p className="errorMsg">{errors.landNo.message}</p>
-                      )}
-                    </div>
-                    </>
+                      <>
+                        <div className="col-lg-1"></div>
+                        <div className="col-12 col-md-6 col-lg-5 mb-3">
+                          <label className="form-label">
+                            Contact Number <span style={{ color: "red" }}>*</span>
+                          </label>
+                          <input
+                            type="tel"
+                            className="form-control"
+                            placeholder="Enter Contact Number"
+                            autoComplete="off"
+                            onKeyDown={handleEmailChange}
+                            {...register("landNo", {
+                              required: "Contact Number is required",
+                              pattern: {
+                                value: /^[0-9]{10}$/,
+                                message:
+                                  "Contact Number should contain only 10 numbers. ",
+                              },
+                            })}
+                          />
+                          {errors.landNo && (
+                            <p className="errorMsg">{errors.landNo.message}</p>
+                          )}
+                        </div>
+                      </>
                     ) : (
                       <>
                         <div className="col-lg-1"></div>
@@ -440,36 +440,36 @@ const CompanyRegistration = () => {
                         </div>
                       </>
                     )}
-                    {!editMode &&(
+                    {!editMode && (
                       <>
-    <div className="col-12 col-md-6 col-lg-5 mb-3">
-    <label className="form-label">
-      Contact Number <span style={{ color: "red" }}>*</span>
-    </label>
-    <input
-      type="tel"
-      className="form-control"
-      placeholder="Enter Contact Number"
-      autoComplete="off"
-      onKeyDown={handleEmailChange}
-      {...register("landNo", {
-        required: "Contact Number is required",
-        pattern: {
-          value: /^[0-9]{10}$/,
-          message:
-            "Contact Number should contain only 10 numbers. ",
-        },
-      })}
-    />
-    {errors.landNo && (
-      <p className="errorMsg">{errors.landNo.message}</p>
-    )}
-  </div>
+                        <div className="col-12 col-md-6 col-lg-5 mb-3">
+                          <label className="form-label">
+                            Contact Number <span style={{ color: "red" }}>*</span>
+                          </label>
+                          <input
+                            type="tel"
+                            className="form-control"
+                            placeholder="Enter Contact Number"
+                            autoComplete="off"
+                            onKeyDown={handleEmailChange}
+                            {...register("landNo", {
+                              required: "Contact Number is required",
+                              pattern: {
+                                value: /^[0-9]{10}$/,
+                                message:
+                                  "Contact Number should contain only 10 numbers. ",
+                              },
+                            })}
+                          />
+                          {errors.landNo && (
+                            <p className="errorMsg">{errors.landNo.message}</p>
+                          )}
+                        </div>
 
-  <div className="col-lg-1"></div>
-  </>
+                        <div className="col-lg-1"></div>
+                      </>
                     )}
-                
+
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
                       <label className="form-label">
                         Alternate Number <span style={{ color: "red" }}>*</span>
@@ -493,8 +493,8 @@ const CompanyRegistration = () => {
                         <p className="errorMsg">{errors.mobileNo.message}</p>
                       )}
                     </div>
-                    {editMode &&(
-                       <div className="col-lg-1"></div>
+                    {editMode && (
+                      <div className="col-lg-1"></div>
 
                     )}
 
@@ -628,7 +628,6 @@ const CompanyRegistration = () => {
                           },
                           pattern: {
                             value: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
-
                             message:
                               "Invalid GST Number",
                           },

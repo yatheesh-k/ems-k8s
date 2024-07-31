@@ -1,5 +1,5 @@
 import axios from "axios";
-import { userId } from "./Auth";
+import { employeeId, userId } from "./Auth";
 
 const protocol = window.location.protocol;
 const hostname = window.location.hostname;
@@ -72,8 +72,8 @@ export const forgotPasswordStep2=(data)=>{
   return axios.post(`${Login_URL}/update/password`, data);
 }
 
-export const resetPassword=(data,companyId)=>{
-  return axiosInstance.patch(`/company/password/${companyId}`, data);
+export const resetPassword=(data,employeeId)=>{
+  return axiosInstance.patch(`/company/employee/${employeeId}/password`, data);
 }
 
 

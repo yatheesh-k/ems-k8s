@@ -1,26 +1,25 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { forgotPasswordStep1, forgotPasswordStep2, ValidateOtp } from '../Utils/Axios';
-import { company } from '../Utils/Auth';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { EnvelopeFill, LockFill, UnlockFill } from 'react-bootstrap-icons';
 
 const ForgotPassword = () => {
-  const { register, handleSubmit,watch, formState: { errors, isSubmitting } } = useForm();
+  const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm();
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState('');
-  const [newPassword, setNewPassword] = useState('');
+  const [passwordShown, setPasswordShown] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [companyShortName, setCompanyShortName] = useState(company);
   const watchPassword = watch('password', '');
-  const navigate=useNavigate();
+  const navigate = useNavigate();
+  const company = sessionStorage.getItem("company");
 
   const onSubmitEmail = async (data) => {
     setLoading(true);
     const formData = {
       username: data.email,
-      company: companyShortName
+      company: company
     };
     try {
       const response = await forgotPasswordStep1(formData);
@@ -28,7 +27,7 @@ const ForgotPassword = () => {
       setEmail(data.email); // Update email state here
       setStep(2); // Move to Step 2 if successful
     } catch (error) {
-     handleApiErrors(error);
+      handleApiErrors(error);
     } finally {
       setLoading(false);
     }
@@ -37,16 +36,16 @@ const ForgotPassword = () => {
   const onSubmitOtp = async (data) => {
     setLoading(true);
     const formData = {
-        username: data.email,
-        otp:data.otp,
-        company: companyShortName
-      };
+      username: data.email,
+      otp: data.otp,
+      company: company
+    };
     try {
       const response = await ValidateOtp(formData);
       console.log(response.data); // Handle API response as needed
       setStep(3); // Move to Step 3 if OTP validation successful
     } catch (error) {
-     handleApiErrors(error);
+      handleApiErrors(error);
     } finally {
       setLoading(false);
     }
@@ -58,19 +57,18 @@ const ForgotPassword = () => {
       const formData = {
         username: email,
         password: data.password,
-        company: companyShortName,
+        company: company,
         companyFullName: data.companyName
       };
       const response = await forgotPasswordStep2(formData);
       console.log(response.data); // Handle API response as needed
-      navigate('/:company/login')
+      navigate('/:company/login');
     } catch (error) {
       handleApiErrors(error);
     } finally {
       setLoading(false);
     }
   };
-
 
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
@@ -82,6 +80,10 @@ const ForgotPassword = () => {
     console.error(error.response);
   };
 
+  const togglePasswordVisibility = () => {
+    setPasswordShown(!passwordShown);
+  };
+
   const renderStep = () => {
     switch (step) {
       case 1:
@@ -89,7 +91,12 @@ const ForgotPassword = () => {
           <form onSubmit={handleSubmit(onSubmitEmail)}>
             <div className="form-group">
               <label>Email:</label>
-              <input type="email" className="form-control" {...register('email', { required: true })} />
+              <div className="input-group">
+                <span className="input-group-text">
+                <EnvelopeFill size={20} color="#4C489D" />
+                </span>
+                <input type="email" className="form-control" {...register('email', { required: true })} />
+              </div>
               {errors.email && <span className="text-danger">Email is required</span>}
             </div>
             <div className="text-center mt-4">
@@ -104,11 +111,21 @@ const ForgotPassword = () => {
           <form onSubmit={handleSubmit(onSubmitOtp)}>
             <div className="form-group">
               <label>Email:</label>
-              <input type="email" className="form-control" value={email} disabled />
+              <div className="input-group">
+                <span className="input-group-text">
+                <EnvelopeFill size={20} color="#4C489D" />
+                </span>
+                <input type="email" className="form-control" value={email} disabled />
+              </div>
             </div>
             <div className="form-group">
               <label>OTP:</label>
-              <input type="text" className="form-control" {...register('otp', { required: true })} />
+              <div className="input-group">
+                <span className="input-group-text">
+                   <EnvelopeFill size={20} color="#4C489D" />
+                </span>
+                <input type="text" className="form-control" {...register('otp', { required: true })} />
+              </div>
               {errors.otp && <span className="text-danger">OTP is required</span>}
             </div>
             <div className="text-center mt-4">
@@ -120,26 +137,49 @@ const ForgotPassword = () => {
         );
       case 3:
         return (
-            <form onSubmit={handleSubmit(onSubmitNewPassword)}>
+          <form onSubmit={handleSubmit(onSubmitNewPassword)}>
             <div className="form-group">
               <label>Email:</label>
-              <input type="email" className="form-control" value={email} disabled />
+              <div className="input-group">
+                <span className="input-group-text">
+                <EnvelopeFill size={20} color="#4C489D" />
+                </span>
+                <input type="email" className="form-control" value={email} disabled />
+              </div>
             </div>
             <div className="form-group">
               <label>New Password:</label>
-              <input type="password" className="form-control" {...register('password', { required: true })} />
+              <div className="input-group">
+                <span className="input-group-text" onClick={togglePasswordVisibility}>
+                  {passwordShown ? (
+                    <UnlockFill size={20} color="#4C489D" />
+                  ) : (
+                    <LockFill size={20} color="#4C489D" />
+                  )}
+                </span>
+                <input type={passwordShown ? "text" : "password"} className="form-control" {...register('password', { required: true })} />
+              </div>
               {errors.password && <span className="text-danger">Password is required</span>}
             </div>
             <div className="form-group">
               <label>Confirm Password:</label>
-              <input
-                type="password"
-                className="form-control"
-                {...register('confirmPassword', {
-                  required: true,
-                  validate: value => value === watchPassword || "Passwords do not match"
-                })}
-              />
+              <div className="input-group">
+                <span className="input-group-text" onClick={togglePasswordVisibility}>
+                  {passwordShown ? (
+                    <UnlockFill size={20} color="#4C489D" />
+                  ) : (
+                    <LockFill size={20} color="#4C489D" />
+                  )}
+                </span>
+                <input
+                  type={passwordShown ? "text" : "password"}
+                  className="form-control"
+                  {...register('confirmPassword', {
+                    required: true,
+                    validate: value => value === watchPassword || "Passwords do not match"
+                  })}
+                />
+              </div>
               {errors.confirmPassword && <span className="text-danger">{errors.confirmPassword.message}</span>}
             </div>
             <div className="form-group">
@@ -160,24 +200,28 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="container">
-      <div className="row justify-content-center">
-        <div className="col-md-6">
-          <div className="card">
-            <div className="card-header">
-              <div className="text-center mt-2">
-                <p className="lead">Forgot Password</p>
-              </div>
-            </div>
-            <div className="card-body">
-              <div className="m-sm-2">
-                {renderStep()}
+    <main className="d-flex w-100 ">
+      <div className="container d-flex flex-column">
+        <div className="row vh-100">
+          <div className="col-sm-10 col-md-7 col-lg-6 mx-auto d-table h-100">
+            <div className="d-table-cell align-middle">
+              <div className="card">
+                <div className="card-header">
+                  <div className="text-center mt-2">
+                    <p className="lead">Forgot Password</p>
+                  </div>
+                </div>
+                <div className="card-body">
+                  <div className="m-sm-2">
+                    {renderStep()}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

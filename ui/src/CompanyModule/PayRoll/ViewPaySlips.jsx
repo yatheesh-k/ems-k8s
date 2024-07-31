@@ -191,19 +191,6 @@ const ViewPaySlips = () => {
           >
             <Eye size={22} color="green" />
           </button>
-          <button
-            className="btn btn-sm"
-            style={{
-              backgroundColor: "transparent",
-              border: "none",
-              padding: "0",
-              marginLeft: "5px",
-            }}
-            onClick={() => handleShowDeleteModal(row.payslipId)}
-            title="Delete"
-          >
-            <XSquareFill size={22} color="#DA542E" />
-          </button>
         </div>
       ),
     },
@@ -214,7 +201,7 @@ const ViewPaySlips = () => {
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3">
-              <strong> Employee Payslip List</strong>
+              <strong> PaySlips</strong>
             </h1>
           </div>
           <div className="col-auto" style={{ paddingBottom: '20px' }}>
@@ -224,7 +211,7 @@ const ViewPaySlips = () => {
                   <a href="/main">Home</a>
                 </li>
                 <li className="breadcrumb-item active">PayRoll</li>
-                <li className="breadcrumb-item active">Employee PaySlip List</li>
+                <li className="breadcrumb-item active">PaySlips</li>
               </ol>
             </nav>
           </div>

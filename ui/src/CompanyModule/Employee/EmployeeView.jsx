@@ -193,7 +193,7 @@ const handleSalary = (id) => {
       name: <h6><b>Department</b></h6>,
       selector: row =>row.department,
       sortable: true,
-      width:"150px"
+      width:"120px"
     },
 
     {
@@ -332,6 +332,7 @@ const handleSalary = (id) => {
                   <div className="col-md-4 mt-2">
                     <select
                       className="form-select"
+                      style={{paddingBottom:'6px'}} 
                       value={selectedYear}
                       onChange={(e) =>
                         filterByMonthYear(selectedMonth, e.target.value)
@@ -348,6 +349,7 @@ const handleSalary = (id) => {
                   <div className="col-md-4 mt-2">
                     <select
                       className="form-select"
+                      style={{paddingBottom:'6px'}}
                       value={selectedMonth}
                       onChange={(e) =>
                         filterByMonthYear(e.target.value, selectedYear)

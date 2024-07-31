@@ -69,8 +69,8 @@ function Message() {
                         <div className="d-table-cell align-middle">
                             <div className="text-center mt-2">
                                 <img src="assets/img/person-1.svg" alt="person" style={{ width: '800px', height: '300px', marginBottom: "40px" }} />
-                                <h1 className="lead" style={{ fontSize: "3rem", fontFamily: "Arial, sans-serif", fontWeight: 'bold', color: '#333', display: 'inline-block', whiteSpace: 'nowrap' }}>Welcome to Employee Management System </h1>
-                                <h3 style={{ fontFamily: "sans-serif", color: '#555' }}>Enter the path according to your company</h3>
+                                <h1 className="lead" style={{ fontSize: "3rem", fontFamily: "Arial, sans-serif", fontWeight: 'bold', color: '#333', display: 'inline-block', whiteSpace: 'nowrap' }}>Welcome To Employee Management System </h1>
+                                <h3 style={{ fontFamily: "sans-serif", color: '#555' }}>Enter The Path According To Your Company</h3>
                             </div>
                             <div className='row' style={{ marginTop: "20px" }}>
                                 <div className='col-12 col-md-6 col-lg-5 mb-3' style={{ paddingLeft: "200px" }}>
