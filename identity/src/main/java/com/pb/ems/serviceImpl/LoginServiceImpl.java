@@ -111,11 +111,10 @@ public class LoginServiceImpl implements LoginService {
         String token= null;
         if (employee != null && employee.getRoles() != null && employee.getRoles().size() > 0) {
             roles.addAll(employee.getRoles());
-             token = JwtTokenUtil.generateEmployeeToken(employee.getId(), roles, request.getCompany(),employee.getEmployeeId());
         } else {
             roles.add(Constants.COMPANY_ADMIN);
-             token = JwtTokenUtil.generateEmployeeToken(employee.getId(), roles, request.getCompany(), request.getUsername());
         }
+        token = JwtTokenUtil.generateEmployeeToken(employee.getId(), roles, request.getCompany(), request.getUsername());
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(new LoginResponse(token, null)), HttpStatus.OK);
     }
@@ -202,7 +201,9 @@ public class LoginServiceImpl implements LoginService {
 
     private Long generateOtp() {
         Random random = new Random();
-        Long otp = 100000 + random.nextLong(900000);
+        //Long otp = 100000 + random.nextLong(900000);
+        //TODO for now harding  the OTP value
+        Long otp = 123456L;
         return otp;
     }
 
