@@ -5,7 +5,7 @@ import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 import Reset from "./Reset";
 import { useAuth } from "../Context/AuthContext";
 import { EmployeeGetApiById } from "../Utils/Axios";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const Header = ({ toggleSidebar }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -30,9 +30,9 @@ const Header = ({ toggleSidebar }) => {
       setError(null);
       try {
         const response = await EmployeeGetApiById(authData.userId);
-        const companyId = response.data.companyId;
-        setFirstName(response.data.firstName);
-        setLastName(response.data.lastName);
+        const { firstName, lastName } = response.data;
+        setFirstName(firstName);
+        setLastName(lastName);
       } catch (error) {
         setError("Failed to fetch data");
       } finally {
@@ -108,48 +108,16 @@ const Header = ({ toggleSidebar }) => {
 
   return (
     <nav className="navbar navbar-expand navbar-light navbar-bg">
-      <a className="sidebar-toggle js-sidebar-toggle" onClick={toggleSidebar} href="#">
+      <a className="sidebar-toggle js-sidebar-toggle" onClick={toggleSidebar}   href>
         <i className="hamburger align-self-center"></i>
       </a>
       <div className="navbar-collapse collapse">
         <ul className="navbar-nav navbar-align">
-          <li className="nav-item dropdown position-relative">
-            <a
-              className="nav-icon dropdown-toggle"
-              href="#"
-              id="alertsDropdown"
-              onClick={toggleNotification}
-            >
-              <div className="position-relative">
-                <span className="align-middle">
-                  <i className="bi bi-bell-fill"></i>
-                </span>
-                <span className="indicator">0</span>
-              </div>
-            </a>
-            {isNotificationOpen && (
-              <div
-                className="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0 show"
-                aria-labelledby="alertsDropdown"
-                style={{ left: "auto", right: "50%" }}
-              >
-                <div className="dropdown-menu-header">0 New Notifications</div>
-                <div className="list-group">
-                  Loading .....
-                </div>
-                <div className="dropdown-menu-footer">
-                  <a href="#" className="text-muted">
-                    Show all notifications
-                  </a>
-                </div>
-              </div>
-            )}
-          </li>
-          {roles.includes("ems_admin") ? (
+          {roles.includes("ems_admin") && (
             <li className="nav-item">
               <a
                 className="nav-link dropdown-toggle d-none d-sm-inline-block text-center"
-                href="#"
+                href
                 onClick={toggleProfile}
               >
                 <span className="text-dark p-2 mb-3">{companyName}</span>
@@ -159,27 +127,25 @@ const Header = ({ toggleSidebar }) => {
                 <div
                   className="dropdown-menu dropdown-menu-end py-0 show"
                   aria-labelledby="profileDropdown"
-                  style={{ left: "auto", right: "50%" }}
+                  style={{ left: "auto", right: "3%" }}
                 >
-                  <a className="dropdown-item" href="/profile">
-                    <i className="align-middle me-1 bi bi-person"></i> Profile
-                  </a>
-                  <a className="dropdown-item" href="#" onClick={handleResetPasswordClick}>
+                  <a className="dropdown-item"   href onClick={handleResetPasswordClick}>
                     <i className="align-middle me-1 bi bi-key"></i> Reset Password
                   </a>
                   <div className="dropdown-divider"></div>
-                  <a className="dropdown-item" href="#" onClick={handleLogOut}>
+                  <a className="dropdown-item"   href onClick={handleLogOut}>
                     <i className="align-middle bi bi-arrow-left-circle" style={{ paddingRight: "10px" }}></i>
                     Log out
                   </a>
                 </div>
               )}
             </li>
-          ) : (
+          )}
+          {roles.includes("company_admin") && (
             <li className="nav-item dropdown position-relative">
               <a
                 className="nav-link dropdown-toggle d-none d-sm-inline-block text-center"
-                href="#"
+                href
                 onClick={toggleProfile}
               >
                 <span className="text-dark p-2 mb-3">{companyName}</span>
@@ -194,11 +160,42 @@ const Header = ({ toggleSidebar }) => {
                   <a className="dropdown-item" href="/profile">
                     <i className="align-middle me-1 bi bi-person"></i> Profile
                   </a>
-                  <a className="dropdown-item" href="#" onClick={handleResetPasswordClick}>
+                  <a className="dropdown-item"   href onClick={handleResetPasswordClick}>
                     <i className="align-middle me-1 bi bi-key"></i> Reset Password
                   </a>
                   <div className="dropdown-divider"></div>
-                  <a className="dropdown-item" href="#" onClick={handleLogOut}>
+                  <a className="dropdown-item"   href onClick={handleLogOut}>
+                    <i className="align-middle bi bi-arrow-left-circle" style={{ paddingRight: "10px" }}></i>
+                    Log out
+                  </a>
+                </div>
+              )}
+            </li>
+          )}
+          {roles.includes("Employee") && (
+            <li className="nav-item dropdown position-relative">
+              <a
+                className="nav-link dropdown-toggle d-none d-sm-inline-block text-center"
+                href
+                onClick={toggleProfile}
+              >
+                <span className="text-dark p-2 mb-3">{firstName} {lastName}</span> 
+                <i className="bi bi-person-circle" style={{ fontSize: "22px" }}></i>
+              </a>
+              {isProfileOpen && (
+                <div
+                  className="dropdown-menu dropdown-menu-end py-0 show"
+                  aria-labelledby="profileDropdown"
+                  style={{ left: "auto", right: "50%" }}
+                >
+                  <a className="dropdown-item" href="/profile">
+                    <i className="align-middle me-1 bi bi-person"></i> Profile
+                  </a>
+                  <a className="dropdown-item"   href onClick={handleResetPasswordClick}>
+                    <i className="align-middle me-1 bi bi-key"></i> Reset Password
+                  </a>
+                  <div className="dropdown-divider"></div>
+                  <a className="dropdown-item"   href onClick={handleLogOut}>
                     <i className="align-middle bi bi-arrow-left-circle" style={{ paddingRight: "10px" }}></i>
                     Log out
                   </a>

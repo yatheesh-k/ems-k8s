@@ -9,7 +9,7 @@ import { CompanyImagePatchApi, companyUpdateByIdApi, companyViewByIdApi, Employe
 import { userId } from "../Utils/Auth";
 
 function Profile() {
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm({ mode: "onChange" });
 
   const [companyId, setCompanyId] = useState(null);
   const [companyData, setCompanyData] = useState({});
@@ -32,7 +32,6 @@ function Profile() {
         const response = await companyViewByIdApi(companyId);
         const data = response.data;
         setCompanyData(data);
-        // Set form values with the fetched data
         setValue("companyName", data.companyName);
         setValue("emailId", data.emailId);
         setValue("mobileNo", data.mobileNo);
@@ -91,6 +90,28 @@ function Profile() {
     }
   };
 
+  const  toInputTitleCase = (e) => {
+    const input = e.target;
+    let value = input.value;
+    // Remove leading spaces
+    value = value.replace(/^\s+/g, '');
+    // Initially disallow spaces
+    if (!/\S/.test(value)) {
+      // If no non-space characters are present, prevent spaces
+      value = value.replace(/\s+/g, '');
+    } else {
+      // Allow spaces if there are non-space characters
+      value = value.replace(/^\s+/g, ''); // Remove leading spaces
+      const words = value.split(' ');
+      const capitalizedWords = words.map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      });
+      value = capitalizedWords.join(' ');
+    }
+    // Update input value
+    input.value = value;
+  };
+
   const handleLogoSubmit = async () => {
     if (!companyId) return;
     try {
@@ -112,6 +133,16 @@ function Profile() {
     }
   };
 
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    if (value.trim() !== "") {
+      return;
+    }
+    if (e.keyCode === 32) {
+      e.preventDefault();
+    }
+  };
+
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
 
@@ -125,14 +156,13 @@ function Profile() {
         <h1 className="h3 mb-3">
           <strong>Profile</strong>
         </h1>
-
         {/* Success Message Modal */}
-        <Modal 
-        show={successMessage !== ""} 
-        onHide={() => setSuccessMessage("")}
-        centered
-        style={{ zIndex: "1050" }}
-        className="custom-modal"
+        <Modal
+          show={successMessage !== ""}
+          onHide={() => setSuccessMessage("")}
+          centered
+          style={{ zIndex: "1050" }}
+          className="custom-modal"
         >
           <ModalHeader closeButton>
             <ModalTitle>Success</ModalTitle>
@@ -146,12 +176,12 @@ function Profile() {
         </Modal>
 
         {/* Error Message Modal */}
-        <Modal 
-        show={errorMessage !== ""} 
-        onHide={() => setErrorMessage("")}
-        centered
-        style={{ zIndex: "1050" }}
-        className="custom-modal"
+        <Modal
+          show={errorMessage !== ""}
+          onHide={() => setErrorMessage("")}
+          centered
+          style={{ zIndex: "1050" }}
+          className="custom-modal"
         >
           <ModalHeader closeButton>
             <ModalTitle>Error</ModalTitle>
@@ -216,15 +246,6 @@ function Profile() {
                     </div>
                   </div>
                 </div>
-                {/* <div className="d-flex justify-content-end">
-                  <button
-                    className="btn btn-primary btn-lg"
-                    type="submit"
-                    onClick={handleSubmit(onSubmit)}
-                  >
-                    Submit
-                  </button>
-                </div> */}
               </div>
             </div>
           </div>
@@ -273,21 +294,32 @@ function Profile() {
                           htmlFor="companyPhoneNo"
                           className="form-label"
                         >
-                          Mobile Number
+                          Alternate Number
                         </label>
                         <input
                           type="text"
                           id="companyPhoneNo"
                           className="form-control"
-                          {...register("mobileNo")}
+                          onInput={toInputTitleCase}
                           defaultValue={companyData.mobileNo}
+                          {...register("mobileNo", {
+                            required: "Mobile Number is required",
+                            pattern: {
+                              value: /^[0-9]{10}$/,
+                              message:
+                                "Alternate Number should contain only 10 numbers",
+                            },
+                          })}
                         />
+                         {errors.mobileNo && (
+                        <p className="errorMsg">{errors.mobileNo.message}</p>
+                      )}
                       </div>
                     </div>
                     <div className="col-md-6">
                       <div className="mb-3">
                         <label htmlFor="companyName" className="form-label">
-                          Short Name
+                          Service Name
                         </label>
                         <input
                           type="text"
@@ -298,32 +330,7 @@ function Profile() {
                           readOnly
                         />
                       </div>
-                      {/* <div className="col-12 col-md-6 col-lg-5 mb-3"> 
-                        <label htmlFor="website" className="form-label">
-                          Password
-                        </label>
-                        <div className="col-sm-12 input-group">
-                        <input
-                          type={passwordShown ? "text" : "password"}
-                          id="website"
-                          className="form-control"
-                          {...register("password")}
-                          defaultValue={companyData.password}
-                        />
-                        <i
-                          onClick={togglePasswordVisiblity}
-                          style={{ margin: "5px" }}
-                        >
-                          {" "}
-                          {passwordShown ? (
-                            <Eye size={17} />
-                          ) : (
-                            <EyeSlash size={17} />
-                          )}
-                        </i>
-                        </div>
-                      </div> */}
-                        <div className="mb-3">
+                      <div className="mb-3">
                         <label
                           htmlFor="companyAddress"
                           className="form-label"
@@ -332,26 +339,57 @@ function Profile() {
                         </label>
                         <input
                           type="text"
-                          id="companyAddress"
                           className="form-control"
-                          {...register("companyAddress")}
+                          placeholder="Enter Company Address"
+                          onKeyDown={handleEmailChange}
+                          onInput={toInputTitleCase}
                           defaultValue={companyData.companyAddress}
+                          autoComplete="off"
+                          id="companyAddress"
+                          {...register("companyAddress", {
+                            required: "Company Address is required",
+                            pattern: {
+                              value: /^[a-zA-Z0-9\s,'#,&*()^\-/.]*$/,
+                              message:
+                                "Please enter valid Address",
+                            },
+                            maxLength: {
+                              value: 100,
+                              message: "maximum 100 characters allowed",
+                            },
+                          })}
                         />
+                        {errors.companyAddress && (
+                          <p className="errorMsg">
+                            {errors.companyAddress.message}
+                          </p>
+                        )}
                       </div>
                       <div className="mb-3">
                         <label
                           htmlFor="companyAddress"
                           className="form-label"
                         >
-                          Land Number
+                          Contact Number
                         </label>
                         <input
                           type="text"
                           id="companyAddress"
                           className="form-control"
-                          {...register("landNo")}
+                          onInput={toInputTitleCase}
                           defaultValue={companyData.landNo}
+                          {...register("landNo", {
+                            required: "Contact Number is required",
+                            pattern: {
+                              value: /^[0-9]{10}$/,
+                              message:
+                                "Contact Number should contain only 10 numbers. ",
+                            },
+                          })}
                         />
+                        {errors.landNo && (
+                          <p className="errorMsg">{errors.landNo.message}</p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -456,9 +494,23 @@ function Profile() {
                           type="text"
                           id="name"
                           className="form-control"
-                          {...register("name")}
+                          onInput={toInputTitleCase}
                           defaultValue={companyData.name}
+                          {...register("name", {
+                            required: "Name is required",
+                            maxLength: {
+                              value: 20,
+                              message: "Name must not exceed 20 characters",
+                            },
+                            pattern: {
+                              value: /^[a-zA-Z\s]*$/,
+                              message: "Name should contain only alphabets",
+                            },
+                          })}
                         />
+                        {errors.name && (
+                        <p className="errorMsg">{errors.name.message}</p>
+                      )}
                       </div>
                       <div className="mb-3">
                         <label
@@ -471,9 +523,22 @@ function Profile() {
                           type="text"
                           id="personalMailId"
                           className="form-control"
-                          {...register("personalMailId")}
+                          onInput={toInputTitleCase}
                           defaultValue={companyData.personalMailId}
+                          {...register("personalMailId", {
+                            required: "MailId is required",
+                            pattern: {
+                              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                              message:
+                                "Entered value does not match email format",
+                            },
+                          })}
                         />
+                        {errors.personalMailId && (
+                        <p className="errorMsg">
+                          {errors.personalMailId.message}
+                        </p>
+                      )}
                       </div>
                     </div>
                     <div className="col-md-6">
@@ -488,9 +553,22 @@ function Profile() {
                           type="text"
                           id="personalMobileNo"
                           className="form-control"
-                          {...register("personalMobileNo")}
+                          onInput={toInputTitleCase}
                           defaultValue={companyData.personalMobileNo}
+                          {...register("personalMobileNo", {
+                            required: "Mobile Number is required",
+                            pattern: {
+                              value: /^[0-9]{10}$/,
+                              message:
+                                "Mobile Number should be exactly 10 digits long and should contain only numbers",
+                            },
+                          })}
                         />
+                         {errors.personalMobileNo && (
+                        <p className="errorMsg">
+                          {errors.personalMobileNo.message}
+                        </p>
+                      )}
                       </div>
                       <div className="mb-3">
                         <label htmlFor="designation" className="form-label">
@@ -500,9 +578,24 @@ function Profile() {
                           type="text"
                           id="designation"
                           className="form-control"
-                          {...register("address")}
+                          onInput={toInputTitleCase}
                           defaultValue={companyData.address}
+                          maxLength={100}
+                        {...register("address", {
+                          required: "Address is required",
+                          maxLength: {
+                            value: 100,
+                            message: "Name must not exceed 100 characters",
+                          },
+                          pattern: {
+                            value: /^[a-zA-Z0-9\s,'#,&*()^\-/.]*$/,
+                            message: "Please enter valid Address",
+                          },
+                        })}
                         />
+                         {errors.address && (
+                        <p className="errorMsg">{errors.address.message}</p>
+                      )}
                       </div>
                     </div>
                   </div>
@@ -519,20 +612,20 @@ function Profile() {
               className="btn btn-primary btn-lg"
               style={{ marginRight: "65px" }}
               type="submit"
-            > 
+            >
               Submit
             </button>
           </div>
         </form>
 
         {/* Modal for Image Upload */}
-        <Modal 
-        show={showModal}
-         onHide={closeModal}
-         centered
-         style={{ zIndex: "1050" }}
-         className="custom-modal"
-         >
+        <Modal
+          show={showModal}
+          onHide={closeModal}
+          centered
+          style={{ zIndex: "1050" }}
+          className="custom-modal"
+        >
           <ModalHeader closeButton>
             <ModalTitle>Update Logo</ModalTitle>
           </ModalHeader>
@@ -558,4 +651,4 @@ function Profile() {
   );
 }
 
-export default Profile;
+export default Profile;

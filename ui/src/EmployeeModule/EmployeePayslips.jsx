@@ -180,18 +180,6 @@ const EmployeePayslips = () => {
           >
             <Eye size={22} color="green" />
           </button>
-          <button
-            className="btn btn-sm"
-            style={{
-              backgroundColor: "transparent",
-              border: "none",
-              padding: "0",
-              marginLeft: "5px",
-            }}
-            onClick={() => handleShowDeleteModal(row.payslipId)}
-          >
-            <XSquareFill size={22} color="#da542e" />
-          </button>
         </div>
       ),
     },

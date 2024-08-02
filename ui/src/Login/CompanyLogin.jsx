@@ -25,6 +25,7 @@ const CompanyLogin = () => {
     },
     mode: "onChange",
   });
+  const token = sessionStorage.getItem("token");
 
   const validateEmail = (value) => {
     if (/[^a-zA-Z0-9@._-]{3,}/.test(value)) {
@@ -189,7 +190,7 @@ const CompanyLogin = () => {
                     </div>
                   </div>
                   <div className="card-body" style={{ padding: "6px" }}>
-                    <div className="m-sm-2">
+                    <div className="m-sm-2" style={{padding:"0 50px 0 50px"}}>
                       <form onSubmit={handleSubmit(onSubmit)} className="align-items-center">
                         <label className="form-label">Email Id</label>
                         <>

@@ -282,16 +282,16 @@ const EmployeeSalaryStructure = () => {
                             placeholder="Select Employee Name"
                           />
                         </div>
-                        <div style={{marginTop:"27px"}}>
-                        <div className="mt-3 ml-3" style={{marginLeft:"20px"}}>
-                          <button
-                            type="button"
-                            className="btn btn-primary"
-                            onClick={handleGoClick}
-                          >
-                            Go
-                          </button>
-                        </div>
+                        <div style={{ marginTop: "27px" }}>
+                          <div className="mt-3 ml-3" style={{ marginLeft: "20px" }}>
+                            <button
+                              type="button"
+                              className="btn btn-primary"
+                              onClick={handleGoClick}
+                            >
+                              Go
+                            </button>
+                          </div>
                         </div>
                       </div>
                       {message && <div className="text-danger mt-2" style={{ marginLeft: '10px' }}>{message}</div>}
@@ -323,13 +323,23 @@ const EmployeeSalaryStructure = () => {
                               },
                               validate: {
                                 notZero: value => value !== "0" || "Value cannot be 0"
-                              }
+                              },
+                              minLength: {
+                                value: 5,
+                                message: "Minimum 5 Numbers Required"
+                              },
+                              maxLength: {
+                                value: 10,
+                                message: "Maximum 10 Numbers Allowed"
+                              },
                             })}
                             value={variableAmount}
                             onChange={handleVariableAmountChange}
                           />
                           {errors.variableAmount && (
-                            <p className="text-danger">{errors.variableAmount.message}</p>
+                            <div className="text-danger">
+                              {errors.variableAmount.message}
+                            </div>
                           )}
                         </div>
                         <div className="col-md-1 mb-3"></div>
@@ -345,6 +355,14 @@ const EmployeeSalaryStructure = () => {
                                 value: /^[0-9]+$/,
                                 message: "These filed accepcts only Integers",
                               },
+                              minLength: {
+                                value: 5,
+                                message: "Minimum 5 Numbers Required"
+                              },
+                              maxLength: {
+                                value: 10,
+                                message: "Maximum 10 Numbers Allowed"
+                              },
                               validate: {
                                 notZero: value => value !== "0" || "Value cannot be 0"
                               }
@@ -353,7 +371,9 @@ const EmployeeSalaryStructure = () => {
                             onChange={handleFixedAmountChange}
                           />
                           {errors.fixedAmount && (
-                            <p className="text-danger">{errors.fixedAmount.message}</p>
+                            <div className="text-danger">
+                              {errors.fixedAmount.message}
+                            </div>
                           )}
                         </div>
                         <div className="col-md-5 mb-3">
@@ -409,6 +429,14 @@ const EmployeeSalaryStructure = () => {
                               value: /^[0-9]+$/,
                               message: "These filed accepcts only Integers",
                             },
+                            minLength: {
+                              value: 1,
+                              message: "Minimum 1 Numbers Required"
+                            },
+                            maxLength: {
+                              value: 2,
+                              message: "Maximum 2 Numbers Allowed"
+                            },
                             validate: {
                               notZero: value => value !== "0" || "Value cannot be 0"
                             }
@@ -417,11 +445,13 @@ const EmployeeSalaryStructure = () => {
                           onChange={handleHraChange}
                         />
                         {errors.hra && (
-                          <p className="text-danger">{errors.hra.message}</p>
+                          <div className="text-danger">
+                            {errors.hra.message}
+                          </div>
                         )}
                       </div>
                       <div className="col-12" style={{ marginTop: "10px" }}>
-                        <label className="form-label">Travel Allowance:<span style={{color:"red"}}>(<CurrencyRupee />)</span></label>
+                        <label className="form-label">Travel Allowance:<span style={{ color: "red" }}>(<CurrencyRupee />)</span></label>
                         <input
                           type="text"
                           className="form-control"
@@ -432,6 +462,14 @@ const EmployeeSalaryStructure = () => {
                               value: /^[0-9]+$/,
                               message: "These filed accepcts only Integers",
                             },
+                            minLength: {
+                              value: 4,
+                              message: "Minimum 4 Numbers Required"
+                            },
+                            maxLength: {
+                              value: 7,
+                              message: "Maximum 7 Numbers Allowed"
+                            },
                             validate: {
                               notZero: value => value !== "0" || "Value cannot be 0"
                             }
@@ -440,11 +478,13 @@ const EmployeeSalaryStructure = () => {
                           onChange={handleTravelAllowanceChange}
                         />
                         {errors.travelAllowance && (
-                          <p className="text-danger">{errors.travelAllowance.message}</p>
+                          <div className="text-danger">
+                            {errors.travelAllowance.message}
+                          </div>
                         )}
                       </div>
                       <div className="col-12" style={{ marginTop: "10px" }}>
-                        <label className="form-label">Special Allowance:<span style={{color:"red"}}>(<CurrencyRupee />)</span></label>
+                        <label className="form-label">Special Allowance:<span style={{ color: "red" }}>(<CurrencyRupee />)</span></label>
                         <input
                           type="text"
                           className="form-control"
@@ -454,7 +494,7 @@ const EmployeeSalaryStructure = () => {
                         />
                       </div>
                       <div className="col-12" style={{ marginTop: "10px" }}>
-                        <label className="form-label">Other Allowances:<span style={{color:"red"}}>(<CurrencyRupee />)</span></label>
+                        <label className="form-label">Other Allowances:<span style={{ color: "red" }}>(<CurrencyRupee />)</span></label>
                         <input
                           type="text"
                           className="form-control"
@@ -527,6 +567,14 @@ const EmployeeSalaryStructure = () => {
                               value: /^[0-9]+$/,
                               message: "These filed accepcts only Integers",
                             },
+                            minLength: {
+                              value: 4,
+                              message: "Minimum 4 Numbers Required"
+                            },
+                            maxLength: {
+                              value: 7,
+                              message: "Maximum 7 Numbers Allowed"
+                            },
                             validate: {
                               notZero: value => value !== "0" || "Value cannot be 0"
                             }
@@ -535,7 +583,9 @@ const EmployeeSalaryStructure = () => {
                           onChange={handlePfEmployeeChange}
                         />
                         {errors.pfEmployee && (
-                          <p className="text-danger">{errors.pfEmployee.message}</p>
+                          <div className="text-danger">
+                            {errors.pfEmployee.message}
+                          </div>
                         )}
                       </div>
                       <div className="col-12" style={{ marginTop: "10px" }}>
@@ -552,16 +602,26 @@ const EmployeeSalaryStructure = () => {
                               value: /^[0-9]+$/,
                               message: "These filed accepcts only Integers",
                             },
+                            minLength: {
+                              value: 4,
+                              message: "Minimum 4 Numbers Required"
+                            },
+                            maxLength: {
+                              value: 7,
+                              message: "Maximum 7 Numbers Allowed"
+                            },
                             validate: {
                               notZero: value => value !== "0" || "Value cannot be 0"
                             }
                           })}
                           value={pfEmployer}
                           onChange={handlePfEmployerChange}
-                        />
+                        />  
                         {errors.pfEmployer && (
-                          <p className="text-danger">{errors.pfEmployer.message}</p>
-                        )}
+                          <div className="text-danger">
+                            {errors.pfEmployer.message}
+                          </div>
+                        )}   
                       </div>
                       <div className="col-12" style={{ marginTop: "10px" }}>
                         <label className="form-label">Total PF</label>

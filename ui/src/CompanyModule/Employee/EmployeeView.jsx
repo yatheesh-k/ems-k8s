@@ -137,7 +137,7 @@ const handleSalary = (id) => {
         </b>
       ),
     },
-    Inactive: {
+    InActive: {
       label: (
         <b
           style={{
@@ -147,7 +147,7 @@ const handleSalary = (id) => {
             padding: "2px",
           }}
         >
-          Inactive
+          InActive
         </b>
       ),
     },
@@ -162,7 +162,7 @@ const handleSalary = (id) => {
     {
       name: <h6><b>S No</b></h6>,
       selector: (row, index) => index + 1,
-      width: "75px",
+      width: "70px",
     },
     {
       name: <h6><b>ID</b></h6>,
@@ -173,7 +173,7 @@ const handleSalary = (id) => {
       name: <h6><b>Name</b></h6>,
       selector: row => (
         <div title={`${row.firstName} ${row.lastName}`}>
-          {`${row.firstName.slice(0, 6)} ${row.lastName.slice(0, 6)}`}
+          {`${row.firstName.slice(0, 6)} ${row.lastName.slice(0, 2)}`}
         </div>
       ),
       sortable: true,
@@ -193,11 +193,11 @@ const handleSalary = (id) => {
       name: <h6><b>Department</b></h6>,
       selector: row =>row.department,
       sortable: true,
-      width:"120px"
+      width:"130px",
     },
 
     {
-      name: <h6><b>Hired Date</b></h6>,
+      name: <h6><b>Date Of Hiring</b></h6>,
       selector:row=> row.dateOfHiring,
       sortable: true,
       format: row => {
@@ -207,7 +207,7 @@ const handleSalary = (id) => {
         const year = date.getFullYear();
         return `${day}-${month}-${year}`;
       },
-      width:'150px'
+      width:'160px'
     },
 
     {
@@ -215,7 +215,7 @@ const handleSalary = (id) => {
       selector: row =>row.status,
       sortable: true,
       cell: (row) => statusMappings[row.status]?.label || "Unknown",
-      width:"150px"
+      width:"120px"
     },
     {
       name: <h5><b>Action</b></h5>,
@@ -227,15 +227,13 @@ const handleSalary = (id) => {
           <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginRight: "10px" }} onClick={() => handleEdit(row.id)} title="Edit">
             <PencilSquare size={22} color='#2255a4' />
           </button>
-          <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }} onClick={() => handleShowDeleteModal(row.id)}  title="Delete">
+          <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0" }} onClick={() => handleShowDeleteModal(row.id)}  title="Delete">
             <XSquareFill size={22} color='#da542e' />
           </button>
         </div>
       )
     }
   ];
-  
-
 
   const dateFormatting = (dateString) => {
     const date = new Date(dateString);

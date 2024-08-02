@@ -75,7 +75,7 @@ const EmployeeRegistration = () => {
     { value: "Accountant", label: "Accountant" },
   ];
 
-  const Status = [
+  const status = [
     { value: "Active", label: "Active" },
     { value: "InActive", label: "InActive" },
   ];
@@ -129,7 +129,7 @@ const EmployeeRegistration = () => {
     fetchDesignations();
   }, []);
 
-  const  toInputTitleCase = (e) => {
+  const toInputTitleCase = (e) => {
     const input = e.target;
     let value = input.value;
     // Remove leading spaces
@@ -150,6 +150,39 @@ const EmployeeRegistration = () => {
     // Update input value
     input.value = value;
   };
+
+  const toInputLowerCase = (e) => {
+    const input = e.target;
+    let value = input.value;
+
+    // Remove leading spaces
+    value = value.replace(/^\s+/g, '');
+
+    // Initially disallow spaces if there are no non-space characters
+    if (!/\S/.test(value)) {
+      // If no non-space characters are present, prevent spaces
+      value = value.replace(/\s+/g, '');
+    } else {
+      // Convert the entire string to lowercase
+      value = value.toLowerCase();
+
+      // Remove leading spaces
+      value = value.replace(/^\s+/g, '');
+      
+      // Capitalize the first letter of each word
+      const words = value.split(' ');
+      const capitalizedWords = words.map(word => {
+        return word.charAt(0).toLowerCase() + word.slice(1);
+      });
+
+      value = capitalizedWords.join(' ');
+    }
+
+    // Update input value
+    input.value = value;
+};
+
+
 
   const onSubmit = async (data) => {
     const company = sessionStorage.getItem('company');
@@ -185,6 +218,7 @@ const EmployeeRegistration = () => {
         dateOfHiring: data.dateOfHiring,
         department: data.department,
         panNo: data.panNo,
+        aadhaarId: data.aadhaarId,
         uanNo: data.uanNo,
         dateOfBirth: data.dateOfBirth,
         roles: roles
@@ -303,7 +337,7 @@ const EmployeeRegistration = () => {
         </div>
         <div className="row">
           <div className="col-12">
-            <div className="card">  
+            <div className="card">
               <div className="card-header">
                 <h5 className="card-title ">
                   {isUpdating ? "Employee Data" : "Employee Registration"}
@@ -316,10 +350,10 @@ const EmployeeRegistration = () => {
               <div className="card-body">
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="row ">
-                      {isUpdating ? (
+                    {isUpdating ? (
                       <div className="col-12 col-md-6 col-lg-5 mb-3">
                         <label className="form-label">
-                           Employee Type <span style={{ color: "red" }}>*</span>
+                          Employee Type <span style={{ color: "red" }}>*</span>
                         </label>
                         <input
                           type="text"
@@ -473,7 +507,7 @@ const EmployeeRegistration = () => {
                         placeholder="Enter Email Id"
                         name="emailId"
                         autoComplete="off"
-                        onInput={toInputTitleCase}
+                        onInput={toInputLowerCase}
                         onKeyDown={handleEmailChange}
                         {...register("emailId", {
                           required: "Email Id Required",
@@ -739,13 +773,13 @@ const EmployeeRegistration = () => {
                             {...field}
                             options={[
                               { value: "Active", label: "Active" },
-                              { value: "Inactive", label: "Inactive" },
+                              { value: "InActive", label: "InActive" },
                             ]}
-                            value={{
-                              value: field.value,
-                              label: [ "Active", "Inactive"][field.value],
-
-                            }}
+                            value={
+                              field.value
+                                ? { value: field.value, label: ["Active", "InActive"].find(option => option === field.value) }
+                                : null
+                            }
                             onChange={(val) => field.onChange(val.value)}
                             placeholder="Select Status"
                           />
@@ -753,7 +787,6 @@ const EmployeeRegistration = () => {
                       />
                       {errors.status && <p className="errorMsg">Employee Status is Required</p>}
                     </div>
-
                     <div className="col-lg-1"></div>
                     {isUpdating ? (
                       <div className="col-12 col-md-6 col-lg-5 mb-3">

@@ -72,7 +72,7 @@ const ManageAttendance = () => {
       <div className="container-fluid p-0">
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
-            <h1 className="h3 mb-3"><strong>Attendance Management</strong></h1>
+            <h1 className="h3 mb-3"><strong>Manage Attendance</strong></h1>
           </div>
           <div className="col-auto" style={{ paddingBottom: "20px" }}>
             <nav aria-label="breadcrumb">

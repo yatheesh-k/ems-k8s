@@ -221,7 +221,7 @@ const ViewPaySlips = () => {
             <div className="row d-flex justify-content-around">
               <div className="col-12 col-md-3">
                 <div className="form-group">
-                  <label className="form-label">Select Employee Name</label>
+                  <label className="form-label">Select Employee</label>
                   <Controller
                     name="employeeId"
                     control={control}
@@ -236,7 +236,7 @@ const ViewPaySlips = () => {
                           field.onChange(val.value);
                           setSelectedEmployeeId(val.value);
                         }}
-                        placeholder="Select Employee Name"
+                        placeholder="Select Employee"
                       />
                     )}
                   />

@@ -137,19 +137,36 @@ const CompanyRegistration = () => {
   };
 
 
-
   const toInputLowerCase = (e) => {
-    const inputValue = e.target.value;
-    let newValue = "";
-    for (let i = 0; i < inputValue.length; i++) {
-      const char = inputValue.charAt(i);
-      if (char.match(/[a-z]/)) {
-        // Only allow lowercase letters
-        newValue += char;
-      }
+    const input = e.target;
+    let value = input.value;
+
+    // Remove leading spaces
+    value = value.replace(/^\s+/g, '');
+
+    // Initially disallow spaces if there are no non-space characters
+    if (!/\S/.test(value)) {
+      // If no non-space characters are present, prevent spaces
+      value = value.replace(/\s+/g, '');
+    } else {
+      // Convert the entire string to lowercase
+      value = value.toLowerCase();
+
+      // Remove leading spaces
+      value = value.replace(/^\s+/g, '');
+      
+      // Capitalize the first letter of each word
+      const words = value.split(' ');
+      const capitalizedWords = words.map(word => {
+        return word.charAt(0).toLowerCase() + word.slice(1);
+      });
+
+      value = capitalizedWords.join(' ');
     }
-    e.target.value = newValue;
-  };
+
+    // Update input value
+    input.value = value;
+};
 
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
@@ -356,6 +373,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Company MailId"
                         autoComplete="off"
+                        onInput={toInputLowerCase}
                         onKeyDown={handleEmailChange}
                         {...register("emailId", {
                           required: "Company MailId is required",
@@ -384,6 +402,7 @@ const CompanyRegistration = () => {
                             placeholder="Enter Contact Number"
                             autoComplete="off"
                             onKeyDown={handleEmailChange}
+                            onInput={toInputTitleCase}
                             {...register("landNo", {
                               required: "Contact Number is required",
                               pattern: {
@@ -410,6 +429,7 @@ const CompanyRegistration = () => {
                               className="form-control"
                               placeholder="Enter Password"
                               onChange={handlePasswordChange}
+                              onInput={toInputTitleCase}
                               autoComplete="off"
                               onKeyDown={handleEmailChange}
                               type={passwordShown ? "text" : "password"}
@@ -451,6 +471,7 @@ const CompanyRegistration = () => {
                             className="form-control"
                             placeholder="Enter Contact Number"
                             autoComplete="off"
+                            onInput={toInputTitleCase}
                             onKeyDown={handleEmailChange}
                             {...register("landNo", {
                               required: "Contact Number is required",
@@ -479,6 +500,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Mobile Number"
                         autoComplete="off"
+                        onInput={toInputTitleCase}
                         onKeyDown={handleEmailChange}
                         {...register("mobileNo", {
                           required: "Mobile Number is required",
@@ -507,6 +529,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Company Address"
                         onKeyDown={handleEmailChange}
+                        onInput={toInputTitleCase}
                         autoComplete="off"
                         {...register("companyAddress", {
                           required: "Company Address is required",
@@ -551,6 +574,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Company CIN number"
                         onKeyDown={handleEmailChange}
+                        onInput={toInputTitleCase}
                         autoComplete="off"
                         maxLength={21}
                         {...register("cinNo", {
@@ -586,6 +610,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Company Registration Number"
                         onKeyDown={handleEmailChange}
+                        onInput={toInputTitleCase}
                         autoComplete="off"
                         maxLength={21}
                         {...register("companyRegNo", {
@@ -618,6 +643,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Company GST number"
                         autoComplete="off"
+                        onInput={toInputTitleCase}
                         onKeyDown={handleEmailChange}
                         maxLength={15}
                         {...register("gstNo", {
@@ -645,6 +671,7 @@ const CompanyRegistration = () => {
                       <input
                         type="text"
                         className="form-control"
+                        onInput={toInputTitleCase}
                         placeholder="Enter Company PAN number"
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
@@ -693,6 +720,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Authorized Name"
                         onKeyDown={handleEmailChange}
+                        onInput={toInputTitleCase}
                         maxLength={20}
                         autoComplete="off"
                         {...register("name", {
@@ -722,6 +750,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter MailId"
                         autoComplete="off"
+                        onInput={toInputLowerCase}
                         onKeyDown={handleEmailChange}
                         {...register("personalMailId", {
                           required: "MailId is required",
@@ -750,6 +779,7 @@ const CompanyRegistration = () => {
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         maxLength={10}
+                        onInput={toInputTitleCase}
                         {...register("personalMobileNo", {
                           required: "Mobile Number is required",
                           pattern: {
@@ -776,6 +806,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Address"
                         autoComplete="off"
+                         onInput={toInputTitleCase}
                         onKeyDown={handleEmailChange}
                         maxLength={100}
                         {...register("address", {

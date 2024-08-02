@@ -16,15 +16,15 @@ const CompanyView = () => {
   const [selectedYear, setSelectedYear] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
-  const [showNoRecordsMessage, setShowNoRecordsMessage] = useState(false); 
+  const [showNoRecordsMessage, setShowNoRecordsMessage] = useState(false);
   const Navigate = useNavigate();
 
   const getUser = async () => {
     try {
       const response = await companyViewApi();
-      setView(response.data.data); 
+      setView(response.data.data);
     } catch (error) {
-     handleApiErrors(error);
+      handleApiErrors(error);
     }
   };
 
@@ -49,13 +49,13 @@ const CompanyView = () => {
         const response = await companyDeleteByIdApi(selectedItemId);
         if (response.status === 200) {
           setTimeout(() => {
-          toast.success("Company Deleted Successfully", {
-            position: "top-right",
-            transition: Bounce,
-            hideProgressBar: true,
-            theme: "colored",
-            autoClose: 3000,
-          },1500);
+            toast.success("Company Deleted Successfully", {
+              position: "top-right",
+              transition: Bounce,
+              hideProgressBar: true,
+              theme: "colored",
+              autoClose: 3000,
+            }, 1500);
           });
           getUser(); // Refresh the list after deletion
           handleCloseDeleteModal();
@@ -92,7 +92,7 @@ const CompanyView = () => {
     {
       name: <h6><b>S No</b></h6>,
       selector: (row, index) => index + 1,
-      width: "75px",
+      width: "70px",
     },
     {
       name: <h6><b>Company Name</b></h6>,
@@ -101,8 +101,7 @@ const CompanyView = () => {
           {row.companyName.slice(0, 12)}
         </div>
       ),
-      minWidth: "150px",
-      maxWidth: "250px",
+      width: "220px",
       wrap: true,
     },
     {
@@ -112,8 +111,7 @@ const CompanyView = () => {
           {row.name.slice(0, 8)}
         </div>
       ),
-      minWidth: "150px",
-      maxWidth: "250px",
+      width: "220px",
       wrap: true,
     },
     {
@@ -124,16 +122,16 @@ const CompanyView = () => {
         </div>
       ),
       sortable: true,
-      width: "250px",
+      width: "200px",
     },
     {
       name: <h6><b>Mobile No</b></h6>,
       selector: (row) => row.mobileNo,
-      width: "220px",
+      width: "160px",
       wrap: true,
     },
     {
-      name:<h6><b>Action</b></h6>,
+      name: <h6><b>Action</b></h6>,
       width: "130px",
       cell: (row) => (
         <div>
@@ -146,6 +144,7 @@ const CompanyView = () => {
               marginRight: "10px",
             }}
             onClick={() => getData(row.id)}
+            title="Edit"
           >
             <PencilSquare size={22} color="#2255A4" />
           </button>
@@ -158,6 +157,7 @@ const CompanyView = () => {
               marginLeft: "5px",
             }}
             onClick={() => handleShowDeleteModal(row.id)}
+            title="Delete"
           >
             <XSquareFill size={22} color="#DA542E" />
           </button>
@@ -186,7 +186,7 @@ const CompanyView = () => {
   return (
     <LayOut>
       <div className="container-fluid p-0">
-      <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
+        <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3"><strong>Summary</strong> </h1>
           </div>
@@ -206,7 +206,7 @@ const CompanyView = () => {
         <div className="row">
           <div className="col-12 col-lg-12 col-xxl-12 d-flex">
             <div className="card flex-fill">
-            <div className="card-header">
+              <div className="card-header">
                 <div className='row mb-2'>
                   <div className='col-12 col-md-6 col-lg-4'>
                     <p className="card-title"> Company View</p>

@@ -171,13 +171,13 @@ const AttendanceReport = () => {
     {
       name: <h6><b>S No</b></h6>,
       selector: (row, index) => index + 1,
-      width: "100px",
+      width: "70px",
     },
     {
       name: <h6><b>Month</b></h6>,
       selector: (row) => row.month,
       sortable: true,
-      width: "150px",
+      width: "130px",
     },
     {
       name: <h6><b>Year</b></h6>,
@@ -189,13 +189,13 @@ const AttendanceReport = () => {
       name: <h6><b>Total Working Days</b></h6>,
       selector: (row) => row.totalWorkingDays,
       sortable: true,
-      width: "250px",
+      width: "240px",
     },
     {
       name: <h6><b>No. Of Working Days</b></h6>,
       selector: (row) => row.noOfWorkingDays,
       sortable: true,
-      width: "250px",
+      width: "240px",
     },
     {
       name: <h6><b>Actions</b></h6>,
@@ -249,7 +249,7 @@ const AttendanceReport = () => {
               <div className="card-header">
                 <div className="row d-flex justify-content-center" style={{paddingLeft:'50px'}}>
                   <div className="col-md-3 mt-3">
-                  <label className="form-label">Select Employee Name</label>
+                  <label className="form-label">Select Employee</label>
                     <Select
                       options={employees}
                       onChange={handleEmployeeChange}

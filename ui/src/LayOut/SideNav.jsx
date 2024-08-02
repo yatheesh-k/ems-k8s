@@ -346,7 +346,7 @@ import { useAuth } from "../Context/AuthContext";
                     style={{ fontSize: "large" }}
                   ></i>
                   <span className="align-middle" style={{ fontSize: "large" }}>
-                    Departments
+                    Department
                   </span>
                 </Link>
               </li>
@@ -442,7 +442,7 @@ import { useAuth } from "../Context/AuthContext";
                       style={{ fontSize: "large" }}
                     ></i>
                   </span>{" "}
-                  <span className="align-middle" style={{ fontSize: "medium" }}>
+                  <span className="align-middle" style={{ fontSize: "large" }}>
                     PayRoll
                   </span>
                   <i
@@ -555,7 +555,7 @@ import { useAuth } from "../Context/AuthContext";
                       style={{ fontSize: "medium" }}
                     ></i>
                   </span>{" "}
-                  <span className="align-middle" style={{ fontSize: "medium" }}>
+                  <span className="align-middle" style={{ fontSize: "large" }}>
                     Attendance
                   </span>
                   <i
