@@ -87,6 +87,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         List<DepartmentEntity> departmentEntities = null;
         try {
             departmentEntities = openSearchOperations.getCompanyDepartmentByName(companyName, null);
+            if (departmentEntities == null || departmentEntities.size()<=0){
+                log.error("Department are Not found");
+                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_DEPARTMENT)),
+                        HttpStatus.NOT_FOUND);
+            }
         } catch (Exception ex) {
             log.error("Exception while fetching departments for company {}: {}", companyName, ex.getMessage());
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
@@ -103,6 +108,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
         try {
             entity = openSearchOperations.getById(departmentId, null, index);
+            if (entity == null){
+                log.error("Department with id {} is not found", departmentId);
+                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_DEPARTMENT), departmentId),
+                        HttpStatus.NOT_FOUND);
+            }
 
         } catch (Exception ex) {
             log.error("Exception while fetching department details {}", ex);
@@ -165,7 +175,7 @@ public class DepartmentServiceImpl implements DepartmentService {
             }
         } catch (Exception ex) {
             log.error("Exception while fetching company details {}", ex);
-            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_DELETE_EMPLOYEE),
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_DELETE_DEPARTMENT),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(

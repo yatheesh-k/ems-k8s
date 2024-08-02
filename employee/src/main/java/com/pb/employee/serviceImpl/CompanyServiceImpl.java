@@ -170,6 +170,7 @@ public class CompanyServiceImpl implements CompanyService {
         if (!multipartFile.isEmpty()){
             multiPartFileStore(multipartFile, entity);
 
+
         }
         openSearchOperations .saveEntity(entity, companyId, Constants.INDEX_EMS);
         return new ResponseEntity<>(
@@ -177,9 +178,9 @@ public class CompanyServiceImpl implements CompanyService {
     }
     public void multiPartFileStore(MultipartFile file, CompanyEntity company) throws IOException, EmployeeException {
         if(!file.isEmpty()){
-            String filename = company.getShortName()+"_"+file.getOriginalFilename();
+            String filename = folderPath+company.getShortName()+"_"+file.getOriginalFilename();
             file.transferTo(new File(filename));
-            company.setImageFile(filename);
+            company.setImageFile(company.getShortName()+"_"+file.getOriginalFilename());
             ResponseEntity.ok(filename);
         }
     }
