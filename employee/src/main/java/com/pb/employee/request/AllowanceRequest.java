@@ -1,7 +1,6 @@
 package com.pb.employee.request;
 
-
-import com.pb.employee.persistance.model.Entity;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 @Getter
@@ -11,11 +10,18 @@ import lombok.*;
 @AllArgsConstructor
 public class AllowanceRequest {
 
-
+    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "Travel Allowance must be a numeric value with up to two decimal places")
     private String travelAllowance;
-    private String pfContributionEmployee;
-    private String hra;
-    private String specialAllowance;
-    private String otherAllowances;
 
+    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "PF Contribution Employee must be a numeric value with up to two decimal places")
+    private String pfContributionEmployee;
+
+    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "HRA must be a numeric value with up to two decimal places")
+    private String hra;
+
+    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "Special Allowance must be a numeric value with up to two decimal places")
+    private String specialAllowance;
+
+    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "Other Allowances must be a numeric value with up to two decimal places")
+    private String otherAllowances;
 }

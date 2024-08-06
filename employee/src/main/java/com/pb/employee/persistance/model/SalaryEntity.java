@@ -25,7 +25,7 @@ public class SalaryEntity implements Entity{
     private String netSalary;
     private AllowanceEntity allowances;
     private DeductionEntity deductions;
-    private int status;
+    private String status;
     private String type;
 
 }

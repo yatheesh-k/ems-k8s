@@ -320,8 +320,8 @@ public class CompanyUtils {
         if(salaryRequest.getGrossAmount() != null) {
             gross = (Base64.getEncoder().encodeToString(salaryRequest.getGrossAmount().toString().getBytes()));
             salary.setGrossAmount(gross);
-           double income = TaxCalculatorUtils.getNewTax(Double.parseDouble(gross));
-           double pfTax = TaxCalculatorUtils.getPfTax(Double.parseDouble(gross)/12);
+           double income = TaxCalculatorUtils.getNewTax(Double.parseDouble(salaryRequest.getGrossAmount()));
+           double pfTax = TaxCalculatorUtils.getPfTax(Double.parseDouble(salaryRequest.getGrossAmount())/12);
             ttax = String.valueOf(pfTax+income);
             salary.getDeductions().setTotalTax(ttax);
             salary.getDeductions().setIncomeTax(String.valueOf(income));
