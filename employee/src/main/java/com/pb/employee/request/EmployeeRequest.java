@@ -19,19 +19,19 @@ public class EmployeeRequest {
     @NotBlank(message = "{notnull.message}")
     private String companyName;
 
-    @Pattern(regexp = "^[A-Za-z]+$", message = "{employee.type}")
+    @Pattern(regexp = "^[A-Z][a-z]+$", message = "{employee.type}")
     @NotBlank(message = "{notnull.message}")
     private String employeeType;
 
-    @Pattern(regexp = "^[A-Z0-9]+$", message = "{employeeId.format}")
+    @Pattern(regexp = "^[A-Z]+[0-9]+$", message = "{employeeId.format}")
     @NotBlank(message = "{notnull.message}")
     private String employeeId;
 
-    @Pattern(regexp = "^[A-Za-z]+$", message = "{firstname.format}")
+    @Pattern(regexp = "^[A-Z][a-z]+$", message = "{firstname.format}")
     @NotBlank(message = "{notnull.message}")
     private String firstName;
 
-    @Pattern(regexp = "^[A-Za-z]+$", message = "{lastname.format}")
+    @Pattern(regexp = "^[A-Z][a-z]+$", message = "{lastname.format}")
     @NotBlank(message = "{notnull.message}")
     private String lastName;
 
@@ -51,7 +51,7 @@ public class EmployeeRequest {
     @NotBlank(message = "{notnull.message}")
     private String dateOfHiring;
 
-    @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{department.format}")
+    @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*$", message = "{department.format}")
     @NotBlank(message = "{notnull.message}")
     private String department;
 
@@ -59,7 +59,7 @@ public class EmployeeRequest {
     @NotBlank(message = "{notnull.message}")
     private String location;
 
-    @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{manager.format}")
+    @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*$", message = "{manager.format}")
     @NotBlank(message = "{notnull.message}")
     private String manager;
 
@@ -67,7 +67,7 @@ public class EmployeeRequest {
 //    @NotBlank(message = "{notnull.message}")
     private List<String> roles;
 
-    @Pattern(regexp = "^[A-Za-z]+$", message = "{status.format}")
+    @Pattern(regexp = "^[A-Z][a-z]+$", message = "{status.format}")
     @NotBlank(message = "{notnull.message}")
     private String status;
 

@@ -17,7 +17,7 @@ public class EmployeeUpdateRequest {
     @NotBlank(message = "{companyname.message}")
     private String companyName;
 
-    @Pattern(regexp = "^[A-Za-z]+$", message = "{employee.type}")
+    @Pattern(regexp = "^[A-Z][a-z]+$", message = "{employee.type}")
     @NotBlank(message = "{notnull.message}")
     private String employeeType;
 
@@ -25,7 +25,7 @@ public class EmployeeUpdateRequest {
     @NotBlank(message = "{notnull.message}")
     private String emailId;
 
-    @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{designation.format}")
+    @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*$", message = "{designation.format}")
     @NotBlank(message = "{notnull.message}")
     private String designation;
 
@@ -33,7 +33,7 @@ public class EmployeeUpdateRequest {
     @NotBlank(message = "{notnull.message}")
     private String location;
 
-    @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{manager.format}")
+    @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*$", message = "{manager.format}")
     @NotBlank(message = "{notnull.message}")
     private String manager;
 
@@ -42,7 +42,7 @@ public class EmployeeUpdateRequest {
 //    @NotBlank(message = "{notnull.message}")
     private List<String> roles;
 
-    @Pattern(regexp = "^[A-Za-z]+$", message = "{status.format}")
+    @Pattern(regexp = "^[A-Z][a-z]+$", message = "{status.format}")
     @NotBlank(message = "{notnull.message}")
     private String status;
 

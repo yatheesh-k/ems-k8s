@@ -16,7 +16,7 @@ public class DepartmentRequest {
     @NotBlank(message = "{companyname.message}")
     private String companyName;
 
-    @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{department.format}")
+    @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*$", message = "{department.format}")
     @NotBlank(message = "{notnull.message}")
     private String name;
 }

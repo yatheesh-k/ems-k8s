@@ -18,67 +18,110 @@ public class CompanyUtils {
 
     public static Entity maskCompanyProperties(CompanyRequest companyRequest, String id) {
         String password = Base64.getEncoder().encodeToString(companyRequest.getPassword().getBytes());
-        String hra = null, pan = null, pf = null, spa = null, ta = null;
-        if(companyRequest.getHraPercentage() != null) {
-            hra = Base64.getEncoder().encodeToString(companyRequest.getHraPercentage().toString().getBytes());
-        }
-        if(companyRequest.getPanNo() != null) {
-            pan = Base64.getEncoder().encodeToString(companyRequest.getPanNo().getBytes());
-        }
-        if(companyRequest.getPfPercentage() != null) {
-            pf = Base64.getEncoder().encodeToString(companyRequest.getPfPercentage().toString().getBytes());
-        }
-        if(companyRequest.getSpecialAllowance() != null) {
-            spa = Base64.getEncoder().encodeToString(companyRequest.getSpecialAllowance().toString().getBytes());
-        }
-        if(companyRequest.getTravelAllowance() != null) {
-            ta = Base64.getEncoder().encodeToString(companyRequest.getTravelAllowance().toString().getBytes());
-        }
+        String hra = null, pan = null, pf = null, spa = null, ta = null, regNo = null, mobileNo=null, landNo= null, gstNo=null, cinNo=null;
         ObjectMapper objectMapper = new ObjectMapper();
 
         CompanyEntity entity = objectMapper.convertValue(companyRequest, CompanyEntity.class);
+        if(companyRequest.getHraPercentage() != null) {
+            hra = Base64.getEncoder().encodeToString(companyRequest.getHraPercentage().toString().getBytes());
+            entity.setHraPercentage(hra);
+
+        }
+        if(companyRequest.getPanNo() != null) {
+            pan = Base64.getEncoder().encodeToString(companyRequest.getPanNo().getBytes());
+            entity.setPanNo(pan);
+        }
+        if(companyRequest.getPfPercentage() != null) {
+            pf = Base64.getEncoder().encodeToString(companyRequest.getPfPercentage().toString().getBytes());
+            entity.setPfPercentage(pf);
+        }
+        if(companyRequest.getSpecialAllowance() != null) {
+            spa = Base64.getEncoder().encodeToString(companyRequest.getSpecialAllowance().toString().getBytes());
+            entity.setSpecialAllowance(spa);
+        }
+        if(companyRequest.getTravelAllowance() != null) {
+            ta = Base64.getEncoder().encodeToString(companyRequest.getTravelAllowance().toString().getBytes());
+            entity.setTravelAllowance(ta);
+        }
+        if(companyRequest.getCompanyRegNo() != null) {
+            regNo = Base64.getEncoder().encodeToString(companyRequest.getCompanyRegNo().toString().getBytes());
+            entity.setCompanyRegNo(regNo);
+        }
+        if(companyRequest.getMobileNo() != null) {
+            mobileNo = Base64.getEncoder().encodeToString(companyRequest.getMobileNo().toString().getBytes());
+            entity.setMobileNo(mobileNo);
+        }
+        if(companyRequest.getLandNo() != null) {
+            landNo = Base64.getEncoder().encodeToString(companyRequest.getLandNo().toString().getBytes());
+            entity.setLandNo(landNo);
+        }
+        if(companyRequest.getGstNo() != null) {
+            gstNo = Base64.getEncoder().encodeToString(companyRequest.getGstNo().toString().getBytes());
+            entity.setGstNo(gstNo);
+        }
+        if(companyRequest.getCinNo() != null) {
+            cinNo = Base64.getEncoder().encodeToString(companyRequest.getCinNo().toString().getBytes());
+            entity.setCinNo(cinNo);
+        }
+
         entity.setId(id);
         entity.setPassword(password);
-        entity.setHraPercentage(hra);
-        entity.setPanNo(pan);
-        entity.setPfPercentage(pf);
-        entity.setSpecialAllowance(spa);
-        entity.setTravelAllowance(ta);
         entity.setType(Constants.COMPANY);
         return entity;
     }
 
     public static Entity unmaskCompanyProperties(CompanyEntity companyEntity) {
-        String hra = null, pan = null, pf = null, spa = null, ta = null;
+        String hra = null, pan = null, pf = null, spa = null, ta = null, regNo = null, mobileNo=null, landNo= null, gstNo=null, cinNo=null;
         if(companyEntity.getHraPercentage() != null) {
             hra = new String(Base64.getDecoder().decode(companyEntity.getHraPercentage().toString().getBytes()));
         }
         if(companyEntity.getPanNo() != null) {
             pan = new String(Base64.getDecoder().decode(companyEntity.getPanNo().toString().getBytes()));
+            companyEntity.setPanNo(pan);
         }
         if(companyEntity.getPfPercentage() != null) {
             pf = new String(Base64.getDecoder().decode(companyEntity.getPfPercentage().toString().getBytes()));
+            companyEntity.setPfPercentage(pf);
+
         }
         if(companyEntity.getSpecialAllowance() != null) {
             spa = new String(Base64.getDecoder().decode(companyEntity.getSpecialAllowance().toString().getBytes()));
+            companyEntity.setSpecialAllowance(spa);
         }
         if(companyEntity.getTravelAllowance() != null) {
             ta = new String(Base64.getDecoder().decode(companyEntity.getTravelAllowance().toString().getBytes()));
+            companyEntity.setTravelAllowance(ta);
+        }
+        if(companyEntity.getCompanyRegNo() != null) {
+            regNo = new String(Base64.getDecoder().decode(companyEntity.getCompanyRegNo().toString().getBytes()));
+            companyEntity.setCompanyRegNo(regNo);
+        }
+        if(companyEntity.getMobileNo() != null) {
+            mobileNo = new String(Base64.getDecoder().decode(companyEntity.getMobileNo().toString().getBytes()));
+            companyEntity.setMobileNo(mobileNo);
+        }
+        if(companyEntity.getLandNo() != null) {
+            landNo = new String(Base64.getDecoder().decode(companyEntity.getLandNo().toString().getBytes()));
+            companyEntity.setLandNo(landNo);
+        }
+        if(companyEntity.getGstNo() != null) {
+            gstNo = new String(Base64.getDecoder().decode(companyEntity.getGstNo().toString().getBytes()));
+            companyEntity.setGstNo(gstNo);
+        }
+        if(companyEntity.getCinNo() != null) {
+            cinNo = new String(Base64.getDecoder().decode(companyEntity.getCinNo().toString().getBytes()));
+            companyEntity.setCinNo(cinNo);
         }
 
         companyEntity.setHraPercentage(hra);
         companyEntity.setPassword("**********");
-        companyEntity.setPanNo(pan);
-        companyEntity.setPfPercentage(pf);
-        companyEntity.setSpecialAllowance(spa);
-        companyEntity.setTravelAllowance(ta);
         companyEntity.setType(Constants.COMPANY);
         return companyEntity;
     }
 
     public static CompanyEntity maskCompanyUpdateProperties(CompanyEntity existingEntity, CompanyUpdateRequest companyRequest) {
 
-        String hra = null, pf = null, spa = null, ta = null;
+        String hra = null, pf = null, spa = null, ta = null, mobileNo=null, landNo=null;
 
         if(companyRequest.getHraPercentage() != null) {
             hra = Base64.getEncoder().encodeToString(companyRequest.getHraPercentage().toString().getBytes());
@@ -97,10 +140,12 @@ public class CompanyUtils {
             existingEntity.setCompanyAddress(companyRequest.getCompanyAddress());
         }
         if(companyRequest.getMobileNo() != null) {
-            existingEntity.setMobileNo(companyRequest.getMobileNo());
+            mobileNo = Base64.getEncoder().encodeToString(companyRequest.getMobileNo().toString().getBytes());
+            existingEntity.setMobileNo(mobileNo);
         }
         if(companyRequest.getLandNo() != null) {
-            existingEntity.setLandNo(companyRequest.getLandNo());
+            landNo = Base64.getEncoder().encodeToString(companyRequest.getLandNo().toString().getBytes());
+            existingEntity.setLandNo(landNo);
         }
         if(companyRequest.getName() != null) {
             existingEntity.setName(companyRequest.getName());
@@ -147,15 +192,16 @@ public class CompanyUtils {
     public static Entity maskEmployeeProperties(EmployeeRequest employeeRequest, String id, String companyId) {
         String password = Base64.getEncoder().encodeToString(employeeRequest.getPassword().getBytes());
         String hra = null, pan = null, pf = null, spa = null, ta = null;
-        if(employeeRequest.getPanNo() != null) {
-            pan = Base64.getEncoder().encodeToString(employeeRequest.getPanNo().getBytes());
-        }
         ObjectMapper objectMapper = new ObjectMapper();
 
         EmployeeEntity entity = objectMapper.convertValue(employeeRequest, EmployeeEntity.class);
+        if(employeeRequest.getPanNo() != null) {
+            pan = Base64.getEncoder().encodeToString(employeeRequest.getPanNo().getBytes());
+            entity.setPanNo(pan);
+        }
+
         entity.setId(id);
         entity.setPassword(password);
-        entity.setPanNo(pan);
         entity.setCompanyId(companyId);
         entity.setType(Constants.EMPLOYEE);
         return entity;

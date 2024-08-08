@@ -10,18 +10,18 @@ import lombok.*;
 @AllArgsConstructor
 public class AllowanceRequest {
 
-    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "Travel Allowance must be a numeric value with up to two decimal places")
+    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{travelAllowance.format}")
     private String travelAllowance;
 
-    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "PF Contribution Employee must be a numeric value with up to two decimal places")
+    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{pfContributionEmployee.format}")
     private String pfContributionEmployee;
 
-    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "HRA must be a numeric value with up to two decimal places")
+    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{hra.format}")
     private String hra;
 
-    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "Special Allowance must be a numeric value with up to two decimal places")
+    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{specialAllowance.format}")
     private String specialAllowance;
 
-    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "Other Allowances must be a numeric value with up to two decimal places")
+    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{otherAllowances.format}")
     private String otherAllowances;
 }
