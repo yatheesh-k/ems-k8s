@@ -18,54 +18,66 @@ import java.util.Base64;
 public class EmployeeUtils {
 
 
-    public static Entity maskEmployeeProperties(EmployeeRequest employeeRequest, String id) {
-        String password = Base64.getEncoder().encodeToString(employeeRequest.getPassword().getBytes());
-        String hra = null, pan = null, pf = null, spa = null, ta = null;
+    public static Entity maskEmployeeProperties(EmployeeRequest employeeRequest,String resourceId) {
+        String uan = null, pan = null, adharId = null, accountNo=null, ifscCode = null,password=null;
         if(employeeRequest.getPanNo() != null) {
             pan = Base64.getEncoder().encodeToString(employeeRequest.getPanNo().getBytes());
+        }
+        if(employeeRequest.getPassword() != null) {
+            password = Base64.getEncoder().encodeToString(employeeRequest.getPassword().getBytes());
+        }
+        if(employeeRequest.getUanNo() != null) {
+            uan = Base64.getEncoder().encodeToString(employeeRequest.getUanNo().getBytes());
+        }
+        if(employeeRequest.getAadhaarId() != null) {
+            adharId = Base64.getEncoder().encodeToString(employeeRequest.getAadhaarId().getBytes());
+        }
+        if(employeeRequest.getIfscCode() != null) {
+            ifscCode = Base64.getEncoder().encodeToString(employeeRequest.getIfscCode().getBytes());
+        }
+        if(employeeRequest.getAccountNo() != null) {
+            accountNo = Base64.getEncoder().encodeToString(employeeRequest.getAccountNo().getBytes());
         }
         ObjectMapper objectMapper = new ObjectMapper();
 
         EmployeeEntity entity = objectMapper.convertValue(employeeRequest, EmployeeEntity.class);
-        entity.setId(id);
+        entity.setId(resourceId);
         entity.setPassword(password);
+        entity.setAadhaarId(adharId);
         entity.setPanNo(pan);
+        entity.setUanNo(uan);
+        entity.setIfscCode(ifscCode);
+        entity.setAccountNo(accountNo);
         entity.setType(Constants.EMPLOYEE);
         return entity;
     }
 
-    public static Entity maskEmployeeUpdateProperties(EmployeeEntity user, EmployeeUpdateRequest employeeUpdateRequest, String id) {
-        ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        EmployeeEntity updatedEntity = objectMapper.convertValue(employeeUpdateRequest, EmployeeEntity.class);
-
-        String hra = null,  pf = null, spa = null, ta = null;
-
-        updatedEntity.setId(id);
-        updatedEntity.setEmployeeId(user.getEmployeeId());
-        updatedEntity.setPanNo(user.getPanNo());
-        updatedEntity.setDateOfBirth(user.getDateOfBirth());
-        updatedEntity.setDateOfHiring(user.getDateOfHiring());
-        updatedEntity.setFirstName(user.getFirstName());
-        updatedEntity.setLastName(user.getLastName());
-        updatedEntity.setDepartment(user.getDepartment());
-        updatedEntity.setUanNo(user.getUanNo());
-        updatedEntity.setType(Constants.EMPLOYEE);
-        return updatedEntity;
-    }
-
 
     public static Entity unmaskEmployeeProperties(EmployeeEntity employeeEntity) {
-        String pan = null;
-//        byte[] password = Base64.getDecoder().decode(employeeEntity.getPassword().getBytes());
-//        String decodedPassword = new String(password, StandardCharsets.UTF_8);
+        String pan = null,uanNo=null,aadhaarId=null,accountNo=null,ifscCode=null;
         if(employeeEntity.getPanNo() != null) {
-           pan = new String((Base64.getDecoder().decode(employeeEntity.getPanNo().toString().getBytes())));
+            pan = new String((Base64.getDecoder().decode(employeeEntity.getPanNo().toString().getBytes())));
         }
+        if(employeeEntity.getUanNo() != null) {
+            uanNo = new String((Base64.getDecoder().decode(employeeEntity.getUanNo().toString().getBytes())));
+        }
+        if(employeeEntity.getAadhaarId() != null) {
+            aadhaarId = new String((Base64.getDecoder().decode(employeeEntity.getAadhaarId().toString().getBytes())));
+        }
+        if(employeeEntity.getAccountNo() != null) {
+            accountNo = new String((Base64.getDecoder().decode(employeeEntity.getAccountNo().toString().getBytes())));
+        }
+        if(employeeEntity.getIfscCode() != null) {
+            ifscCode = new String((Base64.getDecoder().decode(employeeEntity.getIfscCode().toString().getBytes())));
+        }
+        employeeEntity.setIfscCode(ifscCode);
+        employeeEntity.setAccountNo(accountNo);
+        employeeEntity.setAadhaarId(aadhaarId);
+        employeeEntity.setUanNo(uanNo);
         employeeEntity.setPassword("**********");
-            employeeEntity.setPanNo(pan);
+        employeeEntity.setPanNo(pan);
         return employeeEntity;
     }
-
     public static SalaryEntity unMaskEmployeeSalaryProperties(SalaryEntity salaryEntity) {
 
         String var = null, fix = null, bas = null, gross = null;

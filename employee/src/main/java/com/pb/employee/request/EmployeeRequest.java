@@ -16,14 +16,14 @@ import java.util.List;
 public class EmployeeRequest {
 
     @Pattern(regexp = "^[a-z]+$", message = "{companyName.format}")
-    @NotBlank(message = "{notnull.message}")
+    @NotBlank(message = "{companyname.message}")
     private String companyName;
 
-    @Pattern(regexp = "^[A-Z][a-z]+$", message = "{employee.type}")
+    @Pattern(regexp = "^[a-zA-Z]+( [a-zA-Z]+)*$", message = "{employee.type}")
     @NotBlank(message = "{notnull.message}")
     private String employeeType;
 
-    @Pattern(regexp = "^[A-Z]+[0-9]+$", message = "{employeeId.format}")
+    @Pattern(regexp = "^[A-Z0-9]+$", message = "{employeeId.format}")
     @NotBlank(message = "{notnull.message}")
     private String employeeId;
 
@@ -31,15 +31,15 @@ public class EmployeeRequest {
     @NotBlank(message = "{notnull.message}")
     private String firstName;
 
-    @Pattern(regexp = "^[A-Z][a-z]+$", message = "{lastname.format}")
+    @Pattern(regexp = "^[A-Za-z]+$", message = "{lastname.format}")
     @NotBlank(message = "{notnull.message}")
     private String lastName;
 
-    @Pattern(regexp = "(?i)^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$", message = "{email.format}")
+    @Pattern(regexp = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,6}$", message = "{invalid.emailId}")
     @NotBlank(message = "{notnull.message}")
-    private String emailId;
+    private String emailId;// "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$"
 
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\\W)(?!.* ).{6,16}$", message = "{password.format}")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\\W)(?!.* ).{6,16}$", message = "{invalid.password}")
     @NotBlank(message = "{notnull.message}")
     private String password;
 
@@ -47,7 +47,7 @@ public class EmployeeRequest {
     @NotBlank(message = "{notnull.message}")
     private String designation;
 
-    @Pattern(regexp = "^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\\d{4}$", message = "{dateOfHiring.format}")
+    @Pattern(regexp =  "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$", message = "{dateOfHiring.format}")
     @NotBlank(message = "{notnull.message}")
     private String dateOfHiring;
 
@@ -63,31 +63,29 @@ public class EmployeeRequest {
     @NotBlank(message = "{notnull.message}")
     private String manager;
 
-//    @ValidRoleList(message = "{role.format}")
-//    @NotBlank(message = "{notnull.message}")
     private List<String> roles;
 
     @Pattern(regexp = "^[A-Z][a-z]+$", message = "{status.format}")
     @NotBlank(message = "{notnull.message}")
     private String status;
 
-    @Pattern(regexp = "^[A-Z]{5}[0-9]{4}[A-Z]{1}$", message = "{panno.format}")
+    @Pattern(regexp = "^[A-Z]{5}[0-9]{4}[A-Z]{1}$", message = "{invalid.panNo}")
     @NotBlank(message = "{notnull.message}")
     private String panNo;
 
-    @Pattern(regexp = "^\\d{12}$", message = "{uanNo.format}")
+    @Pattern(regexp = "^\\d{12}$", message = "{invalid.uanNo}")
     @NotBlank(message = "{notnull.message}")
     private String uanNo;
 
-    @Pattern(regexp = "^\\d{12}$", message = "{aadhaarId.format}")
+    @Pattern(regexp = "^\\d{12}$", message = "{invalid.aadhaarId}")
     @NotBlank(message = "{notnull.message}")
     private String aadhaarId;
 
-    @Pattern(regexp = "^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\\d{4}$", message = "{dateOfBirth.format}")
+    @Pattern(regexp =  "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$", message = "{dateOfBirth.format}")
     @NotBlank(message = "{notnull.message}")
     private String dateOfBirth;
 
-    @Pattern(regexp = "^\\d{9,18}$", message = "{accountno.format}")
+    @Pattern(regexp = "^\\d{9,18}$", message = "{accountNo.format}")
     @NotBlank(message = "{notnull.message}")
     private String accountNo;
 

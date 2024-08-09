@@ -17,27 +17,27 @@ public class SalaryRequest {
     private String companyName;
 
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{basicSalary.format}")
-    @NotBlank(message = "{basicSalary.message}")
+    @NotBlank(message = "{notnull.message}")
     private String basicSalary;
 
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{fixedAmount.format}")
-    @NotBlank(message = "{fixedAmount.message}")
+    @NotBlank(message = "{notnull.message}")
     private String fixedAmount;
 
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{variableAmount.format}")
-    @NotBlank(message = "{variableAmount.message}")
+    @NotBlank(message = "{notnull.message}")
     private String variableAmount;
 
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{grossAmount.format}")
-    @NotBlank(message = "{grossAmount.message}")
+    @NotBlank(message = "{notnull.message}")
     private String grossAmount;
 
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{totalEarnings.format}")
-    @NotBlank(message = "{totalEarnings.message}")
+    @NotBlank(message = "{notnull.message}")
     private String totalEarnings;
 
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{netSalary.format}")
-    @NotBlank(message = "{netSalary.message}")
+    @NotBlank(message = "{notnull.message}")
     private String netSalary;
 
     @Valid
@@ -47,6 +47,6 @@ public class SalaryRequest {
     private DeductionRequest deductions;
 
     @Pattern(regexp = "^[A-Za-z]+$", message = "{status.format}")
-    @NotBlank(message = "{status.message}")
+    @NotBlank(message = "{notnull.message}")
     private String status;
 }

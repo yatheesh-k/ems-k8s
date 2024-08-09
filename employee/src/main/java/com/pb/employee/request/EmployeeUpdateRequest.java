@@ -21,7 +21,7 @@ public class EmployeeUpdateRequest {
     @NotBlank(message = "{notnull.message}")
     private String employeeType;
 
-    @Pattern(regexp = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$", message = "{email.format}")
+    @Pattern(regexp = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$", message = "{invalid.emailId}")
     @NotBlank(message = "{notnull.message}")
     private String emailId;
 
@@ -37,16 +37,13 @@ public class EmployeeUpdateRequest {
     @NotBlank(message = "{notnull.message}")
     private String manager;
 
-
-//    @Pattern(regexp = "^[A-Za-z ]+$", message = "{roles.format}")
-//    @NotBlank(message = "{notnull.message}")
     private List<String> roles;
 
     @Pattern(regexp = "^[A-Z][a-z]+$", message = "{status.format}")
     @NotBlank(message = "{notnull.message}")
     private String status;
 
-    @Pattern(regexp = "^\\d{9,18}$", message = "{accountno.format}")
+    @Pattern(regexp = "^\\d{9,18}$", message = "{accountNo.format}")
     @NotBlank(message = "{notnull.message}")
     private String accountNo;
 

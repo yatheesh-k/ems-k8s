@@ -2,7 +2,7 @@ package com.pb.employee.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,16 +16,21 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class AttendanceUpdateRequest {
 
+    @NotNull(message = "{notnull.message}")
+    @Pattern(regexp = "^[A-Z][a-z]*$", message = "{invalid.month}")
     private String month;
+
+    @NotNull(message = "{notnull.message}")
+    @Pattern(regexp = "^\\d+$", message = "{invalid.year}")
     private String year;
 
-    @NotEmpty(message = "{total.working.days}")
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-    @JsonProperty("totalWorkingDays")
+    @NotNull(message = "{notnull.message}")
+    @DecimalMax(value = "31", message = "{total.working.days}")
+    @Digits(integer = 9, fraction = 0, message = "{total.working.days}")
     private String totalWorkingDays;
 
-    @NotEmpty(message = "{no.of.working.days}")
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-    @JsonProperty("noOfWorkingDays")
+    @NotNull(message = "{notnull.message}")
+    @DecimalMax(value = "31", message = "{no.of.working.days}")
+    @Digits(integer = 9, fraction = 0, message = "{no.of.working.days}")
     private String noOfWorkingDays;
 }

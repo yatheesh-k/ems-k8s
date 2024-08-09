@@ -68,7 +68,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         try{
             List<CompanyEntity> shortNameEntity = openSearchOperations.getCompanyByData(null, Constants.COMPANY, employeeRequest.getCompanyName());
 
-            Entity companyEntity = CompanyUtils.maskEmployeeProperties(employeeRequest, resourceId, shortNameEntity.getFirst().getId());
+            Entity companyEntity = EmployeeUtils.maskEmployeeProperties(employeeRequest, resourceId);
             Entity result = openSearchOperations.saveEntity(companyEntity, resourceId, index);
         } catch (Exception exception) {
             log.error("Unable to save the employee details {} {}", employeeRequest.getEmailId(),exception.getMessage());

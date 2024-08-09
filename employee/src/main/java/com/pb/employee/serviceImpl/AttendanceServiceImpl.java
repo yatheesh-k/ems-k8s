@@ -27,9 +27,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.util.StringUtils;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.YearMonth;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -37,6 +38,16 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Autowired
     private OpenSearchOperations openSearchOperations;
+
+
+    private static final Map<String, Month> MONTH_NAME_MAP = createMonthNameMap();
+    private static Map<String, Month> createMonthNameMap() {
+        Map<String, Month> map = new HashMap<>();
+        for (Month month : Month.values()) {
+            map.put(month.name().substring(0, 1) + month.name().substring(1).toLowerCase(), month);
+        }
+        return map;
+    }
 
     @Override
     public ResponseEntity<?> uploadAttendanceFile(String company,MultipartFile file) throws EmployeeException {
@@ -162,11 +173,9 @@ public class AttendanceServiceImpl implements AttendanceService {
     private List<AttendanceRequest> parseExcelFile(MultipartFile file, String company) throws Exception {
         List<AttendanceRequest> attendanceRequests = new ArrayList<>();
         String fileName = file.getOriginalFilename();
-
         if (fileName != null && (fileName.endsWith(".xls") || fileName.endsWith(".xlsx"))) {
             try (InputStream excelIs = file.getInputStream()) {
                 log.info("Successfully opened input stream for file: {}", fileName);
-
                 Workbook wb = null;
                 try {
                     wb = new XSSFWorkbook(excelIs);
@@ -174,56 +183,69 @@ public class AttendanceServiceImpl implements AttendanceService {
                     log.error("Failed to create workbook for file: {}", e.getMessage(), e);
                     throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.FAILED_TO_CREATE), HttpStatus.INTERNAL_SERVER_ERROR);
                 }
-
                 Sheet sheet = wb.getSheetAt(0);
                 log.info("Successfully retrieved sheet: '{}', with {} rows.", sheet.getSheetName(), sheet.getPhysicalNumberOfRows());
-
                 Iterator<Row> rowIt = sheet.rowIterator();
-
                 if (!rowIt.hasNext()) {
                     log.warn("No rows found in the sheet '{}'", sheet.getSheetName());
                 }
+                // Get current year and month
+                LocalDate now = LocalDate.now();
+                String currentYear = String.valueOf(now.getYear());
+                String currentMonth = now.getMonth().name().substring(0, 1) + now.getMonth().name().substring(1).toLowerCase(); // Capitalize only first letter
                 while (rowIt.hasNext()) {
                     Row currentRow = rowIt.next();
                     log.info("Processing row number: {}", currentRow.getRowNum());
-
                     if (currentRow.getRowNum() == 0) {
                         log.info("Skipping header row.");
                         continue;
                     }
-
                     if (StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(0)))
                             || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(1)))
                             || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(2)))
                             || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(3)))
-                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(4)))
-                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(5)))
-                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(6)))
-                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(7)))) {
+                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(4)))) {
                         log.warn("Skipping row {} as one or more critical cells are empty", currentRow.getRowNum());
                         continue;
                     }
-
                     AttendanceRequest attendanceRequest = new AttendanceRequest();
                     attendanceRequest.setCompany(company);
                     attendanceRequest.setEmployeeId(getCellValue(currentRow.getCell(0)));
-                    attendanceRequest.setMonth(getCellValue(currentRow.getCell(4)));
                     attendanceRequest.setFirstName(getCellValue(currentRow.getCell(1)));
                     attendanceRequest.setLastName(getCellValue(currentRow.getCell(2)));
                     attendanceRequest.setEmailId(getCellValue(currentRow.getCell(3)));
-
-                    // Handle parsing and setting year, totalWorkingDays, and noOfWorkingDays
+                    // Set default year and month
+                    attendanceRequest.setYear(currentYear);
+                    attendanceRequest.setMonth(currentMonth);
+                    // Determine the number of days in the given month and year
+                    int year = Integer.parseInt(currentYear);
+                    Month month = MONTH_NAME_MAP.get(currentMonth); // Use the map to get Month object
+                    if (month == null) {
+                        log.error("Invalid month name provided: {}", currentMonth);
+                        throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_MONTH_NAME), HttpStatus.BAD_REQUEST);
+                    }
+                    YearMonth yearMonth = YearMonth.of(year, month);
+                    int totalDaysInMonth = yearMonth.lengthOfMonth(); // Total days in the month
+                    // Validate noOfWorkingDays
+                    String noOfWorkingDaysStr = getCellValue(currentRow.getCell(4));
+                    int noOfWorkingDays;
                     try {
-                        attendanceRequest.setYear(String.valueOf((int) Double.parseDouble(getCellValue(currentRow.getCell(5)))));
-                        attendanceRequest.setTotalWorkingDays(String.valueOf((int) Double.parseDouble(getCellValue(currentRow.getCell(7)))));
-                        attendanceRequest.setNoOfWorkingDays(String.valueOf((int) Double.parseDouble(getCellValue(currentRow.getCell(6)))));
+                        // Convert to Double first, then to Integer
+                        double noOfWorkingDaysDouble = Double.parseDouble(noOfWorkingDaysStr);
+                        noOfWorkingDays = (int) Math.round(noOfWorkingDaysDouble); // Use rounding to handle fractional values
+                        // Check if noOfWorkingDays is less than or equal to totalDaysInMonth
+                        if (noOfWorkingDays > totalDaysInMonth) {
+                            log.error("No of working days '{}' exceeds total days in the month '{}'", noOfWorkingDays, totalDaysInMonth);
+                            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_NO_OF_WORKING_DAYS), HttpStatus.BAD_REQUEST);
+                        }
+                        // Set totalWorkingDays as total days in month since it is not provided
+                        attendanceRequest.setTotalWorkingDays(String.valueOf(totalDaysInMonth));
+                        attendanceRequest.setNoOfWorkingDays(String.valueOf(noOfWorkingDays));
                     } catch (NumberFormatException e) {
-                        log.error("Error parsing numeric values from row {}: {}", currentRow.getRowNum(), e.getMessage());
+                        log.error("Error parsing numeric values for working days: {}", e.getMessage());
                         throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.NUMBER_EXCEPTION), HttpStatus.INTERNAL_SERVER_ERROR);
                     }
-
                     attendanceRequests.add(attendanceRequest);
-
                     log.info("Added attendance request for employee ID: {}", attendanceRequest.getEmployeeId());
                 }
                 wb.close();
@@ -274,8 +296,6 @@ public class AttendanceServiceImpl implements AttendanceService {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
                         HttpStatus.NOT_FOUND);
             }
-
-
             // Generate attendance ID and check if it already exists
             String attendanceId = ResourceIdUtils.generateAttendanceId(attendanceRequest.getCompany(), employee.getId(), attendanceRequest.getYear(), attendanceRequest.getMonth());
             Object object = openSearchOperations.getById(attendanceId, null, index);
@@ -285,7 +305,6 @@ public class AttendanceServiceImpl implements AttendanceService {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.ATTENDANCE_ALREADY_EXISTS),
                         HttpStatus.NOT_ACCEPTABLE);
             }
-
             // Create and save the new AttendanceEntity
             Entity attendanceEntity = CompanyUtils.maskAttendanceProperties(attendanceRequest, attendanceId, employeeId);
             openSearchOperations.saveEntity(attendanceEntity, attendanceId, index);
@@ -295,7 +314,6 @@ public class AttendanceServiceImpl implements AttendanceService {
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SAVE_ATTENDANCE),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.CREATED);
     }
