@@ -42,7 +42,7 @@ const Designation = () => {
       setDesignations(designations);
       setFilteredData(designations);
     } catch (error) {
-      handleApiErrors(error);
+      // handleApiErrors(error);
     }
   };
   
@@ -249,6 +249,7 @@ const Designation = () => {
                       className="form-control"
                       placeholder='Search....'
                       value={search}
+                      onInput={toInputTitleCase}
                       onChange={(e) => getFilteredList(e.target.value)}
                     />
                   </div>

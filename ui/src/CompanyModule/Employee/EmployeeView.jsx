@@ -59,40 +59,40 @@ const EmployeeView = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-        try {
-            const data = await EmployeeGetApi(); // Assuming EmployeeGetApi is a function returning a Promise
-            const filteredData = data
-                .filter(employee => employee.firstName !== null)
-                .map(({ referenceId, ...rest }) => rest);
-            // Set state only if data is valid
-            if (Array.isArray(filteredData)) {
-                setEmployees(filteredData);
-                setFilteredData(filteredData);
-            } else {
-                console.error('Employee data is not an array:', data);
-            }
-        } catch (error) {
-            handleApiErrors(error);
+      try {
+        const data = await EmployeeGetApi(); // Assuming EmployeeGetApi is a function returning a Promise
+        const filteredData = data
+          .filter(employee => employee.firstName !== null)
+          .map(({ referenceId, ...rest }) => rest);
+        // Set state only if data is valid
+        if (Array.isArray(filteredData)) {
+          setEmployees(filteredData);
+          setFilteredData(filteredData);
+        } else {
+          console.error('Employee data is not an array:', data);
         }
+      } catch (error) {
+        handleApiErrors(error);
+      }
     };
 
     fetchData();
-}, []); // Ensure the dependency array is empty to run once on mount
+  }, []); // Ensure the dependency array is empty to run once on mount
 
-const handleApiErrors = (error) => {
-  if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
-    const errorMessage = error.response.data.error.message;
-    toast.error(errorMessage);
-  } else {
-    toast.error("Network Error !");
-  }
-  console.error(error.response);
-};
-    
+  const handleApiErrors = (error) => {
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
+    } else {
+      toast.error("Network Error !");
+    }
+    console.error(error.response);
+  };
 
-const handleSalary = (id) => {
-  Navigate(`/employeeSalaryList?id=${id}`);
-};
+
+  const handleSalary = (id) => {
+    Navigate(`/employeeSalaryList?id=${id}`);
+  };
 
 
   const handleEdit = (id) => {
@@ -103,22 +103,23 @@ const handleSalary = (id) => {
   const handleConfirmDelete = async () => {
     if (selectedItemId) {
       try {
-      await  EmployeeDeleteApiById(selectedItemId)
+        await EmployeeDeleteApiById(selectedItemId)
           .then((response) => {
-           
+            setTimeout(() => {
               toast.success("Employee Deleted Succesfully", {
                 position: "top-right",
                 transition: Bounce,
                 hideProgressBar: true,
                 theme: "colored",
-                autoClose: 3000, // Close the toast after 3 seconx  ds
-              });
-         
+                autoClose: 3000,
+              }, 1000);
+            });
+
             //getEmployees()
             handleCloseDeleteModal();
           });
       } catch (error) {
-         handleApiErrors(error)
+        handleApiErrors(error)
       }
     }
   };
@@ -137,7 +138,7 @@ const handleSalary = (id) => {
         </b>
       ),
     },
-    InActive: {
+    Inactive: {
       label: (
         <b
           style={{
@@ -147,7 +148,7 @@ const handleSalary = (id) => {
             padding: "2px",
           }}
         >
-          InActive
+          Inactive
         </b>
       ),
     },
@@ -166,7 +167,7 @@ const handleSalary = (id) => {
     },
     {
       name: <h6><b>ID</b></h6>,
-      selector: row=> row.employeeId,
+      selector: row => row.employeeId,
       width: "100px",
     },
     {
@@ -191,7 +192,7 @@ const handleSalary = (id) => {
     },
     {
       name: <h6><b>Department</b></h6>,
-      selector: row =>row.department,
+      selector: row => row.department,
       sortable: true,
       width:"130px",
     },
@@ -212,7 +213,7 @@ const handleSalary = (id) => {
 
     {
       name: <h6><b>Status</b></h6>,
-      selector: row =>row.status,
+      selector: row => row.status,
       sortable: true,
       cell: (row) => statusMappings[row.status]?.label || "Unknown",
       width:"120px"
@@ -221,7 +222,7 @@ const handleSalary = (id) => {
       name: <h5><b>Action</b></h5>,
       cell: (row) => (
         <div>
-           <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginRight: "10px" }} onClick={() => handleSalary(row.id)}  title="View Salary">
+          <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginRight: "10px" }} onClick={() => handleSalary(row.id)} title="View Salary">
             <Wallet size={22} color='#d116dd' />
           </button>
           <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginRight: "10px" }} onClick={() => handleEdit(row.id)} title="Edit">
@@ -253,12 +254,12 @@ const handleSalary = (id) => {
       const dateOfHiring = new Date(item.dateOfHiring)
         .toLocaleDateString()
         .toLowerCase();
-        const employeeId = item.employeeId.toString().toLowerCase()
+      const employeeId = item.employeeId.toString().toLowerCase()
       return (
         fullName.includes(searchTerm.toLowerCase()) ||
         email.includes(searchTerm.toLowerCase()) ||
         department.includes(searchTerm.toLowerCase()) ||
-        dateOfHiring.includes(searchTerm.toLowerCase())||
+        dateOfHiring.includes(searchTerm.toLowerCase()) ||
         employeeId.includes(searchTerm.toLowerCase())
       );
     });
@@ -281,28 +282,49 @@ const handleSalary = (id) => {
     setFilteredData(result);
   };
 
+  const  toInputTitleCase = (e) => {
+    const input = e.target;
+    let value = input.value;
+    // Remove leading spaces
+    value = value.replace(/^\s+/g, '');
+    // Initially disallow spaces
+    if (!/\S/.test(value)) {
+      // If no non-space characters are present, prevent spaces
+      value = value.replace(/\s+/g, '');
+    } else {
+      // Allow spaces if there are non-space characters
+      value = value.replace(/^\s+/g, ''); // Remove leading spaces
+      const words = value.split(' ');
+      const capitalizedWords = words.map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      });
+      value = capitalizedWords.join(' ');
+    }
+    // Update input value
+    input.value = value;
+  };
 
   return (
     <LayOut>
       <div className="container-fluid p-0">
-      <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
-              <div className="col">
-              <h1 className="h3 mb-3"><strong>Employees</strong> </h1>
-              </div>
-              <div className="col-auto">
-                <nav aria-label="breadcrumb">
-                  <ol className="breadcrumb mb-0">
-                    <li className="breadcrumb-item">
-                      <a href="/main">Home</a>
-                    </li>
-                   
-                    <li className="breadcrumb-item active">
-                      Employees 
-                    </li>
-                  </ol>
-                </nav>
-              </div>
-            </div>
+        <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
+          <div className="col">
+            <h1 className="h3 mb-3"><strong>Employees</strong> </h1>
+          </div>
+          <div className="col-auto">
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                  <a href="/main">Home</a>
+                </li>
+
+                <li className="breadcrumb-item active">
+                  Employees
+                </li>
+              </ol>
+            </nav>
+          </div>
+        </div>
 
         {/**Department View TableForm */}
         <div className="row">
@@ -317,50 +339,51 @@ const handleSalary = (id) => {
                     </Link>
                   </div>
                   <div className="row col-12 mb-2">
-                 
-                  <div className="col-md-4 mt-2 ">
-                    <input
-                      type="search"
-                      className="form-control"
-                      placeholder="Search...."
-                      value={search}
-                      onChange={(e) => getFilteredList(e.target.value)}
-                    />
-                  </div>
-                  <div className="col-md-4 mt-2">
-                    <select
-                      className="form-select"
-                      style={{paddingBottom:'6px'}} 
-                      value={selectedYear}
-                      onChange={(e) =>
-                        filterByMonthYear(selectedMonth, e.target.value)
-                      }
-                    >
-                      <option value="">Select Year</option>
-                      {getRecentYears().map((year) => (
-                        <option key={year} value={year}>
-                          {year}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="col-md-4 mt-2">
-                    <select
-                      className="form-select"
-                      style={{paddingBottom:'6px'}}
-                      value={selectedMonth}
-                      onChange={(e) =>
-                        filterByMonthYear(e.target.value, selectedYear)
-                      }
-                    >
-                      <option value="">Select Month</option>
-                      {getMonthNames().map((month, index) => (
-                        <option key={index} value={(index + 1).toString()}>
-                          {month}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+
+                    <div className="col-md-4 mt-2 ">
+                      <input
+                        type="search"
+                        className="form-control"
+                        placeholder="Search...."
+                        value={search}
+                        onInput={toInputTitleCase}
+                        onChange={(e) => getFilteredList(e.target.value)}
+                      />
+                    </div>
+                    <div className="col-md-4 mt-2">
+                      <select
+                        className="form-select"
+                        style={{ paddingBottom: '6px' }}
+                        value={selectedYear}
+                        onChange={(e) =>
+                          filterByMonthYear(selectedMonth, e.target.value)
+                        }
+                      >
+                        <option value="">Select Year</option>
+                        {getRecentYears().map((year) => (
+                          <option key={year} value={year}>
+                            {year}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-md-4 mt-2">
+                      <select
+                        className="form-select"
+                        style={{ paddingBottom: '6px' }}
+                        value={selectedMonth}
+                        onChange={(e) =>
+                          filterByMonthYear(e.target.value, selectedYear)
+                        }
+                      >
+                        <option value="">Select Month</option>
+                        {getMonthNames().map((month, index) => (
+                          <option key={index} value={(index + 1).toString()}>
+                            {month}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
 
                   <div
@@ -372,7 +395,7 @@ const handleSalary = (id) => {
               <DataTable
                 columns={columns}
                 data={filteredData}
-               
+
               />
             </div>
           </div>

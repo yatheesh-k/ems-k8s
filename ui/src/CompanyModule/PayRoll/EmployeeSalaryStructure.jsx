@@ -6,13 +6,14 @@ import { EmployeeGetApi, EmployeeSalaryPostApi } from "../../Utils/Axios";
 import { CurrencyRupee, QuestionCircle } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 const EmployeeSalaryStructure = () => {
   const {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors },
   } = useForm({ mode: 'onChange' });
   const [employes, setEmployes] = useState([]);
@@ -182,7 +183,7 @@ const EmployeeSalaryStructure = () => {
 
   const companyName = sessionStorage.getItem("company");
 
-  const onSubmit = (e) => {
+  const onSubmit = (data) => {
     if (
       variableAmount === 0 &&
       fixedAmount === 0 &&
@@ -194,10 +195,9 @@ const EmployeeSalaryStructure = () => {
       pfEmployer === 0 &&
       grossAmount === 0
     ) {
-      // setErrorMessage("Please fill the fields.");
       return;
     }
-
+  
     const postData = {
       companyName,
       basicSalary,
@@ -218,22 +218,23 @@ const EmployeeSalaryStructure = () => {
         pfEmployer: parseFloat(pfEmployer),
         totalDeductions: parseFloat(totalPF),
       },
-      status: 0,
+      status: data.status, // Ensure status is captured from form data
     };
-
+  
     console.log("Post Data:", postData);
-
+  
     EmployeeSalaryPostApi(employeeId, postData)
       .then((response) => {
-        toast.success(response.data.message)
+        toast.success(response.data.message);
         setErrorMessage(""); // Clear error message on success
         setShowFields(false);
-        navigate('/employeeview')
+        navigate('/employeeview');
       })
       .catch((error) => {
-        handleApiErrors(error)
+        handleApiErrors(error);
       });
   };
+  
 
   return (
     <LayOut>
@@ -315,6 +316,7 @@ const EmployeeSalaryStructure = () => {
                             type="text"
                             className="form-control"
                             autoComplete="off"
+                            maxLength={10}
                             {...register("variableAmount", {
                               required: "Variable amount is required",
                               pattern: {
@@ -349,6 +351,7 @@ const EmployeeSalaryStructure = () => {
                             type="text"
                             className="form-control"
                             autoComplete="off"
+                            maxLength={10}
                             {...register("fixedAmount", {
                               required: "Fixed amount is required",
                               pattern: {
@@ -423,6 +426,7 @@ const EmployeeSalaryStructure = () => {
                           type="text"
                           className="form-control"
                           autoComplete="off"
+                          maxLength={2}
                           {...register("hra", {
                             required: "Hra is required",
                             pattern: {
@@ -456,6 +460,7 @@ const EmployeeSalaryStructure = () => {
                           type="text"
                           className="form-control"
                           autoComplete="off"
+                          maxLength={7}
                           {...register("travelAllowance", {
                             required: "Travel Allowance is required",
                             pattern: {
@@ -490,6 +495,7 @@ const EmployeeSalaryStructure = () => {
                           className="form-control"
                           autoComplete="off"
                           value={specialAllowance}
+                          maxLength={7}
                           onChange={handleSpecialAllowanceChange}
                         />
                       </div>
@@ -500,6 +506,7 @@ const EmployeeSalaryStructure = () => {
                           className="form-control"
                           autoComplete="off"
                           value={otherAllowances}
+                          maxLength={7}
                           onChange={handleOtherAllowancesChange}
                         />
                       </div>
@@ -561,6 +568,7 @@ const EmployeeSalaryStructure = () => {
                           type="text"
                           className="form-control"
                           autoComplete="off"
+                          maxLength={7}
                           {...register("pfEmployee", {
                             required: "EMployee's PF Contribution is required",
                             pattern: {
@@ -596,6 +604,7 @@ const EmployeeSalaryStructure = () => {
                           type="text"
                           className="form-control"
                           autoComplete="off"
+                          maxLength={7}
                           {...register("pfEmployer", {
                             required: "Employer's PF Contribution is required",
                             pattern: {
@@ -616,12 +625,12 @@ const EmployeeSalaryStructure = () => {
                           })}
                           value={pfEmployer}
                           onChange={handlePfEmployerChange}
-                        />  
+                        />
                         {errors.pfEmployer && (
                           <div className="text-danger">
                             {errors.pfEmployer.message}
                           </div>
-                        )}   
+                        )}
                       </div>
                       <div className="col-12" style={{ marginTop: "10px" }}>
                         <label className="form-label">Total PF</label>
@@ -637,33 +646,65 @@ const EmployeeSalaryStructure = () => {
                   <div className="col-12">
                     <div className="card">
                       <div className="card-header">
-                        <h5 className="card-title"> Net Salary </h5>
-                        <hr />
+                        <h5 className="card-title"> Status </h5>
                         <div className="col-12">
-                          <label className="form-label">Total Amount</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            value={totalAmount}
-                            readOnly
+                          <Controller
+                            name="status"
+                            control={control}
+                            defaultValue=""
+                            rules={{ required: true }}
+                            render={({ field }) => (
+                              <Select
+                                {...field}
+                                options={[
+                                  { value: "Active", label: "Active" },
+                                  { value: "Inactive", label: "Inactive" },
+                                ]}
+                                value={
+                                  field.value
+                                    ? { value: field.value, label: ["Active", "Inactive"].find(option => option === field.value) }
+                                    : null
+                                }
+                                onChange={(val) => field.onChange(val.value)}
+                                placeholder="Select Status"
+                              />
+                            )}
                           />
+                          {errors.status && <p className="errorMsg">Employee Status is Required</p>}
+                        </div>
+                        </div>
+                        </div>
+                        </div>
+                        <div className="col-12">
+                          <div className="card">
+                            <div className="card-header">
+                              <h5 className="card-title"> Net Salary </h5>
+                              <hr />
+                              <div className="col-12">
+                                <label className="form-label">Total Amount</label>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  value={totalAmount}
+                                  readOnly
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-12 text-end" style={{ marginTop: "60px" }}>
+                          <button type="submit" className="btn btn-primary">
+                            Submit
+                          </button>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="col-12 text-end" style={{ marginTop: "60px" }}>
-                    <button type="submit" className="btn btn-primary">
-                      Submit
-                    </button>
-                  </div>
-                </div>
-              </>
+                    </>
             )}
-          </div>
-        </form>
-      </div>
-    </LayOut>
-  );
+                  </div>
+                </form>
+              </div>
+          </LayOut>
+          );
 };
 
-export default EmployeeSalaryStructure;
+          export default EmployeeSalaryStructure;

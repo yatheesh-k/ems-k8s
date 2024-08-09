@@ -114,7 +114,7 @@ const CompanyRegistration = () => {
     console.error(error.response);
   };
 
-  const  toInputTitleCase = (e) => {
+  const toInputTitleCase = (e) => {
     const input = e.target;
     let value = input.value;
     // Remove leading spaces
@@ -154,7 +154,7 @@ const CompanyRegistration = () => {
 
       // Remove leading spaces
       value = value.replace(/^\s+/g, '');
-      
+
       // Capitalize the first letter of each word
       const words = value.split(' ');
       const capitalizedWords = words.map(word => {
@@ -166,7 +166,7 @@ const CompanyRegistration = () => {
 
     // Update input value
     input.value = value;
-};
+  };
 
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
@@ -323,6 +323,10 @@ const CompanyRegistration = () => {
                             value: 2,
                             message: "minimum 2 characters required",
                           },
+                          maxLength: {
+                            value: 20,
+                            message: "maximum 20 characters allowed",
+                          },
                         })}
                         disabled={editMode}
                       />
@@ -378,9 +382,8 @@ const CompanyRegistration = () => {
                         {...register("emailId", {
                           required: "Company MailId is required",
                           pattern: {
-                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                            message:
-                              "No Spaces allowed Entered value does not match email format",
+                            value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                            message: "Invalid email format it allows Only .com, .in, .org, .net, .edu, .gov are allowed",
                           },
                         })}
                         disabled={editMode}
@@ -568,7 +571,7 @@ const CompanyRegistration = () => {
                 <div className="card-body">
                   <div className="row">
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Company CIN Number</label>
+                      <label className="form-label">Company CIN Number<span style={{ color: "red" }}>*</span></label>
                       <input
                         type="text"
                         className="form-control"
@@ -603,7 +606,7 @@ const CompanyRegistration = () => {
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Company Register Number{" "}
-                        {/* <span style={{ color: "red" }}>*</span> */}
+                        <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
                         type="text"
@@ -636,7 +639,7 @@ const CompanyRegistration = () => {
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Company GST Number{" "}
-                        {/* <span style={{ color: "red" }}>*</span> */}
+                        <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
                         type="text"
@@ -755,9 +758,8 @@ const CompanyRegistration = () => {
                         {...register("personalMailId", {
                           required: "MailId is required",
                           pattern: {
-                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                            message:
-                              "Entered value does not match email format",
+                            value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                            message: "Invalid email format it allows Only .com, .in, .org, .net, .edu, .gov are allowed",
                           },
                         })}
                       />
@@ -806,7 +808,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Address"
                         autoComplete="off"
-                         onInput={toInputTitleCase}
+                        onInput={toInputTitleCase}
                         onKeyDown={handleEmailChange}
                         maxLength={100}
                         {...register("address", {

@@ -112,6 +112,37 @@ function Profile() {
     input.value = value;
   };
 
+  const toInputLowerCase = (e) => {
+    const input = e.target;
+    let value = input.value;
+
+    // Remove leading spaces
+    value = value.replace(/^\s+/g, '');
+
+    // Initially disallow spaces if there are no non-space characters
+    if (!/\S/.test(value)) {
+      // If no non-space characters are present, prevent spaces
+      value = value.replace(/\s+/g, '');
+    } else {
+      // Convert the entire string to lowercase
+      value = value.toLowerCase();
+
+      // Remove leading spaces
+      value = value.replace(/^\s+/g, '');
+      
+      // Capitalize the first letter of each word
+      const words = value.split(' ');
+      const capitalizedWords = words.map(word => {
+        return word.charAt(0).toLowerCase() + word.slice(1);
+      });
+
+      value = capitalizedWords.join(' ');
+    }
+
+    // Update input value
+    input.value = value;
+};
+
   const handleLogoSubmit = async () => {
     if (!companyId) return;
     try {
@@ -330,6 +361,31 @@ function Profile() {
                           readOnly
                         />
                       </div>
+                      {/* <div className="col-12 col-md-6 col-lg-5 mb-3"> 
+                        <label htmlFor="website" className="form-label">
+                          Password
+                        </label>
+                        <div className="col-sm-12 input-group">
+                        <input
+                          type={passwordShown ? "text" : "password"}
+                          id="website"
+                          className="form-control"
+                          {...register("password")}
+                          defaultValue={companyData.password}
+                        />
+                        <i
+                          onClick={togglePasswordVisiblity}
+                          style={{ margin: "5px" }}
+                        >
+                          {" "}
+                          {passwordShown ? (
+                            <Eye size={17} />
+                          ) : (
+                            <EyeSlash size={17} />
+                          )}
+                        </i>
+                        </div>
+                      </div> */}
                       <div className="mb-3">
                         <label
                           htmlFor="companyAddress"
@@ -523,7 +579,7 @@ function Profile() {
                           type="text"
                           id="personalMailId"
                           className="form-control"
-                          onInput={toInputTitleCase}
+                          onInput={toInputLowerCase}
                           defaultValue={companyData.personalMailId}
                           {...register("personalMailId", {
                             required: "MailId is required",
@@ -630,11 +686,19 @@ function Profile() {
             <ModalTitle>Update Logo</ModalTitle>
           </ModalHeader>
           <ModalBody>
-            <input type="file" onChange={onChangePicture} />
+            <input type="file"
+              {...register("file", { required: "Logo Required" })}
+              onChange={onChangePicture}
+            />
             {postImage && (
               <div>
                 <image src={postImage} alt="Selected Logo" style={{ width: "100%" }} />
               </div>
+            )}
+            {errors.file && (
+              <p className="errorMsg">
+                {errors.file.message}
+              </p>
             )}
           </ModalBody>
           <ModalFooter>

@@ -24,10 +24,12 @@ const ForgotPassword = () => {
     };
     try {
       const response = await forgotPasswordStep1(formData);
-      console.log(response.data); // Handle API response as needed
+      console.log(response.data);
+      toast.success("OTP Sent Successfully"); // Handle API response as needed
       setEmail(data.email); // Update email state here
       setStep(2); // Move to Step 2 if successful
     } catch (error) {
+      console.error("Failed to send OTP:", error);
       handleApiErrors(error);
     } finally {
       setLoading(false);
@@ -43,6 +45,7 @@ const ForgotPassword = () => {
     };
     try {
       const response = await ValidateOtp(formData);
+      toast.success("Verification Successfull");
       console.log(response.data); // Handle API response as needed
       setStep(3); // Move to Step 3 if OTP validation successful
     } catch (error) {
@@ -62,6 +65,7 @@ const ForgotPassword = () => {
         companyFullName: data.companyName
       };
       const response = await forgotPasswordStep2(formData);
+      toast.success("Password Updated Successfully");
       console.log(response.data); // Handle API response as needed
       navigate('/:company/login');
     } catch (error) {

@@ -733,9 +733,6 @@ import { useAuth } from "../Context/AuthContext";
       </div>
     </nav>
   );
-};
-
-
-               
+}
 
   export default SideNav;

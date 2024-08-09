@@ -32,9 +32,7 @@ import PaySlipDoc from '../Login/PayslipDoc';
 import EmployeeSalaryById from '../EmployeeModule/EmployeeSalaryById';
 import Reset from '../LayOut/Reset';
 import ForgotPassword from '../Login/ForgotPassword'
-
-
-
+import EmployeeProfile from '../EmployeeModule/EmployeeProfile';
 
 
 
@@ -55,6 +53,7 @@ const Rout = () => {
       <Route path='/employeeView' element={<EmployeeView />}></Route>
       <Route path='/existingProcess' element={<ExistsEmpRegistration />}></Route>
       <Route path='/existingList' element={<ExistsEmployeeView />}></Route>
+      <Route path='/employeeProfile' element={<EmployeeProfile/>}></Route>
       {/* <Route path='/payroll'> */}
       <Route path='/companySalaryStructure' element={<CompanySalaryStructure />}></Route>
       <Route path='/employeeSalaryStructure' element={<EmployeeSalaryStructure />}></Route>

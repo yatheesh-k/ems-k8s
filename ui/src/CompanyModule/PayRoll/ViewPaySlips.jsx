@@ -163,16 +163,19 @@ const ViewPaySlips = () => {
       name: <h6><b>Net Amount</b></h6>,
       selector: row => parseFloat(row.salary.netSalary).toFixed(2),
       sortable: true,
+      width: "250px",
     },
     {
       name: <h6><b>Month</b></h6>,
       selector: row => row.month,
       sortable: true,
+      width: "200px",
     },
     {
       name: <h6><b>Year</b></h6>,
       selector: row => row.year,
       sortable: true,
+      width: "200px",
     },
     {
       name: <h6><b>Actions</b></h6>,

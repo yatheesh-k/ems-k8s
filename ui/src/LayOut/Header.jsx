@@ -120,7 +120,6 @@ const Header = ({ toggleSidebar }) => {
                 href
                 onClick={toggleProfile}
               >
-                <span className="text-dark p-2 mb-3">{companyName}</span>
                 <i className="bi bi-person-circle" style={{ fontSize: "22px" }}></i>
               </a>
               {isProfileOpen && (
@@ -188,7 +187,7 @@ const Header = ({ toggleSidebar }) => {
                   aria-labelledby="profileDropdown"
                   style={{ left: "auto", right: "50%" }}
                 >
-                  <a className="dropdown-item" href="/profile">
+                  <a className="dropdown-item" href="/employeeProfile">
                     <i className="align-middle me-1 bi bi-person"></i> Profile
                   </a>
                   <a className="dropdown-item"   href onClick={handleResetPasswordClick}>

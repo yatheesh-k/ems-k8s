@@ -183,6 +183,28 @@ const CompanyView = () => {
     console.log("Perform search with:", search, selectedMonth, selectedYear);
   };
 
+  const  toInputTitleCase = (e) => {
+    const input = e.target;
+    let value = input.value;
+    // Remove leading spaces
+    value = value.replace(/^\s+/g, '');
+    // Initially disallow spaces
+    if (!/\S/.test(value)) {
+      // If no non-space characters are present, prevent spaces
+      value = value.replace(/\s+/g, '');
+    } else {
+      // Allow spaces if there are non-space characters
+      value = value.replace(/^\s+/g, ''); // Remove leading spaces
+      const words = value.split(' ');
+      const capitalizedWords = words.map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      });
+      value = capitalizedWords.join(' ');
+    }
+    // Update input value
+    input.value = value;
+  };
+  
   return (
     <LayOut>
       <div className="container-fluid p-0">
@@ -215,6 +237,7 @@ const CompanyView = () => {
                   <div className='col-12 col-md-6 col-lg-4'>
                     <input type='search' className="form-control" placeholder='Search....'
                       value={search}
+                      onInput={toInputTitleCase}
                       onChange={(e) => getFilteredList(e.target.value)}
                     />
                   </div>

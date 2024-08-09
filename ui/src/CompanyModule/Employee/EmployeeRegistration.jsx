@@ -77,7 +77,7 @@ const EmployeeRegistration = () => {
 
   const status = [
     { value: "Active", label: "Active" },
-    { value: "InActive", label: "InActive" },
+    { value: "Inactive", label: "Inactive" },
   ];
 
   useEffect(() => {
@@ -163,26 +163,18 @@ const EmployeeRegistration = () => {
       // If no non-space characters are present, prevent spaces
       value = value.replace(/\s+/g, '');
     } else {
-      // Convert the entire string to lowercase
+      // Allow spaces if there are non-space characters
       value = value.toLowerCase();
-
-      // Remove leading spaces
-      value = value.replace(/^\s+/g, '');
-      
-      // Capitalize the first letter of each word
+      value = value.replace(/^\s+/g, ''); // Remove leading spaces
       const words = value.split(' ');
       const capitalizedWords = words.map(word => {
         return word.charAt(0).toLowerCase() + word.slice(1);
       });
-
       value = capitalizedWords.join(' ');
     }
-
     // Update input value
     input.value = value;
-};
-
-
+  };
 
   const onSubmit = async (data) => {
     const company = sessionStorage.getItem('company');
@@ -205,7 +197,8 @@ const EmployeeRegistration = () => {
       status: data.status,
       accountNo: data.accountNo,
       ifscCode: data.ifscCode,
-      bankName: data.bankName
+      bankName: data.bankName,
+      aadhaarId: data.aadhaarId
     };
 
     // Add fields specific to POST request
@@ -383,7 +376,7 @@ const EmployeeRegistration = () => {
                         <Controller
                           name="employeeType"
                           control={control}
-                          rules={{ required: true }}
+                          rules={{ required: 'Employee Type is required' }}
                           render={({ field }) => (
                             <Select
                               {...field}
@@ -512,9 +505,8 @@ const EmployeeRegistration = () => {
                         {...register("emailId", {
                           required: "Email Id Required",
                           pattern: {
-                            value:
-                              /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                            message: "Entered value does not match email format",
+                            value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                            message: "Invalid email format it allows Only .com, .in, .org, .net, .edu, .gov are allowed",
                           },
                         })}
                       />
@@ -579,7 +571,7 @@ const EmployeeRegistration = () => {
                           rules={{ required: "Department Required" }}
                           render={({ field }) => (
                             <select {...field} className="form-select">
-                              <option value="" disabled>Select a Department</option>
+                              <option value="" disabled>Select Department</option>
                               {departments.map(department => (
                                 <option key={department.id} value={department.name}>
                                   {department.name}
@@ -605,7 +597,7 @@ const EmployeeRegistration = () => {
                         rules={{ required: true }}
                         render={({ field }) => (
                           <select {...field} className="form-select" >
-                            <option value="" disabled>Select a Designation</option>
+                            <option value="" disabled>Select Designation</option>
                             {designations.map(designation => (
                               <option key={designation.id} value={designation.name}>
                                 {designation.name}
@@ -773,11 +765,11 @@ const EmployeeRegistration = () => {
                             {...field}
                             options={[
                               { value: "Active", label: "Active" },
-                              { value: "InActive", label: "InActive" },
+                              { value: "Inactive", label: "Inactive" },
                             ]}
                             value={
                               field.value
-                                ? { value: field.value, label: ["Active", "InActive"].find(option => option === field.value) }
+                                ? { value: field.value, label: ["Active", "Inactive"].find(option => option === field.value) }
                                 : null
                             }
                             onChange={(val) => field.onChange(val.value)}
@@ -814,7 +806,7 @@ const EmployeeRegistration = () => {
                       </div>
                     ) : (
                       <div className="col-12 col-md-6 col-lg-5 mb-2">
-                        <label className="form-label mb-3">Select Employee Role<span style={{ color: "red" }}>*</span></label>
+                        <label className="form-label mb-3">Select Role<span style={{ color: "red" }}>*</span></label>
                         <Controller
                           name="roles"
                           control={control}
@@ -911,7 +903,7 @@ const EmployeeRegistration = () => {
                             message:
                               "Invalid Bank Name format",
                           },
-                          maxLength: {
+                          minLength: {
                             value: 3,
                             message: "Minimum 3 characters Required",
                           },
@@ -986,12 +978,12 @@ const EmployeeRegistration = () => {
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Aadhar Number <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">Aadhaar Number <span style={{ color: "red" }}>*</span></label>
                       <input
                         type="text"
                         readOnly={isUpdating}
                         className="form-control"
-                        placeholder="Enter Aadhar number"
+                        placeholder="Enter Aadhaar Number"
                         name="aadhaarId"
                         onInput={toInputTitleCase}
                         autoComplete="off"

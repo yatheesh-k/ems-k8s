@@ -34,7 +34,7 @@ const Department = () => {
       const response = await DepartmentGetApi();
       setDepartments(response.data.data);
     } catch (error) {
-      handleApiErrors(error);
+      // handleApiErrors(error);
     }
   };
   useEffect(() => {
@@ -253,6 +253,7 @@ const Department = () => {
                       className="form-control"
                       placeholder='Search....'
                       value={search}
+                      onInput={toInputTitleCase}
                       onChange={(e) => getFilteredList(e.target.value)}
                     />
                   </div>

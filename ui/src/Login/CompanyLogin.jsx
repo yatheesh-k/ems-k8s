@@ -105,7 +105,7 @@ const CompanyLogin = () => {
       .then((response) => {
         setLoading(false);
         if (response.status === 200) {
-          toast.success("Company Login Successful", {
+          toast.success("Login Successful", {
             position: "top-right",
             transition: Bounce,
             hideProgressBar: true,
