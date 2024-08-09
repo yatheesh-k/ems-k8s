@@ -59,7 +59,7 @@ public class EmployeeController {
         return employeeService.getEmployeeById(companyName, employeeId);
     }
 
-    @RequestMapping(value = "{companyName}/employee/{employeeId}", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "employee/{employeeId}", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.updateEmployee.tag}", description = "${api.updateEmployee.description}")
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -67,7 +67,6 @@ public class EmployeeController {
     public ResponseEntity<?> updateCompanyById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                                @RequestHeader(Constants.AUTH_KEY) String authToken,
                                                @PathVariable String employeeId,
-                                               @PathVariable String companyName,
                                                @RequestBody @Valid  EmployeeUpdateRequest employeeUpdateRequest) throws IOException, EmployeeException {
         return employeeService.updateEmployeeById(employeeId, employeeUpdateRequest);
     }

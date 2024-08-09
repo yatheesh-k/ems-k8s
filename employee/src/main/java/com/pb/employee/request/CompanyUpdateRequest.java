@@ -1,5 +1,8 @@
 package com.pb.employee.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -10,30 +13,38 @@ import lombok.*;
 @AllArgsConstructor
 public class CompanyUpdateRequest {
 
+    @Schema(example = "companyAddress")
     @NotBlank(message = "{notnull.message}")
     @Pattern(regexp = "^[A-Za-z0-9\\s,.'-]+$", message = "{companyAddress.pattern.message}")
     @Size(min = 1, max = 100, message = "{companyAddress.pattern.message}")
     private String companyAddress;
 
+    @Schema(example = "mobileNo")
     @NotBlank(message = "{notnull.message}")
     @Pattern(regexp = "^\\d{10}$", message = "{invalid.mobileNo}")
     private String mobileNo;
 
+    @Schema(example = "landNo")
     @NotBlank(message = "{notnull.message}")
     @Pattern(regexp = "^\\d{10}$", message = "{invalid.mobileNo")
     private String landNo;
 
-    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{companyname.message}")
+    @Schema(example = "name")
+    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{name.message}")
+    @Size(min = 3, max = 20, message = "{size.message}")
     private String name;
 
+    @Schema(example = "personalMailId")
     @NotBlank(message = "{notnull.message}")
     @Pattern(regexp="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$", message="{invalid.emailId}")
     private String personalMailId;
 
+    @Schema(example = "personalMobileNo")
     @NotBlank(message = "{notnull.message}")
     @Pattern(regexp = "^\\d{10}$", message = "{invalid.mobileNo}")
     private String personalMobileNo;
 
+    @Schema(example = "address")
     @NotBlank(message = "{notnull.message}")
     @Pattern(regexp = "^[A-Za-z0-9\\s,.'-]+$", message = "{companyAddress.pattern.message}")
     @Size(min = 1, max = 100, message = "{companyAddress.pattern.message}")

@@ -1,8 +1,10 @@
 package com.pb.employee.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Getter
@@ -12,32 +14,40 @@ import lombok.*;
 @AllArgsConstructor
 public class SalaryRequest {
 
+    @Schema(example = "companyShortName")
     @Pattern(regexp = "^[a-z]+$", message = "{companyName.format}")
     @NotBlank(message = "{companyname.message}")
+    @Size(min = 2, max = 20, message = "{size.message}")
     private String companyName;
 
+    @Schema(example = "basicSalary")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{basicSalary.format}")
-    @NotBlank(message = "{notnull.message}")
+    @Size(min = 4, max = 10, message = "{size.message}")
     private String basicSalary;
 
+    @Schema(example = "fixedAmount")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{fixedAmount.format}")
-    @NotBlank(message = "{notnull.message}")
+    @Size(min = 4, max = 10, message = "{size.message}")
     private String fixedAmount;
 
+    @Schema(example = "variableAmount")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{variableAmount.format}")
-    @NotBlank(message = "{notnull.message}")
+    @Size(min = 4, max = 10, message = "{size.message}")
     private String variableAmount;
 
+    @Schema(example = "grossAmount")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{grossAmount.format}")
-    @NotBlank(message = "{notnull.message}")
+    @Size(min = 4, max = 10, message = "{size.message}")
     private String grossAmount;
 
+    @Schema(example = "totalEarnings")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{totalEarnings.format}")
-    @NotBlank(message = "{notnull.message}")
+    @Size(min = 4, max = 10, message = "{size.message}")
     private String totalEarnings;
 
+    @Schema(example = "netSalary")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{netSalary.format}")
-    @NotBlank(message = "{notnull.message}")
+    @Size(min = 4, max = 10, message = "{size.message}")
     private String netSalary;
 
     @Valid
@@ -46,6 +56,7 @@ public class SalaryRequest {
     @Valid
     private DeductionRequest deductions;
 
+    @Schema(example = "status")
     @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{status.format}")
     @NotBlank(message = "{notnull.message}")
     private String status;

@@ -14,35 +14,43 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class AttendanceRequest{
 
+    @Schema(example = "company")
     @NotNull(message = "${companyname.message}")
     @Pattern(regexp = "^[a-z]+$", message = "${employee.shortname.message}")
     private String company;
 
     private String employeeId;
 
+    @Schema(example = "month")
     @NotNull(message = "{notnull.message}")
     @Pattern(regexp = "^[A-Z][a-z]*$", message = "{invalid.month}")
     private String month;
 
+    @Schema(example = "year")
     @NotNull(message = "{notnull.message}")
     @Pattern(regexp = "^\\d+$", message = "{invalid.year}")
     private String year;
 
+    @Schema(example = "emailId")
     @NotNull(message = "{notnull.message}")
     @Pattern(regexp = "^[a-z][a-z0-9._%+-]*@[a-z0-9.-]+\\.[a-z]{2,}$", message = "{invalid.emailId}")
     private String emailId;
 
+    @Schema(example = "firstName")
     @Pattern(regexp = "^[A-Za-z]+$", message = "{name.message}")
     private String firstName;
 
+    @Schema(example = "lastName")
     @Pattern(regexp = "^[A-Za-z]+$", message = "{name.message}")
     private String lastName;
 
+    @Schema(example = "totalWorkingDays")
     @NotNull(message = "{notnull.message}")
     @DecimalMax(value = "31", message = "{total.working.days}")
     @Digits(integer = 9, fraction = 0, message = "{total.working.days}")
     private String totalWorkingDays;
 
+    @Schema(example = "noOfWorkingDays")
     @NotNull(message = "{notnull.message}")
     @DecimalMax(value = "31", message = "{no.of.working.days}")
     @Digits(integer = 9, fraction = 0, message = "{no.of.working.days}")
