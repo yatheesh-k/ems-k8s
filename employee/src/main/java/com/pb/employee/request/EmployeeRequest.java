@@ -65,7 +65,7 @@ public class EmployeeRequest {
 
     private List<String> roles;
 
-    @Pattern(regexp = "^[A-Z][a-z]+$", message = "{status.format}")
+    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{status.format}")
     @NotBlank(message = "{notnull.message}")
     private String status;
 

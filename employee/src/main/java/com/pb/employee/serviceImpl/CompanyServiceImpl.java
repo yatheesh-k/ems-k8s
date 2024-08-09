@@ -195,7 +195,7 @@ public class CompanyServiceImpl implements CompanyService {
 
             if (companyEntity!=null) {
                 openSearchOperations.deleteEntity(companyEntity.getId(),Constants.INDEX_EMS);
-                System.out.println("THe conpany si i:"+companyEntity.getId());
+                log.info("The company is:"+companyEntity.getId());
 
                 openSearchOperations.deleteIndex(index);
                 log.info("Index deleted for short name: {}", companyEntity.getShortName());
@@ -205,12 +205,9 @@ public class CompanyServiceImpl implements CompanyService {
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_DELETE_COMPANY),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.DELETED), HttpStatus.OK);
-
     }
-
 
     @Override
     public ResponseEntity<?> getCompanyImageById(String companyId) throws EmployeeException {
@@ -227,7 +224,6 @@ public class CompanyServiceImpl implements CompanyService {
                     HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
-
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(image),
                 HttpStatus.OK
@@ -259,13 +255,13 @@ public class CompanyServiceImpl implements CompanyService {
 
 
             String newPassword = Base64.getEncoder().encodeToString(employeePasswordReset.getNewPassword().toString().getBytes());
-           employee.setPassword(newPassword);
-           if (employee.getCompanyId() != null) {
-               CompanyEntity companyEntity = openSearchOperations.getCompanyById(employee.getCompanyId(), null, Constants.INDEX_EMS);
-               companyEntity.setPassword(newPassword);
-               openSearchOperations.saveEntity(companyEntity, employee.getCompanyId(), Constants.INDEX_EMS);
+            employee.setPassword(newPassword);
+            if (employee.getCompanyId() != null) {
+                CompanyEntity companyEntity = openSearchOperations.getCompanyById(employee.getCompanyId(), null, Constants.INDEX_EMS);
+                companyEntity.setPassword(newPassword);
+                openSearchOperations.saveEntity(companyEntity, employee.getCompanyId(), Constants.INDEX_EMS);
 
-           }
+            }
 
             openSearchOperations.saveEntity(employee, id, index);
 

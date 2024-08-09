@@ -12,7 +12,7 @@ import lombok.*;
 public class CompanyRequest {
 
     @NotNull(message = "{companyname.message}")
-    @Pattern(regexp = "^(?!\\s)(?!.*\\s$)[a-zA-Z0-9\\s,'#,&*()^\\-/]*$", message = "{company.message}")
+    @Pattern(regexp ="^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{companyname.message}")
     private String companyName;
 
     @NotNull(message = "{notnull.message}")
@@ -47,7 +47,7 @@ public class CompanyRequest {
     @Pattern(regexp = "^[A-Z]{5}\\d{4}[A-Z]$", message = "{invalid.panNo}")
     private String panNo;
 
-    @Pattern(regexp = "^[A-Za-z]+$", message = "{name.message}")
+    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{name.message}")
     private String name;
 
     @NotNull(message = "{notnull.message}")
@@ -59,7 +59,8 @@ public class CompanyRequest {
     private String personalMobileNo;
 
     @NotNull(message = "{notnull.message}")
-    @Pattern(regexp = "^(?!\\s)(?!.*\\s$)[a-zA-Z0-9\\s,'#,&*()^\\-/]*$", message = "{companyAddress.pattern.message}")
+    @Pattern(regexp = "^[A-Za-z0-9\\s,.'-]+$", message = "{companyAddress.pattern.message}")
+    @Size(min = 1, max = 100, message = "{companyAddress.pattern.message}")
     private String address;
 
     private String imageFile;
@@ -72,27 +73,12 @@ public class CompanyRequest {
     private String cinNo;
 
     @NotNull(message = "{notnull.message}")
-    @Min(value = 0, message = "{invalid.pf}")
-    @Max(value = 100, message = "{invalid.pf}")
-    private Integer pfPercentage;
-
-    @NotNull(message = "{notnull.message}")
-    @Digits(integer = 9, fraction = 0, message = "{travelAllowance.format}")
-    private Integer travelAllowance;
-
-    @NotNull(message = "{notnull.message}")
-    @Digits(integer = 9, fraction = 0, message = "{specialAllowance.format}")
-    private Integer specialAllowance;
-
-    @NotNull(message = "{notnull.message}")
-    @Digits(integer = 9, fraction = 0, message = "{invalid.hra}")
-    private Integer hraPercentage;
-
-    @NotNull(message = "{notnull.message}")
     @Pattern(regexp = "^[a-z]+$", message = "{company.shortname.message}")
     private String shortName;
 
-    @NotNull(message = "{notnull.message}")
-    @Pattern(regexp = "^(?!\\s)(?!.*\\s$)[a-zA-Z0-9\\s,'#,&*()^\\-/]*$", message = "{companyBranch.pattern.message}")
+    private Integer pfPercentage;
+    private Integer travelAllowance;
+    private Integer specialAllowance;
+    private Integer hraPercentage;
     private String companyBranch;
 }

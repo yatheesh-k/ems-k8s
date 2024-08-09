@@ -21,7 +21,7 @@ public class EmployeeUpdateRequest {
     @NotBlank(message = "{notnull.message}")
     private String employeeType;
 
-    @Pattern(regexp = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$", message = "{invalid.emailId}")
+    @Pattern(regexp = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,6}$", message = "{invalid.emailId}")
     @NotBlank(message = "{notnull.message}")
     private String emailId;
 

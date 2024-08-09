@@ -10,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 public class CompanyImageUpdate {
 
-    @NotNull(message = "${notnull.message}")
+    @NotNull(message = "{notnull.message}")
     private String image;
 
 }

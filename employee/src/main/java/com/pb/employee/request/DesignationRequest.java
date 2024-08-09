@@ -15,7 +15,7 @@ public class DesignationRequest {
     @NotBlank(message = "{companyname.message}")
     private String companyName;
 
-    @Pattern(regexp = "^^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*$", message = "{designation.format}")
+    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{designation.format}")
     @NotBlank(message = "{notnull.message}")
     private String name;
 }

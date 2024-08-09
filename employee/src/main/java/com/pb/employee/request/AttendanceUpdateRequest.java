@@ -25,11 +25,6 @@ public class AttendanceUpdateRequest {
     private String year;
 
     @NotNull(message = "{notnull.message}")
-    @DecimalMax(value = "31", message = "{total.working.days}")
-    @Digits(integer = 9, fraction = 0, message = "{total.working.days}")
-    private String totalWorkingDays;
-
-    @NotNull(message = "{notnull.message}")
     @DecimalMax(value = "31", message = "{no.of.working.days}")
     @Digits(integer = 9, fraction = 0, message = "{no.of.working.days}")
     private String noOfWorkingDays;
