@@ -57,7 +57,7 @@ const EmployeeView = () => {
     return `${year}-${month}-${day}`;
   };
 
-  useEffect(() => {
+
     const fetchData = async () => {
       try {
         const data = await EmployeeGetApi(); // Assuming EmployeeGetApi is a function returning a Promise
@@ -75,7 +75,7 @@ const EmployeeView = () => {
         handleApiErrors(error);
       }
     };
-
+    useEffect(() => {
     fetchData();
   }, []); // Ensure the dependency array is empty to run once on mount
 
@@ -105,7 +105,7 @@ const EmployeeView = () => {
       try {
         await EmployeeDeleteApiById(selectedItemId)
           .then((response) => {
-            setTimeout(() => {
+           
               toast.success("Employee Deleted Succesfully", {
                 position: "top-right",
                 transition: Bounce,
@@ -113,7 +113,9 @@ const EmployeeView = () => {
                 theme: "colored",
                 autoClose: 3000,
               }, 1000);
-            });
+              setTimeout(() => {
+                fetchData();
+            },1000);
 
             //getEmployees()
             handleCloseDeleteModal();
@@ -138,7 +140,7 @@ const EmployeeView = () => {
         </b>
       ),
     },
-    Inactive: {
+    InActive: {
       label: (
         <b
           style={{

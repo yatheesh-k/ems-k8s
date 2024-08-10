@@ -6,7 +6,7 @@ import { useAuth } from '../Context/AuthContext';
 import { CompanyImageGetApi, EmployeeGetApiById } from '../Utils/Axios';
 
 const LayOut = ({ children }) => {
-  const name = sessionStorage.getItem("name");
+  const name = localStorage.getItem("name");
   const {authData,isInitialized}=useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -137,7 +137,7 @@ export default LayOut;
 //   const profileDropdownRef = useRef(null);
 
 //   const navigate = useNavigate();
-//   const token = sessionStorage.getItem("token");
+//   const token = localStorage.getItem("token");
 
 //   useEffect(() => {
 //     if (!isInitialized) return; // Wait until initialization is complete
@@ -217,7 +217,7 @@ export default LayOut;
 //   }, []);
 
 //   const handleLogOut = () => {
-//     sessionStorage.clear();
+//     localStorage.clear();
 //     navigate("/");
 //   };
 

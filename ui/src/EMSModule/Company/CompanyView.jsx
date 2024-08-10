@@ -25,7 +25,7 @@ const CompanyView = () => {
       setView(response.data.data);
     } catch (error) {
       handleApiErrors(error);
-    }
+    } 
   };
 
   const getData = (id) => {

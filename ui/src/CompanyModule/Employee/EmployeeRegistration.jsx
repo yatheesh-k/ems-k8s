@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import axios from "axios";
 import Select from "react-select";
-import { Eye, EyeSlash, Handbag } from "react-bootstrap-icons";
+import { Eye, EyeSlash} from "react-bootstrap-icons";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Bounce, toast } from "react-toastify";
+import {toast } from "react-toastify";
 import LayOut from "../../LayOut/LayOut";
 import { DepartmentGetApi, DesignationGetApi, EmployeeGetApiById, EmployeePatchApiById, EmployeePostApi, EmployeePutApiById, employeeUpdateByIdApi, employeeViewApi } from "../../Utils/Axios";
+import { useAuth } from "../../Context/AuthContext";
 
 const EmployeeRegistration = () => {
 
@@ -25,18 +25,14 @@ const EmployeeRegistration = () => {
     },
     mode: "onChange",
   });
-  const [view, setView] = useState([]);
-  const [user, setUser] = useState([]);
+  const { user} = useAuth();
   const [departments, setDepartments] = useState([]);
   const [designations, setDesignations] = useState([]);
-  const [stat, setStat] = useState([]);
-  const [role, setRole] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false); // State to track if updating or creating
   const [employeeId, setEmployeeId] = useState("");
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
   const [companyName, setCompanyName] = useState("");
-  const [pending, setPending] = useState(false)
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -82,7 +78,7 @@ const EmployeeRegistration = () => {
 
   useEffect(() => {
     // Retrieve companyName from session storage
-    const storedCompanyName = sessionStorage.getItem("name");
+    const storedCompanyName = localStorage.getItem("name");
     setCompanyName(storedCompanyName);
 
     // Generate employeeId only if data is not submitted
@@ -93,7 +89,7 @@ const EmployeeRegistration = () => {
   }, [isDataSubmitted, companyName]);
 
   const generateEmployeeId = (companyName) => {
-    const seriesCounter = sessionStorage.getItem("seriesCounter") || 1;
+    const seriesCounter = localStorage.getItem("seriesCounter") || 1;
     const formattedSeriesCounter = String(seriesCounter).padStart(4, "0");
     const newEmployeeId =
       companyName.toUpperCase().substring(0, 3) + formattedSeriesCounter;
@@ -186,7 +182,7 @@ const EmployeeRegistration = () => {
     }
     // Constructing the payload
     let payload = {
-      companyName: company,
+      companyName: user.company,
       employeeType: data.employeeType,
       emailId: data.emailId,
       password: data.password,
@@ -242,6 +238,8 @@ const EmployeeRegistration = () => {
     }
   };
 
+  
+  
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
       const errorMessage = error.response.data.error.message;
@@ -251,8 +249,7 @@ const EmployeeRegistration = () => {
     }
     console.error(error.response);
   };
-
-
+  
   useEffect(() => {
     if (location && location.state && location.state.id) {
       const fetchData = async () => {
@@ -279,8 +276,7 @@ const EmployeeRegistration = () => {
       fetchData();
     }
   }, [location.state, reset, setValue]);
-
-
+  
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -655,7 +651,7 @@ const EmployeeRegistration = () => {
                         {...register("location", {
                           required: "Location Required",
                           pattern: {
-                            value: /^[a-zA-Z0-9\s,'"#&()*+./:;<=>?@[\\]^_`{|}~-]*$/,
+                            value: /^[a-zA-Z0-9\s,'#,&*()^\-/]*$/,
                             message:
                               "Invalid Location",
                           },

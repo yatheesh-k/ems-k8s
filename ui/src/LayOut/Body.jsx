@@ -18,11 +18,10 @@ const Body = () => {
         </h1>
        <div className="row h-100 w-90">
        {isAdmin ? (
-          <iframe
-            src="http://122.175.43.71:5601/s/ems/app/dashboards#/view/a937e737-55c7-4fe4-b81a-3d40a5d2f7bd?embed=true&_g=(refreshInterval:(pause:!t,value:60000),time:(from:now-15m,to:now))&_a=()"
-            height="100%" width="100%" 
-            title="EMS Dashboard"
-          ></iframe>
+        <iframe src="http://122.175.43.71:5601/s/ems/app/dashboards#/view/deba4a73-baa2-4c62-aa78-089197311bcb?_g=(refreshInterval%3A(pause%3A!t%2Cvalue%3A60000)%2Ctime%3A(from%3Anow-15m%2Cto%3Anow))&hide-filter-bar=true"
+         height="100%" width="100%" 
+        title="EMS Dashboard">
+        </iframe>
         ) : (
           <div className="text-center">Loading Dashboards...</div>
         )}

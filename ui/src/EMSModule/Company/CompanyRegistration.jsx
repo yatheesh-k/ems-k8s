@@ -537,7 +537,7 @@ const CompanyRegistration = () => {
                         {...register("companyAddress", {
                           required: "Company Address is required",
                           pattern: {
-                            value: /^[a-zA-Z0-9\s,'"#&()*+./:;<=>?@[\\]^_`{|}~-]*$/,
+                            value: /^[a-zA-Z0-9\s,'#,&*()^\-/.]*$/,
                             message:
                               "Please enter valid Address",
                           },
@@ -818,7 +818,7 @@ const CompanyRegistration = () => {
                             message: "Name must not exceed 100 characters",
                           },
                           pattern: {
-                            value: /^[a-zA-Z0-9\s,'"#&()*+./:;<=>?@[\\]^_`{|}~-]*$/,
+                            value: /^[a-zA-Z0-9\s,'#,&*()^\-/.]*$/,
                             message: "Please enter valid Address",
                           },
                         })}

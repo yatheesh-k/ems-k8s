@@ -7,7 +7,7 @@ const hostname = window.location.hostname;
 const BASE_URL = `${protocol}//${hostname}:8092/ems`;
 const Login_URL = `${protocol}//${hostname}:9090/ems`;
 
-const token = sessionStorage.getItem("token");
+const token = localStorage.getItem("token");
 
 const axiosInstance = axios.create({
     baseURL: BASE_URL,
@@ -24,8 +24,8 @@ export const loginApi = (data) => {
     .post(`${Login_URL}/emsadmin/login`, data)
     .then((response) => {
       const { token, refreshToken } = response.data.data;
-      sessionStorage.setItem("token", token);
-      sessionStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("token", token);
+      localStorage.setItem("refreshToken", refreshToken);
       return response.data;
     })
     .catch((error) => {
@@ -50,9 +50,9 @@ export const CompanyloginApi = (data) => {
     return axios.post(`${Login_URL}/company/login`, data)
         .then(response => {
           const { token, refreshToken } = response.data.data;
-          // Store the token and refresh token in sessionStorage
-          sessionStorage.setItem("token", token);
-          sessionStorage.setItem("refreshToken", refreshToken);
+          // Store the token and refresh token in localStorage
+          localStorage.setItem("token", token);
+          localStorage.setItem("refreshToken", refreshToken);
             return response.data;
         })
         .catch(error=>{
@@ -114,7 +114,7 @@ export const companyPasswordUpdateById = async (companyId) => {
 }
 
 export const DepartmentGetApi = () => {
-  const company=sessionStorage.getItem("company")
+  const company=localStorage.getItem("company")
     return axiosInstance.get(`${company}/department`);
 }
 
@@ -122,12 +122,12 @@ export const DepartmentPostApi = (data) => {
     return axiosInstance.post("/department",data);
 }
 export const DepartmentGetApiById = (departmentId) => {
-  const company=sessionStorage.getItem("company")
+  const company=localStorage.getItem("company")
     return axiosInstance.get(`${company}/department/${departmentId}`)
 }
 
 export const DepartmentDeleteApiById = (departmentId) => {
-  const company=sessionStorage.getItem("company")
+  const company=localStorage.getItem("company")
     return axiosInstance.delete(`${company}/department/${departmentId}`)
     .then(response => {
       return response.data; 
@@ -139,12 +139,12 @@ export const DepartmentDeleteApiById = (departmentId) => {
 }
 
 export const DepartmentPutApiById = (departmentId, data) => {
-  const company = sessionStorage.getItem("company");
+  const company = localStorage.getItem("company");
   return axiosInstance.patch(`${company}/department/${departmentId}`, data)
 };
 
 export const DesignationGetApi = () => {
-  const company=sessionStorage.getItem("company")
+  const company=localStorage.getItem("company")
     return axiosInstance.get(`${company}/designations`)
     .then(response => {
       return response.data.data;  
@@ -160,7 +160,7 @@ export const DesignationPostApi = (data) => {
 }
 
 export const DesignationGetApiById = (designationId) => {
-  const company=sessionStorage.getItem("company")
+  const company=localStorage.getItem("company")
     return axiosInstance.get(`${company}/designation/${designationId}`)
     .then(response => {
       return response.data; 
@@ -172,18 +172,18 @@ export const DesignationGetApiById = (designationId) => {
 }
 
 export const DesignationDeleteApiById = (designationId) => {
-  const company=sessionStorage.getItem("company")
+  const company=localStorage.getItem("company")
     return axiosInstance.delete(`${company}/designation/${designationId}`)
 }
 
 export const DesignationPutApiById = (designationId, data) => {
-  const company = sessionStorage.getItem("company");
+  const company = localStorage.getItem("company");
   return axiosInstance.patch(`${company}/designation/${designationId}`, data  )
 };
 
 
 export const EmployeeGetApi = () => {
-  const company = sessionStorage.getItem("company");
+  const company = localStorage.getItem("company");
   return axiosInstance.get(`/${company}/employee`)
     .then(response => response.data.data) // Assuming response.data.data contains your employee data
     .catch(error => {
@@ -193,12 +193,12 @@ export const EmployeeGetApi = () => {
 }
 
 export const EmployeePostApi = (data) => {
-  const company=sessionStorage.getItem("company")
+  const company=localStorage.getItem("company")
     return axiosInstance.post('/employee',data);
 }
 
 export const EmployeeGetApiById = (employeeId) => {
-  const company=sessionStorage.getItem("company")
+  const company=localStorage.getItem("company")
     return axiosInstance.get(`/${company}/employee/${employeeId}`)
     .then(response => {
       return response.data; 
@@ -210,7 +210,7 @@ export const EmployeeGetApiById = (employeeId) => {
 }
 
 export const EmployeeDeleteApiById = (employeeId) => {
-  const company=sessionStorage.getItem("company")
+  const company=localStorage.getItem("company")
     return axiosInstance.delete(`/${company}/employee/${employeeId}`)
     .then(response => {
       return response.data; 
@@ -222,8 +222,7 @@ export const EmployeeDeleteApiById = (employeeId) => {
 }
 
 export const EmployeePatchApiById = (employeeId, data) => {
-  const company = sessionStorage.getItem("company");
-  return axiosInstance.patch(`/${company}/employee/${employeeId}`, data)
+  return axiosInstance.patch(`/employee/${employeeId}`, data)
 };
 
 export const roleApi = () =>{
@@ -236,22 +235,22 @@ export const EmployeeSalaryPostApi=(employeeId,data)=>{
 }
 
 export const EmployeeSalaryGetApi=(employeeId)=>{
-  const company = sessionStorage.getItem("company")
+  const company = localStorage.getItem("company")
   return axiosInstance.get(`/${company}/employee/${employeeId}/salaries`);
 }
 
 export const EmployeeSalaryGetApiById=(employeeId,salaryId)=>{
-  const company = sessionStorage.getItem("company")
+  const company = localStorage.getItem("company")
   return axiosInstance.get(`/${company}/employee/${employeeId}/salary/${salaryId}`);
 }
 
 export const EmployeeSalaryPatchApiById=(employeeId,salaryId,data)=>{
-  const company = sessionStorage.getItem("company")
+  const company = localStorage.getItem("company")
   return axiosInstance.patch(`/employee/${employeeId}/salary/${salaryId}`,data);
 }
 
 export const EmployeeSalaryDeleteApiById=(employeeId,salaryId)=>{
-  const company = sessionStorage.getItem("company")
+  const company = localStorage.getItem("company")
   return axiosInstance.delete(`/${company}/employee/${employeeId}/salary/${salaryId}`);
 }
 
@@ -264,7 +263,7 @@ export const EmployeePayslipGeneration=(data) =>{
 }
 
 export const EmployeePayslipGetById = (employeeId, payslipId, month, year) => {
-  const company = sessionStorage.getItem("company");
+  const company = localStorage.getItem("company");
   return axiosInstance.get(`/${company}/employee/${employeeId}/payslip/${payslipId}`, {
     params: {
       month: month,
@@ -275,7 +274,7 @@ export const EmployeePayslipGetById = (employeeId, payslipId, month, year) => {
 
 
 export const EmployeePayslipsGet=(employeeId, month, year)=>{
-  const company = sessionStorage.getItem("company")
+  const company = localStorage.getItem("company")
   return axiosInstance.get(`/${company}/employee/${employeeId}/payslips`,{
     params: {
       // month: month,
@@ -285,29 +284,29 @@ export const EmployeePayslipsGet=(employeeId, month, year)=>{
 }
 
 export const EmployeePayslipDeleteById=(employeeId,payslipId)=>{
-  const company = sessionStorage.getItem("company")
+  const company = localStorage.getItem("company")
   return axiosInstance.delete(`/${company}/employee/${employeeId}/payslip/${payslipId}`);
 }
 
 export const AttendanceManagementApi=(formData)=>{
-  const company = sessionStorage.getItem("company")
+  const company = localStorage.getItem("company")
   return axiosInstance.post(`/${company}/employee/attendance`,formData);
 }
 
 export const AttendanceReportApi=(employeeId,month,year)=>{
-  const company = sessionStorage.getItem("company")
+  const company = localStorage.getItem("company")
   return axiosInstance.get(`/${company}/employee/${employeeId}/attendance`,{
     params:{month,year}
   });
 }
 
 export const AttendancePatchById=(employeeId,attendanceId,data)=>{
-  const company = sessionStorage.getItem("company")
+  const company = localStorage.getItem("company")
   return axiosInstance.patch(`/${company}/employee/${employeeId}/attendance/${attendanceId}`,data);
 }
 
 export const AttendanceDeleteById=(employeeId,attendanceId)=>{
-  const company= sessionStorage.getItem("company")
+  const company= localStorage.getItem("company")
   return axiosInstance.delete(`/${company}/employee/${employeeId}/attendance/${attendanceId}`);
 }
 export const CompanyImagePatchApi=(companyId,formData)=>{

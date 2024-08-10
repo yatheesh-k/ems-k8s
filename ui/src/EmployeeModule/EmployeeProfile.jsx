@@ -2,24 +2,18 @@ import React, { useEffect, useState } from "react";
 import LayOut from "../LayOut/LayOut";
 import { EmployeeGetApiById } from "../Utils/Axios";
 import { jwtDecode } from "jwt-decode";
+import { useAuth } from "../Context/AuthContext";
 
 const EmployeeProfile = () => {
     const [error, setError] = useState("");
     const [employeeData, setEmployeeData] = useState(false);
     const [companyData, setCompanyData] = useState({});
+    const { user} = useAuth();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const token = sessionStorage.getItem("token");
-                if (!token) {
-                    throw new Error("Token not found");
-                }
-
-                const decodedToken = jwtDecode(token);
-                const employeeId = decodedToken.sub;
-
-                const response = await EmployeeGetApiById(employeeId);
+                const response = await EmployeeGetApiById(user.userId);
                 setEmployeeData(response.data);
             } catch (error) {
                 setError(error);

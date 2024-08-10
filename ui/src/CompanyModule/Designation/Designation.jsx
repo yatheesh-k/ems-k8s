@@ -13,6 +13,7 @@ import {
   DesignationPostApi,
   DesignationPutApiById
 } from '../../Utils/Axios';
+import { useAuth } from '../../Context/AuthContext';
 
 const Designation = () => {
   const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm({mode:"onChange"});
@@ -24,8 +25,7 @@ const Designation = () => {
   const [addDesignation, setAddDesignation] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null); // State to store the ID of the item to be deleted
-  const company = sessionStorage.getItem("company");
-
+  const { user} = useAuth();
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
     setSelectedItemId(null); // Reset the selected item ID
@@ -54,7 +54,7 @@ const Designation = () => {
     setPending(true);
     try {
       const formData = {
-        companyName: company,
+        companyName: user.company,
         name: data.name
       };
       if (editingUserId) {

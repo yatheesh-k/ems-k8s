@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { loginApi } from "../Utils/Axios";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
+import { jwtDecode } from "jwt-decode";
+import { useAuth } from "../Context/AuthContext";
 
 const EmsLogin = () => {
   const {
@@ -13,8 +15,7 @@ const EmsLogin = () => {
     formState: { errors },
     reset,
   } = useForm({ defaultValues: { username: "", password: "" }, mode:"onChange" });
-
-  const { company } = useParams();
+  const { setAuthUser } = useAuth();
   const navigate = useNavigate();
   const [passwordShown, setPasswordShown] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false); // State for error modal
@@ -31,32 +32,39 @@ const EmsLogin = () => {
     }
   };
 
-  const onSubmit = (data) => {
-    const payload = {
-      ...data,
-      company: company,
-    };
-    loginApi(payload)
-      .then((response) => {
-        console.log(response.data);
-        toast.success("Login Successful");
-        navigate("/main");
-      })
-      .catch((error) => {
-        console.error("Login failed:", error);
-        if (error.response && error.response.data && error.response.data.error) {
-          // Extract error message from response
-          const errorMessage = error.response.data.error.message;
-          // Update error message state and show error modal
-          setErrorMessage(errorMessage);
-          setShowErrorModal(true);
-        } else {
-          // Default error message
-          setErrorMessage("Login failed. Please try again later.");
+  const onSubmit = async (data) => {
+    try {
+      const response = await loginApi(data);
+      console.log("API response:", response); // Log the entire response to verify structure
+      console.log("responseToken",response.data.token)
+      const token = response.data?.token;
+      console.log("token:",token);
+      if (token) {
+        try {
+          const decodedToken = jwtDecode(token);
+          const { sub: userId, roles: userRole, company, employeeId } = decodedToken;
+          console.log("Decoded Token:", decodedToken); // Log decoded token for inspection
+          setAuthUser({ userId, userRole, company, employeeId });
+          toast.success("Company Login Successfully");
+          navigate("/main");
+        } catch (decodeError) {
+          console.error("Token decoding failed:", decodeError);
+          setErrorMessage("Failed to decode token. Ensure token is valid.");
           setShowErrorModal(true);
         }
-      });
+      } else {
+        console.error('Token not found in response');
+        setErrorMessage("Unexpected response format. Token not found.");
+        setShowErrorModal(true);
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      const errorMsg = error.response?.data?.error?.message || "Login failed. Please try again later.";
+      setErrorMessage(errorMsg);
+      setShowErrorModal(true);
+    }
   };
+  
 
   const closeModal = () => {
     setShowErrorModal(false);

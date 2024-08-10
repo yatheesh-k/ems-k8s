@@ -11,7 +11,7 @@ const Header = ({ toggleSidebar }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [roles, setRoles] = useState([]);
-  const { authData, isInitialized } = useAuth();
+  const { user} = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
@@ -23,13 +23,13 @@ const Header = ({ toggleSidebar }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isInitialized || !authData) return;
+    if (!user) return;
 
     const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await EmployeeGetApiById(authData.userId);
+        const response = await EmployeeGetApiById(user.userId);
         const { firstName, lastName } = response.data;
         setFirstName(firstName);
         setLastName(lastName);
@@ -41,9 +41,9 @@ const Header = ({ toggleSidebar }) => {
     };
 
     fetchData();
-  }, [authData, isInitialized]);
+  }, [user]);
 
-  const token = sessionStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     if (token) {
@@ -93,7 +93,7 @@ const Header = ({ toggleSidebar }) => {
   }, []);
 
   const handleLogOut = () => {
-    sessionStorage.clear();
+    localStorage.clear();
     navigate("/");
   };
 

@@ -7,11 +7,12 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { CompanyImagePatchApi, companyUpdateByIdApi, companyViewByIdApi, EmployeeGetApiById } from "../Utils/Axios";
 import { userId } from "../Utils/Auth";
+import { useAuth } from "../Context/AuthContext";
 
 function Profile() {
   const { register, handleSubmit, setValue, formState: { errors } } = useForm({ mode: "onChange" });
-
-  const [companyId, setCompanyId] = useState(null);
+  const {user}=useAuth();
+  //const [companyId, setCompanyId] = useState(null);
   const [companyData, setCompanyData] = useState({});
   const [postImage, setPostImage] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -27,9 +28,9 @@ function Profile() {
 
   useEffect(() => {
     const fetchCompanyData = async () => {
-      if (!companyId) return;
+      if (!user.companyId) return;
       try {
-        const response = await companyViewByIdApi(companyId);
+        const response = await companyViewByIdApi(user.companyId);
         const data = response.data;
         setCompanyData(data);
         setValue("companyName", data.companyName);
@@ -52,25 +53,12 @@ function Profile() {
     };
 
     fetchCompanyData();
-  }, [setValue, companyId]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await EmployeeGetApiById(userId);
-        const companyId = response.data.companyId;
-        setCompanyId(companyId);
-      } catch (error) {
-        setError(error);
-      }
-    };
-    fetchData();
-  }, []);
+  }, [setValue, user.companyId]);
 
   const handleDetailsSubmit = async (data) => {
-    if (!companyId) return;
+    if (!user.companyId) return;
     try {
-      await companyUpdateByIdApi(companyId, data);
+      await companyUpdateByIdApi(user.companyId, data);
       setSuccessMessage("Profile Updated Successfully.");
       toast.success("Company Details Updated Successfully");
       setErrorMessage("");
@@ -144,13 +132,13 @@ function Profile() {
 };
 
 const handleLogoSubmit = async () => {
-  if (!companyId) return;
+  if (!user.companyId) return;
   try {
     if (postImage) {
       const formData = new FormData();
       formData.append("image", "string");
       formData.append("file", postImage);
-      await CompanyImagePatchApi(companyId, formData);
+      await CompanyImagePatchApi(user.companyId, formData);
       setPostImage("");
       setSuccessMessage("Logo updated successfully.");
       toast.success("Company Logo Updated Successfully");

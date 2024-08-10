@@ -7,6 +7,7 @@ import LayOut from '../../LayOut/LayOut';
 import DeletePopup from '../../Utils/DeletePopup';
 import { ModalBody, ModalHeader, ModalTitle } from 'react-bootstrap';
 import { DepartmentDeleteApiById, DepartmentGetApi, DepartmentPostApi, DepartmentPutApiById } from '../../Utils/Axios';
+import { useAuth } from '../../Context/AuthContext';
 
 const Department = () => {
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm({mode:"onChange"});
@@ -18,7 +19,7 @@ const Department = () => {
   const [search, setSearch] = useState('');
   const [filteredDepartments, setFilteredDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
-  const company = sessionStorage.getItem("company");
+  const { user} = useAuth();
 
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
@@ -45,7 +46,7 @@ const Department = () => {
     setLoading(true);
     try {
       const formData = {
-        companyName: company,
+        companyName: user.company,
         name: data.name,
       };
 

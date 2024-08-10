@@ -7,6 +7,7 @@ import { CurrencyRupee, QuestionCircle } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Controller, useForm } from "react-hook-form";
+import { useAuth } from "../../Context/AuthContext";
 
 const EmployeeSalaryStructure = () => {
   const {
@@ -16,6 +17,7 @@ const EmployeeSalaryStructure = () => {
     control,
     formState: { errors },
   } = useForm({ mode: 'onChange' });
+  const { user} = useAuth();
   const [employes, setEmployes] = useState([]);
   const [grossAmount, setGrossAmount] = useState(0);
   const [hra, setHra] = useState(0);
@@ -181,7 +183,7 @@ const EmployeeSalaryStructure = () => {
     setTotalAmount(netSalary.toFixed(2));
   }, [pfEmployee, pfEmployer, incomeTax, pfTax, totalEarnings]);
 
-  const companyName = sessionStorage.getItem("company");
+  const companyName = user.company;
 
   const onSubmit = (data) => {
     if (

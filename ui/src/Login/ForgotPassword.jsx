@@ -14,7 +14,7 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const watchPassword = watch('password', '');
   const navigate = useNavigate();
-  const company = sessionStorage.getItem("company");
+  const company = localStorage.getItem("company");
 
   const onSubmitEmail = async (data) => {
     setLoading(true);

@@ -1,33 +1,13 @@
-import { jwtDecode } from "jwt-decode";
 import React, { useEffect, useState } from "react";
-import {
-  Receipt,
-  Speedometer2,
-} from "react-bootstrap-icons";
 import { Link, useLocation } from "react-router-dom";
-import { CompanyImageGetApi, EmployeeGetApiById } from "../Utils/Axios";
-import { toast } from "react-toastify";
 import { useAuth } from "../Context/AuthContext";
 
 const SideNav = () => {
-  const { authData, isInitialized } = useAuth();
   const [isPayrollOpen, setIsPayrollOpen] = useState(false); // State for managing PayRoll dropdown
   const [isAttendanceOpen, setIsAttendanceOpen] = useState(false); // State for managing Attendance dropdown
   const [isCompanyOpen, setIsCompanyOpen] = useState(false); // State for managing Company dropdown
-  const [roles, setRoles] = useState([]);
-  const [logoFileName, setLogoFileName] = useState(null);
-  const [id, setId] = useState([]);
   const location = useLocation();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const token = sessionStorage.getItem("token");
-
-  useEffect(() => {
-    if (token) {
-      const decodedToken = jwtDecode(token);
-      setRoles(decodedToken.roles || []);
-    }
-  }, [token]);
+  const { user={}, logoFileName, loading} = useAuth();
 
   useEffect(() => {
     if (
@@ -206,9 +186,9 @@ const SideNav = () => {
     setIsPayrollOpen(false);
   };
 
-  if (!isInitialized) {
-    return <div>Loading context...</div>; // Show a loading message or spinner until context is initialized
-  }
+  // if (!isInitialized) {
+  //   return <div>Loading context...</div>; // Show a loading message or spinner until context is initialized
+  // }
 
   const emsAdminLogoPath = "assets/img/pathbreaker_logo.png";
 
@@ -225,7 +205,7 @@ const SideNav = () => {
             />
           ) : (
             <span>
-              {roles.includes("ems_admin") ? (
+              {user && user.userRole && user.userRole.includes("ems_admin") ? (
                 <imgx
                   className="align-middle"
                   src={emsAdminLogoPath}
@@ -246,7 +226,7 @@ const SideNav = () => {
           )}
         </a>
         <ul className="sidebar-nav mt-2">
-          {roles.includes("ems_admin") && (
+          {user && user.userRole && user.userRole.includes("ems_admin") && (
             <>
               <li
                 className={`sidebar-item ${location.pathname === "/main" ? "active" : ""
@@ -313,7 +293,7 @@ const SideNav = () => {
               </li>
             </>
           )}
-          {roles.includes("company_admin") && (
+          {user && user.userRole && user.userRole.includes("company_admin") && (
             <>
               <li
                 className={`sidebar-item ${location.pathname === "/main" ? "active" : ""
@@ -665,7 +645,7 @@ const SideNav = () => {
             </>
           )} */}
 
-          {(roles.includes("Employee") || roles.includes("HR") || roles.includes("Manager") || roles.includes("Accountant")) && (
+          {(user && user.userRole && user.userRole.includes("Employee") || user && user.userRole && user.userRole.includes("HR") || user && user.userRole && user.userRole.includes("Manager") || user && user.userRole && user.userRole.includes("Accountant")) && (
             <>
               <li
                 className={`sidebar-item ${location.pathname === "/main" ? "active" : ""

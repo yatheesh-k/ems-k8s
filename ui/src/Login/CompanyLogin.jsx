@@ -2,14 +2,12 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  EnvelopeFill,
-  LockFill,
-  UnlockFill,
-} from "react-bootstrap-icons";
+import { EnvelopeFill, LockFill, UnlockFill } from "react-bootstrap-icons";
 import { Bounce, toast } from "react-toastify";
 import { CompanyloginApi, ValidateOtp } from "../Utils/Axios";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
+import { jwtDecode } from "jwt-decode";
+import { useAuth } from "../Context/AuthContext";
 
 const CompanyLogin = () => {
   const {
@@ -29,25 +27,25 @@ const CompanyLogin = () => {
 
   const validateEmail = (value) => {
     if (/[^a-zA-Z0-9@._-]{3,}/.test(value)) {
-      return "Please enter a valid Email Id .";
+      return "Please enter a valid Email Id.";
     }
     return true;
   };
 
-  const { company } = useParams();
+  const { setAuthUser } = useAuth();
+    const { company } = useParams();
   const navigate = useNavigate();
   const [passwordShown, setPasswordShown] = useState(false);
-  const [otpSent, setOtpSent] = useState(false); // Initially set to false
+  const [otpSent, setOtpSent] = useState(false); 
   const [loading, setLoading] = useState(false);
-  const [ShowOtpField, setShowOtpField] = useState("");
+  const [showOtpField, setShowOtpField] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [otpTimeLimit, setOtpTimeLimit] = useState(56); // Time limit for OTP in seconds
-  const [otpExpired, setOtpExpired] = useState(false); // State for OTP expiration
-  const [sessionTimeout, setSessionTimeout] = useState(false); // State for session timeout
+  const [otpTimeLimit, setOtpTimeLimit] = useState(56); 
+  const [otpExpired, setOtpExpired] = useState(false); 
 
   useEffect(() => {
-    sessionStorage.setItem("company", company);
+    localStorage.setItem("company", company);
   }, [company]);
 
   useEffect(() => {
@@ -63,36 +61,54 @@ const CompanyLogin = () => {
   }, [otpTimeLimit]);
 
   const sendOtp = (data) => {
-    setLoading(true);
     const payload = {
       username: data.username,
       password: data.password,
       company: company,
     };
-
+  
+    setLoading(true);
     CompanyloginApi(payload)
       .then((response) => {
-        console.log(response.data);
-        toast.success("OTP Sent Successfully");
+        
+        // Ensure you're accessing the token from the correct part of the response
+        const token = response.data?.token;
+  
+        if (token) {
+          localStorage.setItem("token", token);
+          const decodedToken = jwtDecode(token);
+  
+          // Adjust the fields based on your token structure
+          const { sub: userId, roles: userRole, company, employeeId } = decodedToken;
+           console.log(userId)
+          setAuthUser({ userId, userRole, company, employeeId });
+          toast.success("OTP Sent Successfully"); 
+          setOtpSent(true);
+          setOtpExpired(false);
+          setOtpTimeLimit(56); 
+          setShowOtpField(true); // Show OTP field
+        } else {
+          console.error('Token not found in response');
+          setErrorMessage("Unexpected response format. Token not found.");
+          setShowErrorModal(true);
+        }
         setLoading(false);
-        setOtpSent(true);
-        setOtpExpired(false); // Reset OTP expiration state
-        setSessionTimeout(false); // Reset session timeout state
-        setOtpTimeLimit(55); // Reset timer for each OTP request
       })
       .catch((error) => {
-        console.error("Failed to send OTP:", error);
+        console.error('sendOtp error:', error); // Log error
         setLoading(false);
+  
         if (error.response && error.response.data && error.response.data.error) {
           const errorMessage = error.response.data.error.message;
           setErrorMessage(errorMessage);
-          setShowErrorModal(true);
         } else {
-          setErrorMessage("Failed to send OTP. Please try again.");
-          setShowErrorModal(true);
+          setErrorMessage("Login failed. Please try again later.");
         }
+        setShowErrorModal(true);
       });
   };
+  
+  
 
   const verifyOtpAndCompanyLogin = (data) => {
     const payload = {
@@ -104,25 +120,17 @@ const CompanyLogin = () => {
     ValidateOtp(payload)
       .then((response) => {
         setLoading(false);
-        if (response.status === 200) {
-          toast.success("Login Successful", {
-            position: "top-right",
-            transition: Bounce,
-            hideProgressBar: true,
-            theme: "colored",
-            autoClose: 2000,
-          });
+        toast.success("Company Login Successful", {
+          position: "top-right",
+          transition: Bounce,
+          hideProgressBar: true,
+          theme: "colored",
+          autoClose: 2000,
+        });
+        setTimeout(() => {
+          navigate("/main");
+        }, 2000);
 
-          if (response.data.imageFile) {
-            sessionStorage.setItem("imageFile", response.data.imageFile);
-          } else {
-            console.error("imageFile is undefined");
-          }
-          setTimeout(() => {
-            
-            navigate("/main", { state: { username: data.username } });
-          }, 3000);
-        }
       })
       .catch((error) => {
         setLoading(false);
@@ -134,7 +142,6 @@ const CompanyLogin = () => {
           setErrorMessage("Login failed. Please try again later.");
           setShowErrorModal(true);
         }
-        // Check if error indicates OTP expired
         if (otpTimeLimit <= 0) {
           setOtpExpired(true);
           setErrorMessage("OTP Expired. Please Login Again");
@@ -152,10 +159,6 @@ const CompanyLogin = () => {
     setPasswordShown(!passwordShown);
   };
 
-  const handlePasswordChange = (e) => {
-    setPasswordShown(e.target.value);
-  };
-
   const handleEmailChange = (e) => {
     if (e.keyCode === 32) {
       e.preventDefault();
@@ -163,12 +166,6 @@ const CompanyLogin = () => {
   };
 
   const onSubmit = (data) => {
-    if (sessionTimeout) {
-      reset(); // Reset form fields
-      setSessionTimeout(false); // Reset session timeout state
-      setShowOtpField(false); // Reset OTP field visibility
-    }
-
     if (otpSent && !otpExpired) {
       verifyOtpAndCompanyLogin(data);
     } else {
@@ -224,7 +221,7 @@ const CompanyLogin = () => {
                           )}
                         </>
                         <div className="mt-3">
-                          {(!otpSent || otpExpired) &&(
+                          {!otpSent && (
                             <>
                               <label className="form-label">Password</label>
                               <div className="input-group">
@@ -240,7 +237,7 @@ const CompanyLogin = () => {
                                   name="password"
                                   id="password"
                                   placeholder="Enter Your Password"
-                                  onChange={handlePasswordChange}
+                                //  onChange={handlePasswordChange}
                                   type={passwordShown ? "text" : "password"}
                                   {...register("password", {
                                     required: "Password is Required",
@@ -269,16 +266,9 @@ const CompanyLogin = () => {
                             <div>
                               <label className="form-label">OTP</label>
                               <div className="mb-3 input-group">
-                                <span className="input-group-text" onClick={togglePasswordVisibility}>
-                                  {passwordShown ? (
-                                    <UnlockFill size={20} color="#4C489D" />
-                                  ) : (
-                                    <LockFill size={20} color="#4C489D" />
-                                  )}
-                                </span>
                                 <input
                                   className="form-control"
-                                  type={passwordShown ? "text" : "password"}
+                                  type="text"
                                   name="otp"
                                   id="otp"
                                   placeholder="Enter Your OTP"
@@ -297,9 +287,8 @@ const CompanyLogin = () => {
                               )}
                             </div>
                           )}
-                         {otpExpired && <div className="text-center"><p className="errorMsg">OTP Expired. Please login again.</p></div>}
+                          {otpExpired && <div className="text-center"><p className="errorMsg">OTP Expired. Please login again.</p></div>}
                         </div>
-
                         <div className="text-center mt-4" style={{ paddingTop: "10px" }}>
                           <button
                             type="submit"
@@ -314,16 +303,13 @@ const CompanyLogin = () => {
                           </button>
                         </div>
                       </form>
-                     
                     </div>
                   </div>
                 </div>
                 <div className="row">
-                  {/* Social media links */}
                   <div className="text-center text-small mt-1">
                     <span>
-                      Copyright &copy;2024 PATHBREAKER TECHNOLOGIES PVT.LTD. All
-                      Rights Reserved{" "}
+                      Copyright &copy;2024 PATHBREAKER TECHNOLOGIES PVT.LTD. All Rights Reserved
                     </span>
                   </div>
                 </div>
@@ -332,7 +318,6 @@ const CompanyLogin = () => {
           </div>
         </div>
       </main>
-      {/* Error modal */}
       <Modal
         show={showErrorModal}
         onHide={closeModal}
@@ -345,7 +330,6 @@ const CompanyLogin = () => {
         </ModalHeader>
         <ModalBody className="text-center fs-bold">
           {errorMessage}
-          {otpExpired && <p>OTP Expired. Please login again.</p>}
         </ModalBody>
       </Modal>
     </div>

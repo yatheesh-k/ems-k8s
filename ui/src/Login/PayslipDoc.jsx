@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { CompanyImageGetApi, companyViewByIdApi, EmployeeGetApiById, EmployeePayslipGetById } from "../Utils/Axios"; // Ensure these functions are correctly defined in your Utils/Axios file
-import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
 import LayOut from "../LayOut/LayOut";
 import { userId } from "../Utils/Auth";
 
 const PayslipDoc = () => {
   const [companyData, setCompanyData] = useState([]);
-  const [companyLogo, setCompanyLogo] = useState("");
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const employeeId = queryParams.get("employeeId");
@@ -16,8 +14,6 @@ const PayslipDoc = () => {
   const { employeeDetails } = location.state || {};
   const [payslipData, setPayslipData] = useState(null);
   const [logoFileName, setLogoFileName] = useState([]);
-  const [id, setId] = useState('');
-  const token = sessionStorage.getItem("token");
 
 
   const fetchCompanyLogo = async (companyId) => {
@@ -66,20 +62,6 @@ const PayslipDoc = () => {
     fetchData();
   }, [userId]);
 
-
-  // useEffect(() => {
-  //   if (token) {
-  //     const decodedToken = jwtDecode(token);
-  //     const userId = decodedToken.sub || null;
-  //     setId(userId);
-
-  //     // Call functions with id
-  //     if (userId) {
-  //       fetchCompanyLogo(userId);
-  //       fetchCompanyData(userId);
-  //     }
-  //   }
-  // }, [token]);
 
   useEffect(() => {
     const fetchPayslipData = async () => {

@@ -1,5 +1,5 @@
-import React from 'react'
-import { Route, Routes } from 'react-router';
+import React, { useEffect } from 'react';
+import { Route, Routes, useLocation } from 'react-router';
 import EmsLogin from '../Login/EmsLogin';
 import CompanyLogin from '../Login/CompanyLogin';
 import CompanyRegistration from '../EMSModule/Company/CompanyRegistration';
@@ -31,12 +31,71 @@ import Profile from '../LayOut/Profile';
 import PaySlipDoc from '../Login/PayslipDoc';
 import EmployeeSalaryById from '../EmployeeModule/EmployeeSalaryById';
 import Reset from '../LayOut/Reset';
+
 import ForgotPassword from '../Login/ForgotPassword'
 import EmployeeProfile from '../EmployeeModule/EmployeeProfile';
 
 
-
 const Rout = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const currentPage = location.pathname + location.search;
+    const token = sessionStorage.getItem('token');
+
+    // Store currentPage in sessionStorage
+    sessionStorage.setItem('currentPage', currentPage);
+
+    // Optionally, if you want to store the token (e.g., on login)
+    if (token) {
+      sessionStorage.setItem('token', token);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    function handleStorageChange(event) {
+      if (event.key === 'currentPage' || event.key === 'token') {
+        const newPage = sessionStorage.getItem('currentPage');
+        const token = sessionStorage.getItem('token');
+
+        if (newPage && token) {
+          const currentUrl = window.location.pathname + window.location.search;
+          if (currentUrl !== newPage) {
+            // Attach token to the URL or handle it as needed
+            window.location.href = `${newPage}?token=${token}`;
+          }
+        }
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    const initialPage = sessionStorage.getItem('currentPage');
+    const token = sessionStorage.getItem('token');
+
+    if (initialPage && token) {
+      const currentUrl = window.location.pathname + window.location.search;
+      if (currentUrl !== initialPage) {
+        // Attach token to the URL or handle it as needed
+        window.location.href = `${initialPage}?token=${token}`;
+      }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    // Clear sessionStorage on logout
+    sessionStorage.clear();
+
+    // Optionally redirect the user to the login page or another route
+    window.location.href = '/login';
+  };
+
   return (
     <Routes>
       <Route path='/' element={<Message />}></Route>
@@ -63,21 +122,18 @@ const Rout = () => {
       <Route path='/increment' element={<AddIncrement />}></Route>
       <Route path='/incrementList' element={<ViewIncrement />}></Route>
       <Route path='/payslip' element={<PaySlipDoc/>}></Route>
-      {/* </Route> */}
-      {/* <Route path='/attendance'> */}
       <Route path='/addAttendance' element={<ManageAttendance />}></Route>
       <Route path='/attendanceList' element={<AttendanceList />}></Route>
       <Route path='/attendanceReport' element={<AttendanceReport />}></Route>
-      {/* </Route> */}
       <Route path='/employeePayslip' element={<EmployeePayslips />}></Route>
-      <Route path= '/employeeSalary' element={<EmployeeSalaryById/>}></Route>
+      <Route path='/employeeSalary' element={<EmployeeSalaryById/>}></Route>
       <Route path='/offerLetter' element={<OfferLetter />}></Route>
       <Route path='/payslipLetter' element={<PaySlipLetter />}></Route>
       <Route path='/hikeLetter' element={<HikeLetter />}></Route>
       <Route path='/existingEmployee' element={<ExistingLetter />}></Route>
       <Route path='/forgotPassword' element={<ForgotPassword/>}></Route>
     </Routes>
-  )
-}
+  );
+};
 
-export default Rout
+export default Rout;

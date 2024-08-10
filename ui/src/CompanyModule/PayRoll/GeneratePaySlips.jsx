@@ -7,6 +7,7 @@ import DataTable from "react-data-table-component";
 import LayOut from "../../LayOut/LayOut";
 import { EmployeePayslipGeneration } from "../../Utils/Axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../Context/AuthContext";
 
 const GeneratePaySlip = () => {
   const {
@@ -14,6 +15,7 @@ const GeneratePaySlip = () => {
     control,
     formState: { errors },
   } = useForm();
+  const { user} = useAuth();
   const [view, setView] = useState([]);
   const [show, setShow] = useState(false);
   const [selectedMonthYear, setSelectedMonthYear] = useState("");
@@ -35,7 +37,6 @@ const GeneratePaySlip = () => {
     }),
   }));
 
-  const company = sessionStorage.getItem("company");
 
   const onSubmit = (data) => {
     const { month, year } = data;
@@ -44,7 +45,7 @@ const GeneratePaySlip = () => {
     const capitalizedMonth = month.label.charAt(0).toUpperCase() + month.label.slice(1);
 
     const payload = {
-      companyName: company,
+      companyName: user.company,
       month: capitalizedMonth, // Use the capitalized month
       year: year.label,
     };

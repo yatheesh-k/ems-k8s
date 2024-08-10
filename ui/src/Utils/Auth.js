@@ -1,8 +1,8 @@
 // authUtils.js
 import { jwtDecode } from 'jwt-decode';
 
-// Check if token exists in sessionStorage
-const token = sessionStorage.getItem('token');
+// Check if token exists in localStorage
+const token = localStorage.getItem('token');
 
 // Decode the token using jwt-decode
 const decodedToken = token ? jwtDecode(token) : null;
