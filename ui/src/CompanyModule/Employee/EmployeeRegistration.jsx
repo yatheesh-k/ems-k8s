@@ -77,7 +77,7 @@ const EmployeeRegistration = () => {
 
   const status = [
     { value: "Active", label: "Active" },
-    { value: "Inactive", label: "Inactive" },
+    { value: "InActive", label: "InActive" },
   ];
 
   useEffect(() => {
@@ -107,7 +107,7 @@ const EmployeeRegistration = () => {
       const data = await DepartmentGetApi();
       setDepartments(data.data.data);
     } catch (error) {
-      handleApiErrors(error)
+      // handleApiErrors(error)
     } finally {
       setLoading(false);
     }
@@ -118,7 +118,7 @@ const EmployeeRegistration = () => {
       const data = await DesignationGetApi();
       setDesignations(data);
     } catch (error) {
-      handleApiErrors(error)
+      // handleApiErrors(error)
     } finally {
       setLoading(false);
     }
@@ -655,9 +655,9 @@ const EmployeeRegistration = () => {
                         {...register("location", {
                           required: "Location Required",
                           pattern: {
-                            value: /^[a-zA-Z0-9\s,'#,&*()^\-/]*$/,
+                            value: /^[a-zA-Z0-9\s,'"#&()*+./:;<=>?@[\\]^_`{|}~-]*$/,
                             message:
-                              "Do not allow '!,@,$,%' special characters",
+                              "Invalid Location",
                           },
                           minLength: {
                             value: 3,
@@ -765,11 +765,11 @@ const EmployeeRegistration = () => {
                             {...field}
                             options={[
                               { value: "Active", label: "Active" },
-                              { value: "Inactive", label: "Inactive" },
+                              { value: "InActive", label: "InActive" },
                             ]}
                             value={
                               field.value
-                                ? { value: field.value, label: ["Active", "Inactive"].find(option => option === field.value) }
+                                ? { value: field.value, label: ["Active", "InActive"].find(option => option === field.value) }
                                 : null
                             }
                             onChange={(val) => field.onChange(val.value)}

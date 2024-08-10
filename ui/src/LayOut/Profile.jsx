@@ -143,26 +143,27 @@ function Profile() {
     input.value = value;
 };
 
-  const handleLogoSubmit = async () => {
-    if (!companyId) return;
-    try {
-      if (postImage) {
-        const formData = new FormData();
-        formData.append("file", postImage);
-        await CompanyImagePatchApi(companyId, formData);
-        setPostImage("");
-        setSuccessMessage("Logo updated successfully.");
-        toast.success("Company Logo Updated Successfully");
-        setErrorMessage("");
-        closeModal();
-      }
-    } catch (err) {
-      console.error("Logo update error:", err);
-      setSuccessMessage("");
-      setErrorMessage("Failed To Update Logo.");
-      setError(err);
+const handleLogoSubmit = async () => {
+  if (!companyId) return;
+  try {
+    if (postImage) {
+      const formData = new FormData();
+      formData.append("image", "string");
+      formData.append("file", postImage);
+      await CompanyImagePatchApi(companyId, formData);
+      setPostImage("");
+      setSuccessMessage("Logo updated successfully.");
+      toast.success("Company Logo Updated Successfully");
+      setErrorMessage("");
+      closeModal();
     }
-  };
+  } catch (err) {
+    console.error("Logo update error:", err);
+    setSuccessMessage("");
+    setErrorMessage("Failed to update logo.");
+    setError(err);
+  }
+};
 
   const handleEmailChange = (e) => {
     const value = e.target.value;

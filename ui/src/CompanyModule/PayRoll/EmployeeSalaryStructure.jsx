@@ -658,11 +658,11 @@ const EmployeeSalaryStructure = () => {
                                 {...field}
                                 options={[
                                   { value: "Active", label: "Active" },
-                                  { value: "Inactive", label: "Inactive" },
+                                  { value: "InActive", label: "InActive" },
                                 ]}
                                 value={
                                   field.value
-                                    ? { value: field.value, label: ["Active", "Inactive"].find(option => option === field.value) }
+                                    ? { value: field.value, label: ["Active", "InActive"].find(option => option === field.value) }
                                     : null
                                 }
                                 onChange={(val) => field.onChange(val.value)}
