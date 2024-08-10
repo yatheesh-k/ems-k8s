@@ -53,10 +53,7 @@ const ManageAttendance = () => {
       "First Name",
       "Last Name",
       "EmailId",
-      "Month",
-      "Year",
       "No of Working Days",
-      "Total Working Days",
     ];
     const data = [headers];
 

@@ -39,7 +39,7 @@ const EmsLogin = () => {
     loginApi(payload)
       .then((response) => {
         console.log(response.data);
-        toast.success("Login successful!");
+        toast.success("Login Successful");
         navigate("/main");
       })
       .catch((error) => {
@@ -68,7 +68,7 @@ const EmsLogin = () => {
       <div className="form_wrapper">
         <div className="form_container">
           <div className="title_container">
-            <h2>Sign in</h2>
+            <h2>Login</h2>
           </div>
           <div className="row clearfix">
             <div className>
@@ -126,7 +126,7 @@ const EmsLogin = () => {
                 </div>
 
                 <button className="button" type="submit">
-                  Log in
+                  Login
                 </button>
               </form>
             </div>

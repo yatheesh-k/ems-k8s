@@ -71,14 +71,14 @@ function Profile() {
     if (!companyId) return;
     try {
       await companyUpdateByIdApi(companyId, data);
-      setSuccessMessage("Profile updated successfully.");
+      setSuccessMessage("Profile Updated Successfully.");
       toast.success("Company Details Updated Successfully");
       setErrorMessage("");
       navigate("/main");
     } catch (err) {
       console.error("Details update error:", err);
       setSuccessMessage("");
-      setErrorMessage("Failed to update profile details.");
+      setErrorMessage("Failed To Update Profile Details.");
       setError(err);
     }
   };
@@ -159,7 +159,7 @@ function Profile() {
     } catch (err) {
       console.error("Logo update error:", err);
       setSuccessMessage("");
-      setErrorMessage("Failed to update logo.");
+      setErrorMessage("Failed To Update Logo.");
       setError(err);
     }
   };

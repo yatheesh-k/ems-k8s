@@ -52,14 +52,14 @@ const Department = () => {
       if (editingId) {
         await DepartmentPutApiById(editingId, formData);
         setTimeout(() => {
-          toast.success('Department updated successfully');
+          toast.success('Department Updated Successfully');
           fetchDepartments(); // Fetch updated list of departments after delay
           setAddDeparment(false);
         }, 1000);
       } else {
         await DepartmentPostApi(formData);
         setTimeout(() => {
-          toast.success('Department created successfully');
+          toast.success('Department Created Successfully');
           fetchDepartments();
           setAddDeparment(false);
         }, 1000);

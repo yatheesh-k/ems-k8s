@@ -19,7 +19,7 @@ const GeneratePaySlip = () => {
   const [selectedMonthYear, setSelectedMonthYear] = useState("");
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
   // Year and Month options for Select components
   const currentYear = new Date().getFullYear();
@@ -39,33 +39,33 @@ const GeneratePaySlip = () => {
 
   const onSubmit = (data) => {
     const { month, year } = data;
-  
+
     // Capitalize the first letter of the month label
     const capitalizedMonth = month.label.charAt(0).toUpperCase() + month.label.slice(1);
-  
+
     const payload = {
       companyName: company,
       month: capitalizedMonth, // Use the capitalized month
       year: year.label,
     };
-  
+
     EmployeePayslipGeneration(payload)
       .then((response) => {
-        toast.success("PaySlip Generated Successfully", {
+        toast.success("PaySlips Generated Successfully", {
           position: "top-right",
           transition: Bounce,
           hideProgressBar: true,
           theme: "colored",
           autoClose: 3000,
         });
-  
+
         setView(response.data); // Update view state with fetched data
         setSelectedMonthYear(`${capitalizedMonth} ${year.label}`); // Update selected month-year
         setShow(true); // Show the DataTable component
         navigate('/payslipsList'); // Navigate to payslips list page
       })
       .catch((error) => {
-      handleApiErrors(error);
+        handleApiErrors(error);
       });
   };
   const handleApiErrors = (error) => {
@@ -97,7 +97,7 @@ const GeneratePaySlip = () => {
 
   const handleGeneratePaySlips = async () => {
     const promises = selectedEmployees.map((employeeId) =>
-      EmployeePayslipGeneration ({
+      EmployeePayslipGeneration({
         month: selectedMonthYear.split(" ")[0],
         year: selectedMonthYear.split(" ")[1],
         employeeId: employeeId,
@@ -184,10 +184,10 @@ const GeneratePaySlip = () => {
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3">
-          <strong>Generate Payslips</strong>
-        </h1>
-        </div>
-        <div className="col-auto" style={{ paddingBottom: '20px' }}>
+              <strong>Generate Payslips</strong>
+            </h1>
+          </div>
+          <div className="col-auto" style={{ paddingBottom: '20px' }}>
             <nav aria-label="breadcrumb">
               <ol className="breadcrumb mb-0">
                 <li className="breadcrumb-item">

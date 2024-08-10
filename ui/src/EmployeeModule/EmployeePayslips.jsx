@@ -18,10 +18,10 @@ const EmployeePayslips = () => {
   const [selectedPayslipId, setSelectedPayslipId] = useState("");
   const [refreshData, setRefreshData] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState('');
-  const [selectedYear, setSelectedYear] = useState(''); 
+  const [selectedYear, setSelectedYear] = useState('');
 
   const navigate = useNavigate();
-  console.log("userId:",userId);
+  console.log("userId:", userId);
   const id = userId;
   console.log(id);
 
@@ -50,20 +50,20 @@ const EmployeePayslips = () => {
         setEmployeeDetails({});
         setEmployeeSalaryView([]);
 
-  const currentYear = new Date().getFullYear();
-  const startYear = 2000;
-  const years = Array.from(
-    { length: currentYear - startYear + 1 },
-    (_, index) => ({
-      value: (startYear + index).toString(), 
-      label: (startYear + index).toString(), 
-    })
-  ).reverse();  
-  const months = Array.from({ length: 12 }, (_, index) => ({
-    value: { value: (index + 1).toString().padStart(2, "0"), label: new Date(2000, index, 1).toLocaleString("default", { month: "long" }) },
-    label: new Date(2000, index, 1).toLocaleString("default", { month: "long" }),
-  }));
-  
+        const currentYear = new Date().getFullYear();
+        const startYear = 2000;
+        const years = Array.from(
+          { length: currentYear - startYear + 1 },
+          (_, index) => ({
+            value: (startYear + index).toString(),
+            label: (startYear + index).toString(),
+          })
+        ).reverse();
+        const months = Array.from({ length: 12 }, (_, index) => ({
+          value: { value: (index + 1).toString().padStart(2, "0"), label: new Date(2000, index, 1).toLocaleString("default", { month: "long" }) },
+          label: new Date(2000, index, 1).toLocaleString("default", { month: "long" }),
+        }));
+
 
       }
     };
@@ -75,7 +75,7 @@ const EmployeePayslips = () => {
     setShowFields(true); // Display payslip details
     setRefreshData(prev => !prev); // Trigger fetchData with updated selectedYear and selectedMonth
   };
-  
+
 
   const handleViewSalary = (employeeId, payslipId) => {
     navigate(`/payslip?employeeId=${employeeId}&payslipId=${payslipId}`, {
@@ -190,10 +190,10 @@ const EmployeePayslips = () => {
   const years = Array.from(
     { length: currentYear - startYear + 1 },
     (_, index) => ({
-      value: (startYear + index).toString(), 
-      label: (startYear + index).toString(), 
+      value: (startYear + index).toString(),
+      label: (startYear + index).toString(),
     })
-  ).reverse();  
+  ).reverse();
   const months = Array.from({ length: 12 }, (_, index) => ({
     value: (index + 1).toString().padStart(2, "0"),
     label: new Date(2000, index, 1).toLocaleString("default", { month: "long" }),
@@ -202,13 +202,28 @@ const EmployeePayslips = () => {
   return (
     <LayOut>
       <div className="container-fluid p-0">
-        <h1 className="h3 mb-3">
-          <strong>PaySlips Form</strong>
-        </h1>
+        <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
+          <div className="col">
+            <h1 className="h3 mb-3">
+              <strong>PaySlips</strong>
+            </h1>
+          </div>
+          <div className="col-auto" style={{ paddingBottom: '20px' }}>
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                  <a href="/main">Home</a>
+                </li>
+                <li className="breadcrumb-item active">PaySlips</li>
+              </ol>
+            </nav>
+          </div>
+        </div>
         <div className="row">
           <div className="col-12">
             <div className="card">
               <div className="card-header">
+                <h5 className="card-title">PaySlips</h5>
                 <div className="dropdown-divider" style={{ borderTopColor: "#D7D9DD" }} />
               </div>
               <div className="card-body">
@@ -250,10 +265,6 @@ const EmployeePayslips = () => {
         {showFields && (
           <div className="card">
             <div className="card-body">
-              <h5 className="card-title mt-2">
-                Payslip Details:
-              </h5>
-              <div className="dropdown-divider" style={{ borderTopColor: "#D7D9DD" }} />
               <DataTable
                 columns={columns}
                 data={employeeSalaryView}

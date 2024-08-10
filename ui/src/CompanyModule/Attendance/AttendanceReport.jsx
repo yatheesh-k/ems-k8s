@@ -123,7 +123,7 @@ const AttendanceReport = () => {
   const handleDelete = async () => {
     try {
       await AttendanceDeleteById(selectedEmployeeId, selectedAttendanceId);
-      toast.success("Attendance record deleted successfully!", {
+      toast.success("Attendance Record Deleted Successfully", {
         position: "top-right",
         transition: Bounce,
         hideProgressBar: true,
@@ -144,7 +144,7 @@ const AttendanceReport = () => {
     console.log("Submitting attendance update for:", selectedEmployeeId, selectedAttendanceId, data);
     try {
       await AttendancePatchById(selectedEmployeeId, selectedAttendanceId, data);
-      toast.success("Attendance record updated successfully!", {
+      toast.success("Attendance Record Updated Successfully", {
         position: "top-right",
         transition: Bounce,
         hideProgressBar: true,
@@ -170,60 +170,60 @@ const AttendanceReport = () => {
       console.error(error.response);
     };
 
-    const columns = [
-      {
-        name: <h6><b>S No</b></h6>,
-        selector: (row, index) => index + 1,
-        width: "100px",
-      },
-      {
-        name: <h6><b>Month</b></h6>,
-        selector: (row) => row.month,
-        sortable: true,
-        width: "150px",
-      },
-      {
-        name: <h6><b>Year</b></h6>,
-        selector: (row) => row.year,
-        sortable: true,
-        width: "120px",
-      },
-      {
-        name: <h6><b>Total Working Days</b></h6>,
-        selector: (row) => row.totalWorkingDays,
-        sortable: true,
-        width: "220px",
-      },
-      {
-        name: <h6><b>No. Of Working Days</b></h6>,
-        selector: (row) => row.noOfWorkingDays,
-        sortable: true,
-        width: "220px",
-      },
-      {
-        name: <h6><b>Actions</b></h6>,
-        cell: (row) => (
-          <div>
-            <button
-              className="btn btn-sm"
-              style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }}
-              onClick={() => handleShowEditModal(row)}
-              title='Edit'
-            >
-              <PencilSquare size={22} color="#2255a4" />
-            </button>
-            <button
-              className="btn btn-sm"
-              style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }}
-              onClick={() => handleShowDeleteModal(row)}
-              title='Delete'
-            >
-              <XSquareFill size={22} color="#da542e" />
-            </button>
-          </div>
-        ),
-      },
-    ];
+  const columns = [
+    {
+      name: <h6><b>S No</b></h6>,
+      selector: (row, index) => index + 1,
+      width: "70px",
+    },
+    {
+      name: <h6><b>Month</b></h6>,
+      selector: (row) => row.month,
+      sortable: true,
+      width: "130px",
+    },
+    {
+      name: <h6><b>Year</b></h6>,
+      selector: (row) => row.year,
+      sortable: true,
+      width: "120px",
+    },
+    {
+      name: <h6><b>No. Of Working Days</b></h6>,
+      selector: (row) => row.noOfWorkingDays,
+      sortable: true,
+      width: "240px",
+    },
+    {
+      name: <h6><b>Total Working Days</b></h6>,
+      selector: (row) => row.totalWorkingDays,
+      sortable: true,
+      width: "240px",
+    },
+    {
+      name: <h6><b>Actions</b></h6>,
+      cell: (row) => (
+        <div>
+          <button
+            className="btn btn-sm"
+            style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }}
+            onClick={() => handleShowEditModal(row)}
+            title='Edit'
+          >
+            <PencilSquare size={22} color="#2255a4" />
+          </button>
+          <button
+            className="btn btn-sm"
+            style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }}
+            onClick={() => handleShowDeleteModal(row)}
+            title='Delete'
+          >
+            <XSquareFill size={22} color="#da542e" />
+          </button>
+        </div>
+      ),
+    },
+  ];
 
     return (
       <LayOut>

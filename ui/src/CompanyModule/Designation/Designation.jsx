@@ -60,7 +60,7 @@ const Designation = () => {
       if (editingUserId) {
         await DesignationPutApiById(editingUserId, formData);
         setTimeout(() => {
-          toast.success('Designation updated successfully');
+          toast.success('Designation Updated Successfully');
             fetchDesignation(); // Fetch updated list of departments after delay
             setAddDesignation(false);
           }, 900);
@@ -69,7 +69,7 @@ const Designation = () => {
         await DesignationPostApi(formData);
        
         setTimeout(() => {
-          toast.success('Designation created successfully');
+          toast.success('Designation Created Successfully');
           fetchDesignation(); // Fetch updated list of departments after delay
           setAddDesignation(false);
           }, 1000);

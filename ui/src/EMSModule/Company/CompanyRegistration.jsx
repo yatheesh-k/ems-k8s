@@ -68,14 +68,14 @@ const CompanyRegistration = () => {
         await new Promise(resolve => setTimeout(resolve, 2000));
         await companyUpdateByIdApi(location.state.id, updateData);
         setTimeout(() => {
-          toast.success("Company updated successfully");
+          toast.success("Company Updated Successfully");
           navigate("/companyView");
           reset();
         }, 900);
       } else {
         await CompanyRegistrationApi(data);
         setTimeout(() => {
-          toast.success("Company created successfully");
+          toast.success("Company Created Successfully");
           navigate("/companyView");
           reset();
         }, 1000);
@@ -370,17 +370,17 @@ const CompanyRegistration = () => {
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
-                        Company MailId <span style={{ color: "red" }}>*</span>
+                        Company Email Id <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
                         type="email"
                         className="form-control"
-                        placeholder="Enter Company MailId"
+                        placeholder="Enter Company Email Id"
                         autoComplete="off"
                         onInput={toInputLowerCase}
                         onKeyDown={handleEmailChange}
                         {...register("emailId", {
-                          required: "Company MailId is required",
+                          required: "Company Email Id is required",
                           pattern: {
                             value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid email format it allows Only .com, .in, .org, .net, .edu, .gov are allowed",
@@ -501,7 +501,7 @@ const CompanyRegistration = () => {
                       <input
                         type="tel"
                         className="form-control"
-                        placeholder="Enter Mobile Number"
+                        placeholder="Enter Alternate Number"
                         autoComplete="off"
                         onInput={toInputTitleCase}
                         onKeyDown={handleEmailChange}
@@ -575,7 +575,7 @@ const CompanyRegistration = () => {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Enter Company CIN number"
+                        placeholder="Enter Company CIN Number"
                         onKeyDown={handleEmailChange}
                         onInput={toInputTitleCase}
                         autoComplete="off"
@@ -644,7 +644,7 @@ const CompanyRegistration = () => {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Enter Company GST number"
+                        placeholder="Enter Company GST Number"
                         autoComplete="off"
                         onInput={toInputTitleCase}
                         onKeyDown={handleEmailChange}
@@ -675,7 +675,7 @@ const CompanyRegistration = () => {
                         type="text"
                         className="form-control"
                         onInput={toInputTitleCase}
-                        placeholder="Enter Company PAN number"
+                        placeholder="Enter Company PAN Number"
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         maxLength={10}
@@ -746,17 +746,17 @@ const CompanyRegistration = () => {
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
-                        Personal MailId <span style={{ color: "red" }}>*</span>
+                        Personal Email Id <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
                         type="email"
                         className="form-control"
-                        placeholder="Enter MailId"
+                        placeholder="Enter Email Id"
                         autoComplete="off"
                         onInput={toInputLowerCase}
                         onKeyDown={handleEmailChange}
                         {...register("personalMailId", {
-                          required: "MailId is required",
+                          required: "Email Id is required",
                           pattern: {
                             value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid email format it allows Only .com, .in, .org, .net, .edu, .gov are allowed",

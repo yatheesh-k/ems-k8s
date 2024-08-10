@@ -222,7 +222,7 @@ const EmployeeRegistration = () => {
       if (location.state && location.state.id) {
         const response = await EmployeePatchApiById(location.state.id, payload);
         console.log("Update successful", response.data);
-        toast.success("Employee updated successfully");
+        toast.success("Employee Updated Successfully");
         setTimeout(() => {
           navigate("/employeeView");
         }, 1000); // Adjust the delay time as needed (in milliseconds)
@@ -231,7 +231,7 @@ const EmployeeRegistration = () => {
       } else {
         const response = await EmployeePostApi(payload);
         console.log("Employee created", response.data);
-        toast.success("Employee created successfully");
+        toast.success("Employee Created Successfully");
         setTimeout(() => {
           navigate("/employeeView");
         }, 1000); // Adjust the delay time as needed (in milliseconds)
@@ -754,7 +754,7 @@ const EmployeeRegistration = () => {
                     )}
 
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
-                      <label className="form-label mb-3">Employee Status <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label mb-3">Select Status <span style={{ color: "red" }}>*</span></label>
                       <Controller
                         name="status"
                         control={control}

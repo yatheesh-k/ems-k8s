@@ -203,7 +203,7 @@ const CompanyLogin = () => {
                               type="email"
                               name="username"
                               id="username"
-                              placeholder="Enter your email"
+                              placeholder="Enter Your Email Id"
                               autoComplete="off"
                               onKeyDown={handleEmailChange}
                               readOnly={otpSent}
@@ -239,7 +239,7 @@ const CompanyLogin = () => {
                                   className="form-control"
                                   name="password"
                                   id="password"
-                                  placeholder="Enter your password"
+                                  placeholder="Enter Your Password"
                                   onChange={handlePasswordChange}
                                   type={passwordShown ? "text" : "password"}
                                   {...register("password", {
@@ -281,7 +281,7 @@ const CompanyLogin = () => {
                                   type={passwordShown ? "text" : "password"}
                                   name="otp"
                                   id="otp"
-                                  placeholder="Enter your OTP"
+                                  placeholder="Enter Your OTP"
                                   autoComplete="off"
                                   {...register("otp", {
                                     required: "OTP is Required.",

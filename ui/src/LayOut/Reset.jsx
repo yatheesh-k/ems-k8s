@@ -50,10 +50,10 @@ const Reset = ({ companyName, onClose, show }) => {
     try {
       setLoading(true);
       const response = await resetPassword(formData, employeeId); 
-      console.log('Password reset successful:', response.data);
+      console.log('Password Reset Successful:', response.data);
       setLoading(false);
       onClose(); // Close modal or handle success state
-      toast.success("Password reset successful!");
+      toast.success("Password Reset Successful");
       navigate("/");
     } catch (error) {
       handleApiErrors(error);

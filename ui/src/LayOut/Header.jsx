@@ -126,7 +126,7 @@ const Header = ({ toggleSidebar }) => {
                 <div
                   className="dropdown-menu dropdown-menu-end py-0 show"
                   aria-labelledby="profileDropdown"
-                  style={{ left: "auto", right: "3%" }}
+                  style={{ left: "auto", right: "6%" }}
                 >
                   <a className="dropdown-item"   href onClick={handleResetPasswordClick}>
                     <i className="align-middle me-1 bi bi-key"></i> Reset Password
@@ -154,7 +154,7 @@ const Header = ({ toggleSidebar }) => {
                 <div
                   className="dropdown-menu dropdown-menu-end py-0 show"
                   aria-labelledby="profileDropdown"
-                  style={{ left: "auto", right: "50%" }}
+                  style={{ left: "auto", right: "40%" }}
                 >
                   <a className="dropdown-item" href="/profile">
                     <i className="align-middle me-1 bi bi-person"></i> Profile
@@ -185,7 +185,7 @@ const Header = ({ toggleSidebar }) => {
                 <div
                   className="dropdown-menu dropdown-menu-end py-0 show"
                   aria-labelledby="profileDropdown"
-                  style={{ left: "auto", right: "50%" }}
+                  style={{ left: "auto", right: "20%" }}
                 >
                   <a className="dropdown-item" href="/employeeProfile">
                     <i className="align-middle me-1 bi bi-person"></i> Profile

@@ -125,7 +125,7 @@ const ViewPaySlips = () => {
   const handleDelete = async () => {
     try {
       await EmployeePayslipDeleteById(selectedEmployeeId, selectedPayslipId);
-      toast.success("Payslip deleted successfully!", {
+      toast.success("Payslip Deleted Successfully!", {
         position: "top-right",
         transition: Bounce,
         hideProgressBar: true,

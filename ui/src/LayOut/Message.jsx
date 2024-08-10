@@ -101,7 +101,7 @@ function Message() {
                                         name="companyName"
                                         className="form-control"
                                         onChange={handleCompanyNameChange}
-                                        placeholder="Enter company service name"
+                                        placeholder="Enter Company Service Name"
                                         onInput={toInputLowerCase}
                                         onKeyDown={handleEmailChange}
                                         {...register("companyName", {
