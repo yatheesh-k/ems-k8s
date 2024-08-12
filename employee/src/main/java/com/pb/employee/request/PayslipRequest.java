@@ -23,11 +23,11 @@ public class PayslipRequest {
     @Pattern(regexp = "^[a-z]+$", message = "${shortname.message}")
     private String companyName;
 
-    @NotBlank(message = "${notnull.message}")
+    @NotBlank(message = "{month.notnull.message}")
     @Pattern(regexp = "^[A-Z][a-z]*$", message = "${invalid.month}")
     private String month;
 
-    @NotBlank(message = "${notnull.message}")
+    @NotBlank(message = "${year.notnull.message}")
     @Pattern(regexp = "^\\d+$", message = "${invalid.year}")
     private String year;
 }

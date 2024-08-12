@@ -19,11 +19,11 @@ public class EmployeePasswordReset {
 
     @Schema(example = "password")
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\\W)(?!.* ).{6,16}$", message = "{password.format}")
-    @NotBlank(message = "{notnull.message}")
+    @NotBlank(message = "{password.notnull.message}")
     private String password;
 
     @Schema(example = "newPassword")
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\\W)(?!.* ).{6,16}$", message = "{password.format}")
-    @NotBlank(message = "{notnull.message}")
+    @NotBlank(message = "{newPassword.notnull.message}")
     private String newPassword;
 }

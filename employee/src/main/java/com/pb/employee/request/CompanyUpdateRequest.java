@@ -14,38 +14,38 @@ import lombok.*;
 public class CompanyUpdateRequest {
 
     @Schema(example = "companyAddress")
-    @NotBlank(message = "{notnull.message}")
+    @NotBlank(message = "{companyAddress.notnull.message}")
     @Pattern(regexp = "^[A-Za-z0-9\\s,.'-]+$", message = "{companyAddress.pattern.message}")
     @Size(min = 1, max = 100, message = "{companyAddress.pattern.message}")
     private String companyAddress;
 
     @Schema(example = "mobileNo")
-    @NotBlank(message = "{notnull.message}")
+    @NotBlank(message = "{mobileNo.notnull.message}")
     @Pattern(regexp = "^\\d{10}$", message = "{invalid.mobileNo}")
     private String mobileNo;
 
     @Schema(example = "landNo")
-    @NotBlank(message = "{notnull.message}")
+    @NotBlank(message = "{landNo.notnull.message}")
     @Pattern(regexp = "^\\d{10}$", message = "{invalid.mobileNo")
     private String landNo;
 
     @Schema(example = "name")
     @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{name.message}")
-    @Size(min = 3, max = 20, message = "{size.message}")
+    @Size(min = 3, max = 20, message = "{name.notnull.message}")
     private String name;
 
     @Schema(example = "personalMailId")
-    @NotBlank(message = "{notnull.message}")
-    @Pattern(regexp="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$", message="{invalid.emailId}")
+    @NotBlank(message = "{personalMailId.notnull.message}")
+    @Pattern(regexp="^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,6}$", message="{invalid.emailId}")
     private String personalMailId;
 
     @Schema(example = "personalMobileNo")
-    @NotBlank(message = "{notnull.message}")
+    @NotBlank(message = "{personalMobileNo.notnull.message}")
     @Pattern(regexp = "^\\d{10}$", message = "{invalid.mobileNo}")
     private String personalMobileNo;
 
     @Schema(example = "address")
-    @NotBlank(message = "{notnull.message}")
+    @NotBlank(message = "{address.notnull.message}")
     @Pattern(regexp = "^[A-Za-z0-9\\s,.'-]+$", message = "{companyAddress.pattern.message}")
     @Size(min = 1, max = 100, message = "{companyAddress.pattern.message}")
     private String address;

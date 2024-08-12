@@ -24,52 +24,51 @@ public class EmployeeUpdateRequest {
 
     @Schema(example = "employeeType")
     @Pattern(regexp = "^[A-Z][a-z]+$", message = "{employee.type}")
-    @Size(min = 3, max = 20, message = "{size.message}")
+    @Size(min = 3, max = 20, message = "{employeeType.size.message}")
     private String employeeType;
 
     @Schema(example = "emailId")
     @Pattern(regexp = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,6}$", message = "{invalid.emailId}")
-    @NotBlank(message = "{notnull.message}")
+    @NotBlank(message = "{emailId.notnull.message}")
     private String emailId;
 
     @Schema(example = "designation")
     @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*$", message = "{designation.format}")
-    @Size(min = 2, max = 20, message = "{size.message}")
+    @Size(min = 2, max = 20, message = "{designation.size.message}")
     private String designation;
 
     @Schema(example = "location")
     @Pattern(regexp = "^(?!\\s)(?!.*\\s$)[a-zA-Z0-9\\s,'#,&*()^\\-/]*$", message = "{location.format}")
-    @NotBlank(message = "{notnull.message}")
+    @NotBlank(message = "{location.notnull.message}")
     private String location;
 
     @Schema(example = "manager")
     @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*$", message = "{manager.format}")
-    @Size(min = 3, max = 30, message = "{size.message}")
+    @Size(min = 3, max = 30, message = "{manager.notnull.message}")
     private String manager;
 
     @NotNull(message = "{roles.format}")
     @Size(min = 1, message = "{roles.size}")
-    private List<@NotBlank(message = "{role.notnull}")
+    private List<@NotBlank(message = "{role.notnull.message}")
     @Pattern(regexp = "^[A-Z][a-z]+$", message = "{roles.format}") String> roles;
 
     @Schema(example = "status")
-    @Pattern(regexp = "^[A-Z][a-z]+$", message = "{status.format}")
-    @NotBlank(message = "{notnull.message}")
+    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{status.format}")
+    @NotBlank(message = "{status.notnull.message}")
     private String status;
 
     @Schema(example = "accountNo")
     @Pattern(regexp = "^\\d{9,18}$", message = "{accountno.format}")
-    @NotBlank(message = "{notnull.message}")
+    @NotBlank(message = "{accountNo.notnull.message}")
     private String accountNo;
 
     @Schema(example = "ifscCode")
     @Pattern(regexp = "^[A-Z]{4}0[A-Z0-9]{6}$", message = "{ifscCode.format}")
-    @NotBlank(message = "{notnull.message}")
+    @NotBlank(message = "{ifscCode.notnull.message}")
     private String ifscCode;
 
     @Schema(example = "bankName")
     @Pattern(regexp = "^(?!\\s)(?!.*\\s$)[A-Za-z&'(),./\\- ]{1,100}$", message = "{bankName.format}")
-    @NotBlank(message = "{notnull.message}")
-    @Size(min = 3, max = 20, message = "{size.message}")
+    @Size(min = 3, max = 20, message = "{bankName.size.message}")
     private String bankName;
 }

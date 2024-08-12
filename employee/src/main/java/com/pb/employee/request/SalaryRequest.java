@@ -22,32 +22,32 @@ public class SalaryRequest {
 
     @Schema(example = "basicSalary")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{basicSalary.format}")
-    @Size(min = 4, max = 10, message = "{size.message}")
+    @Size(min = 4, max = 10, message = "{basicSalary.size.message}")
     private String basicSalary;
 
     @Schema(example = "fixedAmount")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{fixedAmount.format}")
-    @Size(min = 4, max = 10, message = "{size.message}")
+    @Size(min = 4, max = 10, message = "{fixedAmount.size.message}")
     private String fixedAmount;
 
     @Schema(example = "variableAmount")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{variableAmount.format}")
-    @Size(min = 4, max = 10, message = "{size.message}")
+    @Size(min = 4, max = 10, message = "{variableAmount.size.message}")
     private String variableAmount;
 
     @Schema(example = "grossAmount")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{grossAmount.format}")
-    @Size(min = 4, max = 10, message = "{size.message}")
+    @Size(min = 4, max = 10, message = "{grossAmount.size.message}")
     private String grossAmount;
 
     @Schema(example = "totalEarnings")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{totalEarnings.format}")
-    @Size(min = 4, max = 10, message = "{size.message}")
+    @Size(min = 4, max = 10, message = "{totalEarnings.size.message}")
     private String totalEarnings;
 
     @Schema(example = "netSalary")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{netSalary.format}")
-    @Size(min = 4, max = 10, message = "{size.message}")
+    @Size(min = 4, max = 10, message = "{netSalary.size.message}")
     private String netSalary;
 
     @Valid
@@ -58,6 +58,6 @@ public class SalaryRequest {
 
     @Schema(example = "status")
     @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{status.format}")
-    @NotBlank(message = "{notnull.message}")
+    @NotBlank(message = "{status.notnull.message}")
     private String status;
 }

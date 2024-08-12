@@ -22,17 +22,17 @@ public class AttendanceRequest{
     private String employeeId;
 
     @Schema(example = "month")
-    @NotNull(message = "{notnull.message}")
+    @NotNull(message = "{month.notnull.message}")
     @Pattern(regexp = "^[A-Z][a-z]*$", message = "{invalid.month}")
     private String month;
 
     @Schema(example = "year")
-    @NotNull(message = "{notnull.message}")
+    @NotNull(message = "{year.notnull.message}")
     @Pattern(regexp = "^\\d+$", message = "{invalid.year}")
     private String year;
 
     @Schema(example = "emailId")
-    @NotNull(message = "{notnull.message}")
+    @NotNull(message = "{emailId.notnull.message}")
     @Pattern(regexp = "^[a-z][a-z0-9._%+-]*@[a-z0-9.-]+\\.[a-z]{2,}$", message = "{invalid.emailId}")
     private String emailId;
 
@@ -45,13 +45,13 @@ public class AttendanceRequest{
     private String lastName;
 
     @Schema(example = "totalWorkingDays")
-    @NotNull(message = "{notnull.message}")
+    @NotNull(message = "{totalWorkingDays.notnull.message}")
     @DecimalMax(value = "31", message = "{total.working.days}")
     @Digits(integer = 9, fraction = 0, message = "{total.working.days}")
     private String totalWorkingDays;
 
     @Schema(example = "noOfWorkingDays")
-    @NotNull(message = "{notnull.message}")
+    @NotNull(message = "{noOfWorkingDays.notnull.message}")
     @DecimalMax(value = "31", message = "{no.of.working.days}")
     @Digits(integer = 9, fraction = 0, message = "{no.of.working.days}")
     private String noOfWorkingDays;

@@ -19,7 +19,6 @@ public class DesignationUpdateRequest {
 
     @Schema(example = "designation")
     @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{designation.format}")
-    @NotBlank(message = "{notnull.message}")
-    @Size(min = 2, max = 20, message = "{size.message}")
+    @Size(min = 2, max = 20, message = "{designation.size.message}")
     private String name;
 }

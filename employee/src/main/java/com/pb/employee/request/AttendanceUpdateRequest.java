@@ -17,14 +17,15 @@ import lombok.experimental.SuperBuilder;
 public class AttendanceUpdateRequest {
 
     @Schema(example = "month")
-    @NotNull(message = "{notnull.message}")
+    @NotNull(message = "{month.notnull.message}")
     @Pattern(regexp = "^[A-Z][a-z]*$", message = "{invalid.month}")
     private String month;
 
     @Schema(example = "year")
-    @NotNull(message = "{notnull.message}")
+    @NotNull(message = "{year.notnull.message}")
     @Pattern(regexp = "^\\d+$", message = "{invalid.year}")
     private String year;
+
 
     @Schema(example = "totalWorkingDays")
     @NotNull(message = "{notnull.message}")
@@ -33,7 +34,7 @@ public class AttendanceUpdateRequest {
     private String totalWorkingDays;
 
     @Schema(example = "noOfWorkingDays")
-    @NotNull(message = "{notnull.message}")
+    @NotNull(message = "{noOfWorkingDays.notnull.message}")
     @DecimalMax(value = "31", message = "{no.of.working.days}")
     @Digits(integer = 9, fraction = 0, message = "{no.of.working.days}")
     private String noOfWorkingDays;
