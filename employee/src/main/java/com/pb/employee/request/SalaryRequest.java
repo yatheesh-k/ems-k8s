@@ -17,37 +17,37 @@ public class SalaryRequest {
     @Schema(example = "companyShortName")
     @Pattern(regexp = "^[a-z]+$", message = "{companyName.format}")
     @NotBlank(message = "{companyname.message}")
-    @Size(min = 2, max = 20, message = "{size.message}")
+    @Size(min = 2, max = 10, message = "{size.message}")
     private String companyName;
 
     @Schema(example = "basicSalary")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{basicSalary.format}")
-    @Size(min = 4, max = 10, message = "{basicSalary.size.message}")
+    @Size(min = 4, max = 20, message = "{basicSalary.size.message}")
     private String basicSalary;
 
     @Schema(example = "fixedAmount")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{fixedAmount.format}")
-    @Size(min = 4, max = 10, message = "{fixedAmount.size.message}")
+    @Size(min = 4, max = 20, message = "{fixedAmount.size.message}")
     private String fixedAmount;
 
     @Schema(example = "variableAmount")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{variableAmount.format}")
-    @Size(min = 4, max = 10, message = "{variableAmount.size.message}")
+    @Size(min = 4, max = 20, message = "{variableAmount.size.message}")
     private String variableAmount;
 
     @Schema(example = "grossAmount")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{grossAmount.format}")
-    @Size(min = 4, max = 10, message = "{grossAmount.size.message}")
+    @Size(min = 4, max = 20, message = "{grossAmount.size.message}")
     private String grossAmount;
 
     @Schema(example = "totalEarnings")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{totalEarnings.format}")
-    @Size(min = 4, max = 10, message = "{totalEarnings.size.message}")
+    @Size(min = 4, max = 20, message = "{totalEarnings.size.message}")
     private String totalEarnings;
 
     @Schema(example = "netSalary")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{netSalary.format}")
-    @Size(min = 4, max = 10, message = "{netSalary.size.message}")
+    @Size(min = 4, max = 20, message = "{netSalary.size.message}")
     private String netSalary;
 
     @Valid

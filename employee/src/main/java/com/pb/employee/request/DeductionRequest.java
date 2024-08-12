@@ -18,19 +18,19 @@ public class DeductionRequest {
 
     @Schema(example = "pfEmployee")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{pfEmployee.format}")
-    @Size(min = 3, max = 10, message = "{pfEmployee.size.message}")
+    @Size(min = 3, max = 20, message = "{pfEmployee.size.message}")
     private String pfEmployee;
 
     @Schema(example = "pfEmployer")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{pfEmployer.format}")
-    @Size(min = 3, max = 10, message = "{pfEmployer.size.message}")
+    @Size(min = 3, max = 20, message = "{pfEmployer.size.message}")
     private String pfEmployer;
 
     private String lop;
 
     @Schema(example = "totalDeductions")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{totalDeductions.format}")
-    @Size(min = 3, max = 10, message = "{totalDeductions.size.message}")
+    @Size(min = 3, max = 20, message = "{totalDeductions.size.message}")
     private String totalDeductions;
 //    private String pfTax;
 //    private String totalTax;

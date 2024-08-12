@@ -87,15 +87,16 @@ public class DepartmentServiceImpl implements DepartmentService {
         List<DepartmentEntity> departmentEntities = null;
         try {
             departmentEntities = openSearchOperations.getCompanyDepartmentByName(companyName, null);
-            if (departmentEntities == null || departmentEntities.size()<=0){
-                log.error("Department are Not found");
-                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_DEPARTMENT)),
-                        HttpStatus.NOT_FOUND);
-            }
+
         } catch (Exception ex) {
             log.error("Exception while fetching departments for company {}: {}", companyName, ex.getMessage());
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
                     HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (departmentEntities == null || departmentEntities.size()<=0){
+            log.error("Department are Not found");
+            throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_DEPARTMENT)),
+                    HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(departmentEntities), HttpStatus.OK);
@@ -108,16 +109,16 @@ public class DepartmentServiceImpl implements DepartmentService {
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
         try {
             entity = openSearchOperations.getById(departmentId, null, index);
-            if (entity == null){
-                log.error("Department with id {} is not found", departmentId);
-                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_DEPARTMENT), departmentId),
-                        HttpStatus.NOT_FOUND);
-            }
 
         } catch (Exception ex) {
             log.error("Exception while fetching department details {}", ex);
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_DEPARTMENT),
                     HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (entity == null){
+            log.error("Department with id {} is not found", departmentId);
+            throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_DEPARTMENT), departmentId),
+                    HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(entity), HttpStatus.OK);

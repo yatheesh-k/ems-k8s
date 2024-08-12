@@ -23,8 +23,10 @@ public class EmployeeEntity implements Entity{
     private String emailId;
     private String password;
     private String designation;
+    private String designationName;
     private String dateOfHiring;
     private String department;
+    private String departmentName;
     private String location;
     private String manager;
     private List<String> roles;

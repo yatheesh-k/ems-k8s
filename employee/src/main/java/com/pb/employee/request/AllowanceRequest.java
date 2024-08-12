@@ -14,26 +14,26 @@ public class AllowanceRequest {
 
     @Schema(example = "travelAllowance")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{travelAllowance.format}")
-    @Size(min = 3, max = 10, message = "{travelAllowance.size}")
+    @Size(min = 3, max = 20, message = "{travelAllowance.size}")
     private String travelAllowance;
 
     @Schema(example = "pfContributionEmployee")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{pfContributionEmployee.format}")
-    @Size(min = 3, max = 10, message = "{pfContributionEmployee.size}")
+    @Size(min = 3, max = 20, message = "{pfContributionEmployee.size}")
     private String pfContributionEmployee;
 
     @Schema(example = "hra")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{hra.format}")
-    @Size(min = 1, max = 2, message = "{hra.size}")
+    @Size(min = 1, max = 3, message = "{hra.size}")
     private String hra;
 
     @Schema(example = "specialAllowance")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{specialAllowance.format}")
-    @Size(min = 3, max = 10, message = "{specialAllowance.size}")
+    @Size(min = 3, max = 20, message = "{specialAllowance.size}")
     private String specialAllowance;
 
     @Schema(example = "otherAllowances")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{otherAllowances.format}")
-    @Size(min = 3, max = 10, message = "{otherAllowances.size}")
+    @Size(min = 3, max = 20, message = "{otherAllowances.size}")
     private String otherAllowances;
 }

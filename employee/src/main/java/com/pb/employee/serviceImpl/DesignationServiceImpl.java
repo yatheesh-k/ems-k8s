@@ -83,15 +83,16 @@ public class DesignationServiceImpl implements DesignationService {
         List<DesignationEntity> designationEntities = null;
         try {
             designationEntities = openSearchOperations.getCompanyDesignationByName(companyName, null);
-            if (designationEntities == null || designationEntities.size()<=0){
-                log.error("Designations are Not found");
-                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_DESIGNATION)),
-                        HttpStatus.NOT_FOUND);
-            }
+
         } catch (Exception ex) {
             log.error("Exception while fetching designation for company {}: {}", companyName, ex.getMessage());
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_DESIGNATION),
                     HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (designationEntities == null || designationEntities.size()<=0){
+            log.error("Designations are Not found");
+            throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_DESIGNATION)),
+                    HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(designationEntities), HttpStatus.OK);
@@ -104,15 +105,15 @@ public class DesignationServiceImpl implements DesignationService {
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
         try {
             entity = openSearchOperations.getById(designationId, null, index);
-            if (entity == null){
-                log.error("Department with id {} is not found", designationId);
-                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_DESIGNATION), designationId),
-                        HttpStatus.NOT_FOUND);
-            }
         } catch (Exception ex) {
             log.error("Exception while fetching designation details {}", ex);
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_DESIGNATION),
                     HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (entity == null){
+            log.error("Department with id {} is not found", designationId);
+            throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_DESIGNATION), designationId),
+                    HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(entity), HttpStatus.OK);

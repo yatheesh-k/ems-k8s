@@ -32,14 +32,13 @@ public class EmployeeUpdateRequest {
     @NotBlank(message = "{emailId.notnull.message}")
     private String emailId;
 
-    @Schema(example = "designation")
-    @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*$", message = "{designation.format}")
-    @Size(min = 2, max = 20, message = "{designation.size.message}")
+    @Schema(example = "designationId")
+    @Size(min = 2, max = 100, message = "{designation.size.message}")
     private String designation;
 
     @Schema(example = "location")
     @Pattern(regexp = "^(?!\\s)(?!.*\\s$)[a-zA-Z0-9\\s,'#,&*()^\\-/]*$", message = "{location.format}")
-    @NotBlank(message = "{location.notnull.message}")
+    @Size(min = 2, max = 100, message = "{location.notnull.message}")
     private String location;
 
     @Schema(example = "manager")

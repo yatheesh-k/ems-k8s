@@ -2,10 +2,7 @@ package com.pb.employee.util;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pb.employee.persistance.model.CompanyEntity;
-import com.pb.employee.persistance.model.EmployeeEntity;
-import com.pb.employee.persistance.model.Entity;
-import com.pb.employee.persistance.model.SalaryEntity;
+import com.pb.employee.persistance.model.*;
 import com.pb.employee.request.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -18,7 +15,7 @@ import java.util.Base64;
 public class EmployeeUtils {
 
 
-    public static Entity maskEmployeeProperties(EmployeeRequest employeeRequest,String resourceId) {
+    public static Entity maskEmployeeProperties(EmployeeRequest employeeRequest,String resourceId, String companyId) {
         String uan = null, pan = null, adharId = null, accountNo=null, ifscCode = null,password=null;
         if(employeeRequest.getPanNo() != null) {
             pan = Base64.getEncoder().encodeToString(employeeRequest.getPanNo().getBytes());
@@ -42,6 +39,7 @@ public class EmployeeUtils {
 
         EmployeeEntity entity = objectMapper.convertValue(employeeRequest, EmployeeEntity.class);
         entity.setId(resourceId);
+        entity.setCompanyId(companyId);
         entity.setPassword(password);
         entity.setAadhaarId(adharId);
         entity.setPanNo(pan);
@@ -53,7 +51,7 @@ public class EmployeeUtils {
     }
 
 
-    public static Entity unmaskEmployeeProperties(EmployeeEntity employeeEntity) {
+    public static Entity unmaskEmployeeProperties(EmployeeEntity employeeEntity, DepartmentEntity entity, DesignationEntity designationEntity) {
         String pan = null,uanNo=null,aadhaarId=null,accountNo=null,ifscCode=null;
         if(employeeEntity.getPanNo() != null) {
             pan = new String((Base64.getDecoder().decode(employeeEntity.getPanNo().toString().getBytes())));
@@ -69,6 +67,12 @@ public class EmployeeUtils {
         }
         if(employeeEntity.getIfscCode() != null) {
             ifscCode = new String((Base64.getDecoder().decode(employeeEntity.getIfscCode().toString().getBytes())));
+        }
+        if (employeeEntity.getDepartment() != null){
+            employeeEntity.setDepartmentName(entity.getName());
+        }
+        if (employeeEntity.getDesignation() != null){
+            employeeEntity.setDesignationName(designationEntity.getName());
         }
         employeeEntity.setIfscCode(ifscCode);
         employeeEntity.setAccountNo(accountNo);

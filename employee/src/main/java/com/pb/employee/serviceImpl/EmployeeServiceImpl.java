@@ -7,12 +7,12 @@ import com.pb.employee.exception.EmployeeErrorMessageKey;
 import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.opensearch.OpenSearchOperations;
-import com.pb.employee.persistance.model.CompanyEntity;
-import com.pb.employee.persistance.model.EmployeeEntity;
-import com.pb.employee.persistance.model.Entity;
+import com.pb.employee.persistance.model.*;
+import com.pb.employee.request.DepartmentRequest;
 import com.pb.employee.request.EmployeePasswordReset;
 import com.pb.employee.request.EmployeeRequest;
 import com.pb.employee.request.EmployeeUpdateRequest;
+import com.pb.employee.response.EmployeeResponse;
 import com.pb.employee.service.EmployeeService;
 import com.pb.employee.util.CompanyUtils;
 import com.pb.employee.util.Constants;
@@ -68,7 +68,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         try{
             List<CompanyEntity> shortNameEntity = openSearchOperations.getCompanyByData(null, Constants.COMPANY, employeeRequest.getCompanyName());
 
-            Entity companyEntity = EmployeeUtils.maskEmployeeProperties(employeeRequest, resourceId);
+            Entity companyEntity = EmployeeUtils.maskEmployeeProperties(employeeRequest, resourceId, shortNameEntity.getFirst().getId());
             Entity result = openSearchOperations.saveEntity(companyEntity, resourceId, index);
         } catch (Exception exception) {
             log.error("Unable to save the employee details {} {}", employeeRequest.getEmailId(),exception.getMessage());
@@ -82,14 +82,21 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
     @Override
-    public ResponseEntity<?> getEmployees(String companyName) throws EmployeeException {
+    public ResponseEntity<?> getEmployees(String companyName) throws EmployeeException, IOException {
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
 
         List<EmployeeEntity> employeeEntities = null;
+
         try {
             employeeEntities = openSearchOperations.getCompanyEmployees(companyName);
             for (EmployeeEntity employee :employeeEntities){
-                EmployeeUtils.unmaskEmployeeProperties(employee);
+                DepartmentEntity entity =null;
+                DesignationEntity designationEntity = null;
+                if (employee.getDepartment() !=null && employee.getDesignation() !=null) {
+                    entity = openSearchOperations.getDepartmentById(employee.getDepartment(), null, index);
+                    designationEntity = openSearchOperations.getDesignationById(employee.getDesignation(), null, index);
+                }
+                EmployeeUtils.unmaskEmployeeProperties(employee, entity, designationEntity );
             }
         } catch (Exception ex) {
             log.error("Exception while fetching employees for company {}: {}", companyName, ex.getMessage());
@@ -112,10 +119,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         try {
             entity = openSearchOperations.getEmployeeById(employeeId, null, index);
-            EmployeeUtils.unmaskEmployeeProperties( entity);
+            DepartmentEntity departmentEntity = openSearchOperations.getDepartmentById(entity.getDepartment(), null, index);
+            DesignationEntity designationEntity = openSearchOperations.getDesignationById(entity.getDesignation(), null, index);
+            EmployeeUtils.unmaskEmployeeProperties(entity, departmentEntity, designationEntity);
 
         } catch (Exception ex) {
-
             log.error("Exception while fetching company details {}", ex);
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
                     HttpStatus.INTERNAL_SERVER_ERROR);

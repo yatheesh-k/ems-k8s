@@ -44,7 +44,7 @@ public class EmployeeRequest {
     @Size(min = 1, max = 20, message = "{lastName.size.message}")
     private String lastName;
 
-
+    @Schema(example = "emailId")
     @Pattern(regexp = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,6}$", message = "{invalid.emailId}")
     @NotBlank(message = "{emailId.notnull.message}")
     private String emailId;// "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$"
@@ -54,24 +54,24 @@ public class EmployeeRequest {
     @NotBlank(message = "{password.notnull.message}")
     private String password;
 
-    @Schema(example = "designation")
-    @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{designation.format}")
-    @Size(min = 2, max = 20, message = "{designation.size.message}")
+    @Schema(example = "designationId")
+//    @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{designation.format}")
+    @Size(min = 2, max = 100, message = "{designation.size.message}")
     private String designation;
 
-    @Schema(example = "dateOfHiring")
+    @Schema(example = "yyyy-mm-dd")
     @Pattern(regexp =  "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$", message = "{dateOfHiring.format}")
     @NotBlank(message = "{dateOfHiring.notnull.message}")
     private String dateOfHiring;
 
-    @Schema(example = "department")
-    @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{department.format}")
-    @Size(min = 2, max = 20, message = "{department.size.message}")
+    @Schema(example = "departmentId")
+//    @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{department.format}")
+    @Size(min = 2, max = 100, message = "{department.size.message}")
     private String department;
 
     @Schema(example = "location")
     @Pattern(regexp = "^(?!\\s)(?!.*\\s$)[A-Za-z0-9\\s,'#,&*()^\\-/]*$", message = "{location.format}")
-    @NotBlank(message = "{location.notnull.message}")
+    @Size(min = 2, max = 100, message = "{location.notnull.message}")
     private String location;
 
     @Schema(example = "manager")
@@ -83,8 +83,6 @@ public class EmployeeRequest {
     @Size(min = 1, message = "{roles.size}")
     private List<@NotBlank(message = "{role.notnull.message}")
     @Pattern(regexp = "^[A-Z][a-z]+$", message = "{roles.format}") String> roles;
-
-
 
     @Schema(example = "status")
     @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{status.format}")
@@ -107,7 +105,7 @@ public class EmployeeRequest {
     @NotBlank(message = "{aadhaarId.notnull.message}")
     private String aadhaarId;
 
-    @Schema(example = "status")
+    @Schema(example = "yyyy-mm-dd")
     @Pattern(regexp =  "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$", message = "{dateOfBirth.format}")
     @NotBlank(message = "{dateOfBirth.notnull.message}")
     private String dateOfBirth;

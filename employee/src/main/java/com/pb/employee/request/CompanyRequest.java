@@ -13,7 +13,7 @@ import lombok.*;
 public class CompanyRequest {
 
     @Schema(example = "companyName")
-    @Size(min = 2, max = 20, message = "{size.message}")
+    @Size(min = 2, max = 40, message = "{size.message}")
     @Pattern(regexp ="^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{companyname.message}")
     private String companyName;
 
@@ -28,7 +28,7 @@ public class CompanyRequest {
     private String password;
 
     @Schema(example = "companyAddress")
-    @NotNull(message = "{companyAddress.notnull.message}")
+    @Size(min = 2, max = 100, message = "{companyAddress.notnull.message}")
     @Pattern(regexp = "^(?!\\s)(?!.*\\s$)[a-zA-Z0-9\\s,'#,&*()^\\-/]*$", message = "{companyAddress.pattern.message}")
     private String companyAddress;
 
@@ -73,15 +73,14 @@ public class CompanyRequest {
     private String personalMobileNo;
 
     @Schema(example = "address")
-    @NotNull(message = "{address.notnull.message}")
     @Pattern(regexp = "^[A-Za-z0-9\\s,.'-]+$", message = "{companyAddress.pattern.message}")
-    @Size(min = 1, max = 100, message = "{companyAddress.pattern.message}")
+    @Size(min = 2, max = 100, message = "{address.notnull.message}")
     private String address;
 
     private String imageFile;
 
     @Schema(example = "companyType")
-    @Pattern(regexp = "^(?!\\s)(?!.*\\s$)[a-zA-Z0-9\\s,'#,&*()^\\-/]*$", message = "{companyAddress.pattern.message}")
+    @Pattern(regexp = "^(?!\\s)(?!.*\\s$)[a-zA-Z0-9\\s,'#,&*()^\\-/]*$", message = "{companyType.pattern.message}")
     private String companyType;
 
     @Schema(example = "cinNo")

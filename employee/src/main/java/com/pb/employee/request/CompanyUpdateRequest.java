@@ -30,8 +30,7 @@ public class CompanyUpdateRequest {
     private String landNo;
 
     @Schema(example = "name")
-    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{name.message}")
-    @Size(min = 3, max = 20, message = "{name.notnull.message}")
+    @Pattern(regexp = "^[A-Za-z]{3,20}(?:\\s[A-Za-z]{2,19})*$", message = "{name.message}")
     private String name;
 
     @Schema(example = "personalMailId")
