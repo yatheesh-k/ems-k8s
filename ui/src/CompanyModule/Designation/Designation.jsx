@@ -28,19 +28,20 @@ const Designation = () => {
   const { user} = useAuth();
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
-    setSelectedItemId(null); // Reset the selected item ID
+    setSelectedItemId(null); 
   };
 
   const handleShowDeleteModal = (id) => {
-    setSelectedItemId(id); // Set the ID of the item to be deleted
+    setSelectedItemId(id); 
     setShowDeleteModal(true);
   };
 
-  const fetchDesignation = async () => {
+   const fetchDesignation = async () => {
     try {
       const designations = await DesignationGetApi();
-      setDesignations(designations);
-      setFilteredData(designations);
+      const sortedDesignations = designations.sort((a, b) => a.name.localeCompare(b.name));
+      setDesignations(sortedDesignations);
+      setFilteredData(sortedDesignations);
     } catch (error) {
       // handleApiErrors(error);
     }
@@ -85,20 +86,31 @@ const Designation = () => {
     }
   };
 
-  const handleConfirmDelete = async (id) => {
-    if (id) {
+  const handleConfirmDelete = async () => {
+    if (selectedItemId) {
       try {
-        await DesignationDeleteApiById(id)
-        setTimeout(() => {
-          toast.success("Designation Deleted Successfully");
-            fetchDesignation(); // Fetch updated list of departments after delay
-          }, 900);
+        await DesignationDeleteApiById(selectedItemId)
+          .then((response) => {
+           
+              toast.success("Designation Deleted Succesfully", {
+                position: "top-right",
+                transition: Bounce,
+                hideProgressBar: true,
+                theme: "colored",
+                autoClose: 3000,
+              });
+              setTimeout(() => {
+                fetchDesignation();
+                //getEmployees()
+            handleCloseDeleteModal();
+            },1000);
 
-        handleCloseDeleteModal(); // Close the delete confirmation modal
+
+          });
       } catch (error) {
-        handleApiErrors(error);
+        handleApiErrors(error)
       }
-    } 
+    }
   };
 
   const handleApiErrors = (error) => {

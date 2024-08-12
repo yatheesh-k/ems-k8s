@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import DataTable from 'react-data-table-component';
 import { PencilSquare, XSquareFill } from 'react-bootstrap-icons';
-import { toast } from 'react-toastify';
+import { Bounce, toast } from 'react-toastify';
 import LayOut from '../../LayOut/LayOut';
 import DeletePopup from '../../Utils/DeletePopup';
 import { ModalBody, ModalHeader, ModalTitle } from 'react-bootstrap';
@@ -33,11 +33,12 @@ const Department = () => {
   const fetchDepartments = async () => {
     try {
       const response = await DepartmentGetApi();
-      setDepartments(response.data.data);
+      const sortedDepartments = response.data.data.sort((a, b) => a.name.localeCompare(b.name));
+      setDepartments(sortedDepartments);
     } catch (error) {
       // handleApiErrors(error);
     }
-  };
+  };  
   useEffect(() => {
     fetchDepartments();
   }, []);
@@ -76,17 +77,27 @@ const Department = () => {
   };
 
 
-  const handleConfirmDelete = async (id) => {
-    if (id) {
+  const handleConfirmDelete = async () => {
+    if (selectedItemId) {
       try {
-        await DepartmentDeleteApiById(id)
-        setTimeout(() => {
-          toast.success("Department Deleted Successfully");
-          fetchDepartments(); // Fetch updated list of departments after delay
-        }, 900);
-        handleCloseDeleteModal(); // Close the delete confirmation modal
+        await DepartmentDeleteApiById(selectedItemId)
+          .then((response) => {
+           
+              toast.success("Department Deleted Succesfully", {
+                position: "top-right",
+                transition: Bounce,
+                hideProgressBar: true,
+                theme: "colored",
+                autoClose: 3000,
+              });
+              setTimeout(() => {
+                fetchDepartments();
+                //getEmployees()
+            handleCloseDeleteModal();
+            },1000);
+          });
       } catch (error) {
-        handleApiErrors(error);
+        handleApiErrors(error)
       }
     }
   };

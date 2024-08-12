@@ -206,9 +206,9 @@ const SideNav = () => {
           ) : (
             <span>
               {user && user.userRole && user.userRole.includes("ems_admin") ? (
-                <imgx
+                <img
                   className="align-middle"
-                  src={emsAdminLogoPath}
+                  src='assets/img/pathbreaker_logo.png'
                   alt="EMS Admin Logo"
                   style={{ height: "80px", width: "180px" }}
                 />
@@ -398,7 +398,63 @@ const SideNav = () => {
                               </span>
                             </Link>
                           </li> */}
-
+                              <li className="sidebar-item has-dropdown">
+                <a
+                  className="sidebar-link collapsed d-flex justify-content-between align-items-center"
+                  data-bs-target="#attendenceManagement"
+                  data-bs-toggle="collapse"
+                  href
+                  onClick={toggleAttendance}
+                >
+                  <span className="align-middle">
+                    <i
+                      className="bi bi-calendar-check-fill"
+                      style={{ fontSize: "medium" }}
+                    ></i>
+                  </span>{" "}
+                  <span className="align-middle" style={{ fontSize: "large" }}>
+                    Attendance
+                  </span>
+                  <i
+                    className={`bi ${isAttendanceOpen ? "bi-chevron-up" : "bi-chevron-down"
+                      } ms-auto`}
+                  ></i>
+                </a>
+                <ul
+                  id="attendenceManagement"
+                  className={`sidebar-dropDown list-unstyled collapse ${isAttendanceOpen ? "show" : ""
+                    }`}
+                >
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${location.pathname === "/addAttendance" ? "active" : ""
+                      }`}
+                  >
+                    <Link className="sidebar-link" to={"/addAttendance"}>
+                      Manage Attendance
+                    </Link>
+                  </li>
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${location.pathname === "/attendanceReport" ? "active" : ""
+                      }`}
+                  >
+                    <Link className="sidebar-link" to={"/attendanceReport"}>
+                      Attendance Report
+                    </Link>
+                  </li>
+                  {/* <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${
+                      location.pathname === "/attendanceList" ? "active" : ""
+                    }`}
+                  >
+                    <Link className="sidebar-link" to={"/attendanceList"}>
+                      Attendance List
+                    </Link>
+                  </li> */}
+                </ul>
+              </li>
               <li className="sidebar-item">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
@@ -503,63 +559,6 @@ const SideNav = () => {
                   >
                     <Link className="sidebar-link" to={"/incrementList"}>
                       Increment List
-                    </Link>
-                  </li> */}
-                </ul>
-              </li>
-              <li className="sidebar-item has-dropdown">
-                <a
-                  className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  data-bs-target="#attendenceManagement"
-                  data-bs-toggle="collapse"
-                  href
-                  onClick={toggleAttendance}
-                >
-                  <span className="align-middle">
-                    <i
-                      className="bi bi-calendar-check-fill"
-                      style={{ fontSize: "medium" }}
-                    ></i>
-                  </span>{" "}
-                  <span className="align-middle" style={{ fontSize: "large" }}>
-                    Attendance
-                  </span>
-                  <i
-                    className={`bi ${isAttendanceOpen ? "bi-chevron-up" : "bi-chevron-down"
-                      } ms-auto`}
-                  ></i>
-                </a>
-                <ul
-                  id="attendenceManagement"
-                  className={`sidebar-dropDown list-unstyled collapse ${isAttendanceOpen ? "show" : ""
-                    }`}
-                >
-                  <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${location.pathname === "/addAttendance" ? "active" : ""
-                      }`}
-                  >
-                    <Link className="sidebar-link" to={"/addAttendance"}>
-                      Manage Attendance
-                    </Link>
-                  </li>
-                  <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${location.pathname === "/attendanceReport" ? "active" : ""
-                      }`}
-                  >
-                    <Link className="sidebar-link" to={"/attendanceReport"}>
-                      Attendance Report
-                    </Link>
-                  </li>
-                  {/* <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${
-                      location.pathname === "/attendanceList" ? "active" : ""
-                    }`}
-                  >
-                    <Link className="sidebar-link" to={"/attendanceList"}>
-                      Attendance List
                     </Link>
                   </li> */}
                 </ul>

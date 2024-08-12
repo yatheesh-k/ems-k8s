@@ -346,7 +346,7 @@ const CompanyRegistration = () => {
                         placeholder="Enter Service Name"
                         autoComplete="off"
                         {...register("shortName", {
-                          required: "Short Name is required",
+                          required: "Service Name is required",
                           pattern: {
                             value: /^[a-z]+$/,
                             message:
@@ -537,9 +537,13 @@ const CompanyRegistration = () => {
                         {...register("companyAddress", {
                           required: "Company Address is required",
                           pattern: {
-                            value: /^[a-zA-Z0-9\s,'#,&*()^\-/.]*$/,
+                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*()^\-/]*$/,
                             message:
                               "Please enter valid Address",
+                          },
+                          minLength: {
+                            value: 3,
+                            message: "minimum 3 characters allowed",
                           },
                           maxLength: {
                             value: 100,
@@ -680,7 +684,7 @@ const CompanyRegistration = () => {
                         onKeyDown={handleEmailChange}
                         maxLength={10}
                         {...register("panNo", {
-                          required: "Company Pan Number is required",
+                          required: "Company PAN Number is required",
                           maxLength: {
                             value: 10,
                             message: "PAN Number must not exceed 10 characters",
@@ -817,8 +821,12 @@ const CompanyRegistration = () => {
                             value: 100,
                             message: "Name must not exceed 100 characters",
                           },
+                          minLength: {
+                            value: 3,
+                            message: "Mimium 3 characters required",
+                          },
                           pattern: {
-                            value: /^[a-zA-Z0-9\s,'#,&*()^\-/.]*$/,
+                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*()^\-/]*$/,
                             message: "Please enter valid Address",
                           },
                         })}

@@ -231,7 +231,6 @@ const CompanyView = () => {
               <div className="card-header">
                 <div className='row mb-2'>
                   <div className='col-12 col-md-6 col-lg-4'>
-                    <p className="card-title"> Company View</p>
                   </div>
                   <div className='col-12 col-md-6 col-lg-4'></div>
                   <div className='col-12 col-md-6 col-lg-4'>

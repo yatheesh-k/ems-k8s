@@ -150,7 +150,7 @@ const EmployeeView = () => {
             padding: "2px",
           }}
         >
-          Inactive
+          InActive
         </b>
       ),
     },

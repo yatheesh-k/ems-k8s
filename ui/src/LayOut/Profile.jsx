@@ -11,7 +11,7 @@ import { useAuth } from "../Context/AuthContext";
 
 function Profile() {
   const { register, handleSubmit, setValue, formState: { errors } } = useForm({ mode: "onChange" });
-  const {user}=useAuth();
+  const { user } = useAuth();
   //const [companyId, setCompanyId] = useState(null);
   const [companyData, setCompanyData] = useState({});
   const [postImage, setPostImage] = useState("");
@@ -78,7 +78,7 @@ function Profile() {
     }
   };
 
-  const  toInputTitleCase = (e) => {
+  const toInputTitleCase = (e) => {
     const input = e.target;
     let value = input.value;
     // Remove leading spaces
@@ -117,7 +117,7 @@ function Profile() {
 
       // Remove leading spaces
       value = value.replace(/^\s+/g, '');
-      
+
       // Capitalize the first letter of each word
       const words = value.split(' ');
       const capitalizedWords = words.map(word => {
@@ -129,29 +129,29 @@ function Profile() {
 
     // Update input value
     input.value = value;
-};
+  };
 
-const handleLogoSubmit = async () => {
-  if (!user.companyId) return;
-  try {
-    if (postImage) {
-      const formData = new FormData();
-      formData.append("image", "string");
-      formData.append("file", postImage);
-      await CompanyImagePatchApi(user.companyId, formData);
-      setPostImage("");
-      setSuccessMessage("Logo updated successfully.");
-      toast.success("Company Logo Updated Successfully");
-      setErrorMessage("");
-      closeModal();
+  const handleLogoSubmit = async () => {
+    if (!user.companyId) return;
+    try {
+      if (postImage) {
+        const formData = new FormData();
+        formData.append("image", "string");
+        formData.append("file", postImage);
+        await CompanyImagePatchApi(user.companyId, formData);
+        setPostImage("");
+        setSuccessMessage("Logo updated successfully.");
+        toast.success("Company Logo Updated Successfully");
+        setErrorMessage("");
+        closeModal();
+      }
+    } catch (err) {
+      console.error("Logo update error:", err);
+      setSuccessMessage("");
+      setErrorMessage("Failed to update logo.");
+      setError(err);
     }
-  } catch (err) {
-    console.error("Logo update error:", err);
-    setSuccessMessage("");
-    setErrorMessage("Failed to update logo.");
-    setError(err);
-  }
-};
+  };
 
   const handleEmailChange = (e) => {
     const value = e.target.value;
@@ -239,29 +239,7 @@ const handleLogoSubmit = async () => {
                           justifyContent: "center",
                         }}
                       >
-                        {postImage ? (
-                          <>
-                            <img
-                              src={postImage}
-                              alt="Selected Logo"
-                              style={{ width: "100%", height: "auto" }}
-                            />
-                            <button
-                              className="btn btn-sm btn-danger"
-                              style={{
-                                position: "absolute",
-                                top: -10,
-                                right: -10,
-                                borderRadius: "50%",
-                              }}
-                              onClick={handleRemoveLogo}
-                            >
-                              X
-                            </button>
-                          </>
-                        ) : (
-                          <CameraFill />
-                        )}
+                        <CameraFill />
                       </div>
                     </div>
                   </div>
@@ -331,9 +309,9 @@ const handleLogoSubmit = async () => {
                             },
                           })}
                         />
-                         {errors.mobileNo && (
-                        <p className="errorMsg">{errors.mobileNo.message}</p>
-                      )}
+                        {errors.mobileNo && (
+                          <p className="errorMsg">{errors.mobileNo.message}</p>
+                        )}
                       </div>
                     </div>
                     <div className="col-md-6">
@@ -554,8 +532,8 @@ const handleLogoSubmit = async () => {
                           })}
                         />
                         {errors.name && (
-                        <p className="errorMsg">{errors.name.message}</p>
-                      )}
+                          <p className="errorMsg">{errors.name.message}</p>
+                        )}
                       </div>
                       <div className="mb-3">
                         <label
@@ -580,10 +558,10 @@ const handleLogoSubmit = async () => {
                           })}
                         />
                         {errors.personalMailId && (
-                        <p className="errorMsg">
-                          {errors.personalMailId.message}
-                        </p>
-                      )}
+                          <p className="errorMsg">
+                            {errors.personalMailId.message}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <div className="col-md-6">
@@ -609,11 +587,11 @@ const handleLogoSubmit = async () => {
                             },
                           })}
                         />
-                         {errors.personalMobileNo && (
-                        <p className="errorMsg">
-                          {errors.personalMobileNo.message}
-                        </p>
-                      )}
+                        {errors.personalMobileNo && (
+                          <p className="errorMsg">
+                            {errors.personalMobileNo.message}
+                          </p>
+                        )}
                       </div>
                       <div className="mb-3">
                         <label htmlFor="designation" className="form-label">
@@ -626,21 +604,21 @@ const handleLogoSubmit = async () => {
                           onInput={toInputTitleCase}
                           defaultValue={companyData.address}
                           maxLength={100}
-                        {...register("address", {
-                          required: "Address is required",
-                          maxLength: {
-                            value: 100,
-                            message: "Name must not exceed 100 characters",
-                          },
-                          pattern: {
-                            value: /^[a-zA-Z0-9\s,'#,&*()^\-/.]*$/,
-                            message: "Please enter valid Address",
-                          },
-                        })}
+                          {...register("address", {
+                            required: "Address is required",
+                            maxLength: {
+                              value: 100,
+                              message: "Name must not exceed 100 characters",
+                            },
+                            pattern: {
+                              value: /^[a-zA-Z0-9\s,'#,&*()^\-/.]*$/,
+                              message: "Please enter valid Address",
+                            },
+                          })}
                         />
-                         {errors.address && (
-                        <p className="errorMsg">{errors.address.message}</p>
-                      )}
+                        {errors.address && (
+                          <p className="errorMsg">{errors.address.message}</p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -681,7 +659,7 @@ const handleLogoSubmit = async () => {
             />
             {postImage && (
               <div>
-                <image src={postImage} alt="Selected Logo" style={{ width: "100%" }} />
+                <image src={postImage} alt="Selected Logo" style={{ width: "50%" }} />
               </div>
             )}
             {errors.file && (
@@ -692,7 +670,7 @@ const handleLogoSubmit = async () => {
           </ModalBody>
           <ModalFooter>
             <Button variant="secondary" onClick={closeModal}>
-              Cancle
+              Cancel
             </Button>
             <Button variant="primary" onClick={handleSubmit(handleLogoSubmit)}>
               Upload

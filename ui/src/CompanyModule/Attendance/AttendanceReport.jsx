@@ -132,8 +132,9 @@ const AttendanceReport = () => {
       });
       setTimeout(() => {
         handleCloseDeleteModal();
+        fetchAttendanceData();
         setRefreshData((prev) => !prev);
-      }, 1200);
+      }, 1500);
     } catch (error) {
       handleApiErrors(error);
     }
@@ -155,6 +156,7 @@ const AttendanceReport = () => {
         handleCloseEditModal();
         setRefreshData((prev) => !prev);
         navigate("/attendanceReport");
+        fetchAttendanceData();
       }, 1000);
     } catch (error) {
       handleApiErrors(error);
@@ -282,7 +284,7 @@ const AttendanceReport = () => {
                       />
                     </div>
                     <div className="col-md-3 mt-5">
-                      <button
+                      <button style={{paddingBottom:"8px"}}
                         className="btn btn-primary"
                         onClick={filterByMonthYear}
                         disabled={!employeeId || !selectedMonth || !selectedYear}
@@ -345,6 +347,7 @@ const AttendanceReport = () => {
                         <input
                           type="number"
                           name='totalWorkingDays'
+                          readOnly
                           className="form-control"
                           {...register("totalWorkingDays", { required: true })}
                         />

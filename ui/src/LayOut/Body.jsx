@@ -4,10 +4,10 @@ import { useAuth } from "../Context/AuthContext";
 import { userRoles } from "../Utils/Auth";
 
 const Body = () => {
-  //const {userRoles}=useAuth();
+  const {user}=useAuth();
   
   // Check if userRoles is defined and if 'ems_admin' role is included
-  const isAdmin = userRoles && userRoles.includes('ems_admin');
+  const isAdmin = user && user.userRole && user.userRole.includes("ems_admin");
 
   return (
     <LayOut>

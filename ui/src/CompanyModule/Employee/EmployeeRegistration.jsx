@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Select from "react-select";
-import { Eye, EyeSlash} from "react-bootstrap-icons";
+import { Eye, EyeSlash } from "react-bootstrap-icons";
 import { useLocation, useNavigate } from "react-router-dom";
-import {toast } from "react-toastify";
+import { toast } from "react-toastify";
 import LayOut from "../../LayOut/LayOut";
 import { DepartmentGetApi, DesignationGetApi, EmployeeGetApiById, EmployeePatchApiById, EmployeePostApi, EmployeePutApiById, employeeUpdateByIdApi, employeeViewApi } from "../../Utils/Axios";
 import { useAuth } from "../../Context/AuthContext";
@@ -25,7 +25,7 @@ const EmployeeRegistration = () => {
     },
     mode: "onChange",
   });
-  const { user} = useAuth();
+  const { user } = useAuth();
   const [departments, setDepartments] = useState([]);
   const [designations, setDesignations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -238,8 +238,8 @@ const EmployeeRegistration = () => {
     }
   };
 
-  
-  
+
+
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
       const errorMessage = error.response.data.error.message;
@@ -249,7 +249,7 @@ const EmployeeRegistration = () => {
     }
     console.error(error.response);
   };
-  
+
   useEffect(() => {
     if (location && location.state && location.state.id) {
       const fetchData = async () => {
@@ -276,7 +276,7 @@ const EmployeeRegistration = () => {
       fetchData();
     }
   }, [location.state, reset, setValue]);
-  
+
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -405,9 +405,9 @@ const EmployeeRegistration = () => {
                         {...register("employeeId", {
                           required: "Employee Id Required",
                           pattern: {
-                            value: /^[A-Z0-9]+$/,
-                            message: "Characters are Not Allowed",
-                          },
+                            value: /^(?=.*\d)[A-Z0-9]+$/,
+                            message: "Must include at least one number and cannot contain only letters.",
+                          },                          
                           minLength: {
                             value: 1,
                             message: "minimum 1 character Required",
@@ -651,10 +651,9 @@ const EmployeeRegistration = () => {
                         {...register("location", {
                           required: "Location Required",
                           pattern: {
-                            value: /^[a-zA-Z0-9\s,'#,&*()^\-/]*$/,
-                            message:
-                              "Invalid Location",
-                          },
+                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*()^\-/]*$/,
+                            message: "Invalid Location",
+                          },                          
                           minLength: {
                             value: 3,
                             message: "minimum 3 characters required",

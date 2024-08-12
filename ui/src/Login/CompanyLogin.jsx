@@ -257,9 +257,11 @@ const CompanyLogin = () => {
                                   {errors.password.message}
                                 </p>
                               )}
+                              <div className="mt-3">
                               <medium>
                                 <a href="/forgotPassword">Forgot password?</a>
                               </medium>
+                              </div>
                             </>
                           )}
                           {otpSent && !otpExpired && (

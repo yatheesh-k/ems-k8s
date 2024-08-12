@@ -227,7 +227,7 @@ const EmployeeSalaryStructure = () => {
   
     EmployeeSalaryPostApi(employeeId, postData)
       .then((response) => {
-        toast.success(response.data.message);
+        toast.success("Employee Salary Added Successfully");
         setErrorMessage(""); // Clear error message on success
         setShowFields(false);
         navigate('/employeeview');

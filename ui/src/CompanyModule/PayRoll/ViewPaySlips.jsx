@@ -277,7 +277,7 @@ const ViewPaySlips = () => {
                 <div className="form-group">
                   <button
                     type="button"
-                    style={{marginTop:"10px"}}
+                    style={{marginTop:"8px",paddingBottom:"8px"}}
                     className="btn btn-primary btn-block"
                     onClick={handleGoClick}
                     disabled={!selectedEmployeeId || !selectedMonth || !selectedYear}

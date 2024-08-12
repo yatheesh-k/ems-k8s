@@ -16,7 +16,6 @@ const Header = ({ toggleSidebar }) => {
   const [error, setError] = useState(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
-  const [companyName, setCompanyName] = useState(company);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const profileDropdownRef = useRef(null);
@@ -115,6 +114,7 @@ const Header = ({ toggleSidebar }) => {
         <ul className="navbar-nav navbar-align">
           {roles.includes("ems_admin") && (
             <li className="nav-item">
+              <span>EMS_Admin</span>
               <a
                 className="nav-link dropdown-toggle d-none d-sm-inline-block text-center"
                 href
@@ -126,7 +126,7 @@ const Header = ({ toggleSidebar }) => {
                 <div
                   className="dropdown-menu dropdown-menu-end py-0 show"
                   aria-labelledby="profileDropdown"
-                  style={{ left: "auto", right: "6%" }}
+                  style={{ left: "auto", right: "3%" }}
                 >
                   <a className="dropdown-item"   href onClick={handleResetPasswordClick}>
                     <i className="align-middle me-1 bi bi-key"></i> Reset Password
@@ -134,7 +134,7 @@ const Header = ({ toggleSidebar }) => {
                   <div className="dropdown-divider"></div>
                   <a className="dropdown-item"   href onClick={handleLogOut}>
                     <i className="align-middle bi bi-arrow-left-circle" style={{ paddingRight: "10px" }}></i>
-                    Log out
+                    Logout
                   </a>
                 </div>
               )}
@@ -147,14 +147,14 @@ const Header = ({ toggleSidebar }) => {
                 href
                 onClick={toggleProfile}
               >
-                <span className="text-dark p-2 mb-3">{companyName}</span>
+                <span className="text-dark p-2 mb-3">{user.company}</span>
                 <i className="bi bi-person-circle" style={{ fontSize: "22px" }}></i>
               </a>
               {isProfileOpen && (
                 <div
                   className="dropdown-menu dropdown-menu-end py-0 show"
                   aria-labelledby="profileDropdown"
-                  style={{ left: "auto", right: "40%" }}
+                  style={{ left: "auto", right: "10%" }}
                 >
                   <a className="dropdown-item" href="/profile">
                     <i className="align-middle me-1 bi bi-person"></i> Profile
@@ -165,7 +165,7 @@ const Header = ({ toggleSidebar }) => {
                   <div className="dropdown-divider"></div>
                   <a className="dropdown-item"   href onClick={handleLogOut}>
                     <i className="align-middle bi bi-arrow-left-circle" style={{ paddingRight: "10px" }}></i>
-                    Log out
+                    Logout
                   </a>
                 </div>
               )}
@@ -205,7 +205,7 @@ const Header = ({ toggleSidebar }) => {
         </ul>
       </div>
       <Reset
-        companyName={companyName}
+        companyName={user.company}
         show={showResetPasswordModal}
         onClose={() => setShowResetPasswordModal(false)}
       />

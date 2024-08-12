@@ -28,7 +28,7 @@ const ManageAttendance = () => {
       const response = await AttendanceManagementApi(formData);
 
       if (response.data.path) {
-        toast.success(response.data.message);
+        toast.success("Attendance Added Successfully");
         reset(); // Reset form after successful submission
       } else {
         toast.error(response.data.error.message);
