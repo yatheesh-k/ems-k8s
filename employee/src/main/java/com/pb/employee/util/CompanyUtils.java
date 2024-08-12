@@ -443,31 +443,32 @@ public class CompanyUtils {
 
     public static Entity maskAttendanceProperties(AttendanceRequest attendanceRequest, String attendanceId, String employeeId) {
         String totalWd = null, noOfWd = null,fn=null,email=null,ln=null;
-        if(attendanceRequest.getTotalWorkingDays() != null) {
-            totalWd = (Base64.getEncoder().encodeToString(attendanceRequest.getTotalWorkingDays().getBytes()));
-        }if(attendanceRequest.getNoOfWorkingDays()!= null) {
-            noOfWd = (Base64.getEncoder().encodeToString(attendanceRequest.getNoOfWorkingDays().getBytes()));
-        }
-        if(attendanceRequest.getEmailId()!= null) {
-            email = (Base64.getEncoder().encodeToString(attendanceRequest.getEmailId().getBytes()));
-        }
-        if(attendanceRequest.getFirstName()!= null) {
-            fn = (Base64.getEncoder().encodeToString(attendanceRequest.getFirstName().getBytes()));
-        }
-        if(attendanceRequest.getLastName()!= null) {
-            ln = (Base64.getEncoder().encodeToString(attendanceRequest.getLastName().getBytes()));
-        }
         ObjectMapper objectMapper = new ObjectMapper();
 
         AttendanceEntity entity = objectMapper.convertValue(attendanceRequest, AttendanceEntity.class);
 
-        entity.setAttendanceId(attendanceId);
+        if(attendanceRequest.getTotalWorkingDays() != null) {
+            totalWd = (Base64.getEncoder().encodeToString(attendanceRequest.getTotalWorkingDays().getBytes()));
+            entity.setTotalWorkingDays(totalWd);
+
+        }if(attendanceRequest.getNoOfWorkingDays()!= null) {
+            noOfWd = (Base64.getEncoder().encodeToString(attendanceRequest.getNoOfWorkingDays().getBytes()));
+            entity.setNoOfWorkingDays(noOfWd);
+        }
+        if(attendanceRequest.getEmailId()!= null) {
+            email = (Base64.getEncoder().encodeToString(attendanceRequest.getEmailId().getBytes()));
+            entity.setEmailId(email);
+        }
+        if(attendanceRequest.getFirstName()!= null) {
+            fn = (Base64.getEncoder().encodeToString(attendanceRequest.getFirstName().getBytes()));
+            entity.setFirstName(fn);
+        }
+        if(attendanceRequest.getLastName()!= null) {
+            ln = (Base64.getEncoder().encodeToString(attendanceRequest.getLastName().getBytes()));
+            entity.setLastName(ln);
+        }
         entity.setEmployeeId(employeeId);
-        entity.setTotalWorkingDays(totalWd);
-        entity.setNoOfWorkingDays(noOfWd);
-        entity.setFirstName(fn);
-        entity.setLastName(ln);
-        entity.setEmailId(email);
+        entity.setAttendanceId(attendanceId);
         entity.setType(Constants.ATTENDANCE);
 
         return entity;

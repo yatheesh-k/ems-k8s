@@ -50,21 +50,42 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public ResponseEntity<?> uploadAttendanceFile(String company,MultipartFile file) throws EmployeeException {
+    public ResponseEntity<?> uploadAttendanceFile(String company, MultipartFile file) throws EmployeeException {
         if (file.isEmpty()) {
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPTY_FILE), HttpStatus.BAD_REQUEST);
         }
-        List<AttendanceRequest> attendanceRequests = null;
+        List<AttendanceRequest> attendanceRequests;
 
         try {
-             attendanceRequests = parseExcelFile(file, company);
+            // Parse the file to get attendance requests
+            attendanceRequests = parseExcelFile(file, company);
+        } catch (Exception e) {
+            log.error("Error processing the uploaded file: {}", e.getMessage(), e);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.FAILED_TO_PROCESS), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        // Check if the attendanceRequests list is empty
+        if (attendanceRequests.isEmpty()) {
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_ATTENDANCE_DATA), HttpStatus.BAD_REQUEST);
+        }
+
+        // Iterate through the attendance requests and validate each field
+        for (AttendanceRequest attendanceRequest : attendanceRequests) {
+            if (attendanceRequest.getEmailId() == null ||
+                    attendanceRequest.getFirstName() == null ||
+                    attendanceRequest.getLastName() == null ||
+                    attendanceRequest.getEmployeeId() == null ||
+                    attendanceRequest.getNoOfWorkingDays() == null) {
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_ATTENDANCE_DATA), HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        try {
             for (AttendanceRequest attendanceRequest : attendanceRequests) {
                 String index = ResourceIdUtils.generateCompanyIndex(attendanceRequest.getCompany());
-
                 String employeeId = ResourceIdUtils.generateEmployeeResourceId(attendanceRequest.getEmailId());
-                EmployeeEntity employee = null;
 
-                employee = openSearchOperations.getEmployeeById(employeeId, null, index);
+                EmployeeEntity employee = openSearchOperations.getEmployeeById(employeeId, null, index);
                 if (EmployeeStatus.INACTIVE.getStatus().equals(employee.getStatus())) {
                     log.error("The employee is inactive {}", employeeId);
                     return new ResponseEntity<>(
@@ -72,16 +93,21 @@ public class AttendanceServiceImpl implements AttendanceService {
                             HttpStatus.CONFLICT);
                 }
 
+                // Add attendance of employees
                 addAttendanceOfEmployees(attendanceRequest);
             }
         } catch (Exception e) {
-            log.error("Error processing the uploaded file: {}", e.getMessage(), e);
+            log.error("Error processing the attendance requests: {}", e.getMessage(), e);
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.FAILED_TO_PROCESS), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
         log.debug("The attendance added successfully...");
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.CREATED);
     }
+
+
+
 
     @Override
     public ResponseEntity<?> getAllEmployeeAttendance(String companyName, String employeeId, String month, String year) throws EmployeeException {
@@ -173,6 +199,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     private List<AttendanceRequest> parseExcelFile(MultipartFile file, String company) throws Exception {
         List<AttendanceRequest> attendanceRequests = new ArrayList<>();
         String fileName = file.getOriginalFilename();
+
         if (fileName != null && (fileName.endsWith(".xls") || fileName.endsWith(".xlsx"))) {
             try (InputStream excelIs = file.getInputStream()) {
                 log.info("Successfully opened input stream for file: {}", fileName);
@@ -183,16 +210,23 @@ public class AttendanceServiceImpl implements AttendanceService {
                     log.error("Failed to create workbook for file: {}", e.getMessage(), e);
                     throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.FAILED_TO_CREATE), HttpStatus.INTERNAL_SERVER_ERROR);
                 }
+
                 Sheet sheet = wb.getSheetAt(0);
                 log.info("Successfully retrieved sheet: '{}', with {} rows.", sheet.getSheetName(), sheet.getPhysicalNumberOfRows());
+
+                // Validate all rows before proceeding to add them
                 Iterator<Row> rowIt = sheet.rowIterator();
                 if (!rowIt.hasNext()) {
                     log.warn("No rows found in the sheet '{}'", sheet.getSheetName());
                 }
+                // List to temporarily hold valid attendance requests
+                List<AttendanceRequest> tempAttendanceRequests = new ArrayList<>();
+
                 // Get current year and month
                 LocalDate now = LocalDate.now();
                 String currentYear = String.valueOf(now.getYear());
                 String currentMonth = now.getMonth().name().substring(0, 1) + now.getMonth().name().substring(1).toLowerCase(); // Capitalize only first letter
+
                 while (rowIt.hasNext()) {
                     Row currentRow = rowIt.next();
                     log.info("Processing row number: {}", currentRow.getRowNum());
@@ -200,20 +234,37 @@ public class AttendanceServiceImpl implements AttendanceService {
                         log.info("Skipping header row.");
                         continue;
                     }
-                    if (StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(0)))
-                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(1)))
-                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(2)))
-                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(3)))
-                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(4)))) {
-                        log.warn("Skipping row {} as one or more critical cells are empty", currentRow.getRowNum());
+
+                    // Check if all cells in the row are empty
+                    boolean allCellsEmpty = StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(0))) && // EmployeeId
+                            StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(1))) && // FirstName
+                            StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(2))) && // LastName
+                            StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(3))) && // EmailId
+                            StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(4)));  // No of Working Days
+
+                    if (allCellsEmpty) {
+                        log.info("Skipping row {} as all cells are empty.", currentRow.getRowNum());
                         continue;
                     }
+
+                    // Check if any required field is empty or null while others have data
+                    if (StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(0))) || // EmployeeId
+                            StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(1))) || // FirstName
+                            StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(2))) || // LastName
+                            StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(3))) || // EmailId
+                            StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(4)))) { // No of Working Days
+                        log.error("Required fields missing or invalid in row {}. Stopping process.", currentRow.getRowNum());
+                        throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_ATTENDANCE_DATA), HttpStatus.BAD_REQUEST);
+                    }
+
+                    // Create an AttendanceRequest object and add it to the temporary list
                     AttendanceRequest attendanceRequest = new AttendanceRequest();
                     attendanceRequest.setCompany(company);
                     attendanceRequest.setEmployeeId(getCellValue(currentRow.getCell(0)));
                     attendanceRequest.setFirstName(getCellValue(currentRow.getCell(1)));
                     attendanceRequest.setLastName(getCellValue(currentRow.getCell(2)));
                     attendanceRequest.setEmailId(getCellValue(currentRow.getCell(3)));
+                    attendanceRequest.setNoOfWorkingDays(getCellValue(currentRow.getCell(4)));
                     // Set default year and month
                     attendanceRequest.setYear(currentYear);
                     attendanceRequest.setMonth(currentMonth);
@@ -242,12 +293,15 @@ public class AttendanceServiceImpl implements AttendanceService {
                         attendanceRequest.setTotalWorkingDays(String.valueOf(totalDaysInMonth));
                         attendanceRequest.setNoOfWorkingDays(String.valueOf(noOfWorkingDays));
                     } catch (NumberFormatException e) {
-                        log.error("Error parsing numeric values for working days: {}", e.getMessage());
-                        throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.NUMBER_EXCEPTION), HttpStatus.INTERNAL_SERVER_ERROR);
+                        log.error("Error parsing numeric values for working days in row {}: {}", currentRow.getRowNum(), e.getMessage());
                     }
-                    attendanceRequests.add(attendanceRequest);
-                    log.info("Added attendance request for employee ID: {}", attendanceRequest.getEmployeeId());
+                    // Add to temporary list if validation passes
+                    tempAttendanceRequests.add(attendanceRequest);
                 }
+
+                // If validation passes for all rows, add to the main list and proceed
+                attendanceRequests.addAll(tempAttendanceRequests);
+
                 wb.close();
             } catch (IOException e) {
                 log.error("Failed to process file: {}", e.getMessage(), e);
@@ -256,6 +310,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         } else {
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_FORMAT), HttpStatus.BAD_REQUEST);
         }
+
         return attendanceRequests;
     }
 

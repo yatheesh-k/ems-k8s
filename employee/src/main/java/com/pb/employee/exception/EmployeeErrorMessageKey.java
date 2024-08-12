@@ -57,7 +57,8 @@ public enum EmployeeErrorMessageKey {
     EMPLOYEE_NOT_FOUND("employee.not.found"),
     EMPLOYEE_INACTIVE("employee.inactive"),
     INVALID_MONTH_NAME("invalid.month"),
-    INVALID_NO_OF_WORKING_DAYS("invalid.working.days");
+    INVALID_NO_OF_WORKING_DAYS("invalid.working.days"),
+    INVALID_ATTENDANCE_DATA("invalid.attendance.data");
 
     private final String key;
 

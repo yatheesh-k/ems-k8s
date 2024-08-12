@@ -34,4 +34,4 @@ springdoc:
 
 file:
   upload:
-    path: 'C:/images/'
+    path: '/opt/ems/ui/public/CompanyLogos/'
