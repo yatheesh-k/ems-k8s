@@ -8,11 +8,8 @@ import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.opensearch.OpenSearchOperations;
 import com.pb.employee.persistance.model.*;
-import com.pb.employee.request.DepartmentRequest;
-import com.pb.employee.request.EmployeePasswordReset;
 import com.pb.employee.request.EmployeeRequest;
 import com.pb.employee.request.EmployeeUpdateRequest;
-import com.pb.employee.response.EmployeeResponse;
 import com.pb.employee.service.EmployeeService;
 import com.pb.employee.util.CompanyUtils;
 import com.pb.employee.util.Constants;
@@ -119,10 +116,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         try {
             entity = openSearchOperations.getEmployeeById(employeeId, null, index);
-            DepartmentEntity departmentEntity = openSearchOperations.getDepartmentById(entity.getDepartment(), null, index);
-            DesignationEntity designationEntity = openSearchOperations.getDesignationById(entity.getDesignation(), null, index);
-            EmployeeUtils.unmaskEmployeeProperties(entity, departmentEntity, designationEntity);
+            DepartmentEntity departmentEntity =null;
+            DesignationEntity designationEntity = null;
+            if (entity.getDepartment() !=null && entity.getDesignation() !=null) {
+                departmentEntity = openSearchOperations.getDepartmentById(entity.getDepartment(), null, index);
+                designationEntity = openSearchOperations.getDesignationById(entity.getDesignation(), null, index);
+                EmployeeUtils.unmaskEmployeeProperties(entity, departmentEntity, designationEntity);
 
+            }
         } catch (Exception ex) {
             log.error("Exception while fetching company details {}", ex);
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
