@@ -22,6 +22,9 @@ const Designation = () => {
   const [search, setSearch] = useState('');
   const [editingUserId, setEditingUserId] = useState(null);
   const [pending, setPending] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [filteredDesignation, setFilteredDesignation] = useState([]);
   const [addDesignation, setAddDesignation] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null); // State to store the ID of the item to be deleted
@@ -140,10 +143,30 @@ const Designation = () => {
     noRowsPerPage: true,
   };
 
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handlePerRowsChange = (newPerPage, page) => {
+    setRowsPerPage(newPerPage);
+    setCurrentPage(page);
+  };
+
+  // Calculate the start index and end index for the current page
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+
+  // Slice the filtered data based on the current page and rows per page
+  const paginatedData = filteredData.slice(startIndex, endIndex);
+
+  // Compute the serial number for each row
+  const getSerialNumber = (index) => startIndex + index + 1;
+
   const columns = [
     {
       name: <h5><b>S No</b></h5>,
-      selector: (row, index) => index + 1,
+      selector: (row, index) => getSerialNumber(index),
+      sortable: true
     },
     {
       name: <h5><b>Designation</b></h5>,
@@ -270,9 +293,15 @@ const Designation = () => {
               </div>
               <DataTable
                 columns={columns}
-                data={filteredData}
+                data={paginatedData}
                 pagination
-                paginationComponentOptions={{paginationComponentOptions}}
+                paginationServer
+                paginationTotalRows={filteredData.length}
+                onChangePage={handlePageChange}
+                onChangeRowsPerPage={handlePerRowsChange}
+                highlightOnHover
+                striped
+                noHeader
               />
             </div>
 

@@ -404,6 +404,7 @@ const CompanyRegistration = () => {
                             className="form-control"
                             placeholder="Enter Contact Number"
                             autoComplete="off"
+                            maxLength={10}
                             onKeyDown={handleEmailChange}
                             onInput={toInputTitleCase}
                             {...register("landNo", {
@@ -474,6 +475,7 @@ const CompanyRegistration = () => {
                             className="form-control"
                             placeholder="Enter Contact Number"
                             autoComplete="off"
+                            maxLength={10}
                             onInput={toInputTitleCase}
                             onKeyDown={handleEmailChange}
                             {...register("landNo", {
@@ -503,10 +505,11 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Alternate Number"
                         autoComplete="off"
+                        maxLength={10}
                         onInput={toInputTitleCase}
                         onKeyDown={handleEmailChange}
                         {...register("mobileNo", {
-                          required: "Mobile Number is required",
+                          required: "Alternate Number is required",
                           pattern: {
                             value: /^[0-9]{10}$/,
                             message:
@@ -732,6 +735,10 @@ const CompanyRegistration = () => {
                         autoComplete="off"
                         {...register("name", {
                           required: "Name is required",
+                          minLength: {
+                            value: 3,
+                            message: "Minimun 3 characters required",
+                          },
                           maxLength: {
                             value: 20,
                             message: "Name must not exceed 20 characters",

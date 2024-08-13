@@ -36,7 +36,7 @@ const EmployeeSalaryList = () => {
 
   const onSubmit = async (data) => {
     try {
-      const { fixedAmount, variableAmount, grossAmount, allowances, deductions, netSalary } = data;
+      const { fixedAmount, variableAmount, grossAmount, allowances, deductions, netSalary, status } = data;
   
       if (!id || !salaryId) {
         toast.error("Employee ID or Salary ID is missing.");
@@ -50,6 +50,7 @@ const EmployeeSalaryList = () => {
         grossAmount,
         allowances,
         deductions,
+        status,
         netSalary
       };
 
@@ -226,6 +227,12 @@ const EmployeeSalaryList = () => {
                       </div>
                     </div>
                     <hr />
+                    <div className="col mb-3">
+                        <div className="form-group">
+                          <label>Status:</label>
+                          <input type="text" className="form-control" defaultValue={item.status} {...register('status')} readOnly />
+                        </div>
+                      </div>
                     <div className="row mt-4 mb-3">
                       <div className="col mb-1">
                         <h3>Net Amount</h3>

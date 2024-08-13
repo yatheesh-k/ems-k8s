@@ -176,24 +176,6 @@ function Profile() {
         <h1 className="h3 mb-3">
           <strong>Profile</strong>
         </h1>
-        {/* Success Message Modal */}
-        <Modal
-          show={successMessage !== ""}
-          onHide={() => setSuccessMessage("")}
-          centered
-          style={{ zIndex: "1050" }}
-          className="custom-modal"
-        >
-          <ModalHeader closeButton>
-            <ModalTitle>Success</ModalTitle>
-          </ModalHeader>
-          <ModalBody>{successMessage}</ModalBody>
-          <ModalFooter>
-            <Button variant="secondary" onClick={() => setSuccessMessage("")}>
-              Close
-            </Button>
-          </ModalFooter>
-        </Modal>
 
         {/* Error Message Modal */}
         <Modal
@@ -297,6 +279,7 @@ function Profile() {
                         <input
                           type="text"
                           id="companyPhoneNo"
+                          placeholder="Enter Alternate Number"
                           className="form-control"
                           onInput={toInputTitleCase}
                           defaultValue={companyData.mobileNo}
@@ -399,6 +382,7 @@ function Profile() {
                           type="text"
                           id="companyAddress"
                           className="form-control"
+                          placeholder="Enter Contact Number"
                           onInput={toInputTitleCase}
                           defaultValue={companyData.landNo}
                           {...register("landNo", {
@@ -516,6 +500,7 @@ function Profile() {
                         <input
                           type="text"
                           id="name"
+                          placeholder="Enter Name"
                           className="form-control"
                           onInput={toInputTitleCase}
                           defaultValue={companyData.name}
@@ -540,11 +525,12 @@ function Profile() {
                           htmlFor="personalMailId"
                           className="form-label"
                         >
-                          Personal Mail ID
+                          Personal Mail Id
                         </label>
                         <input
                           type="text"
                           id="personalMailId"
+                          placeholder="Enter personal Mail Id"
                           className="form-control"
                           onInput={toInputLowerCase}
                           defaultValue={companyData.personalMailId}
@@ -576,6 +562,7 @@ function Profile() {
                           type="text"
                           id="personalMobileNo"
                           className="form-control"
+                          placeholder="Enetr Personal Mobile No"
                           onInput={toInputTitleCase}
                           defaultValue={companyData.personalMobileNo}
                           {...register("personalMobileNo", {
@@ -599,7 +586,8 @@ function Profile() {
                         </label>
                         <input
                           type="text"
-                          id="designation"
+                          id="address"
+                          placeholder="Enter Address"
                           className="form-control"
                           onInput={toInputTitleCase}
                           defaultValue={companyData.address}

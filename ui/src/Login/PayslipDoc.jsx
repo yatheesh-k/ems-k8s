@@ -55,7 +55,7 @@ const PayslipDoc = () => {
         fetchCompanyLogo(companyId);
         fetchCompanyData(companyId)
       } catch (error) {
-        handleApiErrors(error);
+        // handleApiErrors(error);
       }
     };
 
@@ -71,7 +71,7 @@ const PayslipDoc = () => {
         const response = await EmployeePayslipGetById(employeeId, payslipId);
         setPayslipData(response.data.data);
       } catch (error) {
-        handleApiErrors(error)
+        // handleApiErrors(error)
       }
     };
     if (employeeId && payslipId) {

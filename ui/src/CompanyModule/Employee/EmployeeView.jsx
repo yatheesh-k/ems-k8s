@@ -194,11 +194,10 @@ const EmployeeView = () => {
     },
     {
       name: <h6><b>Department</b></h6>,
-      selector: row => row.department,
+      selector: row => row.departmentName,
       sortable: true,
       width:"130px",
     },
-
     {
       name: <h6><b>Date Of Hiring</b></h6>,
       selector:row=> row.dateOfHiring,

@@ -135,7 +135,7 @@ const ViewPaySlips = () => {
       handleCloseDeleteModal();
       setRefreshData(prev => !prev);
     } catch (error) {
-      handleApiErrors(error);
+      // handleApiErrors(error);
     }
   };
 

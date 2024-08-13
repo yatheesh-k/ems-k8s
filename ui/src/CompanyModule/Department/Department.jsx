@@ -17,6 +17,8 @@ const Department = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [search, setSearch] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [filteredDepartments, setFilteredDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
   const { user} = useAuth();
@@ -169,12 +171,31 @@ const Department = () => {
 
   console.log(filteredDepartments);
 
+  
+  const handlePageChange = page => {
+    setCurrentPage(page);
+  };
+
+  const handlePerRowsChange = (newPerPage, page) => {
+    setRowsPerPage(newPerPage);
+    setCurrentPage(page);
+  };
+
+  // Calculate the start index and end index for the current page
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+
+  // Slice the filtered data based on the current page and rows per page
+  const paginatedData = filteredDepartments.slice(startIndex, endIndex);
+
+  // Compute the serial number for each row
+  const getSerialNumber = (index) => startIndex + index + 1;
 
 
   const columns = [
     {
       name: <h5><b>S No</b></h5>,
-      selector: (row, index) => index + 1,
+      selector: (row, index) => getSerialNumber(index), 
     },
     {
       name: <h5><b>Department Name</b></h5>,
@@ -274,8 +295,12 @@ const Department = () => {
               </div>
               <DataTable
                 columns={columns}
-                data={filteredDepartments}
+                data={paginatedData}
                 pagination
+                paginationServer
+                paginationTotalRows={filteredDepartments.length}
+                onChangePage={handlePageChange}
+                onChangeRowsPerPage={handlePerRowsChange}
                 highlightOnHover
                 striped
                 noHeader

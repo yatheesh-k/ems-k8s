@@ -64,13 +64,6 @@ const EmployeeRegistration = () => {
     { value: "Support", label: "Support" },
   ];
 
-  const Roles = [
-    { value: "Employee", label: "Employee" },
-    { value: "Hr", label: "Hr" },
-    { value: "Manager", label: "Manager" },
-    { value: "Accountant", label: "Accountant" },
-  ];
-
   const status = [
     { value: "Active", label: "Active" },
     { value: "InActive", label: "InActive" },
@@ -539,9 +532,9 @@ const EmployeeRegistration = () => {
                           type="text"
                           className="form-control"
                           placeholder="Enter Employee Type"
-                          name="department"
+                          name="departmentName"
                           readOnly
-                          {...register("department", {
+                          {...register("departmentName", {
                             required: "Department Required",
                             pattern: {
                               value: /^[A-Za-z ]+$/,
@@ -569,7 +562,7 @@ const EmployeeRegistration = () => {
                             <select {...field} className="form-select">
                               <option value="" disabled>Select Department</option>
                               {departments.map(department => (
-                                <option key={department.id} value={department.name}>
+                                <option key={department.id} value={department.id}>
                                   {department.name}
                                 </option>
                               ))}
@@ -582,7 +575,7 @@ const EmployeeRegistration = () => {
                           </p>
                         )}
                       </div>
-                    )}
+                     )} 
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
                       <label className="form-label">Designation <span style={{ color: "red" }}>*</span></label>
@@ -595,9 +588,9 @@ const EmployeeRegistration = () => {
                           <select {...field} className="form-select" >
                             <option value="" disabled>Select Designation</option>
                             {designations.map(designation => (
-                              <option key={designation.id} value={designation.name}>
+                              <option key={designation.id} value={designation.id}>
                                 {designation.name}
-                              </option>
+                              </option>  
                             ))}
                           </select>
                         )}
@@ -775,50 +768,6 @@ const EmployeeRegistration = () => {
                       {errors.status && <p className="errorMsg">Employee Status is Required</p>}
                     </div>
                     <div className="col-lg-1"></div>
-                    {isUpdating ? (
-                      <div className="col-12 col-md-6 col-lg-5 mb-3">
-                        <label className="form-label">Role <span style={{ color: "red" }}>*</span></label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Enter Last Name"
-                          name="roles"
-                          readOnly
-                          {...register("roles", {
-                            required: "Role is Required",
-                            pattern: {
-                              value: /^[A-Za-z ]+$/,
-                              message:
-                                "These fields accepts only Alphabetic Characters",
-                            },
-                          })}
-                        />
-                        {errors.roles && (
-                          <p className="errorMsg">
-                            {errors.type.message}
-                          </p>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="col-12 col-md-6 col-lg-5 mb-2">
-                        <label className="form-label mb-3">Select Role<span style={{ color: "red" }}>*</span></label>
-                        <Controller
-                          name="roles"
-                          control={control}
-                          rules={{ required: true }}
-                          render={({ field }) => (
-                            <Select
-                              {...field}
-                              options={Roles}
-                              value={Roles.find(option => option.value === field.value)}
-                              onChange={(val) => field.onChange(val.value)}
-                              placeholder="Select Role"
-                            />
-                          )}
-                        />
-                        {errors.roles && <p className="errorMsg">Employee Role is Required</p>}
-                      </div>
-                    )}
                     <div className="col-lg-6"></div>
                     <hr />
                     <h4 className="m-2 mb-3">Account Details <span style={{ color: "red" }}>*</span></h4>
