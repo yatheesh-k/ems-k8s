@@ -58,6 +58,7 @@ public enum EmployeeErrorMessageKey {
     EMPLOYEE_INACTIVE("employee.inactive"),
     INVALID_MONTH_NAME("invalid.month"),
     INVALID_NO_OF_WORKING_DAYS("invalid.working.days"),
+    INVALID_EMPLOYEE_DETAILS("invalid.employee.details"),
     INVALID_ATTENDANCE_DATA("invalid.attendance.data");
 
     private final String key;

@@ -57,47 +57,63 @@ public class AttendanceServiceImpl implements AttendanceService {
         List<AttendanceRequest> attendanceRequests;
 
         try {
-            // Parse the file to get attendance requests
             attendanceRequests = parseExcelFile(file, company);
-        } catch (Exception e) {
-            log.error("Error processing the uploaded file: {}", e.getMessage(), e);
-            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.FAILED_TO_PROCESS), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        // Check if the attendanceRequests list is empty
-        if (attendanceRequests.isEmpty()) {
-            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_ATTENDANCE_DATA), HttpStatus.BAD_REQUEST);
-        }
-
-        // Iterate through the attendance requests and validate each field
-        for (AttendanceRequest attendanceRequest : attendanceRequests) {
-            if (attendanceRequest.getEmailId() == null ||
-                    attendanceRequest.getFirstName() == null ||
-                    attendanceRequest.getLastName() == null ||
-                    attendanceRequest.getEmployeeId() == null ||
-                    attendanceRequest.getNoOfWorkingDays() == null) {
-                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_ATTENDANCE_DATA), HttpStatus.BAD_REQUEST);
+            if (attendanceRequests.isEmpty()) {
+                return new ResponseEntity<>(
+                        ResponseBuilder.builder().build().
+                                createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler
+                                        .getMessage(EmployeeErrorMessageKey.EMPTY_FILE)))),
+                        HttpStatus.NOT_FOUND);
             }
-        }
 
-        try {
+            // Validate all attendance requests before adding
             for (AttendanceRequest attendanceRequest : attendanceRequests) {
                 String index = ResourceIdUtils.generateCompanyIndex(attendanceRequest.getCompany());
-                String employeeId = ResourceIdUtils.generateEmployeeResourceId(attendanceRequest.getEmailId());
 
+                // Validate Employee using employeeId or emailId
+                String employeeId = ResourceIdUtils.generateEmployeeResourceId(attendanceRequest.getEmailId());
                 EmployeeEntity employee = openSearchOperations.getEmployeeById(employeeId, null, index);
+
+                // If employee is not found, throw an error
+                if (employee == null) {
+                    log.error("Employee not found for attendance and ID: {}", employeeId);
+                    return new ResponseEntity<>(
+                            ResponseBuilder.builder().build().
+                                    createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler
+                                            .getMessage(EmployeeErrorMessageKey.EMPLOYEE_NOT_FOUND)))),
+                            HttpStatus.NOT_FOUND);
+                }
+                String requestEmployeeId = attendanceRequest.getEmployeeId();
+                log.debug("Received employee ID as a string: " + requestEmployeeId);
+
+                // Validate firstName, lastName, and emailId
+                if (!attendanceRequest.getFirstName().equalsIgnoreCase(employee.getFirstName()) ||
+                        !attendanceRequest.getLastName().equalsIgnoreCase(employee.getLastName()) ||
+                        !requestEmployeeId.equalsIgnoreCase(employee.getEmployeeId())) {
+                    log.error("Validation failed for employee ID: {}. Details provided do not match.", employeeId);
+                    return new ResponseEntity<>(
+                            ResponseBuilder.builder().build().
+                                    createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler
+                                            .getMessage(EmployeeErrorMessageKey.INVALID_EMPLOYEE_DETAILS)))),
+                            HttpStatus.BAD_REQUEST);
+                }
+
                 if (EmployeeStatus.INACTIVE.getStatus().equals(employee.getStatus())) {
                     log.error("The employee is inactive {}", employeeId);
                     return new ResponseEntity<>(
-                            ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_INACTIVE)))),
+                            ResponseBuilder.builder().build().
+                                    createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler
+                                            .getMessage(EmployeeErrorMessageKey.EMPLOYEE_INACTIVE)))),
                             HttpStatus.CONFLICT);
                 }
-
-                // Add attendance of employees
+            }
+            // If all validations pass, add attendance
+            for (AttendanceRequest attendanceRequest : attendanceRequests) {
                 addAttendanceOfEmployees(attendanceRequest);
             }
+
         } catch (Exception e) {
-            log.error("Error processing the attendance requests: {}", e.getMessage(), e);
+            log.error("Error processing the uploaded file: {}", e.getMessage(), e);
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.FAILED_TO_PROCESS), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -105,9 +121,6 @@ public class AttendanceServiceImpl implements AttendanceService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.CREATED);
     }
-
-
-
 
     @Override
     public ResponseEntity<?> getAllEmployeeAttendance(String companyName, String employeeId, String month, String year) throws EmployeeException {
@@ -199,7 +212,6 @@ public class AttendanceServiceImpl implements AttendanceService {
     private List<AttendanceRequest> parseExcelFile(MultipartFile file, String company) throws Exception {
         List<AttendanceRequest> attendanceRequests = new ArrayList<>();
         String fileName = file.getOriginalFilename();
-
         if (fileName != null && (fileName.endsWith(".xls") || fileName.endsWith(".xlsx"))) {
             try (InputStream excelIs = file.getInputStream()) {
                 log.info("Successfully opened input stream for file: {}", fileName);
@@ -210,23 +222,16 @@ public class AttendanceServiceImpl implements AttendanceService {
                     log.error("Failed to create workbook for file: {}", e.getMessage(), e);
                     throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.FAILED_TO_CREATE), HttpStatus.INTERNAL_SERVER_ERROR);
                 }
-
                 Sheet sheet = wb.getSheetAt(0);
                 log.info("Successfully retrieved sheet: '{}', with {} rows.", sheet.getSheetName(), sheet.getPhysicalNumberOfRows());
-
-                // Validate all rows before proceeding to add them
                 Iterator<Row> rowIt = sheet.rowIterator();
                 if (!rowIt.hasNext()) {
                     log.warn("No rows found in the sheet '{}'", sheet.getSheetName());
                 }
-                // List to temporarily hold valid attendance requests
-                List<AttendanceRequest> tempAttendanceRequests = new ArrayList<>();
-
                 // Get current year and month
                 LocalDate now = LocalDate.now();
                 String currentYear = String.valueOf(now.getYear());
                 String currentMonth = now.getMonth().name().substring(0, 1) + now.getMonth().name().substring(1).toLowerCase(); // Capitalize only first letter
-
                 while (rowIt.hasNext()) {
                     Row currentRow = rowIt.next();
                     log.info("Processing row number: {}", currentRow.getRowNum());
@@ -234,37 +239,20 @@ public class AttendanceServiceImpl implements AttendanceService {
                         log.info("Skipping header row.");
                         continue;
                     }
-
-                    // Check if all cells in the row are empty
-                    boolean allCellsEmpty = StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(0))) && // EmployeeId
-                            StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(1))) && // FirstName
-                            StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(2))) && // LastName
-                            StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(3))) && // EmailId
-                            StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(4)));  // No of Working Days
-
-                    if (allCellsEmpty) {
-                        log.info("Skipping row {} as all cells are empty.", currentRow.getRowNum());
+                    if (StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(0)))
+                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(1)))
+                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(2)))
+                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(3)))
+                            || StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(4)))) {
+                        log.warn("Skipping row {} as one or more critical cells are empty", currentRow.getRowNum());
                         continue;
                     }
-
-                    // Check if any required field is empty or null while others have data
-                    if (StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(0))) || // EmployeeId
-                            StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(1))) || // FirstName
-                            StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(2))) || // LastName
-                            StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(3))) || // EmailId
-                            StringUtils.isEmptyOrWhitespace(getCellValue(currentRow.getCell(4)))) { // No of Working Days
-                        log.error("Required fields missing or invalid in row {}. Stopping process.", currentRow.getRowNum());
-                        throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_ATTENDANCE_DATA), HttpStatus.BAD_REQUEST);
-                    }
-
-                    // Create an AttendanceRequest object and add it to the temporary list
                     AttendanceRequest attendanceRequest = new AttendanceRequest();
                     attendanceRequest.setCompany(company);
                     attendanceRequest.setEmployeeId(getCellValue(currentRow.getCell(0)));
                     attendanceRequest.setFirstName(getCellValue(currentRow.getCell(1)));
                     attendanceRequest.setLastName(getCellValue(currentRow.getCell(2)));
                     attendanceRequest.setEmailId(getCellValue(currentRow.getCell(3)));
-                    attendanceRequest.setNoOfWorkingDays(getCellValue(currentRow.getCell(4)));
                     // Set default year and month
                     attendanceRequest.setYear(currentYear);
                     attendanceRequest.setMonth(currentMonth);
@@ -287,21 +275,20 @@ public class AttendanceServiceImpl implements AttendanceService {
                         // Check if noOfWorkingDays is less than or equal to totalDaysInMonth
                         if (noOfWorkingDays > totalDaysInMonth) {
                             log.error("No of working days '{}' exceeds total days in the month '{}'", noOfWorkingDays, totalDaysInMonth);
-                            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_NO_OF_WORKING_DAYS), HttpStatus.BAD_REQUEST);
+                            throw new EmployeeException(ErrorMessageHandler
+                                    .getMessage(EmployeeErrorMessageKey.INVALID_NO_OF_WORKING_DAYS),
+                                    HttpStatus.BAD_REQUEST);
                         }
                         // Set totalWorkingDays as total days in month since it is not provided
                         attendanceRequest.setTotalWorkingDays(String.valueOf(totalDaysInMonth));
                         attendanceRequest.setNoOfWorkingDays(String.valueOf(noOfWorkingDays));
                     } catch (NumberFormatException e) {
-                        log.error("Error parsing numeric values for working days in row {}: {}", currentRow.getRowNum(), e.getMessage());
+                        log.error("Error parsing numeric values for working days: {}", e.getMessage());
+                        throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.NUMBER_EXCEPTION), HttpStatus.INTERNAL_SERVER_ERROR);
                     }
-                    // Add to temporary list if validation passes
-                    tempAttendanceRequests.add(attendanceRequest);
+                    attendanceRequests.add(attendanceRequest);
+                    log.info("Added attendance request for employee ID: {}", attendanceRequest.getEmployeeId());
                 }
-
-                // If validation passes for all rows, add to the main list and proceed
-                attendanceRequests.addAll(tempAttendanceRequests);
-
                 wb.close();
             } catch (IOException e) {
                 log.error("Failed to process file: {}", e.getMessage(), e);
@@ -310,28 +297,30 @@ public class AttendanceServiceImpl implements AttendanceService {
         } else {
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_FORMAT), HttpStatus.BAD_REQUEST);
         }
-
         return attendanceRequests;
     }
 
 
-    private String getCellValue(Cell cell) {
+    public String getCellValue(Cell cell) {
         if (cell == null) {
             return "";
         }
+
         switch (cell.getCellType()) {
             case STRING:
                 return cell.getStringCellValue();
             case NUMERIC:
+                // Format numeric values to remove decimal points if they are integers
                 if (DateUtil.isCellDateFormatted(cell)) {
                     return cell.getDateCellValue().toString();
                 } else {
-                    return String.valueOf(cell.getNumericCellValue());
+                    double numericValue = cell.getNumericCellValue();
+                    if (numericValue == (int) numericValue) {
+                        return String.valueOf((int) numericValue); // Remove decimal point for whole numbers
+                    } else {
+                        return String.valueOf(numericValue);
+                    }
                 }
-            case BOOLEAN:
-                return String.valueOf(cell.getBooleanCellValue());
-            case FORMULA:
-                return cell.getCellFormula();
             default:
                 return "";
         }

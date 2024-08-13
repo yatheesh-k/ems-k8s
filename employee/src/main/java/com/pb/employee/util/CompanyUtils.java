@@ -219,9 +219,6 @@ public class CompanyUtils {
         if (employeeUpdateRequest.getManager() != null){
             user.setManager(employeeUpdateRequest.getManager());
         }
-        if (employeeUpdateRequest.getRoles() != null){
-            user.setRoles(Collections.singletonList(String.valueOf(employeeUpdateRequest.getRoles())));
-        }
         if (employeeUpdateRequest.getEmailId() != null){
             user.setEmailId(employeeUpdateRequest.getEmailId());
         }

@@ -46,10 +46,10 @@ public class EmployeeUpdateRequest {
     @Size(min = 3, max = 30, message = "{manager.notnull.message}")
     private String manager;
 
-    @NotNull(message = "{roles.format}")
+   /* @NotNull(message = "{roles.format}")
     @Size(min = 1, message = "{roles.size}")
     private List<@NotBlank(message = "{role.notnull.message}")
-    @Pattern(regexp = "^[A-Z][a-z]+$", message = "{roles.format}") String> roles;
+    @Pattern(regexp = "^[A-Z][a-z]+$", message = "{roles.format}") String> roles;*/
 
     @Schema(example = "status")
     @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{status.format}")
