@@ -148,12 +148,6 @@ const EmployeeSalaryById = () => {
                         <input type="text" className="form-control" value={item.deductions.pfEmployer} readOnly />
                       </div>
                     </div>
-                    <div className="col mb-3">
-                      <div className="form-group">
-                        <label>LOP:</label>
-                        <input type="text" className="form-control" value={item.deductions.lop} readOnly />
-                      </div>
-                    </div>
                   </div>
                   <div className="row">
                     <div className="col mb-3">

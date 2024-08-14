@@ -129,16 +129,13 @@ console.log(user.company)
     const input = e.target;
     let value = input.value;
     const cursorPosition = input.selectionStart; // Save the cursor position
-  
     // Remove leading spaces
     value = value.replace(/^\s+/g, '');
-  
     // Ensure only alphabets and spaces are allowed
-    value = value.replace(/[^a-zA-Z\s]/g, '');
-  
+    const allowedCharsRegex = /^[a-zA-Z0-9\s!@#&()*/,.\\-]+$/;
+    value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
     // Capitalize the first letter of each word
     const words = value.split(' ');
-  
     // Capitalize the first letter of each word and lowercase the rest
     const capitalizedWords = words.map(word => {
       if (word.length > 0) {
@@ -146,18 +143,14 @@ console.log(user.company)
       }
       return '';
     });
-  
     // Join the words back into a string
     let formattedValue = capitalizedWords.join(' ');
-  
     // Remove spaces not allowed (before the first two characters)
     if (formattedValue.length > 2) {
       formattedValue = formattedValue.slice(0, 2) + formattedValue.slice(2).replace(/\s+/g, ' ');
     }
-  
     // Update input value
     input.value = formattedValue;
-  
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
@@ -186,50 +179,33 @@ console.log(user.company)
     input.value = value;
   };
 
-    //   const roles = data.roles ? [data.roles] : []; 
-  //   // Constructing the payload
-  //   let payload = {
-  //       companyName: company,
-  //       employeeType: data.employeeType,
-  //       emailId: data.emailId,
-  //       password: data.password,
-  //       designation: data.designation,
-  //       location: data.location,
-  //       manager: data.manager,
-  //       roles: roles,
-  //       status: data.status,
-  //       accountNo: data.accountNo,
-  //       ifscCode: data.ifscCode,
-  //       bankName: data.bankName,
-  //       aadhaarId: data.aadhaarId
-  //   };
-  //   if (location.state && location.state.id) {
-  //     payload = {
-  //         ...payload,
-  //         employeeId: data.employeeId,
-  //         firstName: data.firstName,
-  //         lastName: data.lastName,
-  //         dateOfHiring: data.dateOfHiring,
-  //         department: data.department,
-  //         panNo: data.panNo,
-  //         uanNo: data.uanNo,
-  //         dateOfBirth: data.dateOfBirth
-  //     };
-  // } else {
-  //     // Include these fields for the create request
-  //     payload = {
-  //         ...payload,
-  //         employeeId: data.employeeId,
-  //         firstName: data.firstName,
-  //         lastName: data.lastName,
-  //         dateOfHiring: data.dateOfHiring,
-  //         department: data.department,
-  //         panNo: data.panNo,
-  //         aadhaarId: data.aadhaarId,
-  //         uanNo: data.uanNo,
-  //         dateOfBirth: data.dateOfBirth
-  //     };
-  // }
+  const toInputSpaceCase = (e) => {
+    let inputValue = e.target.value;
+    let newValue = "";
+  
+    // Remove spaces from the beginning of inputValue
+    inputValue = inputValue.trimStart(); // Keep spaces only after the initial non-space character
+  
+    // Track if we've encountered any non-space character yet
+    let encounteredNonSpace = false;
+  
+    for (let i = 0; i < inputValue.length; i++) {
+      const char = inputValue.charAt(i);
+  
+      // Allow any alphabetic characters (both lowercase and uppercase) and numbers
+      // Allow spaces only after encountering non-space characters
+      if (char.match(/[a-zA-Z0-9]/) || (encounteredNonSpace && char === " ")) {
+        if (char !== " ") {
+          encounteredNonSpace = true;
+        }
+        newValue += char;
+      }
+    }
+  
+    // Update the input value
+    e.target.value = newValue;
+  };
+
 let company=user.company
   const onSubmit = async (data) => {
       // const roles = data.roles ? [data.roles] : []; 
@@ -885,7 +861,7 @@ let company=user.company
                         className="form-control"
                         placeholder="Enter Account Number"
                         name="accountNo"
-                        onInput={toInputTitleCase}
+                        onInput={toInputSpaceCase}
                         onKeyDown={handleEmailChange}
                         autoComplete="off"
                         {...register("accountNo", {
@@ -917,7 +893,7 @@ let company=user.company
                         className="form-control"
                         placeholder="Enter IFSC Code"
                         name="ifscCode"
-                        onInput={toInputTitleCase}
+                        onInput={toInputSpaceCase}
                         onKeyDown={handleEmailChange}
                         autoComplete="off"
                         {...register("ifscCode", {
@@ -944,7 +920,7 @@ let company=user.company
                         className="form-control"
                         placeholder="Enter Bank Name"
                         name="bankName"
-                        onInput={toInputTitleCase}
+                        onInput={toInputSpaceCase}
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         {...register("bankName", {
@@ -978,7 +954,7 @@ let company=user.company
                         placeholder="Enter UAN Number"
                         name="uanNo"
                         readOnly={isUpdating}
-                        onInput={toInputTitleCase}
+                        onInput={toInputSpaceCase}
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         {...register("uanNo", {
@@ -1007,7 +983,7 @@ let company=user.company
                         className="form-control"
                         placeholder="Enter PAN Number"
                         name="panNo"
-                        onInput={toInputTitleCase}
+                        onInput={toInputSpaceCase}
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         {...register("panNo", {
@@ -1036,7 +1012,7 @@ let company=user.company
                         className="form-control"
                         placeholder="Enter Aadhaar Number"
                         name="aadhaarId"
-                        onInput={toInputTitleCase}
+                        onInput={toInputSpaceCase}
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         {...register("aadhaarId", {

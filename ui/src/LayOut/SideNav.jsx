@@ -644,53 +644,50 @@ const SideNav = () => {
             </>
           )} */}
 
-          {(!user && user.userRole && user.userRole.includes("company_admin") || user && user.userRole && user.userRole.includes("ems_admin")) && (
-       
-            <>
-              <li
-                className={`sidebar-item ${location.pathname === "/main" ? "active" : ""
-                  }`}
-              >
-                <Link className="sidebar-link" to={"/main"}>
-                  <i
-                    className="bi bi-grid-1x2-fill"
-                    style={{ fontSize: "large" }}
-                  ></i>
-                  <span className="align-middle" style={{ fontSize: "large" }}>
-                    Dashboard
-                  </span>
-                </Link>
-              </li>
-              <li
-                className={`sidebar-item ${location.pathname === "/employeeSalary" ? "active" : ""
-                  }`}
-              >
-                <Link className="sidebar-link" to={"/employeeSalary"}>
-                  <i
-                    className="bi bi-card-list"
-                    style={{ fontSize: "large" }}
-                  ></i>
-                  <span className="align-middle" style={{ fontSize: "large" }}>
-                    Salary List
-                  </span>
-                </Link>
-              </li>
-              <li
-                className={`sidebar-item ${location.pathname === "/employeePayslip" ? "active" : ""
-                  }`}
-              >
-                <Link className="sidebar-link" to={"/employeePayslip"}>
-                  <i
-                    className="bi bi-file-earmark-medical-fill"
-                    style={{ fontSize: "large" }}
-                  ></i>
-                  <span className="align-middle" style={{ fontSize: "large" }}>
-                  PaySlips
-                  </span>
-                </Link>
-              </li>
-            </>
-          )}
+{(!user || !(user.userRole && (user.userRole.includes("company_admin") || user.userRole.includes("ems_admin")))) && (
+  <>
+    <li
+      className={`sidebar-item ${location.pathname === "/main" ? "active" : ""}`}
+    >
+      <Link className="sidebar-link" to={"/main"}>
+        <i
+          className="bi bi-grid-1x2-fill"
+          style={{ fontSize: "large" }}
+        ></i>
+        <span className="align-middle" style={{ fontSize: "large" }}>
+          Dashboard
+        </span>
+      </Link>
+    </li>
+    <li
+      className={`sidebar-item ${location.pathname === "/employeeSalary" ? "active" : ""}`}
+    >
+      <Link className="sidebar-link" to={"/employeeSalary"}>
+        <i
+          className="bi bi-card-list"
+          style={{ fontSize: "large" }}
+        ></i>
+        <span className="align-middle" style={{ fontSize: "large" }}>
+          Salary List
+        </span>
+      </Link>
+    </li>
+    <li
+      className={`sidebar-item ${location.pathname === "/employeePayslip" ? "active" : ""}`}
+    >
+      <Link className="sidebar-link" to={"/employeePayslip"}>
+        <i
+          className="bi bi-file-earmark-medical-fill"
+          style={{ fontSize: "large" }}
+        ></i>
+        <span className="align-middle" style={{ fontSize: "large" }}>
+          PaySlips
+        </span>
+      </Link>
+    </li>
+  </>
+)}
+
         </ul>
       </div>
     </nav>

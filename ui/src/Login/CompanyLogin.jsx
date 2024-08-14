@@ -120,7 +120,7 @@ const CompanyLogin = () => {
     ValidateOtp(payload)
       .then((response) => {
         setLoading(false);
-        toast.success("Company Login Successful", {
+        toast.success("Login Successful", {
           position: "top-right",
           transition: Bounce,
           hideProgressBar: true,

@@ -28,10 +28,11 @@ const EmployeePayslips = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (userId) {
+        if (userId) { console.log("userId",userId);
           const [employeeDetailsResponse, payslipsResponse] = await Promise.all(
             [
               EmployeeGetApiById(userId),
+             
               EmployeePayslipsGet(
                 userId,
                 selectedMonth,

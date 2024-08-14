@@ -17,7 +17,7 @@ const EmployeeSalaryStructure = () => {
     control,
     formState: { errors },
   } = useForm({ mode: 'onChange' });
-  const { user} = useAuth();
+  const { user } = useAuth();
   const [employes, setEmployes] = useState([]);
   const [grossAmount, setGrossAmount] = useState(0);
   const [hra, setHra] = useState(0);
@@ -199,7 +199,7 @@ const EmployeeSalaryStructure = () => {
     ) {
       return;
     }
-  
+
     const postData = {
       companyName,
       basicSalary,
@@ -222,9 +222,9 @@ const EmployeeSalaryStructure = () => {
       },
       status: data.status, // Ensure status is captured from form data
     };
-  
+
     console.log("Post Data:", postData);
-  
+
     EmployeeSalaryPostApi(employeeId, postData)
       .then((response) => {
         toast.success("Employee Salary Added Successfully");
@@ -236,7 +236,7 @@ const EmployeeSalaryStructure = () => {
         handleApiErrors(error);
       });
   };
-  
+
 
   return (
     <LayOut>
@@ -312,7 +312,7 @@ const EmployeeSalaryStructure = () => {
                       <hr />
                       <div className="row">
                         <div className="col-md-5 mb-3">
-                          <label className="form-label">Variable Amount</label>
+                          <label className="form-label">Variable Amount<span style={{ color: "red" }}>*</span></label>
                           <input
                             id="variableAmount"
                             type="text"
@@ -348,7 +348,7 @@ const EmployeeSalaryStructure = () => {
                         </div>
                         <div className="col-md-1 mb-3"></div>
                         <div className="col-md-5 mb-3">
-                          <label className="form-label">Fixed Amount</label>
+                          <label className="form-label">Fixed Amount<span style={{ color: "red" }}>*</span></label>
                           <input
                             type="text"
                             className="form-control"
@@ -382,7 +382,7 @@ const EmployeeSalaryStructure = () => {
                           )}
                         </div>
                         <div className="col-md-5 mb-3">
-                          <label className="form-label">Gross Amount</label>
+                          <label className="form-label">Gross Amount<span style={{ color: "red" }}>*</span></label>
                           <input
                             type="text"
                             className="form-control"
@@ -393,7 +393,7 @@ const EmployeeSalaryStructure = () => {
                         </div>
                         <div className="col-md-1 mb-3"></div>
                         <div className="col-md-5 mb-3">
-                          <label className="form-label">Monthly Salary</label>
+                          <label className="form-label">Monthly Salary<span style={{ color: "red" }}>*</span></label>
                           <input
                             type="text"
                             className="form-control"
@@ -411,7 +411,7 @@ const EmployeeSalaryStructure = () => {
                       <h5 className="card-title"> Allowances </h5>
                       <hr />
                       <div className="col-12">
-                        <label className="form-label">Basic Salary</label>
+                        <label className="form-label">Basic Salary<span style={{ color: "red" }}>*</span></label>
                         <input
                           type="text"
                           className="form-control"
@@ -422,7 +422,7 @@ const EmployeeSalaryStructure = () => {
                       </div>
                       <div className="col-12" style={{ marginTop: "10px" }}>
                         <label className="form-label">
-                          HRA:<span style={{ color: "red" }}>(%)</span>
+                          HRA:<span style={{ color: "red" }}>(%)*</span>
                         </label>
                         <input
                           type="text"
@@ -457,7 +457,7 @@ const EmployeeSalaryStructure = () => {
                         )}
                       </div>
                       <div className="col-12" style={{ marginTop: "10px" }}>
-                        <label className="form-label">Travel Allowance:<span style={{ color: "red" }}>(<CurrencyRupee />)</span></label>
+                        <label className="form-label">Travel Allowance:<span style={{ color: "red" }}>(<CurrencyRupee />)*</span></label>
                         <input
                           type="text"
                           className="form-control"
@@ -513,7 +513,7 @@ const EmployeeSalaryStructure = () => {
                         />
                       </div>
                       <div className="col-12" style={{ marginTop: "10px" }}>
-                        <label className="form-label">Total Earnings</label>
+                        <label className="form-label">Total Earnings<span style={{ color: "red" }}>*</span></label>
                         <input
                           type="text"
                           className="form-control"
@@ -561,10 +561,10 @@ const EmployeeSalaryStructure = () => {
                           onChange={handleTotalTaxChange}
                         />
                       </div> */}
-                      <h5 className="card-title mt-3"> PF Contibution </h5>
+                      <h5 className="card-title mt-3"> PF Contibution</h5>
                       <div className="col-12" style={{ marginTop: "10px" }}>
                         <label className="form-label">
-                          Employee's PF Contribution
+                          Employee's PF Contribution<span style={{ color: "red" }}>*</span>
                         </label>
                         <input
                           type="text"
@@ -600,7 +600,7 @@ const EmployeeSalaryStructure = () => {
                       </div>
                       <div className="col-12" style={{ marginTop: "10px" }}>
                         <label className="form-label">
-                          Employer's PF Contribution
+                          Employer's PF Contribution<span style={{ color: "red" }}>*</span>
                         </label>
                         <input
                           type="text"
@@ -635,7 +635,7 @@ const EmployeeSalaryStructure = () => {
                         )}
                       </div>
                       <div className="col-12" style={{ marginTop: "10px" }}>
-                        <label className="form-label">Total PF</label>
+                        <label className="form-label">Total PF<span style={{ color: "red" }}>*</span></label>
                         <input
                           type="text"
                           className="form-control"
@@ -648,8 +648,10 @@ const EmployeeSalaryStructure = () => {
                   <div className="col-12">
                     <div className="card">
                       <div className="card-header">
-                        <h5 className="card-title"> Status </h5>
+                        <h5 className="card-title"> Status</h5>
+                        <hr />
                         <div className="col-12">
+                          <label className="form-label">Total Amount<span style={{ color: "red" }}>*</span></label>
                           <Controller
                             name="status"
                             control={control}
@@ -674,39 +676,39 @@ const EmployeeSalaryStructure = () => {
                           />
                           {errors.status && <p className="errorMsg">Employee Status is Required</p>}
                         </div>
-                        </div>
-                        </div>
-                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-12">
+                    <div className="card">
+                      <div className="card-header">
+                        <h5 className="card-title"> Net Salary </h5>
+                        <hr />
                         <div className="col-12">
-                          <div className="card">
-                            <div className="card-header">
-                              <h5 className="card-title"> Net Salary </h5>
-                              <hr />
-                              <div className="col-12">
-                                <label className="form-label">Total Amount</label>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  value={totalAmount}
-                                  readOnly
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="col-12 text-end" style={{ marginTop: "60px" }}>
-                          <button type="submit" className="btn btn-primary">
-                            Submit
-                          </button>
+                          <label className="form-label">Total Amount<span style={{ color: "red" }}>*</span></label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={totalAmount}
+                            readOnly
+                          />
                         </div>
                       </div>
-                    </>
-            )}
+                    </div>
                   </div>
-                </form>
-              </div>
-          </LayOut>
-          );
+                  <div className="col-12 text-end" style={{ marginTop: "60px" }}>
+                    <button type="submit" className="btn btn-primary">
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </form>
+      </div>
+    </LayOut>
+  );
 };
 
-          export default EmployeeSalaryStructure;
+export default EmployeeSalaryStructure;

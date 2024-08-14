@@ -277,7 +277,7 @@ export const EmployeePayslipsGet = (employeeId, month, year) => {
   const company = localStorage.getItem("company")
   return axiosInstance.get(`/${company}/employee/${employeeId}/payslips`, {
     params: {
-      // month: month,
+       month: month,
       year: year
     }
   });

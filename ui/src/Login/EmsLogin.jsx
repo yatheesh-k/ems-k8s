@@ -40,7 +40,7 @@ const EmsLogin = () => {
           const decodedToken = jwtDecode(token);
           const { sub: userId, roles: userRole, company, employeeId } = decodedToken;
           setAuthUser({ userId, userRole, company, employeeId });
-          toast.success("Company Login Successfully");
+          toast.success("Login Successfully");
           navigate("/main");
         } catch (decodeError) {
           console.error("Token decoding failed:", decodeError);

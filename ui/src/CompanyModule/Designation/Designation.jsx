@@ -215,26 +215,34 @@ const Designation = () => {
     }
   };
 
-  const  toInputTitleCase = (e) => {
+  const toInputTitleCase = (e) => {
     const input = e.target;
     let value = input.value;
+    const cursorPosition = input.selectionStart; // Save the cursor position
     // Remove leading spaces
     value = value.replace(/^\s+/g, '');
-    // Initially disallow spaces
-    if (!/\S/.test(value)) {
-      // If no non-space characters are present, prevent spaces
-      value = value.replace(/\s+/g, '');
-    } else {
-      // Allow spaces if there are non-space characters
-      value = value.replace(/^\s+/g, ''); // Remove leading spaces
-      const words = value.split(' ');
-      const capitalizedWords = words.map(word => {
-        return word.charAt(0).toUpperCase() + word.slice(1);
-      });
-      value = capitalizedWords.join(' ');
+    // Ensure only alphabets and spaces are allowed
+    const allowedCharsRegex = /^[a-zA-Z0-9\s!@#&()*/,.\\-]+$/;
+    value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
+    // Capitalize the first letter of each word
+    const words = value.split(' ');
+    // Capitalize the first letter of each word and lowercase the rest
+    const capitalizedWords = words.map(word => {
+      if (word.length > 0) {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      }
+      return '';
+    });
+    // Join the words back into a string
+    let formattedValue = capitalizedWords.join(' ');
+    // Remove spaces not allowed (before the first two characters)
+    if (formattedValue.length > 2) {
+      formattedValue = formattedValue.slice(0, 2) + formattedValue.slice(2).replace(/\s+/g, ' ');
     }
     // Update input value
-    input.value = value;
+    input.value = formattedValue;
+    // Restore the cursor position
+    input.setSelectionRange(cursorPosition, cursorPosition);
   };
   const handleEmailChange = (e) => {
     // Get the current value of the input field

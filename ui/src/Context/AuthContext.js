@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }) => {
       }
     }
   }, []);
+  console.log("userIdContext",user.userId)
 
   const setAuthUser = (userData) => {
     setUser(userData);

@@ -1,26 +1,30 @@
 import React, { useEffect, useState } from "react";
 import LayOut from "../LayOut/LayOut";
 import { EmployeeGetApiById } from "../Utils/Axios";
-import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../Context/AuthContext";
 
 const EmployeeProfile = () => {
     const [error, setError] = useState("");
     const [employeeData, setEmployeeData] = useState(false);
-    const [companyData, setCompanyData] = useState({});
     const { user} = useAuth();
-
-    useEffect(() => {
+     console.log("EmployeeProfile",user.userId)
+     useEffect(() => {
+        if (!user.userId) return; // Ensure userId is available before fetching data
+      
         const fetchData = async () => {
-            try {
-                const response = await EmployeeGetApiById(user.userId);
-                setEmployeeData(response.data);
-            } catch (error) {
-                setError(error);
-            }
+          try {
+            const response = await EmployeeGetApiById(user.userId);
+            console.log("API Response:", response.data); // Log API response to verify data
+            setEmployeeData(response.data); // Set employee data from response
+          } catch (error) {
+            setError("Failed to fetch employee data");
+            console.error("Error fetching employee data:", error);
+          }
         };
+      
         fetchData();
-    }, []);
+      }, [user.userId]); // Run effect when user.userId changes
+      
 
     return (
         <LayOut>
@@ -127,7 +131,7 @@ const EmployeeProfile = () => {
                                             type="text"
                                             className="form-control"
                                             name="department"
-                                            value={employeeData.department}
+                                            value={employeeData.departmentName}
                                             readOnly
                                         />
                                     </div>
@@ -138,7 +142,7 @@ const EmployeeProfile = () => {
                                             name="designation"
                                             type="text"
                                             className="form-control"
-                                            value={employeeData.designation}
+                                            value={employeeData.designationName}
                                             readOnly
                                         />
                                     </div>
@@ -162,16 +166,7 @@ const EmployeeProfile = () => {
                                             readOnly
                                         />
                                     </div>
-                                    <div className="col-12 col-md-6 col-lg-5 mb-3">
-                                        <label className="form-label">Password</label>
-                                        <div className="col-sm-12 input-group">
-                                            <input
-                                                className="form-control"
-                                                value={employeeData.password}
-                                                readOnly
-                                            />
-                                        </div>
-                                    </div>
+                              
                                     <div className="col-lg-1"></div>
                                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                                         <label className="form-label">Date of Birth</label>
@@ -182,6 +177,8 @@ const EmployeeProfile = () => {
                                             readOnly
                                         />
                                     </div>
+                                    <div className="col-lg-1"></div>
+
                                     <div className="col-12 col-md-6 col-lg-5 mb-2">
                                         <label className="form-label mb-3">Employee Status </label>
                                         <input
@@ -192,17 +189,7 @@ const EmployeeProfile = () => {
                                             readOnly
                                         />
                                     </div>
-                                    <div className="col-lg-1"></div>
-                                    <div className="col-12 col-md-6 col-lg-5 mb-3">
-                                        <label className="form-label">Role </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            value={employeeData.roles}
-                                            name="roles"
-                                            readOnly
-                                        />
-                                    </div>
+                               
                                     <div className="col-lg-6"></div>
                                     <hr />
                                     <h4 className="m-2 mb-3">Account Details</h4>

@@ -118,16 +118,13 @@ const CompanyRegistration = () => {
     const input = e.target;
     let value = input.value;
     const cursorPosition = input.selectionStart; // Save the cursor position
-  
     // Remove leading spaces
     value = value.replace(/^\s+/g, '');
-  
     // Ensure only alphabets and spaces are allowed
-    value = value.replace(/[^a-zA-Z\s]/g, '');
-  
+    const allowedCharsRegex = /^[a-zA-Z0-9\s!@#&()*/,.\\-]+$/;
+    value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
     // Capitalize the first letter of each word
     const words = value.split(' ');
-  
     // Capitalize the first letter of each word and lowercase the rest
     const capitalizedWords = words.map(word => {
       if (word.length > 0) {
@@ -135,18 +132,14 @@ const CompanyRegistration = () => {
       }
       return '';
     });
-  
     // Join the words back into a string
     let formattedValue = capitalizedWords.join(' ');
-  
     // Remove spaces not allowed (before the first two characters)
     if (formattedValue.length > 2) {
       formattedValue = formattedValue.slice(0, 2) + formattedValue.slice(2).replace(/\s+/g, ' ');
     }
-  
     // Update input value
     input.value = formattedValue;
-  
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
@@ -186,27 +179,30 @@ const CompanyRegistration = () => {
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
     let newValue = "";
-
+  
     // Remove spaces from the beginning of inputValue
-    inputValue = inputValue.trim();
-
+    inputValue = inputValue.trimStart(); // Keep spaces only after the initial non-space character
+  
     // Track if we've encountered any non-space character yet
     let encounteredNonSpace = false;
-
+  
     for (let i = 0; i < inputValue.length; i++) {
       const char = inputValue.charAt(i);
+  
+      // Allow any alphabetic characters (both lowercase and uppercase) and numbers
+      // Allow spaces only after encountering non-space characters
       if (char.match(/[a-zA-Z0-9]/) || (encounteredNonSpace && char === " ")) {
-        // Allow any alphabetic characters (both lowercase and uppercase)
-        // Allow numbers and spaces only after encountering non-space characters
         if (char !== " ") {
           encounteredNonSpace = true;
         }
         newValue += char;
       }
     }
-
-    e.target.value = newValue.toLowerCase(); // Convert to lowercase (if needed)
+  
+    // Update the input value
+    e.target.value = newValue;
   };
+  
 
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -421,7 +417,7 @@ const CompanyRegistration = () => {
                             autoComplete="off"
                             maxLength={10}
                             onKeyDown={handleEmailChange}
-                            onInput={toInputTitleCase}
+                            onInput={toInputSpaceCase }
                             {...register("landNo", {
                               required: "Contact Number is Required",
                               pattern: {
@@ -448,7 +444,7 @@ const CompanyRegistration = () => {
                               className="form-control"
                               placeholder="Enter Password"
                               onChange={handlePasswordChange}
-                              onInput={toInputTitleCase}
+                              //onInput={toInputTitleCase}
                               autoComplete="off"
                               onKeyDown={handleEmailChange}
                               type={passwordShown ? "text" : "password"}
@@ -491,7 +487,7 @@ const CompanyRegistration = () => {
                             placeholder="Enter Contact Number"
                             autoComplete="off"
                             maxLength={10}
-                            onInput={toInputTitleCase}
+                            onInput={toInputSpaceCase }
                             onKeyDown={handleEmailChange}
                             {...register("landNo", {
                               required: "Contact Number is Required",
@@ -520,7 +516,7 @@ const CompanyRegistration = () => {
                         placeholder="Enter Alternate Number"
                         autoComplete="off"
                         maxLength={10}
-                        onInput={toInputTitleCase}
+                        onInput={toInputSpaceCase }
                         onKeyDown={handleEmailChange}
                         {...register("mobileNo", {
                           required: "Alternate Number is Required",
@@ -539,7 +535,6 @@ const CompanyRegistration = () => {
                       <div className="col-lg-1"></div>
 
                     )}
-
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Company Address <span style={{ color: "red" }}>*</span>
@@ -598,7 +593,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Company CIN Number"
                         onKeyDown={handleEmailChange}
-                        onInput={toInputTitleCase}
+                        onInput={toInputSpaceCase }
                         autoComplete="off"
                         maxLength={21}
                         {...register("cinNo", {
@@ -634,7 +629,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Company Registration Number"
                         onKeyDown={handleEmailChange}
-                        onInput={toInputTitleCase}
+                        onInput={toInputSpaceCase }
                         autoComplete="off"
                         maxLength={21}
                         {...register("companyRegNo", {
@@ -667,7 +662,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Company GST Number"
                         autoComplete="off"
-                        onInput={toInputTitleCase}
+                        onInput={toInputSpaceCase }
                         onKeyDown={handleEmailChange}
                         maxLength={15}
                         {...register("gstNo", {
@@ -695,7 +690,7 @@ const CompanyRegistration = () => {
                       <input
                         type="text"
                         className="form-control"
-                        onInput={toInputTitleCase}
+                        onInput={toInputSpaceCase}
                         placeholder="Enter Company PAN Number"
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
@@ -806,7 +801,7 @@ const CompanyRegistration = () => {
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         maxLength={10}
-                        onInput={toInputTitleCase}
+                        onInput={toInputSpaceCase}
                         {...register("personalMobileNo", {
                           required: "Personal Mobile Number is Required",
                           pattern: {

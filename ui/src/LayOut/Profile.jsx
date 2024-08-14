@@ -209,29 +209,7 @@ function Profile() {
                           justifyContent: "center",
                         }}
                       >
-                        {postImage ? (
-                          <>
-                            <img
-                              src={postImage}
-                              alt="Selected Logo"
-                              style={{ width: "100%", height: "auto" }}
-                            />
-                            <button
-                              className="btn btn-sm btn-danger"
-                              style={{
-                                position: "absolute",
-                                top: -10,
-                                right: -10,
-                                borderRadius: "50%",
-                              }}
-                              onClick={handleRemoveLogo}
-                            >
-                              X
-                            </button>
-                          </>
-                        ) : (
                           <CameraFill />
-                        )}
                       </div>
                     </div>
                   </div>
