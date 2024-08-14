@@ -211,7 +211,7 @@ const PayslipDoc = () => {
                         Department
                       </th>
                       <td style={{ padding: "4px", textAlign: "left" }}>
-                        {employeeDetails.department}
+                        {employeeDetails.departmentName}
                       </td>
                       <th
                         style={{
@@ -224,7 +224,7 @@ const PayslipDoc = () => {
                         Designation
                       </th>
                       <td style={{ padding: "4px", textAlign: "left" }}>
-                        {employeeDetails.designation}
+                        {employeeDetails.designationName}
                       </td>
                     </tr>
                     <tr>

@@ -2,19 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { EmployeeSalaryGetApi, EmployeeSalaryPatchApiById } from '../../Utils/Axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import LayOut from '../../LayOut/LayOut';
-import { PencilSquare } from 'react-bootstrap-icons';
+import { ArrowLeftCircle, PencilSquare } from 'react-bootstrap-icons';
 import { toast } from 'react-toastify';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../../Context/AuthContext';
-import { company } from '../../Utils/Auth';
 
 const EmployeeSalaryList = () => {
-  const { handleSubmit, reset, register } = useForm({ mode: "onChange" });
+  const { handleSubmit, reset, register, setValue } = useForm({ mode: "onChange" });
   const { user } = useAuth("");
   const [employeeSalaryView, setEmployeeSalaryView] = useState([]);
-  const [expanded, setExpanded] = useState({});
+  const [expandedIndex, setExpandedIndex] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const [editingData, setEditingData] = useState(null);
   const [editingId, setEditingId] = useState("");
   const [salaryId, setSalaryId] = useState("");
   const queryParams = new URLSearchParams(location.search);
@@ -24,9 +24,8 @@ const EmployeeSalaryList = () => {
     if (id) {
       EmployeeSalaryGetApi(id).then(response => {
         setEmployeeSalaryView(response.data.data);
-        // Assuming the response has a salaryId field
         if (response.data.data.length > 0) {
-          setSalaryId(response.data.data[0].salaryId);  // Adjust this based on your response structure
+          setSalaryId(response.data.data[0].salaryId);
         }
       });
     }
@@ -42,7 +41,7 @@ const EmployeeSalaryList = () => {
         toast.error("Employee ID or Salary ID is missing.");
         return;
       }
-  
+
       const formData = {
         companyName,
         fixedAmount,
@@ -55,10 +54,11 @@ const EmployeeSalaryList = () => {
       };
 
       console.log("FormData:", formData);
-  
+
       await EmployeeSalaryPatchApiById(id, salaryId, formData);
-  
+
       toast.success('Salary Updated Successfully');
+      collapseExpandedCard(); 
       reset();
       setEditingId(null);
     } catch (error) {
@@ -77,11 +77,40 @@ const EmployeeSalaryList = () => {
   };
 
   const toggleExpand = (index) => {
-    setExpanded(prevState => ({ ...prevState, [index]: !prevState[index] }));
+    setExpandedIndex(prevIndex => (prevIndex === index ? null : index));
+  };
+
+  const collapseExpandedCard = () => {
+    setExpandedIndex(null);
   };
 
   const handleNavigateToRegister = () => {
     navigate('/employeeSalaryStructure');
+  };
+
+  const handleEditClick = async (salaryId) => {
+    try {
+      const response = await EmployeeSalaryGetApi(id);
+      const salaryDetails = response.data.data.find(item => item.salaryId === salaryId);
+      if (salaryDetails) {
+        setEditingData(salaryDetails);
+        setValue('fixedAmount', salaryDetails.fixedAmount);
+        setValue('variableAmount', salaryDetails.variableAmount);
+        setValue('allowances.travelAllowance', salaryDetails.allowances.travelAllowance);
+        setValue('allowances.hra', salaryDetails.allowances.hra);
+        setValue('allowances.specialAllowance', salaryDetails.allowances.specialAllowance);
+        setValue('allowances.otherAllowances', salaryDetails.allowances.otherAllowances);
+        setValue('deductions.pfEmployee', salaryDetails.deductions.pfEmployee);
+        setValue('deductions.pfEmployer', salaryDetails.deductions.pfEmployer);
+        setValue('deductions.pfTax', salaryDetails.deductions.pfTax);
+        setValue('deductions.incomeTax', salaryDetails.deductions.incomeTax);
+        setValue('deductions.totalTax', salaryDetails.deductions.totalTax);
+        setValue('netSalary', salaryDetails.netSalary);
+        setValue('status', salaryDetails.status);
+      }
+    } catch (error) {
+      handleApiErrors(error);
+    }
   };
 
   return (
@@ -89,7 +118,7 @@ const EmployeeSalaryList = () => {
       <div className="container mt-4">
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
-            <h1 className="h3 mb-3"><strong>Employee Salary List</strong> </h1>
+            <h1 className="h3 mb-3"><strong>Employee Salary List</strong></h1>
           </div>
           <div className="col-auto">
             <nav aria-label="breadcrumb">
@@ -112,14 +141,16 @@ const EmployeeSalaryList = () => {
             <div key={index} className="card mb-3">
               <div className="card-header d-flex justify-content-between align-items-center" onClick={() => toggleExpand(index)} style={{ cursor: 'pointer' }}>
                 <h5 className="mb-0"> {index + 1}. Net Salary: {item.netSalary}</h5>
-                <PencilSquare size={22} color='#2255a4' />
+                <PencilSquare size={22} color='#2255a4' onClick={() => handleEditClick(item.salaryId)} />
               </div>
-              {expanded[index] && (
+              {expandedIndex === index && (
                 <div className="card-body">
+                  <div style={{marginBottom:'3%', marginRight:"10%"}} >
+                      <ArrowLeftCircle size={22} color='' onClick={collapseExpandedCard}/>
+                    </div>
                   <form onSubmit={handleSubmit(onSubmit)}>
                     <input type="hidden" name="id" value={id} ref={register()} />
                     <input type="hidden" name="salaryId" value={salaryId} ref={register()} />
-
                     <div className="row">
                       <div className="col mb-3">
                         <div className="form-group">
