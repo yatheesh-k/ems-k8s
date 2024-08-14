@@ -1,17 +1,52 @@
 pipeline {
     agent any
 
+    environment {
+        GIT_URL = "git@github.com:PathBreakerGit/ems.git"  
+        REPO_DIR = "/opt/ems/"
+        NGINX_DIR = "/var/www/ems/"
+        UI_BUILD_DIR = "/opt/ems/ui/"
+        EMPLOYEE_MODULE = "/opt/ems/employee/"
+        IDENTITY_MODULE = "/opt/ems/identity/"
+    }
+
     stages {
         stage('Deploy Application') {
             steps {
-                script {
-                 
-                    sh '''
-                        /opt/ems-services/ems-deploy-script/build.sh
-                    '''
+                sshagent(['ac46ef33-599c-4de0-b2b9-036d7cd7b5b4']) {  
+                    script {
+                        sh '''
+                            #!/bin/bash
+
+                            sudo rm -rf $NGINX_DIR/*
+
+                            if [ -d "$REPO_DIR" ]; then
+                                cd $REPO_DIR
+                                git pull origin main  # No need for sudo
+                            else
+                                git clone $GIT_URL $REPO_DIR
+                                cd $REPO_DIR
+                            fi
+
+                            cd $EMPLOYEE_MODULE
+                            ./gradlew clean build
+
+                            cd $IDENTITY_MODULE
+                            ./gradlew clean build
+
+                            cd $UI_BUILD_DIR
+                            npm install
+                            npm run build
+
+                            sudo cp -r $UI_BUILD_DIR/build/* $NGINX_DIR/
+
+                            sudo systemctl start nginx
+                            sudo systemctl restart employee.service 
+                            sudo systemctl restart identity.service
+                        '''
+                    }
                 }
             }
         }
     }
 }
-
