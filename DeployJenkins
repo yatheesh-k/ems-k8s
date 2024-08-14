@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        GIT_URL = "https://github.com/PathBreakerGit/ems.git"
+        GIT_URL = "git@github.com:PathBreakerGit/ems.git"
         REPO_DIR = "/opt/ems/"
         NGINX_DIR = "/var/www/ems/"
         UI_BUILD_DIR = "/opt/ems/ui/"
