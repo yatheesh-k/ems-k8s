@@ -7,7 +7,7 @@ pipeline {
                 script {
                  
                     sh '''
-                        /opt/ems/deploy.sh
+                        /opt/ems-services/ems-deploy-script/build.sh
                     '''
                 }
             }
