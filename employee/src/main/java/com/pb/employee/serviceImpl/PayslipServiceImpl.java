@@ -6,6 +6,7 @@ import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.opensearch.OpenSearchOperations;
 import com.pb.employee.persistance.model.*;
+import com.pb.employee.request.EmployeeStatus;
 import com.pb.employee.request.PayslipRequest;
 import com.pb.employee.service.PayslipService;
 import com.pb.employee.util.*;
@@ -73,6 +74,11 @@ public class PayslipServiceImpl implements PayslipService {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_NOT_MATCHING),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
+            if (entity.getStatus().equals(EmployeeStatus.INACTIVE.getStatus())){
+                log.error("Employee{} Salary {}: is inActive", salaryId, employeeId);
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.SALARY_INACTIVE),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         try {
             // Retrieve attendance details
             String attendanceId = ResourceIdUtils.generateAttendanceId(payslipRequest.getCompanyName(),employeeId,payslipRequest.getYear(),payslipRequest.getMonth());
@@ -131,11 +137,13 @@ public class PayslipServiceImpl implements PayslipService {
                 // Generate and save payslip for the current employee
                 List<PayslipEntity> payslipPropertiesList = new ArrayList<>();
                 for (SalaryEntity salary : salaryEntities) {
-                    PayslipEntity payslipProperties = PayslipUtils.unMaskEmployeePayslipProperties(salary, payslipRequest, paySlipId, employee.getId(), attendanceEntities);
-                    PayslipUtils.formatNumericalFields(payslipProperties);
-                    payslipProperties = PayslipUtils.maskEmployeePayslip(payslipProperties, salary, attendanceEntities);
-                    generatedPayslips.add(payslipProperties);
-                    payslipPropertiesList.add(payslipProperties);
+                    if (salary.getStatus().equals(EmployeeStatus.ACTIVE.getStatus())){
+                        PayslipEntity payslipProperties = PayslipUtils.unMaskEmployeePayslipProperties(salary, payslipRequest, paySlipId, employee.getId(), attendanceEntities);
+                        PayslipUtils.formatNumericalFields(payslipProperties);
+                        payslipProperties = PayslipUtils.maskEmployeePayslip(payslipProperties, salary, attendanceEntities);
+                        generatedPayslips.add(payslipProperties);
+                        payslipPropertiesList.add(payslipProperties);
+                   }
                 }
 
                 // Save all payslips for the current employee

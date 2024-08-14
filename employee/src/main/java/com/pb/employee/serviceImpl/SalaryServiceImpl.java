@@ -11,6 +11,7 @@ import com.pb.employee.opensearch.OpenSearchOperations;
 import com.pb.employee.persistance.model.EmployeeEntity;
 import com.pb.employee.persistance.model.Entity;
 import com.pb.employee.persistance.model.SalaryEntity;
+import com.pb.employee.request.EmployeeStatus;
 import com.pb.employee.request.SalaryRequest;
 import com.pb.employee.service.SalaryService;
 import com.pb.employee.util.CompanyUtils;
@@ -27,7 +28,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 
@@ -44,12 +48,29 @@ public class SalaryServiceImpl implements SalaryService {
 
     @Override
     public ResponseEntity<?> addSalary(SalaryRequest salaryRequest,String employeeId) throws EmployeeException{
-        String salaryId = ResourceIdUtils.generateSalaryResourceId(employeeId);
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        String timestamp = currentDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        String salaryId = ResourceIdUtils.generateSalaryResourceId(employeeId, timestamp);
         EmployeeEntity entity = null;
+        List<SalaryEntity> salary = null;
         String index = ResourceIdUtils.generateCompanyIndex(salaryRequest.getCompanyName());
         try{
                 entity = openSearchOperations.getEmployeeById(employeeId, null, index);
             if (entity!=null) {
+                salary = openSearchOperations.getSalaries(salaryRequest.getCompanyName(), employeeId);
+                if (salary != null){
+                    for (SalaryEntity salaryEntity : salary) {
+                        String gross = new String(Base64.getDecoder().decode(salaryEntity.getGrossAmount()));
+                        if (gross.equals(salaryRequest.getGrossAmount())) {
+                            return new ResponseEntity<>(
+                                    ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.SALARY_ALREADY_EXIST)))),
+                                    HttpStatus.CONFLICT);
+                        }
+                        salaryEntity.setStatus(EmployeeStatus.INACTIVE.getStatus());
+                        openSearchOperations.saveEntity(salaryEntity, salaryEntity.getSalaryId(), index);
+
+                    }
+                }
                 Entity salaryEntity = CompanyUtils.maskEmployeeSalaryProperties(salaryRequest, salaryId,employeeId);
                 Entity result = openSearchOperations.saveEntity(salaryEntity, salaryId, index);
             } else {

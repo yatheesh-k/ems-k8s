@@ -61,6 +61,20 @@ public class EmployeeServiceImpl implements EmployeeService {
                     HttpStatus.CONFLICT);
         }
         try{
+            DepartmentEntity departmentEntity =null;
+            DesignationEntity designationEntity = null;
+                departmentEntity = openSearchOperations.getDepartmentById(employeeRequest.getDepartment(), null, index);
+                if (departmentEntity == null){
+                    return new ResponseEntity<>(
+                            ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_DEPARTMENT)))),
+                            HttpStatus.CONFLICT);
+                }
+                designationEntity = openSearchOperations.getDesignationById(employeeRequest.getDesignation(), null, index);
+                if (designationEntity == null){
+                    return new ResponseEntity<>(
+                        ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_DESIGNATION)))),
+                        HttpStatus.CONFLICT);
+                }
             List<CompanyEntity> shortNameEntity = openSearchOperations.getCompanyByData(null, Constants.COMPANY, employeeRequest.getCompanyName());
 
             Entity companyEntity = EmployeeUtils.maskEmployeeProperties(employeeRequest, resourceId, shortNameEntity.getFirst().getId());
@@ -149,6 +163,13 @@ public class EmployeeServiceImpl implements EmployeeService {
             log.error("Exception while fetching company details {}", ex);
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
                     HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        DesignationEntity designationEntity = null;
+        designationEntity = openSearchOperations.getDesignationById(employeeUpdateRequest.getDesignation(), null, index);
+        if (designationEntity == null){
+            return new ResponseEntity<>(
+                    ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_DESIGNATION)))),
+                    HttpStatus.CONFLICT);
         }
         Entity entity = CompanyUtils.maskEmployeeUpdateProperties(user, employeeUpdateRequest);
         openSearchOperations.saveEntity(entity, employeeId, index);

@@ -24,8 +24,8 @@ public class ResourceIdUtils {
     public static String generateEmployeeResourceId(String id) {
         return generateGlobalResourceId(ResourceType.EMPLOYEE, id);
     }
-    public static String generateSalaryResourceId(String employeeId) {
-        return generateGlobalResourceId(ResourceType.SALARY,employeeId);
+    public static String generateSalaryResourceId(String employeeId, String time) {
+        return generateGlobalResourceId(ResourceType.SALARY,employeeId, time);
     }
 
     public static String generatePayslipId(String month, String year, String employeeId) {

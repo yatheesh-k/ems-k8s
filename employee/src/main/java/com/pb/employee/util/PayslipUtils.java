@@ -74,12 +74,14 @@ public class PayslipUtils {
             byte[] decodedPfEmployer = Base64.getDecoder().decode(salaryRequest.getDeductions().getPfEmployer());
             pfc = Double.parseDouble(new String(decodedPfEmployee)) + Double.parseDouble(new String(decodedPfEmployer));
             pfc = pfc/12;
+            pfc = Math.ceil(pfc);
             salary.getAllowances().setPfContributionEmployee(String.valueOf(pfc));
         }
         if (salaryRequest.getAllowances().getHra() != null) {
             byte[] decodedHra = Base64.getDecoder().decode(salaryRequest.getAllowances().getHra());
             hra = Double.parseDouble(new String(decodedHra));
             hra = ((gross/12)*(hra/100));
+            hra = Math.ceil(hra);
             salary.getAllowances().setHra(String.valueOf(hra));
         }
         if (salaryRequest.getAllowances().getSpecialAllowance() != null) {
@@ -119,8 +121,9 @@ public class PayslipUtils {
             int noOfLeaves = totalWorkingDays - noOfWorkingDays;
             if (noOfLeaves > 1) {
                 double monthlySalary = (gross / 12);
-                int perDaySalary = (int) (monthlySalary / totalWorkingDays);
-                lop = (double) ((noOfLeaves - 1) * perDaySalary);
+                double perDaySalary = (monthlySalary / totalWorkingDays);
+                lop = (noOfLeaves - 1) * perDaySalary;
+                lop = Math.ceil(lop);
             }else {
                 lop = (double) 0;
             }
