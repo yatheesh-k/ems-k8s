@@ -6,7 +6,7 @@ import { CameraFill, Eye, EyeSlash } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { CompanyImagePatchApi, companyUpdateByIdApi, companyViewByIdApi, EmployeeGetApiById } from "../Utils/Axios";
-import { userId } from "../Utils/Auth";
+import { useAuth } from "../Context/AuthContext";
 
 function Profile() {
   const { register, handleSubmit,reset, setValue, formState: { errors } } = useForm({ mode: "onChange" });
@@ -25,12 +25,11 @@ function Profile() {
   const togglePasswordVisiblity = () => {
     setPasswordShown(!passwordShown);
   };
-
   useEffect(() => {
     const fetchCompanyData = async () => {
-      if (!companyId) return;
+      if (!user.companyId) return;
       try {
-        const response = await companyViewByIdApi(companyId);
+        const response = await companyViewByIdApi(user.companyId);
         const data = response.data;
         setCompanyData(data);
         setValue("companyName", data.companyName);
@@ -53,23 +52,22 @@ function Profile() {
     };
 
     fetchCompanyData();
-  }, [setValue, companyId]);
+  }, [setValue, user.companyId]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await EmployeeGetApiById(userId);
+        const response = await EmployeeGetApiById(user.userId);
         const companyId = response.data.companyId;
-        setCompanyId(companyId);
       } catch (error) {
         setError(error);
       }
     };
     fetchData();
-  }, []);
+  }, [user]);
 
   const handleDetailsSubmit = async (data) => {
-    if (!companyId) return;
+    if (!user.companyId) return;
 
     // Extract only the fields you want to update
     const updateData = {
@@ -83,7 +81,7 @@ function Profile() {
     };
 
     try {
-        await companyUpdateByIdApi(companyId, updateData);
+        await companyUpdateByIdApi(user.companyId, updateData);
         setSuccessMessage("Profile Updated Successfully.");
         toast.success("Company Details Updated Successfully");
         setErrorMessage("");
@@ -106,13 +104,13 @@ function Profile() {
 
 
   const handleLogoSubmit = async () => {
-    if (!companyId) return;
+    if (!user.companyId) return;
     try {
       if (postImage) {
         const formData = new FormData();
         formData.append("image", "string");
         formData.append("file", postImage);
-        await CompanyImagePatchApi(companyId, formData);
+        await CompanyImagePatchApi(user.companyId, formData);
         setPostImage("");
         setSuccessMessage("Logo updated successfully.");
         toast.success("Company Logo Updated Successfully");
