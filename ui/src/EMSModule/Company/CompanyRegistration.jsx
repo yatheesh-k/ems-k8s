@@ -277,7 +277,7 @@ const CompanyRegistration = () => {
                             value="Private Limited"
                             style={{ marginRight: "10px" }}
                             {...register("companyType", {
-                              required: !editMode ? "Please select your Company Type" : false,
+                              required: !editMode ? "Please Select Your Company Type" : false,
                             })}
                             disabled={editMode}
                           />
@@ -294,7 +294,7 @@ const CompanyRegistration = () => {
                           value="Firm"
                           style={{ marginRight: "10px" }}
                           {...register("companyType", {
-                            required: !editMode ? "Please select your Company Type" : false,
+                            required: !editMode ? "Please Select Your Company Type" : false,
                           })}
                           disabled={editMode}
                         />
@@ -329,14 +329,14 @@ const CompanyRegistration = () => {
                         onInput={toInputTitleCase}
                         autoComplete="off"
                         {...register("companyName", {
-                          required: "Company Name is required",
+                          required: "Company Name is Required",
                           pattern: {
                             value: /^[a-zA-Z\s,.'\-\/]*$/,
                             message: "Field accepts only alphabets and special characters:( , ' -  . /)",
                           },
                           minLength: {
                             value: 2,
-                            message: "minimum 2 characters required",
+                            message: "minimum 2 characters Required",
                           },
                           maxLength: {
                             value: 20,
@@ -361,7 +361,7 @@ const CompanyRegistration = () => {
                         placeholder="Enter Service Name"
                         autoComplete="off"
                         {...register("shortName", {
-                          required: "Service Name is required",
+                          required: "Service Name is Required",
                           pattern: {
                             value: /^[a-z]+$/,
                             message:
@@ -369,7 +369,7 @@ const CompanyRegistration = () => {
                           },
                           minLength: {
                             value: 2,
-                            message: "minimum 2 characters required",
+                            message: "minimum 2 characters Required",
 
                           },
                           maxLength: {
@@ -395,7 +395,7 @@ const CompanyRegistration = () => {
                         onInput={toInputLowerCase}
                         onKeyDown={handleEmailChange}
                         {...register("emailId", {
-                          required: "Company Email Id is required",
+                          required: "Company Email Id is Required",
                           pattern: {
                             value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid email format it allows Only .com, .in, .org, .net, .edu, .gov are allowed",
@@ -423,7 +423,7 @@ const CompanyRegistration = () => {
                             onKeyDown={handleEmailChange}
                             onInput={toInputTitleCase}
                             {...register("landNo", {
-                              required: "Contact Number is required",
+                              required: "Contact Number is Required",
                               pattern: {
                                 value: /^[0-9]{10}$/,
                                 message:
@@ -461,7 +461,7 @@ const CompanyRegistration = () => {
                                 },
                                 minLength: {
                                   value: 6,
-                                  message: "Minimum 6 characters required",
+                                  message: "Minimum 6 characters Required",
                                 },
                                 maxLength: {
                                   value: 16,
@@ -494,7 +494,7 @@ const CompanyRegistration = () => {
                             onInput={toInputTitleCase}
                             onKeyDown={handleEmailChange}
                             {...register("landNo", {
-                              required: "Contact Number is required",
+                              required: "Contact Number is Required",
                               pattern: {
                                 value: /^[0-9]{10}$/,
                                 message:
@@ -510,7 +510,6 @@ const CompanyRegistration = () => {
                         <div className="col-lg-1"></div>
                       </>
                     )}
-
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
                       <label className="form-label">
                         Alternate Number <span style={{ color: "red" }}>*</span>
@@ -524,7 +523,7 @@ const CompanyRegistration = () => {
                         onInput={toInputTitleCase}
                         onKeyDown={handleEmailChange}
                         {...register("mobileNo", {
-                          required: "Alternate Number is required",
+                          required: "Alternate Number is Required",
                           pattern: {
                             value: /^[0-9]{10}$/,
                             message:
@@ -553,7 +552,7 @@ const CompanyRegistration = () => {
                         onInput={toInputTitleCase}
                         autoComplete="off"
                         {...register("companyAddress", {
-                          required: "Company Address is required",
+                          required: "Company Address is Required",
                           pattern: {
                             value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*()^\-/]*$/,
                             message:
@@ -603,7 +602,7 @@ const CompanyRegistration = () => {
                         autoComplete="off"
                         maxLength={21}
                         {...register("cinNo", {
-                          required: "Company CIN Number is required",
+                          required: "Company CIN Number is Required",
                           maxLength: {
                             value: 21,
                             message: "CIN Number must not exceed 21 characters",
@@ -627,7 +626,7 @@ const CompanyRegistration = () => {
 
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
-                        Company Register Number{" "}
+                        Company Registration Number{" "}
                         <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
@@ -639,7 +638,7 @@ const CompanyRegistration = () => {
                         autoComplete="off"
                         maxLength={21}
                         {...register("companyRegNo", {
-                          required: "Company Register Number is required",
+                          required: "Company Registration Number is Required",
                           maxLength: {
                             value: 21,
                             message: "Registration Number must not exceed 21 characters",
@@ -672,7 +671,7 @@ const CompanyRegistration = () => {
                         onKeyDown={handleEmailChange}
                         maxLength={15}
                         {...register("gstNo", {
-                          required: "Company GST Number is required",
+                          required: "Company GST Number is Required",
                           maxLength: {
                             value: 15,
                             message: "GST Number must not exceed 15 characters",
@@ -702,7 +701,7 @@ const CompanyRegistration = () => {
                         onKeyDown={handleEmailChange}
                         maxLength={10}
                         {...register("panNo", {
-                          required: "Company PAN Number is required",
+                          required: "Company PAN Number is Required",
                           maxLength: {
                             value: 10,
                             message: "PAN Number must not exceed 10 characters",
@@ -743,16 +742,16 @@ const CompanyRegistration = () => {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Enter Authorized Name"
+                        placeholder="Enter Name"
                         onKeyDown={handleEmailChange}
                         onInput={toInputTitleCase}
                         maxLength={20}
                         autoComplete="off"
                         {...register("name", {
-                          required: "Name is required",
+                          required: "Name is Required",
                           minLength: {
                             value: 3,
-                            message: "Minimun 3 characters required",
+                            message: "Minimun 3 characters Required",
                           },
                           maxLength: {
                             value: 20,
@@ -777,12 +776,12 @@ const CompanyRegistration = () => {
                       <input
                         type="email"
                         className="form-control"
-                        placeholder="Enter Email Id"
+                        placeholder="Enter Personal Email Id"
                         autoComplete="off"
                         onInput={toInputLowerCase}
                         onKeyDown={handleEmailChange}
                         {...register("personalMailId", {
-                          required: "Email Id is required",
+                          required: "Personal Email Id is Required",
                           pattern: {
                             value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid email format it allows Only .com, .in, .org, .net, .edu, .gov are allowed",
@@ -803,13 +802,13 @@ const CompanyRegistration = () => {
                       <input
                         type="tel"
                         className="form-control"
-                        placeholder="Enter Mobile Number"
+                        placeholder="Enter Personal Mobile Number"
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         maxLength={10}
                         onInput={toInputTitleCase}
                         {...register("personalMobileNo", {
-                          required: "Mobile Number is required",
+                          required: "Personal Mobile Number is Required",
                           pattern: {
                             value: /^[0-9]{10}$/,
                             message:
@@ -838,14 +837,14 @@ const CompanyRegistration = () => {
                         onKeyDown={handleEmailChange}
                         maxLength={100}
                         {...register("address", {
-                          required: "Address is required",
+                          required: "Address is Required",
                           maxLength: {
                             value: 100,
                             message: "Name must not exceed 100 characters",
                           },
                           minLength: {
                             value: 3,
-                            message: "Mimium 3 characters required",
+                            message: "Mimium 3 characters Required",
                           },
                           pattern: {
                             value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*()^\-/]*$/,

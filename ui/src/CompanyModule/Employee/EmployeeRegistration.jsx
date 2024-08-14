@@ -420,12 +420,12 @@ let company=user.company
                     ) : (
                       <div className="col-12 col-md-6 col-lg-5 mb-3">
                         <label className="form-label">
-                          Select Employee Type <span style={{ color: "red" }}>*</span>
+                           Employee Type <span style={{ color: "red" }}>*</span>
                         </label>
                         <Controller
                           name="employeeType"
                           control={control}
-                          rules={{ required: 'Employee Type is required' }}
+                          rules={{ required: 'Employee Type is Required' }}
                           render={({ field }) => (
                             <Select
                               {...field}
@@ -456,7 +456,7 @@ let company=user.company
                         onKeyDown={handleEmailChange}
                         autoComplete='off'
                         {...register("employeeId", {
-                          required: "Employee Id Required",
+                          required: "Employee ID is Required",
                           pattern: {
                             value: /^(?=.*\d)[A-Z0-9]+$/,
                             message: "Must include at least one number and cannot contain only letters.",
@@ -488,7 +488,7 @@ let company=user.company
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         {...register("firstName", {
-                          required: "First Name Required",
+                          required: "First Name is Required",
                           pattern: {
                             value: /^[A-Za-z ]+$/,
                             message:
@@ -496,11 +496,11 @@ let company=user.company
                           },
                           minLength: {
                             value: 3,
-                            message: "Minimum 3 characters required",
+                            message: "Minimum 3 characters Required",
                           },
                           maxLength: {
                             value: 60,
-                            message: "Maximum 60 characters required",
+                            message: "Maximum 60 characters Required",
                           },
                         })}
                       />
@@ -522,18 +522,18 @@ let company=user.company
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         {...register("lastName", {
-                          required: "Last Name Required",
+                          required: "Last Name is Required",
                           pattern: {
                             value: /^[A-Za-z ]+$/,
                             message: "These fields accept only alphabetic characters",
                           },
                           minLength: {
                             value: 1,
-                            message: "Minimum 1 character required",
+                            message: "Minimum 1 character Required",
                           },
                           maxLength: {
                             value: 60,
-                            message: "Maximum 60 characters required",
+                            message: "Maximum 60 characters Required",
                           },
                         })}
                       />
@@ -552,7 +552,7 @@ let company=user.company
                         onInput={toInputLowerCase}
                         onKeyDown={handleEmailChange}
                         {...register("emailId", {
-                          required: "Email Id Required",
+                          required: "Email Id is Required",
                           pattern: {
                             value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid email format it allows Only .com, .in, .org, .net, .edu, .gov are allowed",
@@ -579,7 +579,7 @@ let company=user.company
                         })}
                       />
                       {errors.dateOfHiring && (
-                        <p className="errorMsg">Date of Hiring Required</p>
+                        <p className="errorMsg">Date of Hiring is Required</p>
                       )}
                     </div>
                     <div className="col-lg-1"></div>
@@ -595,7 +595,7 @@ let company=user.company
                           name="departmentName"
                           readOnly
                           {...register("departmentName", {
-                            required: "Department Required",
+                            required: "Department is Required",
                             pattern: {
                               value: /^[A-Za-z ]+$/,
                               message: "This field accepts only alphabetic characters",
@@ -617,7 +617,7 @@ let company=user.company
                           name="department"
                           control={control}
                           defaultValue=""
-                          rules={{ required: "Department Required" }}
+                          rules={{ required: "Department is Required" }}
                           render={({ field }) => (
                             <select {...field} className="form-select">
                               <option value="" disabled>Select Department</option>
@@ -656,7 +656,7 @@ let company=user.company
                         )}
                       />
                       {errors && errors.designation && (
-                        <p className="errorMsg">Designation Required</p>
+                        <p className="errorMsg">Designation is Required</p>
                       )}
                     </div>
 
@@ -671,7 +671,7 @@ let company=user.company
                         autoComplete="off" minLength={1}
                         onKeyDown={handleEmailChange}
                         {...register("manager", {
-                          required: "Manager Required",
+                          required: "Manager is Required",
                           pattern: {
                             value: /^[A-Za-z ]+$/,
                             message:
@@ -679,11 +679,11 @@ let company=user.company
                           },
                           minLength: {
                             value: 3,
-                            message: "minimum 3 character required",
+                            message: "minimum 3 character Required",
                           },
                           maxLength: {
                             value: 60,
-                            message: "Maximum 60 characters required",
+                            message: "Maximum 60 characters Required",
                           },
                         })}
                       />
@@ -702,18 +702,18 @@ let company=user.company
                         autoComplete="off" minLength={2}
                         onKeyDown={handleEmailChange}
                         {...register("location", {
-                          required: "Location Required",
+                          required: "Location is Required",
                           pattern: {
                             value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*()^\-/]*$/,
                             message: "Invalid Location",
                           },                          
                           minLength: {
                             value: 3,
-                            message: "minimum 3 characters required",
+                            message: "minimum 3 characters Required",
                           },
                           maxLength: {
                             value: 200,
-                            message: "Maximum 200 characters required",
+                            message: "Maximum 200 characters Required",
                           },
                         })}
                       />
@@ -739,7 +739,7 @@ let company=user.company
                               onKeyDown={handleEmailChange} maxLength={16}
                               type={passwordShown ? "text" : "password"}
                               {...register("password", {
-                                required: "Password Required",
+                                required: "Password is Required",
                                 pattern: {
                                   value:
                                     /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{6,16}$/,
@@ -747,7 +747,7 @@ let company=user.company
                                 },
                                 minLength: {
                                   value: 6,
-                                  message: "minimum 6 characters are required",
+                                  message: "minimum 6 characters are Required",
                                 },
                                 maxLength: {
                                   value: 16,
@@ -782,7 +782,7 @@ let company=user.company
                         type={isUpdating ? "date" : "date"}
                         readOnly={isUpdating}
                         name="dateOfBirth"
-                        placeholder="Enter Hiring Date"
+                        placeholder="Enter Birth Date"
                         className="form-control"
                         autoComplete="off"
                         {...register("dateOfBirth", {
@@ -794,7 +794,7 @@ let company=user.company
                         })}
                       />
                       {errors.dateOfBirth && (
-                        <p className="errorMsg">DOB Required</p>
+                        <p className="errorMsg">Date of Birth is Required</p>
                       )}
                     </div>
                     {isUpdating && (
@@ -825,7 +825,7 @@ let company=user.company
                           />
                         )}
                       />
-                      {errors.status && <p className="errorMsg">Employee Status is Required</p>}
+                      {errors.status && <p className="errorMsg"> Status is Required</p>}
                     </div>
                     <div className="col-lg-1"></div>
                     {/* {isUpdating ? (
@@ -889,7 +889,7 @@ let company=user.company
                         onKeyDown={handleEmailChange}
                         autoComplete="off"
                         {...register("accountNo", {
-                          required: "Account Number Required",
+                          required: "Account Number is Required",
                           pattern: {
                             value: /^\d{9,18}$/,
                             message:
@@ -897,7 +897,7 @@ let company=user.company
                           },
                           minLength: {
                             value: 9,
-                            message: "Account Number minimum 9 numbers required",
+                            message: "Account Number minimum 9 numbers Required",
                           },
                           maxLength: {
                             value: 18,
@@ -921,7 +921,7 @@ let company=user.company
                         onKeyDown={handleEmailChange}
                         autoComplete="off"
                         {...register("ifscCode", {
-                          required: "IFSC Code Required",
+                          required: "IFSC Code is Required",
                           pattern: {
                             value: /^[A-Z]{4}0[A-Z0-9]{6}$/,
                             message:
@@ -948,7 +948,7 @@ let company=user.company
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         {...register("bankName", {
-                          required: "Bank Name  Required",
+                          required: "Bank Name is Required",
                           pattern: {
                             value: /^[A-Za-z&'(),./\- ]{1,100}$/,
                             message:
@@ -982,7 +982,7 @@ let company=user.company
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         {...register("uanNo", {
-                          required: "Uan Required",
+                          required: "UAN Number is Required",
                           pattern: {
                             value: /^\d{12}$/,
                             message:
@@ -1011,7 +1011,7 @@ let company=user.company
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         {...register("panNo", {
-                          required: "Pan Number Required",
+                          required: "PAN Number is Required",
                           maxLength: {
                             value: 10,
                             message: "Pan Number must not exceed 10 characters",
@@ -1040,7 +1040,7 @@ let company=user.company
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         {...register("aadhaarId", {
-                          required: "Aadhar number Required",
+                          required: "Aadhaar Number is Required",
                           pattern: {
                             value: /^\d{12}$/,
                             message:

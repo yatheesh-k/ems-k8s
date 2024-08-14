@@ -28,6 +28,12 @@ const Department = () => {
     setSelectedItemId(null); // Reset the selected item ID
   };
 
+  const handleCloseAddDepartmentModal = () => {
+    setAddDeparment(false);
+    reset();
+    setEditingId(null);
+  };
+
   const handleShowDeleteModal = (id) => {
     setSelectedItemId(id); // Set the ID of the item to be deleted
     setShowDeleteModal(true);
@@ -343,7 +349,7 @@ const Department = () => {
                                 onKeyDown={handleEmailChange}
                                 autoComplete='off'
                                 {...register("name", {
-                                  required: "Department Required",
+                                  required: "Department is Required",
                                   pattern: {
                                     value: /^[A-Za-z ]+$/,
                                     message: "This Field accepts only Alphabetic Characters",
@@ -373,7 +379,7 @@ const Department = () => {
                           <button
                             type='button'
                             className="btn btn-secondary"
-                            onClick={() => setAddDeparment(false)}
+                            onClick={handleCloseAddDepartmentModal}
                           >
                             Cancel
                           </button>

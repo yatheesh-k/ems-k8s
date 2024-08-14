@@ -20,6 +20,7 @@ const Designation = () => {
   const [designations, setDesignations] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [search, setSearch] = useState('');
+  const [editingId, setEditingId] = useState(null);
   const [editingUserId, setEditingUserId] = useState(null);
   const [pending, setPending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,6 +38,12 @@ const Designation = () => {
   const handleShowDeleteModal = (id) => {
     setSelectedItemId(id); 
     setShowDeleteModal(true);
+  };
+
+  const handleCloseAddDesignationModal = () => {
+    setAddDesignation(false);
+    reset();
+    setEditingId(null);
   };
 
    const fetchDesignation = async () => {
@@ -343,7 +350,7 @@ const Designation = () => {
                                 onKeyDown={handleEmailChange}
                                 autoComplete='off'
                                 {...register("name", {
-                                  required: "Designation Required",
+                                  required: "Designation is Required",
                                   pattern: {
                                     value: /^[A-Za-z ]+$/,
                                     message: "This Field accepts only Alphabetic Characters",
@@ -372,7 +379,7 @@ const Designation = () => {
                           <button
                             type='button'
                             className="btn btn-secondary"
-                            onClick={() => setAddDesignation(false)}
+                            onClick={handleCloseAddDesignationModal}
                           >
                             Cancel
                           </button>

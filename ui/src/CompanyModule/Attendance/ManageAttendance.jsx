@@ -109,7 +109,7 @@ const ManageAttendance = () => {
                           accept=".xlsx"
 
                           {...register("attendanceFile", {
-                            required: "Upload Attendance file",
+                            required: "Upload Attendance File",
                           })}
                         />
                         {errors.attendanceFile && (

@@ -9,9 +9,10 @@ import { CompanyImagePatchApi, companyUpdateByIdApi, companyViewByIdApi, Employe
 import { userId } from "../Utils/Auth";
 
 function Profile() {
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm({ mode: "onChange" });
+  const { register, handleSubmit,reset, setValue, formState: { errors } } = useForm({ mode: "onChange" });
+  const { user } = useAuth();
+  //const [companyId, setCompanyId] = useState(null);
 
-  const [companyId, setCompanyId] = useState(null);
   const [companyData, setCompanyData] = useState({});
   const [postImage, setPostImage] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -128,6 +129,12 @@ function Profile() {
 
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
+
+  const handleCloseUploadImageModal = () => {
+    setPostImage(false);
+    reset();
+    setShowModal(false);
+  };
 
   const handleRemoveLogo = () => {
     setPostImage("");
@@ -470,8 +477,9 @@ function Profile() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="secondary" onClick={closeModal}>
-              Close
+            <Button variant="secondary" onClick={handleCloseUploadImageModal}>
+              Cancel
+
             </Button>
             <Button variant="primary" onClick={handleLogoSubmit}>
               Upload Logo
