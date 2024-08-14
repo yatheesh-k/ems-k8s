@@ -14,7 +14,7 @@ public class CompanyRequest {
 
     @Schema(example = "companyName")
     @Size(min = 2, max = 40, message = "{size.message}")
-    @Pattern(regexp ="^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{companyname.message}")
+    @Pattern(regexp ="^[A-Z][A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{companyname.message}")
     private String companyName;
 
     @Schema(example = "emailId")
@@ -29,7 +29,8 @@ public class CompanyRequest {
 
     @Schema(example = "companyAddress")
     @Size(min = 2, max = 100, message = "{companyAddress.notnull.message}")
-    @Pattern(regexp = "^(?!\\s)(?!.*\\s$)[a-zA-Z0-9\\s,'#,&*()^\\-/]*$", message = "{companyAddress.pattern.message}")
+    @Pattern(regexp = "^(?!\\s)(?!.*\\s$)(?=.*[A-Za-z])([\\d#&*()^\\-/]*[A-Z][a-zA-Z0-9,'.#&*()^\\-/]*)(\\s+[A-Z][a-zA-Z0-9,'.#&*()^\\-/]*)*$",
+            message = "{companyAddress.pattern.message}")
     private String companyAddress;
 
     @Schema(example = "companyRegNo")
@@ -59,7 +60,7 @@ public class CompanyRequest {
 
     @Schema(example = "name")
     @Size(min = 3, max = 20, message = "{name.notnull.message}")
-    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{name.message}")
+    @Pattern(regexp = "^[A-Z][a-z]+(?:\\s[A-Z][A-Za-z]*)*$", message = "{name.message}")
     private String name;
 
     @Schema(example = "personalMailId")
@@ -73,7 +74,8 @@ public class CompanyRequest {
     private String personalMobileNo;
 
     @Schema(example = "address")
-    @Pattern(regexp = "^[A-Za-z0-9\\s,.'-]+$", message = "{companyAddress.pattern.message}")
+    @Pattern(regexp = "^(?!\\s)(?!.*\\s$)(?=.*[A-Za-z])([\\d#&*()^\\-/]*[A-Z][a-zA-Z0-9,'.#&*()^\\-/]*)(\\s+[A-Z][a-zA-Z0-9,'.#&*()^\\-/]*)*$",
+            message = "{companyAddress.pattern.message}")
     @Size(min = 2, max = 100, message = "{address.notnull.message}")
     private String address;
 

@@ -14,9 +14,8 @@ import lombok.*;
 public class CompanyUpdateRequest {
 
     @Schema(example = "companyAddress")
-    @NotBlank(message = "{companyAddress.notnull.message}")
-    @Pattern(regexp = "^[A-Za-z0-9\\s,.'-]+$", message = "{companyAddress.pattern.message}")
-    @Size(min = 1, max = 100, message = "{companyAddress.pattern.message}")
+    @Pattern(regexp = "^(?!\\s)(?!.*\\s$)(?=.*[A-Za-z])([\\d#&*()^\\-/]*[A-Z][a-zA-Z0-9,'.#&*()^\\-/]*)(\\s+[A-Z][a-zA-Z0-9,'.#&*()^\\-/]*)*$", message = "{companyAddress.pattern.message}")
+    @Size(min = 1, max = 100, message = "{companyAddress.notnull.message}")
     private String companyAddress;
 
     @Schema(example = "mobileNo")
@@ -30,7 +29,8 @@ public class CompanyUpdateRequest {
     private String landNo;
 
     @Schema(example = "name")
-    @Pattern(regexp = "^[A-Za-z]{3,20}(?:\\s[A-Za-z]{2,19})*$", message = "{name.message}")
+    @Size(min = 3, max = 20, message = "{name.notnull.message}")
+    @Pattern(regexp = "^[A-Z][a-z](?:\\s[A-Z][A-Za-z]*)*$", message = "{name.message}")
     private String name;
 
     @Schema(example = "personalMailId")
@@ -44,9 +44,8 @@ public class CompanyUpdateRequest {
     private String personalMobileNo;
 
     @Schema(example = "address")
-    @NotBlank(message = "{address.notnull.message}")
-    @Pattern(regexp = "^[A-Za-z0-9\\s,.'-]+$", message = "{companyAddress.pattern.message}")
-    @Size(min = 1, max = 100, message = "{companyAddress.pattern.message}")
+    @Pattern(regexp = "^(?!\\s)(?!.*\\s$)(?=.*[A-Za-z])([\\d#&*()^\\-/]*[A-Z][a-zA-Z0-9,'.#&*()^\\-/]*)(\\s+[A-Z][a-zA-Z0-9,'.#&*()^\\-/]*)*$", message = "{companyAddress.pattern.message}")
+    @Size(min = 1, max = 100, message = "{address.notnull.message}")
     private String address;
 
 //    @Pattern(regexp = "^[A-Za-z]+$", message = "{company.type}")
