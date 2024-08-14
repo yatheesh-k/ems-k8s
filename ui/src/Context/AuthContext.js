@@ -27,7 +27,9 @@ export const AuthProvider = ({ children }) => {
           userRole: decodedToken.roles,
           company: decodedToken.company,
           employeeId: decodedToken.employeeId,
+     
         });
+       
       } catch (error) {
         console.error('Failed to decode token:', error);
         localStorage.removeItem('token');
@@ -39,7 +41,6 @@ export const AuthProvider = ({ children }) => {
   const setAuthUser = (userData) => {
     setUser(userData);
   };
-
   useEffect(() => {
     if (!user.userId) return;
 
@@ -66,7 +67,6 @@ export const AuthProvider = ({ children }) => {
         const logoResponse = await CompanyImageGetApi(companyId);
         if (logoResponse?.data?.data) {
           const logoPath = logoResponse.data.data;
-          console.log("Company logo path:", logoPath);
           setLogoFileName(logoPath);
         } else {
           console.error("Response or data is missing");

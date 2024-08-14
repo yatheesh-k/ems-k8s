@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { company } from "../Utils/Auth";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 import Reset from "./Reset";
 import { useAuth } from "../Context/AuthContext";
@@ -20,7 +19,6 @@ const Header = ({ toggleSidebar }) => {
   const [lastName, setLastName] = useState("");
   const profileDropdownRef = useRef(null);
   const navigate = useNavigate();
-
   useEffect(() => {
     if (!user) return;
 
@@ -113,8 +111,9 @@ const Header = ({ toggleSidebar }) => {
       <div className="navbar-collapse collapse">
         <ul className="navbar-nav navbar-align">
           {roles.includes("ems_admin") && (
+            <>
+             <span className="mt-3">EMS-Admin</span>
             <li className="nav-item">
-              <span>EMS_Admin</span>
               <a
                 className="nav-link dropdown-toggle d-none d-sm-inline-block text-center"
                 href
@@ -139,6 +138,7 @@ const Header = ({ toggleSidebar }) => {
                 </div>
               )}
             </li>
+            </>
           )}
           {roles.includes("company_admin") && (
             <li className="nav-item dropdown position-relative">
@@ -171,7 +171,7 @@ const Header = ({ toggleSidebar }) => {
               )}
             </li>
           )}
-          {roles.includes("Employee") && (
+        {!roles.includes("ems_admin") && !roles.includes("company_admin") && (
             <li className="nav-item dropdown position-relative">
               <a
                 className="nav-link dropdown-toggle d-none d-sm-inline-block text-center"
@@ -201,7 +201,7 @@ const Header = ({ toggleSidebar }) => {
                 </div>
               )}
             </li>
-          )}
+        )}
         </ul>
       </div>
       <Reset

@@ -41,6 +41,7 @@ function Message() {
     const onSubmit = (data) => {
         closeModal()
         const { companyName } = data;
+        localStorage.setItem('companyName',companyName)
         reset();
         navigate(`/${companyName}/login`);
 

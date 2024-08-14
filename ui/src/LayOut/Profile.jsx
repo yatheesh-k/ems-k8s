@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Modal, Button, Toast, ModalHeader, ModalTitle, ModalBody, ModalFooter } from "react-bootstrap";
+import { Modal, Button, ModalHeader, ModalTitle, ModalBody, ModalFooter } from "react-bootstrap";
 import LayOut from "./LayOut";
 import { CameraFill, Eye, EyeSlash } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { CompanyImagePatchApi, companyUpdateByIdApi, companyViewByIdApi, EmployeeGetApiById } from "../Utils/Axios";
 import { userId } from "../Utils/Auth";
-import { useAuth } from "../Context/AuthContext";
 
 function Profile() {
   const { register, handleSubmit, setValue, formState: { errors } } = useForm({ mode: "onChange" });
-  const { user } = useAuth();
-  //const [companyId, setCompanyId] = useState(null);
+
+  const [companyId, setCompanyId] = useState(null);
   const [companyData, setCompanyData] = useState({});
   const [postImage, setPostImage] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -28,9 +27,9 @@ function Profile() {
 
   useEffect(() => {
     const fetchCompanyData = async () => {
-      if (!user.companyId) return;
+      if (!companyId) return;
       try {
-        const response = await companyViewByIdApi(user.companyId);
+        const response = await companyViewByIdApi(companyId);
         const data = response.data;
         setCompanyData(data);
         setValue("companyName", data.companyName);
@@ -53,92 +52,66 @@ function Profile() {
     };
 
     fetchCompanyData();
-  }, [setValue, user.companyId]);
+  }, [setValue, companyId]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await EmployeeGetApiById(userId);
+        const companyId = response.data.companyId;
+        setCompanyId(companyId);
+      } catch (error) {
+        setError(error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleDetailsSubmit = async (data) => {
-    if (!user.companyId) return;
+    if (!companyId) return;
+
+    // Extract only the fields you want to update
+    const updateData = {
+        companyAddress: data.companyAddress,
+        mobileNo: data.mobileNo,
+        landNo: data.landNo,
+        name: data.name,
+        personalMailId: data.personalMailId,
+        personalMobileNo: data.personalMobileNo,
+        address: data.address
+    };
+
     try {
-      await companyUpdateByIdApi(user.companyId, data);
-      setSuccessMessage("Profile Updated Successfully.");
-      toast.success("Company Details Updated Successfully");
-      setErrorMessage("");
-      navigate("/main");
+        await companyUpdateByIdApi(companyId, updateData);
+        setSuccessMessage("Profile Updated Successfully.");
+        toast.success("Company Details Updated Successfully");
+        setErrorMessage("");
+        navigate("/main");
     } catch (err) {
-      console.error("Details update error:", err);
-      setSuccessMessage("");
-      setErrorMessage("Failed To Update Profile Details.");
-      setError(err);
+        console.error("Details update error:", err);
+        setSuccessMessage("");
+        setErrorMessage("Failed To Update Profile Details.");
+        setError(err);
     }
-  };
+};
+
 
   const onChangePicture = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setPostImage(file);
+        setPostImage(file); // Set the actual File object here
     }
-  };
+};
 
-  const toInputTitleCase = (e) => {
-    const input = e.target;
-    let value = input.value;
-    // Remove leading spaces
-    value = value.replace(/^\s+/g, '');
-    // Initially disallow spaces
-    if (!/\S/.test(value)) {
-      // If no non-space characters are present, prevent spaces
-      value = value.replace(/\s+/g, '');
-    } else {
-      // Allow spaces if there are non-space characters
-      value = value.replace(/^\s+/g, ''); // Remove leading spaces
-      const words = value.split(' ');
-      const capitalizedWords = words.map(word => {
-        return word.charAt(0).toUpperCase() + word.slice(1);
-      });
-      value = capitalizedWords.join(' ');
-    }
-    // Update input value
-    input.value = value;
-  };
-
-  const toInputLowerCase = (e) => {
-    const input = e.target;
-    let value = input.value;
-
-    // Remove leading spaces
-    value = value.replace(/^\s+/g, '');
-
-    // Initially disallow spaces if there are no non-space characters
-    if (!/\S/.test(value)) {
-      // If no non-space characters are present, prevent spaces
-      value = value.replace(/\s+/g, '');
-    } else {
-      // Convert the entire string to lowercase
-      value = value.toLowerCase();
-
-      // Remove leading spaces
-      value = value.replace(/^\s+/g, '');
-
-      // Capitalize the first letter of each word
-      const words = value.split(' ');
-      const capitalizedWords = words.map(word => {
-        return word.charAt(0).toLowerCase() + word.slice(1);
-      });
-
-      value = capitalizedWords.join(' ');
-    }
-
-    // Update input value
-    input.value = value;
-  };
 
   const handleLogoSubmit = async () => {
-    if (!user.companyId) return;
+    if (!companyId) return;
     try {
       if (postImage) {
         const formData = new FormData();
         formData.append("image", "string");
         formData.append("file", postImage);
-        await CompanyImagePatchApi(user.companyId, formData);
+        await CompanyImagePatchApi(companyId, formData);
         setPostImage("");
         setSuccessMessage("Logo updated successfully.");
         toast.success("Company Logo Updated Successfully");
@@ -148,20 +121,10 @@ function Profile() {
     } catch (err) {
       console.error("Logo update error:", err);
       setSuccessMessage("");
-      setErrorMessage("Failed to update logo.");
+      setErrorMessage("Failed To Update Logo.");
       setError(err);
     }
-  };
-
-  const handleEmailChange = (e) => {
-    const value = e.target.value;
-    if (value.trim() !== "") {
-      return;
-    }
-    if (e.keyCode === 32) {
-      e.preventDefault();
-    }
-  };
+  }
 
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
@@ -176,6 +139,24 @@ function Profile() {
         <h1 className="h3 mb-3">
           <strong>Profile</strong>
         </h1>
+        {/* Success Message Modal */}
+        <Modal
+          show={successMessage !== ""}
+          onHide={() => setSuccessMessage("")}
+          centered
+          style={{ zIndex: "1050" }}
+          className="custom-modal"
+        >
+          <ModalHeader closeButton>
+            <ModalTitle>Success</ModalTitle>
+          </ModalHeader>
+          <ModalBody>{successMessage}</ModalBody>
+          <ModalFooter>
+            <Button variant="secondary" onClick={() => setSuccessMessage("")}>
+              Close
+            </Button>
+          </ModalFooter>
+        </Modal>
 
         {/* Error Message Modal */}
         <Modal
@@ -221,7 +202,29 @@ function Profile() {
                           justifyContent: "center",
                         }}
                       >
-                        <CameraFill />
+                        {postImage ? (
+                          <>
+                            <img
+                              src={postImage}
+                              alt="Selected Logo"
+                              style={{ width: "100%", height: "auto" }}
+                            />
+                            <button
+                              className="btn btn-sm btn-danger"
+                              style={{
+                                position: "absolute",
+                                top: -10,
+                                right: -10,
+                                borderRadius: "50%",
+                              }}
+                              onClick={handleRemoveLogo}
+                            >
+                              X
+                            </button>
+                          </>
+                        ) : (
+                          <CameraFill />
+                        )}
                       </div>
                     </div>
                   </div>
@@ -231,6 +234,7 @@ function Profile() {
           </div>
         </div>
 
+        {/* Form for Company Details */}
         <form onSubmit={handleSubmit(handleDetailsSubmit)}>
           <div className="row mt-3">
             <div className="col-12">
@@ -269,399 +273,208 @@ function Profile() {
                           readOnly
                         />
                       </div>
+
                       <div className="mb-3">
-                        <label
-                          htmlFor="companyPhoneNo"
-                          className="form-label"
-                        >
-                          Alternate Number
+                        <label htmlFor="companyMobile" className="form-label">
+                          Company Mobile No
                         </label>
                         <input
                           type="text"
-                          id="companyPhoneNo"
-                          placeholder="Enter Alternate Number"
+                          id="companyMobile"
                           className="form-control"
-                          onInput={toInputTitleCase}
+                          {...register("mobileNo")}
                           defaultValue={companyData.mobileNo}
-                          {...register("mobileNo", {
-                            required: "Mobile Number is required",
-                            pattern: {
-                              value: /^[0-9]{10}$/,
-                              message:
-                                "Alternate Number should contain only 10 numbers",
-                            },
-                          })}
                         />
-                        {errors.mobileNo && (
-                          <p className="errorMsg">{errors.mobileNo.message}</p>
-                        )}
-                      </div>
+                      </div>                    
                     </div>
+
                     <div className="col-md-6">
-                      <div className="mb-3">
-                        <label htmlFor="companyName" className="form-label">
-                          Service Name
+                    <div className="mb-3">
+                        <label htmlFor="companyShortName" className="form-label">
+                          Company Short Name
                         </label>
                         <input
                           type="text"
-                          id="companyName"
+                          id="companyShortName"
                           className="form-control"
                           {...register("shortName")}
                           defaultValue={companyData.shortName}
                           readOnly
                         />
                       </div>
-                      {/* <div className="col-12 col-md-6 col-lg-5 mb-3"> 
-                        <label htmlFor="website" className="form-label">
-                          Password
-                        </label>
-                        <div className="col-sm-12 input-group">
-                        <input
-                          type={passwordShown ? "text" : "password"}
-                          id="website"
-                          className="form-control"
-                          {...register("password")}
-                          defaultValue={companyData.password}
-                        />
-                        <i
-                          onClick={togglePasswordVisiblity}
-                          style={{ margin: "5px" }}
-                        >
-                          {" "}
-                          {passwordShown ? (
-                            <Eye size={17} />
-                          ) : (
-                            <EyeSlash size={17} />
-                          )}
-                        </i>
-                        </div>
-                      </div> */}
+                   
+
                       <div className="mb-3">
-                        <label
-                          htmlFor="companyAddress"
-                          className="form-label"
-                        >
-                          Company Address
+                        <label htmlFor="landNo" className="form-label">
+                          Landline No
                         </label>
                         <input
                           type="text"
+                          id="landNo"
                           className="form-control"
-                          placeholder="Enter Company Address"
-                          onKeyDown={handleEmailChange}
-                          onInput={toInputTitleCase}
-                          defaultValue={companyData.companyAddress}
-                          autoComplete="off"
-                          id="companyAddress"
-                          {...register("companyAddress", {
-                            required: "Company Address is required",
-                            pattern: {
-                              value: /^[a-zA-Z0-9\s,'#,&*()^\-/.]*$/,
-                              message:
-                                "Please enter valid Address",
-                            },
-                            maxLength: {
-                              value: 100,
-                              message: "maximum 100 characters allowed",
-                            },
-                          })}
+                          {...register("landNo")}
+                          defaultValue={companyData.landNo}
                         />
-                        {errors.companyAddress && (
-                          <p className="errorMsg">
-                            {errors.companyAddress.message}
-                          </p>
-                        )}
                       </div>
                       <div className="mb-3">
-                        <label
-                          htmlFor="companyAddress"
-                          className="form-label"
-                        >
-                          Contact Number
+                        <label htmlFor="companyAddress" className="form-label">
+                          Company Address
                         </label>
-                        <input
-                          type="text"
+                        <textarea
                           id="companyAddress"
                           className="form-control"
-                          placeholder="Enter Contact Number"
-                          onInput={toInputTitleCase}
-                          defaultValue={companyData.landNo}
-                          {...register("landNo", {
-                            required: "Contact Number is required",
-                            pattern: {
-                              value: /^[0-9]{10}$/,
-                              message:
-                                "Contact Number should contain only 10 numbers. ",
-                            },
-                          })}
+                          {...register("companyAddress")}
+                          defaultValue={companyData.companyAddress}
                         />
-                        {errors.landNo && (
-                          <p className="errorMsg">{errors.landNo.message}</p>
-                        )}
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="row mt-3">
-            <div className="col-12">
-              <div className="card">
-                <div className="card-header">
-                  <h5 className="card-title">Company Registration Details</h5>
-                  <hr />
-                </div>
-                <div className="card-body">
-                  <div className="row">
+                  <div className="row mt-2">
                     <div className="col-md-6">
-                      <div className="mb-3">
-                        <label htmlFor="name" className="form-label">
-                          Company CIN Number
+                    <div className="mb-3">
+                        <label htmlFor="cinNo" className="form-label">
+                          CIN No
                         </label>
                         <input
                           type="text"
-                          id="name"
+                          id="cinNo"
                           className="form-control"
                           {...register("cinNo")}
                           defaultValue={companyData.cinNo}
                           readOnly
                         />
                       </div>
+                      
                       <div className="mb-3">
-                        <label
-                          htmlFor="personalMailId"
-                          className="form-label"
-                        >
-                          Company Register Number
+                        <label htmlFor="panNo" className="form-label">
+                          PAN No
                         </label>
                         <input
                           type="text"
-                          id="personalMailId"
-                          className="form-control"
-                          {...register("companyRegNo")}
-                          defaultValue={companyData.companyRegNo}
-                          readOnly
-                        />
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="mb-3">
-                        <label
-                          htmlFor="personalMobileNo"
-                          className="form-label"
-                        >
-                          Company GST Number
-                        </label>
-                        <input
-                          type="text"
-                          id="personalMobileNo"
-                          className="form-control"
-                          {...register("gstNo")}
-                          defaultValue={companyData.gstNo}
-                          readOnly
-                        />
-                      </div>
-                      <div className="mb-3">
-                        <label htmlFor="designation" className="form-label">
-                          Company PAN Number
-                        </label>
-                        <input
-                          type="text"
-                          id="designation"
+                          id="panNo"
                           className="form-control"
                           {...register("panNo")}
                           defaultValue={companyData.panNo}
                           readOnly
                         />
                       </div>
+                    
                     </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+                    <div className="col-md-6"> 
+                      <div className="mb-3 ">
+                        <label htmlFor="companyRegNo" className="form-label">
+                          Company Reg. No
+                        </label>
+                        <input
+                          type="text"
+                          id="companyRegNo"
+                          className="form-control"
+                          {...register("companyRegNo")}
+                          defaultValue={companyData.companyRegNo}
+                          readOnly
+                        />
+                      </div>
 
-
-          <div className="row mt-3">
-            <div className="col-12">
-              <div className="card">
-                <div className="card-header">
-                  <h5 className="card-title">Personal Information</h5>
-                  <hr />
-                </div>
-                <div className="card-body">
-                  <div className="row">
-                    <div className="col-md-6">
                       <div className="mb-3">
+                        <label htmlFor="gstNo" className="form-label">
+                          GST No
+                        </label>
+                        <input
+                          type="text"
+                          id="gstNo"
+                          className="form-control"
+                          {...register("gstNo")}
+                          defaultValue={companyData.gstNo}
+                          readOnly
+                        />
+                      </div>
+                      </div>
+                  </div>
+                  <div className="row mt-2">
+                  <div className="col-md-6">
+                  <div className="mb-3">
                         <label htmlFor="name" className="form-label">
-                          Name
+                          Contact Person Name
                         </label>
                         <input
                           type="text"
                           id="name"
-                          placeholder="Enter Name"
                           className="form-control"
-                          onInput={toInputTitleCase}
+                          {...register("name")}
                           defaultValue={companyData.name}
-                          {...register("name", {
-                            required: "Name is required",
-                            maxLength: {
-                              value: 20,
-                              message: "Name must not exceed 20 characters",
-                            },
-                            pattern: {
-                              value: /^[a-zA-Z\s]*$/,
-                              message: "Name should contain only alphabets",
-                            },
-                          })}
                         />
-                        {errors.name && (
-                          <p className="errorMsg">{errors.name.message}</p>
-                        )}
                       </div>
+
                       <div className="mb-3">
-                        <label
-                          htmlFor="personalMailId"
-                          className="form-label"
-                        >
+                        <label htmlFor="personalMailId" className="form-label">
                           Personal Mail Id
                         </label>
                         <input
                           type="text"
                           id="personalMailId"
-                          placeholder="Enter personal Mail Id"
                           className="form-control"
-                          onInput={toInputLowerCase}
+                          {...register("personalMailId")}
                           defaultValue={companyData.personalMailId}
-                          {...register("personalMailId", {
-                            required: "MailId is required",
-                            pattern: {
-                              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                              message:
-                                "Entered value does not match email format",
-                            },
-                          })}
                         />
-                        {errors.personalMailId && (
-                          <p className="errorMsg">
-                            {errors.personalMailId.message}
-                          </p>
-                        )}
                       </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="mb-3">
-                        <label
-                          htmlFor="personalMobileNo"
-                          className="form-label"
-                        >
+                  </div>
+                  <div className="col-md-6">
+                  <div className="mb-3">
+                        <label htmlFor="personalMobileNo" className="form-label">
                           Personal Mobile No
                         </label>
                         <input
                           type="text"
                           id="personalMobileNo"
                           className="form-control"
-                          placeholder="Enetr Personal Mobile No"
-                          onInput={toInputTitleCase}
+                          {...register("personalMobileNo")}
                           defaultValue={companyData.personalMobileNo}
-                          {...register("personalMobileNo", {
-                            required: "Mobile Number is required",
-                            pattern: {
-                              value: /^[0-9]{10}$/,
-                              message:
-                                "Mobile Number should be exactly 10 digits long and should contain only numbers",
-                            },
-                          })}
                         />
-                        {errors.personalMobileNo && (
-                          <p className="errorMsg">
-                            {errors.personalMobileNo.message}
-                          </p>
-                        )}
                       </div>
+
                       <div className="mb-3">
-                        <label htmlFor="designation" className="form-label">
+                        <label htmlFor="address" className="form-label">
                           Address
                         </label>
-                        <input
-                          type="text"
+                        <textarea
                           id="address"
-                          placeholder="Enter Address"
                           className="form-control"
-                          onInput={toInputTitleCase}
+                          {...register("address")}
                           defaultValue={companyData.address}
-                          maxLength={100}
-                          {...register("address", {
-                            required: "Address is required",
-                            maxLength: {
-                              value: 100,
-                              message: "Name must not exceed 100 characters",
-                            },
-                            pattern: {
-                              value: /^[a-zA-Z0-9\s,'#,&*()^\-/.]*$/,
-                              message: "Please enter valid Address",
-                            },
-                          })}
                         />
-                        {errors.address && (
-                          <p className="errorMsg">{errors.address.message}</p>
-                        )}
                       </div>
-                    </div>
                   </div>
+                  </div>
+                </div>
+
+                <div className="card-footer text-end">
+                  <button type="submit" className="btn btn-primary">
+                    Save
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-
-          <div
-            className="col-12 d-flex justify-content-end mt-5"
-            style={{ background: "none" }}
-          >
-            <button
-              className="btn btn-primary btn-lg"
-              style={{ marginRight: "65px" }}
-              type="submit"
-            >
-              Submit
-            </button>
-          </div>
         </form>
 
-        {/* Modal for Image Upload */}
-        <Modal
-          show={showModal}
-          onHide={closeModal}
-          centered
-          style={{ zIndex: "1050" }}
-          className="custom-modal"
-        >
+        {/* Modal for Logo Upload */}
+        <Modal show={showModal} onHide={closeModal} style={{zIndex:"1050"}} centered>
           <ModalHeader closeButton>
-            <ModalTitle>Update Logo</ModalTitle>
+            <ModalTitle>Upload Logo</ModalTitle>
           </ModalHeader>
           <ModalBody>
-            <input type="file"
-              {...register("file", { required: "Logo Required" })}
+            <input
+              type="file"
+              className="form-control"
               onChange={onChangePicture}
             />
-            {postImage && (
-              <div>
-                <image src={postImage} alt="Selected Logo" style={{ width: "50%" }} />
-              </div>
-            )}
-            {errors.file && (
-              <p className="errorMsg">
-                {errors.file.message}
-              </p>
-            )}
           </ModalBody>
           <ModalFooter>
             <Button variant="secondary" onClick={closeModal}>
-              Cancel
+              Close
             </Button>
-            <Button variant="primary" onClick={handleSubmit(handleLogoSubmit)}>
-              Upload
+            <Button variant="primary" onClick={handleLogoSubmit}>
+              Upload Logo
             </Button>
           </ModalFooter>
         </Modal>

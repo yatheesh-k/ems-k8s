@@ -92,6 +92,7 @@ const Designation = () => {
   const handleConfirmDelete = async () => {
     if (selectedItemId) {
       try {
+
         await DesignationDeleteApiById(selectedItemId)
           .then((response) => {
            
@@ -110,6 +111,7 @@ const Designation = () => {
 
 
           });
+
       } catch (error) {
         handleApiErrors(error)
       }

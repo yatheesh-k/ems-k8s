@@ -21,7 +21,7 @@ const EmployeeRegistration = () => {
   } = useForm({
     defaultValues: {
       status: "", // Initialize with default value or leave empty if fetching dynamically
-      roles: ''
+      roles: null
     },
     mode: "onChange",
   });
@@ -35,7 +35,7 @@ const EmployeeRegistration = () => {
   const [companyName, setCompanyName] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-
+console.log(user.company)
   const [passwordShown, setPasswordShown] = useState(false);
   const togglePasswordVisiblity = () => {
     setPasswordShown(!passwordShown);
@@ -62,6 +62,13 @@ const EmployeeRegistration = () => {
     { value: "Contract", label: "Contract" },
     { value: "Trainee", label: "Trainee" },
     { value: "Support", label: "Support" },
+  ];
+
+  const Roles = [
+    { value: "Employee", label: "Employee" },
+    { value: "Hr", label: "Hr" },
+    { value: "Manager", label: "Manager" },
+    { value: "Accountant", label: "Accountant" },
   ];
 
   const status = [
@@ -121,29 +128,43 @@ const EmployeeRegistration = () => {
   const toInputTitleCase = (e) => {
     const input = e.target;
     let value = input.value;
+    const cursorPosition = input.selectionStart; // Save the cursor position
+  
     // Remove leading spaces
     value = value.replace(/^\s+/g, '');
-    // Initially disallow spaces
-    if (!/\S/.test(value)) {
-      // If no non-space characters are present, prevent spaces
-      value = value.replace(/\s+/g, '');
-    } else {
-      // Allow spaces if there are non-space characters
-      value = value.replace(/^\s+/g, ''); // Remove leading spaces
-      const words = value.split(' ');
-      const capitalizedWords = words.map(word => {
-        return word.charAt(0).toUpperCase() + word.slice(1);
-      });
-      value = capitalizedWords.join(' ');
+  
+    // Ensure only alphabets and spaces are allowed
+    value = value.replace(/[^a-zA-Z\s]/g, '');
+  
+    // Capitalize the first letter of each word
+    const words = value.split(' ');
+  
+    // Capitalize the first letter of each word and lowercase the rest
+    const capitalizedWords = words.map(word => {
+      if (word.length > 0) {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      }
+      return '';
+    });
+  
+    // Join the words back into a string
+    let formattedValue = capitalizedWords.join(' ');
+  
+    // Remove spaces not allowed (before the first two characters)
+    if (formattedValue.length > 2) {
+      formattedValue = formattedValue.slice(0, 2) + formattedValue.slice(2).replace(/\s+/g, ' ');
     }
+  
     // Update input value
-    input.value = value;
+    input.value = formattedValue;
+  
+    // Restore the cursor position
+    input.setSelectionRange(cursorPosition, cursorPosition);
   };
 
   const toInputLowerCase = (e) => {
     const input = e.target;
     let value = input.value;
-
     // Remove leading spaces
     value = value.replace(/^\s+/g, '');
 
@@ -165,75 +186,118 @@ const EmployeeRegistration = () => {
     input.value = value;
   };
 
+    //   const roles = data.roles ? [data.roles] : []; 
+  //   // Constructing the payload
+  //   let payload = {
+  //       companyName: company,
+  //       employeeType: data.employeeType,
+  //       emailId: data.emailId,
+  //       password: data.password,
+  //       designation: data.designation,
+  //       location: data.location,
+  //       manager: data.manager,
+  //       roles: roles,
+  //       status: data.status,
+  //       accountNo: data.accountNo,
+  //       ifscCode: data.ifscCode,
+  //       bankName: data.bankName,
+  //       aadhaarId: data.aadhaarId
+  //   };
+  //   if (location.state && location.state.id) {
+  //     payload = {
+  //         ...payload,
+  //         employeeId: data.employeeId,
+  //         firstName: data.firstName,
+  //         lastName: data.lastName,
+  //         dateOfHiring: data.dateOfHiring,
+  //         department: data.department,
+  //         panNo: data.panNo,
+  //         uanNo: data.uanNo,
+  //         dateOfBirth: data.dateOfBirth
+  //     };
+  // } else {
+  //     // Include these fields for the create request
+  //     payload = {
+  //         ...payload,
+  //         employeeId: data.employeeId,
+  //         firstName: data.firstName,
+  //         lastName: data.lastName,
+  //         dateOfHiring: data.dateOfHiring,
+  //         department: data.department,
+  //         panNo: data.panNo,
+  //         aadhaarId: data.aadhaarId,
+  //         uanNo: data.uanNo,
+  //         dateOfBirth: data.dateOfBirth
+  //     };
+  // }
+let company=user.company
   const onSubmit = async (data) => {
-    const company = sessionStorage.getItem('company');
-    let roles = data.roles;
-
-    // Convert roles to an array if it's not already
-    if (!Array.isArray(roles)) {
-      roles = [roles];
-    }
+      // const roles = data.roles ? [data.roles] : []; 
     // Constructing the payload
     let payload = {
-      companyName: user.company,
-      employeeType: data.employeeType,
-      emailId: data.emailId,
-      password: data.password,
-      designation: data.designation,
-      location: data.location,
-      manager: data.manager,
-      roles: roles,
-      status: data.status,
-      accountNo: data.accountNo,
-      ifscCode: data.ifscCode,
-      bankName: data.bankName,
-      aadhaarId: data.aadhaarId
+        companyName: company,
+        employeeType: data.employeeType,
+        emailId: data.emailId,
+        password: data.password,
+        designation: data.designation,
+        location: data.location,
+        manager: data.manager,
+        //roles: roles,
+        status: data.status,
+        accountNo: data.accountNo,
+        ifscCode: data.ifscCode,
+        bankName: data.bankName,
+        aadhaarId: data.aadhaarId
     };
-
-    // Add fields specific to POST request
-    if (!location.state || !location.state.id) {
+    if (location.state && location.state.id) {
       payload = {
-        ...payload,
-        employeeId: data.employeeId,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        dateOfHiring: data.dateOfHiring,
-        department: data.department,
-        panNo: data.panNo,
-        aadhaarId: data.aadhaarId,
-        uanNo: data.uanNo,
-        dateOfBirth: data.dateOfBirth,
-        roles: roles
+          ...payload,
+          employeeId: data.employeeId,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          dateOfHiring: data.dateOfHiring,
+          department: data.department,
+          panNo: data.panNo,
+          uanNo: data.uanNo,
+          dateOfBirth: data.dateOfBirth
       };
-    }
+  } else {
+      // Include these fields for the create request
+      payload = {
+          ...payload,
+          employeeId: data.employeeId,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          dateOfHiring: data.dateOfHiring,
+          department: data.department,
+          panNo: data.panNo,
+          aadhaarId: data.aadhaarId,
+          uanNo: data.uanNo,
+          dateOfBirth: data.dateOfBirth
+      };
+  }
 
     try {
-      if (location.state && location.state.id) {
-        const response = await EmployeePatchApiById(location.state.id, payload);
-        console.log("Update successful", response.data);
-        toast.success("Employee Updated Successfully");
+        if (location.state && location.state.id) {
+            const response = await EmployeePatchApiById(location.state.id,payload);
+            console.log("Update successful", response.data);
+            toast.success("Employee Updated Successfully");
+        } else {
+            const response = await EmployeePostApi(payload);
+            console.log("Employee created", response.data);
+            toast.success("Employee Created Successfully");
+        }
         setTimeout(() => {
-          navigate("/employeeView");
+            navigate("/employeeView");
         }, 1000); // Adjust the delay time as needed (in milliseconds)
-
+        
         reset();
-      } else {
-        const response = await EmployeePostApi(payload);
-        console.log("Employee created", response.data);
-        toast.success("Employee Created Successfully");
-        setTimeout(() => {
-          navigate("/employeeView");
-        }, 1000); // Adjust the delay time as needed (in milliseconds)
-        reset();
-      }
     } catch (error) {
-      handleApiErrors(error);
+        handleApiErrors(error);
     }
-  };
+}; 
 
-
-
-  const handleApiErrors = (error) => {
+   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
       const errorMessage = error.response.data.error.message;
       toast.error(errorMessage);
@@ -251,16 +315,12 @@ const EmployeeRegistration = () => {
           console.log(response.data);
           reset(response.data);
           setIsUpdating(true);
-
           // Assuming roles is an array and setting the first role
           setValue('status', response.data.data.status.toString());
-
           // Check if roles array has any items
-          if (response.data.data.roles && response.data.data.roles.length > 0) {
-            setValue('roles', response.data.data.roles[0]);
-          } else {
-            setValue('roles', null); // Or set default value as needed
-          }
+          const role = response.data.data.roles[0]; // Assuming roles is an array
+          const selectedRole = Roles.find(option => option.value === role);
+                setValue('roles', selectedRole || null); 
         } catch (error) {
           handleApiErrors(error);
         }
@@ -523,7 +583,7 @@ const EmployeeRegistration = () => {
                       )}
                     </div>
                     <div className="col-lg-1"></div>
-                    {isUpdating ? (
+                     {isUpdating ? (
                       <div className="col-12 col-md-6 col-lg-5 mb-3">
                         <label className="form-label">
                           Department <span style={{ color: "red" }}>*</span>
@@ -542,13 +602,13 @@ const EmployeeRegistration = () => {
                             },
                           })}
                         />
-                        {errors.department && (
+                        {errors.departmentName && (
                           <p className="errorMsg">
-                            {errors.department.message}
+                            {errors.departmentName.message}
                           </p>
                         )}
                       </div>
-                    ) : (
+                    ) : ( 
                       <div className="col-12 col-md-6 col-lg-5 mb-3">
                         <label className="form-label">
                           Department <span style={{ color: "red" }}>*</span>
@@ -575,7 +635,7 @@ const EmployeeRegistration = () => {
                           </p>
                         )}
                       </div>
-                     )} 
+                     )}
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
                       <label className="form-label">Designation <span style={{ color: "red" }}>*</span></label>
@@ -590,7 +650,7 @@ const EmployeeRegistration = () => {
                             {designations.map(designation => (
                               <option key={designation.id} value={designation.id}>
                                 {designation.name}
-                              </option>  
+                              </option>
                             ))}
                           </select>
                         )}
@@ -768,6 +828,53 @@ const EmployeeRegistration = () => {
                       {errors.status && <p className="errorMsg">Employee Status is Required</p>}
                     </div>
                     <div className="col-lg-1"></div>
+                    {/* {isUpdating ? (
+                      <div className="col-12 col-md-6 col-lg-5 mb-3">
+                        <label className="form-label">Role <span style={{ color: "red" }}>*</span></label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter Last Name"
+                          name="roles"
+                          readOnly
+                          {...register("roles", {
+                            required: "Role is Required",
+                            pattern: {
+                              value: /^[A-Za-z ]+$/,
+                              message:
+                                "These fields accepts only Alphabetic Characters",
+                            },
+                          })}
+                        />
+                        {errors.roles && (
+                          <p className="errorMsg">
+                            {errors.type.message}
+                          </p>
+                        )}
+                      </div>
+                    ) : ( */}
+                      {/* <div className="col-12 col-md-6 col-lg-5 mb-2">
+                        <label className="form-label mb-3">Select Role<span style={{ color: "red" }}>*</span></label>
+                        <Controller
+                          name="roles"
+                          control={control}
+                          rules={{ required: true }}
+                          render={({ field }) => (
+                            <Select
+                            {...field}
+                            options={Roles}
+                            value={Roles.find(option => option.value === field.value) || null}
+                            onChange={(selectedOption) => {
+                                // Handle the change and set the selected value
+                                field.onChange(selectedOption ? selectedOption.value : '');
+                            }}                            placeholder="Select Role"
+                            isClearable // Optionally allow clearing the selection
+                        />
+                          )}
+                        />
+                        {errors.roles && <p className="errorMsg">Employee Role is Required</p>}
+                      </div> */}
+                    {/* )} */}
                     <div className="col-lg-6"></div>
                     <hr />
                     <h4 className="m-2 mb-3">Account Details <span style={{ color: "red" }}>*</span></h4>

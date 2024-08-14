@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Envelope, Facebook, Google, Instagram, Key, Linkedin, Lock, Unlock } from "react-bootstrap-icons";
-import { useNavigate, useParams } from "react-router";
+import { Envelope, Lock, Unlock } from "react-bootstrap-icons";
+import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { loginApi } from "../Utils/Axios";
@@ -13,7 +13,6 @@ const EmsLogin = () => {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm({ defaultValues: { username: "", password: "" }, mode:"onChange" });
   const { setAuthUser } = useAuth();
   const navigate = useNavigate();
@@ -35,15 +34,11 @@ const EmsLogin = () => {
   const onSubmit = async (data) => {
     try {
       const response = await loginApi(data);
-      console.log("API response:", response); // Log the entire response to verify structure
-      console.log("responseToken",response.data.token)
       const token = response.data?.token;
-      console.log("token:",token);
       if (token) {
         try {
           const decodedToken = jwtDecode(token);
           const { sub: userId, roles: userRole, company, employeeId } = decodedToken;
-          console.log("Decoded Token:", decodedToken); // Log decoded token for inspection
           setAuthUser({ userId, userRole, company, employeeId });
           toast.success("Company Login Successfully");
           navigate("/main");

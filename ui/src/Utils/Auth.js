@@ -13,9 +13,3 @@ export const userRoles = decodedToken ? decodedToken.roles : null;
 export const company = decodedToken ? decodedToken.company : null;
 export const employeeId = decodedToken ? decodedToken.employee : null;
 
-console.log('Token:', token);
-console.log('Decoded Token:', decodedToken);
-console.log('User ID:', userId);
-console.log('User Roles:', userRoles);
-console.log('Company:', company);
-console.log('Employee ID:', employeeId);

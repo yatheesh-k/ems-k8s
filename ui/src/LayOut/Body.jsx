@@ -11,8 +11,7 @@ const Body = () => {
 
   return (
     <LayOut>
-  
-      <div className="container-fluid p-0" style={{height:"100%"}} >
+      <div className="container-fluid p-0 h-100" style={{height:"100%"}} >
         <h1 className="h3 mb-3">
           <strong>Dashboard</strong>{" "}
         </h1>

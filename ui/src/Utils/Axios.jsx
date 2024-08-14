@@ -1,8 +1,9 @@
 import axios from "axios";
-import { employeeId, userId } from "./Auth";
+import { useAuth } from "../Context/AuthContext";
 
 const protocol = window.location.protocol;
 const hostname = window.location.hostname;
+
 
 const BASE_URL = `${protocol}//${hostname}:8092/ems`;
 const Login_URL = `${protocol}//${hostname}:9090/ems`;
@@ -18,7 +19,6 @@ const axiosInstance = axios.create({
     // crossDomain:true
   }
 });
-
 export const loginApi = (data) => {
   return axios
     .post(`${Login_URL}/emsadmin/login`, data)
@@ -128,7 +128,7 @@ export const DepartmentGetApiById = (departmentId) => {
 
 export const DepartmentDeleteApiById = (departmentId) => {
   const company = localStorage.getItem("company")
-  return axiosInstance.delete(`${company}/department/${departmentId}`)
+    return axiosInstance.delete(`${company}/department/${departmentId}`)
     .then(response => {
       return response.data;
     })
@@ -139,13 +139,13 @@ export const DepartmentDeleteApiById = (departmentId) => {
 }
 
 export const DepartmentPutApiById = (departmentId, data) => {
-  const company = localStorage.getItem("company");
-  return axiosInstance.patch(`${company}/department/${departmentId}`, data)
+  const company = localStorage.getItem("company")
+    return axiosInstance.patch(`${company}/department/${departmentId}`, data)
 };
 
 export const DesignationGetApi = () => {
   const company = localStorage.getItem("company")
-  return axiosInstance.get(`${company}/designations`)
+    return axiosInstance.get(`${company}/designations`)
     .then(response => {
       return response.data.data;
     })
@@ -161,7 +161,7 @@ export const DesignationPostApi = (data) => {
 
 export const DesignationGetApiById = (designationId) => {
   const company = localStorage.getItem("company")
-  return axiosInstance.get(`${company}/designation/${designationId}`)
+    return axiosInstance.get(`${company}/designation/${designationId}`)
     .then(response => {
       return response.data;
     })
@@ -173,17 +173,17 @@ export const DesignationGetApiById = (designationId) => {
 
 export const DesignationDeleteApiById = (designationId) => {
   const company = localStorage.getItem("company")
-  return axiosInstance.delete(`${company}/designation/${designationId}`)
+    return axiosInstance.delete(`${company}/designation/${designationId}`)
 }
 
 export const DesignationPutApiById = (designationId, data) => {
-  const company = localStorage.getItem("company");
+   const company = localStorage.getItem("company")
   return axiosInstance.patch(`${company}/designation/${designationId}`, data)
 };
 
 
 export const EmployeeGetApi = () => {
-  const company = localStorage.getItem("company");
+   const company = localStorage.getItem("company")
   return axiosInstance.get(`/${company}/employee`)
     .then(response => response.data.data) // Assuming response.data.data contains your employee data
     .catch(error => {
@@ -263,7 +263,7 @@ export const EmployeePayslipGeneration = (data) => {
 }
 
 export const EmployeePayslipGetById = (employeeId, payslipId, month, year) => {
-  const company = localStorage.getItem("company");
+   const company = localStorage.getItem("company")
   return axiosInstance.get(`/${company}/employee/${employeeId}/payslip/${payslipId}`, {
     params: {
       month: month,

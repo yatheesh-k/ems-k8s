@@ -7,7 +7,7 @@ const SideNav = () => {
   const [isAttendanceOpen, setIsAttendanceOpen] = useState(false); // State for managing Attendance dropdown
   const [isCompanyOpen, setIsCompanyOpen] = useState(false); // State for managing Company dropdown
   const location = useLocation();
-  const { user = {}, logoFileName, loading } = useAuth();
+  const { user={}, logoFileName, loading} = useAuth();
 
   useEffect(() => {
     if (
@@ -398,7 +398,7 @@ const SideNav = () => {
                               </span>
                             </Link>
                           </li> */}
-              <li className="sidebar-item has-dropdown">
+                              <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
                   data-bs-target="#attendenceManagement"
@@ -643,7 +643,9 @@ const SideNav = () => {
               </li>
             </>
           )} */}
-          {!(user.userRole?.includes("ems_admin") || user.userRole?.includes("company_admin")) && (
+
+          {(!user && user.userRole && user.userRole.includes("company_admin") || user && user.userRole && user.userRole.includes("ems_admin")) && (
+       
             <>
               <li
                 className={`sidebar-item ${location.pathname === "/main" ? "active" : ""
@@ -683,7 +685,7 @@ const SideNav = () => {
                     style={{ fontSize: "large" }}
                   ></i>
                   <span className="align-middle" style={{ fontSize: "large" }}>
-                    PaySlips
+                  PaySlips
                   </span>
                 </Link>
               </li>
