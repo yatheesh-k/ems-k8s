@@ -1,25 +1,32 @@
 pipeline {
     agent any
+
     stages {
+        stage('Checkout SCM') {
+            steps {
+                checkout scm
+            }
+        }
         stage('Build') {
             steps {
                 script {
-                    sh 'sudo docker compose -f /docker/DockerCompose.yml build'
+                    dir('docker') {
+                        sh 'docker compose -f DockerCompose.yml build'
+                    }
                 }
             }
         }
         stage('Deploy') {
             steps {
                 script {
-                    sh 'sudo docker compose -f /docker/DockerCompose.yml  up -d'
+                    dir('docker') {
+                        sh 'docker compose -f DockerCompose.yml up -d'
+                    }
                 }
             }
         }
     }
     post {
-        success {
-            echo 'Deployment successful!'
-        }
         failure {
             echo 'Deployment failed.'
         }
