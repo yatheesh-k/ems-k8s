@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import Select from "react-select";
@@ -182,29 +183,33 @@ console.log(user.company)
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
     let newValue = "";
+    let encounteredNonSpace = false;
   
     // Remove spaces from the beginning of inputValue
-    inputValue = inputValue.trimStart(); // Keep spaces only after the initial non-space character
-  
-    // Track if we've encountered any non-space character yet
-    let encounteredNonSpace = false;
+    inputValue = inputValue.trimStart();
   
     for (let i = 0; i < inputValue.length; i++) {
       const char = inputValue.charAt(i);
   
+      // Capitalize the first non-space character
+      if (!encounteredNonSpace && char.match(/[a-zA-Z0-9]/)) {
+        newValue += char.toUpperCase();
+        encounteredNonSpace = true;
+      } 
       // Allow any alphabetic characters (both lowercase and uppercase) and numbers
       // Allow spaces only after encountering non-space characters
-      if (char.match(/[a-zA-Z0-9]/) || (encounteredNonSpace && char === " ")) {
+      else if (char.match(/[a-zA-Z0-9]/) || (encounteredNonSpace && char === " ")) {
+        newValue += char;
         if (char !== " ") {
           encounteredNonSpace = true;
         }
-        newValue += char;
       }
     }
   
     // Update the input value
     e.target.value = newValue;
   };
+  
 
 let company=user.company
   const onSubmit = async (data) => {
@@ -859,7 +864,7 @@ let company=user.company
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Enter Account Number"
+                        placeholder="Enter Bank Account Number"
                         name="accountNo"
                         onInput={toInputSpaceCase}
                         onKeyDown={handleEmailChange}
@@ -891,7 +896,7 @@ let company=user.company
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Enter IFSC Code"
+                        placeholder="Enter Bank IFSC Code"
                         name="ifscCode"
                         onInput={toInputSpaceCase}
                         onKeyDown={handleEmailChange}

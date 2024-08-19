@@ -129,7 +129,7 @@ const AttendanceReport = () => {
         hideProgressBar: true,
         theme: "colored",
         autoClose: 3000,
-      });
+      }); 
       setTimeout(() => {
         handleCloseDeleteModal();
         fetchAttendanceData();
@@ -156,7 +156,7 @@ const AttendanceReport = () => {
         handleCloseEditModal();
         setRefreshData((prev) => !prev);
         navigate("/attendanceReport");
-        fetchAttendanceData();
+        fetchAttendanceData(selectedEmployeeId, selectedMonth, selectedYear);
       }, 1000);
     } catch (error) {
       handleApiErrors(error);

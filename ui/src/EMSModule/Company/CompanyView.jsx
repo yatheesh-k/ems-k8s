@@ -17,6 +17,8 @@ const CompanyView = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [showNoRecordsMessage, setShowNoRecordsMessage] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const Navigate = useNavigate();
 
   const getUser = async () => {
@@ -30,7 +32,7 @@ const CompanyView = () => {
 
   const getData = (id) => {
     console.log(id);
-    Navigate(`/companyRegistration`, { state: { id } }); //deleteuser/
+    Navigate(`/companyRegistration`, { state: { id } });
   };
 
   const handleCloseDeleteModal = () => {
@@ -69,7 +71,7 @@ const CompanyView = () => {
           });
         }
       } catch (error) {
-        handleApiErrors(error)
+        handleApiErrors(error);
       }
     }
   };
@@ -77,6 +79,11 @@ const CompanyView = () => {
   useEffect(() => {
     getUser();
   }, []);
+
+  useEffect(() => {
+    // Reset pagination when data changes
+    setCurrentPage(1);
+  }, [view, filteredData]);
 
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
@@ -91,7 +98,7 @@ const CompanyView = () => {
   const columns = [
     {
       name: <h6><b>S No</b></h6>,
-      selector: (row, index) => index + 1,
+      selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
       width: "70px",
     },
     {
@@ -176,35 +183,30 @@ const CompanyView = () => {
       );
     });
     setFilteredData(filtered);
-    setShowNoRecordsMessage(filtered.length === 0); // Update state based on filtered data length
+    setShowNoRecordsMessage(filtered.length === 0);
   };
 
   const handleSearch = () => {
     console.log("Perform search with:", search, selectedMonth, selectedYear);
   };
 
-  const  toInputTitleCase = (e) => {
+  const toInputTitleCase = (e) => {
     const input = e.target;
     let value = input.value;
-    // Remove leading spaces
     value = value.replace(/^\s+/g, '');
-    // Initially disallow spaces
     if (!/\S/.test(value)) {
-      // If no non-space characters are present, prevent spaces
       value = value.replace(/\s+/g, '');
     } else {
-      // Allow spaces if there are non-space characters
-      value = value.replace(/^\s+/g, ''); // Remove leading spaces
+      value = value.replace(/^\s+/g, '');
       const words = value.split(' ');
       const capitalizedWords = words.map(word => {
         return word.charAt(0).toUpperCase() + word.slice(1);
       });
       value = capitalizedWords.join(' ');
     }
-    // Update input value
     input.value = value;
   };
-  
+
   return (
     <LayOut>
       <div className="container-fluid p-0">
@@ -250,6 +252,8 @@ const CompanyView = () => {
                   columns={columns}
                   data={filteredData.length > 0 ? filteredData : view}
                   pagination
+                  onChangePage={page => setCurrentPage(page)}
+                  onChangeRowsPerPage={perPage => setRowsPerPage(perPage)}
                 />
               )}
             </div>

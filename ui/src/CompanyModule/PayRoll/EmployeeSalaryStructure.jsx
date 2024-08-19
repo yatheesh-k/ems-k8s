@@ -651,7 +651,7 @@ const EmployeeSalaryStructure = () => {
                         <h5 className="card-title"> Status</h5>
                         <hr />
                         <div className="col-12">
-                          <label className="form-label">Total Amount<span style={{ color: "red" }}>*</span></label>
+                          <label className="form-label">Status<span style={{ color: "red" }}>*</span></label>
                           <Controller
                             name="status"
                             control={control}

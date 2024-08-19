@@ -424,6 +424,7 @@ function Profile() {
                           className="form-control"
                           {...register("address")}
                           defaultValue={companyData.address}
+                          
                         />
                       </div>
                   </div>
@@ -446,11 +447,14 @@ function Profile() {
             <ModalTitle>Upload Logo</ModalTitle>
           </ModalHeader>
           <ModalBody>
-            <input
+          <input
               type="file"
               className="form-control"
               onChange={onChangePicture}
             />
+            {errorMessage && (
+              <p className="text-danger">{errorMessage}</p>
+            )}
           </ModalBody>
           <ModalFooter>
             <Button variant="secondary" onClick={handleCloseUploadImageModal}>
