@@ -1,0 +1,32 @@
+version: '3.8'
+
+services: 
+  identity:
+    build:
+      context: ../identity
+      dockerfile: ../docker/IdentityModuleDockerfile
+    ports: 
+      - "9090:9090"
+    networks:
+      - ems-app-network
+
+  employee:
+    build:
+      context: ../employee
+      dockerfile: ../docker/IdentityModuleDockerfile
+    ports:
+      - "8092:8092"
+    networks: 
+      - ems-app-network
+
+  frontend:
+    build: 
+      context: ../frontend
+      dockerfile: ../docker/FrontendDockerfile
+    ports: "2800:2800"
+    networks:
+      - ems-app-network
+
+networks:
+  ems-app-network:
+    driver: bridge

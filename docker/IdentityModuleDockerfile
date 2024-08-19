@@ -1,0 +1,19 @@
+FROM openjdk:21-jdk
+
+WORKDIR /app
+
+# Copy the Gradle wrapper and build files
+COPY identity/gradle /app/gradle
+COPY identity/gradlew /app/
+COPY identity/build.gradle /app/
+COPY identity/settings.gradle /app/
+
+COPY identity/src /app/src
+
+RUN chmod +x gradlew
+
+RUN ./gradlew build
+
+EXPOSE 9090
+
+CMD ["java", "-jar", "build/libs/identity.jar"]

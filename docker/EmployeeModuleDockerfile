@@ -1,0 +1,20 @@
+FROM openjdk:21-jdk
+
+WORKDIR /app
+
+COPY employee/gradle /app/gradle
+COPY employee/gradlew /app/
+COPY employee/build.gradle /app/
+COPY employee/settings.gradle /app/
+COPY employee/src /app/src
+
+
+RUN chmod +x gradlew 
+
+RUN chmod +x employee/gradlew
+
+RUN ./gradlew build
+
+EXPOSE 8092	
+
+ENTRYPOINT ["java", "-jar", "/app/identity/build/libs/employee.jar"]
