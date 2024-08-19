@@ -11,7 +11,7 @@ pipeline {
             steps {
                 script {
                     dir('docker') {
-                        sh 'docker compose -f DockerCompose.yml build'
+                        sh 'sudo docker compose -f DockerCompose.yml build'
                     }
                 }
             }
@@ -20,7 +20,7 @@ pipeline {
             steps {
                 script {
                     dir('docker') {
-                        sh 'docker compose -f DockerCompose.yml up -d'
+                        sh ' sudo docker compose -f DockerCompose.yml up -d'
                     }
                 }
             }
