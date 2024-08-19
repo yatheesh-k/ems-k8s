@@ -4,14 +4,14 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    sh 'sudo docker compose -f /docker/containerisation.jenkins build'
+                    sh 'sudo docker compose -f /docker/DockerCompose.yml build'
                 }
             }
         }
         stage('Deploy') {
             steps {
                 script {
-                    sh 'sudo docker compose -f /docker/containerisation.jenkins up -d'
+                    sh 'sudo docker compose -f /docker/DockerCompose.yml  up -d'
                 }
             }
         }
