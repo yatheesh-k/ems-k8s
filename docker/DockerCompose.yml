@@ -3,7 +3,7 @@ version: '3.8'
 services:
   frontend:
     build:
-      context: ./ui/src/
+      context: ./ui
       dockerfile: docker/FrontendDockerfile
     ports:
       - "3000:3000"
