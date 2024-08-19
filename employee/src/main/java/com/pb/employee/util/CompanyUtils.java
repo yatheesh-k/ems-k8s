@@ -8,9 +8,7 @@ import com.pb.employee.request.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.Base64;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -508,5 +506,108 @@ public class CompanyUtils {
         entity.setType(Constants.ATTENDANCE);
 
         return entity;
+    }
+
+    public static Map<String, Object> duplicateValues(CompanyRequest companyRequest, List<CompanyEntity> companyEntities) {
+        Map<String, Object> responseBody = new HashMap<>();
+           String cinNo = null, regNo = null, mobileNo = null, landNo =  null, gstNo = null, panNo= null, personalMail = null, personalMobile = null;
+        for (CompanyEntity companyEntity :companyEntities) {
+
+            if (companyRequest.getCompanyRegNo() != null && companyEntity.getCompanyRegNo() != null) {
+                regNo = new String(Base64.getDecoder().decode(companyEntity.getCompanyRegNo().getBytes()));
+                if (regNo.equals(companyRequest.getCompanyRegNo())){
+                    responseBody.put(Constants.DUPLICATE_REGISTER_NO, companyRequest.getCompanyRegNo());
+                }
+
+            }
+            if (companyRequest.getMobileNo() != null && companyEntity.getMobileNo() != null) {
+                mobileNo = new String(Base64.getDecoder().decode(companyEntity.getMobileNo().getBytes()));
+                if (mobileNo.equals(companyRequest.getMobileNo())){
+                    responseBody.put(Constants.DUPLICATE_MOBILE_NO, companyRequest.getMobileNo());
+                }
+
+            }
+            if (companyRequest.getLandNo() != null && companyEntity.getLandNo() != null) {
+                landNo = new String(Base64.getDecoder().decode(companyEntity.getLandNo().getBytes()));
+                if (landNo.equals(companyRequest.getLandNo())){
+                    responseBody.put(Constants.DUPLICATE_LAND_NO, companyRequest.getLandNo());
+                }
+
+            }
+            if (companyRequest.getGstNo() != null && companyEntity.getGstNo() != null) {
+                gstNo = new String(Base64.getDecoder().decode(companyEntity.getGstNo().getBytes()));
+                if (gstNo.equals(companyRequest.getGstNo())){
+                    responseBody.put(Constants.DUPLICATE_GST_NO, companyRequest.getGstNo());
+                }
+
+            }
+            if (companyRequest.getPanNo() != null && companyEntity.getPanNo() != null) {
+                panNo = new String(Base64.getDecoder().decode(companyEntity.getPanNo().getBytes()));
+                if (panNo.equals(companyRequest.getPanNo())){
+                    responseBody.put(Constants.DUPLICATE_PAN_NO, companyRequest.getPanNo());
+                }
+
+            }
+            if (companyRequest.getPersonalMailId() != null && companyEntity.getPersonalMailId() != null) {
+                personalMail = companyEntity.getPersonalMailId();
+                if (personalMail.equals(companyRequest.getPersonalMailId())){
+                    responseBody.put(Constants.DUPLICATE_PERSONAL_MAIL, companyRequest.getPersonalMailId());
+                }
+
+            }
+            if (companyRequest.getPersonalMobileNo() != null && companyEntity.getPersonalMobileNo() != null) {
+                personalMobile = companyEntity.getPersonalMobileNo();
+                if (personalMobile.equals(companyRequest.getPersonalMobileNo())){
+                    responseBody.put(Constants.DUPLICATE_PERSONAL_MOBILE, companyRequest.getPersonalMobileNo());
+                }
+
+            }
+
+            if (companyRequest.getCinNo() != null && companyEntity.getCinNo() != null) {
+                cinNo = new String(Base64.getDecoder().decode(companyEntity.getCinNo().getBytes()));
+                if (cinNo.equals(companyRequest.getCinNo())){
+                    responseBody.put(Constants.DUPLICATE_CIN_NO, companyRequest.getCinNo());
+                }
+
+            }
+        }
+        return responseBody;
+    }
+
+    public static Map<String, Object> duplicateUpdateValues(CompanyUpdateRequest companyUpdateRequest, List<CompanyEntity> companyEntities) {
+        Map<String, Object> responseBody = new HashMap<>();
+        String cinNo = null, regNo = null, mobileNo = null, landNo =  null, gstNo = null, panNo= null, personalMail = null, personalMobile = null;
+        for (CompanyEntity companyEntity :companyEntities) {
+            if (companyUpdateRequest.getMobileNo() != null && companyEntity.getMobileNo() != null) {
+                mobileNo = new String(Base64.getDecoder().decode(companyEntity.getMobileNo().getBytes()));
+                if (mobileNo.equals(companyUpdateRequest.getMobileNo())){
+                    responseBody.put(Constants.DUPLICATE_MOBILE_NO, companyUpdateRequest.getMobileNo());
+                }
+
+            }
+            if (companyUpdateRequest.getLandNo() != null && companyEntity.getLandNo() != null) {
+                landNo = new String(Base64.getDecoder().decode(companyEntity.getLandNo().getBytes()));
+                if (landNo.equals(companyUpdateRequest.getLandNo())){
+                    responseBody.put(Constants.DUPLICATE_LAND_NO, companyUpdateRequest.getLandNo());
+                }
+
+            }
+            if (companyUpdateRequest.getPersonalMailId() != null && companyEntity.getPersonalMailId() != null) {
+                personalMail = companyEntity.getPersonalMailId();
+                if (personalMail.equals(companyUpdateRequest.getPersonalMailId())){
+                    responseBody.put(Constants.DUPLICATE_PERSONAL_MAIL, companyUpdateRequest.getPersonalMailId());
+                }
+
+            }
+            if (companyUpdateRequest.getPersonalMobileNo() != null && companyEntity.getPersonalMobileNo() != null) {
+                personalMobile = companyEntity.getPersonalMobileNo();
+                if (personalMobile.equals(companyUpdateRequest.getPersonalMobileNo())){
+                    responseBody.put(Constants.DUPLICATE_PERSONAL_MOBILE, companyUpdateRequest.getPersonalMobileNo());
+                }
+
+            }
+        }
+        return responseBody;
+
     }
 }

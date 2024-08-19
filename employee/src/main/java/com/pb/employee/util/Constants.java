@@ -46,4 +46,16 @@ public class Constants {
     public static final String YEAR = "year";
     public static final String GENERATE_PAYSLIP = "generatePayslip";
     public static final String EMPLOYEE_WITHOUT_ATTENDANCE = "employeesWithoutAttendance";
+    public static final String DUPLICATE_EMPLOYEE_ID = "duplicateEmployeeId";
+    public static final String DUPLICATE_AADHAAR_ID ="duplicateAadhaarId";
+    public static final String DUPLICATE_PAN_NO = "duplicatePanNo";
+    public static final String DUPLICATE_UAN_NO = "duplicateUanNo";
+    public static final String DUPLICATE_ACCOUNT_NO = "duplicateAccountNo";
+    public static final String DUPLICATE_CIN_NO = "duplicateCinNo";
+    public static final String DUPLICATE_REGISTER_NO = "duplicateRegisterNo";
+    public static final String DUPLICATE_MOBILE_NO = "duplicateMobileNo";
+    public static final String DUPLICATE_LAND_NO = "duplicateLandNo";
+    public static final String DUPLICATE_GST_NO = "duplicateGstNo";
+    public static final String DUPLICATE_PERSONAL_MAIL = "duplicatePersonalMailId";
+    public static final String DUPLICATE_PERSONAL_MOBILE = "duplicatePersonalMobileNo";
 }

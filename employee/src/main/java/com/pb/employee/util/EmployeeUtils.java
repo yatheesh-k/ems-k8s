@@ -2,13 +2,20 @@ package com.pb.employee.util;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pb.employee.exception.EmployeeErrorMessageKey;
+import com.pb.employee.exception.EmployeeException;
+import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.persistance.model.*;
 import com.pb.employee.request.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -174,4 +181,60 @@ public class EmployeeUtils {
         salaryEntity.setType(Constants.SALARY);
         return salaryEntity;
     }
+
+    public static Map<String, Object> duplicateValues(EmployeeRequest employeeRequest, List<EmployeeEntity> employees) throws EmployeeException {
+        Map<String, Object> responseBody = new HashMap<>();
+
+            for (EmployeeEntity employeeEntity : employees) {
+                String employeeId = null, aadhaarId = null, panNo = null, uanNo = null, accountNo = null;
+                if (employeeEntity.getEmployeeId() != null && employeeEntity.getEmployeeId().equals(employeeRequest.getEmployeeId())) {
+                    responseBody.put(Constants.DUPLICATE_EMPLOYEE_ID, employeeRequest.getEmployeeId());
+
+                }
+                if (employeeEntity.getAadhaarId()!=null) {
+                    aadhaarId = new String((Base64.getDecoder().decode(employeeEntity.getAadhaarId().toString().getBytes())));
+                    if (aadhaarId.equals(employeeRequest.getAadhaarId())) {
+                        responseBody.put(Constants.DUPLICATE_AADHAAR_ID, employeeRequest.getAadhaarId());
+                    }
+                }
+                if (employeeEntity.getPanNo() != null) {
+                    panNo = new String((Base64.getDecoder().decode(employeeEntity.getPanNo().toString().getBytes())));
+                    if (panNo.equals(employeeRequest.getPanNo())) {
+                        responseBody.put(Constants.DUPLICATE_PAN_NO, employeeRequest.getPanNo());
+                    }
+                }
+                if (employeeEntity.getUanNo() != null) {
+                    uanNo = new String((Base64.getDecoder().decode(employeeEntity.getUanNo().toString().getBytes())));
+                    if (uanNo.equals(employeeRequest.getUanNo())) {
+                        responseBody.put(Constants.DUPLICATE_UAN_NO, employeeRequest.getUanNo());
+                    }
+                }
+                if (employeeEntity.getAccountNo() != null) {
+                    accountNo = new String((Base64.getDecoder().decode(employeeEntity.getAccountNo().toString().getBytes())));
+                    if (accountNo.equals(employeeRequest.getAccountNo())) {
+                        responseBody.put(Constants.DUPLICATE_ACCOUNT_NO, employeeRequest.getAccountNo());
+                    }
+                }
+
+
+            }
+
+        return responseBody;
+    }
+    public static Map<String, Object> duplicateUpdateValues(EmployeeUpdateRequest employeeUpdateRequest, List<EmployeeEntity> employees) throws EmployeeException {
+        Map<String, Object> responseBody = new HashMap<>();
+         // Iterate through the list to check for duplicates
+            for (EmployeeEntity employeeEntity : employees) {
+                String accountNo = null;
+                if (employeeEntity.getAccountNo() != null) {
+                    accountNo = new String((Base64.getDecoder().decode(employeeEntity.getAccountNo().toString().getBytes())));
+                    if (accountNo.equals(employeeUpdateRequest.getAccountNo())) {
+                        responseBody.put(Constants.DUPLICATE_ACCOUNT_NO, employeeUpdateRequest.getAccountNo());
+                    }
+                }
+            }
+
+        return responseBody;
+    }
+
 }

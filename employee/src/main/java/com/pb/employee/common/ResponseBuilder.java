@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.ws.rs.WebApplicationException;
+import java.util.Map;
 
 @Builder
 @Getter
@@ -24,6 +25,12 @@ public class ResponseBuilder {
     public<T> ResponseObject<T> createSuccessResponse(T object) {
         return ResponseObject.<T>builder()
                 .path(ServletUriComponentsBuilder.fromCurrentRequest().toUriString()).message("Success")
+                .data(object)
+                .build();
+    }
+    public<T> ResponseObject<T> failureResponse(T object) {
+        return ResponseObject.<T>builder()
+                .path(ServletUriComponentsBuilder.fromCurrentRequest().toUriString()).message("Failed")
                 .data(object)
                 .build();
     }
@@ -76,5 +83,5 @@ public class ResponseBuilder {
                 .data(object)
                 .build();
     }
-    
+
 }

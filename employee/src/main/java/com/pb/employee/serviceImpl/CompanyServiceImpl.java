@@ -17,6 +17,7 @@ import com.pb.employee.request.EmployeePasswordReset;
 import com.pb.employee.service.CompanyService;
 import com.pb.employee.util.CompanyUtils;
 import com.pb.employee.util.Constants;
+import com.pb.employee.util.EmployeeUtils;
 import com.pb.employee.util.ResourceIdUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.IllegalFormatCodePointException;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -59,6 +57,15 @@ public class CompanyServiceImpl implements CompanyService {
                 log.error("Company details existed{}", companyRequest.getCompanyName());
                 throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.COMPANY_ALREADY_EXISTS), companyRequest.getCompanyName()),
                         HttpStatus.CONFLICT);
+            }
+            List<CompanyEntity> companyEntities = openSearchOperations.getCompanies();
+
+            Map<String, Object> duplicateValues = CompanyUtils.duplicateValues(companyRequest, companyEntities);
+            if (!duplicateValues.isEmpty()) {
+                return new ResponseEntity<>(
+                        ResponseBuilder.builder().build().failureResponse(duplicateValues),
+                        HttpStatus.CONFLICT
+                );
             }
         } catch (IOException e) {
             log.error("Unable to get the company details {}", companyRequest.getCompanyName());
@@ -138,6 +145,15 @@ public class CompanyServiceImpl implements CompanyService {
             if (user == null) {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_COMPANY),
                         HttpStatus.BAD_REQUEST);
+            }
+            List<CompanyEntity> companyEntities = openSearchOperations.getCompanies();
+
+            Map<String, Object> duplicateValues = CompanyUtils.duplicateUpdateValues(companyUpdateRequest, companyEntities);
+            if (!duplicateValues.isEmpty()) {
+                return new ResponseEntity<>(
+                        ResponseBuilder.builder().build().failureResponse(duplicateValues),
+                        HttpStatus.CONFLICT
+                );
             }
         } catch (Exception ex) {
             log.error("Exception while fetching user {}, {}", companyId, ex);

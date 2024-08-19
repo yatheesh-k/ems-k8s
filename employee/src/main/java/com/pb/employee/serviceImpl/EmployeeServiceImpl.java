@@ -22,7 +22,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -40,12 +43,22 @@ public class EmployeeServiceImpl implements EmployeeService {
         String resourceId = ResourceIdUtils.generateEmployeeResourceId(employeeRequest.getEmailId());
         Object entity = null;
         String index = ResourceIdUtils.generateCompanyIndex(employeeRequest.getCompanyName());
+
         try{
             entity = openSearchOperations.getById(resourceId, null, index);
             if(entity != null) {
                 log.error("employee details existed{}", employeeRequest.getCompanyName());
                 throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_EMAILID_ALREADY_EXISTS), employeeRequest.getEmailId()),
                         HttpStatus.CONFLICT);
+            }
+            List<EmployeeEntity> employees = openSearchOperations.getCompanyEmployees(employeeRequest.getCompanyName());
+
+            Map<String, Object> duplicateValues = EmployeeUtils.duplicateValues(employeeRequest, employees);
+            if (!duplicateValues.isEmpty()) {
+                return new ResponseEntity<>(
+                        ResponseBuilder.builder().build().failureResponse(duplicateValues),
+                        HttpStatus.CONFLICT
+                );
             }
         } catch (IOException e) {
             log.error("Unable to get the company details {}", employeeRequest.getCompanyName());
@@ -88,6 +101,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.CREATED);
 
     }
+
 
 
     @Override
@@ -153,7 +167,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         String index = ResourceIdUtils.generateCompanyIndex(employeeUpdateRequest.getCompanyName());
         try {
             user = openSearchOperations.getEmployeeById(employeeId, null, index);
+            List<EmployeeEntity> employees = openSearchOperations.getCompanyEmployees(employeeUpdateRequest.getCompanyName());
 
+            Map<String, Object> duplicateValues = EmployeeUtils.duplicateUpdateValues(employeeUpdateRequest, employees);
+            if (!duplicateValues.isEmpty()) {
+                return new ResponseEntity<>(
+                        ResponseBuilder.builder().build().failureResponse(duplicateValues),
+                        HttpStatus.CONFLICT
+                );
+            }
             if (user == null) {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_COMPANY),
                         HttpStatus.BAD_REQUEST);
@@ -176,6 +198,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
     }
+
 
 
     @Override
@@ -201,5 +224,8 @@ public class EmployeeServiceImpl implements EmployeeService {
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.DELETED), HttpStatus.OK);
 
     }
+
+
+
 
 }
