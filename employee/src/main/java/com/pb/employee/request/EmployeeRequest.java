@@ -1,12 +1,16 @@
 package com.pb.employee.request;
 
 
+import com.pb.employee.config.ValidAge;
+import com.sun.jersey.spi.StringReader;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.checkerframework.checker.i18nformatter.qual.I18nInvalidFormat;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.Date;
 import java.util.List;
@@ -16,6 +20,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ValidAge // <-- Apply the custom validation here
 public class EmployeeRequest {
 
     @Schema(example = "companyShortName")
@@ -35,12 +40,12 @@ public class EmployeeRequest {
     private String employeeId;
 
     @Schema(example = "firstName")
-    @Pattern(regexp = "^[A-Z][a-z]+$", message = "{firstname.format}")
+    @Pattern(regexp ="^[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*$", message = "{firstname.format}")
     @Size(min = 3, max = 20, message = "{firstName.size.message}")
     private String firstName;
 
     @Schema(example = "lastName")
-    @Pattern(regexp = "^[A-Z][a-z]+$", message = "{lastname.format}")
+    @Pattern(regexp = "^[A-Z](?:[a-z]+)?(?:\\s[A-Z][a-z]+)*$", message = "{lastname.format}")
     @Size(min = 1, max = 20, message = "{lastName.size.message}")
     private String lastName;
 
@@ -64,13 +69,18 @@ public class EmployeeRequest {
     @NotBlank(message = "{dateOfHiring.notnull.message}")
     private String dateOfHiring;
 
+    @Schema(example = "yyyy-mm-dd")
+    @Pattern(regexp =  "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$", message = "{dateOfBirth.format}")
+    @NotBlank(message = "{dateOfBirth.notnull.message}")
+    private String dateOfBirth;
+
     @Schema(example = "departmentId")
 //    @Pattern(regexp = "^(?!.*[\\s]{2})(?!.*\\s$)(?!^\\s)(?!.*\\d.*)[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{department.format}")
     @Size(min = 2, max = 100, message = "{department.size.message}")
     private String department;
 
     @Schema(example = "location")
-    @Pattern(regexp = "^(?=.*[A-Za-z])([\\dA-Z][\\dA-Za-z0-9'.#&*()^\\-/]*)(\\s+[A-Z][a-zA-Z0-9'.#&*()^\\-/]*)*,\\s+[A-Z][a-zA-Z]+(\\s+\\d{6})?$", message = "{location.format}")
+    @Pattern(regexp = "^[\\w\\s'.#&*()^\\-/]*[A-Za-z0-9]+(\\s+[A-Z][a-zA-Z0-9'.#&*()^\\-/]*)*,?\\s*[A-Z]*[a-zA-Z]*\\s*(\\d{6})?$", message = "{location.format}")
     @Size(min = 2, max = 100, message = "{location.notnull.message}")
     private String location;
 
@@ -84,8 +94,8 @@ public class EmployeeRequest {
     private List<@NotBlank(message = "{role.notnull.message}")
     @Pattern(regexp = "^[A-Z][a-z]+$", message = "{roles.format}") String> roles;*/
 
-    @Schema(example = "status")
-    @Pattern(regexp = "^[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*$", message = "{status.format}")
+    @Schema(example = "status")//
+    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{status.format}")
     @NotBlank(message = "{status.notnull.message}")
     private String status;
 
@@ -105,11 +115,6 @@ public class EmployeeRequest {
     @NotBlank(message = "{aadhaarId.notnull.message}")
     private String aadhaarId;
 
-    @Schema(example = "yyyy-mm-dd")
-    @Pattern(regexp =  "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$", message = "{dateOfBirth.format}")
-    @NotBlank(message = "{dateOfBirth.notnull.message}")
-    private String dateOfBirth;
-
     @Schema(example = "accountNo")
     @Pattern(regexp = "^\\d{9,18}$", message = "{accountNo.format}")
     @NotBlank(message = "{accountNo.notnull.message}")
@@ -121,7 +126,7 @@ public class EmployeeRequest {
     private String ifscCode;
 
     @Schema(example = "bankName")
-    @Pattern(regexp = "^(?!.*\\s{2})(?!.*\\s$)(?!^\\s)[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*$", message = "{bankName.format}")
+    @Pattern(regexp = "^(?!.*\\s{2})(?!.*\\s$)(?!^\\s)([A-Z]+[a-z]*)(?:\\s[A-Za-z]+)*$", message = "{bankName.format}")
     @Size(min = 3, max = 20, message = "{bankName.size.message}")
     private String bankName;
 
