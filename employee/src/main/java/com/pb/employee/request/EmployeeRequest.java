@@ -40,7 +40,7 @@ public class EmployeeRequest {
     private String firstName;
 
     @Schema(example = "lastName")
-    @Pattern(regexp = "^[A-Za-z]+$", message = "{lastname.format}")
+    @Pattern(regexp = "^[A-Z][a-z]+$", message = "{lastname.format}")
     @Size(min = 1, max = 20, message = "{lastName.size.message}")
     private String lastName;
 
@@ -70,7 +70,7 @@ public class EmployeeRequest {
     private String department;
 
     @Schema(example = "location")
-    @Pattern(regexp = "^(?!\\s)(?!.*\\s$)[A-Za-z0-9\\s,'#,&*()^\\-/]*$", message = "{location.format}")
+    @Pattern(regexp = "^(?=.*[A-Za-z])([\\dA-Z][\\dA-Za-z0-9'.#&*()^\\-/]*)(\\s+[A-Z][a-zA-Z0-9'.#&*()^\\-/]*)*,\\s+[A-Z][a-zA-Z]+(\\s+\\d{6})?$", message = "{location.format}")
     @Size(min = 2, max = 100, message = "{location.notnull.message}")
     private String location;
 
@@ -85,7 +85,7 @@ public class EmployeeRequest {
     @Pattern(regexp = "^[A-Z][a-z]+$", message = "{roles.format}") String> roles;*/
 
     @Schema(example = "status")
-    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{status.format}")
+    @Pattern(regexp = "^[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*$", message = "{status.format}")
     @NotBlank(message = "{status.notnull.message}")
     private String status;
 
@@ -121,7 +121,7 @@ public class EmployeeRequest {
     private String ifscCode;
 
     @Schema(example = "bankName")
-    @Pattern(regexp = "^(?!\\s)(?!.*\\s$)[A-Za-z&'(),./\\- ]{1,100}$", message = "{bankName.format}")
+    @Pattern(regexp = "^(?!.*\\s{2})(?!.*\\s$)(?!^\\s)[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*$", message = "{bankName.format}")
     @Size(min = 3, max = 20, message = "{bankName.size.message}")
     private String bankName;
 

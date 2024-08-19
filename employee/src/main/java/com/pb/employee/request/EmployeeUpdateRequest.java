@@ -37,7 +37,7 @@ public class EmployeeUpdateRequest {
     private String designation;
 
     @Schema(example = "location")
-    @Pattern(regexp = "^(?!\\s)(?!.*\\s$)[a-zA-Z0-9\\s,'#,&*()^\\-/]*$", message = "{location.format}")
+    @Pattern(regexp = "^(?=.*[A-Za-z])([\\dA-Z][\\dA-Za-z0-9'.#&*()^\\-/]*)(\\s+[A-Z][a-zA-Z0-9'.#&*()^\\-/]*)*,\\s+[A-Z][a-zA-Z]+(\\s+\\d{6})?$", message = "{location.format}")
     @Size(min = 2, max = 100, message = "{location.notnull.message}")
     private String location;
 
@@ -67,7 +67,7 @@ public class EmployeeUpdateRequest {
     private String ifscCode;
 
     @Schema(example = "bankName")
-    @Pattern(regexp = "^(?!\\s)(?!.*\\s$)[A-Za-z&'(),./\\- ]{1,100}$", message = "{bankName.format}")
+    @Pattern(regexp = "^(?!.*\\s{2})(?!.*\\s$)(?!^\\s)[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*$", message = "{bankName.format}")
     @Size(min = 3, max = 20, message = "{bankName.size.message}")
     private String bankName;
 }
