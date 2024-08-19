@@ -10,17 +10,18 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                        sh 'sudo docker compose -f DockerCompose.yml build'
-                    
+                    dir('docker') {
+                        sh 'docker compose -f DockerCompose.yml build'
+                    }
                 }
             }
         }
         stage('Deploy') {
             steps {
                 script {
-                
-                        sh ' sudo docker compose -f DockerCompose.yml up -d'
-                    
+                    dir('docker') {
+                        sh 'docker compose -f DockerCompose.yml up -d'
+                    }
                 }
             }
         }
