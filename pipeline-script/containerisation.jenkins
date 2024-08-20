@@ -12,7 +12,7 @@ pipeline {
             dir('docker'){
                 script {
                         sh 'pwd'
-                        sh 'docker compose -f /docker/DockerCompose.yml build'
+                        sh 'docker compose -f DockerCompose.yml build'
                         sh 'pwd'
 
                     
