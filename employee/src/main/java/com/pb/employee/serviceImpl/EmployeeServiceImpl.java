@@ -168,7 +168,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         try {
             user = openSearchOperations.getEmployeeById(employeeId, null, index);
             List<EmployeeEntity> employees = openSearchOperations.getCompanyEmployees(employeeUpdateRequest.getCompanyName());
-
+            employees.removeIf(employee -> employee.getId().equals(employeeId));
             Map<String, Object> duplicateValues = EmployeeUtils.duplicateUpdateValues(employeeUpdateRequest, employees);
             if (!duplicateValues.isEmpty()) {
                 return new ResponseEntity<>(

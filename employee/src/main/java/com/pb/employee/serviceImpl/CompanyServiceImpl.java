@@ -147,7 +147,7 @@ public class CompanyServiceImpl implements CompanyService {
                         HttpStatus.BAD_REQUEST);
             }
             List<CompanyEntity> companyEntities = openSearchOperations.getCompanies();
-
+            companyEntities.removeIf(company -> company.getId().equals(companyId));
             Map<String, Object> duplicateValues = CompanyUtils.duplicateUpdateValues(companyUpdateRequest, companyEntities);
             if (!duplicateValues.isEmpty()) {
                 return new ResponseEntity<>(

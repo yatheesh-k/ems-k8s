@@ -67,55 +67,58 @@ public class PayslipUtils {
             byte[] decodedTrav = Base64.getDecoder().decode(salaryRequest.getAllowances().getTravelAllowance());
             trav= Double.parseDouble(new String(decodedTrav));
             trav =  trav/12.0;
+            trav = (double) Math.round(trav);
             salary.getAllowances().setTravelAllowance(String.valueOf(trav));
         }
-        if (salary.getDeductions().getPfEmployee() != null) {
-            byte[] decodedPfEmployee = Base64.getDecoder().decode(salaryRequest.getDeductions().getPfEmployee());
-            byte[] decodedPfEmployer = Base64.getDecoder().decode(salaryRequest.getDeductions().getPfEmployer());
-            pfc = Double.parseDouble(new String(decodedPfEmployee)) + Double.parseDouble(new String(decodedPfEmployer));
-            pfc = pfc/12;
-            pfc = Math.ceil(pfc);
-            salary.getAllowances().setPfContributionEmployee(String.valueOf(pfc));
-        }
+
         if (salaryRequest.getAllowances().getHra() != null) {
             byte[] decodedHra = Base64.getDecoder().decode(salaryRequest.getAllowances().getHra());
             hra = Double.parseDouble(new String(decodedHra));
             hra = ((gross/12)*(hra/100));
-            hra = Math.ceil(hra);
+            hra = (double) Math.round(hra);
             salary.getAllowances().setHra(String.valueOf(hra));
         }
         if (salaryRequest.getAllowances().getSpecialAllowance() != null) {
             byte[] decodedSpa = Base64.getDecoder().decode(salaryRequest.getAllowances().getSpecialAllowance());
             spa = Double.parseDouble(new String(decodedSpa));
             spa = spa/12.0;
+            spa = (double) Math.round(spa);
             salary.getAllowances().setSpecialAllowance(String.valueOf(spa));
         }
         if (salaryRequest.getAllowances().getOtherAllowances() != null) {
             byte[] decodedOther = Base64.getDecoder().decode(salaryRequest.getAllowances().getOtherAllowances());
             other = Double.parseDouble(new String(decodedOther));
             other = other/12.0;
+            other = (double) Math.round(other);
             salary.getAllowances().setOtherAllowances(String.valueOf(other));
-        }
-        bas = ((gross/12.0)-(other+spa+hra+pfc+trav));
-        if (bas!=null)
-            salary.setBasicSalary(String.valueOf(bas));
-
-        if (salaryRequest.getTotalEarnings() != null) {
-            te = bas+other+spa+hra+pfc+trav;
-            salary.setTotalEarnings(String.valueOf(te));
         }
 
         if (salaryRequest.getDeductions().getPfEmployee() != null) {
             byte[] decodedPfE = Base64.getDecoder().decode(salaryRequest.getDeductions().getPfEmployee());
             pfE = Double.parseDouble(new String(decodedPfE));
             pfE = pfE/12.0;
+            pfE = (double) Math.round(pfE);
             salary.getDeductions().setPfEmployee(String.valueOf(pfE));
         }
         if (salaryRequest.getDeductions().getPfEmployer() != null) {
             byte[] decodedPfEmployer = Base64.getDecoder().decode(salaryRequest.getDeductions().getPfEmployer());
             pfEmployer = Double.parseDouble(new String(decodedPfEmployer));
             pfEmployer = pfEmployer/12.0;
+            pfEmployer = (double) Math.round(pfEmployer);
             salary.getDeductions().setPfEmployer(String.valueOf(pfEmployer));
+        }
+            pfc = pfE + pfEmployer;
+            pfc = (double) Math.round(pfc);
+            salary.getAllowances().setPfContributionEmployee(String.valueOf(pfc));
+        bas = ((gross/12.0)-(other+spa+hra+pfc+trav));
+        if (bas!=null) {
+            bas = (double) Math.round(bas);
+            salary.setBasicSalary(String.valueOf(bas));
+        }
+        if (salaryRequest.getTotalEarnings() != null) {
+            te = bas+other+spa+hra+pfc+trav;
+            te = (double) Math.round(te);
+            salary.setTotalEarnings(String.valueOf(te));
         }
 
             int noOfLeaves = totalWorkingDays - noOfWorkingDays;
@@ -123,7 +126,7 @@ public class PayslipUtils {
                 double monthlySalary = (gross / 12);
                 double perDaySalary = (monthlySalary / totalWorkingDays);
                 lop = (noOfLeaves - 1) * perDaySalary;
-                lop = Math.ceil(lop);
+                lop = (double) Math.round(lop);
             }else {
                 lop = (double) 0;
             }
@@ -135,6 +138,8 @@ public class PayslipUtils {
                 tded = lop + pfEmployer + pfE;
             }else {
                 tded=pfEmployer+pfE;
+                tded = (double) Math.round(tded);
+
             }
             salary.getDeductions().setTotalDeductions(String.valueOf(tded));
         }
@@ -143,12 +148,14 @@ public class PayslipUtils {
             byte[] decodedTax = Base64.getDecoder().decode(salaryRequest.getDeductions().getPfTax());
             tax = Double.parseDouble(new String(decodedTax));
             tax = tax/12.0;
+            tax = (double) Math.round(tax);
             salary.getDeductions().setPfTax(String.valueOf(tax));
         }
         if (salaryRequest.getDeductions().getIncomeTax() != null) {
             byte[] decodedItax = Base64.getDecoder().decode(salaryRequest.getDeductions().getIncomeTax());
             itax = Double.parseDouble(new String(decodedItax));
             itax = itax/12.0;
+            itax = (double) Math.round(itax);
             salary.getDeductions().setIncomeTax(String.valueOf(itax));
 
         }
@@ -156,12 +163,13 @@ public class PayslipUtils {
             byte[] decodedTtax = Base64.getDecoder().decode(salaryRequest.getDeductions().getTotalTax());
             ttax = Double.parseDouble(new String(decodedTtax));
             ttax = tax + itax;
-
+            ttax = (double) Math.round(ttax);
             salary.getDeductions().setTotalTax(String.valueOf(ttax));
         }
 
         if (salaryRequest.getNetSalary() != null) {
             net = te-tded-ttax;
+            net = (double) Math.round(net);
             salary.setNetSalary(String.valueOf(net));
 
         }
