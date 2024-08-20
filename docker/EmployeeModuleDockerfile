@@ -2,11 +2,11 @@ FROM openjdk:21-jdk
 
 WORKDIR /app
 
-COPY ..employee/gradle /app/gradle
-COPY ..employee/gradlew /app/
-COPY ..employee/build.gradle /app/
-COPY ..employee/settings.gradle /app/
-COPY ..employee/src /app/src
+COPY /var/lib/jenkins/workspace/ems-deployement/employee/gradle /app/gradle
+COPY /var/lib/jenkins/workspace/ems-deployement/employee/gradlew /app/
+COPY /var/lib/jenkins/workspace/ems-deployement/employee/build.gradle /app/
+COPY /var/lib/jenkins/workspace/ems-deployement/employee/settings.gradle /app/
+COPY /var/lib/jenkins/workspace/ems-deployement/employee/src /app/src
 
 
 RUN chmod +x gradlew 
