@@ -34,11 +34,11 @@ const ViewPaySlips = () => {
         const data = await EmployeeGetApi();
         const filteredData = data
           .filter((employee) => employee.firstName !== null)
-          .map(({ id, firstName, lastName }) => ({
-            label: `${firstName} ${lastName}`,
+          .map(({ id, firstName, lastName, employeeId }) => ({
+            label: `${firstName} ${lastName} (${employeeId})`,
             value: id,
           }));
-        setEmployees(filteredData);
+        setEmployees(filteredData); 
       } catch (error) {
         console.error("Error fetching employees:", error);
       }

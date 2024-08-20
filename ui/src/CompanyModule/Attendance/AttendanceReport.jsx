@@ -8,10 +8,10 @@ import { PencilSquare, XSquareFill } from 'react-bootstrap-icons';
 import DataTable from 'react-data-table-component';
 import { useNavigate } from 'react-router-dom';
 import DeletePopup from '../../Utils/DeletePopup';
-import { ModalTitle, ModalHeader, ModalBody, } from 'react-bootstrap';
+import { ModalTitle, ModalHeader, ModalBody } from 'react-bootstrap';
 
 const AttendanceReport = () => {
-  const { register, handleSubmit, formState: { errors }, reset, } = useForm('');
+  const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const [employees, setEmployees] = useState([]);
   const [showFields, setShowFields] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState("");
@@ -27,7 +27,6 @@ const AttendanceReport = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedAttendance, setSelectedAttendance] = useState({});
-  const [refreshData, setRefreshData] = useState(false);
   const navigate = useNavigate();
 
   const handleEmployeeChange = (selectedOption) => {
@@ -59,6 +58,7 @@ const AttendanceReport = () => {
       noOfWorkingDays: row.noOfWorkingDays,
     });
     setEditAttendance(true);
+    setShowEditModal(true);
   };
 
   const handleCloseEditModal = () => {
@@ -82,7 +82,7 @@ const AttendanceReport = () => {
       setAttendanceData(response.data.data);
       setEmployeeAttendance(response.data.data);
       setShowFields(true);
-      reset(response.data.data)
+      reset(response.data.data);
     } catch (error) {
       console.error("Error fetching attendance data:", error);
     }
@@ -94,11 +94,12 @@ const AttendanceReport = () => {
         const data = await EmployeeGetApi();
         const formattedData = data
           .filter((employee) => employee.firstName !== null)
-          .map(({ id, firstName, lastName }) => ({
-            label: `${firstName} ${lastName}`,
+          .map(({ id, firstName, lastName, employeeId }) => ({
+            label: `${firstName} ${lastName} (${employeeId})`,
             value: id,
             firstName,
             lastName,
+            employeeId,
           }));
         setEmployees(formattedData);
       } catch (error) {
@@ -129,7 +130,7 @@ const AttendanceReport = () => {
         hideProgressBar: true,
         theme: "colored",
         autoClose: 3000,
-      }); 
+      });
       setTimeout(() => {
         handleCloseDeleteModal();
         fetchAttendanceData();
@@ -139,7 +140,6 @@ const AttendanceReport = () => {
       handleApiErrors(error);
     }
   };
-
 
   const onSubmit = async (data) => {
     console.log("Submitting attendance update for:", selectedEmployeeId, selectedAttendanceId, data);
@@ -156,21 +156,22 @@ const AttendanceReport = () => {
         handleCloseEditModal();
         setRefreshData((prev) => !prev);
         navigate("/attendanceReport");
-        fetchAttendanceData(selectedEmployeeId, selectedMonth, selectedYear);
+        fetchAttendanceData();
       }, 1000);
     } catch (error) {
       handleApiErrors(error);
     }
   };
-    const handleApiErrors = (error) => {
-      if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
-        const errorMessage = error.response.data.error.message;
-        toast.error(errorMessage);
-      } else {
-        toast.error("Network Error !");
-      }
-      console.error(error.response);
-    };
+
+  const handleApiErrors = (error) => {
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
+    } else {
+      toast.error("Network Error !");
+    }
+    console.error(error.response);
+  };
 
   const columns = [
     {
@@ -227,166 +228,167 @@ const AttendanceReport = () => {
     },
   ];
 
-    return (
-      <LayOut>
-        <div className="container-fluid p-0">
-          <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
-            <div className="col">
-              <h1 className="h3 mb-3">
-                <strong>Attendance Report</strong>
-              </h1>
-            </div>
-            <div className="col-auto" style={{ paddingBottom: '20px' }}>
-              <nav aria-label="breadcrumb">
-                <ol className="breadcrumb mb-0">
-                  <li className="breadcrumb-item">
-                    <a href="/main">Home</a>
-                  </li>
-                  <li className="breadcrumb-item active">Attendance</li>
-                  <li className="breadcrumb-item active">Attendance Report</li>
-                </ol>
-              </nav>
-            </div>
+  return (
+    <LayOut>
+      <div className="container-fluid p-0">
+        <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
+          <div className="col">
+            <h1 className="h3 mb-3">
+              <strong>Attendance Report</strong>
+            </h1>
           </div>
-          <div className="row">
-            <div className="col-12">
-              <div className="card">
-                <div className="card-header">
-                  <div className="row d-flex justify-content-center" style={{ paddingLeft: '50px' }}>
-                    <div className="col-md-3 mt-3">
-                      <label className="form-label">Select Employee</label>
-                      <Select
-                        options={employees}
-                        onChange={handleEmployeeChange}
-                        placeholder="Select Employee"
-                      />
-                    </div>
-                    <div className="col-md-3 mt-3">
-                      <label className="form-label">Select Year</label>
-                      <Select
-                        options={getRecentYears().map((year) => ({
-                          label: year,
-                          value: year,
-                        }))}
-                        onChange={(selectedOption) => setSelectedYear(selectedOption.value)}
-                        placeholder="Select Year"
-                      />
-                    </div>
-                    <div className="col-md-3 mt-3">
-                      <label className="form-label">Select Month</label>
-                      <Select
-                        options={getMonthNames().map((month, index) => ({
-                          label: month,
-                          value: index + 1,
-                        }))}
-                        onChange={(selectedOption) => setSelectedMonth(selectedOption.value)}
-                        placeholder="Select Month"
-                      />
-                    </div>
-                    <div className="col-md-3 mt-5">
-                      <button style={{paddingBottom:"8px"}}
-                        className="btn btn-primary"
-                        onClick={filterByMonthYear}
-                        disabled={!employeeId || !selectedMonth || !selectedYear}
-                      >
-                        Go
-                      </button>
-                    </div>
+          <div className="col-auto" style={{ paddingBottom: '20px' }}>
+            <nav aria-label="breadcrumb">
+              <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                  <a href="/main">Home</a>
+                </li>
+                <li className="breadcrumb-item active">Attendance</li>
+                <li className="breadcrumb-item active">Attendance Report</li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-12">
+            <div className="card">
+              <div className="card-header">
+                <div className="row d-flex justify-content-center" style={{ paddingLeft: '50px' }}>
+                  <div className="col-md-3 mt-3">
+                    <label className="form-label">Select Employee</label>
+                    <Select
+                      options={employees}
+                      onChange={handleEmployeeChange}
+                      placeholder="Select Employee"
+                    />
+                  </div>
+                  <div className="col-md-3 mt-3">
+                    <label className="form-label">Select Year</label>
+                    <Select
+                      options={getRecentYears().map((year) => ({
+                        label: year,
+                        value: year,
+                      }))}
+                      onChange={(selectedOption) => setSelectedYear(selectedOption.value)}
+                      placeholder="Select Year"
+                    />
+                  </div>
+                  <div className="col-md-3 mt-3">
+                    <label className="form-label">Select Month</label>
+                    <Select
+                      options={getMonthNames().map((month, index) => ({
+                        label: month,
+                        value: index + 1,
+                      }))}
+                      onChange={(selectedOption) => setSelectedMonth(selectedOption.value)}
+                      placeholder="Select Month"
+                    />
+                  </div>
+                  <div className="col-md-3 mt-5">
+                    <button
+                      style={{ paddingBottom: "8px" }}
+                      className="btn btn-primary"
+                      onClick={filterByMonthYear}
+                      disabled={!employeeId || !selectedMonth || !selectedYear}
+                    >
+                      Go
+                    </button>
                   </div>
                 </div>
-                <div className="card-body">
-                  {showFields && (
+              </div>
+              <div className="card-body">
+                {showFields && (
+                  <div>
+                    <h5 className="card-title mt-2">
+                      Attendance Details for {`${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName}`}
+                    </h5>
+                    <hr />
                     <div>
-                      <h5 className="card-title mt-2">
-                        Attendance Details for {`${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName}`}
-                      </h5>
-                      <hr />
-                      <div>
-                        <DataTable
-                          columns={columns}
-                          data={employeeAttendance}
-                          pagination
-                          highlightOnHover
-                          pointerOnHover
-                          dense
-                        />
-                      </div>
+                      <DataTable
+                        columns={columns}
+                        data={employeeAttendance}
+                        pagination
+                        highlightOnHover
+                        pointerOnHover
+                        dense
+                      />
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <DeletePopup
-          show={showDeleteModal}
-          handleClose={handleCloseDeleteModal}
-          handleConfirm={handleDelete}
-          id={selectedItemId}
-          pageName="Attendance"
-        />
-        {editAttendance && (
-          <div
-            role='dialog'
-            aria-modal="true"
-            className='fade modal show'
-            tabIndex="-1"
-            style={{ zIndex: "9999", display: "block" }}
-          >
-            <div className="modal-dialog modal-dialog-centered">
-              <div className="modal-content">
-                <ModalHeader>
-                  <ModalTitle>Edit Attendance</ModalTitle>
-                </ModalHeader>
-                <ModalBody>
-                  <form onSubmit={handleSubmit(onSubmit)} >
-                    <div className="card-body" style={{ width: "1060px", paddingBottom: "0px" }}>
-                      <div className='col-12 col-md-6 col-lg-4 mb-2'>
-                        <label>Total Working Days</label>
-                        <input
-                          type="number"
-                          name='totalWorkingDays'
-                          readOnly
-                          className="form-control"
-                          {...register("totalWorkingDays", { required: true })}
-                        />
-                        {errors.totalWorkingDays && <span>This field is required</span>}
-                      </div>
-                      <div className='col-12 col-md-6 col-lg-4 mb-2'>
-                        <label>No. Of Working Days</label>
-                        <input
-                          type="number"
-                          name='noOfWorkingDays'
-                          className="form-control"
-                          {...register("noOfWorkingDays", { required: true })}
-                        />
-                        {errors.noOfWorkingDays && <span>This field is required</span>}
-                      </div>
+      <DeletePopup
+        show={showDeleteModal}
+        handleClose={handleCloseDeleteModal}
+        handleConfirm={handleDelete}
+        id={selectedItemId}
+        pageName="Attendance"
+      />
+      {showEditModal && (
+        <div
+          role='dialog'
+          aria-modal="true"
+          className='fade modal show'
+          tabIndex="-1"
+          style={{ zIndex: "9999", display: "block" }}
+        >
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <ModalHeader>
+                <ModalTitle>Edit Attendance</ModalTitle>
+              </ModalHeader>
+              <ModalBody>
+                <form onSubmit={handleSubmit(onSubmit)} >
+                  <div className="card-body" style={{ width: "1060px", paddingBottom: "0px" }}>
+                    <div className='col-12 col-md-6 col-lg-4 mb-2'>
+                      <label>Total Working Days</label>
+                      <input
+                        type="number"
+                        name='totalWorkingDays'
+                        readOnly
+                        className="form-control"
+                        {...register("totalWorkingDays", { required: true })}
+                      />
+                      {errors.totalWorkingDays && <span>This field is required</span>}
                     </div>
-                    <div className='modal-footer'>
-                      <button
-                        className="btn btn-primary"
-                        type='submit'
-                      >
-                        Save changes
-                      </button>
-                      <button
-                        type='button'
-                        className="btn btn-secondary"
-                        onClick={() => setEditAttendance(false)}
-                      >
-                        Cancel
-                      </button>
+                    <div className='col-12 col-md-6 col-lg-4 mb-2'>
+                      <label>No. Of Working Days</label>
+                      <input
+                        type="number"
+                        name='noOfWorkingDays'
+                        className="form-control"
+                        {...register("noOfWorkingDays", { required: true })}
+                      />
+                      {errors.noOfWorkingDays && <span>This field is required</span>}
                     </div>
-                  </form>
-                </ModalBody>
-              </div>
+                  </div>
+                  <div className='modal-footer'>
+                    <button
+                      className="btn btn-primary"
+                      type='submit'
+                    >
+                      Save changes
+                    </button>
+                    <button
+                      type='button'
+                      className="btn btn-secondary"
+                      onClick={handleCloseEditModal}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </ModalBody>
             </div>
           </div>
-        )}
-      </LayOut>
-    );
-  };
+        </div>
+      )}
+    </LayOut>
+  );
+};
 
-  export default AttendanceReport;
+export default AttendanceReport;

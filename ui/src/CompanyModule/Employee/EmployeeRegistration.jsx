@@ -183,7 +183,7 @@ console.log(user.company)
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
     let newValue = "";
-    let encounteredNonSpace = false;
+    let capitalizeNext = true;  // Flag to determine if the next character should be capitalized
   
     // Remove spaces from the beginning of inputValue
     inputValue = inputValue.trimStart();
@@ -191,24 +191,23 @@ console.log(user.company)
     for (let i = 0; i < inputValue.length; i++) {
       const char = inputValue.charAt(i);
   
-      // Capitalize the first non-space character
-      if (!encounteredNonSpace && char.match(/[a-zA-Z0-9]/)) {
-        newValue += char.toUpperCase();
-        encounteredNonSpace = true;
-      } 
-      // Allow any alphabetic characters (both lowercase and uppercase) and numbers
-      // Allow spaces only after encountering non-space characters
-      else if (char.match(/[a-zA-Z0-9]/) || (encounteredNonSpace && char === " ")) {
+      // Check if the current character is a space
+      if (char === " ") {
         newValue += char;
-        if (char !== " ") {
-          encounteredNonSpace = true;
-        }
+        capitalizeNext = true;  // Set flag to capitalize next non-space character
+      } else if (capitalizeNext && char.match(/[a-zA-Z0-9]/)) {
+        newValue += char.toUpperCase();
+        capitalizeNext = false;  // Reset flag after capitalizing a character
+      } else {
+        newValue += char;  // Add character as is if it's not the first one after a space
       }
     }
   
     // Update the input value
     e.target.value = newValue;
   };
+  
+  
   
 
 let company=user.company

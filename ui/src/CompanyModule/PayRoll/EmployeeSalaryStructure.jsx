@@ -50,7 +50,7 @@ const EmployeeSalaryStructure = () => {
         .map(({ referenceId, ...rest }) => rest);
       setEmployes(
         filteredData.map((employee) => ({
-          label: `${employee.firstName} ${employee.lastName}`,
+          label: `${employee.firstName} ${employee.lastName} (${employee.employeeId})`,
           value: employee.id,
         }))
       );
@@ -148,7 +148,6 @@ const EmployeeSalaryStructure = () => {
     // Convert hra percentage to actual amount
     const hraPercentage = parseFloat(hra || 0); // Assuming hra is given as a percentage
     const hraAmount = (hraPercentage / 100) * parseFloat(grossAmount || 0);
-
     const travelAllowanceValue = parseFloat(travelAllowance || 0);
     const specialAllowanceValue = parseFloat(specialAllowance || 0);
     const otherAllowancesValue = parseFloat(otherAllowances || 0);
