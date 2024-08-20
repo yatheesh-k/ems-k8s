@@ -11,8 +11,9 @@ pipeline {
             steps {
                 script {
                         sh 'pwd'
-
                         sh 'docker compose -f /docker/DockerCompose.yml build'
+                        sh 'cd docker'
+
                     
                 }
             }
