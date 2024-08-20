@@ -4,7 +4,7 @@ services:
   frontend:
     build:
       context: /var/lib/jenkins/workspace/ems-deployement/ui/
-      dockerfile: docker/FrontendDockerfile
+      dockerfile: /var/lib/jenkins/workspace/ems-deployement/docker/FrontendDockerfile
     ports:
       - "3000:3000"
     networks:
@@ -13,7 +13,7 @@ services:
   identity:
     build:
       context: /var/lib/jenkins/workspace/ems-deployement/identity/
-      dockerfile: docker/IdentityModuleDockerfile
+      dockerfile: /var/lib/jenkins/workspace/ems-deployement/docker/IdentityModuleDockerfile
     ports:
       - "9090:2800"
     networks:
@@ -22,7 +22,7 @@ services:
   employee:
     build:
       context: /var/lib/jenkins/workspace/ems-deployement/employee
-      dockerfile: docker/EmployeeModuleDockerfile
+      dockerfile: /var/lib/jenkins/workspace/ems-deployement/docker/EmployeeModuleDockerfile
     ports:
       - "8092:8092"
     networks:
