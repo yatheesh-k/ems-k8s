@@ -8,16 +8,15 @@ pipeline {
             }
         }
         stage('Build') {
-            steps {
+            steps { 
+            dir('docker'){
                 script {
                         sh 'pwd'
-                        sh 'cd docker'
-                                            sh 'pwd'
-
                         sh 'docker compose -f /docker/DockerCompose.yml build'
-                        
+                        sh 'pwd'
 
                     
+                }
                 }
             }
         }
