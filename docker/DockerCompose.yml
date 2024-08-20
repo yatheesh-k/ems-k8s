@@ -3,7 +3,7 @@ version: '3.8'
 services:
   frontend:
     build:
-      context: ./ui
+      context: /var/lib/jenkins/workspace/ems-deployement/ui/
       dockerfile: docker/FrontendDockerfile
     ports:
       - "3000:3000"
@@ -12,7 +12,7 @@ services:
 
   identity:
     build:
-      context: ./identity
+      context: /var/lib/jenkins/workspace/ems-deployement/identity/
       dockerfile: docker/IdentityModuleDockerfile
     ports:
       - "9090:2800"
@@ -21,7 +21,7 @@ services:
 
   employee:
     build:
-      context: ./employee
+      context: /var/lib/jenkins/workspace/ems-deployement/employee
       dockerfile: docker/EmployeeModuleDockerfile
     ports:
       - "8092:8092"
