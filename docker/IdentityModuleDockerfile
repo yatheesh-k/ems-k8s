@@ -2,12 +2,12 @@ FROM openjdk:21-jdk
 
 WORKDIR /app
 
-COPY ..identity/gradle /app/gradle
-COPY ..identity/gradlew /app/
-COPY ..identity/build.gradle /app/
-COPY ..identity/settings.gradle /app/
+COPY /var/lib/jenkins/workspace/ems-deployement/identity/gradle /app/gradle
+COPY /var/lib/jenkins/workspace/ems-deployement/identity/gradlew /app/
+COPY /var/lib/jenkins/workspace/ems-deployement/identity/build.gradle /app/
+COPY /var/lib/jenkins/workspace/ems-deployement/identity/settings.gradle /app/
 
-COPY ..identity/src /app/src
+COPY /var/lib/jenkins/workspace/ems-deployement/identity/src /app/src
 
 RUN chmod +x gradlew
 
