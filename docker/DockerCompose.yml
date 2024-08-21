@@ -1,33 +1,37 @@
-version: '3.8'
 
 services:
   frontend:
     build:
-      context: /var/lib/jenkins/workspace/ems-deployement/ui/
-      dockerfile: /var/lib/jenkins/workspace/ems-deployement/docker/FrontendDockerfile
+      context: /var/lib/jenkins/workspace/ems-deployement
+      dockerfile: /var/lib/jenkins/workspace/ems-deployement/frontend
     ports:
-      - "3000:3000"
+      - "2800:3000"
     networks:
-      - my-network
+      - ems-network
+    environment:
+      - ELASTICSEARCH_URL=http://host.docker.internal:9200
 
   identity:
     build:
-      context: /var/lib/jenkins/workspace/ems-deployement/identity/
-      dockerfile: /var/lib/jenkins/workspace/ems-deployement/docker/IdentityModuleDockerfile
+      context: /var/lib/jenkins/workspace/ems-deployement
+      dockerfile: /opt/docker/identity/docker/identity
     ports:
-      - "9090:2800"
+      - "9090:9090"
     networks:
-      - my-network
+      - ems-network
+    environment:
+      - ELASTICSEARCH_URL=http://host.docker.internal:9200
 
   employee:
     build:
-      context: /var/lib/jenkins/workspace/ems-deployement/employee
-      dockerfile: /var/lib/jenkins/workspace/ems-deployement/docker/EmployeeModuleDockerfile
+      context: /var/lib/jenkins/workspace/ems-deployement
+      dockerfile: /var/lib/jenkins/workspace/ems-deployement/employee
     ports:
       - "8092:8092"
     networks:
-      - my-network
+      - ems-network
+    environment:
+      - ELASTICSEARCH_URL=http://host.docker.internal:9200
 
 networks:
-  my-network:
-    external: true
+  ems-network:
