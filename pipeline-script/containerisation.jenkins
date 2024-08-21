@@ -11,13 +11,6 @@ pipeline {
             }
         }
 
-        stage('Build Images') {
-            steps {
-                script {
-                    sh 'sudo docker compose -f /var/lib/jenkins/workspace/ems-deployement/docker/DockerCompose.yml build'
-                }
-            }
-        }
 
         stage('Starting New Containers') {
             steps {
