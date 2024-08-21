@@ -14,7 +14,7 @@ pipeline {
         stage('Build Images') {
             steps {
                 script {
-                    sh 'sudo docker compose build -f /var/lib/jenkins/workspace/ems-deployement/docker/DockerCompose.yml build'
+                    sh 'sudo docker compose -f /var/lib/jenkins/workspace/ems-deployement/docker/DockerCompose.yml build'
                 }
             }
         }
