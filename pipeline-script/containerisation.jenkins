@@ -7,7 +7,6 @@ pipeline {
             steps {
                 script {
                     sh 'sudo docker compose -f /var/lib/jenkins/workspace/ems-deployement/docker/DockerCompose.yml down'
-                    sh 'sudo docker system prune -f '
                 }
             }
         }
