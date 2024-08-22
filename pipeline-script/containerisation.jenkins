@@ -4,13 +4,6 @@ pipeline {
     stages {
 
         stage('Clone Repository') {
-        steps {
-         script {
-            sh 'sudo rm -rf /var/lib/jenkins/workspace/ems-deployement'
-            sh 'git clone https://github.com/PathBreakerGit/ems.git /var/lib/jenkins/workspace/ems-deployement'
-        }
-    }
-}
      
         stage('Removing Old Containers') {
             steps {
