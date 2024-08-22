@@ -2,6 +2,8 @@ pipeline {
     agent any
 
     stages {
+
+        stage('Clone Repository') {
      
         stage('Removing Old Containers') {
             steps {
@@ -12,7 +14,14 @@ pipeline {
             }
         }
 
-
+         stage('Build Images') {
+            steps {
+                script {
+                    sh 'sudo docker compose -f /var/lib/jenkins/workspace/ems-deployement/docker/DockerCompose.yml build --no-cache'
+                }
+            }
+        }
+        
         stage('Starting New Containers') {
             steps {
                 script {
