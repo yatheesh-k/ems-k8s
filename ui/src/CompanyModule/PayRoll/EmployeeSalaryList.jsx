@@ -64,7 +64,6 @@ const EmployeeSalaryList = () => {
       await EmployeeSalaryPatchApiById(id, editingData.salaryId, formData);
 
       toast.success('Salary Updated Successfully');
-      collapseExpandedCard();
       reset();
       setEditingData(null);
       setEmployeeSalaryView(prev => prev.map(item =>
@@ -85,67 +84,54 @@ const EmployeeSalaryList = () => {
     console.error(error.response);
   };
 
-  const toggleExpand = async (salaryId) => {
-    if (expandedSalaryId === salaryId) {
-      // Collapse if the same item is clicked
-      setExpandedSalaryId(null);
-    } else {
-      // Expand the clicked item and collapse others
-      setExpandedSalaryId(salaryId);
-      const response = await EmployeeSalaryGetApi(id);
-      const salaryDetails = response.data.data.find(item => item.salaryId === salaryId);
-      if (salaryDetails) {
-        setEditingData(salaryDetails);
-        setValue('fixedAmount', salaryDetails.fixedAmount);
-        setValue('variableAmount', salaryDetails.variableAmount);
-        setValue('allowances.travelAllowance', salaryDetails.allowances.travelAllowance);
-        setValue('allowances.hra', salaryDetails.allowances.hra);
-        setValue('allowances.specialAllowance', salaryDetails.allowances.specialAllowance);
-        setValue('allowances.otherAllowances', salaryDetails.allowances.otherAllowances);
-        setValue('deductions.pfEmployee', salaryDetails.deductions.pfEmployee);
-        setValue('deductions.pfEmployer', salaryDetails.deductions.pfEmployer);
-        setValue('deductions.pfTax', salaryDetails.deductions.pfTax);
-        setValue('deductions.incomeTax', salaryDetails.deductions.incomeTax);
-        setValue('deductions.totalTax', salaryDetails.deductions.totalTax);
-        setValue('netSalary', salaryDetails.netSalary);
-        setValue('status', salaryDetails.status);
+
+  useEffect(() => {
+    const fetchSalaryData = async () => {
+      try {
+        // Replace with your actual API call
+        const response = await EmployeeSalaryGetApi(id);
+        const salaries = response.data.data;
+        setEmployeeSalaryView(salaries); // Set the salary data in state
+      } catch (error) {
+        console.error('Error fetching salary data:', error);
       }
-    }
-  };
-
-  const handleEditClick = async (salaryId, e) => {
-    e.stopPropagation();
-
-    try {
-      const response = await EmployeeSalaryGetApiById(salaryId);
-      const salaryDetails = response.data; 
-
-      if (salaryDetails) {
-        setEditingData(salaryDetails); 
-        setValue('fixedAmount', salaryDetails.fixedAmount);
-        setValue('variableAmount', salaryDetails.variableAmount);
-        setValue('allowances.travelAllowance', salaryDetails.allowances.travelAllowance);
-        setValue('allowances.hra', salaryDetails.allowances.hra);
-        setValue('allowances.specialAllowance', salaryDetails.allowances.specialAllowance);
-        setValue('allowances.otherAllowances', salaryDetails.allowances.otherAllowances);
-        setValue('deductions.pfEmployee', salaryDetails.deductions.pfEmployee);
-        setValue('deductions.pfEmployer', salaryDetails.deductions.pfEmployer);
-        setValue('deductions.pfTax', salaryDetails.deductions.pfTax);
-        setValue('deductions.incomeTax', salaryDetails.deductions.incomeTax);
-        setValue('deductions.totalTax', salaryDetails.deductions.totalTax);
-        setValue('netSalary', salaryDetails.netSalary);
-        setValue('status', salaryDetails.status);
-        
-        setExpandedSalaryId(salaryId);
-      }
-    } catch (error) {
-      handleApiErrors(error); 
-    }
-  };
-
-    const collapseExpandedCard = () => {
-      setExpandedSalaryId(null);
     };
+    
+    fetchSalaryData();
+  }, [id]);
+
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case 'Active':
+        return { backgroundColor: 'green', color: 'white', padding: '2px 8px', borderRadius: '4px' };
+      case 'InActive':
+        return { backgroundColor: 'red', color: 'white', padding: '2px 8px', borderRadius: '4px' };
+      default:
+        return { backgroundColor: 'gray', color: 'white', padding: '2px 8px', borderRadius: '4px' };
+    }
+  };
+
+  // const toggleExpand = (salaryId) => {
+  //   if (expandedSalaryId === salaryId) {
+  //     setExpandedSalaryId(null);
+  //   } else {
+  //     setExpandedSalaryId(salaryId);
+  //     const selectedData = employeeSalaryView.find(item => item.salaryId === salaryId);
+  //     setEditingData(selectedData);
+  //     reset(selectedData); // Populate form fields with the selected salary data
+  //   }
+  // };
+
+  // const collapseExpandedCard = () => {
+  //   setExpandedSalaryId(null);
+  // };
+
+  const handleEditClick = (salaryId, event) => {
+    event.stopPropagation(); // Prevent the card from toggling when editing
+    navigate(`/employeeSalaryStructure?salaryId=${salaryId}&employeeId=${id}`); // Navigate with both parameters
+  };
+  
+  
 
     const handleNavigateToRegister = () => {
       navigate('/employeeSalaryStructure');
@@ -177,14 +163,16 @@ const EmployeeSalaryList = () => {
           {employeeSalaryView.length > 0 ? (
             employeeSalaryView.map((item, index) => (
               <div key={index} className="card mb-3">
-                <div className="card-header d-flex justify-content-between align-items-center" onClick={() => toggleExpand(item.salaryId)} style={{ cursor: 'pointer' }}>
+                <div className="card-header d-flex justify-content-between align-items-center" style={{ cursor: 'pointer' }}>
                   <h5 className="mb-0"> {index + 1}. Net Salary: {item.netSalary}</h5>
-                  <PencilSquare size={22} color='#2255a4' onClick={(e) => handleEditClick(item.salaryId, e)} />
+                  <div className="d-flex align-items-center">
+                <span className="me-3" style={getStatusStyle(item.status)}>{item.status}</span>
+                <PencilSquare size={22} color='#2255a4' onClick={(e) => handleEditClick(item.salaryId, e)} />
+              </div>
                 </div>
                 {expandedSalaryId === item.salaryId && (
                   <div className="card-body">
                     <div style={{ marginBottom: '3%', marginRight: "10%" }} >
-                      <ArrowLeftCircle size={22} color='' onClick={collapseExpandedCard} />
                     </div>
                     <form onSubmit={handleSubmit(onSubmit)}>
                       <input type="hidden" name="id" value={id} ref={register()} />

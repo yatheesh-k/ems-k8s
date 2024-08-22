@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Select from "react-select";
 import LayOut from "../../LayOut/LayOut";
-import { EmployeeGetApi, EmployeeSalaryPostApi } from "../../Utils/Axios";
+import { EmployeeGetApi, EmployeeSalaryPostApi,EmployeeSalaryGetApiById, EmployeeSalaryPatchApiById } from "../../Utils/Axios";
 import { CurrencyRupee, QuestionCircle } from "react-bootstrap-icons";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Controller, useForm } from "react-hook-form";
 import { useAuth } from "../../Context/AuthContext";
@@ -18,6 +18,10 @@ const EmployeeSalaryStructure = () => {
     formState: { errors },
   } = useForm({ mode: 'onChange' });
   const { user } = useAuth();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const salaryId = queryParams.get('salaryId');
+  const id=queryParams.get('employeeId')
   const [employes, setEmployes] = useState([]);
   const [grossAmount, setGrossAmount] = useState(0);
   const [hra, setHra] = useState(0);
@@ -41,7 +45,18 @@ const EmployeeSalaryStructure = () => {
   const [otherAllowances, setOtherAllowances] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
   const [message, setMessage] = useState("");
+  const [status, setStatus] = useState("");
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (id && salaryId) {
+      setShowFields(true);
+    } else {
+      setShowFields(false);
+    }
+  }, [id, salaryId]);
+
 
   useEffect(() => {
     EmployeeGetApi().then((data) => {
@@ -56,6 +71,53 @@ const EmployeeSalaryStructure = () => {
       );
     });
   }, []);
+
+  useEffect(() => {
+    if (id && salaryId) {
+      EmployeeSalaryGetApiById(id,salaryId).then((response) => {
+        const data = response.data.data; 
+        if (data) {
+          setEmployeeId(data.employeeId);
+          setBasicSalary(parseFloat(data.basicSalary));
+          setFixedAmount(parseFloat(data.fixedAmount));
+          setVariableAmount(parseFloat(data.variableAmount));
+          setGrossAmount(parseFloat(data.grossAmount));
+          setTotalEarnings(parseFloat(data.totalEarnings));
+          setTotalAmount(parseFloat(data.netSalary));
+          setHra(parseFloat(data.allowances.hra));
+          setTravelAllowance(parseFloat(data.allowances.travelAllowance));
+          setSpecialAllowance(parseFloat(data.allowances.specialAllowance));
+          setOtherAllowances(parseFloat(data.allowances.otherAllowances));
+          setPfEmployee(parseFloat(data.deductions.pfEmployee));
+          setPfEmployer(parseFloat(data.deductions.pfEmployer));
+          setIncomeTax(parseFloat(data.deductions.incomeTax));
+          setPfTax(parseFloat(data.deductions.pfTax));
+          setTotalTax(parseFloat(data.deductions.totalTax));
+          setStatus(data.status || '');
+          setValue('status', data.status || '')
+          setTotalPF(parseFloat(data.deductions.totalDeductions));
+          setShowFields(true);
+        }
+      }).catch((error) => {
+        handleApiErrors(error);
+      });
+    } else {
+      setShowFields(false);
+    }
+  }, [id,salaryId,setValue]);
+
+  useEffect(() => {
+    if (salaryId && id) {
+      setValue('variableAmount', variableAmount);
+      setValue('fixedAmount', fixedAmount);
+      setValue('hra', hra);
+      setValue('travelAllowance', travelAllowance);
+      setValue('pfEmployee', pfEmployee);
+      setValue('pfEmployer', pfEmployer);
+      // Update other values as necessary
+    }
+  }, [variableAmount, fixedAmount, hra, travelAllowance, pfEmployee, pfEmployer, salaryId, id, setValue]);
+  
 
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
@@ -223,14 +285,17 @@ const EmployeeSalaryStructure = () => {
     };
 
     console.log("Post Data:", postData);
+    const apiCall = salaryId
+    ? () => EmployeeSalaryPatchApiById(employeeId, salaryId, postData) // Update existing data
+    : () => EmployeeSalaryPostApi(employeeId, postData); // Add new data
 
-    EmployeeSalaryPostApi(employeeId, postData)
-      .then((response) => {
-        toast.success("Employee Salary Added Successfully");
-        setErrorMessage(""); // Clear error message on success
-        setShowFields(false);
-        navigate('/employeeview');
-      })
+  apiCall()
+    .then((response) => {
+      toast.success(salaryId ? "Employee Salary Updated Successfully" : "Employee Salary Added Successfully");
+      setErrorMessage(""); // Clear error message on success
+      setShowFields(false);
+      navigate('/employeeview');
+    })
       .catch((error) => {
         handleApiErrors(error);
       });
@@ -260,49 +325,7 @@ const EmployeeSalaryStructure = () => {
             </div>
           </div>
           <div className="row">
-            <div className="col-12">
-              <div className="card">
-                <div className="card-header" style={{ paddingBottom: "0" }}>
-                  <h5 className="card-title">Employee Details</h5>
-                  <div
-                    className="dropdown-divider"
-                    style={{ borderTopColor: "#d7d9dd" }}
-                  />
-                </div>
-                <div className="card-body" style={{ padding: "0 0 0 25%" }}>
-                  <div className="mb-4">
-                    <div className="row align-items-center">
-                      <div className="col-12 d-flex align-items-center">
-                        <div
-                          className="mt-3"
-                          style={{ flex: "1 1 auto", maxWidth: "400px" }}
-                        >
-                          <label className="form-label">Select Employee Name</label>
-                          <Select
-                            options={employes}
-                            onChange={handleEmployeeChange}
-                            placeholder="Select Employee Name"
-                          />
-                        </div>
-                        <div style={{ marginTop: "27px" }}>
-                          <div className="mt-3 ml-3" style={{ marginLeft: "20px" }}>
-                            <button
-                              type="button"
-                              className="btn btn-primary"
-                              onClick={handleGoClick}
-                            >
-                              Go
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                      {message && <div className="text-danger mt-2" style={{ marginLeft: '10px' }}>{message}</div>}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {showFields && (
+            {showFields ? (
               <>
                 <div className="col-12">
                   <div className="card">
@@ -654,7 +677,7 @@ const EmployeeSalaryStructure = () => {
                           <Controller
                             name="status"
                             control={control}
-                            defaultValue=""
+                            defaultValue={status}
                             rules={{ required: true }}
                             render={({ field }) => (
                               <Select
@@ -668,7 +691,10 @@ const EmployeeSalaryStructure = () => {
                                     ? { value: field.value, label: ["Active", "InActive"].find(option => option === field.value) }
                                     : null
                                 }
-                                onChange={(val) => field.onChange(val.value)}
+                                onChange={(val) => {
+                                  field.onChange(val.value);
+                                  setStatus(val.value); // Update local status state on change
+                                }}
                                 placeholder="Select Status"
                               />
                             )}
@@ -702,6 +728,49 @@ const EmployeeSalaryStructure = () => {
                   </div>
                 </div>
               </>
+            ):(
+              <div className="col-12">
+              <div className="card">
+                <div className="card-header" style={{ paddingBottom: "0" }}>
+                  <h5 className="card-title">Employee Details</h5>
+                  <div
+                    className="dropdown-divider"
+                    style={{ borderTopColor: "#d7d9dd" }}
+                  />
+                </div>
+                <div className="card-body" style={{ padding: "0 0 0 25%" }}>
+                  <div className="mb-4">
+                    <div className="row align-items-center">
+                      <div className="col-12 d-flex align-items-center">
+                        <div
+                          className="mt-3"
+                          style={{ flex: "1 1 auto", maxWidth: "400px" }}
+                        >
+                          <label className="form-label">Select Employee Name</label>
+                          <Select
+                            options={employes}
+                            onChange={handleEmployeeChange}
+                            placeholder="Select Employee Name"
+                          />
+                        </div>
+                        <div style={{ marginTop: "27px" }}>
+                          <div className="mt-3 ml-3" style={{ marginLeft: "20px" }}>
+                            <button
+                              type="button"
+                              className="btn btn-primary"
+                              onClick={handleGoClick}
+                            >
+                              Go
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      {message && <div className="text-danger mt-2" style={{ marginLeft: '10px' }}>{message}</div>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             )}
           </div>
         </form>

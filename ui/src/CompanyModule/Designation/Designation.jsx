@@ -236,8 +236,8 @@ const Designation = () => {
     // Join the words back into a string
     let formattedValue = capitalizedWords.join(' ');
     // Remove spaces not allowed (before the first two characters)
-    if (formattedValue.length > 2) {
-      formattedValue = formattedValue.slice(0, 2) + formattedValue.slice(2).replace(/\s+/g, ' ');
+    if (formattedValue.length > 3) {
+      formattedValue = formattedValue.slice(0, 3) + formattedValue.slice(3).replace(/\s+/g, ' ');
     }
     // Update input value
     input.value = formattedValue;

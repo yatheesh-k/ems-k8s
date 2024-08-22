@@ -90,19 +90,18 @@ const Department = () => {
       try {
         await DepartmentDeleteApiById(selectedItemId)
           .then((response) => {
-           
               toast.success("Department Deleted Succesfully", {
                 position: "top-right",
                 transition: Bounce,
                 hideProgressBar: true,
                 theme: "colored",
-                autoClose: 3000,
+                autoClose: 1000,
               });
               setTimeout(() => {
                 fetchDepartments();
                 //getEmployees()
-            handleCloseDeleteModal();
-            },1000);
+             handleCloseDeleteModal();
+            }, 1000);
           });
       } catch (error) {
         handleApiErrors(error)

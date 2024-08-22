@@ -567,7 +567,8 @@ const EmployeeRegistration = () => {
                       )}
                     </div>
                     <div className="col-lg-1"></div>
-                    {isUpdating ? (
+
+                     {/* {isUpdating ? (
                       <div className="col-12 col-md-6 col-lg-5 mb-3">
                         <label className="form-label">
                           Department <span style={{ color: "red" }}>*</span>
@@ -592,7 +593,9 @@ const EmployeeRegistration = () => {
                           </p>
                         )}
                       </div>
-                    ) : (
+
+                    ) : (  */}
+
                       <div className="col-12 col-md-6 col-lg-5 mb-3">
                         <label className="form-label">
                           Department <span style={{ color: "red" }}>*</span>
@@ -619,7 +622,8 @@ const EmployeeRegistration = () => {
                           </p>
                         )}
                       </div>
-                    )}
+                    {/* )} */}
+
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
                       <label className="form-label">Designation <span style={{ color: "red" }}>*</span></label>
