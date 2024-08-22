@@ -2,6 +2,12 @@ pipeline {
     agent any
 
     stages {
+
+        stage('Clean Workspace'){
+            script{
+                deleteDir()    
+            }
+        }
      
         stage('Removing Old Containers') {
             steps {
