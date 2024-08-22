@@ -6,7 +6,7 @@ pipeline {
         stage('Clone Repository') {
         steps {
          script {
-            sh 'rm -rf /var/lib/jenkins/workspace/ems-deployement'
+            sh 'sudo rm -rf /var/lib/jenkins/workspace/ems-deployement'
             sh 'git clone https://github.com/PathBreakerGit/ems.git /var/lib/jenkins/workspace/ems-deployement'
         }
     }
