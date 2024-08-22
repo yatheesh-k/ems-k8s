@@ -19,6 +19,7 @@ const AttendanceReport = () => {
   const [selectedEmployeeDetails, setSelectedEmployeeDetails] = useState({});
   const [editAttendance, setEditAttendance] = useState(false);
   const [attendanceData, setAttendanceData] = useState([]);
+  const [refreshData, setRefreshData] = useState("");
   const [employeeAttendance, setEmployeeAttendance] = useState([]);
   const [employeeId, setEmployeeId] = useState("");
   const [selectedItemId, setSelectedItemId] = useState(null);
@@ -82,7 +83,6 @@ const AttendanceReport = () => {
       setAttendanceData(response.data.data);
       setEmployeeAttendance(response.data.data);
       setShowFields(true);
-      reset(response.data.data);
     } catch (error) {
       console.error("Error fetching attendance data:", error);
     }
@@ -133,7 +133,7 @@ const AttendanceReport = () => {
       });
       setTimeout(() => {
         handleCloseDeleteModal();
-        fetchAttendanceData();
+        fetchAttendanceData(employeeId, selectedMonth, selectedYear); // Add parameters here
         setRefreshData((prev) => !prev);
       }, 1500);
     } catch (error) {
@@ -156,7 +156,7 @@ const AttendanceReport = () => {
         handleCloseEditModal();
         setRefreshData((prev) => !prev);
         navigate("/attendanceReport");
-        fetchAttendanceData();
+        fetchAttendanceData(employeeId, selectedMonth, selectedYear); // Add parameters here
       }, 1000);
     } catch (error) {
       handleApiErrors(error);
