@@ -18,14 +18,6 @@ pipeline {
             }
         }
 
-        stage('Build'){
-            steps{
-                script{
-                    sh 'sudo docker compose -f /var/lib/jenkins/workspace/ems-deployement/docker/DockerCompose.yml build --no-cache'
-                }
-            }
-        }
-
 
         stage('Starting New Containers') {
             steps {
