@@ -1,4 +1,4 @@
-pippeline{
+pipeline{
     agent any 
     stages{
         stage('Building ui'){
