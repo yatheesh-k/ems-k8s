@@ -2,8 +2,6 @@ pipeline {
     agent any
 
     stages {
-
-        stage('Clone Repository') {
      
         stage('Removing Old Containers') {
             steps {
@@ -29,5 +27,4 @@ pipeline {
             sh 'sudo docker system prune -f'
         }
     }
-}
 }
