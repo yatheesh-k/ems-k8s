@@ -1,15 +1,13 @@
-pippeline{
+pipeline {
     agent any 
-    stages{
-        stage('Building ui'){
-            steps{
-                script{
-                    sh 'cd /var/lib/jenkins/workspace/ems-deployement/ui/'
-                    sh 'sudo npm clean-install'
-                    sh 'sudo npm run build'
-                    sh 'cd /var/lib/jenkins/workspace/ems-deployement/ui/build/'
-                    sh 'sudo cp * /var/www/ems -R'
-                }
+    stages {
+        stage('Building ui') {
+            steps {
+                sh 'cd /var/lib/jenkins/workspace/ems-deployement/ui/'
+                sh 'sudo npm clean-install'
+                sh 'sudo npm run build'
+                sh 'cd /var/lib/jenkins/workspace/ems-deployement/ui/build/'
+                sh 'sudo cp * /var/www/ems -R'
             }
         }
     }
