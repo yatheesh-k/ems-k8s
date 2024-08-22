@@ -15,7 +15,7 @@ pipeline {
         stage('Build'){
             steps{
                 script{
-                    sh 'sudo docker compose -f /var/lib/jenkins/workspace/ems-deployement/docker/DockerCompose.yml build --'
+                    sh 'sudo docker compose -f /var/lib/jenkins/workspace/ems-deployement/docker/DockerCompose.yml build --no-cache'
                 }
             }
         }
