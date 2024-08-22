@@ -3,9 +3,9 @@ pipeline {
 
     stages {
 
-        stage('Clean Workspace'){
-            script{
-                deleteDir()    
+         stage('Clean Workspace') {
+            steps {
+                deleteDir() 
             }
         }
      
@@ -13,10 +13,19 @@ pipeline {
             steps {
                 script {
                     sh 'sudo docker compose -f /var/lib/jenkins/workspace/ems-deployement/docker/DockerCompose.yml down'
-                    sh 'sudo docker system prune -f'
+                    sh 'sudo docker system prune -f '
                 }
             }
         }
+
+        stage('Build'){
+            steps{
+                script{
+                    sh 'sudo docker compose -f /var/lib/jenkins/workspace/ems-deployement/docker/DockerCompose.yml build --no-cache'
+                }
+            }
+        }
+
 
         stage('Starting New Containers') {
             steps {
