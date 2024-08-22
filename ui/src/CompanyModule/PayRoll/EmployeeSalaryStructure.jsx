@@ -673,7 +673,7 @@ const EmployeeSalaryStructure = () => {
                               />
                             )}
                           />
-                          {errors.status && <p className="errorMsg">Employee Status is Required</p>}
+                          {errors.status && <p className="text-danger errorMsg">Employee Status is Required</p>}
                         </div>
                       </div>
                     </div>

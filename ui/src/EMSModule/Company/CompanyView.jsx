@@ -81,7 +81,6 @@ const CompanyView = () => {
   }, []);
 
   useEffect(() => {
-    // Reset pagination when data changes
     setCurrentPage(1);
   }, [view, filteredData]);
 

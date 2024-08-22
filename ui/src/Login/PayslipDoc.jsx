@@ -135,7 +135,7 @@ const PayslipDoc = () => {
             >
               <div>
                 <p>
-                  Pay Slip for the month of : <b>
+                  PaySlip for the month of : <b>
                     {payslipData.month} {" "}
                     {payslipData.year}
                   </b>
@@ -343,7 +343,7 @@ const PayslipDoc = () => {
 
               <div
                 className="line"
-                style={{ marginLeft: "50px", marginRight: "50px" }}
+                style={{ marginLeft: "22px", marginRight: "22px" }}
               >
                 <hr />
               </div>
@@ -361,14 +361,12 @@ const PayslipDoc = () => {
                     <tr>
                       <td className="earnings" style={{ padding: "4px", textAlign: "center" }}>Basic Salary</td>
                       <td className="earnings">{payslipData.salary.basicSalary || 0}</td>
-
                       <td className="deductions" style={{ padding: "4px", textAlign: "center" }}>PF Employer</td>
                       <td className="deductions">{payslipData.salary.deductions.pfEmployer || 0}</td>
                     </tr>
                     <tr>
                       <td className="earnings" style={{ padding: "4px", textAlign: "center" }}>HRA</td>
                       <td className="earnings">{payslipData.salary.allowances.hra || 0}</td>
-
                       <td className="deductions" style={{ padding: "4px", textAlign: "center" }}>PF Employee</td>
                       <td className="deductions">{payslipData.salary.deductions.pfEmployee || 0}</td>
                     </tr>
@@ -381,24 +379,30 @@ const PayslipDoc = () => {
                     <tr>
                       <td className="earnings" style={{ padding: "4px", textAlign: "center" }}>Travel Allowance</td>
                       <td className="earnings">{payslipData.salary.allowances.travelAllowance || 0}</td>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "center", backgroundColor: "rgb(230, 230, 230)" }}>Taxes (C)</th>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "center", backgroundColor: "rgb(230, 230, 230)" }}>Amount</th>
+                      <td className="deductions" style={{ padding: "4px", textAlign: "center" }}>Total Deductions (B)</td>
+                      <td className="deductions">{payslipData.salary.deductions.totalDeductions || 0}</td>
                     </tr>
                     <tr>
                       <td className="earnings" style={{ padding: "4px", textAlign: "center" }}>Other Allowance</td>
                       <td className="earnings">{payslipData.salary.allowances.otherAllowances || 0}</td>
-                      <td className="taxes" style={{ padding: "4px", textAlign: "center" }}>Income Tax</td>
-                      <td className="taxes">{payslipData.salary.deductions.incomeTax || 0}</td>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "center", backgroundColor: "rgb(230, 230, 230)" }}>Taxes (C)</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "center", backgroundColor: "rgb(230, 230, 230)" }}>Amount</th>
                     </tr>
                     <tr>
                       <td className="earnings" style={{ padding: "4px", textAlign: "center" }}>PF Contribution Employee</td>
                       <td className="earnings">{payslipData.salary.allowances.pfContributionEmployee || 0}</td>
+                      <td className="taxes" style={{ padding: "4px", textAlign: "center" }}>Income Tax</td>
+                      <td className="taxes">{payslipData.salary.deductions.incomeTax || 0}</td>
+                    </tr>
+                    <tr>
+                      <td className="earnings" style={{ padding: "4px", textAlign: "center" }}>Total Earnings (A)</td>
+                      <td className="earnings">{payslipData.salary.totalEarnings || 0}</td>
                       <td className="taxes" style={{ padding: "4px", textAlign: "center" }}>Professional Tax</td>
                       <td className="taxes">{payslipData.salary.deductions.pfTax || 0}</td>
                     </tr>
                     <tr>
-                      <td className="earnings" style={{ padding: "4px", textAlign: "center" }}>Total Earnings(A)</td>
-                      <td className="earnings">{payslipData.salary.totalEarnings || 0}</td>
+                      <td className="earnings" style={{ padding: "4px", textAlign: "center" }}></td>
+                      <td className="earnings"></td>
                       <td className="taxes" style={{ padding: "4px", textAlign: "center" }}>Total Tax (C)</td>
                       <td className="taxes">{payslipData.salary.deductions.totalTax || 0}</td>
                     </tr>
@@ -408,7 +412,7 @@ const PayslipDoc = () => {
               </div>
               <div
                 className="line"
-                style={{ marginLeft: "50px", marginRight: "50px" }}
+                style={{ marginLeft: "22px", marginRight: "22px" }}
               >
                 <hr />
               </div>
@@ -517,7 +521,7 @@ const PayslipDoc = () => {
                 <div className="company-details text-center" style={{ padding: "3px" }}>
                   <p> {companyData.companyName},</p>
                   <p> {companyData.companyAddress},</p>
-                  <p>Contact No: {companyData.mobileNo}, Mail ID :{companyData.emailId}.</p>
+                  <p>Contact No: {companyData.mobileNo}, Mail Id: {companyData.emailId}.</p>
                   <p> </p>
                 </div>
               </div>

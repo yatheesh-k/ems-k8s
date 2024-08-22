@@ -13,7 +13,7 @@ const Reset = ({ companyName, onClose, show }) => {
   const [newPasswordShown, setNewPasswordShown] = useState(false);
   const [confirmPasswordShown, setConfirmPasswordShown] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [employeeId, setEmployeeId] = useState(null);
+  const [id, setEmployeeId] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
@@ -30,8 +30,8 @@ const Reset = ({ companyName, onClose, show }) => {
     const fetchData = async () => {
       try {
         const response = await EmployeeGetApiById(userId);
-        const employeeId = response.data.employeeId;
-        setEmployeeId(employeeId);
+        const id = response.data.id;
+        setEmployeeId(id);
       } catch (error) {
         setError(error);
         // toast.error("Error fetching employee data!");
@@ -49,7 +49,7 @@ const Reset = ({ companyName, onClose, show }) => {
 
     try {
       setLoading(true);
-      const response = await resetPassword(formData, employeeId); 
+      const response = await resetPassword(formData, id); 
       console.log('Password Reset Successful:', response.data);
       setLoading(false);
       onClose(); // Close modal or handle success state

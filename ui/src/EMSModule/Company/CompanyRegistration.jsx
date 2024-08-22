@@ -63,27 +63,23 @@ const CompanyRegistration = () => {
         companyType: data.companyType,
         // Add other fields as needed
       };
-
       if (location.state && location.state.id) {
         await new Promise(resolve => setTimeout(resolve, 2000));
         await companyUpdateByIdApi(location.state.id, updateData);
-        setTimeout(() => {
-          toast.success("Company Updated Successfully");
-          navigate("/companyView");
-          reset();
-        }, 900);
+        toast.success("Company Updated Successfully");
+        navigate("/companyView");
       } else {
         await CompanyRegistrationApi(data);
-        setTimeout(() => {
-          toast.success("Company Created Successfully");
-          navigate("/companyView");
-          reset();
-        }, 1000);
+        toast.success("Company Created Successfully");
+        navigate("/companyView");
       }
+      reset();
     } catch (error) {
-      handleApiErrors(error)
+      handleApiErrors(error);
+      // Optionally, you can show an error toast here
+      // toast.error("An error occurred. Please try again.");
     }
-  };
+  };  
 
   useEffect(() => {
     if (location && location.state && location.state.id) {
@@ -105,11 +101,15 @@ const CompanyRegistration = () => {
 
 
   const handleApiErrors = (error) => {
+    if (error.response && error.response.data && error.response.data.message) {
+      const alertMessage = `${error.response.data.message} (Duplicate Values)`;
+      alert(alertMessage);
+    }
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
       const errorMessage = error.response.data.error.message;
       toast.error(errorMessage);
     } else {
-      toast.error("Network Error !");
+      // toast.error("Network Error !");
     }
     console.error(error.response);
   };

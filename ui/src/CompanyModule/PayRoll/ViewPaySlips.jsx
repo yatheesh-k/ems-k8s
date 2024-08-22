@@ -9,7 +9,7 @@ import {
   EmployeePayslipsGet,
   EmployeePayslipDeleteById,
 } from "../../Utils/Axios";
-import { Eye, XSquareFill } from "react-bootstrap-icons"; 
+import { Eye, XSquareFill } from "react-bootstrap-icons";
 import { toast, Bounce } from "react-toastify";
 import DataTable from "react-data-table-component";
 import DeletePopup from "../../Utils/DeletePopup";
@@ -38,7 +38,7 @@ const ViewPaySlips = () => {
             label: `${firstName} ${lastName} (${employeeId})`,
             value: id,
           }));
-        setEmployees(filteredData); 
+        setEmployees(filteredData);
       } catch (error) {
         console.error("Error fetching employees:", error);
       }
@@ -277,7 +277,7 @@ const ViewPaySlips = () => {
                 <div className="form-group">
                   <button
                     type="button"
-                    style={{marginTop:"8px",paddingBottom:"8px"}}
+                    style={{ marginTop: "8px", paddingBottom: "8px" }}
                     className="btn btn-primary btn-block"
                     onClick={handleGoClick}
                     disabled={!selectedEmployeeId || !selectedMonth || !selectedYear}
@@ -295,14 +295,9 @@ const ViewPaySlips = () => {
           <div className="card">
             <div className="card-body">
               <h5 className="card-title mt-2">
-                {" "}
-                Payslip Details:
-                {`${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName}`}{" "}
+                PaySlip Details for {`${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})`}
               </h5>
-              <div
-                className="dropdown-divider"
-                style={{ borderTopColor: "#d7d9dd" }}
-              />
+              <hr />
               <DataTable
                 columns={columns}
                 data={employeeSalaryView}

@@ -6,25 +6,25 @@ import { useAuth } from "../Context/AuthContext";
 const EmployeeProfile = () => {
     const [error, setError] = useState("");
     const [employeeData, setEmployeeData] = useState(false);
-    const { user} = useAuth();
-     console.log("EmployeeProfile",user.userId)
-     useEffect(() => {
+    const { user } = useAuth();
+    console.log("EmployeeProfile", user.userId)
+    useEffect(() => {
         if (!user.userId) return; // Ensure userId is available before fetching data
-      
+
         const fetchData = async () => {
-          try {
-            const response = await EmployeeGetApiById(user.userId);
-            console.log("API Response:", response.data); // Log API response to verify data
-            setEmployeeData(response.data); // Set employee data from response
-          } catch (error) {
-            setError("Failed to fetch employee data");
-            console.error("Error fetching employee data:", error);
-          }
+            try {
+                const response = await EmployeeGetApiById(user.userId);
+                console.log("API Response:", response.data); // Log API response to verify data
+                setEmployeeData(response.data); // Set employee data from response
+            } catch (error) {
+                setError("Failed to fetch employee data");
+                console.error("Error fetching employee data:", error);
+            }
         };
-      
+
         fetchData();
-      }, [user.userId]); // Run effect when user.userId changes
-      
+    }, [user.userId]); // Run effect when user.userId changes
+
 
     return (
         <LayOut>
@@ -51,6 +51,7 @@ const EmployeeProfile = () => {
                         <div className="card">
                             <div className="card-header">
                                 <h5 className="card-title ">
+                                    Employee Data
                                 </h5>
                                 <div
                                     className="dropdown-divider"
@@ -166,7 +167,7 @@ const EmployeeProfile = () => {
                                             readOnly
                                         />
                                     </div>
-                              
+
                                     <div className="col-lg-1"></div>
                                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                                         <label className="form-label">Date of Birth</label>
@@ -189,10 +190,15 @@ const EmployeeProfile = () => {
                                             readOnly
                                         />
                                     </div>
-                               
-                                    <div className="col-lg-6"></div>
-                                    <hr />
-                                    <h4 className="m-2 mb-3">Account Details</h4>
+                                    <div className="card-header" style={{ paddingLeft: "0px" }}>
+                                        <h5 className="card-title ">
+                                            Bank Accoount Details
+                                        </h5>
+                                        <div
+                                            className="dropdown-divider"
+                                            style={{ borderTopColor: "#d7d9dd" }}
+                                        />
+                                    </div>
                                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                                         <label className="form-label">Bank Account Number </label>
                                         <input

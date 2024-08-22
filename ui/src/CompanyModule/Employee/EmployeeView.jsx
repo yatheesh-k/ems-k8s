@@ -10,11 +10,14 @@ import LayOut from "../../LayOut/LayOut";
 import { EmployeeDeleteApiById, EmployeeGetApi } from "../../Utils/Axios";
 
 const EmployeeView = () => {
+  const [view, setView] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const Navigate = useNavigate();
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -98,7 +101,7 @@ const EmployeeView = () => {
 
   const handleEdit = (id) => {
     console.log(id);
-    Navigate(`/employeeRegistration`, { state: { id } }); //deleteuser/
+    Navigate(`/employeeRegistration`, { state: { id } }); 
   };
 
   const handleConfirmDelete = async () => {
@@ -165,7 +168,7 @@ const EmployeeView = () => {
   const columns = [
     {
       name: <h6><b>S No</b></h6>,
-      selector: (row, index) => index + 1,
+      selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
       width: "70px",
     },
     {
@@ -177,7 +180,7 @@ const EmployeeView = () => {
       name: <h6><b>Name</b></h6>,
       selector: row => (
         <div title={`${row.firstName} ${row.lastName}`}>
-          {`${row.firstName.slice(0, 6)} ${row.lastName.slice(0, 2)}`}
+          {`${row.firstName.slice(0, 8)}`}
         </div>
       ),
       sortable: true,
@@ -403,9 +406,11 @@ const EmployeeView = () => {
                 </div>
               </div>
               <DataTable
-                columns={columns}
-                data={filteredData}
-
+               columns={columns}
+               data={filteredData.length > 0 ? filteredData : view}
+               pagination
+               onChangePage={page => setCurrentPage(page)}
+               onChangeRowsPerPage={perPage => setRowsPerPage(perPage)}
               />
             </div>
           </div>
@@ -414,8 +419,8 @@ const EmployeeView = () => {
             handleClose={handleCloseDeleteModal}
             handleConfirm={(id) =>
               handleConfirmDelete(id) / console.log(id)
-            } // Pass the id to handleConfirmDelete
-            id={selectedItemId} // Pass the selectedItemId to DeletePopup
+            } 
+            id={selectedItemId} 
             pageName="Employee"
           />
         </div>

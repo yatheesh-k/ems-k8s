@@ -300,7 +300,7 @@ const AttendanceReport = () => {
                 {showFields && (
                   <div>
                     <h5 className="card-title mt-2">
-                      Attendance Details for {`${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName}`}
+                      Attendance Details for {`${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})`}
                     </h5>
                     <hr />
                     <div>

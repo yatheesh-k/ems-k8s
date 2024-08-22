@@ -36,7 +36,7 @@ const EmployeeRegistration = () => {
   const [companyName, setCompanyName] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-console.log(user.company)
+  console.log(user.company)
   const [passwordShown, setPasswordShown] = useState(false);
   const togglePasswordVisiblity = () => {
     setPasswordShown(!passwordShown);
@@ -184,13 +184,13 @@ console.log(user.company)
     let inputValue = e.target.value;
     let newValue = "";
     let capitalizeNext = true;  // Flag to determine if the next character should be capitalized
-  
+
     // Remove spaces from the beginning of inputValue
     inputValue = inputValue.trimStart();
-  
+
     for (let i = 0; i < inputValue.length; i++) {
       const char = inputValue.charAt(i);
-  
+
       // Check if the current character is a space
       if (char === " ") {
         newValue += char;
@@ -202,82 +202,86 @@ console.log(user.company)
         newValue += char;  // Add character as is if it's not the first one after a space
       }
     }
-  
+
     // Update the input value
     e.target.value = newValue;
   };
-  
-  
-  
 
-let company=user.company
+
+
+
+  let company = user.company
   const onSubmit = async (data) => {
-      // const roles = data.roles ? [data.roles] : []; 
+    // const roles = data.roles ? [data.roles] : []; 
     // Constructing the payload
     let payload = {
-        companyName: company,
-        employeeType: data.employeeType,
-        emailId: data.emailId,
-        password: data.password,
-        designation: data.designation,
-        location: data.location,
-        manager: data.manager,
-        //roles: roles,
-        status: data.status,
-        accountNo: data.accountNo,
-        ifscCode: data.ifscCode,
-        bankName: data.bankName,
-        aadhaarId: data.aadhaarId
+      companyName: company,
+      employeeType: data.employeeType,
+      emailId: data.emailId,
+      password: data.password,
+      designation: data.designation,
+      location: data.location,
+      manager: data.manager,
+      //roles: roles,
+      status: data.status,
+      accountNo: data.accountNo,
+      ifscCode: data.ifscCode,
+      bankName: data.bankName,
+      aadhaarId: data.aadhaarId
     };
     if (location.state && location.state.id) {
       payload = {
-          ...payload,
-          employeeId: data.employeeId,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          dateOfHiring: data.dateOfHiring,
-          department: data.department,
-          panNo: data.panNo,
-          uanNo: data.uanNo,
-          dateOfBirth: data.dateOfBirth
+        ...payload,
+        employeeId: data.employeeId,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        dateOfHiring: data.dateOfHiring,
+        department: data.department,
+        panNo: data.panNo,
+        uanNo: data.uanNo,
+        dateOfBirth: data.dateOfBirth
       };
-  } else {
+    } else {
       // Include these fields for the create request
       payload = {
-          ...payload,
-          employeeId: data.employeeId,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          dateOfHiring: data.dateOfHiring,
-          department: data.department,
-          panNo: data.panNo,
-          aadhaarId: data.aadhaarId,
-          uanNo: data.uanNo,
-          dateOfBirth: data.dateOfBirth
+        ...payload,
+        employeeId: data.employeeId,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        dateOfHiring: data.dateOfHiring,
+        department: data.department,
+        panNo: data.panNo,
+        aadhaarId: data.aadhaarId,
+        uanNo: data.uanNo,
+        dateOfBirth: data.dateOfBirth
       };
-  }
+    }
 
     try {
-        if (location.state && location.state.id) {
-            const response = await EmployeePatchApiById(location.state.id,payload);
-            console.log("Update successful", response.data);
-            toast.success("Employee Updated Successfully");
-        } else {
-            const response = await EmployeePostApi(payload);
-            console.log("Employee created", response.data);
-            toast.success("Employee Created Successfully");
-        }
-        setTimeout(() => {
-            navigate("/employeeView");
-        }, 1000); // Adjust the delay time as needed (in milliseconds)
-        
-        reset();
-    } catch (error) {
-        handleApiErrors(error);
-    }
-}; 
+      if (location.state && location.state.id) {
+        const response = await EmployeePatchApiById(location.state.id, payload);
+        console.log("Update successful", response.data);
+        toast.success("Employee Updated Successfully");
+      } else {
+        const response = await EmployeePostApi(payload);
+        console.log("Employee created", response.data);
+        toast.success("Employee Created Successfully");
+      }
+      setTimeout(() => {
+        navigate("/employeeView");
+      }, 1000); // Adjust the delay time as needed (in milliseconds)
 
-   const handleApiErrors = (error) => {
+      reset();
+    } catch (error) {
+      handleApiErrors(error);
+    }
+  };
+
+  const handleApiErrors = (error) => {
+    if (error.response && error.response.data && error.response.data.message) {
+      const alertMessage = `${error.response.data.message} (Duplicate Values)`;
+      alert(alertMessage);
+    }
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
       const errorMessage = error.response.data.error.message;
       toast.error(errorMessage);
@@ -300,7 +304,7 @@ let company=user.company
           // Check if roles array has any items
           const role = response.data.data.roles[0]; // Assuming roles is an array
           const selectedRole = Roles.find(option => option.value === role);
-                setValue('roles', selectedRole || null); 
+          setValue('roles', selectedRole || null);
         } catch (error) {
           handleApiErrors(error);
         }
@@ -400,7 +404,7 @@ let company=user.company
                     ) : (
                       <div className="col-12 col-md-6 col-lg-5 mb-3">
                         <label className="form-label">
-                           Employee Type <span style={{ color: "red" }}>*</span>
+                          Employee Type <span style={{ color: "red" }}>*</span>
                         </label>
                         <Controller
                           name="employeeType"
@@ -425,22 +429,22 @@ let company=user.company
                     )}
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Employee ID <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">Employee Id <span style={{ color: "red" }}>*</span></label>
                       <input
                         type={isUpdating ? "text" : "text"}
                         readOnly={isUpdating}
                         className="form-control"
-                        placeholder="Enter Employee ID"
+                        placeholder="Enter Employee Id"
                         name="employeeId"
                         minLength={1} maxLength={10}
                         onKeyDown={handleEmailChange}
                         autoComplete='off'
                         {...register("employeeId", {
-                          required: "Employee ID is Required",
+                          required: "Employee Id is Required",
                           pattern: {
                             value: /^(?=.*\d)[A-Z0-9]+$/,
                             message: "Must include at least one number and cannot contain only letters.",
-                          },                          
+                          },
                           minLength: {
                             value: 1,
                             message: "minimum 1 character Required",
@@ -563,7 +567,7 @@ let company=user.company
                       )}
                     </div>
                     <div className="col-lg-1"></div>
-                     {isUpdating ? (
+                    {isUpdating ? (
                       <div className="col-12 col-md-6 col-lg-5 mb-3">
                         <label className="form-label">
                           Department <span style={{ color: "red" }}>*</span>
@@ -588,7 +592,7 @@ let company=user.company
                           </p>
                         )}
                       </div>
-                    ) : ( 
+                    ) : (
                       <div className="col-12 col-md-6 col-lg-5 mb-3">
                         <label className="form-label">
                           Department <span style={{ color: "red" }}>*</span>
@@ -615,7 +619,7 @@ let company=user.company
                           </p>
                         )}
                       </div>
-                     )}
+                    )}
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
                       <label className="form-label">Designation <span style={{ color: "red" }}>*</span></label>
@@ -686,7 +690,7 @@ let company=user.company
                           pattern: {
                             value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*()^\-/]*$/,
                             message: "Invalid Location",
-                          },                          
+                          },
                           minLength: {
                             value: 3,
                             message: "minimum 3 characters Required",
@@ -782,7 +786,7 @@ let company=user.company
                     )}
 
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
-                      <label className="form-label mb-3">Select Status <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label mb-3">Status <span style={{ color: "red" }}>*</span></label>
                       <Controller
                         name="status"
                         control={control}
@@ -833,7 +837,7 @@ let company=user.company
                         )}
                       </div>
                     ) : ( */}
-                      {/* <div className="col-12 col-md-6 col-lg-5 mb-2">
+                    {/* <div className="col-12 col-md-6 col-lg-5 mb-2">
                         <label className="form-label mb-3">Select Role<span style={{ color: "red" }}>*</span></label>
                         <Controller
                           name="roles"
@@ -855,9 +859,15 @@ let company=user.company
                         {errors.roles && <p className="errorMsg">Employee Role is Required</p>}
                       </div> */}
                     {/* )} */}
-                    <div className="col-lg-6"></div>
-                    <hr />
-                    <h4 className="m-2 mb-3">Account Details <span style={{ color: "red" }}>*</span></h4>
+                    <div className="card-header" style={{ paddingLeft: "0px" }}>
+                      <h5 className="card-title ">
+                        Bank Accoount Details
+                      </h5>
+                      <div
+                        className="dropdown-divider"
+                        style={{ borderTopColor: "#d7d9dd" }}
+                      />
+                    </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Bank Account Number <span style={{ color: "red" }}>*</span></label>
                       <input
@@ -869,7 +879,7 @@ let company=user.company
                         onKeyDown={handleEmailChange}
                         autoComplete="off"
                         {...register("accountNo", {
-                          required: "Account Number is Required",
+                          required: "Bank Account Number is Required",
                           pattern: {
                             value: /^\d{9,18}$/,
                             message:
@@ -901,7 +911,7 @@ let company=user.company
                         onKeyDown={handleEmailChange}
                         autoComplete="off"
                         {...register("ifscCode", {
-                          required: "IFSC Code is Required",
+                          required: "Bank IFSC Code is Required",
                           pattern: {
                             value: /^[A-Z]{4}0[A-Z0-9]{6}$/,
                             message:

@@ -127,10 +127,6 @@ const Header = ({ toggleSidebar }) => {
                   aria-labelledby="profileDropdown"
                   style={{ left: "auto", right: "3%" }}
                 >
-                  <a className="dropdown-item"   href onClick={handleResetPasswordClick}>
-                    <i className="align-middle me-1 bi bi-key"></i> Reset Password
-                  </a>
-                  <div className="dropdown-divider"></div>
                   <a className="dropdown-item"   href onClick={handleLogOut}>
                     <i className="align-middle bi bi-arrow-left-circle" style={{ paddingRight: "10px" }}></i>
                     Logout
