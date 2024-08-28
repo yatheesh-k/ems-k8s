@@ -57,9 +57,11 @@ const CompanyView = () => {
               hideProgressBar: true,
               theme: "colored",
               autoClose: 3000,
-            }, 1500);
+            });
           });
-          getUser(); // Refresh the list after deletion
+          setTimeout(() => {
+            getUser(); // Refresh the list after deletion
+        }, 1000);
           handleCloseDeleteModal();
         } else {
           toast.error("Failed to delete company. Please try again.", {

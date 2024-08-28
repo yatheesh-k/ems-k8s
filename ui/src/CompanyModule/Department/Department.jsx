@@ -101,7 +101,7 @@ const Department = () => {
                 fetchDepartments();
                 //getEmployees()
              handleCloseDeleteModal();
-            }, 1000);
+            }, 1500);
           });
       } catch (error) {
         handleApiErrors(error)

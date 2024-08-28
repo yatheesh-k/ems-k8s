@@ -66,12 +66,17 @@ const CompanyRegistration = () => {
       if (location.state && location.state.id) {
         await new Promise(resolve => setTimeout(resolve, 2000));
         await companyUpdateByIdApi(location.state.id, updateData);
-        toast.success("Company Updated Successfully");
-        navigate("/companyView");
+        setTimeout(() => {
+          toast.success("Company Updated Successfully");
+          navigate("/companyView");
+      }, 1000);
       } else {
         await CompanyRegistrationApi(data);
-        toast.success("Company Created Successfully");
-        navigate("/companyView");
+        setTimeout(() => {
+          toast.success("Company Created Successfully");
+          navigate("/companyView");
+      }, 1000);
+       
       }
       reset();
     } catch (error) {
@@ -327,7 +332,7 @@ const CompanyRegistration = () => {
                         {...register("companyName", {
                           required: "Company Name is Required",
                           pattern: {
-                            value: /^[a-zA-Z\s,.'\-\/]*$/,
+                            value: /^[a-zA-Z\s,.'\-/]*$/,
                             message: "Field accepts only alphabets and special characters:( , ' -  . /)",
                           },
                           minLength: {
@@ -418,7 +423,7 @@ const CompanyRegistration = () => {
                             maxLength={10}
                             onKeyDown={handleEmailChange}
                             onInput={toInputSpaceCase }
-                            {...register("landNo", {
+                            {...register("mobileNo", {
                               required: "Contact Number is Required",
                               pattern: {
                                 value: /^[0-9]{10}$/,
@@ -427,8 +432,8 @@ const CompanyRegistration = () => {
                               },
                             })}
                           />
-                          {errors.landNo && (
-                            <p className="errorMsg">{errors.landNo.message}</p>
+                          {errors.mobileNo && (
+                            <p className="errorMsg">{errors.mobileNo.message}</p>
                           )}
                         </div>
                       </>
@@ -489,7 +494,7 @@ const CompanyRegistration = () => {
                             maxLength={10}
                             onInput={toInputSpaceCase }
                             onKeyDown={handleEmailChange}
-                            {...register("landNo", {
+                            {...register("mobileNo", {
                               required: "Contact Number is Required",
                               pattern: {
                                 value: /^[0-9]{10}$/,
@@ -498,8 +503,8 @@ const CompanyRegistration = () => {
                               },
                             })}
                           />
-                          {errors.landNo && (
-                            <p className="errorMsg">{errors.landNo.message}</p>
+                          {errors.mobileNo && (
+                            <p className="errorMsg">{errors.mobileNo.message}</p>
                           )}
                         </div>
 
@@ -518,7 +523,7 @@ const CompanyRegistration = () => {
                         maxLength={10}
                         onInput={toInputSpaceCase }
                         onKeyDown={handleEmailChange}
-                        {...register("mobileNo", {
+                        {...register("landNo", {
                           required: "Alternate Number is Required",
                           pattern: {
                             value: /^[0-9]{10}$/,
@@ -527,8 +532,8 @@ const CompanyRegistration = () => {
                           },
                         })}
                       />
-                      {errors.mobileNo && (
-                        <p className="errorMsg">{errors.mobileNo.message}</p>
+                      {errors.landNo && (
+                        <p className="errorMsg">{errors.landNo.message}</p>
                       )}
                     </div>
                     {editMode && (
@@ -549,7 +554,7 @@ const CompanyRegistration = () => {
                         {...register("companyAddress", {
                           required: "Company Address is Required",
                           pattern: {
-                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*()^\-/]*$/,
+                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*.()^\-/]*$/,
                             message:
                               "Please enter valid Address",
                           },
@@ -842,7 +847,7 @@ const CompanyRegistration = () => {
                             message: "Mimium 3 characters Required",
                           },
                           pattern: {
-                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*()^\-/]*$/,
+                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*.()^\-/]*$/,
                             message: "Please enter valid Address",
                           },
                         })}

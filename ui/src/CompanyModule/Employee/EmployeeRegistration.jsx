@@ -278,10 +278,10 @@ const EmployeeRegistration = () => {
   };
 
   const handleApiErrors = (error) => {
-    if (error.response && error.response.data && error.response.data.message) {
-      const alertMessage = `${error.response.data.message} (Duplicate Values)`;
-      alert(alertMessage);
-    }
+    // if (error.response && error.response.data && error.response.data.message) {
+    //   const alertMessage = `${error.response.data.message} (Duplicate Values)`;
+    //   alert(alertMessage);
+    // }
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
       const errorMessage = error.response.data.error.message;
       toast.error(errorMessage);
@@ -692,7 +692,7 @@ const EmployeeRegistration = () => {
                         {...register("location", {
                           required: "Location is Required",
                           pattern: {
-                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*()^\-/]*$/,
+                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*.()^\-/]*$/,
                             message: "Invalid Location",
                           },
                           minLength: {
