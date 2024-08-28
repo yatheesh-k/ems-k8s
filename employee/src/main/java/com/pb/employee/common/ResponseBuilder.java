@@ -30,7 +30,7 @@ public class ResponseBuilder {
     }
     public<T> ResponseObject<T> failureResponse(T object) {
         return ResponseObject.<T>builder()
-                .path(ServletUriComponentsBuilder.fromCurrentRequest().toUriString()).message("Failed")
+                .path(ServletUriComponentsBuilder.fromCurrentRequest().toUriString()).message("Failed Due To Duplicate Values")
                 .data(object)
                 .build();
     }

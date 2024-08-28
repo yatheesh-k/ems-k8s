@@ -2,6 +2,10 @@ package com.pb.employee.util;
 
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriBuilder;
+
+import java.net.URI;
+import java.util.function.Function;
 
 @Component
 public class Constants {
@@ -46,16 +50,23 @@ public class Constants {
     public static final String YEAR = "year";
     public static final String GENERATE_PAYSLIP = "generatePayslip";
     public static final String EMPLOYEE_WITHOUT_ATTENDANCE = "employeesWithoutAttendance";
-    public static final String DUPLICATE_EMPLOYEE_ID = "duplicateEmployeeId";
-    public static final String DUPLICATE_AADHAAR_ID ="duplicateAadhaarId";
-    public static final String DUPLICATE_PAN_NO = "duplicatePanNo";
-    public static final String DUPLICATE_UAN_NO = "duplicateUanNo";
-    public static final String DUPLICATE_ACCOUNT_NO = "duplicateAccountNo";
-    public static final String DUPLICATE_CIN_NO = "duplicateCinNo";
-    public static final String DUPLICATE_REGISTER_NO = "duplicateRegisterNo";
-    public static final String DUPLICATE_MOBILE_NO = "duplicateMobileNo";
-    public static final String DUPLICATE_LAND_NO = "duplicateLandNo";
-    public static final String DUPLICATE_GST_NO = "duplicateGstNo";
-    public static final String DUPLICATE_PERSONAL_MAIL = "duplicatePersonalMailId";
-    public static final String DUPLICATE_PERSONAL_MOBILE = "duplicatePersonalMobileNo";
+    public static final String DUPLICATE_EMPLOYEE_ID = "EmployeeId";
+    public static final String DUPLICATE_AADHAAR_ID ="AadhaarId";
+    public static final String DUPLICATE_PAN_NO = "PanNo";
+    public static final String DUPLICATE_UAN_NO = "UanNo";
+    public static final String DUPLICATE_ACCOUNT_NO = "AccountNo";
+    public static final String DUPLICATE_CIN_NO = "CinNo";
+    public static final String DUPLICATE_REGISTER_NO = "RegisterNo";
+    public static final String DUPLICATE_MOBILE_NO = "MobileNo";
+    public static final String DUPLICATE_LAND_NO = "LandNo";
+    public static final String DUPLICATE_GST_NO = "GstNo";
+    public static final String DUPLICATE_PERSONAL_MAIL = "PersonalMailId";
+    public static final String DUPLICATE_PERSONAL_MOBILE = "PersonalMobileNo";
+    public static final String KEYWORD = ".keyword";
+    public static final String EMS_ADMIN_LOGIN = "/emsadmin/login";
+    public static final String TOKEN_VALIDATE ="/token/validate" ;
+    public static final String COMPANY_LOGIN = "/company/login";
+    public static final String VALIDATE = "/validate";
+    public static final String FORGOT_PASSWORD ="/forgot/password" ;
+    public static final String UPDATE_PASSWORD ="/update/password" ;
 }

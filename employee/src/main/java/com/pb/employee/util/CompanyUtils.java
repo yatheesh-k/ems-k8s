@@ -214,6 +214,9 @@ public class CompanyUtils {
         if (employeeUpdateRequest.getDesignation() != null){
             user.setDesignation(employeeUpdateRequest.getDesignation());
         }
+        if (employeeUpdateRequest.getDepartment() != null){
+            user.setDepartment(employeeUpdateRequest.getDepartment());
+        }
         if (employeeUpdateRequest.getManager() != null){
             user.setManager(employeeUpdateRequest.getManager());
         }
@@ -370,9 +373,9 @@ public class CompanyUtils {
             double income = TaxCalculatorUtils.getNewTax(Double.parseDouble(salaryRequest.getGrossAmount()));
             double pfTax = TaxCalculatorUtils.getPfTax(Double.parseDouble(salaryRequest.getGrossAmount())/12);
             ttax = String.valueOf(pfTax+income);
-            salary.getDeductions().setTotalTax(ttax);
-            salary.getDeductions().setIncomeTax(String.valueOf(income));
-            salary.getDeductions().setPfTax(String.valueOf(pfTax));
+            salary.getDeductions().setTotalTax(Base64.getEncoder().encodeToString(ttax.getBytes()));
+            salary.getDeductions().setIncomeTax(Base64.getEncoder().encodeToString(String.valueOf(income).getBytes()));
+            salary.getDeductions().setPfTax(Base64.getEncoder().encodeToString(String.valueOf(pfTax).getBytes()));
         }
         if(salaryRequest.getBasicSalary() != null) {
             bas = (Base64.getEncoder().encodeToString(salaryRequest.getBasicSalary().toString().getBytes()));

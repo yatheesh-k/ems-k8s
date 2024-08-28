@@ -14,7 +14,7 @@ import lombok.*;
 public class CompanyUpdateRequest {
 
     @Schema(example = "companyAddress")
-    @Pattern(regexp = "^[\\w\\s'.#&*()^\\-/]*[A-Za-z0-9]+(\\s+[A-Z][a-zA-Z0-9'.#&*()^\\-/]*)*,?\\s*[A-Z]*[a-zA-Z]*\\s*(\\d{6})?$", message = "{companyAddress.pattern.message}")
+    @Pattern(regexp = "^(?:\\d*\\s*)?(?:[A-Z][a-zA-Z]*(?:[\\d*\\s',.#&*()^\\-/]+[A-Z][a-zA-Z]*)*)+(?:[\\s]*\\d*)?\\.?$", message = "{companyAddress.pattern.message}")
     @Size(min = 1, max = 100, message = "{companyAddress.notnull.message}")
     private String companyAddress;
 
@@ -44,7 +44,7 @@ public class CompanyUpdateRequest {
     private String personalMobileNo;
 
     @Schema(example = "address")
-    @Pattern(regexp = "^[\\w\\s'.#&*()^\\-/]*[A-Za-z0-9]+(\\s+[A-Z][a-zA-Z0-9'.#&*()^\\-/]*)*,?\\s*[A-Z]*[a-zA-Z]*\\s*(\\d{6})?$", message = "{companyAddress.pattern.message}")
+    @Pattern(regexp = "^(?:\\d*\\s*)?(?:[A-Z][a-zA-Z]*(?:[\\d*\\s',.#&*()^\\-/]+[A-Z][a-zA-Z]*)*)+(?:[\\s]*\\d*)?\\.?$", message = "{companyAddress.pattern.message}")
     @Size(min = 1, max = 100, message = "{address.notnull.message}")
     private String address;
 

@@ -187,6 +187,13 @@ public class EmployeeServiceImpl implements EmployeeService {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
         DesignationEntity designationEntity = null;
+        DepartmentEntity departmentEntity = null;
+        departmentEntity = openSearchOperations.getDepartmentById(employeeUpdateRequest.getDepartment(), null, index);
+        if (departmentEntity == null){
+            return new ResponseEntity<>(
+                    ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_DEPARTMENT)))),
+                    HttpStatus.CONFLICT);
+        }
         designationEntity = openSearchOperations.getDesignationById(employeeUpdateRequest.getDesignation(), null, index);
         if (designationEntity == null){
             return new ResponseEntity<>(

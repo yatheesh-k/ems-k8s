@@ -14,6 +14,7 @@ import com.pb.employee.persistance.model.Entity;
 import com.pb.employee.util.Constants;
 import com.pb.employee.util.ResourceIdUtils;
 import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.Result;
 import org.opensearch.client.opensearch._types.mapping.KeywordProperty;
 import org.opensearch.client.opensearch._types.mapping.Property;
@@ -220,14 +221,14 @@ public class OpenSearchOperations {
 
         if(designationName != null) {
             boolQueryBuilder = boolQueryBuilder
-                    .filter(q -> q.matchPhrase(t -> t.field(Constants.NAME).query(designationName)));
+                    .filter(q -> q.term(t -> t.field(Constants.NAME + Constants.KEYWORD).value(FieldValue.of(designationName))));
         }
         BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
         SearchResponse<DesignationEntity> searchResponse = null;
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
         try {
             searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
-                    .query(finalBoolQueryBuilder.build().toQuery()), DesignationEntity.class);
+                    .query(finalBoolQueryBuilder.build()._toQuery()), DesignationEntity.class);
         } catch (IOException e) {
             e.getStackTrace();
             logger.error(e.getMessage());
@@ -238,7 +239,7 @@ public class OpenSearchOperations {
         List<DesignationEntity> designationEntities = new ArrayList<>();
         if(hits.size() > 0) {
             for(Hit<DesignationEntity> hit : hits){
-                designationEntities.add(hit.source());
+                    designationEntities.add(hit.source());
             }
         }
         return designationEntities;
@@ -315,11 +316,11 @@ public class OpenSearchOperations {
     public List<DepartmentEntity> getCompanyDepartmentByName(String companyName, String departmentName) throws EmployeeException {
         logger.debug("Getting the Resource by id {} : {}", companyName, departmentName);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
-        boolQueryBuilder = boolQueryBuilder
-                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.DEPARTMENT)));
+        boolQueryBuilder =
+        boolQueryBuilder.filter(q -> q.term(t -> t.field(Constants.TYPE).value(FieldValue.of(Constants.DEPARTMENT))));
         if(departmentName != null) {
             boolQueryBuilder = boolQueryBuilder
-                    .filter(q -> q.matchPhrase(t -> t.field(Constants.NAME).query(departmentName)));
+                    .filter(q -> q.term(t -> t.field(Constants.NAME + Constants.KEYWORD).value(FieldValue.of(departmentName))));
         }
         BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
         SearchResponse<DepartmentEntity> searchResponse = null;
@@ -337,7 +338,7 @@ public class OpenSearchOperations {
         List<DepartmentEntity> departmentEntities = new ArrayList<>();
         if(hits.size() > 0) {
             for(Hit<DepartmentEntity> hit : hits){
-                departmentEntities.add(hit.source());
+                    departmentEntities.add(hit.source());
             }
         }
         return departmentEntities;

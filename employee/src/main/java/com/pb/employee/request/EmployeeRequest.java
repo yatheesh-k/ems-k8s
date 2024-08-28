@@ -80,7 +80,7 @@ public class EmployeeRequest {
     private String department;
 
     @Schema(example = "location")
-    @Pattern(regexp = "^[\\w\\s'.#&*()^\\-/]*[A-Za-z0-9]+(\\s+[A-Z][a-zA-Z0-9'.#&*()^\\-/]*)*,?\\s*[A-Z]*[a-zA-Z]*\\s*(\\d{6})?$", message = "{location.format}")
+    @Pattern(regexp = "^(?:\\d*\\s*)?(?:[A-Z][a-zA-Z]*(?:[\\d*\\s',.#&*()^\\-/]+[A-Z][a-zA-Z]*)*)+(?:[\\s]*\\d*)?\\.?$", message = "{location.format}")
     @Size(min = 2, max = 100, message = "{location.notnull.message}")
     private String location;
 

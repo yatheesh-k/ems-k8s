@@ -36,8 +36,12 @@ public class EmployeeUpdateRequest {
     @Size(min = 2, max = 100, message = "{designation.size.message}")
     private String designation;
 
+    @Schema(example = "departmentId")
+    @Size(min = 2, max = 100, message = "{department.size.message}")
+    private String department;
+
     @Schema(example = "location")
-    @Pattern(regexp = "^[\\w\\s'.#&*()^\\-/]*[A-Za-z0-9]+(\\s+[A-Z][a-zA-Z0-9'.#&*()^\\-/]*)*,?\\s*[A-Z]*[a-zA-Z]*\\s*(\\d{6})?$", message = "{location.format}")
+    @Pattern(regexp = "^(?:\\d*\\s*)?(?:[A-Z][a-zA-Z]*(?:[\\d*\\s',.#&*()^\\-/]+[A-Z][a-zA-Z]*)*)+(?:[\\s]*\\d*)?\\.?$", message = "{location.format}")
     @Size(min = 2, max = 100, message = "{location.notnull.message}")
     private String location;
 

@@ -75,11 +75,15 @@ public class EmployeeUtils {
         if(employeeEntity.getIfscCode() != null) {
             ifscCode = new String((Base64.getDecoder().decode(employeeEntity.getIfscCode().toString().getBytes())));
         }
-        if (employeeEntity.getDepartment() != null){
+        if (entity != null && employeeEntity.getDepartment() != null) {
             employeeEntity.setDepartmentName(entity.getName());
+        }else {
+            employeeEntity.setDepartmentName(null);
         }
-        if (employeeEntity.getDesignation() != null){
+        if (designationEntity != null && employeeEntity.getDesignation() != null) {
             employeeEntity.setDesignationName(designationEntity.getName());
+        }else {
+            employeeEntity.setDesignationName(null);
         }
         employeeEntity.setIfscCode(ifscCode);
         employeeEntity.setAccountNo(accountNo);

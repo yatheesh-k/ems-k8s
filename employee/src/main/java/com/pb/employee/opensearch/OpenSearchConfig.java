@@ -54,6 +54,10 @@ public class OpenSearchConfig {
             restClient, new JacksonJsonpMapper());
     TypeMapping mapping = new TypeMapping.Builder()
             .properties(Constants.RESOURCE_ID, new Property.Builder().keyword(new KeywordProperty.Builder().build()).build())
+            .properties(Constants.SHORT_NAME, new Property.Builder().keyword(new KeywordProperty.Builder().build()).build())
+            .properties(Constants.NAME, new Property.Builder().keyword(new KeywordProperty.Builder().build()).build())
+            .properties(Constants.DESIGNATION, new Property.Builder().keyword(new KeywordProperty.Builder().build()).build())
+            .properties(Constants.DEPARTMENT, new Property.Builder().keyword(new KeywordProperty.Builder().build()).build())
             .build();
     CreateIndexRequest createIndexRequest = new CreateIndexRequest.Builder()
             .index(Constants.INDEX_EMS)
