@@ -2,6 +2,12 @@ server:
   port: 8092
   servlet:
     contextPath: /ems
+  ssl:
+    enabled: true
+    key-store: classpath:certificates/ssl.jks
+    key-store-password: pathbreaker
+    key-alias: pbt
+    key-store-type: JKS
 spring:
   aop:
     proxy-target-class: true
