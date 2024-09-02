@@ -1,32 +1,150 @@
-import React from "react";
-import LayOut from "./LayOut";
-import { useAuth } from "../Context/AuthContext";
-import { userRoles } from "../Utils/Auth";
+import React, { useEffect, useState } from 'react';
+import LayOut from './LayOut';
+import { useAuth } from '../Context/AuthContext';
+import { EmployeeGetApi } from '../Utils/Axios';
+import { toast } from 'react-toastify';
+import { PeopleFill, PersonFillCheck, PersonFillExclamation } from 'react-bootstrap-icons';
 
 const Body = () => {
-  const {user}=useAuth();
+  const { user } = useAuth();
+  const [employees, setEmployees]= useState([]);;
+
+  const isAdmin = user?.userRole?.includes("ems_admin");
+  const isCompanyAdmin = user?.userRole?.includes("company_admin");
+
+  const [data, setData] = useState({
+    totalEmployeesCount: 0,
+    activeEmployeesCount: 0,
+    inactiveEmployeesCount: 0
+  });
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    try {
+      const response = await EmployeeGetApi();
   
-  // Check if userRoles is defined and if 'ems_admin' role is included
-  const isAdmin = user && user.userRole && user.userRole.includes("ems_admin");
+      console.log('Full API Response:', response);
+  
+      if (response && Array.isArray(response)) {
+        const employees = response;
+  
+        console.log('Employees Data:', employees);
+  
+        const filteredData = employees
+          .filter((employee) => employee.firstName && employee.firstName.trim() !== '')
+          .map(({ id, firstName, lastName, employeeId, status }) => ({
+            label: `${firstName} ${lastName} (${employeeId})`,
+            value: id,
+            status: status 
+          }));
+  
+        setEmployees(filteredData);
+
+        const totalEmployeesCount = filteredData.length;
+        const activeEmployeesCount = filteredData.filter(emp => emp.status === 'Active').length;
+        const inactiveEmployeesCount = filteredData.filter(emp => emp.status === 'InActive').length;
+  
+        setData({
+          totalEmployeesCount,
+          activeEmployeesCount,
+          inactiveEmployeesCount
+        });
+      } else {
+        throw new Error('Invalid data format from API');
+      }
+    } catch (error) {
+      handleApiErrors(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
+
+  const handleApiErrors = (error) => {
+    if (error.response?.data?.error?.message) {
+      const errorMessage = error.response.data.error.message;
+      toast.error(errorMessage);
+    } else {
+      // toast.error("Network Error !");
+    }
+    console.error('API Error:', error);
+  };
+
+  useEffect(() => {
+    if (isCompanyAdmin) {
+      fetchData();
+    }
+  }, [isCompanyAdmin]);
 
   return (
     <LayOut>
-      <div className="container-fluid p-0 h-100" style={{height:"100%"}} >
+      <div className="container-fluid p-0 h-100" style={{ height: "100%" }}>
         <h1 className="h3 mb-3">
-          <strong>Dashboard</strong>{" "}
+          <strong>Dashboard</strong>
         </h1>
-       <div className="row h-100 w-90">
-       {isAdmin ? (
-        <iframe src="http://122.175.43.71:5601/s/ems/app/dashboards#/view/deba4a73-baa2-4c62-aa78-089197311bcb?_g=(refreshInterval%3A(pause%3A!t%2Cvalue%3A60000)%2Ctime%3A(from%3Anow-15m%2Cto%3Anow))&hide-filter-bar=true"
-         height="100%" width="100%" 
-        title="EMS Dashboard">
-        </iframe>
-        ) : (
-          <div className="text-center">Loading Dashboards...</div>
-        )}
-      </div>
+        <div className="row h-100">
+          {user && user.userRole && user.userRole.includes("ems_admin") ? (
+            <iframe
+              src="http://122.175.43.71:5601/s/ems/app/dashboards#/view/deba4a73-baa2-4c62-aa78-089197311bcb?_g=(refreshInterval%3A(pause%3A!t%2Cvalue%3A60000)%2Ctime%3A(from%3Anow-15m%2Cto%3Anow))&hide-filter-bar=true"
+              height="100%"
+              width="100%"
+              title="EMS Dashboard"
+              style={{ border: 'none' }}
+            ></iframe>
+          ) : (
+            <>
+              {loading ? (
+                <p>Loading...</p>
+              ) : (
+                <div className="row">
+                  <div className="col-xl-4 col-12 mb-3">
+                    <div className="card mt-3">
+                      <div className="card-body mt-3">
+                        <div className="d-flex align-items-center mb-2">
+                          <PeopleFill color='blue' size={30} className="me-3" />
+                          <div>
+                            <h5 className="card-title">Total Employees</h5>
+                            <h1 className="mt-1">{data.totalEmployeesCount}</h1>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-xl-4 col-12 mb-3">
+                    <div className="card mt-3">
+                      <div className="card-body mt-3">
+                        <div className="d-flex align-items-center mb-2">
+                          <PersonFillCheck color='green' size={30} className="me-3" />
+                          <div>
+                            <h5 className="card-title">Active Employees</h5>
+                            <h1 className="mt-1">{data.activeEmployeesCount}</h1>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-xl-4 col-12 mb-3">
+                    <div className="card mt-3">
+                      <div className="card-body mt-3">
+                        <div className="d-flex align-items-center mb-2">
+                          <PersonFillExclamation color='red' size={30} className="me-3" />
+                          <div>
+                            <h5 className="card-title">InActive Employees</h5>
+                            <h1 className="mt-1">{data.inactiveEmployeesCount}</h1>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </LayOut>
   );
 };
+
 export default Body;

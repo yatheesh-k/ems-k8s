@@ -10,14 +10,13 @@ import { useAuth } from "../Context/AuthContext";
 
 function Profile() {
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm({ mode: "onChange" });
-  const { user } = useAuth();
   const [companyData, setCompanyData] = useState({});
   const [postImage, setPostImage] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [error, setError] = useState(null);
-  const [passwordShown, setPasswordShown] = useState(false);
+  const { user = {}, logoFileName, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,7 +50,7 @@ function Profile() {
 
   const handleDetailsSubmit = async (data) => {
     if (!user.companyId) return;
-  
+
     const updateData = {
       companyAddress: data.companyAddress,
       mobileNo: data.mobileNo,
@@ -61,38 +60,38 @@ function Profile() {
       personalMobileNo: data.personalMobileNo,
       address: data.address
     };
-  
+
     try {
       // Attempt to update company details
       await companyUpdateByIdApi(user.companyId, updateData);
-  
+
       // Clear any previous error message
       setErrorMessage("");
       setError(null);
-  
+
       // If the update is successful, show success message
       setSuccessMessage("Profile Updated Successfully.");
       toast.success("Company Details Updated Successfully");
-  
+
       // Redirect to main page
       navigate("/main");
     } catch (err) {
       // Log the error to the console
       console.error("Details update error:", err);
-  
+
       // Clear any previous success message
       setSuccessMessage("");
-  
+
       // Set the error message and display error notification
       setErrorMessage("Failed To Update Profile Details.");
       setError(err);
-  
+
       // Show error notification
       toast.error("Failed To Update Company Details");
     }
   };
-  
-  
+
+
 
   const handleLogoSubmit = async () => {
     if (!user.companyId) return;
@@ -140,7 +139,6 @@ function Profile() {
 
   const handleCloseUploadImageModal = () => {
     setPostImage(null);
-    reset();
     setShowModal(false);
     setErrorMessage("");
   };
@@ -268,6 +266,16 @@ function Profile() {
                         <CameraFill />
                       </div>
                     </div>
+                    </div>
+                    <div className="col-12 col-md-6 mb-3">
+                    {logoFileName && (
+                      <img
+                        className="align-middle"
+                        src={`CompanyLogos/${logoFileName}`}
+                        alt="Company Logo"
+                        style={{ height: "80px", width: "180px" }}
+                      />
+                    )}
                   </div>
                 </div>
               </div>
@@ -604,22 +612,20 @@ function Profile() {
             </div>
           </div>
         </form>
-
         {/* Modal for Logo Upload */}
-        {/* Modal for Logo Upload */}
-        < Modal show={showModal} onHide={closeModal} style={{ zIndex: "1050" }
+        < Modal show={showModal} onHide={handleCloseUploadImageModal} style={{ zIndex: "1050" }
         } centered >
           <ModalHeader closeButton>
             <ModalTitle>Upload Logo</ModalTitle>
           </ModalHeader>
           <ModalBody>
-          <input
+            <input
               type="file"
               className="form-control"
               onChange={onChangePicture}
             />
             {errorMessage && (
-              <p className="text-danger" style={{marginLeft:"2%"}}>{errorMessage}</p>
+              <p className="text-danger" style={{ marginLeft: "2%" }}>{errorMessage}</p>
             )}
           </ModalBody>
           <ModalFooter>

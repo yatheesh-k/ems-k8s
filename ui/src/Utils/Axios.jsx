@@ -273,11 +273,10 @@ export const EmployeePayslipGetById = (employeeId, payslipId, month, year) => {
 };
 
 
-export const EmployeePayslipsGet = (employeeId, month, year) => {
+export const EmployeePayslipsGet = (employeeId, year) => {
   const company = localStorage.getItem("company")
   return axiosInstance.get(`/${company}/employee/${employeeId}/payslips`, {
     params: {
-       month: month,
       year: year
     }
   });
@@ -294,9 +293,9 @@ export const AttendanceManagementApi = (formData) => {
 }
 
 export const AttendanceReportApi = (employeeId, month, year) => {
-  const company = localStorage.getItem("company")
-  return axiosInstance.get(`/${company}/employee/${employeeId}/attendance`, {
-    params: { month, year }
+  const companyName = localStorage.getItem("companyName")
+  return axiosInstance.get(`/${companyName}/attendance`, {
+    params: {employeeId, month, year}
   });
 }
 
