@@ -1,5 +1,6 @@
 package com.pb.employee.serviceImpl;
 
+import com.itextpdf.text.DocumentException;
 import com.pb.employee.common.ResponseBuilder;
 import com.pb.employee.exception.EmployeeErrorMessageKey;
 import com.pb.employee.exception.EmployeeException;
@@ -12,10 +13,13 @@ import com.pb.employee.service.PayslipService;
 import com.pb.employee.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -275,6 +279,293 @@ public class PayslipServiceImpl implements PayslipService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.DELETED), HttpStatus.OK);
 
+    }
+
+    public ResponseEntity<byte[]> downloadPayslip(String companyName, String payslipId, String employeeId) {
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+        EmployeeEntity employee = null;
+        PayslipEntity entity = null;
+        DepartmentEntity department = null;
+        DesignationEntity designation = null;
+        CompanyEntity company = null;
+        try {
+
+            employee = openSearchOperations.getEmployeeById(employeeId, null, index);
+            if (employee == null){
+                log.error("Employee with this {}, is not found", employeeId);
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            department = openSearchOperations.getDepartmentById(employee.getDepartment(), null, index);
+            designation = openSearchOperations.getDesignationById(employee.getDesignation(), null, index);
+            company = openSearchOperations.getCompanyById(employee.getCompanyId(), null, Constants.INDEX_EMS);
+            if (company==null) {
+                log.error("company are not {} found", employee.getCompanyId());
+                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.COMPANY_ALREADY_EXISTS), companyName),
+                        HttpStatus.CONFLICT);
+            }
+            entity=openSearchOperations.getPayslipById(payslipId, null, index);
+            PayslipUtils.unmaskEmployeePayslip(entity);
+            Entity companyEntity = CompanyUtils.unmaskCompanyProperties(company);
+            Entity employeeEntity = EmployeeUtils.unmaskEmployeeProperties(employee, department, designation);
+            String htmlContent = generatePayslipHtml(entity, (EmployeeEntity) employeeEntity, company);
+
+            // Convert HTML to PDF
+            byte[] pdfBytes = generatePdfFromHtml(htmlContent);
+
+            // Set HTTP headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "payslip_" + payslipId + ".pdf");
+
+            // Return response
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+
+        } catch (IOException e) {
+            // Handle the error
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (EmployeeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public byte[] generatePdfFromHtml(String html) throws IOException {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            // Create a PDF renderer
+            ITextRenderer renderer = new ITextRenderer();
+
+            // Set the HTML content
+            renderer.setDocumentFromString(html);
+
+            // Layout and create the PDF
+            renderer.layout();
+            renderer.createPDF(baos);
+
+            // Return the PDF bytes
+            return baos.toByteArray();
+        } catch (DocumentException e) {
+            // Handle iText-specific exceptions
+            throw new IOException(e.getMessage());
+        }
+    }
+    private String generatePayslipHtml(PayslipEntity payslipEntity, EmployeeEntity employee, CompanyEntity company) {
+        StringBuilder htmlBuilder = new StringBuilder();
+
+        htmlBuilder.append("<!DOCTYPE html>");
+        htmlBuilder.append("<html lang=\"en\">");
+        htmlBuilder.append("<head>");
+        htmlBuilder.append("<meta charset=\"UTF-8\"/>");
+        htmlBuilder.append("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>");
+        htmlBuilder.append("<title>Pay Slip</title>");
+
+        htmlBuilder.append("<style>");
+        htmlBuilder.append("@page {");
+        htmlBuilder.append("  size: A4;");
+        htmlBuilder.append("  margin: 6mm;");
+        htmlBuilder.append("}");
+        htmlBuilder.append("body {");
+        htmlBuilder.append("  margin: 0;");
+        htmlBuilder.append("  padding: 0;");
+        htmlBuilder.append("}");
+        htmlBuilder.append(".main {");
+        htmlBuilder.append("  width: 100%;");
+        htmlBuilder.append("  box-sizing: border-box;");
+        htmlBuilder.append("}");
+        htmlBuilder.append(".pdfPage {");
+        htmlBuilder.append("  width: 100%;");
+        htmlBuilder.append("  margin: 0 auto;");
+        htmlBuilder.append("  box-sizing: border-box;");
+        htmlBuilder.append("}");
+        htmlBuilder.append(".top { display: flex;flex-wrap: wrap; justify-content: space-around; margin-bottom: 20px; }");
+        htmlBuilder.append(".date-info { text-align: left; flex: 1; }");
+        htmlBuilder.append(".logo { text-align: end; flex-shrink: 0;margin-bottom:20px; margin-top:0px;margin-left:350px}");
+        htmlBuilder.append(".logo img {max-width: 120px; height: 80px; display: flex; }");
+        htmlBuilder.append(".details {");
+        htmlBuilder.append("  width: 100%;");
+        htmlBuilder.append("  margin-bottom: 20px;");
+        htmlBuilder.append("  border-collapse: collapse;");
+        htmlBuilder.append("}");
+        htmlBuilder.append(".details table {");
+        htmlBuilder.append("  width: 100%;");
+        htmlBuilder.append("  border-collapse: collapse;");
+        htmlBuilder.append("}");
+        htmlBuilder.append(".details th, .details td {");
+        htmlBuilder.append("  border: 0.5px solid black;");
+        htmlBuilder.append("  padding: 4px;");
+        htmlBuilder.append("  text-align: left;");
+        htmlBuilder.append("}");
+        htmlBuilder.append(".employee-details {");
+        htmlBuilder.append("  text-align: center;");
+        htmlBuilder.append("}");
+        htmlBuilder.append(".text {");
+        htmlBuilder.append("  margin: 20px 0;");
+        htmlBuilder.append("}");
+        htmlBuilder.append(".address {");
+        htmlBuilder.append("  margin-top: 220px;");
+        htmlBuilder.append("  text-align: center;");
+        htmlBuilder.append("}");
+        htmlBuilder.append("</style>");
+
+        htmlBuilder.append("</head>");
+        htmlBuilder.append("<body>");
+        htmlBuilder.append("<div class=\"main\">");
+        htmlBuilder.append("<div class=\"pdfPage\">");
+
+        htmlBuilder.append("<table>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<td>");
+        htmlBuilder.append("<div class=\"date-info\">");
+        htmlBuilder.append("<h4 id=\"month-year\">").append(payslipEntity.getMonth()+" / "+payslipEntity.getYear()).append("</h4>");
+        htmlBuilder.append("<h4 id=\"employee-name\">").append(employee.getFirstName()+" "+employee.getLastName()).append("</h4>");
+        htmlBuilder.append("</div>");
+        htmlBuilder.append("</td>");
+        htmlBuilder.append("<td>");
+        htmlBuilder.append("<div class=\"logo\">");
+        htmlBuilder.append("<img src=\"https://pathbreakertech.com/images/pathbreakertech-logo.png\"/>");
+        htmlBuilder.append("</div>");
+        htmlBuilder.append("</td>");
+        htmlBuilder.append("</tr>");
+        htmlBuilder.append("</table>");
+
+        htmlBuilder.append("<div class=\"details\">");
+        htmlBuilder.append("<table>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<th colspan=\"4\" class=\"employee-details\">Employee Details</th>");
+        htmlBuilder.append("</tr>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<th>EmployeeId</th>");
+        htmlBuilder.append("<td>").append(employee.getEmployeeId()).append("</td>");
+        htmlBuilder.append("<th>Joining Date</th>");
+        htmlBuilder.append("<td>").append(employee.getDateOfHiring()).append("</td>");
+        htmlBuilder.append("</tr>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<th>Date Of Birth</th>");
+        htmlBuilder.append("<td>").append(employee.getDateOfBirth()).append("</td>");
+        htmlBuilder.append("<th>PAN</th>");
+        htmlBuilder.append("<td>").append(employee.getPanNo()).append("</td>");
+        htmlBuilder.append("</tr>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<th>Department</th>");
+        htmlBuilder.append("<td>").append(employee.getDepartmentName()).append("</td>");
+        htmlBuilder.append("<th>UAN</th>");
+        htmlBuilder.append("<td>").append(employee.getUanNo()).append("</td>");
+        htmlBuilder.append("</tr>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<th>Designation</th>");
+        htmlBuilder.append("<td>").append(employee.getDesignationName()).append("</td>");
+        htmlBuilder.append("<th>Location</th>");
+        htmlBuilder.append("<td>").append(employee.getLocation()).append("</td>");
+        htmlBuilder.append("</tr>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<td colspan=\"4\" class=\"employee-details\">Bank ACC No: ").append(employee.getAccountNo()).append(" ;IFSC: ").append(employee.getIfscCode()).append(" ;Bank: ").append(employee.getBankName()).append("</td>");
+        htmlBuilder.append("</tr>");
+        htmlBuilder.append("</table>");
+        htmlBuilder.append("</div>");
+
+        htmlBuilder.append("<div class=\"details\">");
+        htmlBuilder.append("<table>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<th>Total Working Days</th>");
+        htmlBuilder.append("<td>").append(payslipEntity.getAttendance().getTotalWorkingDays()).append("</td>");
+        htmlBuilder.append("<th>No.Of Working Days</th>");
+        htmlBuilder.append("<td>").append(payslipEntity.getAttendance().getNoOfWorkingDays()).append("</td>");
+        htmlBuilder.append("<th>No.Of Leaves</th>");
+        try {
+            int totalWorkingDays = Integer.parseInt(payslipEntity.getAttendance().getTotalWorkingDays());
+            int noOfWorkingDays = Integer.parseInt(payslipEntity.getAttendance().getNoOfWorkingDays());
+            int workingDays = totalWorkingDays - noOfWorkingDays;
+
+            htmlBuilder.append("<td>").append(workingDays).append("</td>");
+        } catch (NumberFormatException e) {
+            log.error("Error parsing working days values: ", e);
+            htmlBuilder.append("<td>N/A</td>"); // Default value or error indication
+        }        htmlBuilder.append("</tr>");
+        htmlBuilder.append("</table>");
+        htmlBuilder.append("</div>");
+
+        htmlBuilder.append("<div class=\"details\">");
+        htmlBuilder.append("<table>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<th class=\"earnings\">Earnings (A)</th>");
+        htmlBuilder.append("<th class=\"earnings\">Amount</th>");
+        htmlBuilder.append("<th class=\"deductions\">Deductions (B)</th>");
+        htmlBuilder.append("<th class=\"deductions\">Amount</th>");
+        htmlBuilder.append("</tr>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<th>Basic Salary</th>");
+        htmlBuilder.append("<td>").append(payslipEntity.getSalary().getBasicSalary()).append("</td>");
+        htmlBuilder.append("<th>PF Employee</th>");
+        htmlBuilder.append("<td>").append(payslipEntity.getSalary().getDeductions().getPfEmployee()).append("</td>");
+        htmlBuilder.append("</tr>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<th>HRA</th>");
+        htmlBuilder.append("<td>").append(payslipEntity.getSalary().getAllowances().getHra()).append("</td>");
+        htmlBuilder.append("<th>PF Employer</th>");
+        htmlBuilder.append("<td>").append(payslipEntity.getSalary().getDeductions().getPfEmployer()).append("</td>");
+        htmlBuilder.append("</tr>");
+        htmlBuilder.append("<tr>");
+
+        htmlBuilder.append("<th>Travel Allowance</th>");
+        htmlBuilder.append("<td>").append(payslipEntity.getSalary().getAllowances().getTravelAllowance()).append("</td>");
+        htmlBuilder.append("<th>LOP</th>");
+        htmlBuilder.append("<td>").append(payslipEntity.getSalary().getDeductions().getLop()).append("</td>");
+        htmlBuilder.append("</tr>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<th>PF Contribution Employee</th>");
+        htmlBuilder.append("<td>").append(payslipEntity.getSalary().getAllowances().getPfContributionEmployee()).append("</td>");
+        htmlBuilder.append("<th>Total Deductions (B)</th>");
+        htmlBuilder.append("<td>").append(payslipEntity.getSalary().getDeductions().getTotalDeductions()).append("</td>");
+        htmlBuilder.append("</tr>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<th>Special Allowance</th>");
+        htmlBuilder.append("<td>").append(payslipEntity.getSalary().getAllowances().getSpecialAllowance()).append("</td>");
+        htmlBuilder.append("<td colspan=\"2\"><strong>Tax Deductions (C)</strong></td>");
+        htmlBuilder.append("</tr>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<th>Other Allowances</th>");
+        htmlBuilder.append("<td>").append(payslipEntity.getSalary().getAllowances().getOtherAllowances()).append("</td>");
+        htmlBuilder.append("<th>Professional Tax</th>");
+        htmlBuilder.append("<td>").append(payslipEntity.getSalary().getDeductions().getPfTax()).append("</td>");
+        htmlBuilder.append("</tr>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<th>Total Earnings (A)</th>");
+        htmlBuilder.append("<td>").append(payslipEntity.getSalary().getTotalEarnings()).append("</td>");
+        htmlBuilder.append("<th>Income Tax</th>");
+        htmlBuilder.append("<td>").append(payslipEntity.getSalary().getDeductions().getIncomeTax()).append("</td>");
+        htmlBuilder.append("</tr>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<th></th>");
+        htmlBuilder.append("<td></td>");
+        htmlBuilder.append("<th><strong>Total Tax (C)</strong></th>");
+        htmlBuilder.append("<td>").append(payslipEntity.getSalary().getDeductions().getTotalTax()).append("</td>");
+        htmlBuilder.append("</tr>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<th></th>");
+        htmlBuilder.append("<td></td>");
+        htmlBuilder.append("<td><strong>Net Pay (A-B-C)</strong></td>");
+        htmlBuilder.append("<td>").append(payslipEntity.getSalary().getNetSalary()).append("</td>");
+        htmlBuilder.append("</tr>");
+        htmlBuilder.append("<tr>");
+        htmlBuilder.append("<th>Net Salary (In Words)</th>");
+        htmlBuilder.append("<td colspan=\"3\">").append(payslipEntity.getInWords()).append("</td>");
+        htmlBuilder.append("</tr>");
+
+        htmlBuilder.append("</table>");
+        htmlBuilder.append("</div>");
+
+        htmlBuilder.append("<div class=\"text\">");
+        htmlBuilder.append("<p><small>This is computer-generated payslip and does not require authentication</small></p>");
+        htmlBuilder.append("</div>");
+        htmlBuilder.append("<div class=\"address\">");
+        htmlBuilder.append("<hr />");
+        htmlBuilder.append("<p>Company Address: ").append(company.getCompanyAddress()).append("</p>");
+        htmlBuilder.append("</div>");
+
+        htmlBuilder.append("</div>");
+        htmlBuilder.append("</div>");
+        htmlBuilder.append("</body>");
+        htmlBuilder.append("</html>");
+
+        return htmlBuilder.toString();
     }
 
 }

@@ -18,4 +18,5 @@ public interface PayslipService {
 
     ResponseEntity<?> deleteEmployeePayslipById(String companyName, String employeeId,String payslipId) throws EmployeeException;
 
+    ResponseEntity<byte[]> downloadPayslip(String companyName, String payslipId, String employeeId);
 }

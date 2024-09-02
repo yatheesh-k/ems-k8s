@@ -97,8 +97,10 @@ dependencyManagement {
     }
 }
 */
-
-
+dependencies {
+    implementation 'org.xhtmlrenderer:flying-saucer-core:9.1.16'
+    implementation 'org.xhtmlrenderer:flying-saucer-pdf-itext5:9.1.16'
+}
 test {
     useJUnitPlatform()
 }
