@@ -38,4 +38,4 @@ springdoc:
     path: /api-docs
 file:
   upload:
-    path: '/opt/ems/ui/public/CompanyLogos/'
+    path: 'D:/ems/ui/public/assets/img/'

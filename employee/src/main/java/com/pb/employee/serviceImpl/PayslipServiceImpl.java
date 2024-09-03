@@ -13,18 +13,14 @@ import com.pb.employee.service.PayslipService;
 import com.pb.employee.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -281,6 +277,7 @@ public class PayslipServiceImpl implements PayslipService {
 
     }
 
+
     public ResponseEntity<byte[]> downloadPayslip(String companyName, String payslipId, String employeeId) {
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
         EmployeeEntity employee = null;
@@ -289,7 +286,7 @@ public class PayslipServiceImpl implements PayslipService {
         DesignationEntity designation = null;
         CompanyEntity company = null;
         try {
-
+           SSLUtil.disableSSLVerification();
             employee = openSearchOperations.getEmployeeById(employeeId, null, index);
             if (employee == null){
                 log.error("Employee with this {}, is not found", employeeId);
@@ -315,8 +312,10 @@ public class PayslipServiceImpl implements PayslipService {
 
             // Set HTTP headers
             HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(org.springframework.http.MediaType.APPLICATION_PDF);
-            headers.setContentDispositionFormData("attachment", "payslip_" + payslipId + ".pdf");
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition.builder("attachment")
+                    .filename("payslip_" + employee.getFirstName() + ".pdf")
+                    .build());
 
             // Return response
             return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
@@ -325,6 +324,8 @@ public class PayslipServiceImpl implements PayslipService {
             // Handle the error
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (EmployeeException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -349,6 +350,8 @@ public class PayslipServiceImpl implements PayslipService {
     }
     private String generatePayslipHtml(PayslipEntity payslipEntity, EmployeeEntity employee, CompanyEntity company) {
         StringBuilder htmlBuilder = new StringBuilder();
+
+        String image ="https://localhost:8092/ems/ui/public/assets/img/"+company.getImageFile();
 
         htmlBuilder.append("<!DOCTYPE html>");
         htmlBuilder.append("<html lang=\"en\">");
@@ -377,7 +380,7 @@ public class PayslipServiceImpl implements PayslipService {
         htmlBuilder.append("}");
         htmlBuilder.append(".top { display: flex;flex-wrap: wrap; justify-content: space-around; margin-bottom: 20px; }");
         htmlBuilder.append(".date-info { text-align: left; flex: 1; }");
-        htmlBuilder.append(".logo { text-align: end; flex-shrink: 0;margin-bottom:20px; margin-top:0px;margin-left:350px}");
+        htmlBuilder.append(".logo { text-align: end; flex-shrink: 0;margin-bottom:20px; margin-top:0px;margin-left:450px}");
         htmlBuilder.append(".logo img {max-width: 120px; height: 80px; display: flex; }");
         htmlBuilder.append(".details {");
         htmlBuilder.append("  width: 100%;");
@@ -420,7 +423,7 @@ public class PayslipServiceImpl implements PayslipService {
         htmlBuilder.append("</td>");
         htmlBuilder.append("<td>");
         htmlBuilder.append("<div class=\"logo\">");
-        htmlBuilder.append("<img src=\"https://pathbreakertech.com/images/pathbreakertech-logo.png\"/>");
+        htmlBuilder.append("<img src=\"").append(image).append("\"/>");
         htmlBuilder.append("</div>");
         htmlBuilder.append("</td>");
         htmlBuilder.append("</tr>");

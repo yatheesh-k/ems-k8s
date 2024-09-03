@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { CompanyImageGetApi, companyViewByIdApi, EmployeeGetApiById, EmployeePayslipGetById } from "../Utils/Axios"; // Ensure these functions are correctly defined in your Utils/Axios file
+import { CompanyImageGetApi, companyViewByIdApi, EmployeeGetApiById, EmployeePaySlipDownloadById, EmployeePayslipGetById } from "../Utils/Axios"; // Ensure these functions are correctly defined in your Utils/Axios file
 import { toast } from "react-toastify";
 import LayOut from "../LayOut/LayOut";
 import { userId } from "../Utils/Auth";
+import { Download } from "react-bootstrap-icons";
+import { useAuth } from "../Context/AuthContext";
+import axios from "axios";
 
 const PayslipDoc = () => {
   const [companyData, setCompanyData] = useState([]);
@@ -14,6 +17,7 @@ const PayslipDoc = () => {
   const { employeeDetails } = location.state || {};
   const [payslipData, setPayslipData] = useState(null);
   const [logoFileName, setLogoFileName] = useState([]);
+  const {user}=useAuth()
 
 
   const fetchCompanyLogo = async (companyId) => {
@@ -58,7 +62,6 @@ const PayslipDoc = () => {
         // handleApiErrors(error);
       }
     };
-
     fetchData();
   }, [userId]);
 
@@ -78,7 +81,67 @@ const PayslipDoc = () => {
       fetchPayslipData();
     }
   }, [employeeId, payslipId]);
+  
+  
+  const handleDownload = async () => {
+    if (employeeId && payslipId) {
+      try {
+        await EmployeePaySlipDownloadById(employeeId, payslipId);
+      } catch (error) {
+        console.error('Error downloading payslip:', error);
+      }
+    } else {
+      console.error('Employee ID or Payslip ID is missing');
+    }
+  };
 
+  // const downloadPayslip = async (employeeId, payslipId) => {
+  //   try {
+  //     // Call the API to get the payslip data
+  //     const response = await EmployeePaySlipDownloadById(employeeId, payslipId, {
+  //       responseType: 'blob',
+  //     });
+      
+  //     console.log('Response:', response); // Log response details
+  
+  //     // Check if the response is valid
+  //     if (!response.data || response.data.size === 0) {
+  //       throw new Error('Received empty response data');
+  //     }
+  
+  //     // Check the content type to ensure it's a PDF
+  //     const contentType = response.headers['content-type'];
+  //     if (contentType !== 'application/pdf') {
+  //       throw new Error(`Unexpected content type: ${contentType}`);
+  //     }
+  
+  //     // Create a Blob from the response data
+  //     const blob = new Blob([response.data], { type: 'application/pdf' });
+  //     const url = window.URL.createObjectURL(blob);
+  
+  //     // Display the PDF (optional)
+  //     displayPDF(url);
+  
+  //     // Create a link element for downloading
+  //     const link = document.createElement('a');
+  //     link.href = url;
+  //     link.setAttribute('download', `payslip_${payslipId}.pdf`);
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     link.remove();
+  
+  //     // Clean up the URL object
+  //     window.URL.revokeObjectURL(url);
+  
+  //   } catch (error) {
+  //     console.error('Error downloading payslip:', error);
+  //     alert('Failed to download payslip. Please try again later.');
+  //   }
+  // };
+  
+  
+  
+  
   if (!payslipData) {
     return <div>Loading...</div>;
   }
@@ -146,7 +209,7 @@ const PayslipDoc = () => {
                 {logoFileName ? (
                   <img
                     className="align-middle"
-                    src={`CompanyLogos/${logoFileName}`} // Dynamic source based on logoFileName
+                    src={`assets/img/${logoFileName}`} // Dynamic source based on logoFileName
                     alt="Logo"
                     style={{ height: "80px", width: "180px" }}
                   />
@@ -176,8 +239,7 @@ const PayslipDoc = () => {
                         style={{
                           padding: "4px",
                           width: "150px",
-                          textAlign: "left",
-                          backgroundColor: "rgb(230, 230, 230)",
+                          textAlign: "left"
                         }}
                       >
                         Employee ID
@@ -189,8 +251,7 @@ const PayslipDoc = () => {
                         style={{
                           padding: "4px",
                           width: "150px",
-                          textAlign: "left",
-                          backgroundColor: "rgb(230, 230, 230)",
+                          textAlign: "left"
                         }}
                       >
                         Date of Hiring
@@ -205,7 +266,6 @@ const PayslipDoc = () => {
                           padding: "4px",
                           width: "150px",
                           textAlign: "left",
-                          backgroundColor: "rgb(230, 230, 230)",
                         }}
                       >
                         Department
@@ -218,7 +278,6 @@ const PayslipDoc = () => {
                           padding: "4px",
                           width: "150px",
                           textAlign: "left",
-                          backgroundColor: "rgb(230, 230, 230)",
                         }}
                       >
                         Designation
@@ -233,7 +292,6 @@ const PayslipDoc = () => {
                           padding: "4px",
                           width: "150px",
                           textAlign: "left",
-                          backgroundColor: "rgb(230, 230, 230)",
                         }}
                       >
                         Bank Name
@@ -246,13 +304,12 @@ const PayslipDoc = () => {
                           padding: "4px",
                           width: "150px",
                           textAlign: "left",
-                          backgroundColor: "rgb(230, 230, 230)",
                         }}
                       >
                         Account Number
                       </th>
                       <td style={{ padding: "4px", textAlign: "left" }}>
-                        {employeeDetails.accountNo}
+                      {maskPanNumber(employeeDetails.accountNo)}
                       </td>
                     </tr>
                     <tr>
@@ -261,20 +318,18 @@ const PayslipDoc = () => {
                           padding: "4px",
                           width: "150px",
                           textAlign: "left",
-                          backgroundColor: "rgb(230, 230, 230)",
                         }}
                       >
                         UAN Number
                       </th>
                       <td style={{ padding: "4px", textAlign: "left" }}>
-                        {employeeDetails.uanNo}
+                        {maskPanNumber(employeeDetails.uanNo)}
                       </td>
                       <th
                         style={{
                           padding: "4px",
                           width: "150px",
                           textAlign: "left",
-                          backgroundColor: "rgb(230, 230, 230)",
                         }}
                       >
                         PAN Number
@@ -305,7 +360,6 @@ const PayslipDoc = () => {
                           padding: "4px",
                           width: "180px",
                           textAlign: "left",
-                          backgroundColor: "rgb(230, 230, 230)",
                         }}
                       >
                         Total Working Days
@@ -317,7 +371,6 @@ const PayslipDoc = () => {
                           padding: "4px",
                           width: "180px",
                           textAlign: "left",
-                          backgroundColor: "rgb(230, 230, 230)",
                         }}
                       >
                         Working Days
@@ -329,7 +382,6 @@ const PayslipDoc = () => {
                           padding: "4px",
                           width: "180px",
                           textAlign: "left",
-                          backgroundColor: "rgb(230, 230, 230)",
                         }}
                       >
                         Total Leaves
@@ -340,21 +392,14 @@ const PayslipDoc = () => {
                   </tbody>
                 </table>
               </div>
-
-              <div
-                className="line"
-                style={{ marginLeft: "22px", marginRight: "22px" }}
-              >
-                <hr />
-              </div>
               <div className="salary-details" style={{ display: "flex", padding: "20px", paddingTop: "10px", paddingBottom: "10px" }}>
                 <table style={{ borderCollapse: "collapse", border: "1px solid black", width: "100%" }}>
                   <thead>
                     <tr>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "center", backgroundColor: "rgb(230, 230, 230)" }}>Earnings (A)</th>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "center", backgroundColor: "rgb(230, 230, 230)" }}>Amount</th>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "center", backgroundColor: "rgb(230, 230, 230)" }}>Deductions (B)</th>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "center", backgroundColor: "rgb(230, 230, 230)" }}>Amount</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "center" }}>Earnings (A)</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "center" }}>Amount</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "center" }}>Deductions (B)</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "center" }}>Amount</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -385,8 +430,8 @@ const PayslipDoc = () => {
                     <tr>
                       <td className="earnings" style={{ padding: "4px", textAlign: "center" }}>Other Allowance</td>
                       <td className="earnings">{payslipData.salary.allowances.otherAllowances || 0}</td>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "center", backgroundColor: "rgb(230, 230, 230)" }}>Taxes (C)</th>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "center", backgroundColor: "rgb(230, 230, 230)" }}>Amount</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "center" }}>Taxes (C)</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "center" }}>Amount</th>
                     </tr>
                     <tr>
                       <td className="earnings" style={{ padding: "4px", textAlign: "center" }}>PF Contribution Employee</td>
@@ -406,83 +451,22 @@ const PayslipDoc = () => {
                       <td className="taxes" style={{ padding: "4px", textAlign: "center" }}>Total Tax (C)</td>
                       <td className="taxes">{payslipData.salary.deductions.totalTax || 0}</td>
                     </tr>
+                    <tr>
+                      <td className="earnings" style={{ padding: "4px", textAlign: "center" }}></td>
+                      <td className="earnings"></td>
+                      <td className="taxes" style={{ padding: "4px", textAlign: "center" }}> Net Salary (A-B-C){" "}</td>
+                      <td className="taxes">{payslipData.salary.netSalary}</td>
+                    </tr>
+                    <tr>
+                      <td className="earnings" colSpan={1} style={{ padding: "4px", textAlign: "center" }}> Net Pay (in words):</td>
+                      <td className="earnings" colSpan={3}><b>{payslipData.inWords || ""}</b></td>
+                     
+                    </tr>
                     {/* Include other earnings, taxes, and deductions as needed */}
                   </tbody>
                 </table>
               </div>
-              <div
-                className="line"
-                style={{ marginLeft: "22px", marginRight: "22px" }}
-              >
-                <hr />
-              </div>
-              <div
-                className="details"
-                style={{
-                  display: "flex",
-                  paddingLeft: "40px",
-                  paddingRight: "40px",
-                  paddingTop: "10px",
-                  paddingBottom: "10px",
-                }}
-              >
-                <table
-                  style={{
-                    borderCollapse: "collapse",
-                    border: "1px solid black",
-                    width: "100%",
-                  }}
-                >
-                  <tbody>
-                    <tr>
-                      <th
-                        className="gross-earnings"
-                        style={{
-                          padding: "4px",
-                          width: "300px",
-                          textAlign: "center",
-                          backgroundColor: "rgb(230, 230, 230)",
-                        }}
-                      >
-                        Gross Amount (per Annum)
-                      </th>
-                      <td className="gross-earnings">
-                        <b>{payslipData.salary.grossAmount || 0}</b>
-                      </td>
-                      <th
-                        className="total-deductions"
-                        style={{
-                          padding: "4px",
-                          width: "300px",
-                          textAlign: "center",
-                          backgroundColor: "rgb(230, 230, 230)",
-                        }}
-                      >
-                        Net Salary (A-B-C){" "}
-                      </th>
-                      <td className="total-deductions">
-                        <b>{payslipData.salary.netSalary}</b>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div
-                className="bottom"
-                style={{
-                  marginLeft: "50px",
-                  marginRight: "50px",
-                  marginTop: "20px",
-                  paddingBottom: "0px",
-                }}
-              >
-
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <h5>
-                    Net Pay (in words): <b>{payslipData.inWords || ""}</b>
-                  </h5>
-                </div>
-              </div>
+               <span className="ms-4"><em>This is computer-generated payslip and does not require authentication</em></span>
               <div
                 className="bottom"
                 style={{
@@ -496,7 +480,6 @@ const PayslipDoc = () => {
                 <div className="line">
                   <hr />
                 </div>
-                &nbsp;
                 &nbsp;
                 &nbsp;
 
@@ -513,13 +496,12 @@ const PayslipDoc = () => {
                   marginLeft: "50px",
                   marginRight: "50px",
                   marginTop: "20px",
-                  paddingBottom: "3px",
+                  paddingBottom: "2px",
                 }}>
                 <div className="line">
                   {/* <hr /> */}
                 </div>
-                <div className="company-details text-center" style={{ padding: "3px" }}>
-                  <p> {companyData.companyName},</p>
+                <div className="company-details text-center" style={{ padding: "2px" }}>
                   <p> {companyData.companyAddress},</p>
                   <p>Contact No: {companyData.mobileNo}, Mail Id: {companyData.emailId}.</p>
                   <p> </p>
@@ -529,6 +511,15 @@ const PayslipDoc = () => {
           </div>
         </div>
       </div>
+      <div className="d-flex justify-content-end align-items-center me-4">
+        <button
+              type="button"
+              className="btn btn-outline-primary"
+              onClick={handleDownload}
+        >
+          <span className="m-2">Download</span> <Download size={18}  className="ml-1" />
+        </button>
+              </div>
     </LayOut>
   );
 };
