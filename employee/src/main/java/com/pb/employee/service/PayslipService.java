@@ -18,6 +18,6 @@ public interface PayslipService {
     ResponseEntity<?> getEmployeePayslips(String companyName, String employeeId,String month,String year) throws EmployeeException;
 
     ResponseEntity<?> deleteEmployeePayslipById(String companyName, String employeeId,String payslipId) throws EmployeeException;
-
+    ResponseEntity<?> getAllEmployeesPayslips(String companyName, String month, String year)throws EmployeeException;
     ResponseEntity<byte[]> downloadPayslip(String companyName, String payslipId, String employeeId, HttpServletRequest request);
 }

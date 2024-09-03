@@ -37,11 +37,11 @@ import java.util.*;
 public class CompanyServiceImpl implements CompanyService {
 
     @Value("${file.upload.path}")
-    private String folderPath;
+    private  String folderPath;
+
     @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private OpenSearchOperations openSearchOperations;
+    private  OpenSearchOperations openSearchOperations;
+
 
     @Override
     public ResponseEntity<?> registerCompany(CompanyRequest companyRequest) throws EmployeeException{
@@ -105,7 +105,6 @@ public class CompanyServiceImpl implements CompanyService {
         // Map the request to an entity
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.CREATED);
-
     }
 
     @Override
@@ -188,11 +187,11 @@ public class CompanyServiceImpl implements CompanyService {
 
 
         }
-        openSearchOperations .saveEntity(entity, companyId, Constants.INDEX_EMS);
+        openSearchOperations.saveEntity(entity, companyId, Constants.INDEX_EMS);
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
     }
-    public void multiPartFileStore(MultipartFile file, CompanyEntity company) throws IOException, EmployeeException {
+    private void multiPartFileStore(MultipartFile file, CompanyEntity company) throws IOException, EmployeeException {
         if(!file.isEmpty()){
             String filename = folderPath+company.getShortName()+"_"+file.getOriginalFilename();
             file.transferTo(new File(filename));
@@ -246,8 +245,6 @@ public class CompanyServiceImpl implements CompanyService {
         );
     }
 
-
-
     @Override
     public ResponseEntity<?> passwordResetForEmployee(EmployeePasswordReset employeePasswordReset, String id) throws EmployeeException {
         EmployeeEntity employee;
@@ -259,8 +256,6 @@ public class CompanyServiceImpl implements CompanyService {
                 throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.COMPANY_ALREADY_EXISTS), employeePasswordReset.getCompanyName()),
                         HttpStatus.CONFLICT);
             }
-
-
             byte[] decodedBytes = Base64.getDecoder().decode(employee.getPassword());
             String decodedPassword = new String(decodedBytes, StandardCharsets.UTF_8);
             if (!decodedPassword.equals(employeePasswordReset.getPassword())){
@@ -268,8 +263,6 @@ public class CompanyServiceImpl implements CompanyService {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_PASSWORD),
                         HttpStatus.NOT_FOUND);
             }
-
-
             String newPassword = Base64.getEncoder().encodeToString(employeePasswordReset.getNewPassword().toString().getBytes());
             employee.setPassword(newPassword);
             if (employee.getCompanyId() != null) {
@@ -278,14 +271,12 @@ public class CompanyServiceImpl implements CompanyService {
                 openSearchOperations.saveEntity(companyEntity, employee.getCompanyId(), Constants.INDEX_EMS);
 
             }
-
             openSearchOperations.saveEntity(employee, id, index);
 
         } catch (Exception ex) {
             log.error("Exception while fetching user {}, {}", employeePasswordReset.getCompanyName(), ex);
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_EMPLOYEE),
                     HttpStatus.INTERNAL_SERVER_ERROR);
-
 
         }
         return new ResponseEntity<>(

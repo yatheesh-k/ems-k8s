@@ -43,16 +43,16 @@ public class AttendanceController {
         return attendanceService.uploadAttendanceFile(company,file);
     }
 
-    @RequestMapping(value = "/{companyName}/employee/{employeeId}/attendance", method = RequestMethod.GET)
+    @RequestMapping(value = "/{companyName}/attendance", method = RequestMethod.GET)
     @io.swagger.v3.oas.annotations.Operation(security = {@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY)},
             summary = "${api.getAttendance.tag}", description = "${api.getAttendance.description}")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK")
     public ResponseEntity<?> getAllEmployeesAttendance(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
-                                            @RequestHeader(Constants.AUTH_KEY) String authToken,
+                                                       @RequestHeader(Constants.AUTH_KEY) String authToken,
                                                        @PathVariable String companyName,
-                                                       @PathVariable String employeeId,
+                                                       @RequestParam(required = false,name = Constants.EMPLOYEE_ID) String employeeId,
                                                        @RequestParam(required = false, name = Constants.MONTH) String month,
-                                                       @RequestParam(Constants.YEAR) String year) throws EmployeeException, IOException {
+                                                       @RequestParam(Constants.YEAR) String year) throws IOException,EmployeeException {
         return attendanceService.getAllEmployeeAttendance(companyName,employeeId,month,year);
     }
 

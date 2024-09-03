@@ -2,18 +2,11 @@ package com.pb.employee.request;
 
 
 import com.pb.employee.config.ValidAge;
-import com.sun.jersey.spi.StringReader;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.checkerframework.checker.i18nformatter.qual.I18nInvalidFormat;
-import org.springframework.validation.annotation.Validated;
-
-import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter

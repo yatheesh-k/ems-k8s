@@ -79,6 +79,18 @@ public class PayslipController {
         return payslipService.getEmployeePayslips(companyName, employeeId,month,year);
     }
 
+    @RequestMapping(value = "/{companyName}/employee/all/payslip", method = RequestMethod.GET)
+    @io.swagger.v3.oas.annotations.Operation(security = {@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY)},
+            summary = "${api.getPayslip.tag}", description = "${api.getPayslip.description}")
+    @ResponseStatus(HttpStatus.OK)
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK")
+    public ResponseEntity<?> getAllEmployeesPayslips(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
+                                                @RequestHeader(Constants.AUTH_KEY) String authToken,
+                                                @PathVariable String companyName,
+                                                @RequestParam(required = false, name = Constants.MONTH) String month,
+                                                @RequestParam(Constants.YEAR) String year) throws EmployeeException {
+        return payslipService.getAllEmployeesPayslips(companyName,month,year);
+    }
     @RequestMapping(value = "/{companyName}/employee/{employeeId}/payslip/{payslipId}", method = RequestMethod.DELETE)
     @io.swagger.v3.oas.annotations.Operation(security = {@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY)},
             summary = "${api.deletePayslip.tag}", description = "${api.deletePayslip.description}")

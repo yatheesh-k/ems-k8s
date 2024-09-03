@@ -32,7 +32,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 @Component
@@ -512,8 +511,9 @@ public class OpenSearchOperations {
         logger.debug("Getting attendance for employee {} for month {} and year {}", employeeId, month, year);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         boolQueryBuilder = boolQueryBuilder
-                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.ATTENDANCE)))
-                .filter(q -> q.matchPhrase(t -> t.field(Constants.EMPLOYEE_ID).query(employeeId)));
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.ATTENDANCE)));
+        if(employeeId!=null)
+            boolQueryBuilder=boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.EMPLOYEE_ID).query(employeeId)));
         if(month!=null){
             boolQueryBuilder=boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.MONTH).query(month)));
         }
@@ -543,4 +543,68 @@ public class OpenSearchOperations {
         return attendanceEntities;
     }
 
+    public List<AttendanceEntity> getAttendanceByYear(String companyName, String employeeId, String year) throws EmployeeException{
+        logger.debug("Getting attendance for employee {} for month {} and year {}", employeeId, year);
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        boolQueryBuilder = boolQueryBuilder
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.ATTENDANCE)));
+        if(year!=null){
+            boolQueryBuilder=boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.YEAR).query(year)));
+        }
+        BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
+        SearchResponse<AttendanceEntity> searchResponse = null;
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+
+        try {
+            searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                    .query(finalBoolQueryBuilder.build().toQuery()), AttendanceEntity.class);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        List<Hit<AttendanceEntity>> hits = searchResponse.hits().hits();
+        logger.info("Number of attendance hits for employee {}: {}", employeeId, hits.size());
+
+        List<AttendanceEntity> attendanceEntities = new ArrayList<>();
+
+        for (Hit<AttendanceEntity> hit : hits) {
+            attendanceEntities.add(hit.source());
+        }
+        return attendanceEntities;
+    }
+
+
+    public List<PayslipEntity> getAllPayslips(String companyName, String month, String year) throws EmployeeException{
+        logger.debug("Getting payslips for  for month {} and year {}", month, year);
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        boolQueryBuilder = boolQueryBuilder
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.PAYSLIP)))
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.YEAR).query(year)));
+        if(month!=null){
+            boolQueryBuilder=boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.MONTH).query(month)));
+        }
+
+        BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
+        SearchResponse<PayslipEntity> searchResponse = null;
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+
+        try {
+            searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                    .query(finalBoolQueryBuilder.build().toQuery()), PayslipEntity.class);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        List<Hit<PayslipEntity>> hits = searchResponse.hits().hits();
+        logger.info("Number of attendance hits for  {}: {}", hits.size());
+
+        List<PayslipEntity> payslipEntities = new ArrayList<>();
+
+        for (Hit<PayslipEntity> hit : hits) {
+            payslipEntities.add(hit.source());
+        }
+        return payslipEntities;
+    }
 }
