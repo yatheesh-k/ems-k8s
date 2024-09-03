@@ -208,9 +208,10 @@ const AttendanceReport = () => {
 
   const columns = [
     {
-      name: <h6><b>S No</b></h6>,
+
+      name: <h6 style={{zIndex:"1"}}><b>S No</b></h6>,
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
-      width: "100px",
+      width: "70px",
     },
     ...(!isAttendance && !selectedYear && !selectedMonth ? [{
       name: <h6><b>Name</b></h6>,

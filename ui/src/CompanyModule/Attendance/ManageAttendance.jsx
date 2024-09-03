@@ -15,7 +15,6 @@ const ManageAttendance = () => {
   } = useForm();
 
   const [selectedFile, setSelectedFile] = useState(null);
-
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
   };
@@ -126,7 +125,6 @@ const ManageAttendance = () => {
                       </div>
                     </div>
                   </div>
-
                 </form>
               </div>
             </div>

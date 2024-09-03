@@ -65,20 +65,20 @@ const Department = () => {
           toast.success('Department Updated Successfully');
           fetchDepartments(); // Fetch updated list of departments after delay
           setAddDeparment(false);
-        }, 1000);
+        }, 1500);
       } else {
         await DepartmentPostApi(formData);
         setTimeout(() => {
           toast.success('Department Created Successfully');
           fetchDepartments();
           setAddDeparment(false);
-        }, 1000);
+        }, 1500);
       }
 
       reset();
       setEditingId(null);
     } catch (error) {
-      handleApiErrors(error);
+      handleApiErrors(error);  
     } finally {
       setLoading(false);
     }
