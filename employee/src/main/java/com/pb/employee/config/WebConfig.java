@@ -11,6 +11,6 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // Maps "/assets/img/**" URL path to the "D:/ems/ui/public/assets/img/" directory
         registry.addResourceHandler("/ui/public/assets/img/**")
-                .addResourceLocations("file:/D:/ems/ui/public/assets/img/");
+                .addResourceLocations("/opt/ems/ui/public/assets/img/");
     }
 }

@@ -9,7 +9,7 @@ import {
   EmployeePayslipsGet,
   EmployeePayslipDeleteById,
 } from "../../Utils/Axios";
-import { Eye, XSquareFill } from "react-bootstrap-icons";
+import { CloudArrowDown, Eye, XSquareFill } from "react-bootstrap-icons";
 import { toast, Bounce } from "react-toastify";
 import DataTable from "react-data-table-component";
 import DeletePopup from "../../Utils/DeletePopup";
@@ -55,17 +55,17 @@ const ViewPaySlips = () => {
       label: (startYear + index).toString(),
     })
   ).reverse();
-  const months = Array.from({ length: 12 }, (_, index) => ({
-    value: {
-      value: (index + 1).toString().padStart(2, "0"),
-      label: new Date(2000, index, 1).toLocaleString("default", {
-        month: "long",
-      }),
-    },
-    label: new Date(2000, index, 1).toLocaleString("default", {
-      month: "long",
-    }),
-  }));
+  // const months = Array.from({ length: 12 }, (_, index) => ({
+  //   value: {
+  //     value: (index + 1).toString().padStart(2, "0"),
+  //     label: new Date(2000, index, 1).toLocaleString("default", {
+  //       month: "long",
+  //     }),
+  //   },
+  //   label: new Date(2000, index, 1).toLocaleString("default", {
+  //     month: "long",
+  //   }),
+  // }));
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,7 +76,6 @@ const ViewPaySlips = () => {
               EmployeeGetApiById(selectedEmployeeId),
               EmployeePayslipsGet(
                 selectedEmployeeId,
-                selectedMonth,
                 selectedYear
               ),
             ]
@@ -95,10 +94,10 @@ const ViewPaySlips = () => {
     };
 
     fetchData();
-  }, [selectedEmployeeId, selectedMonth, selectedYear, refreshData]);
+  }, [selectedEmployeeId, selectedYear, refreshData]);
 
   const handleGoClick = () => {
-    if (selectedEmployeeId || selectedMonth || selectedYear)
+    if (selectedEmployeeId || selectedYear)
       setShowSpinner(true);
     setTimeout(() => {
       setShowFields(true);
@@ -157,25 +156,19 @@ const ViewPaySlips = () => {
     {
       name: <h6><b>S No</b></h6>,
       selector: (row, index) => index + 1,
-      width: "150px",
-    },
-    {
-      name: <h6><b>Net Amount</b></h6>,
-      selector: row => parseFloat(row.salary.netSalary).toFixed(2),
-      sortable: true,
-      width: "250px",
+      width: "180px",
     },
     {
       name: <h6><b>Month</b></h6>,
       selector: row => row.month,
       sortable: true,
-      width: "200px",
+      width: "280px",
     },
     {
-      name: <h6><b>Year</b></h6>,
-      selector: row => row.year,
+      name: <h6><b>Net Amount</b></h6>,
+      selector: row => parseFloat(row.salary.netSalary).toFixed(2),
       sortable: true,
-      width: "200px",
+      width: "300px",
     },
     {
       name: <h6><b>Actions</b></h6>,
@@ -193,6 +186,19 @@ const ViewPaySlips = () => {
             title="View Payslip"
           >
             <Eye size={22} color="green" />
+          </button>
+          <button
+            className="btn btn-sm"
+            style={{
+              backgroundColor: "transparent",
+              border: "none",
+              padding: "0",
+              marginLeft: "5px",
+            }}
+            onClick={() => handleViewSalary(row.employeeId, row.payslipId)}
+            title="Download Payslip"
+          >
+            <CloudArrowDown size={22} color='#d116dd' />
           </button>
         </div>
       ),
@@ -260,19 +266,6 @@ const ViewPaySlips = () => {
                   />
                 </div>
               </div>
-
-              <div className="col-12 col-md-3">
-                <div className="form-group">
-                  <label className="form-label">Select Month</label>
-                  <Select
-                    options={months}
-                    value={months.find((option) => option.label === selectedMonth)}
-                    onChange={(selectedOption) => setSelectedMonth(selectedOption.label)}
-                    placeholder="Select Month"
-                  />
-                </div>
-              </div>
-
               <div className="col-12 col-md-3 mt-4">
                 <div className="form-group">
                   <button
@@ -280,7 +273,7 @@ const ViewPaySlips = () => {
                     style={{ marginTop: "8px", paddingBottom: "8px" }}
                     className="btn btn-primary btn-block"
                     onClick={handleGoClick}
-                    disabled={!selectedEmployeeId || !selectedMonth || !selectedYear}
+                    disabled={!selectedEmployeeId || !selectedYear}
                   >
                     Go
                   </button>
@@ -295,7 +288,7 @@ const ViewPaySlips = () => {
           <div className="card">
             <div className="card-body">
               <h5 className="card-title mt-2">
-                PaySlip Details for {`${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})`}
+                PaySlip Details for {`${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})(${selectedYear})`}
               </h5>
               <hr />
               <DataTable
@@ -304,10 +297,7 @@ const ViewPaySlips = () => {
                 pagination
                 highlightOnHover
                 pointerOnHover
-                fixedHeader
-                responsive
                 dense
-                noHeader
               />
             </div>
           </div>

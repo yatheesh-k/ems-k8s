@@ -94,52 +94,6 @@ const PayslipDoc = () => {
       console.error('Employee ID or Payslip ID is missing');
     }
   };
-
-  // const downloadPayslip = async (employeeId, payslipId) => {
-  //   try {
-  //     // Call the API to get the payslip data
-  //     const response = await EmployeePaySlipDownloadById(employeeId, payslipId, {
-  //       responseType: 'blob',
-  //     });
-      
-  //     console.log('Response:', response); // Log response details
-  
-  //     // Check if the response is valid
-  //     if (!response.data || response.data.size === 0) {
-  //       throw new Error('Received empty response data');
-  //     }
-  
-  //     // Check the content type to ensure it's a PDF
-  //     const contentType = response.headers['content-type'];
-  //     if (contentType !== 'application/pdf') {
-  //       throw new Error(`Unexpected content type: ${contentType}`);
-  //     }
-  
-  //     // Create a Blob from the response data
-  //     const blob = new Blob([response.data], { type: 'application/pdf' });
-  //     const url = window.URL.createObjectURL(blob);
-  
-  //     // Display the PDF (optional)
-  //     displayPDF(url);
-  
-  //     // Create a link element for downloading
-  //     const link = document.createElement('a');
-  //     link.href = url;
-  //     link.setAttribute('download', `payslip_${payslipId}.pdf`);
-  //     document.body.appendChild(link);
-  //     link.click();
-  //     link.remove();
-  
-  //     // Clean up the URL object
-  //     window.URL.revokeObjectURL(url);
-  
-  //   } catch (error) {
-  //     console.error('Error downloading payslip:', error);
-  //     alert('Failed to download payslip. Please try again later.');
-  //   }
-  // };
-  
-  
   
   
   if (!payslipData) {

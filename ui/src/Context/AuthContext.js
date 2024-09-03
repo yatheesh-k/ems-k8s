@@ -27,9 +27,9 @@ export const AuthProvider = ({ children }) => {
           userRole: decodedToken.roles,
           company: decodedToken.company,
           employeeId: decodedToken.employeeId,
-     
+
         });
-       
+
       } catch (error) {
         console.error('Failed to decode token:', error);
         localStorage.removeItem('token');
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
       }
     }
   }, []);
-  console.log("userIdContext",user.userId)
+  console.log("userIdContext", user.userId)
 
   const setAuthUser = (userData) => {
     setUser(userData);
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
       try {
         console.log("Fetching employee data for userId:", user.userId);
         const response = await EmployeeGetApiById(user.userId);
-        const companyId = response.data.companyId; 
+        const companyId = response.data.companyId;
         setUser(prevUser => ({ ...prevUser, companyId }));
         await fetchCompanyLogo(companyId);
       } catch (error) {
@@ -87,7 +87,8 @@ export const AuthProvider = ({ children }) => {
   }, [user]);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, logoFileName, loading, error,setAuthUser }}>
+    <AuthContext.Provider value={{ user, setUser, logoFileName,setLogoFileName, loading, error,setAuthUser }}>
+
       {children}
     </AuthContext.Provider>
   );

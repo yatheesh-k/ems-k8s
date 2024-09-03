@@ -11,6 +11,7 @@ import com.pb.employee.request.EmployeeStatus;
 import com.pb.employee.request.PayslipRequest;
 import com.pb.employee.service.PayslipService;
 import com.pb.employee.util.*;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -278,17 +279,19 @@ public class PayslipServiceImpl implements PayslipService {
     }
 
 
-    public ResponseEntity<byte[]> downloadPayslip(String companyName, String payslipId, String employeeId) {
+
+    public ResponseEntity<byte[]> downloadPayslip(String companyName, String payslipId, String employeeId, HttpServletRequest request) {
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
-        EmployeeEntity employee = null;
-        PayslipEntity entity = null;
-        DepartmentEntity department = null;
-        DesignationEntity designation = null;
-        CompanyEntity company = null;
+        EmployeeEntity employee;
+        PayslipEntity entity;
+        DepartmentEntity department;
+        DesignationEntity designation;
+        CompanyEntity company;
+
         try {
-           SSLUtil.disableSSLVerification();
+            SSLUtil.disableSSLVerification();
             employee = openSearchOperations.getEmployeeById(employeeId, null, index);
-            if (employee == null){
+            if (employee == null) {
                 log.error("Employee with this {}, is not found", employeeId);
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
                         HttpStatus.INTERNAL_SERVER_ERROR);
@@ -296,16 +299,16 @@ public class PayslipServiceImpl implements PayslipService {
             department = openSearchOperations.getDepartmentById(employee.getDepartment(), null, index);
             designation = openSearchOperations.getDesignationById(employee.getDesignation(), null, index);
             company = openSearchOperations.getCompanyById(employee.getCompanyId(), null, Constants.INDEX_EMS);
-            if (company==null) {
-                log.error("company are not {} found", employee.getCompanyId());
+            if (company == null) {
+                log.error("Company {} is not found", employee.getCompanyId());
                 throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.COMPANY_ALREADY_EXISTS), companyName),
                         HttpStatus.CONFLICT);
             }
-            entity=openSearchOperations.getPayslipById(payslipId, null, index);
+            entity = openSearchOperations.getPayslipById(payslipId, null, index);
             PayslipUtils.unmaskEmployeePayslip(entity);
             Entity companyEntity = CompanyUtils.unmaskCompanyProperties(company);
             Entity employeeEntity = EmployeeUtils.unmaskEmployeeProperties(employee, department, designation);
-            String htmlContent = generatePayslipHtml(entity, (EmployeeEntity) employeeEntity, company);
+            String htmlContent = generatePayslipHtml(entity, (EmployeeEntity) employeeEntity, company, request);
 
             // Convert HTML to PDF
             byte[] pdfBytes = generatePdfFromHtml(htmlContent);
@@ -329,29 +332,24 @@ public class PayslipServiceImpl implements PayslipService {
             throw new RuntimeException(e);
         }
     }
+
     public byte[] generatePdfFromHtml(String html) throws IOException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            // Create a PDF renderer
             ITextRenderer renderer = new ITextRenderer();
-
-            // Set the HTML content
             renderer.setDocumentFromString(html);
-
-            // Layout and create the PDF
             renderer.layout();
             renderer.createPDF(baos);
-
-            // Return the PDF bytes
             return baos.toByteArray();
         } catch (DocumentException e) {
-            // Handle iText-specific exceptions
             throw new IOException(e.getMessage());
         }
     }
-    private String generatePayslipHtml(PayslipEntity payslipEntity, EmployeeEntity employee, CompanyEntity company) {
+
+    private String generatePayslipHtml(PayslipEntity payslipEntity, EmployeeEntity employee, CompanyEntity company, HttpServletRequest request) {
         StringBuilder htmlBuilder = new StringBuilder();
 
-        String image ="https://localhost:8092/ems/ui/public/assets/img/"+company.getImageFile();
+        String baseUrl = getBaseUrl(request);
+        String image = baseUrl + "ui/public/assets/img/" + company.getImageFile();
 
         htmlBuilder.append("<!DOCTYPE html>");
         htmlBuilder.append("<html lang=\"en\">");
@@ -380,7 +378,7 @@ public class PayslipServiceImpl implements PayslipService {
         htmlBuilder.append("}");
         htmlBuilder.append(".top { display: flex;flex-wrap: wrap; justify-content: space-around; margin-bottom: 20px; }");
         htmlBuilder.append(".date-info { text-align: left; flex: 1; }");
-        htmlBuilder.append(".logo { text-align: end; flex-shrink: 0;margin-bottom:20px; margin-top:0px;margin-left:450px}");
+        htmlBuilder.append(".logo { text-align: end; flex-shrink: 0;margin-bottom:20px; margin-top:0px;margin-left:500px}");
         htmlBuilder.append(".logo img {max-width: 120px; height: 80px; display: flex; }");
         htmlBuilder.append(".details {");
         htmlBuilder.append("  width: 100%;");
@@ -560,7 +558,7 @@ public class PayslipServiceImpl implements PayslipService {
         htmlBuilder.append("</div>");
         htmlBuilder.append("<div class=\"address\">");
         htmlBuilder.append("<hr />");
-        htmlBuilder.append("<p>Company Address: ").append(company.getCompanyAddress()).append("</p>");
+        htmlBuilder.append("<p>Company Address: ").append(company.getCompanyAddress()+", Mobile No:"+company.getMobileNo()+", emailId:"+company.getEmailId()).append("</p>");
         htmlBuilder.append("</div>");
 
         htmlBuilder.append("</div>");
@@ -570,5 +568,14 @@ public class PayslipServiceImpl implements PayslipService {
 
         return htmlBuilder.toString();
     }
+    private String getBaseUrl(HttpServletRequest request) {
+        String scheme = request.getScheme(); // http or https
+        String serverName = request.getServerName(); // localhost or IP address
+        int serverPort = request.getServerPort(); // port number
+        String contextPath = request.getContextPath(); // context path
+
+        return scheme + "://" + serverName + ":" + serverPort + contextPath + "/";
+    }
+
 
 }

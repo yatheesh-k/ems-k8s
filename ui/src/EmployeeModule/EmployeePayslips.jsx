@@ -35,7 +35,6 @@ const EmployeePayslips = () => {
              
               EmployeePayslipsGet(
                 userId,
-                selectedMonth,
                 selectedYear
               ),
             ]

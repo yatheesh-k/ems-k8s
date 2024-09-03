@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useAuth } from "../Context/AuthContext";
+import { employeeId } from "./Auth";
 
 const protocol = window.location.protocol;
 const hostname = window.location.hostname;
@@ -111,7 +112,7 @@ export const companyPasswordUpdateById = async (companyId) => {
 }
 
 export const DepartmentGetApi = () => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
   return axiosInstance.get(`${company}/department`);
 }
 
@@ -119,12 +120,12 @@ export const DepartmentPostApi = (data) => {
   return axiosInstance.post("/department", data);
 }
 export const DepartmentGetApiById = (departmentId) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
   return axiosInstance.get(`${company}/department/${departmentId}`)
 }
 
 export const DepartmentDeleteApiById = (departmentId) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
     return axiosInstance.delete(`${company}/department/${departmentId}`)
     .then(response => {
       return response.data;
@@ -136,12 +137,12 @@ export const DepartmentDeleteApiById = (departmentId) => {
 }
 
 export const DepartmentPutApiById = (departmentId, data) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
     return axiosInstance.patch(`${company}/department/${departmentId}`, data)
 };
 
 export const DesignationGetApi = () => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
     return axiosInstance.get(`${company}/designations`)
     .then(response => {
       return response.data.data;
@@ -157,7 +158,7 @@ export const DesignationPostApi = (data) => {
 }
 
 export const DesignationGetApiById = (designationId) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
     return axiosInstance.get(`${company}/designation/${designationId}`)
     .then(response => {
       return response.data;
@@ -169,18 +170,18 @@ export const DesignationGetApiById = (designationId) => {
 }
 
 export const DesignationDeleteApiById = (designationId) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
     return axiosInstance.delete(`${company}/designation/${designationId}`)
 }
 
 export const DesignationPutApiById = (designationId, data) => {
-   const company = localStorage.getItem("company")
+   const company = localStorage.getItem("companyName")
   return axiosInstance.patch(`${company}/designation/${designationId}`, data)
 };
 
 
 export const EmployeeGetApi = () => {
-   const company = localStorage.getItem("company")
+   const company = localStorage.getItem("companyName")
   return axiosInstance.get(`/${company}/employee`)
     .then(response => response.data.data) // Assuming response.data.data contains your employee data
     .catch(error => {
@@ -190,12 +191,12 @@ export const EmployeeGetApi = () => {
 }
 
 export const EmployeePostApi = (data) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
   return axiosInstance.post('/employee', data);
 }
 
 export const EmployeeGetApiById = (employeeId) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
   return axiosInstance.get(`/${company}/employee/${employeeId}`)
     .then(response => {
       return response.data;
@@ -207,7 +208,7 @@ export const EmployeeGetApiById = (employeeId) => {
 }
 
 export const EmployeeDeleteApiById = (employeeId) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
   return axiosInstance.delete(`/${company}/employee/${employeeId}`)
     .then(response => {
       return response.data;
@@ -232,22 +233,22 @@ export const EmployeeSalaryPostApi = (employeeId, data) => {
 }
 
 export const EmployeeSalaryGetApi = (employeeId) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
   return axiosInstance.get(`/${company}/employee/${employeeId}/salaries`);
 }
 
 export const EmployeeSalaryGetApiById = (employeeId, salaryId) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
   return axiosInstance.get(`/${company}/employee/${employeeId}/salary/${salaryId}`);
 }
 
 export const EmployeeSalaryPatchApiById = (employeeId, salaryId, data) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
   return axiosInstance.patch(`/employee/${employeeId}/salary/${salaryId}`, data);
 }
 
 export const EmployeeSalaryDeleteApiById = (employeeId, salaryId) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
   return axiosInstance.delete(`/${company}/employee/${employeeId}/salary/${salaryId}`);
 }
 
@@ -260,7 +261,7 @@ export const EmployeePayslipGeneration = (data) => {
 }
 
 export const EmployeePayslipGetById = (employeeId, payslipId, month, year) => {
-   const company = localStorage.getItem("company")
+   const company = localStorage.getItem("companyName")
   return axiosInstance.get(`/${company}/employee/${employeeId}/payslip/${payslipId}`, {
     params: {
       month: month,
@@ -270,11 +271,11 @@ export const EmployeePayslipGetById = (employeeId, payslipId, month, year) => {
 };
 
 
-export const EmployeePayslipsGet = (employeeId, month, year) => {
+
+export const EmployeePayslipsGet = (employeeId, year) => {
   const company = localStorage.getItem("company")
   return axiosInstance.get(`/${company}/employee/${employeeId}/payslips`, {
     params: {
-       month: month,
       year: year
     }
   });
@@ -311,24 +312,25 @@ export const EmployeePaySlipDownloadById = async (employeeId, payslipId) => {
 };
 
 export const EmployeePayslipDeleteById = (employeeId, payslipId) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("comapnyName")
   return axiosInstance.delete(`/${company}/employee/${employeeId}/payslip/${payslipId}`);
 }
 
 export const AttendanceManagementApi = (formData) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
   return axiosInstance.post(`/${company}/employee/attendance`, formData);
 }
 
 export const AttendanceReportApi = (employeeId, month, year) => {
-  const company = localStorage.getItem("company")
-  return axiosInstance.get(`/${company}/employee/${employeeId}/attendance`, {
-    params: { month, year }
+
+  const companyName = localStorage.getItem("companyName")
+  return axiosInstance.get(`/${companyName}/attendance`, {
+    params: {employeeId, month, year}
   });
 }
 
 export const AttendancePatchById = (employeeId, attendanceId, data) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
   return axiosInstance.patch(`/${company}/employee/${employeeId}/attendance/${attendanceId}`, data);
 }
 

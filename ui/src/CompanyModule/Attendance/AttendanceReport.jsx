@@ -3,7 +3,7 @@ import LayOut from '../../LayOut/LayOut';
 import Select from 'react-select';
 import { useForm } from 'react-hook-form';
 import { Bounce, toast } from 'react-toastify';
-import { EmployeeGetApi, AttendanceReportApi, AttendanceDeleteById, AttendancePatchById } from '../../Utils/Axios';
+import { EmployeeGetApi, AttendanceReportApi, AttendanceDeleteById, AttendancePatchById, AllAttendanceReportApi } from '../../Utils/Axios';
 import { PencilSquare, XSquareFill } from 'react-bootstrap-icons';
 import DataTable from 'react-data-table-component';
 import { useNavigate } from 'react-router-dom';
@@ -28,6 +28,11 @@ const AttendanceReport = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedAttendance, setSelectedAttendance] = useState({});
+  const [isAllAttendance, setIsAllAttendance] = useState(false);
+  const [isAttendance, setIsAttendance] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
   const navigate = useNavigate();
 
   const handleEmployeeChange = (selectedOption) => {
@@ -68,11 +73,11 @@ const AttendanceReport = () => {
   };
 
   const filterByMonthYear = () => {
-    if (employeeId && selectedMonth && selectedYear) {
-      fetchAttendanceData(employeeId, selectedMonth, selectedYear);
-    } else {
-      alert("Please select employee, month, and year.");
+    if (!selectedYear) {
+      alert("Please select a year.");
+      return;
     }
+    fetchAttendanceData(employeeId, selectedMonth, selectedYear);
   };
 
   const fetchAttendanceData = async (empId, month, year) => {
@@ -83,10 +88,30 @@ const AttendanceReport = () => {
       setAttendanceData(response.data.data);
       setEmployeeAttendance(response.data.data);
       setShowFields(true);
+      setIsAllAttendance(false); 
+      setIsAttendance(true); 
     } catch (error) {
       console.error("Error fetching attendance data:", error);
     }
   };
+
+  const fetchAllAttendanceData = async () => {
+    try {
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1; 
+        const currentYear = now.getFullYear();
+
+        const monthNames = getMonthNames();
+        const currentMonthName = monthNames[currentMonth - 1]; 
+
+        const response = await AttendanceReportApi(null, currentMonthName, currentYear);
+        setAttendanceData(response.data.data);
+        setIsAllAttendance(true);
+        setIsAttendance(false);
+    } catch (error) {
+        console.error("Error fetching attendance data:", error);
+    }
+};
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -108,6 +133,7 @@ const AttendanceReport = () => {
     };
 
     fetchEmployees();
+    fetchAllAttendanceData();
   }, []);
 
   const getMonthNames = () => {
@@ -133,7 +159,7 @@ const AttendanceReport = () => {
       });
       setTimeout(() => {
         handleCloseDeleteModal();
-        fetchAttendanceData(employeeId, selectedMonth, selectedYear); // Add parameters here
+        fetchAttendanceData(employeeId, selectedMonth, selectedYear);
         setRefreshData((prev) => !prev);
       }, 1500);
     } catch (error) {
@@ -142,7 +168,6 @@ const AttendanceReport = () => {
   };
 
   const onSubmit = async (data) => {
-    console.log("Submitting attendance update for:", selectedEmployeeId, selectedAttendanceId, data);
     try {
       await AttendancePatchById(selectedEmployeeId, selectedAttendanceId, data);
       toast.success("Attendance Record Updated Successfully", {
@@ -156,11 +181,19 @@ const AttendanceReport = () => {
         handleCloseEditModal();
         setRefreshData((prev) => !prev);
         navigate("/attendanceReport");
-        fetchAttendanceData(employeeId, selectedMonth, selectedYear); // Add parameters here
+        fetchAttendanceData(employeeId, selectedMonth, selectedYear);
       }, 1000);
     } catch (error) {
       handleApiErrors(error);
     }
+  };
+
+  const getMonthAndYear = () => {
+    if (attendanceData.length > 0) {
+      const firstRecord = attendanceData[0];
+      return `${firstRecord.month} ${firstRecord.year}`;
+    }
+    return "";
   };
 
   const handleApiErrors = (error) => {
@@ -175,22 +208,29 @@ const AttendanceReport = () => {
 
   const columns = [
     {
-      name: <h6><b>S No</b></h6>,
-      selector: (row, index) => index + 1,
+
+      name: <h6 style={{zIndex:"1"}}><b>S No</b></h6>,
+      selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
       width: "70px",
     },
-    {
+    ...(!isAttendance && !selectedYear && !selectedMonth ? [{
+      name: <h6><b>Name</b></h6>,
+      selector: (row) => `${row.firstName} ${row.lastName}`,
+      sortable: true,
+      width: "200px",
+    }] : []),
+    ...(!isAllAttendance && selectedYear ? [{
+      name: <h6><b>Name</b></h6>,
+      selector: (row) => `${row.firstName} ${row.lastName}`,
+      sortable: true,
+      width: "150px",
+    }] : []),
+    ...(!isAllAttendance && selectedYear ? [{
       name: <h6><b>Month</b></h6>,
       selector: (row) => row.month,
       sortable: true,
-      width: "130px",
-    },
-    {
-      name: <h6><b>Year</b></h6>,
-      selector: (row) => row.year,
-      sortable: true,
       width: "120px",
-    },
+    }] : []),
     {
       name: <h6><b>No. Of Working Days</b></h6>,
       selector: (row) => row.noOfWorkingDays,
@@ -227,6 +267,7 @@ const AttendanceReport = () => {
       ),
     },
   ];
+
 
   return (
     <LayOut>
@@ -289,7 +330,7 @@ const AttendanceReport = () => {
                       style={{ paddingBottom: "8px" }}
                       className="btn btn-primary"
                       onClick={filterByMonthYear}
-                      disabled={!employeeId || !selectedMonth || !selectedYear}
+                      disabled={!selectedYear}
                     >
                       Go
                     </button>
@@ -297,16 +338,35 @@ const AttendanceReport = () => {
                 </div>
               </div>
               <div className="card-body">
-                {showFields && (
+                {showFields ? (
                   <div>
                     <h5 className="card-title mt-2">
-                      Attendance Details for {`${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})`}
+                      Attendance Details for {selectedEmployeeDetails.firstName ? `${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})` : 'All Employees'}
+                      {selectedYear && ` - ${selectedYear}`}
+                      {selectedMonth && ` - ${getMonthNames()[selectedMonth - 1]}`}
                     </h5>
                     <hr />
                     <div>
                       <DataTable
                         columns={columns}
-                        data={employeeAttendance}
+                        data={attendanceData}
+                        pagination
+                        highlightOnHover
+                        pointerOnHover
+                        dense
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <h5 className="card-title mt-2">
+                      Attendance Details for {getMonthAndYear()}
+                    </h5>
+                    <hr />
+                    <div>
+                      <DataTable
+                        columns={columns}
+                        data={attendanceData}
                         pagination
                         highlightOnHover
                         pointerOnHover

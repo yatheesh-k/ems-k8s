@@ -67,7 +67,7 @@ const ForgotPassword = () => {
       const response = await forgotPasswordStep2(formData);
       toast.success("Password Updated Successfully");
       console.log(response.data); // Handle API response as needed
-      navigate('/:company/login');
+      navigate(`/${company}/login`);
     } catch (error) {
       handleApiErrors(error);
     } finally {

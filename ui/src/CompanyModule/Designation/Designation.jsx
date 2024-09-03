@@ -25,7 +25,6 @@ const Designation = () => {
   const [pending, setPending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [filteredDesignation, setFilteredDesignation] = useState([]);
   const [addDesignation, setAddDesignation] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null); // State to store the ID of the item to be deleted
@@ -120,7 +119,7 @@ const Designation = () => {
           });
 
       } catch (error) {
-        handleApiErrors(error)
+        handleApiErrors(error);
       }
     }
   };

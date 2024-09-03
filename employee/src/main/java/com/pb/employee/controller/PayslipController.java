@@ -6,6 +6,7 @@ import com.pb.employee.request.SalaryRequest;
 import com.pb.employee.service.PayslipService;
 import com.pb.employee.util.Constants;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -98,8 +99,9 @@ public class PayslipController {
                                                   @RequestHeader(Constants.AUTH_KEY) String authToken,
                                                   @PathVariable String companyName,
                                                   @PathVariable String payslipId,
-                                                  @PathVariable String employeeId) {
-        return payslipService.downloadPayslip(companyName, payslipId, employeeId);
+                                                  @PathVariable String employeeId,
+                                                  HttpServletRequest request) {
+        return payslipService.downloadPayslip(companyName, payslipId, employeeId, request);
     }
 
 

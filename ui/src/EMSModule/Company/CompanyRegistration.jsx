@@ -21,6 +21,7 @@ const CompanyRegistration = () => {
   const [companyType, setCompanyType] = useState("");
   const [passwordShown, setPasswordShown] = useState("");
   const [editMode, setEditMode] = useState(false); // State to track edit mode
+  const [errorMessage,setErrorMessage]=useState('');
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -80,9 +81,25 @@ const CompanyRegistration = () => {
       }
       reset();
     } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        const message = error.response.data.message;
+        const data = error.response.data.data;
+
+        let errorDetails = 'No additional details available.';
+
+        if (data && typeof data === 'object') {
+          // Format error details dynamically
+          errorDetails = Object.entries(data)
+            .map(([key, value]) => `${key}: ${value || 'N/A'}`)
+            .join('\n');
+        }
+
+        const alertMessage = `${message}\n=>\n${errorDetails}`;
+        setErrorMessage(alertMessage);
+
+      } else {
       handleApiErrors(error);
-      // Optionally, you can show an error toast here
-      // toast.error("An error occurred. Please try again.");
+      }
     }
   };  
 
@@ -106,10 +123,6 @@ const CompanyRegistration = () => {
 
 
   const handleApiErrors = (error) => {
-    if (error.response && error.response.data && error.response.data.message) {
-      const alertMessage = `${error.response.data.message} (Duplicate Values)`;
-      alert(alertMessage);
-    }
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
       const errorMessage = error.response.data.error.message;
       toast.error(errorMessage);
@@ -862,6 +875,11 @@ const CompanyRegistration = () => {
             </div>
           </div>
           <div className="col-lg-1"></div>
+          {errorMessage && (
+                      <div className="alert alert-info mt-4 text-center">
+                        {errorMessage}
+                      </div>
+                    )}
           <div className="col-12 d-flex justify-content-end mt-5"
             style={{ background: "none" }}
           >

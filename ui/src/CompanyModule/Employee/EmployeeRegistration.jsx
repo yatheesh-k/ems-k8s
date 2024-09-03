@@ -34,6 +34,7 @@ const EmployeeRegistration = () => {
   const [employeeId, setEmployeeId] = useState("");
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
   const [companyName, setCompanyName] = useState("");
+  const [errorMessage, setErrorMessage] = useState(''); // State for error message
   const navigate = useNavigate();
   const location = useLocation();
   console.log(user.company)
@@ -273,7 +274,25 @@ const EmployeeRegistration = () => {
 
       reset();
     } catch (error) {
+      if (error.response && error.response.data && error.response.data.message) {
+        const message = error.response.data.message;
+        const data = error.response.data.data;
+
+        let errorDetails = 'No additional details available.';
+
+        if (data && typeof data === 'object') {
+          // Format error details dynamically
+          errorDetails = Object.entries(data)
+            .map(([key, value]) => `${key}: ${value || 'N/A'}`)
+            .join('\n');
+        }
+
+        const alertMessage = `${message}\n=>\n${errorDetails}`;
+        setErrorMessage(alertMessage);
+
+      } else {
       handleApiErrors(error);
+      }
     }
   };
 
@@ -1050,6 +1069,11 @@ const EmployeeRegistration = () => {
                         <p className="errorMsg">{errors.aadhaarId.message}</p>
                       )}
                     </div>
+                    {errorMessage && (
+                      <div className="alert alert-danger mt-4 text-center">
+                        {errorMessage}
+                      </div>
+                    )}
                     <div
                       className="col-12 mt-4  d-flex justify-content-end"
                       style={{ background: "none" }}
