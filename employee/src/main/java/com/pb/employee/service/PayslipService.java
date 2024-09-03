@@ -3,6 +3,7 @@ package com.pb.employee.service;
 import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.request.PayslipRequest;
 import com.pb.employee.request.SalaryRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
@@ -18,5 +19,5 @@ public interface PayslipService {
 
     ResponseEntity<?> deleteEmployeePayslipById(String companyName, String employeeId,String payslipId) throws EmployeeException;
 
-    ResponseEntity<byte[]> downloadPayslip(String companyName, String payslipId, String employeeId);
+    ResponseEntity<byte[]> downloadPayslip(String companyName, String payslipId, String employeeId, HttpServletRequest request);
 }

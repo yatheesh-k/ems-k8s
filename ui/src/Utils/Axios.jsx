@@ -15,9 +15,6 @@ const axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: {
     Authorization: `Bearer ${token}`,
-    // 'Access-Control-Allow-Origin':'*/*',
-    // 'Content-Type':'application/json',
-    // crossDomain:true
   }
 });
 export const loginApi = (data) => {
@@ -284,10 +281,35 @@ export const EmployeePayslipsGet = (employeeId, year) => {
   });
 }
 
-export const EmployeePaySlipDownloadById=(employeeId,payslipId)=>{
-  const company = localStorage.getItem("companyName")
-  return axiosInstance.get(`/${company}/employee/${employeeId}/download/${payslipId}`);
-}
+export const EmployeePaySlipDownloadById = async (employeeId, payslipId) => {
+  const company = localStorage.getItem("companyName");
+
+  try {
+    // Make the API request with specific headers for this request
+    const response = await axiosInstance.get(
+      `/${company}/employee/${employeeId}/download/${payslipId}`,
+      {
+        responseType: 'blob', // Handle the response as a binary blob
+        headers: {
+          'Accept': 'application/pdf', // Accept PDF format
+        }
+      }
+    );
+
+    // Handle the response (e.g., trigger a file download)
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `payslip_${employeeId}.pdf`; // Customize file name as needed
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+
+  } catch (error) {
+    console.error('Download error:', error);
+  }
+};
 
 export const EmployeePayslipDeleteById = (employeeId, payslipId) => {
   const company = localStorage.getItem("comapnyName")

@@ -20,7 +20,7 @@ public class LoginController {
         this.webClient = webClientBuilder.baseUrl(baseUrl).build();
     }
 
-    @PostMapping("/emsadmin/login")
+    @PostMapping("emsadmin/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             return webClient.post()
@@ -34,7 +34,7 @@ public class LoginController {
         }
     }
 
-    @PatchMapping("/emsadmin/login")
+    @PatchMapping("emsadmin/login")
     public ResponseEntity<?> updatePassword(@RequestBody LoginRequest request) {
         try {
             return webClient.patch()
@@ -48,7 +48,7 @@ public class LoginController {
         }
     }
 
-    @PostMapping("/token/validate")
+    @PostMapping("token/validate")
     public ResponseEntity<?> validateToken(@RequestBody ValidateLoginRequest request) {
         try {
             return webClient.post()
@@ -62,7 +62,7 @@ public class LoginController {
         }
     }
 
-    @PostMapping("/company/login")
+    @PostMapping("company/login")
     public ResponseEntity<?> companyLogin(@RequestBody EmployeeLoginRequest request) {
         try {
             return webClient.post()
@@ -76,7 +76,7 @@ public class LoginController {
         }
     }
 
-    @PostMapping("/validate")
+    @PostMapping("validate")
     public ResponseEntity<?> validateCompanyOtp(@RequestBody OTPRequest request) {
         try {
             return webClient.post()
@@ -90,7 +90,7 @@ public class LoginController {
         }
     }
 
-    @PostMapping("/forgot/password")
+    @PostMapping("forgot/password")
     public ResponseEntity<?> forgotPassword(@RequestBody EmployeePasswordRequest request) {
         try {
             return webClient.post()
@@ -104,7 +104,7 @@ public class LoginController {
         }
     }
 
-    @PostMapping("/update/password")
+    @PostMapping("update/password")
     public ResponseEntity<?> updatePassword(@RequestBody EmployeePasswordforgot request) {
         try {
             return webClient.post()

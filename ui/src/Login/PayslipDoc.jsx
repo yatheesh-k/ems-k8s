@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import LayOut from "../LayOut/LayOut";
 import { userId } from "../Utils/Auth";
 import { Download } from "react-bootstrap-icons";
+import { useAuth } from "../Context/AuthContext";
+import axios from "axios";
 
 const PayslipDoc = () => {
   const [companyData, setCompanyData] = useState([]);
@@ -15,6 +17,7 @@ const PayslipDoc = () => {
   const { employeeDetails } = location.state || {};
   const [payslipData, setPayslipData] = useState(null);
   const [logoFileName, setLogoFileName] = useState([]);
+  const {user}=useAuth()
 
 
   const fetchCompanyLogo = async (companyId) => {
@@ -78,28 +81,21 @@ const PayslipDoc = () => {
       fetchPayslipData();
     }
   }, [employeeId, payslipId]);
-
-  const downloadPayslip = async (employeeId, payslipId) => {
-    try {
-      // Call the API to get the payslip data
-      const response = await EmployeePaySlipDownloadById(employeeId, payslipId, {
-        responseType: 'blob' // Important for handling binary data
-      });
   
-      // Create a link element and trigger the download
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `payslip_${payslipId}.pdf`); // Adjust the file name if needed
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error) {
-      console.error('Error downloading payslip:', error);
-      handleApiErrors(error); // Make sure to handle API errors appropriately
+  
+  const handleDownload = async () => {
+    if (employeeId && payslipId) {
+      try {
+        await EmployeePaySlipDownloadById(employeeId, payslipId);
+      } catch (error) {
+        console.error('Error downloading payslip:', error);
+      }
+    } else {
+      console.error('Employee ID or Payslip ID is missing');
     }
   };
-
+  
+  
   if (!payslipData) {
     return <div>Loading...</div>;
   }
@@ -473,13 +469,7 @@ const PayslipDoc = () => {
         <button
               type="button"
               className="btn btn-outline-primary"
-              onClick={() => {
-                if (employeeId && payslipId) {
-                  downloadPayslip(employeeId, payslipId);
-                } else {
-                  console.error('Employee ID or Payslip ID is missing');
-                }
-              }}
+              onClick={handleDownload}
         >
           <span className="m-2">Download</span> <Download size={18}  className="ml-1" />
         </button>
