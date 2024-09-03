@@ -142,7 +142,8 @@ public class AttendanceServiceImpl implements AttendanceService {
                 // Fetch attendance records for all employees for the specified year
                 List<AttendanceEntity> allAttendanceEntities = openSearchOperations.getAttendanceByYear(companyName, null, year);
 
-                // Filter the attendance records to find those for the specific employee and month if provided
+                // Filter the attendance records to find those for the specific
+                // employee and month if provided
                 attendanceEntities = allAttendanceEntities.stream()
                         .filter(attendance -> employeeId.equals(attendance.getEmployeeId()) &&
                                 (month == null || month.isEmpty() || month.equals(attendance.getMonth())))
