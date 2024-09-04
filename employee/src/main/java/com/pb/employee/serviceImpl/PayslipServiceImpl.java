@@ -373,7 +373,7 @@ public class PayslipServiceImpl implements PayslipService {
 
         String baseUrl = getBaseUrl(request);
         String image = baseUrl + "ui/public/assets/img/" + company.getImageFile();
-
+        log.info("IMAGEPATH"+image);
         htmlBuilder.append("<!DOCTYPE html>");
         htmlBuilder.append("<html lang=\"en\">");
         htmlBuilder.append("<head>");
