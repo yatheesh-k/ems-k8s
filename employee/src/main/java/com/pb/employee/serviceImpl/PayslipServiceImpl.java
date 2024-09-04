@@ -19,8 +19,6 @@ import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.*;
 
 @Service
@@ -212,7 +210,6 @@ public class PayslipServiceImpl implements PayslipService {
 
     }
 
-
     @Override
     public ResponseEntity<?> getEmployeePayslips(String companyName, String employeeId,String month,String year) throws EmployeeException {
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
@@ -239,6 +236,33 @@ public class PayslipServiceImpl implements PayslipService {
             }
         } catch (Exception ex) {
             log.error("Exception while fetching payslips for employee {}: {}", employeeId, ex.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES_PAYSLIP),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(allPayslips), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<?> getAllEmployeesPayslips(String companyName,String month,String year) throws EmployeeException {
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+        EmployeeEntity employee = null;
+        Object salary = null;
+        List<PayslipEntity> allPayslips =null;
+        try {
+            // Fetch employee details
+            allPayslips = openSearchOperations.getAllPayslips(companyName,month,year);
+            for (PayslipEntity payslipEntity:allPayslips){
+                PayslipUtils.unmaskEmployeePayslip(payslipEntity);
+            }
+
+            if (allPayslips.isEmpty()) {
+                log.warn("No matching payslips found for employee with ID {}", employee);
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_NOT_MATCHING),
+                        HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception ex) {
+            log.error("Exception while fetching payslips {}", ex.getMessage());
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES_PAYSLIP),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -277,7 +301,6 @@ public class PayslipServiceImpl implements PayslipService {
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.DELETED), HttpStatus.OK);
 
     }
-
 
 
     public ResponseEntity<byte[]> downloadPayslip(String companyName, String payslipId, String employeeId, HttpServletRequest request) {

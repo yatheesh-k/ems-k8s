@@ -42,9 +42,10 @@ public class SalaryServiceImpl implements SalaryService {
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
-    private OpenSearchOperations openSearchOperations;
+    private  OpenSearchOperations openSearchOperations;
     @Autowired
     private EmployeeServiceImpl employeeService;
+
 
     @Override
     public ResponseEntity<?> addSalary(SalaryRequest salaryRequest,String employeeId) throws EmployeeException{
@@ -151,8 +152,6 @@ public class SalaryServiceImpl implements SalaryService {
                             HttpStatus.INTERNAL_SERVER_ERROR);
                 }
             }
-
-
         } catch (Exception ex) {
             log.error("Exception while fetching salaries for employees {}: {}", employeeId, ex.getMessage());
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),

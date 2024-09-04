@@ -7,10 +7,12 @@ import com.pb.employee.request.AttendanceUpdateRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 public interface AttendanceService {
 
     ResponseEntity<?> uploadAttendanceFile(String company,MultipartFile file) throws EmployeeException;
-    ResponseEntity<?> getAllEmployeeAttendance(String companyName,String employeeId,String month,String year)throws EmployeeException;
+    ResponseEntity<?> getAllEmployeeAttendance(String companyName,String employeeId,String month,String year)throws IOException,EmployeeException;
 
     ResponseEntity<?> deleteEmployeeAttendanceById(String companyName, String employeeId, String attendanceId)throws EmployeeException;
 

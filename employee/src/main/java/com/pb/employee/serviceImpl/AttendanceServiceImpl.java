@@ -31,16 +31,18 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class AttendanceServiceImpl implements AttendanceService {
 
     @Autowired
-    private OpenSearchOperations openSearchOperations;
+    private  OpenSearchOperations openSearchOperations;
 
 
     private static final Map<String, Month> MONTH_NAME_MAP = createMonthNameMap();
+
     private static Map<String, Month> createMonthNameMap() {
         Map<String, Month> map = new HashMap<>();
         for (Month month : Month.values()) {
@@ -98,6 +100,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                             HttpStatus.BAD_REQUEST);
                 }
 
+
                 if (EmployeeStatus.INACTIVE.getStatus().equals(employee.getStatus())) {
                     log.error("The employee is inactive {}", employeeId);
                     return new ResponseEntity<>(
@@ -123,36 +126,67 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public ResponseEntity<?> getAllEmployeeAttendance(String companyName, String employeeId, String month, String year) throws EmployeeException {
-        List<AttendanceEntity> attendanceEntities = null;
+    public ResponseEntity<?> getAllEmployeeAttendance(String companyName, String employeeId, String month, String year) throws IOException, EmployeeException {
+        List<AttendanceEntity> attendanceEntities;
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
-
         try {
-            // Fetch the actual employeeId from the database based on the generatedEmployeeId
-            EmployeeEntity employee = openSearchOperations.getEmployeeById(employeeId,null,index);
+            // Validate if the year is provided
+            if (employeeId != null && !employeeId.isEmpty()) {
+                // Validate employee existence
+                EmployeeEntity employee = openSearchOperations.getEmployeeById(employeeId, null, index);
+                if (employee == null) {
+                    throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+                            HttpStatus.NOT_FOUND);
+                }
 
-            // Check if employee exists
-            if (employee == null) {
-                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+                // Fetch attendance records for all employees for the specified year
+                List<AttendanceEntity> allAttendanceEntities = openSearchOperations.getAttendanceByYear(companyName, null, year);
+
+                // Filter the attendance records to find those for the specific
+                // employee and month if provided
+                attendanceEntities = allAttendanceEntities.stream()
+                        .filter(attendance -> employeeId.equals(attendance.getEmployeeId()) &&
+                                (month == null || month.isEmpty() || month.equals(attendance.getMonth())))
+                        .collect(Collectors.toList());
+
+                // If no attendance records are found for the specific employee
+                if (attendanceEntities.isEmpty()) {
+                    throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.NO_ATTENDANCE_FOUND),
+                            HttpStatus.NOT_FOUND);
+                }
+
+            }  else {
+                // If employeeId is not provided, fetch attendance for all employees in the company for the given year/month
+                if (month != null && !month.isEmpty()) {
+                    attendanceEntities = openSearchOperations.getAttendanceByMonthAndYear(companyName, null, month, year);
+                } else {
+                    attendanceEntities = openSearchOperations.getAttendanceByYear(companyName, null, year);
+                }
+            }
+
+            // Check if the attendanceEntities list is empty, implying no records were found
+            if (attendanceEntities == null || attendanceEntities.isEmpty()) {
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.NO_ATTENDANCE_FOUND),
                         HttpStatus.NOT_FOUND);
             }
-            // Call the method to get attendance based on whether the month is provided or not
-            if ((month != null && !month.isEmpty())||(year!= null && !year.isEmpty())) {
-                attendanceEntities = openSearchOperations.getAttendanceByMonthAndYear(companyName,employeeId, month, year);
-            }
+
             // Unmask sensitive properties if required
-            for (AttendanceEntity attendanceEntity : attendanceEntities) {
-                CompanyUtils.unMaskAttendanceProperties(attendanceEntity);
+            if (attendanceEntities != null) {
+                for (AttendanceEntity attendanceEntity : attendanceEntities) {
+                    CompanyUtils.unMaskAttendanceProperties(attendanceEntity);
+                }
             }
             // Return success response with the retrieved attendance records
             return new ResponseEntity<>(ResponseBuilder.builder().build().createSuccessResponse(attendanceEntities), HttpStatus.OK);
 
         } catch (Exception ex) {
-            log.error("Exception while fetching attendance for employees {}: {}", companyName, ex.getMessage());
+            log.error("Exception while fetching attendance for employees in company {}: {}", companyName, ex.getMessage());
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_GET_ATTENDANCE),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 
     @Override
     public ResponseEntity<?> deleteEmployeeAttendanceById(String companyName, String employeeId, String attendanceId) throws EmployeeException {
@@ -301,7 +335,7 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
 
-    public String getCellValue(Cell cell) {
+    private String getCellValue(Cell cell) {
         if (cell == null) {
             return "";
         }
