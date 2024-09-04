@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pb.employee.model.ResourceType;
 import com.pb.employee.persistance.model.*;
 import com.pb.employee.request.*;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -68,7 +69,7 @@ public class CompanyUtils {
         return entity;
     }
 
-    public static Entity unmaskCompanyProperties(CompanyEntity companyEntity) {
+    public static Entity unmaskCompanyProperties(CompanyEntity companyEntity,  HttpServletRequest request) {
         String hra = null, pan = null, pf = null, spa = null, ta = null, regNo = null, mobileNo=null, landNo= null, gstNo=null, cinNo=null;
         if(companyEntity.getHraPercentage() != null) {
             hra = new String(Base64.getDecoder().decode(companyEntity.getHraPercentage().getBytes()));
@@ -110,6 +111,10 @@ public class CompanyUtils {
         if(companyEntity.getCinNo() != null) {
             cinNo = new String(Base64.getDecoder().decode(companyEntity.getCinNo().getBytes()));
             companyEntity.setCinNo(cinNo);
+        }
+        if (companyEntity.getImageFile() != null){
+            String baseUrl = getBaseUrl(request);
+            String image = baseUrl + "var/www/ems/assets/img/" + companyEntity.getImageFile();
         }
         companyEntity.setPassword("**********");
         companyEntity.setType(Constants.COMPANY);
@@ -613,4 +618,13 @@ public class CompanyUtils {
         return responseBody;
 
     }
+    public static String getBaseUrl(HttpServletRequest request) {
+        String scheme = request.getScheme(); // http or https
+        String serverName = request.getServerName(); // localhost or IP address
+        int serverPort = request.getServerPort(); // port number
+        String contextPath = request.getContextPath(); // context path
+
+        return scheme + "://" + serverName + ":" + serverPort + contextPath + "/";
+    }
+
 }
