@@ -8,6 +8,7 @@ import com.pb.employee.request.CompanyRequest;
 import com.pb.employee.request.CompanyUpdateRequest;
 import com.pb.employee.request.EmployeePasswordReset;
 import com.pb.employee.response.CompanyResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,13 +17,13 @@ import java.util.List;
 
 public interface CompanyService {
     ResponseEntity<?> registerCompany(CompanyRequest companyRequest) throws EmployeeException;
-    ResponseEntity<?> getCompanies() throws EmployeeException;
-    ResponseEntity<?> getCompanyById(String companyId) throws EmployeeException;
+    ResponseEntity<?> getCompanies( HttpServletRequest request) throws EmployeeException;
+    ResponseEntity<?> getCompanyById(String companyId,  HttpServletRequest request) throws EmployeeException;
     ResponseEntity<?> updateCompanyById(String companyId, CompanyUpdateRequest companyUpdateRequest) throws IOException, EmployeeException;
     ResponseEntity<?> updateCompanyImageById(String companyId,  CompanyImageUpdate companyImageUpdate,MultipartFile multipartFile) throws EmployeeException, IOException;
     ResponseEntity<?> deleteCompanyById(String companyId) throws EmployeeException;
 
-    ResponseEntity<?> getCompanyImageById(String companyId)  throws EmployeeException;
+    ResponseEntity<?> getCompanyImageById(String companyId, HttpServletRequest request)  throws EmployeeException;
 
     ResponseEntity<?> passwordResetForEmployee(EmployeePasswordReset employeePasswordReset, String id) throws EmployeeException;
 }

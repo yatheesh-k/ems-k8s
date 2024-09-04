@@ -9,6 +9,7 @@ import com.pb.employee.request.EmployeePasswordReset;
 import com.pb.employee.service.CompanyService;
 import com.pb.employee.util.Constants;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,8 +46,9 @@ public class CompanyController {
     @ResponseStatus(HttpStatus.OK)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
     public ResponseEntity<?> getCompanies(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
-                                          @RequestHeader(Constants.AUTH_KEY) String authToken) throws EmployeeException {
-        return companyService.getCompanies();
+                                          @RequestHeader(Constants.AUTH_KEY) String authToken,
+                                          HttpServletRequest request) throws EmployeeException {
+        return companyService.getCompanies(request);
     }
 
     @RequestMapping(value = "/{companyId}", method = RequestMethod.GET)
@@ -55,8 +57,9 @@ public class CompanyController {
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
     public ResponseEntity<?> getCompanyById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                             @RequestHeader(Constants.AUTH_KEY) String authToken,
-                                            @PathVariable String companyId) throws EmployeeException {
-        return companyService.getCompanyById(companyId);
+                                            @PathVariable String companyId,
+                                            HttpServletRequest request) throws EmployeeException {
+        return companyService.getCompanyById(companyId, request);
     }
 
     @RequestMapping(value = "/{companyId}", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -110,8 +113,8 @@ public class CompanyController {
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
     public ResponseEntity<?> getCompanyImage(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                             @RequestHeader(Constants.AUTH_KEY) String authToken,
-                                            @PathVariable String companyId) throws EmployeeException {
-        return companyService.getCompanyImageById(companyId);
+                                            @PathVariable String companyId, HttpServletRequest request) throws EmployeeException {
+        return companyService.getCompanyImageById(companyId, request);
     }
 
 }

@@ -19,6 +19,7 @@ import com.pb.employee.util.CompanyUtils;
 import com.pb.employee.util.Constants;
 import com.pb.employee.util.EmployeeUtils;
 import com.pb.employee.util.ResourceIdUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -109,12 +110,12 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public ResponseEntity<?> getCompanies() throws EmployeeException {
+    public ResponseEntity<?> getCompanies( HttpServletRequest request) throws EmployeeException {
 
         List<CompanyEntity> companyEntities = null;
         companyEntities = openSearchOperations.getCompanies();
         for(CompanyEntity companyEntity : companyEntities) {
-            CompanyUtils.unmaskCompanyProperties(companyEntity);
+            CompanyUtils.unmaskCompanyProperties(companyEntity, request);
         }
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(companyEntities), HttpStatus.OK);
@@ -122,12 +123,12 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public ResponseEntity<?> getCompanyById(String companyId)  throws EmployeeException{
+    public ResponseEntity<?> getCompanyById(String companyId, HttpServletRequest request)  throws EmployeeException{
         log.info("getting details of {}", companyId);
         CompanyEntity companyEntity = null;
         try {
             companyEntity = openSearchOperations.getCompanyById(companyId, null, Constants.INDEX_EMS);
-            CompanyUtils.unmaskCompanyProperties(companyEntity);
+            CompanyUtils.unmaskCompanyProperties(companyEntity, request);
         } catch (Exception ex) {
             log.error("Exception while fetching company details {}", ex);
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_SAVE_COMPANY),
@@ -226,13 +227,14 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public ResponseEntity<?> getCompanyImageById(String companyId) throws EmployeeException {
+    public ResponseEntity<?> getCompanyImageById(String companyId, HttpServletRequest request) throws EmployeeException {
         log.info("getting details of {}", companyId);
         CompanyEntity companyEntity = null;
         String image = null;
         try {
             companyEntity = openSearchOperations.getCompanyById(companyId, null, Constants.INDEX_EMS);
-            image = companyEntity.getImageFile();
+            String baseUrl = CompanyUtils.getBaseUrl(request);
+            image = baseUrl + "var/www/ems/assets/img/" + companyEntity.getImageFile();
         } catch (Exception ex) {
             log.error("Exception while fetching company details {}", ex);
             throw new EmployeeException(

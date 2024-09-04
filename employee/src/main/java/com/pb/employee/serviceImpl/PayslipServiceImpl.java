@@ -306,7 +306,7 @@ public class PayslipServiceImpl implements PayslipService {
             }
             entity = openSearchOperations.getPayslipById(payslipId, null, index);
             PayslipUtils.unmaskEmployeePayslip(entity);
-            Entity companyEntity = CompanyUtils.unmaskCompanyProperties(company);
+            Entity companyEntity = CompanyUtils.unmaskCompanyProperties(company, request);
             Entity employeeEntity = EmployeeUtils.unmaskEmployeeProperties(employee, department, designation);
             String htmlContent = generatePayslipHtml(entity, (EmployeeEntity) employeeEntity, company, request);
 
@@ -348,9 +348,7 @@ public class PayslipServiceImpl implements PayslipService {
     private String generatePayslipHtml(PayslipEntity payslipEntity, EmployeeEntity employee, CompanyEntity company, HttpServletRequest request) {
         StringBuilder htmlBuilder = new StringBuilder();
 
-        String baseUrl = getBaseUrl(request);
-        String image = baseUrl + "ui/public/assets/img/" + company.getImageFile();
-        log.info("IMAGEPATH"+image);
+
         htmlBuilder.append("<!DOCTYPE html>");
         htmlBuilder.append("<html lang=\"en\">");
         htmlBuilder.append("<head>");
@@ -421,7 +419,7 @@ public class PayslipServiceImpl implements PayslipService {
         htmlBuilder.append("</td>");
         htmlBuilder.append("<td>");
         htmlBuilder.append("<div class=\"logo\">");
-        htmlBuilder.append("<img src=\"").append(image).append("\"/>");
+        htmlBuilder.append("<img src=\"").append(company.getImageFile()).append("\"/>");
         htmlBuilder.append("</div>");
         htmlBuilder.append("</td>");
         htmlBuilder.append("</tr>");
@@ -567,14 +565,6 @@ public class PayslipServiceImpl implements PayslipService {
         htmlBuilder.append("</html>");
 
         return htmlBuilder.toString();
-    }
-    private String getBaseUrl(HttpServletRequest request) {
-        String scheme = request.getScheme(); // http or https
-        String serverName = request.getServerName(); // localhost or IP address
-        int serverPort = request.getServerPort(); // port number
-        String contextPath = request.getContextPath(); // context path
-
-        return scheme + "://" + serverName + ":" + serverPort + contextPath + "/";
     }
 
 
