@@ -22,6 +22,7 @@ const EmployeeSalaryStructure = () => {
   const queryParams = new URLSearchParams(location.search);
   const salaryId = queryParams.get('salaryId');
   const id=queryParams.get('employeeId')
+
   const [employes, setEmployes] = useState([]);
   const [grossAmount, setGrossAmount] = useState(0);
   const [hra, setHra] = useState(0);

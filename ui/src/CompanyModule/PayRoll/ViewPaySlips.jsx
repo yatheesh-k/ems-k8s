@@ -187,19 +187,6 @@ const ViewPaySlips = () => {
           >
             <Eye size={22} color="green" />
           </button>
-          <button
-            className="btn btn-sm"
-            style={{
-              backgroundColor: "transparent",
-              border: "none",
-              padding: "0",
-              marginLeft: "5px",
-            }}
-            onClick={() => handleViewSalary(row.employeeId, row.payslipId)}
-            title="Download Payslip"
-          >
-            <CloudArrowDown size={22} color='#d116dd' />
-          </button>
         </div>
       ),
     },

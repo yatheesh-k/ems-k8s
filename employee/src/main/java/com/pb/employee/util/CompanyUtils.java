@@ -115,6 +115,7 @@ public class CompanyUtils {
         if (companyEntity.getImageFile() != null){
             String baseUrl = getBaseUrl(request);
             String image = baseUrl + "var/www/ems/assets/img/" + companyEntity.getImageFile();
+            companyEntity.setImageFile(image);
         }
         companyEntity.setPassword("**********");
         companyEntity.setType(Constants.COMPANY);

@@ -16,28 +16,27 @@ const PayslipDoc = () => {
   const payslipId = queryParams.get("payslipId");
   const { employeeDetails } = location.state || {};
   const [payslipData, setPayslipData] = useState(null);
-  const [logoFileName, setLogoFileName] = useState([]);
-  const {user}=useAuth()
+  //const [logoFileName, setLogoFileName] = useState([]);
+  const {  logoFileName} = useAuth();
 
-
-  const fetchCompanyLogo = async (companyId) => {
-    try {
-      const logoResponse = await CompanyImageGetApi(companyId);
-      console.log("Full logo response:", logoResponse.data.data);
-      if (logoResponse && logoResponse.data && logoResponse.data.data) {
-        const logoPath = logoResponse.data.data;
-        // Extracting filename from path
-        const fileName = logoPath.split('\\').pop();
-        // Set state with filename
-        setLogoFileName(fileName);
-        console.log("fileName", fileName);
-      } else {
-        console.error("Response or data is missing");
-      }
-    } catch (err) {
-      console.error("Error fetching company logo:", err);
-    }
-  };
+  // const fetchCompanyLogo = async (companyId) => {
+  //   try {
+  //     const logoResponse = await CompanyImageGetApi(companyId);
+  //     console.log("Full logo response:", logoResponse.data.data);
+  //     if (logoResponse && logoResponse.data && logoResponse.data.data) {
+  //       const logoPath = logoResponse.data.data;
+  //       // Extracting filename from path
+  //       const fileName = logoPath.split('\\').pop();
+  //       // Set state with filename
+  //       setLogoFileName(fileName);
+  //       console.log("fileName", fileName);
+  //     } else {
+  //       console.error("Response or data is missing");
+  //     }
+  //   } catch (err) {
+  //     console.error("Error fetching company logo:", err);
+  //   }
+  // };
 
   const fetchCompanyData = async (companyId) => {
     try {
@@ -56,7 +55,6 @@ const PayslipDoc = () => {
         console.log(response.data.companyId)
         const companyId = response.data.companyId;
         console.log(companyId);
-        fetchCompanyLogo(companyId);
         fetchCompanyData(companyId)
       } catch (error) {
         // handleApiErrors(error);
@@ -81,8 +79,6 @@ const PayslipDoc = () => {
       fetchPayslipData();
     }
   }, [employeeId, payslipId]);
-  
-  
   const handleDownload = async () => {
     if (employeeId && payslipId) {
       try {
@@ -94,8 +90,7 @@ const PayslipDoc = () => {
       console.error('Employee ID or Payslip ID is missing');
     }
   };
-  
-  
+
   if (!payslipData) {
     return <div>Loading...</div>;
   }
@@ -163,7 +158,7 @@ const PayslipDoc = () => {
                 {logoFileName ? (
                   <img
                     className="align-middle"
-                    src={`assets/img/${logoFileName}`} // Dynamic source based on logoFileName
+                    src={`${logoFileName}`} // Dynamic source based on logoFileName
                     alt="Logo"
                     style={{ height: "80px", width: "180px" }}
                   />

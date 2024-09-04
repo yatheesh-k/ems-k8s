@@ -884,7 +884,7 @@ const EmployeeRegistration = () => {
                     {/* )} */}
                     <div className="card-header" style={{ paddingLeft: "0px" }}>
                       <h5 className="card-title ">
-                        Bank Accoount Details
+                        Account Details
                       </h5>
                       <div
                         className="dropdown-divider"

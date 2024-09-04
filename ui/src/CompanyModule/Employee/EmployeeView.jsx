@@ -100,7 +100,6 @@ const EmployeeView = () => {
 
 
   const handleEdit = (id) => {
-    console.log(id);
     Navigate(`/employeeRegistration`, { state: { id } }); 
   };
 

@@ -5,18 +5,18 @@ import LayOut from "./LayOut";
 import { CameraFill } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { CompanyImagePatchApi, companyUpdateByIdApi, companyViewByIdApi, EmployeeGetApiById } from "../Utils/Axios";
+import { CompanyImagePatchApi, companyUpdateByIdApi, companyViewByIdApi } from "../Utils/Axios";
 import { useAuth } from "../Context/AuthContext";
 
 function Profile() {
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm({ mode: "onChange" });
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm({ mode: "onChange" });
   const [companyData, setCompanyData] = useState({});
   const [postImage, setPostImage] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [error, setError] = useState(null);
-  const { user = {}, logoFileName, loading } = useAuth();
+  const { user = {}, logoFileName } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,17 +36,6 @@ function Profile() {
     fetchCompanyData();
   }, [setValue, user.companyId]);
 
-  useEffect(() => {
-    const fetchEmployeeData = async () => {
-      try {
-        const response = await EmployeeGetApiById(user.userId);
-        // No action needed if successful
-      } catch (error) {
-        setError(error);
-      }
-    };
-    fetchEmployeeData();
-  }, [user]);
 
   const handleDetailsSubmit = async (data) => {
     if (!user.companyId) return;
@@ -271,7 +260,7 @@ function Profile() {
                     {logoFileName && (
                       <img
                         className="align-middle"
-                        src={`CompanyLogos/${logoFileName}`}
+                        src={`${logoFileName}`}
                         alt="Company Logo"
                         style={{ height: "80px", width: "180px" }}
                       />

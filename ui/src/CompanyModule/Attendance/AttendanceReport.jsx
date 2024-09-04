@@ -95,25 +95,26 @@ const AttendanceReport = () => {
     }
   };
 
-  const fetchAllAttendanceData = async () => {
-    try {
-        const now = new Date();
-        const currentMonth = now.getMonth() + 1; 
-        const currentYear = now.getFullYear();
 
-        const monthNames = getMonthNames();
-        const currentMonthName = monthNames[currentMonth - 1]; 
-
-        const response = await AttendanceReportApi(null, currentMonthName, currentYear);
-        setAttendanceData(response.data.data);
-        setIsAllAttendance(true);
-        setIsAttendance(false);
-    } catch (error) {
-        console.error("Error fetching attendance data:", error);
-    }
-};
 
   useEffect(() => {
+    const fetchAllAttendanceData = async () => {
+      try {
+          const now = new Date();
+          const currentMonth = now.getMonth() + 1; 
+          const currentYear = now.getFullYear();
+  
+          const monthNames = getMonthNames();
+          const currentMonthName = monthNames[currentMonth - 1]; 
+  
+          const response = await AttendanceReportApi(null, currentMonthName, currentYear);
+          setAttendanceData(response.data.data);
+          setIsAllAttendance(true);
+          setIsAttendance(false);
+      } catch (error) {
+          console.error("Error fetching attendance data:", error);
+      }
+  };
     const fetchEmployees = async () => {
       try {
         const data = await EmployeeGetApi();

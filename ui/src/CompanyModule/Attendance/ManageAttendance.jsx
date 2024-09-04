@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LayOut from "../../LayOut/LayOut";
-import { AttendanceManagementApi } from "../../Utils/Axios";
+import { AttendanceManagementApi, EmployeeGetApi } from "../../Utils/Axios";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { Download } from "react-bootstrap-icons";
@@ -15,10 +15,36 @@ const ManageAttendance = () => {
   } = useForm();
 
   const [selectedFile, setSelectedFile] = useState(null);
+  const [employees, setEmployees] = useState([]);
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const data = await EmployeeGetApi();
+        const formattedData = data
+          .filter((employee) => employee.firstName !== null)
+          .map(({ id, firstName, lastName, employeeId, emailId, workingDays }) => ({
+            label: `${firstName} ${lastName} (${employeeId})`,
+            value: id,
+            firstName,
+            lastName,
+            employeeId,
+            emailId,
+            workingDays
+          }));
+        setEmployees(formattedData);
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+        toast.error("Failed to fetch employee data");
+      }
+    };
+
+    fetchEmployees();
+  }, []);
+
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
   };
-
 
   const onSubmit = async (data) => {
     const formData = new FormData();
@@ -46,6 +72,7 @@ const ManageAttendance = () => {
     }
     console.error(error.response);
   };
+
   const exportToExcel = () => {
     const headers = [
       "EmployeeId",
@@ -54,7 +81,18 @@ const ManageAttendance = () => {
       "EmailId",
       "No of Working Days",
     ];
+
     const data = [headers];
+
+    employees.forEach(employee => {
+      data.push([
+        employee.employeeId,
+        employee.firstName,
+        employee.lastName,
+        employee.emailId || "N/A",
+        employee.workingDays || "0"
+      ]);
+    });
 
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(data);
@@ -92,7 +130,7 @@ const ManageAttendance = () => {
                   className="btn btn-outline-primary"
                   onClick={exportToExcel}
                 >
-                  Download Sample Attendance <Download size={20} className="ml-1" />
+                  Download Attendance Excel Sheet <Download size={20} className="ml-1" />
                 </button>
               </div>
               <div className="dropdown-divider" style={{ borderTopColor: "#d7d9dd" }} />
@@ -106,7 +144,6 @@ const ManageAttendance = () => {
                           className="form-control"
                           type="file"
                           accept=".xlsx"
-
                           {...register("attendanceFile", {
                             required: "Upload Attendance File",
                           })}

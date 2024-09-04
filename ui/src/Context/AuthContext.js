@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { EmployeeGetApiById, CompanyImageGetApi } from '../Utils/Axios'; // Import your API functions
+import { EmployeeGetApiById,companyViewByIdApi } from '../Utils/Axios'; // Import your API functions
 import { jwtDecode } from "jwt-decode";
 
 // Create a context for authentication
@@ -37,7 +37,6 @@ export const AuthProvider = ({ children }) => {
       }
     }
   }, []);
-  console.log("userIdContext", user.userId)
 
   const setAuthUser = (userData) => {
     setUser(userData);
@@ -56,7 +55,6 @@ export const AuthProvider = ({ children }) => {
         setUser(prevUser => ({ ...prevUser, companyId }));
         await fetchCompanyLogo(companyId);
       } catch (error) {
-        console.log("Error fetching employee data:", error);
         setError("Failed to fetch data");
       } finally {
         setLoading(false);
@@ -65,16 +63,22 @@ export const AuthProvider = ({ children }) => {
 
     const fetchCompanyLogo = async (companyId) => {
       try {
-        const logoResponse = await CompanyImageGetApi(companyId);
-        if (logoResponse?.data?.data) {
-          const logoPath = logoResponse.data.data;
-          setLogoFileName(logoPath);
+        const logoResponse = await companyViewByIdApi(companyId);
+      
+        // Access company data from the response
+        const companyData = logoResponse?.data;
+  
+        if (companyData) {
+          const logoPath = companyData?.imageFile;
+          if (logoPath) {
+            setLogoFileName(logoPath);
+          } else {
+            setError("Logo not found in company data");
+          }
         } else {
-          console.error("Response or data is missing");
-          setError("Logo not found");
+          setError("Company data not found");
         }
       } catch (err) {
-        console.error("Error fetching company logo:", err);
         setError("Error fetching logo");
       }
     };

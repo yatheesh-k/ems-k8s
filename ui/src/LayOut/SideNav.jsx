@@ -216,7 +216,7 @@ const SideNav = () => {
                 logoFileName && (
                   <img
                     className="align-middle"
-                    src={`assets/img/${logoFileName}`} // Dynamic source based on logoFileName
+                    src={`${logoFileName}`} // Dynamic source based on logoFileName
                     alt="Company Logo"
                     style={{ height: "80px", width: "180px" }}
                   />

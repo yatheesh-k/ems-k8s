@@ -133,8 +133,8 @@ const EmployeeSalaryList = () => {
   
   
 
-    const handleNavigateToRegister = () => {
-      navigate('/employeeSalaryStructure');
+    const handleNavigateToRegister = (id) => {
+      navigate(`/employeeSalaryStructure?employeeId=${id}`);
     };
 
     return (
