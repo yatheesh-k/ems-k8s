@@ -271,12 +271,20 @@ export const EmployeePayslipGetById = (employeeId, payslipId, month, year) => {
 };
 
 
-
-export const EmployeePayslipsGet = (employeeId, year) => {
+export const EmployeePayslipsGet = (employeeId, month, year) => {
   const company = localStorage.getItem("company")
   return axiosInstance.get(`/${company}/employee/${employeeId}/payslips`, {
     params: {
-      year: year
+      month, year
+    }
+  });
+}
+
+export const AllEmployeePayslipsGet = (month, year) => {
+  const company = localStorage.getItem("company")
+  return axiosInstance.get(`/${company}/employee/all/payslip`, {
+    params: {
+      month, year
     }
   });
 }
@@ -324,7 +332,7 @@ export const AttendanceReportApi = (employeeId, month, year) => {
 
   const companyName = localStorage.getItem("companyName")
   return axiosInstance.get(`/${companyName}/attendance`, {
-    params: {employeeId, month, year}
+    params: { employeeId, month, year }
   });
 }
 
@@ -344,7 +352,6 @@ export const CompanyImagePatchApi = (companyId, formData) => {
 export const CompanyImageGetApi = (companyId) => {
   return axiosInstance.get(`/company/${companyId}/image`);
 }
-
 
 
 

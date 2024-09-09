@@ -3,7 +3,7 @@ import LayOut from '../../LayOut/LayOut';
 import Select from 'react-select';
 import { useForm } from 'react-hook-form';
 import { Bounce, toast } from 'react-toastify';
-import { EmployeeGetApi, AttendanceReportApi, AttendanceDeleteById, AttendancePatchById, AllAttendanceReportApi } from '../../Utils/Axios';
+import { EmployeeGetApi, AttendanceReportApi, AttendanceDeleteById, AttendancePatchById } from '../../Utils/Axios';
 import { PencilSquare, XSquareFill } from 'react-bootstrap-icons';
 import DataTable from 'react-data-table-component';
 import { useNavigate } from 'react-router-dom';
@@ -32,6 +32,8 @@ const AttendanceReport = () => {
   const [isAttendance, setIsAttendance] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [columns, setColumns] = useState([]);
+  const [hasRecords, setHasRecords] = useState(true); // Add this state
 
   const navigate = useNavigate();
 
@@ -85,36 +87,43 @@ const AttendanceReport = () => {
       const monthNames = getMonthNames();
       const monthName = monthNames[month - 1];
       const response = await AttendanceReportApi(empId, monthName, year);
-      setAttendanceData(response.data.data);
-      setEmployeeAttendance(response.data.data);
+      const data = response.data.data;
+      setAttendanceData(data);
+      setEmployeeAttendance(data);
+      setHasRecords(data.length > 0); 
       setShowFields(true);
-      setIsAllAttendance(false); 
-      setIsAttendance(true); 
+      setIsAllAttendance(false);
+      setIsAttendance(true);
+      updateColumns(true);
     } catch (error) {
       console.error("Error fetching attendance data:", error);
+      setHasRecords(false); 
     }
   };
 
+  const fetchAllAttendanceData = async () => {
+    try {
+      const now = new Date();
+      const currentMonth = now.getMonth() + 1;
+      const currentYear = now.getFullYear();
 
+      const monthNames = getMonthNames();
+      const currentMonthName = monthNames[currentMonth - 1];
+
+      const response = await AttendanceReportApi(null, currentMonthName, currentYear);
+      const data = response.data.data;
+      setAttendanceData(data);
+      setHasRecords(data.length > 0);
+      setIsAllAttendance(true);
+      setIsAttendance(false);
+      updateColumns(true); 
+    } catch (error) {
+      console.error("Error fetching attendance data:", error);
+      setHasRecords(false); // In case of error, assume no records
+    }
+  };
 
   useEffect(() => {
-    const fetchAllAttendanceData = async () => {
-      try {
-          const now = new Date();
-          const currentMonth = now.getMonth() + 1; 
-          const currentYear = now.getFullYear();
-  
-          const monthNames = getMonthNames();
-          const currentMonthName = monthNames[currentMonth - 1]; 
-  
-          const response = await AttendanceReportApi(null, currentMonthName, currentYear);
-          setAttendanceData(response.data.data);
-          setIsAllAttendance(true);
-          setIsAttendance(false);
-      } catch (error) {
-          console.error("Error fetching attendance data:", error);
-      }
-  };
     const fetchEmployees = async () => {
       try {
         const data = await EmployeeGetApi();
@@ -207,68 +216,83 @@ const AttendanceReport = () => {
     console.error(error.response);
   };
 
-  const columns = [
-    {
+  const updateColumns = (update = false) => {
+    const commonColumns = [
+      {
+        name: <h6><b>No. Of Working Days</b></h6>,
+        selector: (row) => row.noOfWorkingDays,
+        sortable: true,
+        width: "240px",
+      },
+      {
+        name: <h6><b>Total Working Days</b></h6>,
+        selector: (row) => row.totalWorkingDays,
+        sortable: true,
+        width: "240px",
+      },
+      {
+        name: <h6><b>Actions</b></h6>,
+        cell: (row) => (
+          <div>
+            <button
+              className="btn btn-sm"
+              style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }}
+              onClick={() => handleShowEditModal(row)}
+              title='Edit'
+            >
+              <PencilSquare size={22} color="#2255a4" />
+            </button>
+            <button
+              className="btn btn-sm"
+              style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }}
+              onClick={() => handleShowDeleteModal(row)}
+              title='Delete'
+            >
+              <XSquareFill size={22} color="#da542e" />
+            </button>
+          </div>
+        ),
+      },
+    ];
 
-      name: <h6 style={{zIndex:"1"}}><b>S No</b></h6>,
-      selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
-      width: "70px",
-    },
-    ...(!isAttendance && !selectedYear && !selectedMonth ? [{
-      name: <h6><b>Name</b></h6>,
-      selector: (row) => `${row.firstName} ${row.lastName}`,
-      sortable: true,
-      width: "200px",
-    }] : []),
-    ...(!isAllAttendance && selectedYear ? [{
-      name: <h6><b>Name</b></h6>,
-      selector: (row) => `${row.firstName} ${row.lastName}`,
-      sortable: true,
-      width: "150px",
-    }] : []),
-    ...(!isAllAttendance && selectedYear ? [{
-      name: <h6><b>Month</b></h6>,
-      selector: (row) => row.month,
-      sortable: true,
-      width: "120px",
-    }] : []),
-    {
-      name: <h6><b>No. Of Working Days</b></h6>,
-      selector: (row) => row.noOfWorkingDays,
-      sortable: true,
-      width: "240px",
-    },
-    {
-      name: <h6><b>Total Working Days</b></h6>,
-      selector: (row) => row.totalWorkingDays,
-      sortable: true,
-      width: "240px",
-    },
-    {
-      name: <h6><b>Actions</b></h6>,
-      cell: (row) => (
-        <div>
-          <button
-            className="btn btn-sm"
-            style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }}
-            onClick={() => handleShowEditModal(row)}
-            title='Edit'
-          >
-            <PencilSquare size={22} color="#2255a4" />
-          </button>
-          <button
-            className="btn btn-sm"
-            style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }}
-            onClick={() => handleShowDeleteModal(row)}
-            title='Delete'
-          >
-            <XSquareFill size={22} color="#da542e" />
-          </button>
-        </div>
-      ),
-    },
-  ];
+    const dynamicColumns = [
+      {
+        name: <h6><b>S No</b></h6>,
+        selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
+        width: "80px",
+      },
+      ...(!isAttendance && !selectedYear && !selectedMonth ? [{
+        name: <h6><b>Name</b></h6>,
+        selector: (row) => `${row.firstName} ${row.lastName}`,
+        sortable: true,
+        width: "200px",
+      }] : []),
+      ...(!isAllAttendance && selectedYear ? [{
+        name: <h6><b>Name</b></h6>,
+        selector: (row) => `${row.firstName} ${row.lastName}`,
+        sortable: true,
+        width: "150px",
+      }] : []),
+      ...(!isAttendance && selectedYear ? [{
+        name: <h6><b>Name</b></h6>,
+        selector: (row) => `${row.firstName} ${row.lastName}`,
+        sortable: true,
+        width: "150px",
+      }] : []),
+      ...(!isAttendance && selectedYear ? [{
+        name: <h6><b>month</b></h6>,
+        selector: (row) => row.month,
+        sortable: true,
+        width: "150px",
+      }] : []),
+    ];
 
+    if (update) {
+      setColumns([...dynamicColumns, ...commonColumns]);
+    } else {
+      setColumns([...commonColumns]); 
+    }
+  };
 
   return (
     <LayOut>
@@ -339,41 +363,28 @@ const AttendanceReport = () => {
                 </div>
               </div>
               <div className="card-body">
-                {showFields ? (
+                <h5 className="card-title mt-2">
+                  Attendance Details for {selectedEmployeeDetails.firstName ? `${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})` : 'All Employees'}
+                  {selectedYear && ` - ${selectedYear}`}
+                  {selectedMonth && ` - ${getMonthNames()[selectedMonth - 1]}`}
+                </h5>
+                <hr />
+                {hasRecords ? (
                   <div>
-                    <h5 className="card-title mt-2">
-                      Attendance Details for {selectedEmployeeDetails.firstName ? `${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})` : 'All Employees'}
-                      {selectedYear && ` - ${selectedYear}`}
-                      {selectedMonth && ` - ${getMonthNames()[selectedMonth - 1]}`}
-                    </h5>
-                    <hr />
-                    <div>
-                      <DataTable
-                        columns={columns}
-                        data={attendanceData}
-                        pagination
-                        highlightOnHover
-                        pointerOnHover
-                        dense
-                      />
-                    </div>
+                    <DataTable
+                      columns={columns}
+                      data={attendanceData}
+                      pagination
+                      highlightOnHover
+                      pointerOnHover
+                      dense
+                      onChangePage={page => setCurrentPage(page)}
+                      onChangeRowsPerPage={perPage => setRowsPerPage(perPage)}
+                    />
                   </div>
                 ) : (
-                  <div>
-                    <h5 className="card-title mt-2">
-                      Attendance Details for {getMonthAndYear()}
-                    </h5>
-                    <hr />
-                    <div>
-                      <DataTable
-                        columns={columns}
-                        data={attendanceData}
-                        pagination
-                        highlightOnHover
-                        pointerOnHover
-                        dense
-                      />
-                    </div>
+                  <div className="text-center mt-4">
+                    <p>There are no records to display</p>
                   </div>
                 )}
               </div>

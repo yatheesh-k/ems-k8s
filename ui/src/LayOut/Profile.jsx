@@ -98,6 +98,7 @@ function Profile() {
       toast.success("Company Logo Updated Successfully");
       setErrorMessage("");
       closeModal();
+      window.location.href = ("/main"); 
     } catch (err) {
       console.error("Logo update error:", err);
       setSuccessMessage("");

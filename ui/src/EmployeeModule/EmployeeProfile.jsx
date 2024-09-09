@@ -9,13 +9,13 @@ const EmployeeProfile = () => {
     const { user } = useAuth();
     console.log("EmployeeProfile", user.userId)
     useEffect(() => {
-        if (!user.userId) return; // Ensure userId is available before fetching data
+        if (!user.userId) return; 
 
         const fetchData = async () => {
             try {
                 const response = await EmployeeGetApiById(user.userId);
-                console.log("API Response:", response.data); // Log API response to verify data
-                setEmployeeData(response.data); // Set employee data from response
+                console.log("API Response:", response.data);
+                setEmployeeData(response.data);
             } catch (error) {
                 setError("Failed to fetch employee data");
                 console.error("Error fetching employee data:", error);
@@ -23,7 +23,7 @@ const EmployeeProfile = () => {
         };
 
         fetchData();
-    }, [user.userId]); // Run effect when user.userId changes
+    }, [user.userId]); 
 
 
     return (

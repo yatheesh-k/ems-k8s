@@ -1,110 +1,83 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { CompanyImageGetApi, companyViewByIdApi, EmployeeGetApiById, EmployeePaySlipDownloadById, EmployeePayslipGetById } from "../Utils/Axios"; // Ensure these functions are correctly defined in your Utils/Axios file
+import { CompanyImageGetApi, companyViewByIdApi, EmployeeGetApiById, EmployeePaySlipDownloadById, EmployeePayslipGetById} from "../Utils/Axios";
 import { toast } from "react-toastify";
 import LayOut from "../LayOut/LayOut";
-import { userId } from "../Utils/Auth";
 import { Download } from "react-bootstrap-icons";
 import { useAuth } from "../Context/AuthContext";
-import axios from "axios";
 
 const PayslipDoc = () => {
-  const [companyData, setCompanyData] = useState([]);
+  const [companyData, setCompanyData] = useState({});
+  const [payslipData, setPayslipData] = useState(null);
+  const [employeeDetails, setEmployeeDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const employeeId = queryParams.get("employeeId");
   const payslipId = queryParams.get("payslipId");
-  const { employeeDetails } = location.state || {};
-  const [payslipData, setPayslipData] = useState(null);
-  //const [logoFileName, setLogoFileName] = useState([]);
-  const {  logoFileName} = useAuth();
+  const { user,logoFileName } = useAuth();
 
-  // const fetchCompanyLogo = async (companyId) => {
-  //   try {
-  //     const logoResponse = await CompanyImageGetApi(companyId);
-  //     console.log("Full logo response:", logoResponse.data.data);
-  //     if (logoResponse && logoResponse.data && logoResponse.data.data) {
-  //       const logoPath = logoResponse.data.data;
-  //       // Extracting filename from path
-  //       const fileName = logoPath.split('\\').pop();
-  //       // Set state with filename
-  //       setLogoFileName(fileName);
-  //       console.log("fileName", fileName);
-  //     } else {
-  //       console.error("Response or data is missing");
-  //     }
-  //   } catch (err) {
-  //     console.error("Error fetching company logo:", err);
-  //   }
-  // };
 
   const fetchCompanyData = async (companyId) => {
     try {
-      const response = await companyViewByIdApi(companyId)
+      const response = await companyViewByIdApi(companyId);
       setCompanyData(response.data);
-
     } catch (err) {
-      console.log(err)
+      console.error("Error fetching company data:", err);
     }
   };
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await EmployeeGetApiById(userId);
-        // Extract companyId from response
-        console.log(response.data.companyId)
-        const companyId = response.data.companyId;
-        console.log(companyId);
-        fetchCompanyData(companyId)
-      } catch (error) {
-        // handleApiErrors(error);
-      }
-    };
-    fetchData();
-  }, [userId]);
 
-
-  useEffect(() => {
-    const fetchPayslipData = async () => {
-      if (!employeeId || !payslipId) return;
-
-      try {
-        const response = await EmployeePayslipGetById(employeeId, payslipId);
-        setPayslipData(response.data.data);
-      } catch (error) {
-        // handleApiErrors(error)
-      }
-    };
-    if (employeeId && payslipId) {
-      fetchPayslipData();
+  const fetchEmployeeDetails = async (employeeId) => {
+    try {
+      const response = await EmployeeGetApiById(employeeId);
+      setEmployeeDetails(response.data);
+      const companyId = response.data.companyId;
+      fetchCompanyData(companyId);
+    } catch (err) {
+      console.error("Error fetching employee details:", err);
     }
-  }, [employeeId, payslipId]);
+  };
+
+  const fetchPayslipData = async () => {
+    if (!employeeId || !payslipId) return;
+    try {
+      const response = await EmployeePayslipGetById(employeeId, payslipId);
+      setPayslipData(response.data.data);
+    } catch (err) {
+      console.error("Error fetching payslip data:", err);
+    }
+  };
+
   const handleDownload = async () => {
     if (employeeId && payslipId) {
       try {
         await EmployeePaySlipDownloadById(employeeId, payslipId);
-      } catch (error) {
-        console.error('Error downloading payslip:', error);
+      } catch (err) {
+        console.error("Error downloading payslip:", err);
       }
     } else {
-      console.error('Employee ID or Payslip ID is missing');
+      console.error("Employee ID or Payslip ID is missing");
     }
   };
 
-  if (!payslipData) {
+  useEffect(() => {
+    setLoading(true);
+    if (employeeId) {
+      fetchEmployeeDetails(employeeId);
+    }
+    if (employeeId && payslipId) {
+      fetchPayslipData();
+    }
+    setLoading(false);
+  }, [employeeId, payslipId, user]);
+
+  if (loading) {
     return <div>Loading...</div>;
   }
 
-
-  const handleApiErrors = (error) => {
-    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
-      const errorMessage = error.response.data.error.message;
-      toast.error(errorMessage);
-    } else {
-      toast.error("Network Error !");
-    }
-    console.error(error.response);
-  };
+  if (!payslipData || !employeeDetails) {
+    return <div>No data available</div>;
+  }
 
   const maskPanNumber = (panNumber) => {
     if (!panNumber || panNumber.length < 4) return panNumber;
@@ -147,9 +120,10 @@ const PayslipDoc = () => {
             >
               <div>
                 <p>
-                  PaySlip for the month of : <b>
-                    {payslipData.month} {" "}
-                    {payslipData.year}
+                 <b>
+                    {payslipData.month}-
+                    {payslipData.year} 
+                    PaySlip 
                   </b>
                 </p>
                 <p>Employee Name: <b>{employeeDetails.firstName} {employeeDetails.lastName}</b></p>
@@ -158,7 +132,7 @@ const PayslipDoc = () => {
                 {logoFileName ? (
                   <img
                     className="align-middle"
-                    src={`${logoFileName}`} // Dynamic source based on logoFileName
+                    src={`${logoFileName}`} 
                     alt="Logo"
                     style={{ height: "80px", width: "180px" }}
                   />
@@ -258,7 +232,7 @@ const PayslipDoc = () => {
                         Account Number
                       </th>
                       <td style={{ padding: "4px", textAlign: "left" }}>
-                      {maskPanNumber(employeeDetails.accountNo)}
+                        {maskPanNumber(employeeDetails.accountNo)}
                       </td>
                     </tr>
                     <tr>
@@ -345,77 +319,77 @@ const PayslipDoc = () => {
                 <table style={{ borderCollapse: "collapse", border: "1px solid black", width: "100%" }}>
                   <thead>
                     <tr>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "center" }}>Earnings (A)</th>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "center" }}>Amount</th>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "center" }}>Deductions (B)</th>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "center" }}>Amount</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "left" }}>Earnings (A)</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "left" }}>Amount</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "left" }}>Deductions (B)</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "left" }}>Amount</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td className="earnings" style={{ padding: "4px", textAlign: "center" }}>Basic Salary</td>
-                      <td className="earnings">{payslipData.salary.basicSalary || 0}</td>
-                      <td className="deductions" style={{ padding: "4px", textAlign: "center" }}>PF Employer</td>
-                      <td className="deductions">{payslipData.salary.deductions.pfEmployer || 0}</td>
+                      <td className="earnings" style={{ padding: "4px", textAlign: "left" }}>Basic Salary</td>
+                      <td className="earnings" style={{textAlign:"left"}}>{payslipData.salary.basicSalary || 0}</td>
+                      <td className="deductions" style={{ padding: "4px", textAlign: "left" }}>PF Employer</td>
+                      <td className="deductions" style={{textAlign:"left"}}>{payslipData.salary.deductions.pfEmployer || 0}</td>
                     </tr>
                     <tr>
-                      <td className="earnings" style={{ padding: "4px", textAlign: "center" }}>HRA</td>
-                      <td className="earnings">{payslipData.salary.allowances.hra || 0}</td>
-                      <td className="deductions" style={{ padding: "4px", textAlign: "center" }}>PF Employee</td>
-                      <td className="deductions">{payslipData.salary.deductions.pfEmployee || 0}</td>
+                      <td className="earnings" style={{ padding: "4px", textAlign: "left" }}>HRA</td>
+                      <td className="earnings" style={{textAlign:"left"}}>{payslipData.salary.allowances.hra || 0}</td>
+                      <td className="deductions" style={{ padding: "4px", textAlign: "left" }}>PF Employee</td>
+                      <td className="deductions" style={{textAlign:"left"}}>{payslipData.salary.deductions.pfEmployee || 0}</td>
                     </tr>
                     <tr>
-                      <td className="earnings" style={{ padding: "4px", textAlign: "center" }}>Special Allowance</td>
-                      <td className="earnings">{payslipData.salary.allowances.specialAllowance || 0}</td>
-                      <td className="deductions" style={{ padding: "4px", textAlign: "center" }}>LOP</td>
-                      <td className="deductions">{payslipData.salary.deductions.lop || 0}</td>
+                      <td className="earnings" style={{ padding: "4px", textAlign: "left" }}>Special Allowance</td>
+                      <td className="earnings" style={{textAlign:"left"}}>{payslipData.salary.allowances.specialAllowance || 0}</td>
+                      <td className="deductions" style={{ padding: "4px", textAlign: "left" }}>LOP</td>
+                      <td className="deductions" style={{textAlign:"left"}}>{payslipData.salary.deductions.lop || 0}</td>
                     </tr>
                     <tr>
-                      <td className="earnings" style={{ padding: "4px", textAlign: "center" }}>Travel Allowance</td>
-                      <td className="earnings">{payslipData.salary.allowances.travelAllowance || 0}</td>
-                      <td className="deductions" style={{ padding: "4px", textAlign: "center" }}>Total Deductions (B)</td>
-                      <td className="deductions">{payslipData.salary.deductions.totalDeductions || 0}</td>
+                      <td className="earnings" style={{ padding: "4px", textAlign: "left" }}>Travel Allowance</td>
+                      <td className="earnings" style={{textAlign:"left"}}>{payslipData.salary.allowances.travelAllowance || 0}</td>
+                      <td className="deductions" style={{ padding: "4px", textAlign: "left" }}>Total Deductions (B)</td>
+                      <td className="deductions" style={{textAlign:"left"}}>{payslipData.salary.deductions.totalDeductions || 0}</td>
                     </tr>
                     <tr>
-                      <td className="earnings" style={{ padding: "4px", textAlign: "center" }}>Other Allowance</td>
-                      <td className="earnings">{payslipData.salary.allowances.otherAllowances || 0}</td>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "center" }}>Taxes (C)</th>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "center" }}>Amount</th>
+                      <td className="earnings" style={{ padding: "4px", textAlign: "left" }}>Other Allowance</td>
+                      <td className="earnings" style={{textAlign:"left"}}>{payslipData.salary.allowances.otherAllowances || 0}</td>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "left" }}>Taxes (C)</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "left" }}>Amount</th>
                     </tr>
                     <tr>
-                      <td className="earnings" style={{ padding: "4px", textAlign: "center" }}>PF Contribution Employee</td>
-                      <td className="earnings">{payslipData.salary.allowances.pfContributionEmployee || 0}</td>
-                      <td className="taxes" style={{ padding: "4px", textAlign: "center" }}>Income Tax</td>
-                      <td className="taxes">{payslipData.salary.deductions.incomeTax || 0}</td>
+                      <td className="earnings" style={{ padding: "4px", textAlign: "left" }}>PF Contribution Employee</td>
+                      <td className="earnings" style={{textAlign:"left"}}>{payslipData.salary.allowances.pfContributionEmployee || 0}</td>
+                      <td className="taxes" style={{ padding: "4px", textAlign: "left" }}>Income Tax</td>
+                      <td className="taxes" style={{textAlign:"left"}}>{payslipData.salary.deductions.incomeTax || 0}</td>
                     </tr>
                     <tr>
-                      <td className="earnings" style={{ padding: "4px", textAlign: "center" }}>Total Earnings (A)</td>
-                      <td className="earnings">{payslipData.salary.totalEarnings || 0}</td>
-                      <td className="taxes" style={{ padding: "4px", textAlign: "center" }}>Professional Tax</td>
-                      <td className="taxes">{payslipData.salary.deductions.pfTax || 0}</td>
+                      <td className="earnings" style={{ padding: "4px", textAlign: "left" }}>Total Earnings (A)</td>
+                      <td className="earnings" style={{textAlign:"left"}}>{payslipData.salary.totalEarnings || 0}</td>
+                      <td className="taxes" style={{ padding: "4px", textAlign: "left" }}>Professional Tax</td>
+                      <td className="taxes" style={{textAlign:"left"}}>{payslipData.salary.deductions.pfTax || 0}</td>
                     </tr>
                     <tr>
-                      <td className="earnings" style={{ padding: "4px", textAlign: "center" }}></td>
+                      <td className="earnings" style={{ padding: "4px", textAlign: "left" }}></td>
                       <td className="earnings"></td>
-                      <td className="taxes" style={{ padding: "4px", textAlign: "center" }}>Total Tax (C)</td>
-                      <td className="taxes">{payslipData.salary.deductions.totalTax || 0}</td>
+                      <td className="taxes" style={{ padding: "4px", textAlign: "left" }}>Total Tax (C)</td>
+                      <td className="taxes" style={{textAlign:"left"}}>{payslipData.salary.deductions.totalTax || 0}</td>
                     </tr>
                     <tr>
-                      <td className="earnings" style={{ padding: "4px", textAlign: "center" }}></td>
+                      <td className="earnings" style={{ padding: "4px", textAlign: "left" }}></td>
                       <td className="earnings"></td>
-                      <td className="taxes" style={{ padding: "4px", textAlign: "center" }}> Net Salary (A-B-C){" "}</td>
-                      <td className="taxes">{payslipData.salary.netSalary}</td>
+                      <td className="taxes" style={{ padding: "4px", textAlign: "left" }}> Net Salary (A-B-C){" "}</td>
+                      <td className="taxes" style={{textAlign:"left"}}>{payslipData.salary.netSalary}</td>
                     </tr>
                     <tr>
-                      <td className="earnings" colSpan={1} style={{ padding: "4px", textAlign: "center" }}> Net Pay (in words):</td>
-                      <td className="earnings" colSpan={3}><b>{payslipData.inWords || ""}</b></td>
-                     
+                      <td className="earnings" colSpan={1} style={{ padding: "4px", textAlign: "left" }}> Net Pay (in words):</td>
+                      <td className="earnings" colSpan={3} style={{textAlign:"left"}}><b>{payslipData.inWords || ""}</b></td>
+
                     </tr>
                     {/* Include other earnings, taxes, and deductions as needed */}
                   </tbody>
                 </table>
               </div>
-               <span className="ms-4"><em>This is computer-generated payslip and does not require authentication</em></span>
+              <span className="ms-4"><em>This is computer-generated payslip and does not require authentication</em></span>
               <div
                 className="bottom"
                 style={{
@@ -462,13 +436,13 @@ const PayslipDoc = () => {
       </div>
       <div className="d-flex justify-content-end align-items-center me-4">
         <button
-              type="button"
-              className="btn btn-outline-primary"
-              onClick={handleDownload}
+          type="button"
+          className="btn btn-outline-primary"
+          onClick={handleDownload}
         >
-          <span className="m-2">Download</span> <Download size={18}  className="ml-1" />
+          <span className="m-2">Download</span> <Download size={18} className="ml-1" />
         </button>
-              </div>
+      </div>
     </LayOut>
   );
 };

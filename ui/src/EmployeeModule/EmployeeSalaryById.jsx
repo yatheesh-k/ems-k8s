@@ -8,7 +8,6 @@ import { userId } from '../Utils/Auth';
 const EmployeeSalaryById = () => {
   const [employeeSalaryView, setEmployeeSalaryView] = useState([]);
   const [expanded, setExpanded] = useState({});
-  const navigate=useNavigate();
   const location = useLocation();
  
   const toggleExpand = (index) => {

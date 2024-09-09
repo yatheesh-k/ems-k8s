@@ -185,6 +185,7 @@ const SideNav = () => {
     setIsCompanyOpen(false);
     setIsPayrollOpen(false);
   };
+  
 
   // if (!isInitialized) {
   //   return <div>Loading context...</div>; // Show a loading message or spinner until context is initialized
@@ -216,7 +217,7 @@ const SideNav = () => {
                 logoFileName && (
                   <img
                     className="align-middle"
-                    src={`${logoFileName}`} // Dynamic source based on logoFileName
+                    src={`${logoFileName}`} 
                     alt="Company Logo"
                     style={{ height: "80px", width: "180px" }}
                   />
@@ -232,7 +233,7 @@ const SideNav = () => {
                 className={`sidebar-item ${location.pathname === "/main" ? "active" : ""
                   }`}
               >
-                <Link className="sidebar-link" to={"/main"}>
+                <a className="sidebar-link" href={"/main"}>
                   <i
                     className="bi bi-grid-1x2-fill"
                     style={{ fontSize: "large" }}
@@ -240,7 +241,7 @@ const SideNav = () => {
                   <span className="align-middle" style={{ fontSize: "large" }}>
                     Dashboard
                   </span>
-                </Link>
+                </a>
               </li>
               <li className="sidebar-item">
                 <a
@@ -274,9 +275,9 @@ const SideNav = () => {
                       : ""
                       }`}
                   >
-                    <Link className="sidebar-link" to={"/companyRegistration"}>
+                    <a className="sidebar-link" href={"/companyRegistration"}>
                       Registration
-                    </Link>
+                    </a>
                   </li>
                   <li
                     style={{ paddingLeft: "40px" }}
@@ -285,9 +286,9 @@ const SideNav = () => {
                       : ""
                       }`}
                   >
-                    <Link className="sidebar-link" to={"/companyView"}>
+                    <a className="sidebar-link" href={"/companyView"}>
                       Summary
-                    </Link>
+                    </a>
                   </li>
                 </ul>
               </li>
@@ -299,7 +300,7 @@ const SideNav = () => {
                 className={`sidebar-item ${location.pathname === "/main" ? "active" : ""
                   }`}
               >
-                <Link className="sidebar-link" to={"/main"}>
+                <a className="sidebar-link" href={"/main"}>
                   <i
                     className="bi bi-grid-1x2-fill"
                     style={{ fontSize: "large" }}
@@ -307,13 +308,13 @@ const SideNav = () => {
                   <span className="align-middle" style={{ fontSize: "large" }}>
                     Dashboard
                   </span>
-                </Link>
+                </a>
               </li>
               <li
                 className={`sidebar-item ${location.pathname === "/department" ? "active" : ""
                   }`}
               >
-                <Link className="sidebar-link" to={"/department"}>
+                <a className="sidebar-link" href={"/department"}>
                   <i
                     className="bi bi-diagram-3-fill"
                     style={{ fontSize: "large" }}
@@ -321,13 +322,13 @@ const SideNav = () => {
                   <span className="align-middle" style={{ fontSize: "large" }}>
                     Department
                   </span>
-                </Link>
+                </a>
               </li>
               <li
                 className={`sidebar-item ${location.pathname === "/designation" ? "active" : ""
                   }`}
               >
-                <Link className="sidebar-link" to={"/designation"}>
+                <a className="sidebar-link" href={"/designation"}>
                   <i
                     className="bi bi-file-earmark-medical-fill"
                     style={{ fontSize: "large" }}
@@ -335,13 +336,13 @@ const SideNav = () => {
                   <span className="align-middle" style={{ fontSize: "large" }}>
                     Designation
                   </span>
-                </Link>
+                </a>
               </li>
               <li
                 className={`sidebar-item ${location.pathname.startsWith("/employee") ? "active" : ""
                   }`}
               >
-                <Link className="sidebar-link" to={"/employeeview"}>
+                <a className="sidebar-link" href={"/employeeview"}>
                   <i
                     className="bi bi-person-plus-fill"
                     style={{ fontSize: "large" }}
@@ -349,7 +350,7 @@ const SideNav = () => {
                   <span className="align-middle" style={{ fontSize: "large" }}>
                     Employees
                   </span>
-                </Link>
+                </a>
               </li>
               {/* <li
                             className={`sidebar-item ${
@@ -430,18 +431,18 @@ const SideNav = () => {
                     className={`sidebar-item ${location.pathname === "/addAttendance" ? "active" : ""
                       }`}
                   >
-                    <Link className="sidebar-link" to={"/addAttendance"}>
+                    <a className="sidebar-link" href={"/addAttendance"}>
                       Manage Attendance
-                    </Link>
+                    </a>
                   </li>
                   <li
                     style={{ paddingLeft: "40px" }}
                     className={`sidebar-item ${location.pathname === "/attendanceReport" ? "active" : ""
                       }`}
                   >
-                    <Link className="sidebar-link" to={"/attendanceReport"}>
+                    <a className="sidebar-link" href={"/attendanceReport"}>
                       Attendance Report
-                    </Link>
+                    </a>
                   </li>
                   {/* <li
                     style={{ paddingLeft: "40px" }}
@@ -491,21 +492,21 @@ const SideNav = () => {
                       : ""
                       }`}
                   >
-                    <Link
+                    <a
                       className="sidebar-link"
-                      to={"/employeeSalaryStructure"}
+                      href={"/employeeSalaryStructure"}
                     >
                       Manage Salary
-                    </Link>
+                    </a>
                   </li>
                   <li
                     style={{ paddingLeft: "40px" }}
                     className={`sidebar-item ${location.pathname === "/payslipGeneration" ? "active" : ""
                       }`}
                   >
-                    <Link className="sidebar-link" to={"/payslipGeneration"}>
+                    <a className="sidebar-link" href={"/payslipGeneration"}>
                       Generate PaySlips
-                    </Link>
+                    </a>
                   </li>
                   <li
                     style={{ paddingLeft: "40px" }}
@@ -514,9 +515,9 @@ const SideNav = () => {
                       : ""
                       }`}
                   >
-                    <Link className="sidebar-link" to={"/payslipsList"}>
+                    <a className="sidebar-link" href={"/payslipsList"}>
                       PaySlips
-                    </Link>
+                    </a>
                   </li>
 
                   {/* <li
@@ -649,7 +650,7 @@ const SideNav = () => {
     <li
       className={`sidebar-item ${location.pathname === "/main" ? "active" : ""}`}
     >
-      <Link className="sidebar-link" to={"/main"}>
+      <a className="sidebar-link" href={"/main"}>
         <i
           className="bi bi-grid-1x2-fill"
           style={{ fontSize: "large" }}
@@ -657,12 +658,12 @@ const SideNav = () => {
         <span className="align-middle" style={{ fontSize: "large" }}>
           Dashboard
         </span>
-      </Link>
+      </a>
     </li>
     <li
       className={`sidebar-item ${location.pathname === "/employeeSalary" ? "active" : ""}`}
     >
-      <Link className="sidebar-link" to={"/employeeSalary"}>
+      <a className="sidebar-link" href={"/employeeSalary"}>
         <i
           className="bi bi-card-list"
           style={{ fontSize: "large" }}
@@ -670,12 +671,12 @@ const SideNav = () => {
         <span className="align-middle" style={{ fontSize: "large" }}>
           Salary List
         </span>
-      </Link>
+      </a>
     </li>
     <li
       className={`sidebar-item ${location.pathname === "/employeePayslip" ? "active" : ""}`}
     >
-      <Link className="sidebar-link" to={"/employeePayslip"}>
+      <a className="sidebar-link" href={"/employeePayslip"}>
         <i
           className="bi bi-file-earmark-medical-fill"
           style={{ fontSize: "large" }}
@@ -683,7 +684,7 @@ const SideNav = () => {
         <span className="align-middle" style={{ fontSize: "large" }}>
           PaySlips
         </span>
-      </Link>
+      </a>
     </li>
   </>
 )}
