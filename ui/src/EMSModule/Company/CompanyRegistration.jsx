@@ -21,7 +21,7 @@ const CompanyRegistration = () => {
   const [companyType, setCompanyType] = useState("");
   const [passwordShown, setPasswordShown] = useState("");
   const [editMode, setEditMode] = useState(false); // State to track edit mode
-  const [errorMessage,setErrorMessage]=useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -70,14 +70,14 @@ const CompanyRegistration = () => {
         setTimeout(() => {
           toast.success("Company Updated Successfully");
           navigate("/companyView");
-      }, 1000);
+        }, 1000);
       } else {
         await CompanyRegistrationApi(data);
         setTimeout(() => {
           toast.success("Company Created Successfully");
           navigate("/companyView");
-      }, 1000);
-       
+        }, 1000);
+
       }
       reset();
     } catch (error) {
@@ -98,10 +98,10 @@ const CompanyRegistration = () => {
         setErrorMessage(alertMessage);
 
       } else {
-      handleApiErrors(error);
+        handleApiErrors(error);
       }
     }
-  };  
+  };
 
   useEffect(() => {
     if (location && location.state && location.state.id) {
@@ -197,16 +197,16 @@ const CompanyRegistration = () => {
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
     let newValue = "";
-  
+
     // Remove spaces from the beginning of inputValue
     inputValue = inputValue.trimStart(); // Keep spaces only after the initial non-space character
-  
+
     // Track if we've encountered any non-space character yet
     let encounteredNonSpace = false;
-  
+
     for (let i = 0; i < inputValue.length; i++) {
       const char = inputValue.charAt(i);
-  
+
       // Allow any alphabetic characters (both lowercase and uppercase) and numbers
       // Allow spaces only after encountering non-space characters
       if (char.match(/[a-zA-Z0-9]/) || (encounteredNonSpace && char === " ")) {
@@ -216,11 +216,11 @@ const CompanyRegistration = () => {
         newValue += char;
       }
     }
-  
+
     // Update the input value
     e.target.value = newValue;
   };
-  
+
 
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -411,7 +411,7 @@ const CompanyRegistration = () => {
                         {...register("emailId", {
                           required: "Company Email Id is Required",
                           pattern: {
-                            value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                            value:/^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid email format it allows Only .com, .in, .org, .net, .edu, .gov are allowed",
                           },
                         })}
@@ -435,7 +435,7 @@ const CompanyRegistration = () => {
                             autoComplete="off"
                             maxLength={10}
                             onKeyDown={handleEmailChange}
-                            onInput={toInputSpaceCase }
+                            onInput={toInputSpaceCase}
                             {...register("mobileNo", {
                               required: "Contact Number is Required",
                               pattern: {
@@ -505,7 +505,7 @@ const CompanyRegistration = () => {
                             placeholder="Enter Contact Number"
                             autoComplete="off"
                             maxLength={10}
-                            onInput={toInputSpaceCase }
+                            onInput={toInputSpaceCase}
                             onKeyDown={handleEmailChange}
                             {...register("mobileNo", {
                               required: "Contact Number is Required",
@@ -534,7 +534,7 @@ const CompanyRegistration = () => {
                         placeholder="Enter Alternate Number"
                         autoComplete="off"
                         maxLength={10}
-                        onInput={toInputSpaceCase }
+                        onInput={toInputSpaceCase}
                         onKeyDown={handleEmailChange}
                         {...register("landNo", {
                           required: "Alternate Number is Required",
@@ -611,7 +611,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Company CIN Number"
                         onKeyDown={handleEmailChange}
-                        onInput={toInputSpaceCase }
+                        onInput={toInputSpaceCase}
                         autoComplete="off"
                         maxLength={21}
                         {...register("cinNo", {
@@ -647,7 +647,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Company Registration Number"
                         onKeyDown={handleEmailChange}
-                        onInput={toInputSpaceCase }
+                        onInput={toInputSpaceCase}
                         autoComplete="off"
                         maxLength={21}
                         {...register("companyRegNo", {
@@ -680,7 +680,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Company GST Number"
                         autoComplete="off"
-                        onInput={toInputSpaceCase }
+                        onInput={toInputSpaceCase}
                         onKeyDown={handleEmailChange}
                         maxLength={15}
                         {...register("gstNo", {
@@ -796,7 +796,7 @@ const CompanyRegistration = () => {
                         {...register("personalMailId", {
                           required: "Personal Email Id is Required",
                           pattern: {
-                            value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                            value:/^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid email format it allows Only .com, .in, .org, .net, .edu, .gov are allowed",
                           },
                         })}
@@ -876,10 +876,10 @@ const CompanyRegistration = () => {
           </div>
           <div className="col-lg-1"></div>
           {errorMessage && (
-                      <div className="alert alert-info mt-4 text-center">
-                        {errorMessage}
-                      </div>
-                    )}
+            <div className="alert alert-info mt-4 text-center">
+              {errorMessage}
+            </div>
+          )}
           <div className="col-12 d-flex justify-content-end mt-5"
             style={{ background: "none" }}
           >

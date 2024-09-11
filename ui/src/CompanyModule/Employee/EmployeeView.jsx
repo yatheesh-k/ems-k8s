@@ -182,7 +182,6 @@ const EmployeeView = () => {
           {`${row.firstName.slice(0, 8)}`}
         </div>
       ),
-      sortable: true,
       width: "130px",
     },
     {
@@ -192,19 +191,16 @@ const EmployeeView = () => {
           {row.emailId.slice(0, 8)}
         </div>
       ),
-      sortable: true,
       width: "150px",
     },
     {
       name: <h6><b>Department</b></h6>,
       selector: row => row.departmentName,
-      sortable: true,
       width:"130px",
     },
     {
       name: <h6><b>Date Of Hiring</b></h6>,
       selector:row=> row.dateOfHiring,
-      sortable: true,
       format: row => {
         const date = new Date(row.dateOfHiring);
         const day = date.getDate().toString().padStart(2, '0');
@@ -218,12 +214,11 @@ const EmployeeView = () => {
     {
       name: <h6><b>Status</b></h6>,
       selector: row => row.status,
-      sortable: true,
       cell: (row) => statusMappings[row.status]?.label || "Unknown",
       width:"120px"
     },
     {
-      name: <h5><b>Action</b></h5>,
+      name: <h5><b>Actions</b></h5>,
       cell: (row) => (
         <div>
           <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginRight: "10px" }} onClick={() => handleSalary(row.id)} title="View Salary">

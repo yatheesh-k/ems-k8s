@@ -98,7 +98,9 @@ function Profile() {
       toast.success("Company Logo Updated Successfully");
       setErrorMessage("");
       closeModal();
-      window.location.href = ("/main"); 
+      setTimeout(() => {
+        window.location.href = "/main";
+      }, 2000);
     } catch (err) {
       console.error("Logo update error:", err);
       setSuccessMessage("");
@@ -120,7 +122,7 @@ function Profile() {
   const onChangePicture = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setPostImage(file); // Set the actual File object here
+      setPostImage(file);
     }
   };
 
@@ -256,12 +258,13 @@ function Profile() {
                         <CameraFill />
                       </div>
                     </div>
-                    </div>
-                    <div className="col-12 col-md-6 mb-3">
+                  </div>
+                  <div className="col-12 col-md-6 mb-3">
                     {logoFileName && (
                       <img
                         className="align-middle"
                         src={`${logoFileName}`}
+                        accept=".png, .jpg. ,svg ,.jpeg, .pdf"
                         alt="Company Logo"
                         style={{ height: "80px", width: "180px" }}
                       />
@@ -612,6 +615,7 @@ function Profile() {
             <input
               type="file"
               className="form-control"
+              accept=".png, .jpg, .svg, .jpeg, .pdf"
               onChange={onChangePicture}
             />
             {errorMessage && (

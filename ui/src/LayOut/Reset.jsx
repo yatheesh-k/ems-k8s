@@ -8,7 +8,7 @@ import { userId } from "../Utils/Auth";
 import { useNavigate } from "react-router-dom";
 
 const Reset = ({ companyName, onClose, show }) => {
-  const { register, handleSubmit, formState: { errors }, getValues } = useForm({mode:"onChange"});
+  const { register, handleSubmit, formState: { errors }, getValues } = useForm({ mode: "onChange" });
   const [oldPasswordShown, setOldPasswordShown] = useState(false);
   const [newPasswordShown, setNewPasswordShown] = useState(false);
   const [confirmPasswordShown, setConfirmPasswordShown] = useState(false);
@@ -49,7 +49,7 @@ const Reset = ({ companyName, onClose, show }) => {
 
     try {
       setLoading(true);
-      const response = await resetPassword(formData, id); 
+      const response = await resetPassword(formData, id);
       console.log('Password Reset Successful:', response.data);
       setLoading(false);
       onClose(); // Close modal or handle success state
@@ -72,7 +72,15 @@ const Reset = ({ companyName, onClose, show }) => {
   };
 
   return (
-    <Modal show={show} onHide={onClose} centered style={{ zIndex: "1050" }}>
+
+    <Modal
+      show={show}
+      onHide={onClose}
+      centered
+      style={{ zIndex: "1050" }}
+      backdrop="static"
+      keyboard={false} 
+    >
       <Modal.Header closeButton>
         <Modal.Title>Reset Password</Modal.Title>
       </Modal.Header>

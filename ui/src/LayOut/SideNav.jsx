@@ -7,7 +7,7 @@ const SideNav = () => {
   const [isAttendanceOpen, setIsAttendanceOpen] = useState(false); // State for managing Attendance dropdown
   const [isCompanyOpen, setIsCompanyOpen] = useState(false); // State for managing Company dropdown
   const location = useLocation();
-  const { user={}, logoFileName, loading} = useAuth();
+  const { user = {}, logoFileName, loading } = useAuth();
 
   useEffect(() => {
     if (
@@ -185,7 +185,7 @@ const SideNav = () => {
     setIsCompanyOpen(false);
     setIsPayrollOpen(false);
   };
-  
+
 
   // if (!isInitialized) {
   //   return <div>Loading context...</div>; // Show a loading message or spinner until context is initialized
@@ -217,7 +217,7 @@ const SideNav = () => {
                 logoFileName && (
                   <img
                     className="align-middle"
-                    src={`${logoFileName}`} 
+                    src={`${logoFileName}`}
                     alt="Company Logo"
                     style={{ height: "80px", width: "180px" }}
                   />
@@ -399,7 +399,7 @@ const SideNav = () => {
                               </span>
                             </Link>
                           </li> */}
-                              <li className="sidebar-item has-dropdown">
+              <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
                   data-bs-target="#attendenceManagement"
@@ -471,7 +471,7 @@ const SideNav = () => {
                     ></i>
                   </span>{" "}
                   <span className="align-middle" style={{ fontSize: "large" }}>
-                    PayRoll
+                    Payroll
                   </span>
                   <i
                     className={`bi ${isPayrollOpen ? "bi-chevron-up" : "bi-chevron-down"
@@ -505,7 +505,7 @@ const SideNav = () => {
                       }`}
                   >
                     <a className="sidebar-link" href={"/payslipGeneration"}>
-                      Generate PaySlips
+                      Generate Payslips
                     </a>
                   </li>
                   <li
@@ -516,7 +516,7 @@ const SideNav = () => {
                       }`}
                   >
                     <a className="sidebar-link" href={"/payslipsList"}>
-                      PaySlips
+                      Payslips
                     </a>
                   </li>
 
@@ -645,50 +645,49 @@ const SideNav = () => {
             </>
           )} */}
 
-{(!user || !(user.userRole && (user.userRole.includes("company_admin") || user.userRole.includes("ems_admin")))) && (
-  <>
-    <li
-      className={`sidebar-item ${location.pathname === "/main" ? "active" : ""}`}
-    >
-      <a className="sidebar-link" href={"/main"}>
-        <i
-          className="bi bi-grid-1x2-fill"
-          style={{ fontSize: "large" }}
-        ></i>
-        <span className="align-middle" style={{ fontSize: "large" }}>
-          Dashboard
-        </span>
-      </a>
-    </li>
-    <li
-      className={`sidebar-item ${location.pathname === "/employeeSalary" ? "active" : ""}`}
-    >
-      <a className="sidebar-link" href={"/employeeSalary"}>
-        <i
-          className="bi bi-card-list"
-          style={{ fontSize: "large" }}
-        ></i>
-        <span className="align-middle" style={{ fontSize: "large" }}>
-          Salary List
-        </span>
-      </a>
-    </li>
-    <li
-      className={`sidebar-item ${location.pathname === "/employeePayslip" ? "active" : ""}`}
-    >
-      <a className="sidebar-link" href={"/employeePayslip"}>
-        <i
-          className="bi bi-file-earmark-medical-fill"
-          style={{ fontSize: "large" }}
-        ></i>
-        <span className="align-middle" style={{ fontSize: "large" }}>
-          PaySlips
-        </span>
-      </a>
-    </li>
-  </>
-)}
-
+          {(!user || !(user.userRole && (user.userRole.includes("company_admin") || user.userRole.includes("ems_admin")))) && (
+            <>
+              <li
+                className={`sidebar-item ${location.pathname === "/main" ? "active" : ""}`}
+              >
+                <a className="sidebar-link" href={"/main"}>
+                  <i
+                    className="bi bi-grid-1x2-fill"
+                    style={{ fontSize: "large" }}
+                  ></i>
+                  <span className="align-middle" style={{ fontSize: "large" }}>
+                    Dashboard
+                  </span>
+                </a>
+              </li>
+              <li
+                className={`sidebar-item ${location.pathname === "/employeeSalary" ? "active" : ""}`}
+              >
+                <a className="sidebar-link" href={"/employeeSalary"}>
+                  <i
+                    className="bi bi-card-list"
+                    style={{ fontSize: "large" }}
+                  ></i>
+                  <span className="align-middle" style={{ fontSize: "large" }}>
+                    Salary List
+                  </span>
+                </a>
+              </li>
+              <li
+                className={`sidebar-item ${location.pathname === "/employeePayslip" ? "active" : ""}`}
+              >
+                <a className="sidebar-link" href={"/employeePayslip"}>
+                  <i
+                    className="bi bi-file-earmark-medical-fill"
+                    style={{ fontSize: "large" }}
+                  ></i>
+                  <span className="align-middle" style={{ fontSize: "large" }}>
+                    Payslips
+                  </span>
+                </a>
+              </li>
+            </>
+          )}
         </ul>
       </div>
     </nav>

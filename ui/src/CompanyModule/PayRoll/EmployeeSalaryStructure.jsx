@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Select from "react-select";
 import LayOut from "../../LayOut/LayOut";
-import { EmployeeGetApi, EmployeeSalaryPostApi,EmployeeSalaryGetApiById, EmployeeSalaryPatchApiById } from "../../Utils/Axios";
+import { EmployeeGetApi, EmployeeSalaryPostApi, EmployeeSalaryGetApiById, EmployeeSalaryPatchApiById } from "../../Utils/Axios";
 import { CurrencyRupee, QuestionCircle } from "react-bootstrap-icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -21,7 +21,7 @@ const EmployeeSalaryStructure = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const salaryId = queryParams.get('salaryId');
-  const id=queryParams.get('employeeId')
+  const id = queryParams.get('employeeId')
 
   const [employes, setEmployes] = useState([]);
   const [grossAmount, setGrossAmount] = useState(0);
@@ -46,7 +46,9 @@ const EmployeeSalaryStructure = () => {
   const [otherAllowances, setOtherAllowances] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
   const [message, setMessage] = useState("");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState("Active");
+  const [isReadOnly, setIsReadOnly] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const navigate = useNavigate();
 
@@ -75,37 +77,41 @@ const EmployeeSalaryStructure = () => {
 
   useEffect(() => {
     if (id && salaryId) {
-      EmployeeSalaryGetApiById(id,salaryId).then((response) => {
-        const data = response.data.data; 
-        if (data) {
-          setEmployeeId(data.employeeId);
-          setBasicSalary(parseFloat(data.basicSalary));
-          setFixedAmount(parseFloat(data.fixedAmount));
-          setVariableAmount(parseFloat(data.variableAmount));
-          setGrossAmount(parseFloat(data.grossAmount));
-          setTotalEarnings(parseFloat(data.totalEarnings));
-          setTotalAmount(parseFloat(data.netSalary));
-          setHra(parseFloat(data.allowances.hra));
-          setTravelAllowance(parseFloat(data.allowances.travelAllowance));
-          setSpecialAllowance(parseFloat(data.allowances.specialAllowance));
-          setOtherAllowances(parseFloat(data.allowances.otherAllowances));
-          setPfEmployee(parseFloat(data.deductions.pfEmployee));
-          setPfEmployer(parseFloat(data.deductions.pfEmployer));
-          setIncomeTax(parseFloat(data.deductions.incomeTax));
-          setPfTax(parseFloat(data.deductions.pfTax));
-          setTotalTax(parseFloat(data.deductions.totalTax));
-          setStatus(data.status || '');
-          setValue('status', data.status || '')
-          setTotalPF(parseFloat(data.deductions.totalDeductions));
-          setShowFields(true);
-        }
-      }).catch((error) => {
-        handleApiErrors(error);
-      });
+      EmployeeSalaryGetApiById(id, salaryId)
+        .then((response) => {
+          const data = response.data.data;
+          if (data) {
+            setEmployeeId(data.employeeId);
+            setBasicSalary(parseFloat(data.basicSalary));
+            setFixedAmount(parseFloat(data.fixedAmount));
+            setVariableAmount(parseFloat(data.variableAmount));
+            setGrossAmount(parseFloat(data.grossAmount));
+            setTotalEarnings(parseFloat(data.totalEarnings));
+            setTotalAmount(parseFloat(data.netSalary));
+            setHra(parseFloat(data.allowances.hra));
+            setTravelAllowance(parseFloat(data.allowances.travelAllowance));
+            setSpecialAllowance(parseFloat(data.allowances.specialAllowance));
+            setOtherAllowances(parseFloat(data.allowances.otherAllowances));
+            setPfEmployee(parseFloat(data.deductions.pfEmployee));
+            setPfEmployer(parseFloat(data.deductions.pfEmployer));
+            setIncomeTax(parseFloat(data.deductions.incomeTax));
+            setPfTax(parseFloat(data.deductions.pfTax));
+            setTotalTax(parseFloat(data.deductions.totalTax));
+            setStatus(data.status || '');
+            setValue('status', data.status || '');
+            setTotalPF(parseFloat(data.deductions.totalDeductions));
+            setShowFields(true);
+            setIsUpdating(true);
+            setIsReadOnly(data.status === 'InActive');
+          }
+        })
+        .catch((error) => {
+          handleApiErrors(error);
+        });
     } else {
       setShowFields(false);
     }
-  }, [id,salaryId,setValue]);
+  }, [id, salaryId, setValue]);
 
   useEffect(() => {
     if (salaryId && id) {
@@ -118,7 +124,7 @@ const EmployeeSalaryStructure = () => {
       // Update other values as necessary
     }
   }, [variableAmount, fixedAmount, hra, travelAllowance, pfEmployee, pfEmployer, salaryId, id, setValue]);
-  
+
 
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
@@ -132,7 +138,7 @@ const EmployeeSalaryStructure = () => {
 
   const handleGoClick = () => {
     if (!employeeId) {
-      setMessage("Please select an employee.");
+      setMessage("Please select Employee Name");
       setShowFields(false);
     } else {
       setShowFields(true);
@@ -287,21 +293,20 @@ const EmployeeSalaryStructure = () => {
 
     console.log("Post Data:", postData);
     const apiCall = salaryId
-    ? () => EmployeeSalaryPatchApiById(employeeId, salaryId, postData) // Update existing data
-    : () => EmployeeSalaryPostApi(employeeId, postData); // Add new data
+      ? () => EmployeeSalaryPatchApiById(employeeId, salaryId, postData) // Update existing data
+      : () => EmployeeSalaryPostApi(employeeId, postData); // Add new data
 
-  apiCall()
-    .then((response) => {
-      toast.success(salaryId ? "Employee Salary Updated Successfully" : "Employee Salary Added Successfully");
-      setErrorMessage(""); // Clear error message on success
-      setShowFields(false);
-      navigate('/employeeview');
-    })
+    apiCall()
+      .then((response) => {
+        toast.success(salaryId ? "Employee Salary Updated Successfully" : "Employee Salary Added Successfully");
+        setErrorMessage(""); // Clear error message on success
+        setShowFields(false);
+        navigate('/employeeview');
+      })
       .catch((error) => {
         handleApiErrors(error);
       });
   };
-
 
   return (
     <LayOut>
@@ -319,7 +324,7 @@ const EmployeeSalaryStructure = () => {
                   <li className="breadcrumb-item">
                     <a href="/main">Home</a>
                   </li>
-                  <li className="breadcrumb-item active">PayRoll</li>
+                  <li className="breadcrumb-item active">Payroll</li>
                   <li className="breadcrumb-item active">Manage Salary</li>
                 </ol>
               </nav>
@@ -360,11 +365,12 @@ const EmployeeSalaryStructure = () => {
                                 message: "Maximum 10 Numbers Allowed"
                               },
                             })}
+                            readOnly={isReadOnly}
                             value={variableAmount}
                             onChange={handleVariableAmountChange}
                           />
                           {errors.variableAmount && (
-                            <div className="text-danger">
+                            <div className="errorMsg">
                               {errors.variableAmount.message}
                             </div>
                           )}
@@ -395,11 +401,12 @@ const EmployeeSalaryStructure = () => {
                                 notZero: value => value !== "0" || "Value cannot be 0"
                               }
                             })}
+                            readOnly={isReadOnly}
                             value={fixedAmount}
                             onChange={handleFixedAmountChange}
                           />
                           {errors.fixedAmount && (
-                            <div className="text-danger">
+                            <div className="errorMsg">
                               {errors.fixedAmount.message}
                             </div>
                           )}
@@ -471,10 +478,11 @@ const EmployeeSalaryStructure = () => {
                             }
                           })}
                           value={hra}
+                          readOnly={isReadOnly}
                           onChange={handleHraChange}
                         />
                         {errors.hra && (
-                          <div className="text-danger">
+                          <div className="errorMsg">
                             {errors.hra.message}
                           </div>
                         )}
@@ -505,10 +513,11 @@ const EmployeeSalaryStructure = () => {
                             }
                           })}
                           value={travelAllowance}
+                          readOnly={isReadOnly}
                           onChange={handleTravelAllowanceChange}
                         />
                         {errors.travelAllowance && (
-                          <div className="text-danger">
+                          <div className="errorMsg">
                             {errors.travelAllowance.message}
                           </div>
                         )}
@@ -521,6 +530,7 @@ const EmployeeSalaryStructure = () => {
                           autoComplete="off"
                           value={specialAllowance}
                           maxLength={7}
+                          readOnly={isReadOnly}
                           onChange={handleSpecialAllowanceChange}
                         />
                       </div>
@@ -532,6 +542,7 @@ const EmployeeSalaryStructure = () => {
                           autoComplete="off"
                           value={otherAllowances}
                           maxLength={7}
+                          readOnly={isReadOnly}
                           onChange={handleOtherAllowancesChange}
                         />
                       </div>
@@ -612,11 +623,12 @@ const EmployeeSalaryStructure = () => {
                               notZero: value => value !== "0" || "Value cannot be 0"
                             }
                           })}
+                          readOnly={isReadOnly}
                           value={pfEmployee}
                           onChange={handlePfEmployeeChange}
                         />
                         {errors.pfEmployee && (
-                          <div className="text-danger">
+                          <div className="errorMsg">
                             {errors.pfEmployee.message}
                           </div>
                         )}
@@ -649,10 +661,11 @@ const EmployeeSalaryStructure = () => {
                             }
                           })}
                           value={pfEmployer}
+                          readOnly={isReadOnly}
                           onChange={handlePfEmployerChange}
                         />
                         {errors.pfEmployer && (
-                          <div className="text-danger">
+                          <div className="errorMsg">
                             {errors.pfEmployer.message}
                           </div>
                         )}
@@ -671,14 +684,25 @@ const EmployeeSalaryStructure = () => {
                   <div className="col-12">
                     <div className="card">
                       <div className="card-header">
-                        <h5 className="card-title"> Status</h5>
+                        <h5 className="card-title">Status</h5>
                         <hr />
                         <div className="col-12">
-                          <label className="form-label">Status<span style={{ color: "red" }}>*</span></label>
-                          <Controller
+                          <label className="form-label">
+                            Status<span style={{ color: 'red' }}>*</span>
+                          </label>
+                          {status === "InActive" ? (
+                            <input
+                              className="form-control"
+                              type="text"
+                              value={status}
+                              readOnly={isReadOnly}
+                            />
+                          ) : (
+                            <>
+                            <Controller
                             name="status"
                             control={control}
-                            defaultValue={status}
+                            defaultValue=""
                             rules={{ required: true }}
                             render={({ field }) => (
                               <Select
@@ -692,15 +716,15 @@ const EmployeeSalaryStructure = () => {
                                     ? { value: field.value, label: ["Active", "InActive"].find(option => option === field.value) }
                                     : null
                                 }
-                                onChange={(val) => {
-                                  field.onChange(val.value);
-                                  setStatus(val.value); // Update local status state on change
-                                }}
+                                onChange={(val) => field.onChange(val.value)}
                                 placeholder="Select Status"
                               />
                             )}
                           />
-                          {errors.status && <p className="text-danger errorMsg">Employee Status is Required</p>}
+                          {errors.status && <p className="errorMsg"> Status is Required</p>}
+                          </>
+                          )}
+
                         </div>
                       </div>
                     </div>
@@ -724,54 +748,54 @@ const EmployeeSalaryStructure = () => {
                   </div>
                   <div className="col-12 text-end" style={{ marginTop: "60px" }}>
                     <button type="submit" className="btn btn-primary">
-                      Submit
+                      {isUpdating ? 'Update' : 'Submit'}
                     </button>
                   </div>
                 </div>
               </>
-            ):(
+            ) : (
               <div className="col-12">
-              <div className="card">
-                <div className="card-header" style={{ paddingBottom: "0" }}>
-                  <h5 className="card-title">Employee Details</h5>
-                  <div
-                    className="dropdown-divider"
-                    style={{ borderTopColor: "#d7d9dd" }}
-                  />
-                </div>
-                <div className="card-body" style={{ padding: "0 0 0 25%" }}>
-                  <div className="mb-4">
-                    <div className="row align-items-center">
-                      <div className="col-12 d-flex align-items-center">
-                        <div
-                          className="mt-3"
-                          style={{ flex: "1 1 auto", maxWidth: "400px" }}
-                        >
-                          <label className="form-label">Select Employee Name</label>
-                          <Select
-                            options={employes}
-                            onChange={handleEmployeeChange}
-                            placeholder="Select Employee Name"
-                          />
-                        </div>
-                        <div style={{ marginTop: "27px" }}>
-                          <div className="mt-3 ml-3" style={{ marginLeft: "20px" }}>
-                            <button
-                              type="button"
-                              className="btn btn-primary"
-                              onClick={handleGoClick}
-                            >
-                              Go
-                            </button>
+                <div className="card">
+                  <div className="card-header" style={{ paddingBottom: "0" }}>
+                    <h5 className="card-title">Employee Details</h5>
+                    <div
+                      className="dropdown-divider"
+                      style={{ borderTopColor: "#d7d9dd" }}
+                    />
+                  </div>
+                  <div className="card-body" style={{ padding: "0 0 0 25%" }}>
+                    <div className="mb-4">
+                      <div className="row align-items-center">
+                        <div className="col-12 d-flex align-items-center">
+                          <div
+                            className="mt-3"
+                            style={{ flex: "1 1 auto", maxWidth: "400px" }}
+                          >
+                            <label className="form-label">Select Employee Name</label>
+                            <Select
+                              options={employes}
+                              onChange={handleEmployeeChange}
+                              placeholder="Select Employee Name"
+                            />
+                          </div>
+                          <div style={{ marginTop: "27px" }}>
+                            <div className="mt-3 ml-3" style={{ marginLeft: "20px" }}>
+                              <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={handleGoClick}
+                              >
+                                Go
+                              </button>
+                            </div>
                           </div>
                         </div>
+                        {message && <div className="errorMsg mt-2" style={{ marginLeft: '10px' }}>{message}</div>}
                       </div>
-                      {message && <div className="text-danger mt-2" style={{ marginLeft: '10px' }}>{message}</div>}
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
             )}
           </div>
         </form>

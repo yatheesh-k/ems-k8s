@@ -194,7 +194,7 @@ const GeneratePaySlip = () => {
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
-                <li className="breadcrumb-item active">PayRoll</li>
+                <li className="breadcrumb-item active">Payroll</li>
                 <li className="breadcrumb-item active">Generate Payslips</li>
               </ol>
             </nav>
@@ -225,7 +225,7 @@ const GeneratePaySlip = () => {
                           />
                         )}
                       />
-                      {errors.year && <p className="errorMsg">Year Required</p>}
+                      {errors.year && <p className="errorMsg">Year is Required</p>}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Select Month</label>
@@ -242,7 +242,7 @@ const GeneratePaySlip = () => {
                           />
                         )}
                       />
-                      {errors.month && <p className="errorMsg">Month Required</p>}
+                      {errors.month && <p className="errorMsg">Month is Required</p>}
                     </div>
                     <div className="col-12 d-flex justify-content-end mt-5">
                       <button

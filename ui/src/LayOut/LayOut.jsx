@@ -79,7 +79,7 @@ const LayOut = ({ children }) => {
                 </div>
                 <div className="col-6 text-end">
                   <p>
-                    Powered By <Link className='text-muted'>PathBreaker Technologies Pvt.Ltd</Link>
+                    Powered By PathBreaker Technologies Pvt.Ltd
                   </p>
                 </div>
               </div>

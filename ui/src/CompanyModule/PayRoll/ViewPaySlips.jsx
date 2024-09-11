@@ -11,7 +11,7 @@ import { AllEmployeePayslipsGet, EmployeeGetApi, EmployeeGetApiById, EmployeePay
 const ViewPaySlips = () => {
   const { control, formState: { errors } } = useForm();
   const [employees, setEmployees] = useState([]);
-  const [showFields, setShowFields]= useState(false);
+  const [showFields, setShowFields] = useState(false);
   const [employeeSalaryView, setEmployeeSalaryView] = useState([]);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
   const [selectedEmployeeDetails, setSelectedEmployeeDetails] = useState({});
@@ -21,7 +21,8 @@ const ViewPaySlips = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [showSpinner, setShowSpinner] = useState(false);
-  const [noRecords, setNoRecords] = useState(false); 
+  const [noRecords, setNoRecords] = useState(false);
+  const [heading, setHeading] = useState("Payslip Details"); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -88,7 +89,6 @@ const ViewPaySlips = () => {
         setNoRecords(true);
       }
     } catch (error) {
-      // handleApiErrors(error);
       setNoRecords(true); 
     } finally {
       setShowSpinner(false); 
@@ -102,6 +102,9 @@ const ViewPaySlips = () => {
     }
     const monthName = getMonthNames()[parseInt(selectedMonth, 10) - 1];
     fetchData(selectedEmployeeId, monthName, selectedYear);
+
+    setHeading(`Payslip Details for ${`${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})`} ${selectedYear ? `- ${selectedYear}` : ''} ${selectedMonth ? `- ${getMonthNames()[selectedMonth - 1]}` : ''}`);    
+    setShowFields(true); 
   };
 
   const handleViewSalary = (employeeId, payslipId) => {
@@ -177,13 +180,11 @@ const ViewPaySlips = () => {
       {
         name: <h6><b>Name</b></h6>,
         selector: row => `${row.attendance.firstName} ${row.attendance.lastName}`,
-        sortable: true,
         width: "280px",
       },
       {
         name: <h6><b>Net Amount</b></h6>,
         selector: row => parseFloat(row.salary.netSalary).toFixed(2),
-        sortable: true,
         width: "300px",
       },
       {
@@ -210,7 +211,6 @@ const ViewPaySlips = () => {
       {
         name: <h6><b>Net Amount</b></h6>,
         selector: row => parseFloat(row.salary.netSalary).toFixed(2),
-        sortable: true,
         width: "600px",
       },
       {
@@ -241,7 +241,7 @@ const ViewPaySlips = () => {
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3">
-              <strong> PaySlips</strong>
+              <strong>Payslips</strong> 
             </h1>
           </div>
           <div className="col-auto" style={{ paddingBottom: '20px' }}>
@@ -250,18 +250,18 @@ const ViewPaySlips = () => {
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
-                <li className="breadcrumb-item active">PayRoll</li>
-                <li className="breadcrumb-item active">PaySlips</li>
+                <li className="breadcrumb-item active">Payroll</li>
+                <li className="breadcrumb-item active">Payslips</li>
               </ol>
             </nav>
           </div>
         </div>
         <div className="card mb-3">
           <div className="card-body justify-content-around">
-            <div className="row d-flex justify-content-around">
+            <div className="row d-flex justify-content-around mt-4">
               <div className="col-12 col-md-3">
                 <div className="form-group">
-                  <label className="form-label">Select Employee</label>
+                  <label className="form-label">Select Employee<span style={{color:"red"}}>*</span></label>
                   <Controller
                     name="employeeId"
                     control={control}
@@ -288,7 +288,7 @@ const ViewPaySlips = () => {
               </div>
               <div className="col-12 col-md-3">
                 <div className="form-group">
-                  <label className="form-label">Select Year</label>
+                  <label className="form-label">Select Year<span style={{color:"red"}}>*</span></label>
                   <Select
                     options={years}
                     value={years.find((option) => option.value === selectedYear) || ""}
@@ -299,7 +299,7 @@ const ViewPaySlips = () => {
               </div>
               <div className="col-12 col-md-3">
                 <div className="form-group">
-                  <label className="form-label">Select Month</label>
+                  <label className="form-label">Select Month<span style={{color:"red"}}>*</span></label>
                   <Select
                     options={months}
                     value={months.find((month) => month.value === selectedMonth) || ""}
@@ -325,9 +325,7 @@ const ViewPaySlips = () => {
             {showFields ? (
               <div>
                 <h5 className="card-title mt-4">
-                  PaySlip Details for {selectedEmployeeDetails.firstName ? `${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})` : 'All Employees'}
-                  {selectedYear && ` - ${selectedYear}`}
-                  {selectedMonth && ` - ${getMonthNames()[selectedMonth - 1]}`}
+                  {heading}
                 </h5>
                 <hr />
                 {noRecords ? (
@@ -346,7 +344,7 @@ const ViewPaySlips = () => {
             ) : (
               <div>
                 <h5 className="card-title mt-4">
-                  PaySlip Details for {getMonthAndYear()}
+                  Payslip Details for {getMonthAndYear()}
                 </h5>
                 <hr />
                 {noRecords ? (

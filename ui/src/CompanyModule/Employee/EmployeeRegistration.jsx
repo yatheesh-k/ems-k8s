@@ -291,7 +291,7 @@ const EmployeeRegistration = () => {
         setErrorMessage(alertMessage);
 
       } else {
-      handleApiErrors(error);
+        handleApiErrors(error);
       }
     }
   };
@@ -557,7 +557,7 @@ const EmployeeRegistration = () => {
                         {...register("emailId", {
                           required: "Email Id is Required",
                           pattern: {
-                            value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                            value: /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid email format it allows Only .com, .in, .org, .net, .edu, .gov are allowed",
                           },
                         })}
@@ -587,7 +587,7 @@ const EmployeeRegistration = () => {
                     </div>
                     <div className="col-lg-1"></div>
 
-                     {/* {isUpdating ? (
+                    {/* {isUpdating ? (
                       <div className="col-12 col-md-6 col-lg-5 mb-3">
                         <label className="form-label">
                           Department <span style={{ color: "red" }}>*</span>
@@ -615,32 +615,32 @@ const EmployeeRegistration = () => {
 
                     ) : (  */}
 
-                      <div className="col-12 col-md-6 col-lg-5 mb-3">
-                        <label className="form-label">
-                          Department <span style={{ color: "red" }}>*</span>
-                        </label>
-                        <Controller
-                          name="department"
-                          control={control}
-                          defaultValue=""
-                          rules={{ required: "Department is Required" }}
-                          render={({ field }) => (
-                            <select {...field} className="form-select">
-                              <option value="" disabled>Select Department</option>
-                              {departments.map(department => (
-                                <option key={department.id} value={department.id}>
-                                  {department.name}
-                                </option>
-                              ))}
-                            </select>
-                          )}
-                        />
-                        {errors.department && (
-                          <p className="errorMsg">
-                            {errors.department.message}
-                          </p>
+                    <div className="col-12 col-md-6 col-lg-5 mb-3">
+                      <label className="form-label">
+                        Department <span style={{ color: "red" }}>*</span>
+                      </label>
+                      <Controller
+                        name="department"
+                        control={control}
+                        defaultValue=""
+                        rules={{ required: "Department is Required" }}
+                        render={({ field }) => (
+                          <select {...field} className="form-select">
+                            <option value="" disabled>Select Department</option>
+                            {departments.map(department => (
+                              <option key={department.id} value={department.id}>
+                                {department.name}
+                              </option>
+                            ))}
+                          </select>
                         )}
-                      </div>
+                      />
+                      {errors.department && (
+                        <p className="errorMsg">
+                          {errors.department.message}
+                        </p>
+                      )}
+                    </div>
                     {/* )} */}
 
                     <div className="col-lg-1"></div>

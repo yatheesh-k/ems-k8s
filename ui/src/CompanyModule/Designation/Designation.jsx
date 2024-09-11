@@ -174,14 +174,13 @@ const Designation = () => {
     {
       name: <h5><b>S No</b></h5>,
       selector: (row, index) => getSerialNumber(index),
-      sortable: true
     },
     {
       name: <h5><b>Designation</b></h5>,
       selector: (row) => row.name,
     },
     {
-      name: <h5><b>Action</b></h5>,
+      name: <h5><b>Actions</b></h5>,
       cell: (row) => (
         <div>
           <button

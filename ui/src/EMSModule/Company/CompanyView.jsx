@@ -139,7 +139,7 @@ const CompanyView = () => {
       wrap: true,
     },
     {
-      name: <h6><b>Action</b></h6>,
+      name: <h6><b>Actions</b></h6>,
       width: "130px",
       cell: (row) => (
         <div>

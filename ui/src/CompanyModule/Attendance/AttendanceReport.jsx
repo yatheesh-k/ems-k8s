@@ -33,7 +33,7 @@ const AttendanceReport = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [columns, setColumns] = useState([]);
-  const [hasRecords, setHasRecords] = useState(true); // Add this state
+  const [hasRecords, setHasRecords] = useState(true); 
 
   const navigate = useNavigate();
 
@@ -90,14 +90,14 @@ const AttendanceReport = () => {
       const data = response.data.data;
       setAttendanceData(data);
       setEmployeeAttendance(data);
-      setHasRecords(data.length > 0); 
+      setHasRecords(data.length > 0);
       setShowFields(true);
       setIsAllAttendance(false);
       setIsAttendance(true);
       updateColumns(true);
     } catch (error) {
       console.error("Error fetching attendance data:", error);
-      setHasRecords(false); 
+      setHasRecords(false);
     }
   };
 
@@ -116,7 +116,7 @@ const AttendanceReport = () => {
       setHasRecords(data.length > 0);
       setIsAllAttendance(true);
       setIsAttendance(false);
-      updateColumns(true); 
+      updateColumns(true);
     } catch (error) {
       console.error("Error fetching attendance data:", error);
       setHasRecords(false); // In case of error, assume no records
@@ -191,19 +191,19 @@ const AttendanceReport = () => {
         handleCloseEditModal();
         setRefreshData((prev) => !prev);
         navigate("/attendanceReport");
-        fetchAttendanceData(employeeId, selectedMonth, selectedYear);
+        fetchAllAttendanceData(employeeId, selectedMonth, selectedYear);
       }, 1000);
     } catch (error) {
       handleApiErrors(error);
     }
   };
 
-  const getMonthAndYear = () => {
-    if (attendanceData.length > 0) {
-      const firstRecord = attendanceData[0];
-      return `${firstRecord.month} ${firstRecord.year}`;
-    }
-    return "";
+  const formatDateHeader = () => {
+    const now = new Date();
+    const currentMonth = now.getMonth();  
+    const currentYear = now.getFullYear();
+    const monthNames = getMonthNames();
+    return `Attendance Details for ${monthNames[currentMonth]} ${currentYear}`;
   };
 
   const handleApiErrors = (error) => {
@@ -221,13 +221,11 @@ const AttendanceReport = () => {
       {
         name: <h6><b>No. Of Working Days</b></h6>,
         selector: (row) => row.noOfWorkingDays,
-        sortable: true,
         width: "240px",
       },
       {
         name: <h6><b>Total Working Days</b></h6>,
         selector: (row) => row.totalWorkingDays,
-        sortable: true,
         width: "240px",
       },
       {
@@ -264,25 +262,21 @@ const AttendanceReport = () => {
       ...(!isAttendance && !selectedYear && !selectedMonth ? [{
         name: <h6><b>Name</b></h6>,
         selector: (row) => `${row.firstName} ${row.lastName}`,
-        sortable: true,
         width: "200px",
       }] : []),
       ...(!isAllAttendance && selectedYear ? [{
         name: <h6><b>Name</b></h6>,
         selector: (row) => `${row.firstName} ${row.lastName}`,
-        sortable: true,
         width: "150px",
       }] : []),
       ...(!isAttendance && selectedYear ? [{
         name: <h6><b>Name</b></h6>,
         selector: (row) => `${row.firstName} ${row.lastName}`,
-        sortable: true,
         width: "150px",
       }] : []),
       ...(!isAttendance && selectedYear ? [{
         name: <h6><b>month</b></h6>,
         selector: (row) => row.month,
-        sortable: true,
         width: "150px",
       }] : []),
     ];
@@ -290,7 +284,7 @@ const AttendanceReport = () => {
     if (update) {
       setColumns([...dynamicColumns, ...commonColumns]);
     } else {
-      setColumns([...commonColumns]); 
+      setColumns([...commonColumns]);
     }
   };
 
@@ -329,7 +323,7 @@ const AttendanceReport = () => {
                     />
                   </div>
                   <div className="col-md-3 mt-3">
-                    <label className="form-label">Select Year</label>
+                    <label className="form-label">Select Year <span style={{color:"red"}}>*</span></label>
                     <Select
                       options={getRecentYears().map((year) => ({
                         label: year,
@@ -364,9 +358,18 @@ const AttendanceReport = () => {
               </div>
               <div className="card-body">
                 <h5 className="card-title mt-2">
-                  Attendance Details for {selectedEmployeeDetails.firstName ? `${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})` : 'All Employees'}
-                  {selectedYear && ` - ${selectedYear}`}
-                  {selectedMonth && ` - ${getMonthNames()[selectedMonth - 1]}`}
+                  {isAttendance ? (
+                    <>
+                      Pay Slip Details for{" "}
+                      {selectedEmployeeDetails.firstName
+                        ? `${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})`
+                        : 'All Employees'}
+                      {selectedYear && ` - ${selectedYear}`}
+                      {selectedMonth && ` - ${getMonthNames()[selectedMonth - 1]}`}
+                    </>
+                  ) : (
+                    formatDateHeader()
+                  )}
                 </h5>
                 <hr />
                 {hasRecords ? (
