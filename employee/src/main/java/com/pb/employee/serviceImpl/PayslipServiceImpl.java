@@ -436,8 +436,8 @@ public class PayslipServiceImpl implements PayslipService {
         htmlBuilder.append("<tr>");
         htmlBuilder.append("<td>");
         htmlBuilder.append("<div class=\"date-info\">");
-        htmlBuilder.append("<h4 id=\"month-year\">").append(payslipEntity.getMonth()+" / "+payslipEntity.getYear()).append("</h4>");
-        htmlBuilder.append("<h4 id=\"employee-name\">").append(employee.getFirstName()+" "+employee.getLastName()).append("</h4>");
+        htmlBuilder.append("<h4 id=\"month-year\">").append(payslipEntity.getMonth()+"-"+payslipEntity.getYear()).append(" Pay Slip</h4>");
+        htmlBuilder.append("<h4 id=\"employee-name\">Employee Name :").append(employee.getFirstName()+" "+employee.getLastName()).append("</h4>");
         htmlBuilder.append("</div>");
         htmlBuilder.append("</td>");
         htmlBuilder.append("<td>");
@@ -463,13 +463,13 @@ public class PayslipServiceImpl implements PayslipService {
         htmlBuilder.append("<th>Date Of Birth</th>");
         htmlBuilder.append("<td>").append(employee.getDateOfBirth()).append("</td>");
         htmlBuilder.append("<th>PAN</th>");
-        htmlBuilder.append("<td>").append(employee.getPanNo()).append("</td>");
+        htmlBuilder.append("<td>").append(maskNumber(employee.getPanNo())).append("</td>");
         htmlBuilder.append("</tr>");
         htmlBuilder.append("<tr>");
         htmlBuilder.append("<th>Department</th>");
         htmlBuilder.append("<td>").append(employee.getDepartmentName()).append("</td>");
         htmlBuilder.append("<th>UAN</th>");
-        htmlBuilder.append("<td>").append(employee.getUanNo()).append("</td>");
+        htmlBuilder.append("<td>").append(maskNumber(employee.getUanNo())).append("</td>");
         htmlBuilder.append("</tr>");
         htmlBuilder.append("<tr>");
         htmlBuilder.append("<th>Designation</th>");
@@ -478,7 +478,7 @@ public class PayslipServiceImpl implements PayslipService {
         htmlBuilder.append("<td>").append(employee.getLocation()).append("</td>");
         htmlBuilder.append("</tr>");
         htmlBuilder.append("<tr>");
-        htmlBuilder.append("<td colspan=\"4\" class=\"employee-details\">Bank ACC No: ").append(employee.getAccountNo()).append(" ;IFSC: ").append(employee.getIfscCode()).append(" ;Bank: ").append(employee.getBankName()).append("</td>");
+        htmlBuilder.append("<td colspan=\"4\" class=\"employee-details\">Bank ACC No: ").append(maskNumber(employee.getAccountNo())).append(";      IFSC: ").append(maskNumber(employee.getIfscCode())).append(";       Bank: ").append(employee.getBankName()).append("</td>");
         htmlBuilder.append("</tr>");
         htmlBuilder.append("</table>");
         htmlBuilder.append("</div>");
@@ -513,69 +513,69 @@ public class PayslipServiceImpl implements PayslipService {
         htmlBuilder.append("<th class=\"deductions\">Amount</th>");
         htmlBuilder.append("</tr>");
         htmlBuilder.append("<tr>");
-        htmlBuilder.append("<th>Basic Salary</th>");
+        htmlBuilder.append("<td>Basic Salary</td>");
         htmlBuilder.append("<td>").append(payslipEntity.getSalary().getBasicSalary()).append("</td>");
-        htmlBuilder.append("<th>PF Employee</th>");
+        htmlBuilder.append("<td>PF Employee</td>");
         htmlBuilder.append("<td>").append(payslipEntity.getSalary().getDeductions().getPfEmployee()).append("</td>");
         htmlBuilder.append("</tr>");
         htmlBuilder.append("<tr>");
-        htmlBuilder.append("<th>HRA</th>");
+        htmlBuilder.append("<td>HRA</td>");
         htmlBuilder.append("<td>").append(payslipEntity.getSalary().getAllowances().getHra()).append("</td>");
-        htmlBuilder.append("<th>PF Employer</th>");
+        htmlBuilder.append("<td>PF Employer</td>");
         htmlBuilder.append("<td>").append(payslipEntity.getSalary().getDeductions().getPfEmployer()).append("</td>");
         htmlBuilder.append("</tr>");
         htmlBuilder.append("<tr>");
 
-        htmlBuilder.append("<th>Travel Allowance</th>");
+        htmlBuilder.append("<td>Travel Allowance</td>");
         htmlBuilder.append("<td>").append(payslipEntity.getSalary().getAllowances().getTravelAllowance()).append("</td>");
-        htmlBuilder.append("<th>LOP</th>");
+        htmlBuilder.append("<td>LOP</td>");
         htmlBuilder.append("<td>").append(payslipEntity.getSalary().getDeductions().getLop()).append("</td>");
         htmlBuilder.append("</tr>");
         htmlBuilder.append("<tr>");
-        htmlBuilder.append("<th>PF Contribution Employee</th>");
+        htmlBuilder.append("<td>PF Contribution Employee</td>");
         htmlBuilder.append("<td>").append(payslipEntity.getSalary().getAllowances().getPfContributionEmployee()).append("</td>");
-        htmlBuilder.append("<th>Total Deductions (B)</th>");
+        htmlBuilder.append("<td>Total Deductions (B)</td>");
         htmlBuilder.append("<td>").append(payslipEntity.getSalary().getDeductions().getTotalDeductions()).append("</td>");
         htmlBuilder.append("</tr>");
         htmlBuilder.append("<tr>");
-        htmlBuilder.append("<th>Special Allowance</th>");
+        htmlBuilder.append("<td>Special Allowance</td>");
         htmlBuilder.append("<td>").append(payslipEntity.getSalary().getAllowances().getSpecialAllowance()).append("</td>");
-        htmlBuilder.append("<td colspan=\"2\"><strong>Tax Deductions (C)</strong></td>");
+        htmlBuilder.append("<td colspan=\"2\"><strong>Taxes (C)</strong></td>");
         htmlBuilder.append("</tr>");
         htmlBuilder.append("<tr>");
-        htmlBuilder.append("<th>Other Allowances</th>");
+        htmlBuilder.append("<td>Other Allowances</td>");
         htmlBuilder.append("<td>").append(payslipEntity.getSalary().getAllowances().getOtherAllowances()).append("</td>");
-        htmlBuilder.append("<th>Professional Tax</th>");
+        htmlBuilder.append("<td>Professional Tax</td>");
         htmlBuilder.append("<td>").append(payslipEntity.getSalary().getDeductions().getPfTax()).append("</td>");
         htmlBuilder.append("</tr>");
         htmlBuilder.append("<tr>");
-        htmlBuilder.append("<th>Total Earnings (A)</th>");
+        htmlBuilder.append("<td>Total Earnings (A)</td>");
         htmlBuilder.append("<td>").append(payslipEntity.getSalary().getTotalEarnings()).append("</td>");
-        htmlBuilder.append("<th>Income Tax</th>");
+        htmlBuilder.append("<td>Income Tax</td>");
         htmlBuilder.append("<td>").append(payslipEntity.getSalary().getDeductions().getIncomeTax()).append("</td>");
         htmlBuilder.append("</tr>");
         htmlBuilder.append("<tr>");
         htmlBuilder.append("<th></th>");
         htmlBuilder.append("<td></td>");
-        htmlBuilder.append("<th><strong>Total Tax (C)</strong></th>");
+        htmlBuilder.append("<td>Total Tax (C)</td>");
         htmlBuilder.append("<td>").append(payslipEntity.getSalary().getDeductions().getTotalTax()).append("</td>");
         htmlBuilder.append("</tr>");
         htmlBuilder.append("<tr>");
         htmlBuilder.append("<th></th>");
         htmlBuilder.append("<td></td>");
-        htmlBuilder.append("<td><strong>Net Pay (A-B-C)</strong></td>");
-        htmlBuilder.append("<td>").append(payslipEntity.getSalary().getNetSalary()).append("</td>");
+        htmlBuilder.append("<td>Net Pay (A-B-C)</td>");
+        htmlBuilder.append("<td><strong>").append(payslipEntity.getSalary().getNetSalary()).append("</strong></td>");
         htmlBuilder.append("</tr>");
         htmlBuilder.append("<tr>");
-        htmlBuilder.append("<th>Net Salary (In Words)</th>");
-        htmlBuilder.append("<td colspan=\"3\">").append(payslipEntity.getInWords()).append("</td>");
+        htmlBuilder.append("<td>Net Salary (In Words)</td>");
+        htmlBuilder.append("<td colspan=\"3\"><strong>").append(payslipEntity.getInWords()).append("</strong></td>");
         htmlBuilder.append("</tr>");
 
         htmlBuilder.append("</table>");
         htmlBuilder.append("</div>");
 
         htmlBuilder.append("<div class=\"text\">");
-        htmlBuilder.append("<p><small>This is computer-generated payslip and does not require authentication</small></p>");
+        htmlBuilder.append("<p><em>This is computer-generated payslip and does not require authentication</em></p>");
         htmlBuilder.append("</div>");
         htmlBuilder.append("<div class=\"address\">");
         htmlBuilder.append("<hr />");
@@ -589,6 +589,13 @@ public class PayslipServiceImpl implements PayslipService {
 
         return htmlBuilder.toString();
     }
-
+    private String maskNumber(String number) {
+        if (number == null || number.length() <= 4) {
+            return number; // If the number is too short or null, return as is
+        }
+        String maskedPart = "*".repeat(number.length() - 4); // Create a mask of asterisks
+        String visiblePart = number.substring(number.length() - 4); // Get the last 4 digits
+        return maskedPart + visiblePart;
+    }
 
 }

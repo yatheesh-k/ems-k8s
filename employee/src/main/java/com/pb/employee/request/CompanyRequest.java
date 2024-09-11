@@ -19,7 +19,7 @@ public class CompanyRequest {
 
     @Schema(example = "emailId")
     @NotNull(message = "{emailId.notnull.message}")
-    @Pattern(regexp =  "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,6}$", message = "{invalid.emailId}")
+    @Pattern(regexp =  "^(?=.*[a-z])[a-z0-9._%+-]*[a-z][a-z0-9._%+-]*@[a-z0-9.-]+\\.[a-z]{2,6}$", message = "{invalid.emailId}")
     private String emailId;
 
     @Schema(example = "password")
@@ -65,7 +65,7 @@ public class CompanyRequest {
 
     @Schema(example = "personalMailId")
     @NotNull(message = "{personalMailId.notnull.message}")
-    @Pattern(regexp = "^[a-z][a-z0-9._%+-]*@[a-z0-9.-]+\\.[a-z]{2,}$", message = "{invalid.emailId}")
+    @Pattern(regexp = "^(?=.*[a-z])[a-z0-9._%+-]*[a-z][a-z0-9._%+-]*@[a-z0-9.-]+\\.[a-z]{2,6}$", message = "{invalid.emailId}")
     private String personalMailId;
 
     @Schema(example = "personalMobileNo")

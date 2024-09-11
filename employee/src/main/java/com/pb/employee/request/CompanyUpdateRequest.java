@@ -35,7 +35,7 @@ public class CompanyUpdateRequest {
 
     @Schema(example = "personalMailId")
     @NotBlank(message = "{personalMailId.notnull.message}")
-    @Pattern(regexp="^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,6}$", message="{invalid.emailId}")
+    @Pattern(regexp="^(?=.*[a-z])[a-z0-9._%+-]*[a-z][a-z0-9._%+-]*@[a-z0-9.-]+\\.[a-z]{2,6}$", message="{invalid.emailId}")
     private String personalMailId;
 
     @Schema(example = "personalMobileNo")
