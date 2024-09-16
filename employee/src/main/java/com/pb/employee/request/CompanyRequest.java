@@ -13,8 +13,8 @@ import lombok.*;
 public class CompanyRequest {
 
     @Schema(example = "companyName")
-    @Size(min = 2, max = 40, message = "{size.message}")
-    @Pattern(regexp ="^[A-Z][A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{companyname.message}")
+    @Size(min = 2, max = 100, message = "{size.message}")
+    @Pattern(regexp ="^(?:[A-Z][a-zA-Z]*(?:[\\s'./]*[A-Z][a-zA-Z]*)*)+(?:[\\s]*[A-Za-z]*)?\\.?$", message = "{companyname.message}")
     private String companyName;
 
     @Schema(example = "emailId")
@@ -28,11 +28,11 @@ public class CompanyRequest {
     private String password;
 
     @Schema(example = "companyAddress")
-    @Size(min = 2, max = 100, message = "{companyAddress.notnull.message}")
-    @Pattern(regexp = "^(?:\\d*\\s*)?(?:[A-Z][a-zA-Z]*(?:[\\d*\\s',.#&*()^\\-/]+[A-Z][a-zA-Z]*)*)+(?:[\\s]*\\d*)?\\.?$",
+    @Size(min = 2, max = 200, message = "{companyAddress.notnull.message}")
+    @Pattern(regexp = "^(?:[A-Za-z0-9]+(?:[\\s.,'#&*()^/][A-Za-z0-9]+)*)+(?:[\\s.,'#&*()/-]*[A-Za-z0-9]+)*(?:[\\s]*[.,#&*()/-]*\\s*)*$",
             message = "{companyAddress.pattern.message}")
-
     private String companyAddress;
+
     @Schema(example = "companyRegNo")
     @NotNull(message = "{companyRegNo.notnull.message}")
     @Pattern(regexp = "^(?!\\s)(?!.*\\s$)[A-Z0-9\\s]{1,21}$", message = "{companyRegNo.pattern.message}")
@@ -74,9 +74,9 @@ public class CompanyRequest {
     private String personalMobileNo;
 
     @Schema(example = "address")
-    @Pattern(regexp =  "^(?:\\d*\\s*)?(?:[A-Z][a-zA-Z]*(?:[\\d*\\s',.#&*()^\\-/]+[A-Z][a-zA-Z]*)*)+(?:[\\s]*\\d*)?\\.?$",
+    @Pattern(regexp =  "^(?:[A-Za-z0-9]+(?:[\\s.,'#&*()^/][A-Za-z0-9]+)*)+(?:[\\s.,'#&*()/-]*[A-Za-z0-9]+)*(?:[\\s]*[.,#&*()/-]*\\s*)*$",
             message = "{address.pattern.message}")
-    @Size(min = 2, max = 100, message = "{address.notnull.message}")
+    @Size(min = 2, max = 200, message = "{address.notnull.message}")
     private String address;
 
     private String imageFile;
@@ -100,6 +100,6 @@ public class CompanyRequest {
 
     @Schema(example = "shortName")
     @Pattern(regexp = "^[a-z]+$", message = "{company.shortname.message}")
-    @Size(min = 2, max = 20, message = "{shortName.notnull.message}")
+    @Size(min = 2, max = 30, message = "{shortName.notnull.message}")
     private String shortName;
 }

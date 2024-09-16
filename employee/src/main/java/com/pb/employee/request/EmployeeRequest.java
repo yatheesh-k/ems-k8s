@@ -19,7 +19,7 @@ public class EmployeeRequest {
     @Schema(example = "companyShortName")
     @Pattern(regexp = "^[a-z]+$", message = "{companyName.format}")
     @NotBlank(message = "{companyname.message}")
-    @Size(min = 2, max = 20, message = "{size.message}")
+    @Size(min = 2, max = 30, message = "{size.message}")
     private String companyName;
 
     @Schema(example = "employeeId")
@@ -73,8 +73,8 @@ public class EmployeeRequest {
     private String department;
 
     @Schema(example = "location")
-    @Pattern(regexp = "^(?:\\d*\\s*)?(?:[A-Z][a-zA-Z]*(?:[\\d*\\s',.#&*()^\\-/]+[A-Z][a-zA-Z]*)*)+(?:[\\s]*\\d*)?\\.?$", message = "{location.format}")
-    @Size(min = 2, max = 100, message = "{location.notnull.message}")
+    @Pattern(regexp = "^(?:[A-Za-z0-9]+(?:[\\s.,'#&*()^/][A-Za-z0-9]+)*)+(?:[\\s.,'#&*()/-]*[A-Za-z0-9]+)*(?:[\\s]*[.,#&*()/-]*\\s*)*$", message = "{location.format}")
+    @Size(min = 2, max = 200, message = "{location.notnull.message}")
     private String location;
 
     @Schema(example = "manager")

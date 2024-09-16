@@ -107,7 +107,7 @@ public class PayslipUtils {
             pfEmployer = (double) Math.round(pfEmployer);
             salary.getDeductions().setPfEmployer(String.valueOf(pfEmployer));
         }
-            pfc = pfE + pfEmployer;
+            pfc = pfEmployer;
             pfc = (double) Math.round(pfc);
             salary.getAllowances().setPfContributionEmployee(String.valueOf(pfc));
         bas = ((gross/12.0)-(other+spa+hra+pfc+trav));
@@ -293,7 +293,7 @@ public class PayslipUtils {
         String var = null, fix = null, bas = null, gross = null,
                 hra = null, trav = null, pfc = null, other = null,spa=null,
                 te= null, pfE = null, pfEmployer =null, lop = null, tax = null,
-                itax = null, ttax = null, tded = null, net = null,noOfWorkingDays=null,totalWorkingDays=null;
+                itax = null, ttax = null, tded = null, net = null,noOfWorkingDays=null,totalWorkingDays=null,firstName=null, lastName =null;;
         if (payslipRequest.getSalary().getFixedAmount() != null) {
             fix = new String(Base64.getDecoder().decode(payslipRequest.getSalary().getFixedAmount()));
         }
@@ -355,6 +355,12 @@ public class PayslipUtils {
             net = new String(Base64.getDecoder().decode(payslipRequest.getSalary().getNetSalary()));
         }
 
+        if (payslipRequest.getAttendance().getFirstName()!= null) {
+            firstName = new String(Base64.getDecoder().decode(payslipRequest.getAttendance().getFirstName()));
+        }
+        if (payslipRequest.getAttendance().getLastName()!= null) {
+            lastName = new String(Base64.getDecoder().decode(payslipRequest.getAttendance().getLastName()));
+        }
         ObjectMapper objectMapper = new ObjectMapper();
 
         PayslipEntity payslipEntity = objectMapper.convertValue(payslipRequest, PayslipEntity.class);
@@ -380,6 +386,8 @@ public class PayslipUtils {
         payslipRequest.setInWords(inWords + " Rupees Only.");
         payslipRequest.getAttendance().setNoOfWorkingDays(noOfWorkingDays);
         payslipRequest.getAttendance().setTotalWorkingDays(totalWorkingDays);
+        payslipRequest.getAttendance().setFirstName(firstName);
+        payslipRequest.getAttendance().setLastName(lastName);
         payslipEntity.setType(Constants.PAYSLIP);
 
 

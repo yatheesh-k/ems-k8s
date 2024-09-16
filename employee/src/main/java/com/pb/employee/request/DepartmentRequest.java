@@ -17,7 +17,7 @@ public class DepartmentRequest {
     @Schema(example = "companyShortName")
     @Pattern(regexp = "^[a-z]+$", message = "{companyName.format}")
     @NotBlank(message = "{companyname.message}")
-    @Size(min = 2, max = 20, message = "{size.message}")
+    @Size(min = 2, max = 30, message = "{size.message}")
     private String companyName;
 
     @Schema(example = "department")

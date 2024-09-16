@@ -309,7 +309,7 @@ public class CompanyUtils {
         // Convert strings to doubles
         double grossAmountDouble = Double.parseDouble(grossAmount);
         double totalDeductionsDouble = Double.parseDouble(totalDeductions);
-        itax = String.valueOf(TaxCalculatorUtils.getNewTax( grossAmountDouble));
+        itax = String.valueOf(TaxCalculatorUtils.getNewTax(grossAmountDouble));
         tax = String.valueOf(TaxCalculatorUtils.getPfTax(grossAmountDouble/12));
 
 
