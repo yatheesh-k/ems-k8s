@@ -23,7 +23,7 @@ public class JwtTokenUtil {
    // Hex Key:	22ba0f64f69a9f1f10bbbc7d5949486aa0199f44c6d071201d7df7b5c5bae5da
     //Plain text key:	LAC RITE SELL TOLD LAMB GREG ED SKIN JAG LORD HATE PUB JACK RAVE RODE GOAL BET GREW IKE TRIM TONE GILL LIEN TONE
    // Reverse:	22ba0f64f69a9f1f10bbbc7d5949486aa0199f44c6d071201d7df7b5c5bae5da
-   private static final String SECRET_KEY = "22ba0f64f69a9f1f10bbbc7d5949486aa0199f44c6d071201d7df7b5c5bae5da"; // Or load from a secure place
+    private static final String SECRET_KEY = "22ba0f64f69a9f1f10bbbc7d5949486aa0199f44c6d071201d7df7b5c5bae5da"; // Or load from a secure place
     private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     @Value("${jwt.secret}")
@@ -32,18 +32,6 @@ public class JwtTokenUtil {
     @Value("${jwt.expiration}")
     private static Long expiration;
 
-   /* public static String generateToken(String username, List<String> roles) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put(Constants.ROLES, roles);
-        return doGenerateToken(claims, username);
-    }
-
-    private static String doGenerateToken(Map<String, Object> claims, String subject) {
-
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(SignatureAlgorithm.HS512, secret).compact();
-    }*/
     public static String generateToken(String username, List<String> roles) {
         return Jwts.builder()
                 .setSubject(username)
@@ -68,7 +56,7 @@ public class JwtTokenUtil {
         return  token;
     }
     public static Claims decodeToken(String token) {
-        return Jwts.parserBuilder()
+        return Jwts.parser()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
@@ -78,7 +66,7 @@ public class JwtTokenUtil {
 
     public static Claims validateToken(String token) throws IdentityException{
         try {
-             return Jwts.parserBuilder()
+             return Jwts.parser()
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(token)
@@ -89,17 +77,4 @@ public class JwtTokenUtil {
                     HttpStatus.UNAUTHORIZED);
         }
     }
-
-   /* public static Claims validateToken(String token) {
-        try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-        } catch (JwtException e) {
-            System.out.println("Invalid JWT token");
-            return null;
-        }
-    }*/
 }
