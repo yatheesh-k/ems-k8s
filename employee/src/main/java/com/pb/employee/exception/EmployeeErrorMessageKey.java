@@ -63,7 +63,10 @@ public enum EmployeeErrorMessageKey {
     INVALID_EMPLOYEE_DETAILS("invalid.employee.details"),
     INVALID_ATTENDANCE_DATA("invalid.attendance.data"),
     INVALID_YEAR("invalid.year"),
-    NO_ATTENDANCE_FOUND("attendance.not.found");
+    NO_ATTENDANCE_FOUND("attendance.not.found"),
+    UNABLE_GET_SALARY_STRUCTURE("unable.get.salary.structure"),
+    UNABLE_SAVE_COMPANY_SALARY("unable.save.company.salary"),
+    COMPANY_SALARY_ALREADY_EXIST("company.salary.already.exist");
 
     private final String key;
 

@@ -1,8 +1,6 @@
 package com.pb.employee.util;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pb.employee.model.ResourceType;
 import com.pb.employee.persistance.model.*;
 import com.pb.employee.request.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -360,11 +358,12 @@ public class CompanyUtils {
         return entity;
     }
 
-    public static Entity maskUpdateSalary(SalaryRequest salaryRequest, SalaryEntity salary) {
+    public static Entity maskUpdateSalary(SalaryUpdateRequest salaryRequest, EmployeeSalaryEntity salary) {
 
         String var = null, fix = null, bas = null, gross = null;
         String hra = null, trav = null, pfc = null, other = null,spa=null;
-        String te= null, pfE = null, pfEmployer =null, lop = null, tax = null, itax = null, ttax = null, tded = null, net = null;
+        String te= null, pfE = null, pfEmployer =null, lop = null, pfTax = null, incomeTax = null, ttax = null, tded = null, net = null;
+
         if(salaryRequest.getFixedAmount() != null) {
             fix = (Base64.getEncoder().encodeToString(salaryRequest.getFixedAmount().toString().getBytes()));
             salary.setFixedAmount(fix);
@@ -373,75 +372,64 @@ public class CompanyUtils {
             var = Base64.getEncoder().encodeToString(salaryRequest.getVariableAmount().toString().getBytes());
             salary.setVariableAmount(var);
         }
-        if(salaryRequest.getGrossAmount() != null) {
-            gross = (Base64.getEncoder().encodeToString(salaryRequest.getGrossAmount().toString().getBytes()));
+        if (salaryRequest.getGrossAmount() != null) {
+            Double itax = TaxCalculatorUtils.getNewTax(Double.parseDouble(salaryRequest.getGrossAmount()));
+            Double ptax = TaxCalculatorUtils.getPfTax(Double.valueOf(salaryRequest.getGrossAmount()));
+            incomeTax=Base64.getEncoder().encodeToString(itax.toString().getBytes());
+            pfTax = Base64.getEncoder().encodeToString(ptax.toString().getBytes());
+            ttax= String.valueOf(itax+ptax);
+            gross= (Base64.getEncoder().encodeToString(salaryRequest.getGrossAmount().toString().getBytes()));
             salary.setGrossAmount(gross);
-            double income = TaxCalculatorUtils.getNewTax(Double.parseDouble(salaryRequest.getGrossAmount()));
-            double pfTax = TaxCalculatorUtils.getPfTax(Double.parseDouble(salaryRequest.getGrossAmount())/12);
-            ttax = String.valueOf(pfTax+income);
-            salary.getDeductions().setTotalTax(Base64.getEncoder().encodeToString(ttax.getBytes()));
-            salary.getDeductions().setIncomeTax(Base64.getEncoder().encodeToString(String.valueOf(income).getBytes()));
-            salary.getDeductions().setPfTax(Base64.getEncoder().encodeToString(String.valueOf(pfTax).getBytes()));
-        }
-        if(salaryRequest.getBasicSalary() != null) {
-            bas = (Base64.getEncoder().encodeToString(salaryRequest.getBasicSalary().toString().getBytes()));
-            salary.setBasicSalary(bas);
+            salary.setIncomeTax(incomeTax);
+            salary.setPfTax(pfTax);
 
         }
+        double totalAllowance = 0.0;
+        if (salaryRequest.getSalaryConfigurationRequest().getAllowances()!=null){
+            Map<String, String> allowance = new HashMap<>();
+            for (Map.Entry<String, String> entry : salaryRequest.getSalaryConfigurationRequest().getAllowances().entrySet()){
+                String encodedValue = Base64.getEncoder().encodeToString(entry.getValue().getBytes());
+                allowance.put(entry.getKey(), encodedValue);
 
-        if(salaryRequest.getAllowances().getTravelAllowance() != null) {
-            trav = (Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getTravelAllowance().toString().getBytes()));
-            salary.getAllowances().setTravelAllowance(trav);
-        }
-        if(salaryRequest.getAllowances().getHra() != null) {
-            hra =(Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getHra().toString().getBytes()));
-            salary.getAllowances().setHra(hra);
-
-        }
-        if(salaryRequest.getAllowances().getOtherAllowances() != null) {
-            other = (Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getOtherAllowances().toString().getBytes()));
-            salary.getAllowances().setOtherAllowances(other);
-        }
-        if(salaryRequest.getAllowances().getPfContributionEmployee() != null) {
-            pfc = (Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getPfContributionEmployee().toString().getBytes()));
-            salary.getAllowances().setPfContributionEmployee(pfc);
+                totalAllowance += Double.parseDouble(entry.getValue());
+            }
+            salary.getSalaryConfigurationEntity().setAllowances(allowance);
 
         }
-        if(salaryRequest.getAllowances().getSpecialAllowance() != null) {
-            spa = (Base64.getEncoder().encodeToString(salaryRequest.getAllowances().getSpecialAllowance().toString().getBytes()));
-            salary.getAllowances().setSpecialAllowance(spa);
-        }
+        double totalDeduction = 0.0;
+        if (salaryRequest.getSalaryConfigurationRequest().getDeductions()!=null){
+            Map<String, String> deductions = new HashMap<>();
+            for (Map.Entry<String, String> entry : salaryRequest.getSalaryConfigurationRequest().getDeductions().entrySet()){
+                String encodedValue = Base64.getEncoder().encodeToString(entry.getValue().getBytes());
+                deductions.put(entry.getKey(), encodedValue);
 
-        if(salaryRequest.getTotalEarnings() != null) {
-            te = (Base64.getEncoder().encodeToString(salaryRequest.getTotalEarnings().toString().getBytes()));
-            salary.setTotalEarnings(te);
-
-        }
-
-        if(salaryRequest.getDeductions().getPfEmployee() != null) {
-            pfE = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getPfEmployee().toString().getBytes()));
-            salary.getDeductions().setPfEmployee(pfE);
+                totalDeduction += Double.parseDouble(entry.getValue());
+            }
+            salary.getSalaryConfigurationEntity().setDeductions(deductions);
 
         }
-        if(salaryRequest.getDeductions().getPfEmployer() != null) {
-            pfEmployer = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getPfEmployer().toString().getBytes()));
-            salary.getDeductions().setPfEmployer(pfEmployer);
+        assert salaryRequest.getGrossAmount() != null;
+        double basicSalary= Double.parseDouble(salaryRequest.getGrossAmount())-totalAllowance;
+        te = String.valueOf(basicSalary+totalAllowance);
 
-        }
-        if(salaryRequest.getDeductions().getLop() != null) {
-            lop = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getLop().toString().getBytes()));
-            salary.getDeductions().setLop(lop);
+        bas = Base64.getEncoder().encodeToString(String.valueOf(basicSalary).getBytes());
+        salary.setBasicSalary(bas);
+            tded = Base64.getEncoder().encodeToString(String.valueOf(totalDeduction).getBytes());
+            salary.setTotalDeductions(tded); // or set it to a specific field if needed
 
-        }
-        if(salaryRequest.getDeductions().getTotalDeductions() != null) {
-            tded = (Base64.getEncoder().encodeToString(salaryRequest.getDeductions().getTotalDeductions().toString().getBytes()));
-            salary.getDeductions().setTotalDeductions(tded);
 
-        }
-        if(salaryRequest.getNetSalary() != null) {
-            net = (Base64.getEncoder().encodeToString(salaryRequest.getNetSalary().toString().getBytes()));
+        net = String.valueOf(Double.valueOf(te)-totalDeduction-Double.valueOf(ttax));
+        if (net!= null){
+            net=Base64.getEncoder().encodeToString(net.getBytes());
             salary.setNetSalary(net);
-
+        }
+        if (te!= null){
+            te=Base64.getEncoder().encodeToString(te.getBytes());
+            salary.setTotalEarnings(te);
+        }
+        if (ttax!=null){
+            ttax = Base64.getEncoder().encodeToString(ttax.getBytes());
+            salary.setTotalTax(ttax);
         }
 
         salary.setType(Constants.SALARY);
@@ -627,5 +615,160 @@ public class CompanyUtils {
 
         return scheme + "://" + serverName + ":" + serverPort + contextPath + "/";
     }
+
+    public static SalaryConfigurationEntity maskSalaryStructureProperties(SalaryConfigurationRequest salaryConfigurationRequest, String resourceId) {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Convert the SalaryConfigurationRequest to SalaryConfigurationEntity
+        SalaryConfigurationEntity entity = objectMapper.convertValue(salaryConfigurationRequest, SalaryConfigurationEntity.class);
+
+        // Set the resource ID and type
+        entity.setId(resourceId);
+        entity.setType(Constants.SALARY_STRUCTURE);
+
+        // Mask allowances and deductions as maps
+        if (salaryConfigurationRequest.getAllowances() != null) {
+            Map<String, String> maskedAllowances = new HashMap<>();
+            for (Map.Entry<String, String> entry : salaryConfigurationRequest.getAllowances().entrySet()) {
+                maskedAllowances.put(entry.getKey(), maskValue(entry.getValue())); // Mask the value
+            }
+            entity.setAllowances(maskedAllowances);
+        }
+
+        if (salaryConfigurationRequest.getDeductions() != null) {
+            Map<String, String> maskedDeductions = new HashMap<>();
+            for (Map.Entry<String, String> entry : salaryConfigurationRequest.getDeductions().entrySet()) {
+                maskedDeductions.put(entry.getKey(), maskValue(entry.getValue())); // Mask the value
+            }
+            entity.setDeductions(maskedDeductions);
+        }
+
+        return entity;
+    }
+
+    // Helper method to mask the values
+    private static String maskValue(String value) {
+        if (value == null || value.isEmpty()) {
+            return value; // Return as is if null or empty
+        }
+        return Base64.getEncoder().encodeToString(value.toString().getBytes()); // Replace with your desired masking pattern
+    }
+
+
+    public static EmployeeSalaryEntity maskEmployeesSalaryProperties(EmployeeSalaryRequest salaryRequest, String id, String employeeId, SalaryConfigurationEntity salaryConfigurationEntity) {
+
+        String fix = null, gross = null, var= null, basic= null, net = null, te=null, totalDed=null, pfTax= null, incomeTax=null, ttax=null;
+        double totalAllowances = 0, totalDeductions=0 ;
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        EmployeeSalaryEntity entity = objectMapper.convertValue(salaryRequest, EmployeeSalaryEntity.class);
+        entity.setSalaryId(id);
+        entity.setEmployeeId(employeeId);
+        if (salaryRequest.getFixedAmount() != null) {
+            fix= (Base64.getEncoder().encodeToString(salaryRequest.getFixedAmount().toString().getBytes()));
+            entity.setFixedAmount(fix);
+        }
+        if (salaryRequest.getVariableAmount() != null) {
+            var= (Base64.getEncoder().encodeToString(salaryRequest.getVariableAmount().toString().getBytes()));
+            entity.setVariableAmount(var);
+        }
+        if (salaryRequest.getGrossAmount() != null) {
+            Double itax = TaxCalculatorUtils.getNewTax(Double.parseDouble(salaryRequest.getGrossAmount()));
+            Double ptax = TaxCalculatorUtils.getPfTax(Double.valueOf(salaryRequest.getGrossAmount()));
+            incomeTax=Base64.getEncoder().encodeToString(itax.toString().getBytes());
+            pfTax = Base64.getEncoder().encodeToString(ptax.toString().getBytes());
+            ttax= String.valueOf(itax+ptax);
+            gross= (Base64.getEncoder().encodeToString(salaryRequest.getGrossAmount().toString().getBytes()));
+            entity.setGrossAmount(gross);
+            entity.setIncomeTax(incomeTax);
+            entity.setPfTax(pfTax);
+
+        }
+        if (salaryConfigurationEntity != null && salaryConfigurationEntity.getAllowances() != null) {
+            totalAllowances = salaryConfigurationEntity.getAllowances().values().stream()
+                    .map(value -> {
+                        try {
+                            // Decode the Base64 encoded string
+                            byte[] decodedBytes = Base64.getDecoder().decode(value);
+                            String decodedString = new String(decodedBytes);
+                            // Parse the decoded string to double
+                            return Double.parseDouble(decodedString);
+                        } catch (Exception e) {
+                            return 0.0; // Use a default value if parsing fails
+                        }
+                    })
+                    .reduce(0.0, Double::sum);
+
+        }
+
+        double basicSalary= Double.valueOf(salaryRequest.getGrossAmount())-totalAllowances;
+        te = String.valueOf(basicSalary+totalAllowances);
+
+        basic = Base64.getEncoder().encodeToString(String.valueOf(basicSalary).getBytes());
+        entity.setBasicSalary(basic);
+        if (salaryConfigurationEntity != null && salaryConfigurationEntity.getDeductions() != null) {
+            totalDeductions = salaryConfigurationEntity.getDeductions().values().stream()
+                    .map(value -> {
+                        try {
+                            byte[] decodedBytes = Base64.getDecoder().decode(value);
+                            String decodedString = new String(decodedBytes);
+                            return Double.parseDouble(decodedString);
+                        } catch (Exception e) {
+                            return 0.0;
+                        }
+                    })
+                    .reduce(0.0, Double::sum);
+
+            // Encode the total deductions back to Base64
+            totalDed = Base64.getEncoder().encodeToString(String.valueOf(totalDeductions).getBytes());
+            entity.setTotalDeductions(totalDed); // or set it to a specific field if needed
+        }
+
+        net = String.valueOf(Double.valueOf(te)-totalDeductions-Double.valueOf(ttax));
+        if (net!= null){
+            net=Base64.getEncoder().encodeToString(net.getBytes());
+            entity.setNetSalary(net);
+        }
+        if (te!= null){
+            te=Base64.getEncoder().encodeToString(te.getBytes());
+            entity.setTotalEarnings(te);
+        }
+        if (ttax!=null){
+            ttax = Base64.getEncoder().encodeToString(ttax.getBytes());
+            entity.setTotalTax(ttax);
+        }
+
+        entity.setSalaryConfigurationEntity(salaryConfigurationEntity);
+        entity.setType(Constants.SALARY);
+        return entity;
+    }
+
+
+
+    public static void unMaskCompanySalaryStructureProperties(SalaryConfigurationEntity salaryConfiguration) {
+        if (salaryConfiguration.getAllowances() != null) {
+            Map<String, String> decodedAllowances = new HashMap<>();
+            for (Map.Entry<String, String> entry : salaryConfiguration.getAllowances().entrySet()) {
+                decodedAllowances.put(entry.getKey(), unMaskValue(entry.getValue()));
+            }
+            salaryConfiguration.setAllowances(decodedAllowances); // Update the original object
+        }
+
+        if (salaryConfiguration.getDeductions() != null) {
+            Map<String, String> decodedDeductions = new HashMap<>();
+            for (Map.Entry<String, String> entry : salaryConfiguration.getDeductions().entrySet()) {
+                decodedDeductions.put(entry.getKey(), unMaskValue(entry.getValue()));
+            }
+            salaryConfiguration.setDeductions(decodedDeductions); // Update the original object
+        }
+    }
+
+    private static String unMaskValue(String value) {
+        if (value == null || value.isEmpty()) {
+            return value; // Return as is if null or empty
+        }
+        return new String(Base64.getDecoder().decode(value)); // Correctly decode without extra bytes conversion
+    }
+
 
 }

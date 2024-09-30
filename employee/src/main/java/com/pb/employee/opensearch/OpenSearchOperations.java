@@ -186,13 +186,13 @@ public class OpenSearchOperations {
         }
         return null;
     }
-    public SalaryEntity getSalaryById(String resourceId, String type, String index) throws IOException {
+    public EmployeeSalaryEntity getSalaryById(String resourceId, String type, String index) throws IOException {
         if(type != null) {
             resourceId = type+"_"+resourceId;
         }
         GetRequest getRequest = new GetRequest.Builder().id(resourceId)
                 .index(index).build();
-        GetResponse<SalaryEntity> searchResponse = esClient.get(getRequest, SalaryEntity.class);
+        GetResponse<EmployeeSalaryEntity> searchResponse = esClient.get(getRequest, EmployeeSalaryEntity.class);
         if(searchResponse != null && searchResponse.source() != null){
             return searchResponse.source();
         }
@@ -606,5 +606,90 @@ public class OpenSearchOperations {
             payslipEntities.add(hit.source());
         }
         return payslipEntities;
+    }
+
+    public SalaryConfigurationEntity getSalaryStructureById(String resourceId, String type, String index) throws IOException {
+        logger.debug("Getting attendence by Id {} of index {}", resourceId, index);
+        if(type != null) {
+            resourceId = type+"_"+resourceId;
+        }
+        GetRequest getRequest = new GetRequest.Builder().id(resourceId)
+                .index(index).build();
+        GetResponse<SalaryConfigurationEntity> searchResponse = esClient.get(getRequest, SalaryConfigurationEntity.class);
+        if(searchResponse != null && searchResponse.source() != null){
+            return searchResponse.source();
+        }
+        return null;
+    }
+    public List<SalaryConfigurationEntity> getSalaryStructureByCompanyDate(String companyName) throws EmployeeException {
+        logger.debug("Getting the Resource by name {} ", companyName);
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        boolQueryBuilder =
+                boolQueryBuilder.filter(q -> q.term(t -> t.field(Constants.TYPE).value(FieldValue.of(Constants.SALARY_STRUCTURE))));
+
+        BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
+        SearchResponse<SalaryConfigurationEntity> searchResponse = null;
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+        try {
+            searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                    .query(finalBoolQueryBuilder.build()._toQuery()), SalaryConfigurationEntity.class);
+        } catch (IOException e) {
+            e.getStackTrace();
+            logger.error(e.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        List<Hit<SalaryConfigurationEntity>> hits = searchResponse.hits().hits();
+        logger.info("Number of hits {}", hits.size());
+        List<SalaryConfigurationEntity> salaryConfigurationEntities = new ArrayList<>();
+        if (hits.size() > 0) {
+            for (Hit<SalaryConfigurationEntity> hit : hits) {
+                salaryConfigurationEntities.add(hit.source());
+            }
+        }
+        return salaryConfigurationEntities;
+    }
+
+    public List<EmployeeSalaryEntity> getEmployeeSalaries(String companyName, String employeeId) throws EmployeeException {
+
+        logger.debug("Getting employees for salary details {}", companyName);
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        boolQueryBuilder = boolQueryBuilder
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.SALARY)))
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.EMPLOYEE_ID).query(employeeId)));
+        BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
+        SearchResponse<EmployeeSalaryEntity> searchResponse = null;
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+
+        try {
+            // Adjust the type or field according to your index structure
+            searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                    .query(finalBoolQueryBuilder.build().toQuery()), EmployeeSalaryEntity.class);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        List<Hit<EmployeeSalaryEntity>> hits = searchResponse.hits().hits();
+        logger.info("Number of employee hits for company is {}: {}", companyName, hits.size());
+
+        List<EmployeeSalaryEntity> salaryEntities = new ArrayList<>();
+        for (Hit<EmployeeSalaryEntity> hit : hits) {
+            salaryEntities.add(hit.source());
+        }
+
+        return salaryEntities;
+    }
+
+    public EmployeeSalaryEntity getEmployeeSalaryById(String resourceId, String type, String index) throws IOException {
+        if(type != null) {
+            resourceId = type+"_"+resourceId;
+        }
+        GetRequest getRequest = new GetRequest.Builder().id(resourceId)
+                .index(index).build();
+        GetResponse<EmployeeSalaryEntity> searchResponse = esClient.get(getRequest, EmployeeSalaryEntity.class);
+        if(searchResponse != null && searchResponse.source() != null){
+            return searchResponse.source();
+        }
+        return null;
     }
 }

@@ -69,4 +69,6 @@ public class Constants {
     public static final String VALIDATE = "/validate";
     public static final String FORGOT_PASSWORD ="/forgot/password" ;
     public static final String UPDATE_PASSWORD ="/update/password" ;
+    public static final String SALARY_STRUCTURE ="salary_structure" ;
+
 }

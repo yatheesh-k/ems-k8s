@@ -49,6 +49,9 @@ public class ResourceIdUtils {
     public static String generateAttendanceId(String company, String employeeId,String year,String month) {
         return generateGlobalResourceId(ResourceType.ATTENDANCE,company,year,month,employeeId);
     }
+    public static String generateSalaryConfigurationResourceId(String companyName, String timestamp) {
+        return generateGlobalResourceId(ResourceType.SALARY_STRUCTURE, companyName, timestamp);
+    }
 
     /**
      * Generate a global resource ID based on the resource type
@@ -78,6 +81,10 @@ public class ResourceIdUtils {
         }
         if (type == ResourceType.DESIGNATION) {
             prefix = Constants.DESIGNATION + "-";
+
+        }
+        if (type == ResourceType.SALARY_STRUCTURE) {
+            prefix = Constants.SALARY_STRUCTURE + "-";
 
         }
         if (type == ResourceType.PAYSLIP) {

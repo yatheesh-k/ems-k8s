@@ -2,8 +2,10 @@ package com.pb.employee.controller;
 
 
 import com.pb.employee.exception.EmployeeException;
+import com.pb.employee.request.EmployeeSalaryRequest;
 import com.pb.employee.request.EmployeeUpdateRequest;
 import com.pb.employee.request.SalaryRequest;
+import com.pb.employee.request.SalaryUpdateRequest;
 import com.pb.employee.service.SalaryService;
 import com.pb.employee.util.Constants;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +34,7 @@ public class SalaryController {
     public ResponseEntity<?> addSalary(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                        @RequestHeader(Constants.AUTH_KEY) String authToken,
                                        @Parameter(required = true, description = "${api.salaryPayload.description}")
-                                       @RequestBody @Valid SalaryRequest salaryRequest,
+                                       @RequestBody @Valid EmployeeSalaryRequest salaryRequest,
                                        @PathVariable String employeeId) throws EmployeeException {
         return salaryService.addSalary(salaryRequest,employeeId);
     }
@@ -69,7 +71,7 @@ public class SalaryController {
     public ResponseEntity<?> updateEmployeeSalaryById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                                       @RequestHeader(Constants.AUTH_KEY) String authToken,
                                                       @PathVariable String employeeId,
-                                                      @RequestBody @Valid SalaryRequest salaryUpdateRequest,
+                                                      @RequestBody @Valid SalaryUpdateRequest salaryUpdateRequest,
                                                       @PathVariable String salaryId) throws EmployeeException {
         return salaryService.updateEmployeeSalaryById(employeeId, salaryUpdateRequest, salaryId);
     }
@@ -84,4 +86,5 @@ public class SalaryController {
                                                       @PathVariable String salaryId) throws EmployeeException {
         return salaryService.deleteEmployeeSalaryById(companyName,employeeId,salaryId);
     }
+
 }

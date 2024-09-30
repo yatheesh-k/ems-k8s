@@ -241,4 +241,80 @@ public class EmployeeUtils {
         return responseBody;
     }
 
+    public static EmployeeSalaryEntity unMaskEmployeeSalaryProperties(EmployeeSalaryEntity salaryEntity) {
+
+        String var = null, fix = null, bas = null, gross = null;
+        String hra = null, trav = null, pfc = null, other = null,spa=null;
+        String te= null, pfE = null, pfEmployer =null, lop = null, tax = null, itax = null, ttax = null, tded = null, net = null;
+        if(salaryEntity.getFixedAmount() != null) {
+            fix = new String((Base64.getDecoder().decode(salaryEntity.getFixedAmount().toString().getBytes())));
+            salaryEntity.setFixedAmount(fix);
+        }
+
+        if(salaryEntity.getVariableAmount() != null) {
+            var = new String(Base64.getDecoder().decode(salaryEntity.getVariableAmount().toString().getBytes()));
+            salaryEntity.setVariableAmount(var);
+        }
+        if(salaryEntity.getGrossAmount() != null) {
+            gross = new String((Base64.getDecoder().decode(salaryEntity.getGrossAmount().toString().getBytes())));
+            salaryEntity.setGrossAmount(gross);
+        }
+        if(salaryEntity.getBasicSalary() != null) {
+            bas = new String((Base64.getDecoder().decode(salaryEntity.getBasicSalary().toString().getBytes())));
+            salaryEntity.setBasicSalary(bas);
+        }
+
+        if(salaryEntity.getTotalEarnings() != null) {
+            te = new String((Base64.getDecoder().decode(salaryEntity.getTotalEarnings().toString().getBytes())));
+            salaryEntity.setTotalEarnings(te);
+        }
+        if(salaryEntity.getTotalDeductions() != null) {
+            tded = new String((Base64.getDecoder().decode(salaryEntity.getTotalDeductions().toString().getBytes())));
+            salaryEntity.setTotalDeductions(tded);
+        }
+
+        if(salaryEntity.getPfTax() != null) {
+            tax = new String((Base64.getDecoder().decode(salaryEntity.getPfTax().toString().getBytes())));
+            salaryEntity.setPfTax(tax);
+        }
+        if (salaryEntity.getIncomeTax() != null){
+            itax = new String((Base64.getDecoder().decode(salaryEntity.getIncomeTax().toString().getBytes())));
+            salaryEntity.setIncomeTax(itax);
+        }
+
+        if(salaryEntity.getTotalTax() != null) {
+            ttax = new String((Base64.getDecoder().decode(salaryEntity.getTotalTax().toString().getBytes())));
+            salaryEntity.setTotalTax(ttax);
+        }
+
+        if(salaryEntity.getNetSalary() != null) {
+            net = new String((Base64.getDecoder().decode(salaryEntity.getNetSalary().toString().getBytes())));
+            salaryEntity.setNetSalary(net);
+        }
+        if (salaryEntity.getSalaryConfigurationEntity().getAllowances() != null) {
+            Map<String, String> decodedAllowances = new HashMap<>();
+            for (Map.Entry<String, String> entry : salaryEntity.getSalaryConfigurationEntity().getAllowances().entrySet()) {
+                decodedAllowances.put(entry.getKey(), unMaskValue(entry.getValue()));
+            }
+            salaryEntity.getSalaryConfigurationEntity().setAllowances(decodedAllowances); // Update the original object
+        }
+
+        if (salaryEntity.getSalaryConfigurationEntity().getDeductions() != null) {
+            Map<String, String> decodedDeductions = new HashMap<>();
+            for (Map.Entry<String, String> entry : salaryEntity.getSalaryConfigurationEntity().getDeductions().entrySet()) {
+                decodedDeductions.put(entry.getKey(), unMaskValue(entry.getValue()));
+            }
+            salaryEntity.getSalaryConfigurationEntity().setDeductions(decodedDeductions); // Update the original object
+        }
+        salaryEntity.setType(Constants.SALARY);
+        return salaryEntity;
+    }
+
+    private static String unMaskValue(String value) {
+        if (value == null || value.isEmpty()) {
+            return value; // Return as is if null or empty
+        }
+        return new String(Base64.getDecoder().decode(value)); // Correctly decode without extra bytes conversion
+    }
+
 }
