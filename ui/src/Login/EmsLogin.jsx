@@ -40,7 +40,7 @@ const EmsLogin = () => {
           const decodedToken = jwtDecode(token);
           const { sub: userId, roles: userRole, company, employeeId } = decodedToken;
           setAuthUser({ userId, userRole, company, employeeId });
-          toast.success("Login Successfully");
+          toast.success("Login Successful");
           navigate("/main");
         } catch (decodeError) {
           console.error("Token decoding failed:", decodeError);
@@ -53,10 +53,16 @@ const EmsLogin = () => {
         setShowErrorModal(true);
       }
     } catch (error) {
-      console.error("Login failed:", error);
-      const errorMsg = error.response?.data?.error?.message || "Login failed. Please try again later.";
-      setErrorMessage(errorMsg);
-      setShowErrorModal(true);
+      console.log("Error response data:", error); 
+      if (error) {
+        const errorMessage = error;
+        setErrorMessage(errorMessage);
+        setShowErrorModal(true);
+      } else {
+        setErrorMessage("Login failed. Please try again later.");
+        setShowErrorModal(true);
+      }
+      
     }
   };
   
@@ -64,6 +70,30 @@ const EmsLogin = () => {
   const closeModal = () => {
     setShowErrorModal(false);
     setErrorMessage(""); // Clear error message when modal is closed
+  };
+
+  const validatePassword = (value) => {
+    const errors = [];
+    if (!/(?=.*[0-9])/.test(value)) {
+      errors.push("at least one digit");
+    }
+    if (!/(?=.*[a-z])/.test(value)) {
+      errors.push("at least one lowercase letter");
+    }
+    if (!/(?=.*[A-Z])/.test(value)) {
+      errors.push("at least one uppercase letter");
+    }
+    if (!/(?=.*\W)/.test(value)) {
+      errors.push("at least one special character");
+    }
+    if (value.includes(" ")) {
+      errors.push("no spaces");
+    }
+    
+    if (errors.length > 0) {
+      return `Password must contain ${errors.join(", ")}.`;
+    }
+    return true; // Return true if all conditions are satisfied
   };
 
   return (
@@ -113,6 +143,11 @@ const EmsLogin = () => {
                         value: 6,
                         message: "Password must be at least 6 characters long",
                       },
+                      maxLength: {
+                        value: 16,
+                        message: "Password must not Exceed 16 characters long",
+                      },
+                      validate:validatePassword,
                     })}
                   />
                   {errors.password && (
@@ -151,7 +186,7 @@ const EmsLogin = () => {
                   </div> */}
                   <div>
                     <span style={{fontSize:"0.8em"}}>
-                      Copyright &copy;2024 PATHBREAKER TECHNOLOGIES PVT.LTD. All
+                      Copyrights &copy;2024 PATHBREAKER TECHNOLOGIES PVT.LTD. All
                       Rights Reserved{" "}
                     </span>
                   </div>

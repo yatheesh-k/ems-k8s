@@ -16794,3 +16794,35 @@ body {
 .form-control::placeholder {
 	color: #999999;
 } */
+
+
+
+nav.companyNavOuter {
+    margin: 0 0 -2px 0;
+    z-index: 1;
+    position: relative;
+}
+nav.companyNavOuter .nav-tabs .nav-link.active {
+    border-bottom: 1px solid #fff;
+    margin-bottom: -1px;
+}
+nav.companyNavOuter .nav-tabs .nav-link.hover{
+    margin-bottom:-1px;
+}
+.nav-tabs .nav-link:focus, .nav-tabs .nav-link:hover{ color:none;}
+.companyNavOuter button{
+    margin:0 10px;
+}
+.tab-content.companyTabContent {
+    border: 1px solid #ccc;
+    padding: 15px;
+}
+.tab-content.companyTabContent .row.bbl{
+    border-bottom:1px solid #ccc;
+}
+.tab-content.companyTabContent .row.ptb25{
+    padding-bottom:25px;
+    padding-top:25px;
+}
+.pull-right{float:right;}
+.mt15{margin-top:15px;}

@@ -103,31 +103,6 @@ const EmployeeView = () => {
     Navigate(`/employeeRegistration`, { state: { id } }); 
   };
 
-  const handleConfirmDelete = async () => {
-    if (selectedItemId) {
-      try {
-        await EmployeeDeleteApiById(selectedItemId)
-          .then((response) => {
-           
-              toast.success("Employee Deleted Succesfully", {
-                position: "top-right",
-                transition: Bounce,
-                hideProgressBar: true,
-                theme: "colored",
-                autoClose: 3000,
-              }, 1000);
-              setTimeout(() => {
-                fetchData();
-            },1000);
-
-            //getEmployees()
-            handleCloseDeleteModal();
-          });
-      } catch (error) {
-        handleApiErrors(error)
-      }
-    }
-  };
   const statusMappings = {
     Active: {
       label: (
@@ -226,9 +201,6 @@ const EmployeeView = () => {
           </button>
           <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0", marginRight: "10px" }} onClick={() => handleEdit(row.id)} title="Edit">
             <PencilSquare size={22} color='#2255a4' />
-          </button>
-          <button className="btn btn-sm " style={{ backgroundColor: "transparent", border: "none", padding: "0" }} onClick={() => handleShowDeleteModal(row.id)}  title="Delete">
-            <XSquareFill size={22} color='#da542e' />
           </button>
         </div>
       )
@@ -408,15 +380,6 @@ const EmployeeView = () => {
               />
             </div>
           </div>
-          <DeletePopup
-            show={showDeleteModal}
-            handleClose={handleCloseDeleteModal}
-            handleConfirm={(id) =>
-              handleConfirmDelete(id) / console.log(id)
-            } 
-            id={selectedItemId} 
-            pageName="Employee"
-          />
         </div>
       </div>
     </LayOut>

@@ -161,38 +161,45 @@ const CompanyRegistration = () => {
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
-
+  const validatePassword = (value) => {
+    const errors = [];
+    if (!/(?=.*[0-9])/.test(value)) {
+      errors.push("at least one digit");
+    }
+    if (!/(?=.*[a-z])/.test(value)) {
+      errors.push("at least one lowercase letter");
+    }
+    if (!/(?=.*[A-Z])/.test(value)) {
+      errors.push("at least one uppercase letter");
+    }
+    if (!/(?=.*\W)/.test(value)) {
+      errors.push("at least one special character");
+    }
+    if (value.includes(" ")) {
+      errors.push("no spaces");
+    }
+    
+    if (errors.length > 0) {
+      return `Password must contain ${errors.join(", ")}.`;
+    }
+    return true; // Return true if all conditions are satisfied
+  };
+  
 
   const toInputLowerCase = (e) => {
     const input = e.target;
     let value = input.value;
-
-    // Remove leading spaces
-    value = value.replace(/^\s+/g, '');
-
-    // Initially disallow spaces if there are no non-space characters
-    if (!/\S/.test(value)) {
-      // If no non-space characters are present, prevent spaces
-      value = value.replace(/\s+/g, '');
-    } else {
-      // Convert the entire string to lowercase
-      value = value.toLowerCase();
-
-      // Remove leading spaces
-      value = value.replace(/^\s+/g, '');
-
-      // Capitalize the first letter of each word
-      const words = value.split(' ');
-      const capitalizedWords = words.map(word => {
-        return word.charAt(0).toLowerCase() + word.slice(1);
-      });
-
-      value = capitalizedWords.join(' ');
-    }
-
+  
+    // Remove all spaces
+    value = value.replace(/\s+/g, '');
+  
+    // Convert the entire string to lowercase
+    value = value.toLowerCase();
+  
     // Update input value
     input.value = value;
   };
+  
 
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
@@ -233,6 +240,52 @@ const CompanyRegistration = () => {
         reject(error);
       };
     });
+  };
+
+  const validateCIN = (value) => {
+    const spaceError = "Spaces are not allowed in the CIN Number.";
+    const patternError = "Invalid CIN Number format";
+
+    if (/\s/.test(value)) {
+      return spaceError; // Return space error if spaces are found
+    }
+
+    // Check the pattern for the CIN Number
+    if (!/^([LU]{1})([0-9]{5})([A-Z]{2})([0-9]{4})([A-Z]{3})([0-9]{6})$/.test(value)) {
+      return patternError; // Return pattern error if it doesn't match
+    }
+
+    return true; // Return true if all checks pass
+  };
+  const validateGST = (value) => {
+    const spaceError = "Spaces are not allowed in the CIN Number.";
+    const patternError = "Invalid CIN Number format";
+
+    if (/\s/.test(value)) {
+      return spaceError; // Return space error if spaces are found
+    }
+
+    // Check the pattern for the CIN Number
+    if (!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(value)) {
+      return patternError; // Return pattern error if it doesn't match
+    }
+
+    return true; // Return true if all checks pass
+  };
+  const validatePAN = (value) => {
+    const spaceError = "Spaces are not allowed in the CIN Number.";
+    const patternError = "Invalid CIN Number format";
+
+    if (/\s/.test(value)) {
+      return spaceError; // Return space error if spaces are found
+    }
+
+    // Check the pattern for the CIN Number
+    if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(value)) {
+      return patternError; // Return pattern error if it doesn't match
+    }
+
+    return true; // Return true if all checks pass
   };
 
   const handleFileUpload = async (e) => {
@@ -294,6 +347,7 @@ const CompanyRegistration = () => {
                               required: !editMode ? "Please Select Your Company Type" : false,
                             })}
                             disabled={editMode}
+                            onChange={handleCompanyTypeChange}
                           />
                           Private Limited
                         </label>
@@ -311,6 +365,7 @@ const CompanyRegistration = () => {
                             required: !editMode ? "Please Select Your Company Type" : false,
                           })}
                           disabled={editMode}
+                          onChange={handleCompanyTypeChange}
                         />
                         Firm
                       </label>
@@ -412,7 +467,7 @@ const CompanyRegistration = () => {
                           required: "Company Email Id is Required",
                           pattern: {
                             value:/^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
-                            message: "Invalid email format it allows Only .com, .in, .org, .net, .edu, .gov are allowed",
+                            message: "Invalid email format",
                           },
                         })}
                         disabled={editMode}
@@ -443,6 +498,13 @@ const CompanyRegistration = () => {
                                 message:
                                   "Contact Number should contain only 10 numbers. ",
                               },
+                              validate: {
+                                notRepeatingDigits: value => {
+                                  const isRepeating = /^(\d)\1{9}$/.test(value); // Check for repeated digits
+                                  return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
+                                }
+                              }
+
                             })}
                           />
                           {errors.mobileNo && (
@@ -468,11 +530,7 @@ const CompanyRegistration = () => {
                               type={passwordShown ? "text" : "password"}
                               {...register("password", {
                                 required: "Password is Required",
-                                pattern: {
-                                  value: /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{6,16}$/,
-                                  message:
-                                    "Password must contain at least 6 characters, including one uppercase letter, one lowercase letter, one number, and one special character.",
-                                },
+                                validate: validatePassword,
                                 minLength: {
                                   value: 6,
                                   message: "Minimum 6 characters Required",
@@ -514,6 +572,12 @@ const CompanyRegistration = () => {
                                 message:
                                   "Contact Number should contain only 10 numbers. ",
                               },
+                              validate: {
+                                notRepeatingDigits: value => {
+                                  const isRepeating = /^(\d)\1{9}$/.test(value); // Check for repeated digits
+                                  return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
+                                }
+                              }
                             })}
                           />
                           {errors.mobileNo && (
@@ -526,7 +590,7 @@ const CompanyRegistration = () => {
                     )}
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
                       <label className="form-label">
-                        Alternate Number <span style={{ color: "red" }}>*</span>
+                        Alternate Number
                       </label>
                       <input
                         type="tel"
@@ -537,12 +601,17 @@ const CompanyRegistration = () => {
                         onInput={toInputSpaceCase}
                         onKeyDown={handleEmailChange}
                         {...register("landNo", {
-                          required: "Alternate Number is Required",
                           pattern: {
                             value: /^[0-9]{10}$/,
                             message:
                               "Alternate Number should contain only 10 numbers",
                           },
+                          validate: {
+                            notRepeatingDigits: value => {
+                              const isRepeating = /^(\d)\1{9}$/.test(value); // Check for repeated digits
+                              return !isRepeating || "Alternate Number cannot consist of the same digit repeated.";
+                            }
+                          }
                         })}
                       />
                       {errors.landNo && (
@@ -604,6 +673,8 @@ const CompanyRegistration = () => {
                 </div>
                 <div className="card-body">
                   <div className="row">
+                  {companyType === "Private Limited" && (
+                    <>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Company CIN Number<span style={{ color: "red" }}>*</span></label>
                       <input
@@ -620,12 +691,7 @@ const CompanyRegistration = () => {
                             value: 21,
                             message: "CIN Number must not exceed 21 characters",
                           },
-                          pattern: {
-                            value: /^([LUu]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$/,
-
-                            message:
-                              "Invalid CIN Number format",
-                          },
+                          validate: validateCIN,
                         })}
                         disabled={editMode}
                       />
@@ -634,41 +700,35 @@ const CompanyRegistration = () => {
                       )}
 
                     </div>
+                     <div className="col-lg-1"></div>
+                     </>
+                  )}
+                   
 
-                    <div className="col-lg-1"></div>
-
-                    <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">
-                        Company Registration Number{" "}
-                        <span style={{ color: "red" }}>*</span>
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Enter Company Registration Number"
-                        onKeyDown={handleEmailChange}
-                        onInput={toInputSpaceCase}
-                        autoComplete="off"
-                        maxLength={21}
-                        {...register("companyRegNo", {
-                          required: "Company Registration Number is Required",
-                          maxLength: {
-                            value: 21,
-                            message: "Registration Number must not exceed 21 characters",
-                          },
-                          pattern: {
-                            value: /^([LUu]{1})([0-9]{5})([A-Za-z]{2})([0-9]{4})([A-Za-z]{3})([0-9]{6})$/,
-
-                            message:
-                              "Invalid Registration Number format",
-                          },
-                        })}
-                        disabled={editMode}
-                      />
-                      {errors.companyRegNo && (
-                        <p className="errorMsg">{errors.companyRegNo.message}</p>
-                      )}
-                    </div>
+                    {companyType === "Firm" && (
+          <div className="col-12 col-md-6 col-lg-5 mb-3">
+            <label className="form-label">
+              Company Registration Number <span style={{ color: "red" }}>*</span>
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Enter Company Registration Number"
+              autoComplete="off"
+              maxLength={21}
+              {...register("companyRegNo", {
+                required: "Company Registration Number is Required",
+                maxLength: {
+                  value: 21,
+                  message: "Registration Number must not exceed 21 characters",
+                },
+               validate:validateCIN
+              })}
+              disabled={editMode}
+            />
+            {errors.companyRegNo && <p className="errorMsg">{errors.companyRegNo.message}</p>}
+          </div>
+        )}
 
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
@@ -689,11 +749,7 @@ const CompanyRegistration = () => {
                             value: 15,
                             message: "GST Number must not exceed 15 characters",
                           },
-                          pattern: {
-                            value: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
-                            message:
-                              "Invalid GST Number",
-                          },
+                          validate:validateGST
                         })}
                         disabled={editMode}
                       />
@@ -719,11 +775,8 @@ const CompanyRegistration = () => {
                             value: 10,
                             message: "PAN Number must not exceed 10 characters",
                           },
-                          pattern: {
-                            value: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
-                            message:
-                              "PAN Number should be in the format: ABCDE1234F",
-                          },
+                          validate:validatePAN
+                         
                         })}
                         disabled={editMode}
                       />
@@ -758,7 +811,7 @@ const CompanyRegistration = () => {
                         placeholder="Enter Name"
                         onKeyDown={handleEmailChange}
                         onInput={toInputTitleCase}
-                        maxLength={20}
+                       
                         autoComplete="off"
                         {...register("name", {
                           required: "Name is Required",
@@ -767,8 +820,8 @@ const CompanyRegistration = () => {
                             message: "Minimun 3 characters Required",
                           },
                           maxLength: {
-                            value: 20,
-                            message: "Name must not exceed 20 characters",
+                            value: 35,
+                            message: "Name must not exceed 35 characters",
                           },
                           pattern: {
                             value: /^[a-zA-Z\s]*$/,
@@ -797,7 +850,7 @@ const CompanyRegistration = () => {
                           required: "Personal Email Id is Required",
                           pattern: {
                             value:/^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
-                            message: "Invalid email format it allows Only .com, .in, .org, .net, .edu, .gov are allowed",
+                            message: "Invalid Email Format ",
                           },
                         })}
                       />
@@ -825,8 +878,14 @@ const CompanyRegistration = () => {
                           pattern: {
                             value: /^[0-9]{10}$/,
                             message:
-                              "Mobile Number should be exactly 10 digits long and should contain only numbers",
+                              "Mobile Number should contain only 10 numbers",
                           },
+                          validate: {
+                            notRepeatingDigits: value => {
+                              const isRepeating = /^(\d)\1{9}$/.test(value); // Check for repeated digits
+                              return !isRepeating || "Personal Mobile Number cannot consist of the same Digit repeated.";
+                            }
+                          }
                         })}
                       />
                       {errors.personalMobileNo && (

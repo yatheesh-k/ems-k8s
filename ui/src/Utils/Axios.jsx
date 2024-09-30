@@ -44,19 +44,22 @@ export const loginApi = (data) => {
     });
 };
 export const CompanyloginApi = (data) => {
-
   return axios.post(`${Login_URL}/company/login`, data)
     .then(response => {
-      const { token, refreshToken } = response.data.data;
-      // Store the token and refresh token in localStorage
-      localStorage.setItem("token", token);
-      localStorage.setItem("refreshToken", refreshToken);
-      return response.data;
+      const { token, refreshToken } = response.data?.data || {};
+      if (token && refreshToken) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("refreshToken", refreshToken);
+      }
+      return response.data; // Return the full response
     })
     .catch(error => {
-      console.log(error);
+      const errorMessage = error.response?.data?.error?.message || "An unknown error occurred.";
+      console.error(errorMessage); // Log the error for debugging
+      throw new Error(errorMessage); // Throw an error with the message
     });
 };
+
 
 export const ValidateOtp = (data) => {
   return axiosInstance.post(`${Login_URL}/validate`, data);
@@ -353,5 +356,19 @@ export const CompanyImageGetApi = (companyId) => {
   return axiosInstance.get(`/company/${companyId}/image`);
 }
 
+export const AllowancesGetApi = () => {
+  return axiosInstance.get(`/allowances`);
+}
 
+export const DeductionsGetApi = () => {
+  return axiosInstance.get(`/deductions`);
+}
 
+export const CompanySalaryStructurePostApi = (data) => {
+  return axiosInstance.post(`/allowances`, data);
+};
+
+export const CompanySalaryStructureGetApi = () => {
+  const company = localStorage.getItem("companyName")
+  return axiosInstance.get(`${company}/salary`);
+}

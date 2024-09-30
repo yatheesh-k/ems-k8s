@@ -22,7 +22,6 @@ const ViewPaySlips = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [showSpinner, setShowSpinner] = useState(false);
   const [noRecords, setNoRecords] = useState(false);
-  const [heading, setHeading] = useState("Payslip Details"); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -63,8 +62,8 @@ const ViewPaySlips = () => {
   }));
 
   const fetchData = async (employeeId, monthName, year) => {
-    setShowSpinner(true); 
-    setNoRecords(false); 
+    setShowSpinner(true);
+    setNoRecords(false);
     try {
       if (employeeId && monthName && year) {
         setApiSource("individual");
@@ -76,7 +75,7 @@ const ViewPaySlips = () => {
         if (employeeDetailsResponse && payslipsResponse) {
           setSelectedEmployeeDetails(employeeDetailsResponse.data || {});
           if (payslipsResponse.data.data.length === 0) {
-            setNoRecords(true); 
+            setNoRecords(true);
           } else {
             setEmployeeSalaryView(payslipsResponse.data.data || []);
           }
@@ -89,9 +88,10 @@ const ViewPaySlips = () => {
         setNoRecords(true);
       }
     } catch (error) {
-      setNoRecords(true); 
+      // handleApiErrors(error);
+      setNoRecords(true);
     } finally {
-      setShowSpinner(false); 
+      setShowSpinner(false);
     }
   };
 
@@ -102,9 +102,6 @@ const ViewPaySlips = () => {
     }
     const monthName = getMonthNames()[parseInt(selectedMonth, 10) - 1];
     fetchData(selectedEmployeeId, monthName, selectedYear);
-
-    setHeading(`Payslip Details for ${`${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})`} ${selectedYear ? `- ${selectedYear}` : ''} ${selectedMonth ? `- ${getMonthNames()[selectedMonth - 1]}` : ''}`);    
-    setShowFields(true); 
   };
 
   const handleViewSalary = (employeeId, payslipId) => {
@@ -141,13 +138,13 @@ const ViewPaySlips = () => {
         const response = await AllEmployeePayslipsGet(monthName, currentYear);
         console.log("All Employee Payslips:", response.data);
         if (response.data.data.length === 0) {
-          setNoRecords(true); 
+          setNoRecords(true);
         } else {
           setEmployeeSalaryView(response.data.data);
         }
       } catch (error) {
         console.error('Error fetching all employee payslips:', error);
-        setNoRecords(true); 
+        setNoRecords(true);
       }
     };
     fetchAllPayslips();
@@ -167,7 +164,7 @@ const ViewPaySlips = () => {
     }
     console.error(error.response || error);
   };
-
+  
   const isGoButtonEnabled = selectedEmployeeId && selectedMonth && selectedYear;
 
   const columns = apiSource === 'all'
@@ -180,57 +177,46 @@ const ViewPaySlips = () => {
       {
         name: <h6><b>Name</b></h6>,
         selector: row => `${row.attendance.firstName} ${row.attendance.lastName}`,
+        sortable: true,
         width: "280px",
       },
       {
         name: <h6><b>Net Amount</b></h6>,
         selector: row => parseFloat(row.salary.netSalary).toFixed(2),
+        sortable: true,
         width: "300px",
       },
       {
         name: <h6><b>Actions</b></h6>,
         cell: row => (
-          <div>
-            <button
-              className="btn btn-sm"
-              style={{
-                backgroundColor: "transparent",
-                border: "none",
-                padding: "0",
-                marginLeft: "18px",
-              }}
-              onClick={() => handleViewSalary(row.employeeId, row.payslipId)}
-              title="View Payslip"
-            >
-              <Eye size={22} color="green" />
-            </button>
-          </div>
+          <button
+            className="btn btn-sm"
+            style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "18px" }}
+            onClick={() => handleViewSalary(row.employeeId, row.payslipId)}
+            title="View Payslip"
+          >
+            <Eye size={22} color="green" />
+          </button>
         ),
       },
     ] : [
       {
         name: <h6><b>Net Amount</b></h6>,
         selector: row => parseFloat(row.salary.netSalary).toFixed(2),
+        sortable: true,
         width: "600px",
       },
       {
         name: <h6><b>Actions</b></h6>,
         cell: row => (
-          <div>
-            <button
-              className="btn btn-sm"
-              style={{
-                backgroundColor: "transparent",
-                border: "none",
-                padding: "0",
-                marginLeft: "18px",
-              }}
-              onClick={() => handleViewSalary(row.employeeId, row.payslipId)}
-              title="View Payslip"
-            >
-              <Eye size={22} color="green" />
-            </button>
-          </div>
+          <button
+            className="btn btn-sm"
+            style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "18px" }}
+            onClick={() => handleViewSalary(row.employeeId, row.payslipId)}
+            title="View Payslip"
+          >
+            <Eye size={22} color="green" />
+          </button>
         ),
       },
     ];
@@ -241,7 +227,7 @@ const ViewPaySlips = () => {
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3">
-              <strong>Payslips</strong> 
+              <strong> PaySlips</strong>
             </h1>
           </div>
           <div className="col-auto" style={{ paddingBottom: '20px' }}>
@@ -250,18 +236,18 @@ const ViewPaySlips = () => {
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
-                <li className="breadcrumb-item active">Payroll</li>
-                <li className="breadcrumb-item active">Payslips</li>
+                <li className="breadcrumb-item active">PayRoll</li>
+                <li className="breadcrumb-item active">PaySlips</li>
               </ol>
             </nav>
           </div>
         </div>
         <div className="card mb-3">
           <div className="card-body justify-content-around">
-            <div className="row d-flex justify-content-around mt-4">
+            <div className="row d-flex justify-content-around">
               <div className="col-12 col-md-3">
                 <div className="form-group">
-                  <label className="form-label">Select Employee<span style={{color:"red"}}>*</span></label>
+                  <label className="form-label">Select Employee</label>
                   <Controller
                     name="employeeId"
                     control={control}
@@ -288,7 +274,7 @@ const ViewPaySlips = () => {
               </div>
               <div className="col-12 col-md-3">
                 <div className="form-group">
-                  <label className="form-label">Select Year<span style={{color:"red"}}>*</span></label>
+                  <label className="form-label">Select Year</label>
                   <Select
                     options={years}
                     value={years.find((option) => option.value === selectedYear) || ""}
@@ -299,7 +285,7 @@ const ViewPaySlips = () => {
               </div>
               <div className="col-12 col-md-3">
                 <div className="form-group">
-                  <label className="form-label">Select Month<span style={{color:"red"}}>*</span></label>
+                  <label className="form-label">Select Month</label>
                   <Select
                     options={months}
                     value={months.find((month) => month.value === selectedMonth) || ""}
@@ -315,7 +301,7 @@ const ViewPaySlips = () => {
                     style={{ marginTop: "8px", paddingBottom: "8px" }}
                     className="btn btn-primary btn-block"
                     onClick={handleGoClick}
-                    disabled={!isGoButtonEnabled} 
+                    disabled={!isGoButtonEnabled}
                   >
                     Go
                   </button>
@@ -325,11 +311,13 @@ const ViewPaySlips = () => {
             {showFields ? (
               <div>
                 <h5 className="card-title mt-4">
-                  {heading}
+                  PaySlip Details for {selectedEmployeeDetails.firstName ? `${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})` : 'All Employees'}
+                  {selectedYear && ` - ${selectedYear}`}
+                  {selectedMonth && ` - ${getMonthNames()[selectedMonth - 1]}`}
                 </h5>
                 <hr />
                 {noRecords ? (
-                  <p style={{textAlign:"center"}}>There are no records to display.</p>
+                  <p style={{ textAlign: "center" }}>There are no records to display.</p>
                 ) : (
                   <DataTable
                     columns={columns}
@@ -344,11 +332,11 @@ const ViewPaySlips = () => {
             ) : (
               <div>
                 <h5 className="card-title mt-4">
-                  Payslip Details for {getMonthAndYear()}
+                  PaySlip Details for {getMonthAndYear()}
                 </h5>
                 <hr />
                 {noRecords ? (
-                  <p style={{textAlign:"center"}}>There are no records to display.</p>
+                  <p style={{ textAlign: "center" }}>There are no records to display.</p>
                 ) : (
                   <DataTable
                     columns={columns}

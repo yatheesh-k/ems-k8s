@@ -352,6 +352,20 @@ const SideNav = () => {
                   </span>
                 </a>
               </li>
+              <li
+                className={`sidebar-item ${location.pathname.startsWith("/companySalaryView") ? "active" : ""
+                  }`}
+              >
+                <a className="sidebar-link" href={"/companySalaryView"}>
+                  <i
+                    className="bi bi-file-earmark-text-fill"
+                    style={{ fontSize: "large" }}
+                  ></i>
+                  <span className="align-middle" style={{ fontSize: "large" }}>
+                    Salary Structure
+                  </span>
+                </a>
+              </li>
               {/* <li
                             className={`sidebar-item ${
                               location.pathname.startsWith("/payslip") ? "active" : ""

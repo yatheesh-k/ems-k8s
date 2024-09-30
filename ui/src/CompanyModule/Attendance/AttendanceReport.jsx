@@ -11,7 +11,7 @@ import DeletePopup from '../../Utils/DeletePopup';
 import { ModalTitle, ModalHeader, ModalBody } from 'react-bootstrap';
 
 const AttendanceReport = () => {
-  const { register, handleSubmit, formState: { errors }, reset } = useForm();
+  const { register, handleSubmit, formState: { errors }, reset,watch } = useForm({mode:'onChange'});
   const [employees, setEmployees] = useState([]);
   const [showFields, setShowFields] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState("");
@@ -22,6 +22,7 @@ const AttendanceReport = () => {
   const [refreshData, setRefreshData] = useState("");
   const [employeeAttendance, setEmployeeAttendance] = useState([]);
   const [employeeId, setEmployeeId] = useState("");
+  const [finalEmployeeDetails, setFinalEmployeeDetails] = useState({});
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
   const [selectedAttendanceId, setSelectedAttendanceId] = useState("");
@@ -41,6 +42,8 @@ const AttendanceReport = () => {
     setEmployeeId(selectedOption.value);
     const selectedEmployee = employees.find(emp => emp.value === selectedOption.value);
     setSelectedEmployeeDetails(selectedEmployee);
+
+    
   };
 
   const handleCloseDeleteModal = () => {
@@ -75,11 +78,13 @@ const AttendanceReport = () => {
   };
 
   const filterByMonthYear = () => {
-    if (!selectedYear) {
+    if (!selectedYear && !handleEmployeeChange) {
       alert("Please select a year.");
       return;
     }
     fetchAttendanceData(employeeId, selectedMonth, selectedYear);
+    setFinalEmployeeDetails(selectedEmployeeDetails);
+
   };
 
   const fetchAttendanceData = async (empId, month, year) => {
@@ -329,7 +334,7 @@ const AttendanceReport = () => {
                         label: year,
                         value: year,
                       }))}
-                      onChange={(selectedOption) => setSelectedYear(selectedOption.value)}
+                      onChange={(selectedOption) => setSelectedYear( selectedOption.value)}
                       placeholder="Select Year"
                     />
                   </div>
@@ -349,7 +354,7 @@ const AttendanceReport = () => {
                       style={{ paddingBottom: "8px" }}
                       className="btn btn-primary"
                       onClick={filterByMonthYear}
-                      disabled={!selectedYear}
+                      disabled={!selectedYear|| !employeeId}
                     >
                       Go
                     </button>
@@ -361,11 +366,11 @@ const AttendanceReport = () => {
                   {isAttendance ? (
                     <>
                       Pay Slip Details for{" "}
-                      {selectedEmployeeDetails.firstName
-                        ? `${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})`
-                        : 'All Employees'}
-                      {selectedYear && ` - ${selectedYear}`}
-                      {selectedMonth && ` - ${getMonthNames()[selectedMonth - 1]}`}
+                      {finalEmployeeDetails.firstName
+                            ? `${finalEmployeeDetails.firstName} ${finalEmployeeDetails.lastName} (${finalEmployeeDetails.employeeId})`
+                            : 'All Employees'}
+                        {selectedYear && ` - ${selectedYear}`}
+                        {selectedMonth && ` - ${getMonthNames()[selectedMonth - 1]}`}
                     </>
                   ) : (
                     formatDateHeader()
@@ -428,7 +433,7 @@ const AttendanceReport = () => {
                         className="form-control"
                         {...register("totalWorkingDays", { required: true })}
                       />
-                      {errors.totalWorkingDays && <span>This field is required</span>}
+                      {errors.totalWorkingDays && <p className="errorMsg">{errors.totalWorkingDays.message}</p>}
                     </div>
                     <div className='col-12 col-md-6 col-lg-4 mb-2'>
                       <label>No. Of Working Days</label>
@@ -436,9 +441,27 @@ const AttendanceReport = () => {
                         type="number"
                         name='noOfWorkingDays'
                         className="form-control"
-                        {...register("noOfWorkingDays", { required: true })}
+                        {...register("noOfWorkingDays", { 
+                          required: true,
+                          pattern: {
+                            value: /^\d+$/,
+                            message: "Allow only Numbers",
+                          },
+                          min: {
+                            value: 0,
+                            message: "Not Exceed less than 0 days",
+                          },
+                          max: {
+                            value: 30,
+                            message: "Not Exceed more than 30 days",
+                          },
+                          validate: (value) => {
+                            const totalWorkingDays = watch("totalWorkingDays"); // Use watch to get the value of totalWorkingDays
+                            return value <= totalWorkingDays || "Cannot exceed total working days.";
+                          },
+                        })}
                       />
-                      {errors.noOfWorkingDays && <span>This field is required</span>}
+                      {errors.noOfWorkingDays && <p className='errorMsg'>{errors.noOfWorkingDays.message}</p>}
                     </div>
                   </div>
                   <div className='modal-footer'>

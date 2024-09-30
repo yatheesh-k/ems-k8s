@@ -70,22 +70,16 @@ const CompanyLogin = () => {
     setLoading(true);
     CompanyloginApi(payload)
       .then((response) => {
-        
-        // Ensure you're accessing the token from the correct part of the response
         const token = response.data?.token;
-  
         if (token) {
           localStorage.setItem("token", token);
           const decodedToken = jwtDecode(token);
-  
-          // Adjust the fields based on your token structure
           const { sub: userId, roles: userRole, company, employeeId } = decodedToken;
-           console.log(userId)
           setAuthUser({ userId, userRole, company, employeeId });
-          toast.success("OTP Sent Successfully"); 
+          toast.success("OTP Sent Successfully");
           setOtpSent(true);
           setOtpExpired(false);
-          setOtpTimeLimit(56); 
+          setOtpTimeLimit(56);
           setShowOtpField(true); // Show OTP field
         } else {
           console.error('Token not found in response');
@@ -95,18 +89,17 @@ const CompanyLogin = () => {
         setLoading(false);
       })
       .catch((error) => {
-        console.error('sendOtp error:', error); // Log error
         setLoading(false);
   
-        if (error.response && error.response.data && error.response.data.error) {
-          const errorMessage = error.response.data.error.message;
-          setErrorMessage(errorMessage);
-        } else {
-          setErrorMessage("Login failed. Please try again later.");
-        }
+        // Ensure we're accessing the error message properly
+        const errorMessage = error.message || "Login failed. Please try again later.";
+        console.error('sendOtp error:', errorMessage); // Log the error
+        setErrorMessage(errorMessage);
         setShowErrorModal(true);
       });
   };
+  
+  
   
   
 
@@ -134,6 +127,7 @@ const CompanyLogin = () => {
       })
       .catch((error) => {
         setLoading(false);
+        console.log("sendOtp",error)
         if (error.response && error.response.data && error.response.data.error) {
           const errorMessage = error.response.data.error.message;
           setErrorMessage(errorMessage);
@@ -144,6 +138,7 @@ const CompanyLogin = () => {
         }
         if (otpTimeLimit <= 0) {
           setOtpExpired(true);
+          setOtpSent(true)
           setErrorMessage("OTP Expired. Please Login Again");
           setShowErrorModal(true);
         }
@@ -171,6 +166,30 @@ const CompanyLogin = () => {
     } else {
       sendOtp(data);
     }
+  };
+
+  const validatePassword = (value) => {
+    const errors = [];
+    if (!/(?=.*[0-9])/.test(value)) {
+      errors.push("at least one digit");
+    }
+    if (!/(?=.*[a-z])/.test(value)) {
+      errors.push("at least one lowercase letter");
+    }
+    if (!/(?=.*[A-Z])/.test(value)) {
+      errors.push("at least one uppercase letter");
+    }
+    if (!/(?=.*\W)/.test(value)) {
+      errors.push("at least one special character");
+    }
+    if (value.includes(" ")) {
+      errors.push("no spaces");
+    }
+    
+    if (errors.length > 0) {
+      return `Password must contain ${errors.join(", ")}.`;
+    }
+    return true; // Return true if all conditions are satisfied
   };
 
   return (
@@ -245,10 +264,7 @@ const CompanyLogin = () => {
                                       value: 6,
                                       message: "Password must be at least 6 characters long",
                                     },
-                                    pattern: {
-                                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-                                      message: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
-                                    },
+                                  validate:validatePassword,
                                   })}
                                 />
                               </div>
@@ -277,10 +293,15 @@ const CompanyLogin = () => {
                                   autoComplete="off"
                                   {...register("otp", {
                                     required: "OTP is Required.",
-                                    pattern: {
-                                      value: /^\d{6}$/,
-                                      message: "OTP must be 6 digits.",
-                                    },
+                                      validate: (value) => {
+                                        if (/\s/.test(value)) {
+                                          return "OTP cannot contain spaces.";
+                                        }
+                                        if (!/^\d{6}$/.test(value)) {
+                                          return "OTP must be exactly 6 digits.";
+                                        }
+                                        return true; // Return true if no errors
+                                      }, 
                                   })}
                                 />
                               </div>
@@ -289,7 +310,11 @@ const CompanyLogin = () => {
                               )}
                             </div>
                           )}
-                          {otpExpired && <div className="text-center"><p className="errorMsg">OTP Expired. Please login again.</p></div>}
+                          {showOtpField && otpExpired && (
+                            <div className="text-center">
+                              <p className="errorMsg">OTP Expired. Please login again.</p>
+                            </div>
+                          )}
                         </div>
                         <div className="text-center mt-4" style={{ paddingTop: "10px" }}>
                           <button
@@ -311,7 +336,7 @@ const CompanyLogin = () => {
                 <div className="row">
                   <div className="text-center text-small mt-1">
                     <span>
-                      Copyright &copy;2024 PATHBREAKER TECHNOLOGIES PVT.LTD. All Rights Reserved
+                      Copyrights &copy;2024 PATHBREAKER TECHNOLOGIES PVT.LTD. All Rights Reserved
                     </span>
                   </div>
                 </div>

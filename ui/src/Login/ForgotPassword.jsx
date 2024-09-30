@@ -10,6 +10,7 @@ const ForgotPassword = () => {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
   const [passwordShown, setPasswordShown] = useState(false);
+  const [confirmPasswordShown, setConfirmPasswordShown] = useState(false);
   const [otpShown, setOtpShown] = useState(false); // Separate state for OTP visibility
   const [loading, setLoading] = useState(false);
   const watchPassword = watch('password', '');
@@ -88,9 +89,36 @@ const ForgotPassword = () => {
   const togglePasswordVisibility = () => {
     setPasswordShown(!passwordShown);
   };
+  const confirmPasswordVisibility = () => {
+    setConfirmPasswordShown(!confirmPasswordShown);
+  };
 
   const toggleOtpVisibility = () => {
     setOtpShown(!otpShown);
+  };
+
+  const validatePassword = (value) => {
+    const errors = [];
+    if (!/(?=.*[0-9])/.test(value)) {
+      errors.push("at least one digit");
+    }
+    if (!/(?=.*[a-z])/.test(value)) {
+      errors.push("at least one lowercase letter");
+    }
+    if (!/(?=.*[A-Z])/.test(value)) {
+      errors.push("at least one uppercase letter");
+    }
+    if (!/(?=.*\W)/.test(value)) {
+      errors.push("at least one special character");
+    }
+    if (value.includes(" ")) {
+      errors.push("no spaces");
+    }
+    
+    if (errors.length > 0) {
+      return `Password must contain ${errors.join(", ")}.`;
+    }
+    return true; // Return true if all conditions are satisfied
   };
 
   const renderStep = () => {
@@ -125,7 +153,7 @@ const ForgotPassword = () => {
             </div>
             <div className="text-center mt-4">
               <button type="submit" className="btn btn-primary" disabled={loading}>
-                {loading ? "Loading..." : "Submit"}
+                {loading ? "Loading..." : "Send OTP"}
               </button>
             </div>
           </form>
@@ -161,7 +189,11 @@ const ForgotPassword = () => {
                     pattern: {
                       value: /^[0-9]{6}$/,
                       message: 'Invalid OTP'
-                    }
+                    },
+                    maxLength: {
+                      value: 6,
+                      message: "Maximum 6 Digits Allowed",
+                    },
                   })}
                 />
               </div>
@@ -189,25 +221,27 @@ const ForgotPassword = () => {
             <div className="form-group">
               <label>OTP:</label>
               <div className="input-group">
-                <span className="input-group-text" onClick={toggleOtpVisibility} style={{ cursor: 'pointer' }}>
+              <span className="input-group-text" onClick={toggleOtpVisibility} style={{ cursor: 'pointer' }}>
                   {otpShown ? (
                     <UnlockFill size={20} color="#4C489D" />
                   ) : (
                     <LockFill size={20} color="#4C489D" />
                   )}
                 </span>
-                <input
-                  placeholder='Enter OTP'
-                  type={otpShown ? "text" : "password"}
-                  className="form-control"
-                  {...register('otp', {
-                    required: 'OTP is required',
-                    pattern: {
-                      value: /^[0-9]{6}$/,
-                      message: 'Invalid OTP'
-                    }
-                  })}
-                />
+              <input
+            placeholder='Enter OTP'
+            type={otpShown ? "text" : "password"}
+            name='otp'
+            className="form-control"
+            {...register('otp', {
+              required: 'OTP is required',
+              pattern: {
+                value: /^[0-9]{6}$/,
+                message: 'Invalid OTP'
+              }
+            })}
+            disabled // Disable the OTP input here
+          />
               </div>
               {errors.otp && <span className="text-danger" style={{ marginLeft: "60px" }}>{errors.otp.message}</span>}
             </div>
@@ -231,10 +265,7 @@ const ForgotPassword = () => {
                       value: 6,
                       message: "Password must be at least 6 characters long",
                     },
-                    pattern: {
-                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-                      message: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
-                    },
+                   validate:validatePassword,
                   })}
                 />
               </div>
@@ -247,8 +278,8 @@ const ForgotPassword = () => {
             <div className="form-group">
               <label>Confirm Password:</label>
               <div className="input-group">
-                <span className="input-group-text" onClick={togglePasswordVisibility}>
-                  {passwordShown ? (
+                <span className="input-group-text" onClick={confirmPasswordVisibility}>
+                  {confirmPasswordShown ? (
                     <UnlockFill size={20} color="#4C489D" />
                   ) : (
                     <LockFill size={20} color="#4C489D" />
@@ -256,7 +287,7 @@ const ForgotPassword = () => {
                 </span>
                 <input
                   placeholder='Confirm Password'
-                  type={passwordShown ? "text" : "password"}
+                  type={confirmPasswordShown ? "text" : "password"}
                   className="form-control"
                   {...register('confirmPassword', {
                     required: 'Confirm Password is required',
@@ -270,35 +301,7 @@ const ForgotPassword = () => {
                 </p>
               )}
             </div>
-            <div className="form-group">
-              <label>Company Name:</label>
-              <div className="input-group">
-                <span className="input-group-text">
-                  <BriefcaseFill size={20} color="#4C489D" />
-                </span>
-              <input
-                placeholder='Enter Your Company'
-                type="text"
-                className="form-control"
-                {...register("companyName", {
-                  required: "Company Name is required",
-                  pattern: {
-                    value: /^[a-zA-Z\s,.'\-\/]*$/,
-                    message: "Field accepts only alphabets and special characters:( , ' -  . /)",
-                  },
-                  minLength: {
-                    value: 2,
-                    message: "minimum 2 characters required",
-                  },
-                })}
-              />
-              </div>
-              {errors.companyName && (
-                <p className="errorMsg" style={{ marginLeft: "60px", marginBottom: "0" }}>
-                  {errors.companyName.message}
-                </p>
-              )}
-            </div>
+        
             <div className="text-center mt-4">
               <button type="submit" className="btn btn-primary" disabled={loading || isSubmitting}>
                 {loading ? "Loading..." : "Update Password"}

@@ -29,6 +29,7 @@ const Designation = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null); // State to store the ID of the item to be deleted
   const { user} = useAuth();
+  const navigate = useNavigate();
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
     setSelectedItemId(null); 
@@ -97,32 +98,41 @@ const Designation = () => {
 
   const handleConfirmDelete = async () => {
     if (selectedItemId) {
+      // Optimistically update the state
+      const updatedDesignations = designations.filter(designation => designation.id !== selectedItemId);
+      setDesignations(updatedDesignations);
+      
       try {
-
-        await DesignationDeleteApiById(selectedItemId)
-          .then((response) => {
-           
-              toast.success("Designation Deleted Succesfully", {
-                position: "top-right",
-                transition: Bounce,
-                hideProgressBar: true,
-                theme: "colored",
-                autoClose: 3000,
-              });
-              setTimeout(() => {
-                fetchDesignation();
-                //getEmployees()
-            handleCloseDeleteModal();
-            },1000);
-
-
-          });
-
+        await DesignationDeleteApiById(selectedItemId);
+        toast.success("Designation Deleted Successfully", {
+          position: "top-right",
+          transition: Bounce,
+          hideProgressBar: true,
+          theme: "colored",
+          autoClose: 1000,
+        });
+  
+        // If no designations are left, you can choose to refetch
+        if (updatedDesignations.length === 0) {
+          // Optionally refetch the designations again if needed
+          // fetchDesignations(); // Uncomment this if you want to refetch from API
+        }
+  
+        setTimeout(() => {
+          // Fetch the updated list after a delay, if needed
+          fetchDesignation();
+          handleCloseDeleteModal();
+        }, 1500);
       } catch (error) {
         handleApiErrors(error);
+        // If there's an error, revert to the original state (not shown in your code)
+        setDesignations(designations); // Reset to original state
+      } finally {
+        handleCloseDeleteModal();
       }
     }
   };
+  
 
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {

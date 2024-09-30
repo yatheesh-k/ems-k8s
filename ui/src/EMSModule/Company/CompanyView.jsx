@@ -27,7 +27,7 @@ const CompanyView = () => {
       setView(response.data.data);
     } catch (error) {
       handleApiErrors(error);
-    } 
+    }
   };
 
   const getData = (id) => {
@@ -61,7 +61,7 @@ const CompanyView = () => {
           });
           setTimeout(() => {
             getUser(); // Refresh the list after deletion
-        }, 1000);
+          }, 1000);
           handleCloseDeleteModal();
         } else {
           toast.error("Failed to delete company. Please try again.", {
@@ -129,7 +129,6 @@ const CompanyView = () => {
           {row.emailId.slice(0, 15)}
         </div>
       ),
-      sortable: true,
       width: "200px",
     },
     {
@@ -237,9 +236,8 @@ const CompanyView = () => {
                   </div>
                   <div className='col-12 col-md-6 col-lg-4'></div>
                   <div className='col-12 col-md-6 col-lg-4'>
-                    <input type='search' className="form-control" placeholder='Search....'
+                    <input type='search' className="form-control" placeholder='search by Company Name, Authorized Name '
                       value={search}
-                      onInput={toInputTitleCase}
                       onChange={(e) => getFilteredList(e.target.value)}
                     />
                   </div>

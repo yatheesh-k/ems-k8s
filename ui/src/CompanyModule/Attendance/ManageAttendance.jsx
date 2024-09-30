@@ -4,7 +4,6 @@ import { AttendanceManagementApi, EmployeeGetApi } from "../../Utils/Axios";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { Download } from "react-bootstrap-icons";
-import * as XLSX from "xlsx";
 
 const ManageAttendance = () => {
   const {
@@ -73,33 +72,26 @@ const ManageAttendance = () => {
     console.error(error.response);
   };
 
-  const exportToExcel = () => {
-    const headers = [
-      "EmployeeId",
-      "First Name",
-      "Last Name",
-      "EmailId",
-      "No of Working Days",
-    ];
+  const convertToCSV = (data) => {
+    const header = ['First Name', 'Last Name', 'Employee ID', 'Email ID', 'Working Days'];
+    const rows = data.map(({ firstName, lastName, employeeId, emailId, workingDays }) => 
+        [firstName, lastName, employeeId, emailId, workingDays]
+    );
 
-    const data = [headers];
+    return [header, ...rows].map(e => e.join(",")).join("\n");
+};
 
-    employees.forEach(employee => {
-      data.push([
-        employee.employeeId,
-        employee.firstName,
-        employee.lastName,
-        employee.emailId || "N/A",
-        employee.workingDays || "0"
-      ]);
-    });
-
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(data);
-    XLSX.utils.book_append_sheet(wb, ws, "Attendance Data");
-
-    XLSX.writeFile(wb, "attendance_data.xlsx");
-  };
+const downloadExcel = () => {
+    const csv = convertToCSV(employees);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.setAttribute('download', 'EmployeeData.csv'); // Set file name
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+};
 
   return (
     <LayOut>
@@ -128,7 +120,7 @@ const ManageAttendance = () => {
                 <button
                   type="button"
                   className="btn btn-outline-primary"
-                  onClick={exportToExcel}
+                  onClick={downloadExcel}
                 >
                   Download Attendance Excel Sheet <Download size={20} className="ml-1" />
                 </button>

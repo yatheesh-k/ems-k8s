@@ -8,7 +8,7 @@ import { userId } from "../Utils/Auth";
 import { useNavigate } from "react-router-dom";
 
 const Reset = ({ companyName, onClose, show }) => {
-  const { register, handleSubmit, formState: { errors }, getValues } = useForm({ mode: "onChange" });
+  const { register, handleSubmit, formState: { errors }, getValues,reset } = useForm({ mode: "onChange" });
   const [oldPasswordShown, setOldPasswordShown] = useState(false);
   const [newPasswordShown, setNewPasswordShown] = useState(false);
   const [confirmPasswordShown, setConfirmPasswordShown] = useState(false);
@@ -71,11 +71,22 @@ const Reset = ({ companyName, onClose, show }) => {
     console.error(error.response);
   };
 
+  const handleClose = () => {
+    // Reset form fields
+    reset();
+    setLoading(false);
+    setOldPasswordShown(false);
+    setNewPasswordShown(false);
+    setConfirmPasswordShown(false);
+    setError(null);
+    onClose(); // Call the original onClose function
+  };
+
   return (
 
     <Modal
       show={show}
-      onHide={onClose}
+      onHide={handleClose}
       centered
       style={{ zIndex: "1050" }}
       backdrop="static"

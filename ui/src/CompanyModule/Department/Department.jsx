@@ -88,26 +88,36 @@ const Department = () => {
   const handleConfirmDelete = async () => {
     if (selectedItemId) {
       try {
-        await DepartmentDeleteApiById(selectedItemId)
-          .then((response) => {
-              toast.success("Department Deleted Succesfully", {
-                position: "top-right",
-                transition: Bounce,
-                hideProgressBar: true,
-                theme: "colored",
-                autoClose: 1000,
-              });
-              setTimeout(() => {
-                fetchDepartments();
-                //getEmployees()
-             handleCloseDeleteModal();
-            }, 1500);
-          });
+        await DepartmentDeleteApiById(selectedItemId);
+        toast.success("Department Deleted Successfully", {
+          position: "top-right",
+          transition: Bounce,
+          hideProgressBar: true,
+          theme: "colored",
+          autoClose: 1000,
+        });
+        
+        // Fetch departments after deletion
+        const updatedDepartments = departments.filter(department => department.id !== selectedItemId);
+        setDepartments(updatedDepartments);
+  
+        // If no departments are left, we can force a fetch or reset state
+        if (updatedDepartments.length === 0) {
+          // Optionally fetch the departments again if needed
+          // fetchDepartments(); // Uncomment this if you want to refetch from API
+        }
+  
+        setTimeout(() => {
+          // Only if you want to refetch after a delay
+          fetchDepartments();
+          handleCloseDeleteModal();
+        }, 1500);
       } catch (error) {
-        handleApiErrors(error)
+        handleApiErrors(error);
       }
     }
   };
+  
 
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
