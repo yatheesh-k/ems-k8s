@@ -37,7 +37,7 @@ public class SalaryConfigurationController {
         return salaryConfigurationService.getDeductionsColumnNames();
     }
 
-    @RequestMapping(value = "/allowances", method = RequestMethod.POST)
+    @RequestMapping(value = "/salary/Structure", method = RequestMethod.POST)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.salary.structure.tag}", description = "${api.salary.structure.description}")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description= "OK")
