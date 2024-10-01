@@ -145,6 +145,7 @@ const EmsLogin = () => {
                       },
                       maxLength: {
                         value: 16,
+
                         message: "Password must not Exceed 16 characters long",
                       },
                       validate:validatePassword,

@@ -13,6 +13,7 @@ import { Eye, EyeSlash } from "react-bootstrap-icons";
 const CompanyRegistration = () => {
   const {
     register,
+    watch,
     handleSubmit,
     formState: { errors },
     reset,
@@ -22,6 +23,7 @@ const CompanyRegistration = () => {
   const [passwordShown, setPasswordShown] = useState("");
   const [editMode, setEditMode] = useState(false); // State to track edit mode
   const [errorMessage, setErrorMessage] = useState('');
+  const watchRegistrationNumber = watch('cinNo', '');
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -408,8 +410,8 @@ const CompanyRegistration = () => {
                             message: "minimum 2 characters Required",
                           },
                           maxLength: {
-                            value: 20,
-                            message: "maximum 20 characters allowed",
+                            value: 32,
+                            message: "maximum 32 characters allowed",
                           },
                         })}
                         disabled={editMode}
@@ -494,9 +496,9 @@ const CompanyRegistration = () => {
                             {...register("mobileNo", {
                               required: "Contact Number is Required",
                               pattern: {
-                                value: /^[0-9]{10}$/,
+                                value: /^(?!0000000000)[0-9]{10}$/,
                                 message:
-                                  "Contact Number should contain only 10 numbers. ",
+                                "Contact Number should be exactly 10 digits long, should contain only numbers, and cannot be all zeros.",
                               },
                               validate: {
                                 notRepeatingDigits: value => {
@@ -568,9 +570,9 @@ const CompanyRegistration = () => {
                             {...register("mobileNo", {
                               required: "Contact Number is Required",
                               pattern: {
-                                value: /^[0-9]{10}$/,
+                                value: /^(?!0000000000)[0-9]{10}$/,
                                 message:
-                                  "Contact Number should contain only 10 numbers. ",
+                                "Contact Number should be exactly 10 digits long, should contain only numbers, and cannot be all zeros.",
                               },
                               validate: {
                                 notRepeatingDigits: value => {
@@ -602,9 +604,9 @@ const CompanyRegistration = () => {
                         onKeyDown={handleEmailChange}
                         {...register("landNo", {
                           pattern: {
-                            value: /^[0-9]{10}$/,
+                            value: /^(?!0000000000)[0-9]{10}$/,
                             message:
-                              "Alternate Number should contain only 10 numbers",
+                            "Alternate Number should be exactly 10 digits long, should contain only numbers, and cannot be all zeros.",
                           },
                           validate: {
                             notRepeatingDigits: value => {
@@ -691,7 +693,9 @@ const CompanyRegistration = () => {
                             value: 21,
                             message: "CIN Number must not exceed 21 characters",
                           },
+
                           validate: validateCIN,
+
                         })}
                         disabled={editMode}
                       />
@@ -700,6 +704,7 @@ const CompanyRegistration = () => {
                       )}
 
                     </div>
+
                      <div className="col-lg-1"></div>
                      </>
                   )}
@@ -729,6 +734,7 @@ const CompanyRegistration = () => {
             {errors.companyRegNo && <p className="errorMsg">{errors.companyRegNo.message}</p>}
           </div>
         )}
+
 
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
@@ -876,8 +882,9 @@ const CompanyRegistration = () => {
                         {...register("personalMobileNo", {
                           required: "Personal Mobile Number is Required",
                           pattern: {
-                            value: /^[0-9]{10}$/,
+                            value: /^(?!0000000000)[0-9]{10}$/,
                             message:
+
                               "Mobile Number should contain only 10 numbers",
                           },
                           validate: {

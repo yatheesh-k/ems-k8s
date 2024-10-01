@@ -11,6 +11,7 @@ import DeletePopup from '../../Utils/DeletePopup';
 import { ModalTitle, ModalHeader, ModalBody } from 'react-bootstrap';
 
 const AttendanceReport = () => {
+
   const { register, handleSubmit, formState: { errors }, reset,watch } = useForm({mode:'onChange'});
   const [employees, setEmployees] = useState([]);
   const [showFields, setShowFields] = useState(false);
@@ -34,7 +35,7 @@ const AttendanceReport = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [columns, setColumns] = useState([]);
-  const [hasRecords, setHasRecords] = useState(true); 
+  const [hasRecords, setHasRecords] = useState(true);
 
   const navigate = useNavigate();
 
@@ -205,7 +206,7 @@ const AttendanceReport = () => {
 
   const formatDateHeader = () => {
     const now = new Date();
-    const currentMonth = now.getMonth();  
+    const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
     const monthNames = getMonthNames();
     return `Attendance Details for ${monthNames[currentMonth]} ${currentYear}`;
@@ -328,7 +329,7 @@ const AttendanceReport = () => {
                     />
                   </div>
                   <div className="col-md-3 mt-3">
-                    <label className="form-label">Select Year <span style={{color:"red"}}>*</span></label>
+                    <label className="form-label">Select Year <span style={{ color: "red" }}>*</span></label>
                     <Select
                       options={getRecentYears().map((year) => ({
                         label: year,
@@ -422,7 +423,7 @@ const AttendanceReport = () => {
                 <ModalTitle>Edit Attendance</ModalTitle>
               </ModalHeader>
               <ModalBody>
-                <form onSubmit={handleSubmit(onSubmit)} >
+                <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="card-body" style={{ width: "1060px", paddingBottom: "0px" }}>
                     <div className='col-12 col-md-6 col-lg-4 mb-2'>
                       <label>Total Working Days</label>
@@ -438,9 +439,11 @@ const AttendanceReport = () => {
                     <div className='col-12 col-md-6 col-lg-4 mb-2'>
                       <label>No. Of Working Days</label>
                       <input
-                        type="number"
+                        type="Number"
                         name='noOfWorkingDays'
+                        maxLength={2}
                         className="form-control"
+
                         {...register("noOfWorkingDays", { 
                           required: true,
                           pattern: {

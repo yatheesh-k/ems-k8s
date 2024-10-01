@@ -817,6 +817,7 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                               type={passwordShown ? "text" : "password"}
                               {...register("password", {
                                 required: "Password is Required",
+
                                validate:validatePassword,
                                 minLength: {
                                   value: 6,
@@ -847,6 +848,7 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
 
                       </>
                     )}
+
 
                    {!isUpdating && (
                       <div className="col-lg-1"></div>
@@ -1058,6 +1060,10 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                             value: /^\d{12}$/,
                             message:
                               "Allows only Integers",
+                          },
+                          minLength: {
+                            value: 12,
+                            message: "MInimum 12 characters required",
                           },
                           maxLength: {
                             value: 12,

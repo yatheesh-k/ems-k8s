@@ -10,7 +10,7 @@ import { DepartmentDeleteApiById, DepartmentGetApi, DepartmentPostApi, Departmen
 import { useAuth } from '../../Context/AuthContext';
 
 const Department = () => {
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm({mode:"onChange"});
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm({ mode: "onChange" });
   const [departments, setDepartments] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [addDepartment, setAddDeparment] = useState(false);
@@ -21,7 +21,7 @@ const Department = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [filteredDepartments, setFilteredDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { user} = useAuth();
+  const { user } = useAuth();
 
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
@@ -46,7 +46,7 @@ const Department = () => {
     } catch (error) {
       // handleApiErrors(error);
     }
-  };  
+  };
   useEffect(() => {
     fetchDepartments();
   }, []);
@@ -78,7 +78,7 @@ const Department = () => {
       reset();
       setEditingId(null);
     } catch (error) {
-      handleApiErrors(error);  
+      handleApiErrors(error);
     } finally {
       setLoading(false);
     }
@@ -88,6 +88,7 @@ const Department = () => {
   const handleConfirmDelete = async () => {
     if (selectedItemId) {
       try {
+
         await DepartmentDeleteApiById(selectedItemId);
         toast.success("Department Deleted Successfully", {
           position: "top-right",
@@ -129,7 +130,7 @@ const Department = () => {
     console.error(error.response);
   };
 
-  
+
   useEffect(() => {
     fetchDepartments();
   }, [])
@@ -194,7 +195,7 @@ const Department = () => {
 
   console.log(filteredDepartments);
 
-  
+
   const handlePageChange = page => {
     setCurrentPage(page);
   };
@@ -218,7 +219,7 @@ const Department = () => {
   const columns = [
     {
       name: <h5><b>S No</b></h5>,
-      selector: (row, index) => getSerialNumber(index), 
+      selector: (row, index) => getSerialNumber(index),
     },
     {
       name: <h5><b>Department Name</b></h5>,
@@ -253,17 +254,17 @@ const Department = () => {
   const handleEmailChange = (e) => {
     // Get the current value of the input field
     const value = e.target.value;
-    
+
     // Check if the value is empty
     if (value.trim() !== '') {
-        return; // Allow space button
+      return; // Allow space button
     }
 
     // Prevent space character entry if the value is empty
     if (e.keyCode === 32) {
-        e.preventDefault();
+      e.preventDefault();
     }
-};
+  };
 
   return (
 
@@ -371,13 +372,13 @@ const Department = () => {
                                     value: /^[A-Za-z ]+$/,
                                     message: "This Field accepts only Alphabetic Characters",
                                   },
-                                  minLength:{
-                                    value:2,
-                                    message:"Minimun 2 characters required"
+                                  minLength: {
+                                    value: 2,
+                                    message: "Minimun 2 characters required"
                                   },
-                                  maxLength:{
-                                    value:20,
-                                    message:"Maximum 20 characters required"
+                                  maxLength: {
+                                    value: 20,
+                                    message: "Maximum 20 characters required"
                                   }
                                 })}
                               />
@@ -407,10 +408,8 @@ const Department = () => {
                 </div>
               </div>
             )}
-
           </div>
         </div>
-
       </div>
     </LayOut>
   );
