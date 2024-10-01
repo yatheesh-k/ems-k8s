@@ -34,6 +34,7 @@ import Reset from '../LayOut/Reset';
 
 import ForgotPassword from '../Login/ForgotPassword'
 import EmployeeProfile from '../EmployeeModule/EmployeeProfile';
+import EmployeeSalaryUpdate from '../CompanyModule/PayRoll/EmployeeSalaryUpdate';
 import CompanySalaryView from '../CompanyModule/PayRoll/CompanySalaryView';
 
 
@@ -118,6 +119,7 @@ const Rout = () => {
       <Route path='/companySalaryStructure' element={<CompanySalaryStructure />}></Route>
       <Route path='/companySalaryView' element={<CompanySalaryView/>}></Route>
       <Route path='/employeeSalaryStructure' element={<EmployeeSalaryStructure />}></Route>
+      <Route path='/employeeSalaryUpdate' element={<EmployeeSalaryUpdate />}></Route>
       <Route path='/employeeSalaryList' element={<EmployeeSalaryList />}></Route>
       <Route path='/payslipGeneration' element={<GeneratePaySlip />}></Route>
       <Route path='/payslipsList' element={<ViewPaySlips />}></Route>

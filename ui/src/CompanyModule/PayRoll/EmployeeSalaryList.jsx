@@ -128,7 +128,7 @@ const EmployeeSalaryList = () => {
 
   const handleEditClick = (salaryId, event) => {
     event.stopPropagation(); // Prevent the card from toggling when editing
-    navigate(`/employeeSalaryStructure?salaryId=${salaryId}&employeeId=${id}`); // Navigate with both parameters
+    navigate(`/employeeSalaryUpdate?salaryId=${salaryId}&employeeId=${id}`); // Navigate with both parameters
   };
   
   

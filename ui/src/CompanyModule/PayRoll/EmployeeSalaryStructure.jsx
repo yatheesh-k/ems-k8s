@@ -46,6 +46,8 @@ const EmployeeSalaryStructure = () => {
   const [status, setStatus] = useState("Active");
   const [isReadOnly, setIsReadOnly] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [allowances, setAllowances] = useState ({});
+  const [deductions, setDeductions] = useState ({});
 
   const navigate = useNavigate();
 
@@ -226,7 +228,7 @@ const EmployeeSalaryStructure = () => {
                       <hr />
                       <div className="row">
                         <div className="col-md-5 mb-3">
-                          <label className="form-label">Variable Amount<span style={{ color: "red" }}>*</span></label>
+                          <label className="form-label">Variable Amount</label>
                           <input
                             id="variableAmount"
                             type="text"

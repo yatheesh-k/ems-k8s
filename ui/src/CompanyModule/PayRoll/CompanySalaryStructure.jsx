@@ -6,6 +6,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import Select from "react-select";
 import { ModalBody, ModalHeader, ModalTitle } from 'react-bootstrap';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const CompanySalaryStructure = () => {
   const { register, handleSubmit, control, getValues, trigger, reset, formState: { errors } } = useForm({ mode: "onChange" });
@@ -22,6 +23,7 @@ const CompanySalaryStructure = () => {
   const [validationErrors, setValidationErrors] = useState("");
   const { user } = useAuth();
   const [fieldCheckboxes, setFieldCheckboxes] = useState({ allowances: {}, deductions: {} });
+  const navigate = useNavigate();
 
   const addField = (fieldName) => {
     const newField = { label: fieldName, type: 'number', value: '' };
@@ -188,6 +190,7 @@ const CompanySalaryStructure = () => {
       const response = await CompanySalaryStructurePostApi(jsonData);
       toast.success("Salary structure submitted successfully!");
       reset();
+      navigate('/companySalaryView');
     } catch (error) {
       if (error.response) {
         console.error("Error response from backend:", error.response.data);

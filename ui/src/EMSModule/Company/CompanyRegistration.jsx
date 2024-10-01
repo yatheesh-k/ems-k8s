@@ -180,28 +180,28 @@ const CompanyRegistration = () => {
     if (value.includes(" ")) {
       errors.push("no spaces");
     }
-    
+
     if (errors.length > 0) {
       return `Password must contain ${errors.join(", ")}.`;
     }
     return true; // Return true if all conditions are satisfied
   };
-  
+
 
   const toInputLowerCase = (e) => {
     const input = e.target;
     let value = input.value;
-  
+
     // Remove all spaces
     value = value.replace(/\s+/g, '');
-  
+
     // Convert the entire string to lowercase
     value = value.toLowerCase();
-  
+
     // Update input value
     input.value = value;
   };
-  
+
 
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
@@ -468,7 +468,7 @@ const CompanyRegistration = () => {
                         {...register("emailId", {
                           required: "Company Email Id is Required",
                           pattern: {
-                            value:/^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                            value: /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid email format",
                           },
                         })}
@@ -709,32 +709,30 @@ const CompanyRegistration = () => {
                      </>
                   )}
                    
-
                     {companyType === "Firm" && (
-          <div className="col-12 col-md-6 col-lg-5 mb-3">
-            <label className="form-label">
-              Company Registration Number <span style={{ color: "red" }}>*</span>
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Enter Company Registration Number"
-              autoComplete="off"
-              maxLength={21}
-              {...register("companyRegNo", {
-                required: "Company Registration Number is Required",
-                maxLength: {
-                  value: 21,
-                  message: "Registration Number must not exceed 21 characters",
-                },
-               validate:validateCIN
-              })}
-              disabled={editMode}
-            />
-            {errors.companyRegNo && <p className="errorMsg">{errors.companyRegNo.message}</p>}
-          </div>
-        )}
-
+                      <div className="col-12 col-md-6 col-lg-5 mb-3">
+                        <label className="form-label">
+                          Company Registration Number <span style={{ color: "red" }}>*</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter Company Registration Number"
+                          autoComplete="off"
+                          maxLength={21}
+                          {...register("companyRegNo", {
+                            required: "Company Registration Number is Required",
+                            maxLength: {
+                              value: 21,
+                              message: "Registration Number must not exceed 21 characters",
+                            },
+                            validate: validateCIN
+                          })}
+                          disabled={editMode}
+                        />
+                        {errors.companyRegNo && <p className="errorMsg">{errors.companyRegNo.message}</p>}
+                      </div>
+                    )}
 
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
@@ -755,7 +753,7 @@ const CompanyRegistration = () => {
                             value: 15,
                             message: "GST Number must not exceed 15 characters",
                           },
-                          validate:validateGST
+                          validate: validateGST
                         })}
                         disabled={editMode}
                       />
@@ -781,8 +779,8 @@ const CompanyRegistration = () => {
                             value: 10,
                             message: "PAN Number must not exceed 10 characters",
                           },
-                          validate:validatePAN
-                         
+                          validate: validatePAN
+
                         })}
                         disabled={editMode}
                       />
@@ -817,7 +815,7 @@ const CompanyRegistration = () => {
                         placeholder="Enter Name"
                         onKeyDown={handleEmailChange}
                         onInput={toInputTitleCase}
-                       
+
                         autoComplete="off"
                         {...register("name", {
                           required: "Name is Required",
@@ -855,7 +853,7 @@ const CompanyRegistration = () => {
                         {...register("personalMailId", {
                           required: "Personal Email Id is Required",
                           pattern: {
-                            value:/^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                            value: /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid Email Format ",
                           },
                         })}

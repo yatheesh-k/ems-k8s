@@ -16,7 +16,7 @@ const EmployeeRegistration = () => {
     handleSubmit,
     control,
     formState: { errors },
-   watch,
+
     reset,
     setValue,
   } = useForm({
@@ -47,10 +47,13 @@ const EmployeeRegistration = () => {
   };
 
   const handleEmailChange = (e) => {
+    // Get the current value of the input field
     const value = e.target.value;
+    // Check if the value is empty
     if (value.trim() !== "") {
-      return;
+      return; // Allow space button
     }
+    // Prevent space character entry if the value is empty
     if (e.keyCode === 32) {
       e.preventDefault();
     }
@@ -123,29 +126,7 @@ const EmployeeRegistration = () => {
     fetchDepartments();
     fetchDesignations();
   }, []);
-  const validatePassword = (value) => {
-    const errors = [];
-    if (!/(?=.*[0-9])/.test(value)) {
-      errors.push("at least one digit");
-    }
-    if (!/(?=.*[a-z])/.test(value)) {
-      errors.push("at least one lowercase letter");
-    }
-    if (!/(?=.*[A-Z])/.test(value)) {
-      errors.push("at least one uppercase letter");
-    }
-    if (!/(?=.*\W)/.test(value)) {
-      errors.push("at least one special character");
-    }
-    if (value.includes(" ")) {
-      errors.push("no spaces");
-    }
-    
-    if (errors.length > 0) {
-      return `Password must contain ${errors.join(", ")}.`;
-    }
-    return true; // Return true if all conditions are satisfied
-  };
+
   const toInputTitleCase = (e) => {
     const input = e.target;
     let value = input.value;
@@ -179,13 +160,23 @@ const EmployeeRegistration = () => {
   const toInputLowerCase = (e) => {
     const input = e.target;
     let value = input.value;
-  
-    // Remove all spaces
-    value = value.replace(/\s+/g, '');
-  
-    // Convert the entire string to lowercase
-    value = value.toLowerCase();
-  
+    // Remove leading spaces
+    value = value.replace(/^\s+/g, '');
+
+    // Initially disallow spaces if there are no non-space characters
+    if (!/\S/.test(value)) {
+      // If no non-space characters are present, prevent spaces
+      value = value.replace(/\s+/g, '');
+    } else {
+      // Allow spaces if there are non-space characters
+      value = value.toLowerCase();
+      value = value.replace(/^\s+/g, ''); // Remove leading spaces
+      const words = value.split(' ');
+      const capitalizedWords = words.map(word => {
+        return word.charAt(0).toLowerCase() + word.slice(1);
+      });
+      value = capitalizedWords.join(' ');
+    }
     // Update input value
     input.value = value;
   };
@@ -366,34 +357,6 @@ const EmployeeRegistration = () => {
     return `${year}-${month}-${day}`;
   };
 
-  const validateDate = (value) => {
-    const selectedDate = new Date(value);
-    if (selectedDate > new Date(threeMonthsFromNow)) {
-        return "Date of Hiring cannot be more than 3 months from today.";
-    }
-    return true; // Return true if no errors
-};
-
-
-
-// Custom validation function for date of birth based on date of hiring
-const validateDateOfBirth = (value, dateOfHiring) => {
-  const selectedDateOfBirth = new Date(value);
-  const selectedDateOfHiring = new Date(dateOfHiring); // Ensure this is a Date object
-  const dateOfBirthLimit = new Date(selectedDateOfHiring);
-  dateOfBirthLimit.setFullYear(selectedDateOfHiring.getFullYear() - 80); // 80 years ago from date of hiring
-
-  if (selectedDateOfBirth > dateOfBirthLimit) {
-      return "Date of Birth must be at least 80 years before the Date of Hiring.";
-  }
-  return true; // Return true if no errors
-};
-
-// In your component
-const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
-
-
-
   return (
     <LayOut>
       <div className="container-fluid p-0">
@@ -499,7 +462,7 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                           required: "Employee Id is Required",
                           pattern: {
                             value: /^(?=.*\d)[A-Z0-9]+$/,
-                            message: "Must include at least one number and cannot contain Uppercase letters only.",
+                            message: "Must include at least one number and cannot contain only letters.",
                           },
                           minLength: {
                             value: 1,
@@ -589,23 +552,14 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                         placeholder="Enter Email Id"
                         name="emailId"
                         autoComplete="off"
-                        // onInput={toInputLowerCase}
-                        // onKeyDown={handleEmailChange}
+                        onInput={toInputLowerCase}
+                        onKeyDown={handleEmailChange}
                         {...register("emailId", {
                           required: "Email Id is Required",
-                          validate: (value) => {
-                            if (/\s/.test(value)) {
-                                return "Email cannot contain spaces.";
-                            }
-                            if (/[A-Z]/.test(value)) {
-                                return "Email cannot contain uppercase letters.";
-                            }
-                            if (!/^(?![0-9]+@)[a-z0-9._%+-]+@[a-z0-9.-]+\.(com|in|org|net|edu|gov)$/.test(value)) {
-                                return "Invalid Email Format.";
-                            }
-                            return true; // Return true if no errors
-                        },
-                        
+                          pattern: {
+                            value: /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                            message: "Invalid email format it allows Only .com, .in, .org, .net, .edu, .gov are allowed",
+                          },
                         })}
                       />
                       {errors.emailId && (
@@ -613,41 +567,8 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                       )}
                     </div>
                     <div className="col-lg-1"></div>
-
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                          <label className="form-label">
-                            Contact Number <span style={{ color: "red" }}>*</span>
-                          </label>
-                          <input
-                            type="tel"
-                            className="form-control"
-                            placeholder="Enter Contact Number"
-                            autoComplete="off"
-                            maxLength={10}
-                            onKeyDown={handleEmailChange}
-                            onInput={toInputSpaceCase}
-                            {...register("mobileNo", {
-                              required: "Contact Number is Required",
-                              pattern: {
-                                value: /^[0-9]{10}$/,
-                                message:
-                                  "Contact Number should contain only 10 numbers. ",
-                              },
-                              validate: {
-                                notRepeatingDigits: value => {
-                                  const isRepeating = /^(\d)\1{9}$/.test(value); // Check for repeated digits
-                                  return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
-                                }
-                              }
-
-                            })}
-                          />
-                          {errors.mobileNo && (
-                            <p className="errorMsg">{errors.mobileNo.message}</p>
-                          )}
-                        </div>
-                    <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Date of Joining <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">Date of Hiring <span style={{ color: "red" }}>*</span></label>
                       <input
                         type={isUpdating ? "date" : "date"}
                         readOnly={isUpdating}
@@ -657,34 +578,43 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                         autoComplete="off"
                         max={threeMonthsFromNow}
                         {...register("dateOfHiring", {
-                          required: "Date of Hiring is Required",
-                          validate: validateDate,
+                          required: true,
                         })}
                       />
                       {errors.dateOfHiring && (
-                        <p className="errorMsg">{errors.dateOfHiring.message}</p>
+                        <p className="errorMsg">Date of Hiring is Required</p>
                       )}
                     </div>
                     <div className="col-lg-1"></div>
+
+                    {/* {isUpdating ? (
                       <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Date of Birth <span style={{ color: "red" }}>*</span></label>
-                      <input
-                        type={isUpdating ? "date" : "date"}
-                        readOnly={isUpdating}
-                        name="dateOfBirth"
-                        placeholder="Enter Birth Date"
-                        className="form-control"
-                        autoComplete="off"
-                        {...register("dateOfBirth", {
-                          required: "Date of Birth is Required",
-                          validate: (value) => validateDateOfBirth(value, dateOfHiring), 
-                        })}
-                        max={getCurrentDate()}
-                      />
-                      {errors.dateOfBirth && (
-                        <p className="errorMsg">{errors.dateOfBirth.message}</p>
-                      )}
-                    </div>
+                        <label className="form-label">
+                          Department <span style={{ color: "red" }}>*</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Enter Employee Type"
+                          name="departmentName"
+                          readOnly
+                          {...register("departmentName", {
+                            required: "Department is Required",
+                            pattern: {
+                              value: /^[A-Za-z ]+$/,
+                              message: "This field accepts only alphabetic characters",
+                            },
+                          })}
+                        />
+                        {errors.departmentName && (
+                          <p className="errorMsg">
+                            {errors.departmentName.message}
+                          </p>
+                        )}
+                      </div>
+
+                    ) : (  */}
+
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Department <span style={{ color: "red" }}>*</span>
@@ -737,7 +667,7 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                       )}
                     </div>
 
-                   
+                    <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Manager <span style={{ color: "red" }}>*</span></label>
                       <input
@@ -798,11 +728,11 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                         <p className="errorMsg">{errors.location.message}</p>
                       )}
                     </div>
-                  
+                    {isUpdating && (
                       <div className="col-lg-1"></div>
-                   
+                    )}
                     {isUpdating ? (
-                      <> </>
+                      <></>
                     ) : (
                       <>
                         <div className="col-12 col-md-6 col-lg-5 mb-3">
@@ -817,7 +747,6 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                               type={passwordShown ? "text" : "password"}
                               {...register("password", {
                                 required: "Password is Required",
-
                                validate:validatePassword,
                                 minLength: {
                                   value: 6,
@@ -848,11 +777,33 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
 
                       </>
                     )}
-
-
                    {!isUpdating && (
                       <div className="col-lg-1"></div>
-                    )}  
+                    )}                    <div className="col-12 col-md-6 col-lg-5 mb-3">
+                      <label className="form-label">Date of Birth <span style={{ color: "red" }}>*</span></label>
+                      <input
+                        type={isUpdating ? "date" : "date"}
+                        readOnly={isUpdating}
+                        name="dateOfBirth"
+                        placeholder="Enter Birth Date"
+                        className="form-control"
+                        autoComplete="off"
+                        {...register("dateOfBirth", {
+                          required: true,
+                        })}
+                        max={getCurrentDate()}
+                        {...register("dateOfBirth", {
+                          required: true,
+                        })}
+                      />
+                      {errors.dateOfBirth && (
+                        <p className="errorMsg">Date of Birth is Required</p>
+                      )}
+                    </div>
+                    {isUpdating && (
+                      <div className="col-lg-1"></div>
+                    )}
+
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
                       <label className="form-label mb-3">Status <span style={{ color: "red" }}>*</span></label>
                       <Controller
@@ -955,21 +906,12 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                           },
                           minLength: {
                             value: 9,
-                            message: "Bank Account Number minimum 9 numbers Required",
+                            message: "Account Number minimum 9 numbers Required",
                           },
                           maxLength: {
                             value: 18,
-                            message: "Bank Account Number must not exceed 18 characters",
+                            message: "Account Number must not exceed 18 characters",
                           },
-                          validate: (value) => {
-                            if (/\s/.test(value)) {
-                                return "Bank Account Number cannot contain spaces.";
-                            }
-                            // if (!/^(\d)\1{17}$/.test(value)) {
-                            //     return "Bank Account Number cannot consist of the same digit repeated.";
-                            // }
-                            return true; // Return true if no errors
-                        },
                         })}
                       />
                       {errors.accountNo && (
@@ -998,12 +940,6 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                             value: 11,
                             message: "IFSC Code must not exceed 11 characters",
                           },
-                          validate: {
-                            notRepeatingDigits: value => {
-                              const isRepeating = /\s/.test(value); // Check for repeated digits
-                              return !isRepeating || "IFSC cannot contain spaces.";
-                            }
-                          }
                         })}
                       />
                       {errors.ifscCode && (
@@ -1069,16 +1005,6 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                             value: 12,
                             message: "UAN Number must not exceed 12 characters",
                           },
-
-                          validate: (value) => {
-                            if (/\s/.test(value)) {
-                                return "UAN Number cannot contain spaces.";
-                            }
-                            // if (!/^(\d)\1{12}$/.test(value)) {
-                            //     return "UAN cannot consist of the same digit repeated.";
-                            // }
-                            return true; // Return true if no errors
-                        },
                         })}
                       />
                       {errors.uanNo && (
@@ -1108,12 +1034,6 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                             message:
                               "Pan Number should be in the format: ABCDE1234F",
                           },
-                          validate: (value) => {
-                            if (/\s/.test(value)) {
-                                return "Pan Number cannot contain spaces.";
-                            }
-                            return true; // Return true if no errors
-                        },
                         })}
                       />
                       {errors.panNo && (
@@ -1141,17 +1061,8 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                           },
                           maxLength: {
                             value: 12,
-                            message: "Aadhaar Number must not exceed 12 characters",
+                            message: "Aadhar Number must not exceed 12 characters",
                           },
-                          validate: (value) => {
-                            if (/\s/.test(value)) {
-                                return "Aadhaar Number cannot contain spaces.";
-                            }
-                            // if (!/^(\d)\1{11}$/.test(value)) {
-                            //     return "Aadhaar Number cannot consist of the same digit repeated.";
-                            // }
-                            return true; // Return true if no errors
-                        },
                         })}
                       />
                       {errors.aadhaarId && (
