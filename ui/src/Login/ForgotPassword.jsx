@@ -4,6 +4,7 @@ import { forgotPasswordStep1, forgotPasswordStep2, ValidateOtp } from '../Utils/
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BriefcaseFill, EnvelopeFill, LockFill, UnlockFill } from 'react-bootstrap-icons';
+import Loader from '../Utils/Loader';
 
 const ForgotPassword = () => {
   const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm({ mode: "onChange" });
@@ -126,6 +127,7 @@ const ForgotPassword = () => {
       case 1:
         return (
           <form onSubmit={handleSubmit(onSubmitEmail)}>
+      
             <div className="form-group">
               <label>Email Id</label>
               <div className="input-group">
@@ -316,6 +318,9 @@ const ForgotPassword = () => {
 
   return (
     <main className="d-flex w-100 ">
+       {loading &&(
+             <Loader/>
+          )}
       <div className="container d-flex flex-column">
         <div className="row vh-100">
           <div className="col-sm-10 col-md-7 col-lg-6 mx-auto d-table h-100">
@@ -327,7 +332,7 @@ const ForgotPassword = () => {
                   </div>
                 </div>
                 <div className="card-body" style={{ marginRight: '60px',paddingTop:'0px' }}>
-                  <div className="m-sm-2">
+                  <div className="mt-2 m-sm-2 ">
                     {renderStep()}
                   </div>
                 </div>

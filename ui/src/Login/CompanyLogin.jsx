@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
-import { EnvelopeFill, LockFill, UnlockFill } from "react-bootstrap-icons";
 import { Bounce, toast } from "react-toastify";
 import { CompanyloginApi, ValidateOtp } from "../Utils/Axios";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../Context/AuthContext";
+import '../LayOut/NewLogin/Message.css'
+import Loader from "../Utils/Loader";
 
 const CompanyLogin = () => {
   const {
@@ -97,11 +97,9 @@ const CompanyLogin = () => {
         setErrorMessage(errorMessage);
         setShowErrorModal(true);
       });
-  };
-  
-  
-  
-  
+
+  }; 
+
 
   const verifyOtpAndCompanyLogin = (data) => {
     const payload = {
@@ -168,6 +166,7 @@ const CompanyLogin = () => {
     }
   };
 
+
   const validatePassword = (value) => {
     const errors = [];
     if (!/(?=.*[0-9])/.test(value)) {
@@ -192,9 +191,10 @@ const CompanyLogin = () => {
     return true; // Return true if all conditions are satisfied
   };
 
+
   return (
     <div>
-      <main className="d-flex w-100 ">
+      {/* <main className="d-flex w-100 ">
         <div className="container d-flex flex-column">
           <div className="row vh-100">
             <div className="col-sm-10 col-md-7 col-lg-6 mx-auto d-table h-100">
@@ -345,7 +345,119 @@ const CompanyLogin = () => {
             </div>
           </div>
         </div>
-      </main>
+      </main> */}
+          <main className="newLoginMainWrapper">
+          {loading &&(
+             <Loader/>
+          )}
+    <div className="newLoginWrapper">
+        <div className="newLoginContainer">
+            <div className="newLoginLeftSectionOuter">
+                <div className="newLoginLeftTitle">Welcome to <br/> Employee Management System</div>
+                <div className="newLoginLeftImgHolder"><img src="..\assets\img\left-img.png" alt='#' /></div>
+            </div>
+            <div className='newLoginRightSectionOuter'>
+                <div className="newLoginRightSection">
+                    <div className="newLoginRightSecTitle">Login</div>
+                    <div className="newLoginRightSecSelectLogin">
+
+                        <div className="loginBtn"><span>Continue with Company login</span></div>
+
+                    </div>
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <div class="formgroup">
+                            <label class="form-label">Email</label>
+                            <input class="form-control form-control-lg"
+                              type="email"
+                              name="email"
+                              placeholder="Email"
+                              autoComplete="off"
+                              onKeyDown={handleEmailChange}
+                              readOnly={otpSent}
+                              {...register("username", {
+                                required: "Email is Required.",
+                                pattern: {
+                                value: /^\S[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                message: "Email is not valid.",
+                                },
+                                })}
+                              />
+                              {errors.username && (
+                              <p className="errorMsg" style={{ marginLeft: "20px" }}>
+                                {errors.username.message}
+                              </p>
+                              )}
+                        </div>
+                        {!otpSent && ( 
+                          <> 
+                          <div class="formgroup">
+                            <label class="form-label">Password</label>
+                            <input class="form-control form-control-lg" 
+                              name="password"
+                              placeholder="Password"
+                              onChange={handleEmailChange}
+                              type={passwordShown ? "text" : "password"}
+                              {...register("password", {
+                                  required: "Password is Required",
+                                  minLength: {
+                                  value: 6,
+                                  message: "Password must be at least 6 characters long",
+                              },
+                              validate:validatePassword,  
+                              })}
+                            />
+                            {errors.password && (
+                              <p className="errorMsg" style={{ marginLeft: "20px" }}>
+                                {errors.password.message}
+                              </p>
+                            )}
+                            <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                            <small>
+                                <a href="/forgotPassword">Forgot password?</a>
+                            </small>
+                        </div>
+                       
+                        <div>
+                            <div class="form-check align-items-center">
+                                <input id='customControlInline' type="checkbox" class="form-check-input" value="remember-me" name="remember-me"  />
+                                <label class="form-check-label text-small" for="customControlInline">Remember me</label>
+                            </div>
+                        </div>
+                        </>
+                       )}
+                      {otpSent && !otpExpired && (   
+                        <div class="formgroup">
+                            <label class="form-label">OTP</label>
+                            <input class="form-control form-control-lg" 
+                             type="text"
+                             name="otp"
+                             id="otp"
+                             placeholder="Enter Your OTP"
+                             autoComplete="off"
+                             {...register("otp", {
+                               required: "OTP is Required.",
+                               pattern: {
+                                 value: /^\d{6}$/,
+                                 message: "OTP must be 6 digits.",
+                               },
+                             })}
+                            />
+                             {errors.otp && (
+                                <p className="errorMsg">{errors.otp.message}</p>
+                              )}
+                        </div>
+                        )}
+                        <div class="d-grid gap-2 mt-3">
+                            <button class="btn btn-lg btn-primary" type="submit">Sign in</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+</main >
+      
       <Modal
         show={showErrorModal}
         onHide={closeModal}

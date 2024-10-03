@@ -41,6 +41,7 @@ export const AuthProvider = ({ children }) => {
   const setAuthUser = (userData) => {
     setUser(userData);
   };
+  
   useEffect(() => {
     if (!user.userId) return;
 

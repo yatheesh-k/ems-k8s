@@ -357,6 +357,44 @@ const EmployeeRegistration = () => {
     return `${year}-${month}-${day}`;
   };
 
+
+  const validateDate = (value) => {
+    const selectedDate = new Date(value);
+    if (selectedDate > new Date(threeMonthsFromNow)) {
+        return "Date of Hiring cannot be more than 3 months from today.";
+    }
+    return true; // Return true if no errors
+};
+
+
+
+// Custom validation function for date of birth based on date of hiring
+const validateDateOfBirth = (value, dateOfHiring) => {
+  const selectedDateOfBirth = new Date(value);
+  const selectedDateOfHiring = new Date(dateOfHiring); // Ensure this is a Date object
+
+  // Calculate limits
+  const minDateOfBirth = new Date(selectedDateOfHiring);
+  minDateOfBirth.setFullYear(selectedDateOfHiring.getFullYear() - 21); // 21 years ago from date of hiring
+
+  const maxDateOfBirth = new Date(selectedDateOfHiring);
+  maxDateOfBirth.setFullYear(selectedDateOfHiring.getFullYear() - 80); // 80 years ago from date of hiring
+
+  // Validate against the limits
+  if (selectedDateOfBirth > minDateOfBirth) {
+      return "Date of Birth must be at least 21 years before the Date of Hiring.";
+  }
+  if (selectedDateOfBirth < maxDateOfBirth) {
+      return "Date of Birth must not exceed 80 years before the Date of Hiring.";
+  }
+
+  return true; // Return true if no errors
+};
+
+
+// In your component
+const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
+
   return (
     <LayOut>
       <div className="container-fluid p-0">

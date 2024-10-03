@@ -6,6 +6,7 @@ const SideNav = () => {
   const [isPayrollOpen, setIsPayrollOpen] = useState(false); // State for managing PayRoll dropdown
   const [isAttendanceOpen, setIsAttendanceOpen] = useState(false); // State for managing Attendance dropdown
   const [isCompanyOpen, setIsCompanyOpen] = useState(false); // State for managing Company dropdown
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const location = useLocation();
   const { user = {}, logoFileName, loading } = useAuth();
 
@@ -22,7 +23,55 @@ const SideNav = () => {
 
   useEffect(() => {
     if (
-      location.pathname === "/companySalaryStructure" ||
+      location.pathname === "/employeeSalaryStructure" ||
+      location.pathname === "/employeeSalaryList" ||
+      location.pathname === "/payslipGeneration" ||
+      location.pathname === "/payslipsList" ||
+      location.pathname === "/increment" ||
+      location.pathname === "/incrementList"
+    ) {
+      setIsPayrollOpen(true);
+    } else {
+      setIsPayrollOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
+      location.pathname === "/addAttendance" ||
+      location.pathname === "/attendanceList" ||
+      location.pathname === "/attendanceReport"
+    ) {
+      setIsAttendanceOpen(true);
+    } else {
+      setIsAttendanceOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
+      location.pathname === "/companySalaryView" ||
+      location.pathname === "/companySalaryStructure"
+    ) {
+      setIsSettingsOpen(true);
+    } else {
+      setIsSettingsOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
+      location.pathname === "/companyRegistration" ||
+      location.pathname.startsWith("/companyView")
+    ) {
+      setIsCompanyOpen(true);
+    } else {
+      setIsCompanyOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
       location.pathname === "/employeeSalaryStructure" ||
       location.pathname === "/employeeSalaryList" ||
       location.pathname === "/payslipGeneration" ||
@@ -61,7 +110,6 @@ const SideNav = () => {
 
   useEffect(() => {
     if (
-      location.pathname === "/companySalaryStructure" ||
       location.pathname === "/employeeSalaryStructure" ||
       location.pathname === "/employeeSalaryList" ||
       location.pathname === "/payslipGeneration" ||
@@ -100,46 +148,6 @@ const SideNav = () => {
 
   useEffect(() => {
     if (
-      location.pathname === "/companySalaryStructure" ||
-      location.pathname === "/employeeSalaryStructure" ||
-      location.pathname === "/employeeSalaryList" ||
-      location.pathname === "/payslipGeneration" ||
-      location.pathname === "/payslipsList" ||
-      location.pathname === "/increment" ||
-      location.pathname === "/incrementList"
-    ) {
-      setIsPayrollOpen(true);
-    } else {
-      setIsPayrollOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/addAttendance" ||
-      location.pathname === "/attendanceList" ||
-      location.pathname === "/attendanceReport"
-    ) {
-      setIsAttendanceOpen(true);
-    } else {
-      setIsAttendanceOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/companyRegistration" ||
-      location.pathname.startsWith("/companyView")
-    ) {
-      setIsCompanyOpen(true);
-    } else {
-      setIsCompanyOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/companySalaryStructure" ||
       location.pathname === "/employeeSalaryStructure" ||
       location.pathname === "/employeeSalaryList" ||
       location.pathname === "/payslipGeneration" ||
@@ -186,6 +194,14 @@ const SideNav = () => {
     setIsPayrollOpen(false);
   };
 
+  const toggleSettings = (e) => {
+    e.preventDefault(); // Prevent default anchor behavior
+    setIsSettingsOpen(!isSettingsOpen);
+    setIsCompanyOpen(false);
+    setIsAttendanceOpen(false);
+    setIsPayrollOpen(false);
+  }; 
+
 
   // if (!isInitialized) {
   //   return <div>Loading context...</div>; // Show a loading message or spinner until context is initialized
@@ -202,7 +218,7 @@ const SideNav = () => {
               className="align-middle"
               src=""
               alt="Loading Logo"
-              style={{ height: "80px", width: "180px", color: "black" }}
+              style={{ height: "55px", width: "160px", color: "black" }}
             />
           ) : (
             <span>
@@ -211,15 +227,15 @@ const SideNav = () => {
                   className="align-middle"
                   src='assets/img/pathbreaker_logo.png'
                   alt="EMS Admin Logo"
-                  style={{ height: "80px", width: "180px" }}
+                  style={{ height: "55px", width: "160px" }}
                 />
               ) : (
                 logoFileName && (
                   <img
-                    className="align-middle"
+                    className="align-middle text-center"
                     src={`${logoFileName}`}
                     alt="Company Logo"
-                    style={{ height: "80px", width: "180px" }}
+                    style={{ height: "55px", width: "160px" }}
                   />
                 )
               )}
@@ -236,9 +252,9 @@ const SideNav = () => {
                 <a className="sidebar-link" href={"/main"}>
                   <i
                     className="bi bi-grid-1x2-fill"
-                    style={{ fontSize: "large" }}
+                    
                   ></i>
-                  <span className="align-middle" style={{ fontSize: "large" }}>
+                  <span className="align-middle">
                     Dashboard
                   </span>
                 </a>
@@ -252,9 +268,9 @@ const SideNav = () => {
                   data-bs-toggle="collapse"
                 >
                   <span className="align-middle">
-                    <i className="bi bi-building" style={{ fontSize: "large" }}></i>
+                    <i className="bi bi-building" ></i>
                   </span>{" "}
-                  <span className="align-middle" style={{ fontSize: "medium" }}>
+                  <span className="align-middle">
                     Employer
                   </span>
                   <i
@@ -303,9 +319,9 @@ const SideNav = () => {
                 <a className="sidebar-link" href={"/main"}>
                   <i
                     className="bi bi-grid-1x2-fill"
-                    style={{ fontSize: "large" }}
+                    
                   ></i>
-                  <span className="align-middle" style={{ fontSize: "large" }}>
+                  <span className="align-middle" >
                     Dashboard
                   </span>
                 </a>
@@ -317,9 +333,9 @@ const SideNav = () => {
                 <a className="sidebar-link" href={"/department"}>
                   <i
                     className="bi bi-diagram-3-fill"
-                    style={{ fontSize: "large" }}
+                    
                   ></i>
-                  <span className="align-middle" style={{ fontSize: "large" }}>
+                  <span className="align-middle" >
                     Department
                   </span>
                 </a>
@@ -331,9 +347,9 @@ const SideNav = () => {
                 <a className="sidebar-link" href={"/designation"}>
                   <i
                     className="bi bi-file-earmark-medical-fill"
-                    style={{ fontSize: "large" }}
+                    
                   ></i>
-                  <span className="align-middle" style={{ fontSize: "large" }}>
+                  <span className="align-middle" >
                     Designation
                   </span>
                 </a>
@@ -345,24 +361,10 @@ const SideNav = () => {
                 <a className="sidebar-link" href={"/employeeview"}>
                   <i
                     className="bi bi-person-plus-fill"
-                    style={{ fontSize: "large" }}
+                    
                   ></i>
-                  <span className="align-middle" style={{ fontSize: "large" }}>
+                  <span className="align-middle" >
                     Employees
-                  </span>
-                </a>
-              </li>
-              <li
-                className={`sidebar-item ${location.pathname.startsWith("/companySalaryView") ? "active" : ""
-                  }`}
-              >
-                <a className="sidebar-link" href={"/companySalaryView"}>
-                  <i
-                    className="bi bi-file-earmark-text-fill"
-                    style={{ fontSize: "large" }}
-                  ></i>
-                  <span className="align-middle" style={{ fontSize: "large" }}>
-                    Salary Structure
                   </span>
                 </a>
               </li>
@@ -373,11 +375,11 @@ const SideNav = () => {
                           >
                             <Link className="sidebar-link" to={"/payslipview"}>
                               <Receipt color="orange" size={25} />{" "}
-                              <i className="bi bi-file-earmark-medical-fill" style={{ fontSize: "large" }}></i>
+                              <i className="bi bi-file-earmark-medical-fill" ></i>
           
                               <span
                                 className="align-middle"
-                                style={{ fontSize: "large" }}
+                                
                               >
                                 PaySlips
                               </span>
@@ -391,9 +393,9 @@ const SideNav = () => {
                 <Link className="sidebar-link" to={"/existingList"}>
                   <i
                     className="bi bi-person-x-fill"
-                    style={{ fontSize: "large" }}
+                    
                   ></i>
-                  <span className="align-middle" style={{ fontSize: "large" }}>
+                  <span className="align-middle" >
                     Exit Process
                   </span>
                 </Link>
@@ -404,10 +406,10 @@ const SideNav = () => {
                             }`}
                           >
                             <Link className="sidebar-link" to={"/usersView"}>
-                              <i className="bi bi-person-circle" style={{ fontSize: "large" }}></i>
+                              <i className="bi bi-person-circle" ></i>
                               <span
                                 className="align-middle"
-                                style={{ fontSize: "large" }}
+                                
                               >
                                 Users Summary
                               </span>
@@ -427,7 +429,7 @@ const SideNav = () => {
                       style={{ fontSize: "medium" }}
                     ></i>
                   </span>{" "}
-                  <span className="align-middle" style={{ fontSize: "large" }}>
+                  <span className="align-middle" >
                     Attendance
                   </span>
                   <i
@@ -481,10 +483,10 @@ const SideNav = () => {
                   <span className="align-middle">
                     <i
                       className="bi bi-receipt-cutoff"
-                      style={{ fontSize: "large" }}
+                      
                     ></i>
                   </span>{" "}
-                  <span className="align-middle" style={{ fontSize: "large" }}>
+                  <span className="align-middle" >
                     Payroll
                   </span>
                   <i
@@ -533,7 +535,7 @@ const SideNav = () => {
                       Payslips
                     </a>
                   </li>
-
+            
                   {/* <li
                     style={{ paddingLeft: "40px" }}
                     className={`sidebar-item ${
@@ -578,6 +580,44 @@ const SideNav = () => {
                   </li> */}
                 </ul>
               </li>
+              <li className="sidebar-item has-dropdown">
+                <a
+                  className="sidebar-link collapsed d-flex justify-content-between align-items-center"
+                  data-bs-target="#settingsManagement"
+                  data-bs-toggle="collapse"
+                  href
+                  onClick={toggleSettings}
+                >
+                  <span className="align-middle">
+                    <i
+                      className="bi bi-gear-fill"
+                      style={{ fontSize: "medium" }}
+                    ></i>
+                  </span>{" "}
+                  <span className="align-middle" >
+                    Settings
+                  </span>
+                  <i
+                    className={`bi ${isSettingsOpen ? "bi-chevron-up" : "bi-chevron-down"
+                      } ms-auto`}
+                  ></i>
+                </a>
+                <ul
+                  id="settingsManagement"
+                  className={`sidebar-dropDown list-unstyled collapse ${isSettingsOpen ? "show" : ""
+                    }`}
+                >
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${location.pathname === "/companySalaryView" ? "active" : ""
+                      }`}
+                  >
+                    <a className="sidebar-link" href={"/companySalaryView"}>
+                      Company Salary Structure
+                    </a>
+                  </li>
+                </ul>
+              </li>
             </>
           )}
 
@@ -591,7 +631,7 @@ const SideNav = () => {
               >
                 <Link className="sidebar-link" to={"/main"}>
                   <Speedometer2 color="orange" size={25} />{" "}
-                  <span className="align-middle" style={{ fontSize: "large" }}>
+                  <span className="align-middle" >
                     Dashboard
                   </span>
                 </Link>
@@ -603,7 +643,7 @@ const SideNav = () => {
               >
                 <Link className="sidebar-link" to={"/department"}>
                   <Diagram3Fill color="orange" size={25} />{" "}
-                  <span className="align-middle" style={{ fontSize: "large" }}>
+                  <span className="align-middle" >
                     Departments
                   </span>
                 </Link>
@@ -615,7 +655,7 @@ const SideNav = () => {
               >
                 <Link className="sidebar-link" to={"/designation"}>
                   <FileMedicalFill color="orange" size={25} />{" "}
-                  <span className="align-middle" style={{ fontSize: "large" }}>
+                  <span className="align-middle" >
                     Designation
                   </span>
                 </Link>
@@ -627,7 +667,7 @@ const SideNav = () => {
               >
                 <Link className="sidebar-link" to={"/employeeview"}>
                   <PersonVcardFill color="orange" size={25} />{" "}
-                  <span className="align-middle" style={{ fontSize: "large" }}>
+                  <span className="align-middle" >
                     Employees
                   </span>
                 </Link>
@@ -639,7 +679,7 @@ const SideNav = () => {
               >
                 <Link className="sidebar-link" to={"/payslipview"}>
                   <Receipt color="orange" size={25} />{" "}
-                  <span className="align-middle" style={{ fontSize: "large" }}>
+                  <span className="align-middle" >
                     PaySlips
                   </span>
                 </Link>
@@ -651,7 +691,7 @@ const SideNav = () => {
               >
                 <Link className="sidebar-link" to={"/relievingview"}>
                   <EraserFill color="orange" size={25} />{" "}
-                  <span className="align-middle" style={{ fontSize: "large" }}>
+                  <span className="align-middle" >
                     Relieved Summary
                   </span>
                 </Link>
@@ -667,9 +707,9 @@ const SideNav = () => {
                 <a className="sidebar-link" href={"/main"}>
                   <i
                     className="bi bi-grid-1x2-fill"
-                    style={{ fontSize: "large" }}
+                    
                   ></i>
-                  <span className="align-middle" style={{ fontSize: "large" }}>
+                  <span className="align-middle" >
                     Dashboard
                   </span>
                 </a>
@@ -680,9 +720,9 @@ const SideNav = () => {
                 <a className="sidebar-link" href={"/employeeSalary"}>
                   <i
                     className="bi bi-card-list"
-                    style={{ fontSize: "large" }}
+                    
                   ></i>
-                  <span className="align-middle" style={{ fontSize: "large" }}>
+                  <span className="align-middle" >
                     Salary List
                   </span>
                 </a>
@@ -693,9 +733,9 @@ const SideNav = () => {
                 <a className="sidebar-link" href={"/employeePayslip"}>
                   <i
                     className="bi bi-file-earmark-medical-fill"
-                    style={{ fontSize: "large" }}
+                    
                   ></i>
-                  <span className="align-middle" style={{ fontSize: "large" }}>
+                  <span className="align-middle" >
                     Payslips
                   </span>
                 </a>

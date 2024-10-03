@@ -266,7 +266,7 @@ function Profile() {
                         src={`${logoFileName}`}
                         accept=".png, .jpg. ,svg ,.jpeg, .pdf"
                         alt="Company Logo"
-                        style={{ height: "80px", width: "180px" }}
+                        style={{ height: "55px", width: "160px" }}
                       />
                     )}
                   </div>

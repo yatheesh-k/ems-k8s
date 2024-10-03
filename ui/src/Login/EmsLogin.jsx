@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { Envelope, Lock, Unlock } from "react-bootstrap-icons";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { loginApi } from "../Utils/Axios";
-import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../Context/AuthContext";
+import Loader from "../Utils/Loader";
 
 const EmsLogin = () => {
   const {
@@ -17,6 +16,7 @@ const EmsLogin = () => {
   const { setAuthUser } = useAuth();
   const navigate = useNavigate();
   const [passwordShown, setPasswordShown] = useState(false);
+  const [loading, setLoading] = useState(false);  
   const [showErrorModal, setShowErrorModal] = useState(false); // State for error modal
   const [errorMessage, setErrorMessage] = useState(""); // State to hold error message
 
@@ -32,9 +32,13 @@ const EmsLogin = () => {
   };
 
   const onSubmit = async (data) => {
+    setLoading(true); // Set loading to true when the request starts
+   
+
     try {
       const response = await loginApi(data);
       const token = response.data?.token;
+
       if (token) {
         try {
           const decodedToken = jwtDecode(token);
@@ -43,17 +47,14 @@ const EmsLogin = () => {
           toast.success("Login Successful");
           navigate("/main");
         } catch (decodeError) {
-          console.error("Token decoding failed:", decodeError);
           setErrorMessage("Failed to decode token. Ensure token is valid.");
           setShowErrorModal(true);
         }
       } else {
-        console.error('Token not found in response');
         setErrorMessage("Unexpected response format. Token not found.");
         setShowErrorModal(true);
       }
     } catch (error) {
-      console.log("Error response data:", error); 
       if (error) {
         const errorMessage = error;
         setErrorMessage(errorMessage);
@@ -62,9 +63,11 @@ const EmsLogin = () => {
         setErrorMessage("Login failed. Please try again later.");
         setShowErrorModal(true);
       }
-      
+    } finally {
+      setLoading(false); // Set loading to false after the request is completed
     }
   };
+
   
 
   const closeModal = () => {
@@ -97,112 +100,146 @@ const EmsLogin = () => {
   };
 
   return (
-    <div>
-      <div className="form_wrapper">
-        <div className="form_container">
-          <div className="title_container">
-            <h2>Login</h2>
+    <main className="newLoginMainWrapper">
+       {loading &&(<Loader/>)}
+  <div className="newLoginWrapper">
+      <div className="newLoginContainer">
+          <div className="newLoginLeftSectionOuter">
+              <div className="newLoginLeftTitle">Welcome to <br/> Employee Management System</div>
+              <div className="newLoginLeftImgHolder"><img src="..\assets\img\left-img.png" alt='#' /></div>
           </div>
-          <div className="row clearfix">
-            <div className>
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="input_field">
-                  <span className="icon" style={{ marginTop: "4px" }}>
-                    <Envelope size={18} />
-                  </span>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    autoComplete="off"
-                    onKeyDown={handleEmailChange}
-                    {...register("username", {
-                      required: "Email is Required.",
-                      pattern: {
-                        value: /^\S[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                        message: "Email is not valid.",
-                      },
-                    })}
-                  />
-                  {errors.username && (
-                    <p className="errorMsg" style={{ marginLeft: "35px" }}>
-                      {errors.username.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="input_field">
-                  <input
-                    name="password"
-                    placeholder="Password"
-                    onChange={handleEmailChange}
-                    type={passwordShown ? "text" : "password"}
-                    {...register("password", {
-                      required: "Password is Required",
-                      minLength: {
-                        value: 6,
-                        message: "Password must be at least 6 characters long",
-                      },
-                      maxLength: {
-                        value: 16,
-
-                        message: "Password must not Exceed 16 characters long",
-                      },
-                      validate:validatePassword,
-                    })}
-                  />
-                  {errors.password && (
-                    <p className="errorMsg" style={{ marginLeft: "35px" }}>
-                      {errors.password.message}
-                    </p>
-                  )}
-                  <span
-                    onClick={togglePasswordVisibility}
-                    style={{ marginTop: "3px" }}
-                  >
-                    {passwordShown ? <Unlock size={20} /> : <Lock size={20} />}
-                  </span>
-                </div>
-
-                <button className="button" type="submit">
-                  Login
-                </button>
-              </form>
-            </div>
-          </div>
-          <div className="row">
-                  {/* <div className="d-flex justify-content-center mt-1">
-                    <a href="/" className="me-1">
-                      <Facebook size={16} />
-                    </a>
-                    <a href="/" className="me-1">
-                      <Linkedin size={16} />
-                    </a>
-                    <a href="/" className="me-1" style={{ color: "#34A853" }}>
-                      <Google size={16} />
-                    </a>
-                    <a href="/" className="me-1" style={{ color: "#E1306C" }}>
-                      <Instagram size={16} />
-                    </a>
-                  </div> */}
-                  <div>
-                    <span style={{fontSize:"0.8em"}}>
-                      Copyrights &copy;2024 PATHBREAKER TECHNOLOGIES PVT.LTD. All
-                      Rights Reserved{" "}
-                    </span>
+          <div className='newLoginRightSectionOuter'>
+              <div className="newLoginRightSection">
+                  <div className="newLoginRightSecTitle">Login</div>
+                  <div className="newLoginRightSecSelectLogin">
+                      <div className="loginBtn"><span>Continue with Ems Admin login</span></div>
                   </div>
-                </div>
-        </div>
-      </div>
+                  <form onSubmit={handleSubmit(onSubmit)}>
+                      <div class="formgroup">
+                          <label class="form-label">Email</label>
+                          <input class="form-control form-control-lg"
+                            type="email"
+                            name="email"
+                            placeholder="Email"
+                            autoComplete="off"
+                            onKeyDown={handleEmailChange}
+                            {...register("username", {
+                              required: "Email is Required.",
+                              pattern: {
+                              value: /^\S[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                              message: "Email is not valid.",
+                              },
+                              })}
+                            />
+                            {errors.username && (
+                            <p className="errorMsg" style={{ marginLeft: "20px" }}>
+                              {errors.username.message}
+                            </p>
+                            )}
+                      </div>
+                      <div class="formgroup">
+                          <label class="form-label">Password</label>
+                          <input class="form-control form-control-lg" 
+                            name="password"
+                            placeholder="Password"
+                            onChange={handleEmailChange}
+                            type={passwordShown ? "text" : "password"}
+                            {...register("password", {
+                                required: "Password is Required",
+                                minLength: {
+                                value: 6,
+                                message: "Password must be at least 6 characters long",
+                            },
+                            validate:validatePassword,
+                            })}
+                          />
+                          {errors.password && (
+                            <p className="errorMsg" style={{ marginLeft: "20px" }}>
+                              {errors.password.message}
+                            </p>
+                          )}
+                          <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                          {/* <small>
+                              <a href="javascript:void(0);">Forgot password?</a>
+                          </small> */}
+                      </div>
+                      <div>
+                          <div class="form-check align-items-center">
+                              <input id='customControlInline' type="checkbox" class="form-check-input" value="remember-me" name="remember-me"  />
+                              <label class="form-check-label text-small" for="customControlInline">Remember me</label>
+                          </div>
+                      </div>
+                      <div class="d-grid gap-2 mt-3">
+                          <button class="btn btn-lg btn-primary" type="submit">Sign in</button>
+                      </div>
+                  </form>
+              </div>
 
-      {/* Error Modal */}
-      <Modal show={showErrorModal} onHide={closeModal} centered style={{ zIndex: "1050" }} className="custom-modal" >
-        <ModalHeader closeButton>
-          <ModalTitle>Error</ModalTitle>
-        </ModalHeader>
-        <ModalBody>{errorMessage}</ModalBody>
-      </Modal>
-    </div>
+          </div>
+      </div>
+  </div>
+  {/* <div className="container flex-column" style={{ background: 'red', display:'none' }}>
+      <div className="row vh-100">
+          <div className="col-sm-10 col-md-7 col-lg-6 mx-auto d-table h-100">
+              <div className="d-table-cell align-middle">
+                  <div className="text-center mt-2">
+                      <img src="assets/img/person-1.svg" alt="person" style={{ width: '800px', height: '300px', marginBottom: "40px" }} />
+                      <h1 className="lead" style={{ fontSize: "3rem", fontFamily: "Arial, sans-serif", fontWeight: 'bold', color: '#333', display: 'inline-block', whiteSpace: 'nowrap' }}>Welcome To Employee Management System </h1>
+                      <h3 style={{ fontFamily: "sans-serif", color: '#555' }}>Enter The Path According To Your Company...</h3>
+                  </div>
+                  <div className='row' style={{ marginTop: "20px" }}>
+                      <div className='col-12 col-md-6 col-lg-5 mb-3' style={{ paddingLeft: "200px" }}>
+                          <Link to={'/emsAdmin/login'}>
+                              <button className="btn btn-primary btn-lg" >EMS Login</button>
+                          </Link>
+                      </div>
+                      <div className='col-lg-1'></div>
+                      <div className='col-12 col-md-6 col-lg-5 mb-3' style={{ paddingLeft: "190px" }} >
+                          <button className="btn btn-primary btn-lg" onClick={openModal}>Company Login</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div> */}
+  {/* {showModal && (
+      <div className="modal" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)', position: 'fixed', top: 0, bottom: 0, left: 0, right: 0, zIndex: 9999 }}>
+          <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content">
+                  <div className="modal-header">
+                      <ModalTitle className="modal-title">Company Service Name</ModalTitle>
+                  </div>
+                  <div className="modal-body">
+                      <form onSubmit={handleSubmit(onSubmit)}>
+                          <input
+                              type="text"
+                              name="companyName"
+                              className="form-control"
+                              placeholder="Enter Company Service Name"
+                              onInput={toInputLowerCase}
+                              onKeyDown={handleEmailChange}
+                              {...register("companyName", {
+                                  required: "Company Service Name is Required",
+                                  pattern: {
+                                      value: /^[a-z]+$/,
+                                      message: "This field accepts only lowercase alphabetic characters without spaces",
+                                  },
+                              })}
+                          />
+                          {errors.companyName && (
+                              <p className='errorMsg'>{errors.companyName.message}</p>
+                          )}
+                          <div className="modal-footer">
+                              <button type="submit" className="btn btn-primary">Submit</button>
+                              <button type="button" className="btn btn-secondary" onClick={closeModal}>Close</button>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </div >
+  )} */}
+</main >
   );
 };
 

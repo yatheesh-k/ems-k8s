@@ -26,17 +26,15 @@ import HikeLetter from '../EmployeeModule/HikeLetter';
 import ExistingLetter from '../EmployeeModule/ExistingLetter';
 import CompanySalaryStructure from '../CompanyModule/PayRoll/CompanySalaryStructure';
 import EmployeeSalaryList from '../CompanyModule/PayRoll/EmployeeSalaryList';
-import Message from '../LayOut/Message';
 import Profile from '../LayOut/Profile';
+import Message from '../LayOut/Message';
 import PaySlipDoc from '../Login/PayslipDoc';
 import EmployeeSalaryById from '../EmployeeModule/EmployeeSalaryById';
 import Reset from '../LayOut/Reset';
-
 import ForgotPassword from '../Login/ForgotPassword'
 import EmployeeProfile from '../EmployeeModule/EmployeeProfile';
 import EmployeeSalaryUpdate from '../CompanyModule/PayRoll/EmployeeSalaryUpdate';
 import CompanySalaryView from '../CompanyModule/PayRoll/CompanySalaryView';
-
 
 const Rout = () => {
   const location = useLocation();
@@ -100,8 +98,8 @@ const Rout = () => {
 
   return (
     <Routes>
-      <Route path='/' element={<Message />}></Route>
-      <Route path='/emsAdmin/login' element={<EmsLogin />}></Route>
+      <Route path='/' element={<Message/>}></Route>
+      <Route path='/login' element={<EmsLogin />}></Route>
       <Route path='/:company/login' element={<CompanyLogin />}></Route>
       <Route path='/resetPassword' element={<Reset/>}></Route>
       <Route path='/profile' element={<Profile/>}></Route>
