@@ -1,6 +1,8 @@
 package com.pb.employee.util;
 
 
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriBuilder;
 
@@ -70,5 +72,6 @@ public class Constants {
     public static final String FORGOT_PASSWORD ="/forgot/password" ;
     public static final String UPDATE_PASSWORD ="/update/password" ;
     public static final String SALARY_STRUCTURE ="salary_structure" ;
-
+    public static final String NEW ="new" ;
+    public static final String OLD = "old";
 }

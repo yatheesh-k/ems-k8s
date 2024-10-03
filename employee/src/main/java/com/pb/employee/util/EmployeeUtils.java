@@ -93,98 +93,6 @@ public class EmployeeUtils {
         employeeEntity.setPanNo(pan);
         return employeeEntity;
     }
-    public static SalaryEntity unMaskEmployeeSalaryProperties(SalaryEntity salaryEntity) {
-
-        String var = null, fix = null, bas = null, gross = null;
-        String hra = null, trav = null, pfc = null, other = null,spa=null;
-        String te= null, pfE = null, pfEmployer =null, lop = null, tax = null, itax = null, ttax = null, tded = null, net = null;
-        if(salaryEntity.getFixedAmount() != null) {
-            fix = new String((Base64.getDecoder().decode(salaryEntity.getFixedAmount().toString().getBytes())));
-        }
-        if(salaryEntity.getVariableAmount() != null) {
-            var = new String(Base64.getDecoder().decode(salaryEntity.getVariableAmount().toString().getBytes()));
-        }
-        if(salaryEntity.getGrossAmount() != null) {
-            gross = new String((Base64.getDecoder().decode(salaryEntity.getGrossAmount().toString().getBytes())));
-        }
-        if(salaryEntity.getBasicSalary() != null) {
-            bas = new String((Base64.getDecoder().decode(salaryEntity.getBasicSalary().toString().getBytes())));
-        }
-
-        if(salaryEntity.getAllowances().getTravelAllowance() != null) {
-            trav = new String((Base64.getDecoder().decode(salaryEntity.getAllowances().getTravelAllowance().toString().getBytes())));
-        }
-        if(salaryEntity.getAllowances().getHra() != null) {
-            hra =new String((Base64.getDecoder().decode(salaryEntity.getAllowances().getHra().toString().getBytes())));
-        }
-        if(salaryEntity.getAllowances().getOtherAllowances() != null) {
-            other = new String((Base64.getDecoder().decode(salaryEntity.getAllowances().getOtherAllowances().toString().getBytes())));
-        }
-        if(salaryEntity.getAllowances().getPfContributionEmployee() != null) {
-            pfc = new String((Base64.getDecoder().decode(salaryEntity.getAllowances().getPfContributionEmployee().toString().getBytes())));
-        }
-
-        if(salaryEntity.getAllowances().getSpecialAllowance() != null) {
-            spa = new String((Base64.getDecoder().decode(salaryEntity.getAllowances().getSpecialAllowance().toString().getBytes())));
-        }
-
-        if(salaryEntity.getTotalEarnings() != null) {
-            te = new String((Base64.getDecoder().decode(salaryEntity.getTotalEarnings().toString().getBytes())));
-        }
-
-        if(salaryEntity.getDeductions().getPfEmployee() != null) {
-            pfE = new String((Base64.getDecoder().decode(salaryEntity.getDeductions().getPfEmployee().toString().getBytes())));
-        }
-        if(salaryEntity.getDeductions().getPfEmployer() != null) {
-            pfEmployer = new String((Base64.getDecoder().decode(salaryEntity.getDeductions().getPfEmployer().toString().getBytes())));
-        }
-        if(salaryEntity.getDeductions().getLop() != null) {
-            lop = new String((Base64.getDecoder().decode(salaryEntity.getDeductions().getLop().toString().getBytes())));
-        }
-        if(salaryEntity.getDeductions().getTotalDeductions() != null) {
-            tded = new String((Base64.getDecoder().decode(salaryEntity.getDeductions().getTotalDeductions().toString().getBytes())));
-        }
-
-        if(salaryEntity.getDeductions().getPfTax() != null) {
-            tax = new String((Base64.getDecoder().decode(salaryEntity.getDeductions().getPfTax().toString().getBytes())));
-        }
-//        Double grossAmount = Double.parseDouble(gross);
-//        Double totalDeductions = Double.valueOf(tded);
-//        itax = String.valueOf(TaxCalculatorUtils.getNewTax( grossAmount-totalDeductions));
-
-        if (salaryEntity.getDeductions().getIncomeTax() != null){
-            itax = new String((Base64.getDecoder().decode(salaryEntity.getDeductions().getIncomeTax().toString().getBytes())));
-        }
-
-        if(salaryEntity.getDeductions().getTotalTax() != null) {
-            ttax = new String((Base64.getDecoder().decode(salaryEntity.getDeductions().getTotalTax().toString().getBytes())));
-        }
-
-        if(salaryEntity.getNetSalary() != null) {
-            net = new String((Base64.getDecoder().decode(salaryEntity.getNetSalary().toString().getBytes())));
-        }
-
-        salaryEntity.setFixedAmount(fix);
-        salaryEntity.setGrossAmount(gross);
-        salaryEntity.setVariableAmount(var);
-        salaryEntity.setBasicSalary(bas);
-        salaryEntity.getAllowances().setSpecialAllowance(spa);
-        salaryEntity.getAllowances().setOtherAllowances(other);
-        salaryEntity.getAllowances().setTravelAllowance(trav);
-        salaryEntity.getAllowances().setHra(hra);
-        salaryEntity.getAllowances().setPfContributionEmployee(pfc);
-        salaryEntity.setTotalEarnings(te);
-        salaryEntity.getDeductions().setPfEmployee(pfE);
-        salaryEntity.getDeductions().setPfEmployer(pfEmployer);
-        salaryEntity.getDeductions().setLop(lop);
-        salaryEntity.getDeductions().setPfTax(tax);
-        salaryEntity.getDeductions().setIncomeTax(itax);
-        salaryEntity.getDeductions().setTotalTax(ttax);
-        salaryEntity.getDeductions().setTotalDeductions(tded);
-        salaryEntity.setNetSalary(net);
-        salaryEntity.setType(Constants.SALARY);
-        return salaryEntity;
-    }
 
     public static Map<String, Object> duplicateValues(EmployeeRequest employeeRequest, List<EmployeeEntity> employees) throws EmployeeException {
         Map<String, Object> responseBody = new HashMap<>();
@@ -290,6 +198,9 @@ public class EmployeeUtils {
         if(salaryEntity.getNetSalary() != null) {
             net = new String((Base64.getDecoder().decode(salaryEntity.getNetSalary().toString().getBytes())));
             salaryEntity.setNetSalary(net);
+        } if(salaryEntity.getTotalTax() != null) {
+            ttax = new String((Base64.getDecoder().decode(salaryEntity.getTotalTax().toString().getBytes())));
+            salaryEntity.setTotalTax(ttax);
         }
         if (salaryEntity.getSalaryConfigurationEntity().getAllowances() != null) {
             Map<String, String> decodedAllowances = new HashMap<>();

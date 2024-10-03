@@ -23,18 +23,18 @@ public class SalaryConfigurationRequest {
 
     private Map<
             @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "{allowance.key.format}")
-            @Size(min = 2, max = 30, message = "{allowance.key.size}") String,
+            @Size(min = 2, max = 50, message = "{allowance.key.size}") String,
 
-            @Pattern(regexp = "^\\d+$", message = "{allowance.format}")
-            @Size(min = 1, max = 20, message = "{allowance.size}") String> allowances;
+            @Pattern(regexp = "^(\\d+|\\d+%)$", message = "{allowance.format}")
+            @Size(min = 1, max = 30, message = "{allowance.size}") String> allowances;
 
     // Deductions: Key must be 2 to 30 characters (letters and spaces only), value must be digits (1 to 30)
     private Map<
             @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "{deduction.key.format}")
-            @Size(min = 2, max = 30, message = "{deduction.key.size}") String,
+            @Size(min = 2, max = 50, message = "{deduction.key.size}") String,
 
-            @Pattern(regexp = "^\\d+$", message = "{deduction.format}")
-            @Size(min = 1, max = 20, message = "{deduction.size}") String> deductions;
+            @Pattern(regexp = "^(\\d+|\\d+%)$", message = "{deduction.format}")
+            @Size(min = 1, max = 30, message = "{deduction.size}") String> deductions;
 
     @Schema(example = "status")
     @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{status.format}")

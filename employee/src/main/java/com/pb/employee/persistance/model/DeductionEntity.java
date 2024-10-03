@@ -15,11 +15,5 @@ public class DeductionEntity implements Entity {
 
     private String pfEmployee;
     private String pfEmployer;
-    private String lop;
-    private String totalDeductions;
-
-    private String pfTax;
-    private String incomeTax;
-    private String totalTax;
 
 }

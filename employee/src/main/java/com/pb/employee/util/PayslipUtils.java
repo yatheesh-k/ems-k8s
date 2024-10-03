@@ -22,10 +22,10 @@ import java.util.Map;
 public class PayslipUtils {
 
     public static PayslipEntity unMaskEmployeePayslipProperties(EmployeeSalaryEntity salaryRequest, PayslipRequest payslipRequest, String id, String employeeId, AttendanceEntity attendanceEntity) {
-        Double var = null, fix = null, bas = null, gross = null;
+        Double var = null, fix = null, bas, gross = null;
         Double te = null, pfE = null, pfEmployer = null, lop = null, tax = null, itax = null, ttax = null, tded = null, net = null;
         int totalWorkingDays = 0, noOfWorkingDays=0;
-
+        double basic;
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -85,27 +85,26 @@ public class PayslipUtils {
 
         if(salaryRequest.getSalaryConfigurationEntity().getAllowances() != null) {
             Map<String, String> decodedAllowances = new HashMap<>();
-            double totalAllowances = 0.0;
 
             for (Map.Entry<String, String> entry : salaryRequest.getSalaryConfigurationEntity().getAllowances().entrySet()) {
                 String unmaskedValue = unMaskValue(entry.getValue());
-                double perMonthValue = Double.parseDouble(unmaskedValue)/12.0;
-                perMonthValue = Math.round(perMonthValue);
-                String entryValue = String.valueOf(perMonthValue);
-                decodedAllowances.put(entry.getKey(), entryValue);
+                String calculatedValue = persentageOrValue(unmaskedValue, gross);
+                decodedAllowances.put(entry.getKey(), calculatedValue);
 
                 // Sum the allowances
-                totalAllowances += perMonthValue;
             }
             salary.getSalaryConfigurationEntity().setAllowances(decodedAllowances);
 
-            bas = (gross/12)-totalAllowances;
-            salary.setBasicSalary(String.valueOf(Math.round(bas)));
-            // Calculate total earnings
-            if (bas != null) {
-                te = bas + totalAllowances; // bas + total allowances
-                salary.setTotalEarnings(String.valueOf(te)); // Set total earnings
-            }
+        }
+        if (salaryRequest.getTotalEarnings() != null){
+            byte[] decodedTax = Base64.getDecoder().decode(salaryRequest.getTotalEarnings());
+            te = Double.parseDouble(new String(decodedTax));
+            te = te/12.0;
+            salary.setTotalEarnings(String.valueOf(Math.round(te)));
+        }
+        if (salaryRequest.getBasicSalary() != null) {
+            basic = Double.parseDouble(new String(Base64.getDecoder().decode(salaryRequest.getBasicSalary()))) / 12.0;
+            salary.setBasicSalary(String.valueOf(basic));
         }
 
         double totalDeduction = 0.0;
@@ -113,11 +112,10 @@ public class PayslipUtils {
             Map<String, String> decodeDeductions = new HashMap<>();
             for (Map.Entry<String, String> entry : salaryRequest.getSalaryConfigurationEntity().getDeductions().entrySet()){
                 String unmaskValues = unMaskValue(entry.getValue());
-                double perMonthValue = Double.parseDouble(unmaskValues)/12.0;
-                String entryValue = String.valueOf(perMonthValue);
-                decodeDeductions.put(entry.getKey(), entryValue);
+                String calculatedValue = persentageOrValue(unmaskValues, gross);
+                decodeDeductions.put(entry.getKey(), calculatedValue);
 
-                totalDeduction += perMonthValue;
+                totalDeduction += Double.parseDouble(calculatedValue);
             }
             salary.getSalaryConfigurationEntity().setDeductions(decodeDeductions);
 
@@ -151,12 +149,28 @@ public class PayslipUtils {
         payslipEntity.setEmployeeId(employeeId);
         payslipEntity.setSalaryId(salaryRequest.getSalaryId());
 
-        payslipEntity.setSalary(salary);
+            payslipEntity.setSalary(salary);
         payslipEntity.setAttendance(attendance);
         payslipEntity.setType(Constants.PAYSLIP);
 
 
         return payslipEntity;
+    }
+    private static String persentageOrValue(String decodedString, double grossAmount) {
+        String result;
+        if (decodedString.endsWith("%")){
+            String percentageString = decodedString.replace("%", "");
+            double percentage = Double.parseDouble(percentageString)/100;
+            double monthlyValue = (percentage*grossAmount)/12;
+            monthlyValue = Math.round(monthlyValue);
+            result = String.valueOf(monthlyValue);
+
+            return result;
+        }else {
+            double monthlyValue = Double.parseDouble(decodedString)/12;
+            result = String.valueOf(Math.round(monthlyValue));
+            return result;
+        }
     }
 
     public static PayslipEntity maskEmployeePayslip(PayslipEntity payslipRequest, EmployeeSalaryEntity salaryRequest, AttendanceEntity attendance) {
