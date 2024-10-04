@@ -64,6 +64,8 @@ public enum EmployeeErrorMessageKey {
     INVALID_ATTENDANCE_DATA("invalid.attendance.data"),
     INVALID_YEAR("invalid.year"),
     NO_ATTENDANCE_FOUND("attendance.not.found"),
+    INVALID_TEMPLATE_NUMBER("template.number"),
+    ERROR_PROCESSING_TEMPLATE("template.error"),
     UNABLE_GET_SALARY_STRUCTURE("unable.get.salary.structure"),
     UNABLE_SAVE_COMPANY_SALARY("unable.save.company.salary"),
     COMPANY_SALARY_ALREADY_EXIST("company.salary.already.exist");

@@ -11,7 +11,10 @@ import com.pb.employee.request.EmployeeStatus;
 import com.pb.employee.request.PayslipRequest;
 import com.pb.employee.service.PayslipService;
 import com.pb.employee.util.*;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import jakarta.servlet.http.HttpServletRequest;
+import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.util.*;
 
 @Service
@@ -27,6 +31,9 @@ public class PayslipServiceImpl implements PayslipService {
 
     @Autowired
     private OpenSearchOperations openSearchOperations;
+
+    @Autowired
+    private Configuration freeMarkerConfig;
 
     @Override
     public ResponseEntity<?> generatePaySlip(PayslipRequest payslipRequest, String salaryId, String employeeId) throws EmployeeException, IOException {
@@ -300,6 +307,268 @@ public class PayslipServiceImpl implements PayslipService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.DELETED), HttpStatus.OK);
 
+    }
+
+    public ResponseEntity<byte[]> downloadPayslip(String companyName, String payslipId, String employeeId, int templateNumber, HttpServletRequest request) {
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+        EmployeeEntity employee;
+        PayslipEntity entity;
+        DepartmentEntity department;
+        DesignationEntity designation;
+        CompanyEntity company;
+
+        try {
+            SSLUtil.disableSSLVerification();
+            employee = openSearchOperations.getEmployeeById(employeeId, null, index);
+            if (employee == null) {
+                log.error("Employee with ID {} is not found", employeeId);
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            department = openSearchOperations.getDepartmentById(employee.getDepartment(), null, index);
+            designation = openSearchOperations.getDesignationById(employee.getDesignation(), null, index);
+            company = openSearchOperations.getCompanyById(employee.getCompanyId(), null, Constants.INDEX_EMS);
+            if (company == null) {
+                log.error("Company {} is not found", employee.getCompanyId());
+                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.COMPANY_ALREADY_EXISTS), companyName),
+                        HttpStatus.CONFLICT);
+            }
+            entity = openSearchOperations.getPayslipById(payslipId, null, index);
+            PayslipUtils.unmaskEmployeePayslip(entity);
+            Entity companyEntity = CompanyUtils.unmaskCompanyProperties(company, request);
+            Entity employeeEntity = EmployeeUtils.unmaskEmployeeProperties(employee, department, designation);
+
+            // Prepare FreeMarker model
+            Map<String, Object> model = new HashMap<>();
+            model.put(Constants.PAYSLIP_ENTITY, entity);
+            model.put(Constants.EMPLOYEE, employeeEntity);
+            model.put(Constants.COMPANY, companyEntity);
+
+            // Handle allowances dynamically
+            List<Map<String, Object>> allowanceList = new ArrayList<>();
+            handleAllowances(entity, allowanceList);
+            model.put(Constants.ALLOWANCE_LIST, allowanceList); // Add allowance list to the model
+
+            // Handle deductions dynamically
+            List<Map<String, Object>> deductionList = new ArrayList<>();
+            handleDeductions(entity, deductionList);
+            model.put(Constants.DEDUCTION_LIST, deductionList); // Add deduction list to the model
+
+            // Choose the template based on the template number
+            String templateName = switch (templateNumber) {
+                case 1 -> Constants.PAYSLIP_TEMPLATE_ONE;
+                case 2 -> Constants.PAYSLIP_TEMPLATE_TWO;
+                case 3 -> Constants.PAYSLIP_TEMPLATE_THREE;
+                case 4 -> Constants.PAYSLIP_TEMPLATE_FOUR;
+                default -> throw new IllegalArgumentException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_TEMPLATE_NUMBER));
+            };
+            System.out.println(model);
+
+            // Generate HTML from FreeMarker template
+            Template template = freeMarkerConfig.getTemplate(templateName);
+            StringWriter stringWriter = new StringWriter();
+            try {
+                template.process(model, stringWriter);
+            } catch (TemplateException e) {
+                throw new IOException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.ERROR_PROCESSING_TEMPLATE) + e.getMessage(), e);
+            }
+            String htmlContent = stringWriter.toString();
+
+            // Convert HTML to PDF
+            byte[] pdfBytes = generatePdfFromHtml(htmlContent);
+
+            // Set HTTP headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition.builder("attachment")
+                    .filename("payslip_" + employee.getFirstName() + ".pdf")
+                    .build());
+
+            // Return response
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+
+        } catch (IOException e) {
+            log.error("IO exception occurred while processing the payslip: {}", e.getMessage(), e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (EmployeeException e) {
+            log.error("Employee exception occurred: {}", e.getMessage());
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            log.error("Unexpected exception occurred: {}", e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void handleAllowances(PayslipEntity entity, List<Map<String, Object>> allowanceList) {
+        // Get the allowances from the entity
+        Map<String, String> allowancesObj = entity.getSalary().getSalaryConfigurationEntity().getAllowances();
+
+        // List to store allowances
+        List<Map<String, Object>> unorderedAllowances = new ArrayList<>();
+
+        if (allowancesObj != null && !allowancesObj.isEmpty()) {
+            // Iterate over the Map<String, String> to extract key-value pairs
+            for (Map.Entry<String, String> entry : allowancesObj.entrySet()) {
+                Map<String, Object> allowanceMap = new HashMap<>();
+                String formattedKey = formatFieldName(entry.getKey());  // Format the key
+                allowanceMap.put(formattedKey, entry.getValue());       // Put key-value into the map
+                unorderedAllowances.add(allowanceMap);                  // Add to unordered list
+            }
+        } else {
+            log.warn("No allowances found for payslip {}", entity.getPayslipId());
+        }
+
+        // Reorder allowances according to specified logic
+        reorderAllowances(allowanceList, unorderedAllowances);
+    }
+
+
+
+    private void reorderAllowances(List<Map<String, Object>> allowanceList, List<Map<String, Object>> unorderedAllowances) {
+        // Create a list to hold the ordered allowances
+        List<Map<String, Object>> orderedAllowances = new ArrayList<>();
+
+        // First, add the HRA if it exists
+        for (Map<String, Object> allowance : unorderedAllowances) {
+            if (allowance.containsKey(Constants.HRA)) {
+                orderedAllowances.add(allowance);
+                unorderedAllowances.remove(allowance); // Remove from unordered list
+                break; // Exit loop after adding HRA
+            }
+        }
+
+        // Add all other dynamic allowances
+        List<String> dynamicAllowanceKeys = new ArrayList<>();
+        for (Map<String, Object> allowance : unorderedAllowances) {
+            for (String key : allowance.keySet()) {
+                // Add to dynamic allowances if it is not HRA, PF Contribution Employee or Other Allowance
+                if (!key.equals(Constants.HRA) && !key.equals(Constants.PF_CONTRIBUTION_EMPLOYEE) && !key.equals(Constants.OTHER_ALLOWANCE)) {
+                    dynamicAllowanceKeys.add(key);
+                }
+            }
+        }
+
+        // Now add all dynamic allowances found
+        for (String key : dynamicAllowanceKeys) {
+            for (Map<String, Object> allowance : unorderedAllowances) {
+                if (allowance.containsKey(key)) {
+                    orderedAllowances.add(allowance);
+                    unorderedAllowances.remove(allowance); // Remove from unordered list
+                    break; // Exit loop after adding the key
+                }
+            }
+        }
+
+        // Add the PF Contribution Employee if it exists
+        for (Map<String, Object> allowance : unorderedAllowances) {
+            if (allowance.containsKey(Constants.PF_CONTRIBUTION_EMPLOYEE)) {
+                orderedAllowances.add(allowance);
+                unorderedAllowances.remove(allowance); // Remove from unordered list
+                break; // Exit loop after adding PF Contribution Employee
+            }
+        }
+
+        // Add Other Allowance last
+        for (Map<String, Object> allowance : unorderedAllowances) {
+            if (allowance.containsKey(Constants.OTHER_ALLOWANCE)) {
+                orderedAllowances.add(allowance);
+                unorderedAllowances.remove(allowance); // Remove from unordered list
+                break; // Exit loop after adding Other Allowance
+            }
+        }
+
+        // Add any remaining allowances (if any) that don't match above criteria
+        orderedAllowances.addAll(unorderedAllowances);
+
+        // Clear the original allowance list and add ordered allowances
+        allowanceList.clear();
+        allowanceList.addAll(orderedAllowances);
+    }
+
+    private void handleDeductions(PayslipEntity entity, List<Map<String, Object>> deductionList) {
+        // Get the deductions from the entity
+        Map<String, String> deductionsObj = entity.getSalary().getSalaryConfigurationEntity().getDeductions();
+
+        // Predefined keys using constants
+        String totalDeductionsKey = Constants.TOTAL_DEDUCTION;
+        List<String> keysAfterTotalDeductions = Arrays.asList(Constants.PF_TAX, Constants.INCOME_TAX, Constants.TOTAL_TAX);
+
+        // List to store unordered deductions
+        List<Map<String, Object>> unorderedDeductions = new ArrayList<>();
+
+        if (deductionsObj != null && !deductionsObj.isEmpty()) {
+            // Iterate over the Map<String, String> to extract key-value pairs
+            for (Map.Entry<String, String> entry : deductionsObj.entrySet()) {
+                Map<String, Object> deductionMap = new HashMap<>();
+                String formattedKey = formatFieldName(entry.getKey());  // Format the key
+                deductionMap.put(formattedKey, entry.getValue());       // Put key-value into the map
+                unorderedDeductions.add(deductionMap);                  // Add to unordered list
+            }
+        } else {
+            log.warn("No deductions found for payslip {}", entity.getPayslipId());
+        }
+
+        // Reorder deductions to ensure total deduction is first
+        unorderedDeductions.sort(Comparator.comparing(map -> map.containsKey(totalDeductionsKey) ? 0 : 1));
+
+        // Reorder after total deductions based on predefined keys
+        List<Map<String, Object>> orderedDeductions = new ArrayList<>();
+        for (String key : keysAfterTotalDeductions) {
+            for (Map<String, Object> deduction : unorderedDeductions) {
+                if (deduction.containsKey(key)) {
+                    orderedDeductions.add(deduction);
+                }
+            }
+        }
+
+        // Add remaining deductions (if any)
+        unorderedDeductions.removeAll(orderedDeductions);
+        orderedDeductions.addAll(unorderedDeductions); // Add back remaining unordered deductions at the end
+
+        // Update the original deduction list with the ordered one
+        deductionList.clear();
+        deductionList.addAll(orderedDeductions);
+    }
+
+
+    private String formatFieldName(String fieldName) {
+        // Special cases for specific fields
+        if (fieldName.equalsIgnoreCase(Constants.HRA_SMALL)) {
+            return Constants.HRA; // Capitalize HRA
+        } else if (fieldName.toLowerCase().startsWith(Constants.PF_SMALL)) {
+            // Capitalize PF and handle space correctly for cases like "pfEmployee"
+            return Constants.PF+ " " + fieldName.substring(2).replaceAll("([A-Z])", " $1").trim(); // Capitalize PF and adjust the rest
+        } else if (fieldName.equalsIgnoreCase(Constants.TOTAL_DEDUCTION_SMALL)) {
+            return Constants.TOTAL_DEDUCTION; // Special formatting for Total Deductions
+        } else if (fieldName.equalsIgnoreCase(Constants.TOTAL_TAX_SMALL)) {
+            return Constants.TOTAL_TAX; // Special formatting for Total Tax
+        }
+
+        // For other fields, convert camelCase to readable format
+        String[] parts = fieldName.split("(?=[A-Z])"); // Split at capital letters
+        StringBuilder formattedName = new StringBuilder();
+
+        for (String part : parts) {
+            formattedName.append(part.substring(0, 1).toUpperCase()) // Capitalize the first letter
+                    .append(part.substring(1).toLowerCase()) // Lowercase the rest
+                    .append(" "); // Add a space
+        }
+
+        return formattedName.toString().trim(); // Return the formatted name
+    }
+
+
+    private byte[] generatePdfFromHtml(String html) throws IOException {
+        html = html.replaceAll("&(?![a-zA-Z]{2,6};|#\\d{1,5};)", "&amp;");
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            ITextRenderer renderer = new ITextRenderer();
+            renderer.setDocumentFromString(html);
+            renderer.layout();
+            renderer.createPDF(baos);
+            return baos.toByteArray();
+        } catch (DocumentException e) {
+            throw new IOException(e.getMessage());
+        }
     }
 
 }

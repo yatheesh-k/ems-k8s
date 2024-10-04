@@ -47,6 +47,7 @@ public class Constants {
     public static final String DESIGNATION = "designation";
     public static final String NAME = "name";
     public static final String PAYSLIP = "payslip";
+    public static final String PAYSLIP_ENTITY = "payslipEntity";
     public static final String FILE = "file";
     public static final String MONTH = "month";
     public static final String YEAR = "year";
@@ -71,7 +72,25 @@ public class Constants {
     public static final String VALIDATE = "/validate";
     public static final String FORGOT_PASSWORD ="/forgot/password" ;
     public static final String UPDATE_PASSWORD ="/update/password" ;
+    public static final String PAYSLIP_TEMPLATE_ONE = "payslip1.ftl";
+    public static final String PAYSLIP_TEMPLATE_TWO = "payslip2.ftl";
+    public static final String PAYSLIP_TEMPLATE_THREE = "payslip3.ftl" ;
+    public static final String PAYSLIP_TEMPLATE_FOUR = "payslip4.ftl";
+    public static final String HRA = "HRA";
+    public static final String HRA_SMALL = "hra";
+    public static final String PF = "PF" ;
+    public static final String PF_SMALL = "pf" ;
+    public static final String TOTAL_DEDUCTION = "Total Deductions (B)" ;
+    public static final String TOTAL_DEDUCTION_SMALL = "totalDeductions" ;
+    public static final String TOTAL_TAX = "Total Tax (C)" ;
+    public static final String TOTAL_TAX_SMALL = "totalTax" ;
+    public static final String PF_TAX = "PF Tax";
+    public static final String INCOME_TAX = "Income Tax";
+    public static final String OTHER_ALLOWANCE = "Other Allowances";
+    public static final String PF_CONTRIBUTION_EMPLOYEE = "PF Contribution Employee";
     public static final String SALARY_STRUCTURE ="salary_structure" ;
     public static final String NEW ="new" ;
     public static final String OLD = "old";
+    public static final String ALLOWANCE_LIST = "allowanceList";
+    public static final String DEDUCTION_LIST = "deductionList";
 }
