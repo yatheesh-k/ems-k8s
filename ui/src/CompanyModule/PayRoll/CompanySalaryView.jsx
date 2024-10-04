@@ -95,7 +95,7 @@ const CompanySalaryView = () => {
                                         <div className='card-body'>
                                             <div className="row">
                                                 <div className="col-12 col-md-5 mb-3">
-                                                    <h5 className="card-title">Allowances</h5>
+                                                    <h5>Allowances</h5>
                                                     <hr />
                                                     {Object.keys(structure.allowances).length > 0 ? (
                                                         Object.keys(structure.allowances).map((allowance) => (

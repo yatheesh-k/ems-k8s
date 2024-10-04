@@ -17072,4 +17072,16 @@ nav.companyNavOuter .nav-tabs .nav-link.hover{
 .pull-right{float:right;}
 .mt15{margin-top:15px;}
 
+/* Custom tooltip styles */
+.tooltip {
+	background-color: #343a40; /* Dark gray background */
+	color: #ffffff; /* White text */
+	border-radius: 0.25rem; /* Optional: rounded corners */
+	padding: 5px 10px; /* Optional: padding */
+  }
+  
+  .tooltip::after {
+	border-top-color: #343a40; /* Match the background color */
+  }
+
 /* Pre Loadder css End */

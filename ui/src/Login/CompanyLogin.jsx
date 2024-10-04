@@ -264,7 +264,6 @@ const CompanyLogin = () => {
                                       value: 6,
                                       message: "Password must be at least 6 characters long",
                                     },
-
                                   validate:validatePassword,
                                   })}
                                 />
@@ -350,119 +349,117 @@ const CompanyLogin = () => {
           {loading &&(
              <Loader/>
           )}
-    <div className="newLoginWrapper">
-        <div className="newLoginContainer">
-            <div className="newLoginLeftSectionOuter">
-                <div className="newLoginLeftTitle">Welcome to <br/> Employee Management System</div>
-                <div className="newLoginLeftImgHolder"><img src="..\assets\img\left-img.png" alt='#' /></div>
-            </div>
-            <div className='newLoginRightSectionOuter'>
-                <div className="newLoginRightSection">
-                    <div className="newLoginRightSecTitle">Login</div>
-                    <div className="newLoginRightSecSelectLogin">
+        <div className="newLoginWrapper">
+            <div className="newLoginContainer">
+                <div className="newLoginLeftSectionOuter">
+                    <div className="newLoginLeftTitle">Welcome to <br/> Employee Management System</div>
+                    <div className="newLoginLeftImgHolder"><img src="..\assets\img\left-img.png" alt='#' /></div>
+                </div>
+                <div className='newLoginRightSectionOuter'>
+                    <div className="newLoginRightSection">
+                        <div className="newLoginRightSecTitle">Login</div>
+                        <div className="newLoginRightSecSelectLogin">
 
-                        <div className="loginBtn"><span>Continue with Company login</span></div>
+                            <div className="loginBtn"><span>Continue with Company login</span></div>
 
-                    </div>
-                    <form onSubmit={handleSubmit(onSubmit)}>
-                        <div class="formgroup">
-                            <label class="form-label">Email</label>
-                            <input class="form-control form-control-lg"
-                              type="email"
-                              name="email"
-                              placeholder="Email"
-                              autoComplete="off"
-                              onKeyDown={handleEmailChange}
-                              readOnly={otpSent}
-                              {...register("username", {
-                                required: "Email is Required.",
-                                pattern: {
-                                value: /^\S[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                                message: "Email is not valid.",
-                                },
-                                })}
-                              />
-                              {errors.username && (
-                              <p className="errorMsg" style={{ marginLeft: "20px" }}>
-                                {errors.username.message}
-                              </p>
-                              )}
                         </div>
-                        {!otpSent && ( 
-                          <> 
-                          <div class="formgroup">
-                            <label class="form-label">Password</label>
-                            <input class="form-control form-control-lg" 
-                              name="password"
-                              placeholder="Password"
-                              onChange={handleEmailChange}
-                              type={passwordShown ? "text" : "password"}
-                              {...register("password", {
-                                  required: "Password is Required",
-                                  minLength: {
-                                  value: 6,
-                                  message: "Password must be at least 6 characters long",
-                              },
-                              validate:validatePassword,  
-                              })}
-                            />
-                            {errors.password && (
-                              <p className="errorMsg" style={{ marginLeft: "20px" }}>
-                                {errors.password.message}
-                              </p>
-                            )}
-                            <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
-                            <small>
-                                <a href="/forgotPassword">Forgot password?</a>
-                            </small>
-                        </div>
-                       
-                        <div>
-                            <div class="form-check align-items-center">
-                                <input id='customControlInline' type="checkbox" class="form-check-input" value="remember-me" name="remember-me"  />
-                                <label class="form-check-label text-small" for="customControlInline">Remember me</label>
+                        <form onSubmit={handleSubmit(onSubmit)}>
+                            <div class="formgroup">
+                                <label class="form-label">Email</label>
+                                <input class="form-control form-control-lg"
+                                  type="email"
+                                  name="email"
+                                  placeholder="Email"
+                                  autoComplete="off"
+                                  onKeyDown={handleEmailChange}
+                                  readOnly={otpSent}
+                                  {...register("username", {
+                                    required: "Email is Required.",
+                                    pattern: {
+                                    value: /^\S[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                    message: "Email is not valid.",
+                                    },
+                                    })}
+                                  />
+                                  {errors.username && (
+                                  <p className="errorMsg" style={{ marginLeft: "20px" }}>
+                                    {errors.username.message}
+                                  </p>
+                                  )}
                             </div>
-                        </div>
-                        </>
-                       )}
-                      {otpSent && !otpExpired && (   
-                        <div class="formgroup">
-                            <label class="form-label">OTP</label>
-                            <input class="form-control form-control-lg" 
-                             type="text"
-                             name="otp"
-                             id="otp"
-                             placeholder="Enter Your OTP"
-                             autoComplete="off"
-                             {...register("otp", {
-                               required: "OTP is Required.",
-                               pattern: {
-                                 value: /^\d{6}$/,
-                                 message: "OTP must be 6 digits.",
-                               },
-                             })}
-                            />
-                             {errors.otp && (
-                                <p className="errorMsg">{errors.otp.message}</p>
-                              )}
-                        </div>
-                        )}
-                        <div class="d-grid gap-2 mt-3">
-                            <button class="btn btn-lg btn-primary" type="submit">Sign in</button>
-                        </div>
-                    </form>
+                            {!otpSent && ( 
+                              <> 
+                              <div class="formgroup">
+                                <label class="form-label">Password</label>
+                                <input class="form-control form-control-lg" 
+                                  name="password"
+                                  placeholder="Password"
+                                  onChange={handleEmailChange}
+                                  type={passwordShown ? "text" : "password"}
+                                  {...register("password", {
+                                      required: "Password is Required",
+                                      minLength: {
+                                      value: 6,
+                                      message: "Password must be at least 6 characters long",
+                                  },
+                                  validate:validatePassword,  
+                                  })}
+                                />
+                                {errors.password && (
+                                  <p className="errorMsg" style={{ marginLeft: "20px" }}>
+                                    {errors.password.message}
+                                  </p>
+                                )}
+                                <span toggle="#password-field" class="bi bi-eye-fill field-icon toggle-password"></span>
+                                <small>
+                                    <a href="/forgotPassword">Forgot password?</a>
+                                </small>
+                            </div>
+                          
+                            <div>
+                                <div class="form-check align-items-center">
+                                    <input id='customControlInline' type="checkbox" class="form-check-input" value="remember-me" name="remember-me"  />
+                                    <label class="form-check-label text-small" for="customControlInline">Remember me</label>
+                                </div>
+                            </div>
+                            </>
+                          )}
+                          {otpSent && !otpExpired && (   
+                            <div class="formgroup">
+                                <label class="form-label">OTP</label>
+                                <input class="form-control form-control-lg" 
+                                type="text"
+                                name="otp"
+                                id="otp"
+                                placeholder="Enter Your OTP"
+                                autoComplete="off"
+                                {...register("otp", {
+                                  required: "OTP is Required.",
+                                  pattern: {
+                                    value: /^\d{6}$/,
+                                    message: "OTP must be 6 digits.",
+                                  },
+                                })}
+                                />
+                                {errors.otp && (
+                                    <p className="errorMsg">{errors.otp.message}</p>
+                                  )}
+                            </div>
+                            )}
+                            <div class="d-grid gap-2 mt-3">
+                                <button class="btn btn-lg btn-primary" type="submit">Sign in</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-   
-</main >
-      
+      </main>
       <Modal
         show={showErrorModal}
         onHide={closeModal}
         centered
-        style={{ zIndex: "1050" }}
+        style={{ zIndex: "1050"}}
         className="custom-modal"
       >
         <ModalHeader closeButton>

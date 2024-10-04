@@ -232,7 +232,11 @@ export const roleApi = () => {
 
 
 export const EmployeeSalaryPostApi = (employeeId, data) => {
-  return axiosInstance.post(`/${employeeId}/salary`, data);
+  return axiosInstance.post(`/${employeeId}/salary`, data, {
+    headers: {
+      'Content-Type': 'application/json', // Ensure content type is JSON
+    }
+  });
 }
 
 export const EmployeeSalaryGetApi = (employeeId) => {

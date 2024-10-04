@@ -66,6 +66,12 @@ const CompanyRegistration = () => {
         companyType: data.companyType,
         // Add other fields as needed
       };
+         // Conditionally add CIN number or Company Registration Number
+    if (data.companyType === "Private Limited") {
+      updateData.cinNumber = data.cinNumber; // Post CIN number
+    } else if (data.companyType === "Firm") {
+      updateData.companyRegistrationNumber = data.companyRegistrationNumber; // Post Company Registration Number
+    }
       if (location.state && location.state.id) {
         await new Promise(resolve => setTimeout(resolve, 2000));
         await companyUpdateByIdApi(location.state.id, updateData);

@@ -16,7 +16,7 @@ const CompanySalaryStructure = () => {
   const [isEditing, setIsEditing] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [allowances, setAllowances] = useState([]);
-  const [deductions, setDeductions] = useState([]);
+  const [deductions, setDeductions] = useState([]); 
   const [newFieldName, setNewFieldName] = useState('');
   const [modalType, setModalType] = useState('');
   const [errorMessage, setErrorMessage] = useState('');

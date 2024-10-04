@@ -135,7 +135,7 @@ const downloadExcel = () => {
                         <input
                           className="form-control"
                           type="file"
-                          accept=".xlsx"
+                           accept=".xlsx,.xls,.csv"
                           {...register("attendanceFile", {
                             required: "Upload Attendance File",
                           })}

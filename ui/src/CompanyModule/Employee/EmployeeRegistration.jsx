@@ -16,7 +16,7 @@ const EmployeeRegistration = () => {
     handleSubmit,
     control,
     formState: { errors },
-
+    watch,
     reset,
     setValue,
   } = useForm({
@@ -372,7 +372,6 @@ const EmployeeRegistration = () => {
 const validateDateOfBirth = (value, dateOfHiring) => {
   const selectedDateOfBirth = new Date(value);
   const selectedDateOfHiring = new Date(dateOfHiring); // Ensure this is a Date object
-
   // Calculate limits
   const minDateOfBirth = new Date(selectedDateOfHiring);
   minDateOfBirth.setFullYear(selectedDateOfHiring.getFullYear() - 21); // 21 years ago from date of hiring
@@ -382,6 +381,7 @@ const validateDateOfBirth = (value, dateOfHiring) => {
 
   // Validate against the limits
   if (selectedDateOfBirth > minDateOfBirth) {
+
       return "Date of Birth must be at least 21 years before the Date of Hiring.";
   }
   if (selectedDateOfBirth < maxDateOfBirth) {
@@ -391,6 +391,29 @@ const validateDateOfBirth = (value, dateOfHiring) => {
   return true; // Return true if no errors
 };
 
+const validatePassword = (value) => {
+  const errors = [];
+  if (!/(?=.*[0-9])/.test(value)) {
+    errors.push("at least one digit");
+  }
+  if (!/(?=.*[a-z])/.test(value)) {
+    errors.push("at least one lowercase letter");
+  }
+  if (!/(?=.*[A-Z])/.test(value)) {
+    errors.push("at least one uppercase letter");
+  }
+  if (!/(?=.*\W)/.test(value)) {
+    errors.push("at least one special character");
+  }
+  if (value.includes(" ")) {
+    errors.push("no spaces");
+  }
+
+  if (errors.length > 0) {
+    return `Password must contain ${errors.join(", ")}.`;
+  }
+  return true; // Return true if all conditions are satisfied
+};
 
 // In your component
 const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
