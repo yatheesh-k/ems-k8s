@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pay Slip</title>
+    <title>Pay Slip Template 3</title>
     <style>
         @page {
             size: A4;
@@ -14,11 +14,6 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: Georgia, 'Times New Roman', Times, serif;
-        }
-
-        #month-year {
-            text-align: center;
         }
 
         .main {
@@ -34,25 +29,27 @@
 
         .top {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-wrap: wrap;
+            justify-content: space-around;
             margin-bottom: 20px;
         }
 
         .date-info {
             text-align: left;
             flex: 1;
+            width: 400px;
         }
 
         .logo {
             text-align: end;
             flex-shrink: 0;
+            margin-bottom: 20px;
             margin-top: 0px;
+            margin-left: 60px
         }
 
         .logo img {
-            margin-top: 20px;
-            max-width: 120px;
+            max-width: 130px;
             height: 100px;
             display: flex;
         }
@@ -60,15 +57,17 @@
         .details {
             width: 100%;
             margin-bottom: 20px;
-
+            border-collapse: collapse;
         }
 
         .details table {
             width: 100%;
+            border-collapse: collapse;
         }
 
         .details th,
         .details td {
+            border: 0.5px solid black;
             padding: 4px;
             text-align: left;
         }
@@ -82,40 +81,68 @@
         }
 
         .address {
-            margin-top: 160px;
+            margin-top: 220px;
             text-align: center;
         }
 
+        .salary-table,
+        .salary-table th,
+        .salary-table td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
         th {
-            background-color: #D3D3D3;
-            color: black;
-            padding: 8px;
+            background-color: #ffcc80;
         }
 
-        .right {
-            text-align: right;
+        .center {
+            text-align: center;
         }
 
-        .company {
-            margin-top: 30px;
+        .salary-details {
+            margin-top: 20px;
         }
 
+        .allowance-fields,
+        .allowance-values {
+            margin-bottom: 28px;
+        }
 
-        #earningsTable {
+        .deduction-fields,
+        .deduction-values {
+            margin-bottom: 28px;
+        }
+
+        .allowance-fields,
+        .allowance-values {
+            border: none;
+            /* No border for allowance tables */
+        }
+
+        .allowance-fields td,
+        .allowance-values td {
+            padding: 4px;
             border: none;
         }
 
-        .details ,.table-main{
-            border: 2px solid black;
-        }
-        .table-child{
-            border: 2px solid black;
-        }
-        #earnings-amount{
-            margin-bottom: 20px;
+        .deduction-fields,
+        .deduction-values {
+            border: none;
+            /* No border for allowance tables */
         }
 
-
+        .deduction-fields td,
+        .deduction-values td {
+            padding: 4px;
+            border: none;
+        }
     </style>
 </head>
 
@@ -125,161 +152,159 @@
             <table>
                 <tr>
                     <td>
+                        <div class="date-info">
+                            <h4 id="month-year">${payslipEntity.month}-${payslipEntity.year} Pay Slip</h4>
+                            <h4 id="employee-name"> Name: ${employee.firstName} ${employee.lastName}</h4>
+                        </div>
+                    </td>
+                    <td>
                         <div class="logo">
-                            <img src="${company.imageFile}" alt="Company Logo" />
+                            <img src="${company.imageFile}" />
                         </div>
                     </td>
                 </tr>
             </table>
 
             <div class="details">
-                <table class="table-main">
+                <table>
                     <tr>
-                        <th colspan="4" class="employee-details"><b>${company.companyName}</b></th>
-                    </tr>
-                    <tr>
-                        <td colspan="4" id="month-year">Payslip for ${payslipEntity.month}-${payslipEntity.year}</td>
+                        <th colspan="4" class="employee-details">Employee Details</th>
                     </tr>
                     <tr>
                         <th>EmployeeId</th>
                         <td>${employee.employeeId}</td>
-                        <th>Name</th>
-                        <td>${employee.firstName} ${employee.lastName}</td>
+                        <th>Joining Date</th>
+                        <td>${employee.dateOfHiring}</td>
                     </tr>
                     <tr>
-                        <th>Department</th>
-                        <td>${employee.departmentName}</td>
+                        <th>Date Of Birth</th>
+                        <td>${employee.dateOfBirth}</td>
                         <th>PAN</th>
                         <td>${employee.panNo}</td>
                     </tr>
                     <tr>
-                        <th>Designation</th>
-                        <td>${employee.designationName}</td>
+                        <th>Department</th>
+                        <td>${employee.departmentName}</td>
                         <th>UAN</th>
                         <td>${employee.uanNo}</td>
                     </tr>
                     <tr>
-                        <th>Bank ACC No</th>
-                        <td>${employee.accountNo}</td>
-                        <th>IFSC</th>
-                        <td>${employee.ifscCode}</td>
-                    </tr>
-                    <tr>
-                        <th>Bank Name</th>
-                        <td>${employee.bankName}</td>
+                        <th>Designation</th>
+                        <td>${employee.designationName}</td>
                         <th>Location</th>
                         <td>${employee.location}</td>
                     </tr>
                     <tr>
-                        <th>STD Days</th>
-                        <td>${payslipEntity.attendance.totalWorkingDays}</td>
-                        <th>Worked Days</th>
-                        <td>${payslipEntity.attendance.noOfWorkingDays}</td>
-                    </tr>
-                    <tr>
-                        <th>LOP Days</th>
-                        <td>
-                            <#assign totalWorkingDays = payslipEntity.attendance.totalWorkingDays?number>
-                            <#assign noOfWorkingDays = payslipEntity.attendance.noOfWorkingDays?number>
-                            <#if (totalWorkingDays - noOfWorkingDays) < 0>
-                                N/A
-                            <#else>
-                                ${totalWorkingDays - noOfWorkingDays}
-                            </#if>
-                        </td>
-                        <th>Date of Birth</th>
-                        <td>${employee.dateOfBirth}</td>
+                        <td colspan="4" class="employee-details">Bank ACC No:
+                            ${employee.accountNo}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IFSC:
+                            ${employee.ifscCode}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            Bank: ${employee.bankName}</td>
                     </tr>
                 </table>
             </div>
 
-            <!-- Earnings and Deductions side by side -->
             <div class="details">
-                <table class="table-child">
+                <table>
+                    <tr>
+                        <th>Total Working Days</th>
+                        <td>${payslipEntity.attendance.totalWorkingDays?number}</td>
+                        <th>No. Of Working Days</th>
+                        <td>${payslipEntity.attendance.noOfWorkingDays?number}</td>
+                        <th>No. Of Leaves</th>
+                        <td>
+                            <#assign totalWorkingDays=payslipEntity.attendance.totalWorkingDays?number>
+                                <#assign noOfWorkingDays=payslipEntity.attendance.noOfWorkingDays?number>
+                                    <#if (totalWorkingDays - noOfWorkingDays) < 0>
+                                        N/A
+                                        <#else>
+                                            ${totalWorkingDays - noOfWorkingDays}
+                                    </#if>
+                        </td>
+                    </tr>
+
+                </table>
+            </div>
+            <div class="salary-details">
+                <table class="salary-table">
                     <tr>
                         <th>Earnings (A)</th>
                         <th>Amount (A)</th>
                         <th>Deductions (B)</th>
                         <th>Amount (B)</th>
                     </tr>
-                     <tr>
-                        <td>Basic Salary</td>
-                        <td>${payslipEntity.salary.basicSalary}</td>
-                     </tr>
-                           <tr>
-                               <td class="earnings">
-                                   <table>
-                                       <#list payslipEntity.salary.allowances as allowanceKey, allowanceValue>
-                                           <#if allowanceValue?? && (allowanceValue?is_number || (allowanceValue?is_string && allowanceValue?trim?length > 0))>
-                                               <#if allowanceKey != "class">
-                                                   <tr>
-                                                       <td>${allowanceKey?replace("_", " ")?capitalize}</td> <!-- Field Name -->
-                                                   </tr>
-                                               </#if>
-                                           </#if>
-                                       </#list>
-
-                                       <tr>
-                                           <td><strong>Total Earnings (A)</strong></td>
-                                       </tr>
-                                   </table>
-                               </td>
-                               <td class="amount">
-                                   <table id="earnings-amount">
-                                       <#list payslipEntity.salary.allowances as allowanceKey, allowanceValue>
-                                           <#if allowanceValue?? && (allowanceValue?is_number || (allowanceValue?is_string && allowanceValue?trim?length > 0))>
-                                               <#if allowanceKey != "class">
-                                                   <tr>
-                                                       <td>${allowanceValue}</td> <!-- Amount corresponding to Field Name -->
-                                                   </tr>
-                                               </#if>
-                                           </#if>
-                                       </#list>
-                                       <tr>
-                                           <!-- Basic Salary Amount -->
-                                       </tr>
-                                       <tr>
-                                           <td><strong>${payslipEntity.salary.totalEarnings}</strong></td> <!-- Total Earnings Amount -->
-                                       </tr>
-                                   </table>
-                               </td>
-                               <td class="deductions">
-                                   <table>
-                                       <#list payslipEntity.salary.deductions as deductionKey, deductionValue>
-                                           <#if deductionValue?? && (deductionValue?is_number || (deductionValue?is_string && deductionValue?trim?length > 0))>
-                                               <#if deductionKey != "class">
-                                                   <tr>
-                                                       <td>${deductionKey?replace("_", " ")?capitalize}</td> <!-- Deduction Field Name -->
-                                                   </tr>
-                                               </#if>
-                                           </#if>
-                                       </#list>
-                                       <tr>
-                                           <td><strong>Total Deductions (B)</strong></td>
-                                       </tr>
-                                   </table>
-                               </td>
-                               <td class="amount">
-                                   <table>
-                                       <#list payslipEntity.salary.deductions as deductionKey, deductionValue>
-                                           <#if deductionValue?? && (deductionValue?is_number || (deductionValue?is_string && deductionValue?trim?length > 0))>
-                                               <#if deductionKey != "class">
-                                                   <tr>
-                                                       <td>${deductionValue}</td> <!-- Amount corresponding to Deduction Field Name -->
-                                                   </tr>
-                                               </#if>
-                                           </#if>
-                                       </#list>
-                                       <tr>
-                                           <td><strong>${payslipEntity.salary.deductions.totalDeductions}</strong></td> <!-- Total Deductions Amount -->
-                                       </tr>
-                                   </table>
-                               </td>
-                           </tr>
-                     <!-- Net Pay Row -->
                     <tr>
-                        <th class="net-border">Net Pay (A-B)</th>
-                        <td><strong>${payslipEntity.salary.netSalary}</strong></td>
+                        <!-- Column for Allowances and Amounts -->
+                        <td>
+                            <table class="allowance-fields">
+                                <!-- Loop through Allowances -->
+                                <tr>
+                                    <td>Basic Salary</td>
+                                </tr>
+                                <#list allowanceList as allowance>
+                                    <#list allowance?keys as key>
+                                        <tr>
+                                            <td>${key}</td>
+                                        </tr>
+                                    </#list>
+                                </#list>
+                                <tr>
+                                    <td>Total Earnings (A)</td>
+                                </tr>
+
+                            </table>
+                        </td>
+
+
+                        <td>
+                            <table class="allowance-values">
+                                <!-- Loop through Allowances to Get Amounts -->
+                                <tr>
+                                    <td>${payslipEntity.salary.basicSalary}</td> <!-- Basic Salary Amount -->
+                                </tr>
+                                <#list allowanceList as allowance>
+                                    <#list allowance?keys as key>
+                                        <tr>
+                                            <td>${allowance[key]}</td> <!-- Display allowance amount -->
+                                        </tr>
+                                    </#list>
+                                </#list>
+                                <tr>
+                                    <td>${payslipEntity.salary.totalEarnings}</td> <!-- Total Earnings Amount -->
+                                </tr>
+                            </table>
+                        </td>
+
+                        <!-- Column for Deductions and Amounts -->
+                        <td>
+                            <table class="deduction-fields">
+                                <!-- Loop through Deductions -->
+                                <#list deductionList as deduction>
+                                    <#list deduction?keys as key>
+                                        <tr>
+                                            <td>${key}</td>
+                                        </tr>
+                                    </#list>
+                                </#list>
+                            </table>
+                        </td>
+
+                        <td>
+                            <table class="deduction-values">
+                                <!-- Loop through Deductions to Get Amounts -->
+                                <#list deductionList as deduction>
+                                    <#list deduction?keys as key>
+                                        <tr>
+                                            <td>${deduction[key]}</td> <!-- Display deduction amount -->
+                                        </tr>
+                                    </#list>
+                                </#list>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- Net Pay Row -->
+                    <tr>
+                        <th>Net Pay (A-B-C)</th>
+                        <td colspan="3"><strong>${payslipEntity.salary.netSalary}</strong></td>
                     </tr>
                     <tr>
                         <th>Net Salary (In Words)</th>
@@ -289,17 +314,17 @@
             </div>
 
             <div class="text">
-                <p><em>This is a computer-generated payslip and does not require authentication.</em></p>
+                <p><em>This is computer-generated payslip and does not require authentication</em></p>
             </div>
-
             <div class="address">
                 <hr />
-                <p class="company">
+                <p>
                     Company Address: ${company.companyAddress}<br />
                     Mobile No: ${company.mobileNo}<br />
                     Email ID: ${company.emailId}
                 </p>
             </div>
+
         </div>
     </div>
 </body>
