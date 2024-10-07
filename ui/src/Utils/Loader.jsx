@@ -1,5 +1,4 @@
 import React from 'react'
-
 const Loader = () => {
   return (
         <div className="preLoaderOuter">
@@ -8,4 +7,4 @@ const Loader = () => {
   )
 }
 
-export default Loader
+export default Loader;

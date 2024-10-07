@@ -369,7 +369,7 @@ export const DeductionsGetApi = () => {
 }
 
 export const CompanySalaryStructurePostApi = (data) => {
-  return axiosInstance.post(`/allowances`, data);
+  return axiosInstance.post(`/salary/Structure`, data);
 };
 
 export const CompanySalaryStructureGetApi = () => {

@@ -13,10 +13,10 @@ const EmployeeRegistration = () => {
 
   const {
     register,
+    watch,
     handleSubmit,
     control,
     formState: { errors },
-    watch,
     reset,
     setValue,
   } = useForm({
@@ -357,7 +357,6 @@ const EmployeeRegistration = () => {
     return `${year}-${month}-${day}`;
   };
 
-
   const validateDate = (value) => {
     const selectedDate = new Date(value);
     if (selectedDate > new Date(threeMonthsFromNow)) {
@@ -365,8 +364,6 @@ const EmployeeRegistration = () => {
     }
     return true; // Return true if no errors
 };
-
-
 
 // Custom validation function for date of birth based on date of hiring
 const validateDateOfBirth = (value, dateOfHiring) => {
