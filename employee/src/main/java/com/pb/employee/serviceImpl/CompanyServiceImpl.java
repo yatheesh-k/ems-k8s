@@ -74,6 +74,21 @@ public class CompanyServiceImpl implements CompanyService {
                     HttpStatus.BAD_REQUEST);
         }
 
+        String companyType = companyRequest.getCompanyType();
+        if (companyType.equals(Constants.PRIVATE)){
+            if (companyRequest.getCinNo()==null || companyRequest.getCinNo().isEmpty()){
+                log.error("Company cin number is required");
+                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.COMPANY_CIN_NO_REQUIRED), companyRequest.getShortName()),
+                        HttpStatus.BAD_REQUEST);
+            }
+
+        }else if (companyType.equals(Constants.FIRM)){
+            if (companyRequest.getCompanyRegNo()==null || companyRequest.getCompanyRegNo().isEmpty()){
+                log.error("Company Registration number is required");
+                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.COMPANY_REG_NO_REQUIRED), companyRequest.getShortName()),
+                        HttpStatus.BAD_REQUEST);
+            }
+        }
         List<CompanyEntity> shortNameEntity = openSearchOperations.getCompanyByData(null, Constants.COMPANY, companyRequest.getShortName());
         if(shortNameEntity !=null && shortNameEntity.size() > 0) {
             log.error("Company with shortname {} already existed", companyRequest.getCompanyName());

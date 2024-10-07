@@ -29,6 +29,7 @@ public class EmployeeEntity implements Entity{
     private String departmentName;
     private String location;
     private String manager;
+    private String mobileNo;
     private List<String> roles;
     private String status;
     private String panNo;

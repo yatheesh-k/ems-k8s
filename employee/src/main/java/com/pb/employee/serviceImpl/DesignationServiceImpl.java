@@ -7,6 +7,7 @@ import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.opensearch.OpenSearchOperations;
 import com.pb.employee.persistance.model.DesignationEntity;
+import com.pb.employee.persistance.model.EmployeeEntity;
 import com.pb.employee.persistance.model.Entity;
 import com.pb.employee.request.DesignationRequest;
 import com.pb.employee.request.DesignationUpdateRequest;
@@ -156,10 +157,21 @@ public class DesignationServiceImpl implements DesignationService {
         log.info("getting details of {}", designationId);
         Object entity = null;
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
-
+        List<EmployeeEntity> employeeEntities;
         try {
             entity = openSearchOperations.getById(designationId, null, index);
+            employeeEntities = openSearchOperations.getCompanyEmployees(companyName);
+            for (EmployeeEntity employee: employeeEntities){
+                if (employee.getDesignation()!=null && employee.getDesignation().equals(designationId)) {
+                    log.error("Designation details existed in employee{}", designationId);
+                    return new ResponseEntity<>(
+                            ResponseBuilder.builder().build().
+                                    createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler
+                                            .getMessage(EmployeeErrorMessageKey.DESIGNATION_IS_EXIST_EMPLOYEE)))),
+                            HttpStatus.CONFLICT);
+                }
 
+            }
             if (entity!=null) {
                 openSearchOperations.deleteEntity(designationId,index);
             } else {

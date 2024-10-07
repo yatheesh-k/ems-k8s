@@ -61,7 +61,7 @@ public class Constants {
     public static final String DUPLICATE_CIN_NO = "CinNo";
     public static final String DUPLICATE_REGISTER_NO = "RegisterNo";
     public static final String DUPLICATE_MOBILE_NO = "MobileNo";
-    public static final String DUPLICATE_LAND_NO = "LandNo";
+    public static final String DUPLICATE_ALTERNATE_NO = "AlternateNo";
     public static final String DUPLICATE_GST_NO = "GstNo";
     public static final String DUPLICATE_PERSONAL_MAIL = "PersonalMailId";
     public static final String DUPLICATE_PERSONAL_MOBILE = "PersonalMobileNo";
@@ -91,6 +91,12 @@ public class Constants {
     public static final String SALARY_STRUCTURE ="salary_structure" ;
     public static final String NEW ="new" ;
     public static final String OLD = "old";
+    public static final String DUPLICATE_EMAIL_ID = "emailId";
+    public static final String DUPLICATE_AS_MOBILE_NO = "The mobile and alternate numbers cannot be the same." ;
+    public static final String DUPLICATE_AS_EMAIL_NO = "The emailId and PersonalEmailId cannot be the same.";
     public static final String ALLOWANCE_LIST = "allowanceList";
     public static final String DEDUCTION_LIST = "deductionList";
+    public static final String PRIVATE = "Private Limited";
+    public static final String FIRM = "Firm";
+
 }

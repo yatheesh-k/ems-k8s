@@ -27,7 +27,7 @@ public class CompanyEntity implements Entity{
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String mobileNo;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String landNo;
+    private String alternateNo;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String gstNo;
     @JsonInclude(JsonInclude.Include.NON_NULL)

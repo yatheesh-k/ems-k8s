@@ -1,10 +1,8 @@
 package com.pb.ems.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +10,6 @@ import lombok.Setter;
 @Setter
 public class OTPRequest{
 
-    @NotEmpty(message = "{user.otp.message}")
     @Schema(required = true,  description = "${login.otp.description}", example = "123456")
     private Long otp;
 

@@ -102,10 +102,6 @@ public class PayslipUtils {
             te = te/12.0;
             salary.setTotalEarnings(String.valueOf(Math.round(te)));
         }
-        if (salaryRequest.getBasicSalary() != null) {
-            basic = Double.parseDouble(new String(Base64.getDecoder().decode(salaryRequest.getBasicSalary()))) / 12.0;
-            salary.setBasicSalary(String.valueOf(basic));
-        }
 
         double totalDeduction = 0.0;
         if (salaryRequest.getSalaryConfigurationEntity().getDeductions()!=null){
@@ -190,9 +186,6 @@ public class PayslipUtils {
         if (payslipRequest.getSalary().getGrossAmount() != null) { //annual
             gross  = Base64.getEncoder().encodeToString((payslipRequest.getSalary().getGrossAmount()).getBytes());
         }
-        if (payslipRequest.getSalary().getBasicSalary() != null) { //annual
-            bas  = Base64.getEncoder().encodeToString((payslipRequest.getSalary().getBasicSalary()).getBytes());
-        }
         if (payslipRequest.getSalary().getTotalEarnings() != null) { //annual
             te  =Base64.getEncoder().encodeToString((payslipRequest.getSalary().getTotalEarnings()).getBytes());
         }
@@ -235,7 +228,6 @@ public class PayslipUtils {
         salary.setFixedAmount(fix);
         salary.setGrossAmount(gross);
         salary.setVariableAmount(var);
-        salary.setBasicSalary(bas);
         salary.setTotalEarnings(te);
         salary.setNetSalary(net);
         salary.setTotalDeductions(tded);
@@ -275,9 +267,7 @@ public class PayslipUtils {
         if (payslipRequest.getSalary().getGrossAmount() != null) {
             gross = new String(Base64.getDecoder().decode(payslipRequest.getSalary().getGrossAmount()));
         }
-        if (payslipRequest.getSalary().getBasicSalary() != null) {
-            bas = new String(Base64.getDecoder().decode(payslipRequest.getSalary().getBasicSalary()));
-        }
+
         if (payslipRequest.getSalary().getSalaryConfigurationEntity().getAllowances() != null) {
             Map<String, String> decodedAllowances = new HashMap<>();
             for (Map.Entry<String, String> entry : payslipRequest.getSalary().getSalaryConfigurationEntity().getAllowances().entrySet()) {
@@ -335,7 +325,6 @@ public class PayslipUtils {
         payslipRequest.getSalary().setFixedAmount(fix);
         payslipRequest.getSalary().setGrossAmount(gross);
         payslipRequest.getSalary().setVariableAmount(var);
-        payslipRequest.getSalary().setBasicSalary(bas);
         payslipRequest.getSalary().setTotalEarnings(te);
         payslipRequest.getSalary().setNetSalary(net);
         payslipRequest.getSalary().setTotalTax(ttax);
@@ -406,7 +395,6 @@ public class PayslipUtils {
     public static void forFormatNumericalFields(PayslipEntity payslipProperties) {
         if (payslipProperties.getSalary() != null) {
             payslipProperties.getSalary().setFixedAmount(formatValue(payslipProperties.getSalary().getFixedAmount()));
-            payslipProperties.getSalary().setBasicSalary(formatValue(payslipProperties.getSalary().getBasicSalary()));
             payslipProperties.getSalary().setNetSalary(formatValue(payslipProperties.getSalary().getNetSalary()));
             payslipProperties.getSalary().setGrossAmount(formatValue(payslipProperties.getSalary().getGrossAmount()));
             payslipProperties.getSalary().setTotalEarnings(formatValue(payslipProperties.getSalary().getTotalEarnings()));

@@ -64,11 +64,17 @@ public enum EmployeeErrorMessageKey {
     INVALID_ATTENDANCE_DATA("invalid.attendance.data"),
     INVALID_YEAR("invalid.year"),
     NO_ATTENDANCE_FOUND("attendance.not.found"),
+    DEPARTMENT_IS_EXIST_EMPLOYEE("department.exist.in.employee"),
+    DESIGNATION_IS_EXIST_EMPLOYEE("designation.exist.in.employee"),
+    EMPLOYEE_DATA_EXIST("employee.date.exist"),
     INVALID_TEMPLATE_NUMBER("template.number"),
     ERROR_PROCESSING_TEMPLATE("template.error"),
     UNABLE_GET_SALARY_STRUCTURE("unable.get.salary.structure"),
     UNABLE_SAVE_COMPANY_SALARY("unable.save.company.salary"),
-    COMPANY_SALARY_ALREADY_EXIST("company.salary.already.exist");
+    COMPANY_SALARY_ALREADY_EXIST("company.salary.already.exist"),
+    INVALID_NO_DAYA("invalid.no.days"),
+    COMPANY_CIN_NO_REQUIRED("company.cin.no.required"),
+    COMPANY_REG_NO_REQUIRED("company.reg.no.required");
 
     private final String key;
 

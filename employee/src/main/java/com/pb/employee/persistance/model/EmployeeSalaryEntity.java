@@ -13,7 +13,6 @@ public class EmployeeSalaryEntity implements Entity {
 
     private String salaryId;
     private String employeeId;
-    private String basicSalary;
     private String fixedAmount;
     private String variableAmount;
     private String grossAmount;

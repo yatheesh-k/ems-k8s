@@ -4,6 +4,8 @@ import com.pb.ems.auth.JwtTokenUtil;
 import com.pb.ems.common.ResponseBuilder;
 import com.pb.ems.common.ResponseObject;
 import com.pb.ems.config.SwaggerConfig;
+import com.pb.ems.exception.ErrorMessageHandler;
+import com.pb.ems.exception.IdentityErrorMessageKey;
 import com.pb.ems.exception.IdentityException;
 import com.pb.ems.model.*;
 import com.pb.ems.service.LoginService;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -79,8 +82,13 @@ public class LoginController {
             summary = "${api.login.otp}", description = "${api.adminlogin.description}")
     @ResponseStatus(HttpStatus.CREATED)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description= "CREATED")
-    public ResponseEntity<?> validateCompanyOtp(@RequestBody @Valid OTPRequest request) throws IdentityException {
+    public ResponseEntity<?> validateCompanyOtp(@RequestBody OTPRequest request) throws IdentityException, MethodArgumentNotValidException {
+        String otp = String.valueOf(request.getOtp());
+        if (otp == null || !otp.matches("^\\d{6}$")) {
+            return ResponseEntity.badRequest().body("Invalid OTP format. Must be a 6-digit number.");
+        }
         return loginService.validateCompanyOtp(request);
+
     }
 
     @PostMapping("forgot/password")

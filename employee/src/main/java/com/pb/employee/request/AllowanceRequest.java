@@ -12,6 +12,16 @@ import lombok.*;
 @AllArgsConstructor
 public class AllowanceRequest {
 
+    @Schema(example = "basicSalary")
+    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{basicSalary.format}")
+    @Size(min = 4, max = 20, message = "{basicSalary.size.message}")
+    private String basicSalary;
+
+    @Schema(example = "hra")
+    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{hra.format}")
+    @Size(min = 1, max = 3, message = "{hra.size}")
+    private String hra;
+
     @Schema(example = "travelAllowance")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{travelAllowance.format}")
     @Size(min = 3, max = 20, message = "{travelAllowance.size}")
@@ -21,11 +31,6 @@ public class AllowanceRequest {
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{pfContributionEmployee.format}")
     @Size(min = 3, max = 20, message = "{pfContributionEmployee.size}")
     private String pfContributionEmployee;
-
-    @Schema(example = "hra")
-    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{hra.format}")
-    @Size(min = 1, max = 3, message = "{hra.size}")
-    private String hra;
 
     @Schema(example = "specialAllowance")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{specialAllowance.format}")

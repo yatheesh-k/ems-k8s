@@ -90,13 +90,24 @@ public class AttendanceServiceImpl implements AttendanceService {
 
                 // Validate firstName, lastName, and emailId
                 if (!attendanceRequest.getFirstName().equalsIgnoreCase(employee.getFirstName()) ||
-                        !attendanceRequest.getLastName().equalsIgnoreCase(employee.getLastName()) ||
+                        (attendanceRequest.getLastName() != null &&
+                                !attendanceRequest.getLastName().equalsIgnoreCase(employee.getLastName())) ||
+                        (!attendanceRequest.getLastName().isEmpty() &&
+                                !employee.getLastName().isEmpty() &&
+                                !attendanceRequest.getLastName().equalsIgnoreCase(employee.getLastName())) ||
                         !requestEmployeeId.equalsIgnoreCase(employee.getEmployeeId())) {
+
                     log.error("Validation failed for employee ID: {}. Details provided do not match.", employeeId);
-                    return new ResponseEntity<>(
-                            ResponseBuilder.builder().build().
-                                    createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler
-                                            .getMessage(EmployeeErrorMessageKey.INVALID_EMPLOYEE_DETAILS)))),
+                    return new ResponseEntity<>(ResponseBuilder.builder().build()
+                            .createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler
+                                    .getMessage(EmployeeErrorMessageKey.INVALID_EMPLOYEE_DETAILS)))),
+                            HttpStatus.BAD_REQUEST);
+                }
+
+                int intworkingdays= Integer.parseInt(attendanceRequest.getNoOfWorkingDays());
+                if(intworkingdays<0){
+                    log.error("invalid no. of days");
+                    return new ResponseEntity<>(ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_NO_DAYA)))),
                             HttpStatus.BAD_REQUEST);
                 }
 
@@ -231,6 +242,12 @@ public class AttendanceServiceImpl implements AttendanceService {
                 log.error("Employee ID mismatch for attendance details {}: expected {}, found", attendanceId, employeeId);
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
                         HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            int numberOfDays = Integer.parseInt(updateRequest.getNoOfWorkingDays());
+            if (numberOfDays<0){
+                log.error("Invalid no. of days");
+                return new ResponseEntity<>(ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_NO_DAYA)))),
+                        HttpStatus.BAD_REQUEST);
             }
         } catch (Exception ex) {
             log.error("Exception while fetching user {}:", employeeId, ex);
