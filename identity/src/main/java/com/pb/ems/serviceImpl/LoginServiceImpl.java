@@ -262,10 +262,9 @@ public class LoginServiceImpl implements LoginService {
     public ResponseEntity<?> updatePasswordForForgot(EmployeePasswordforgot otpRequest) throws IdentityException {
         EmployeeEntity user = null;
 
-
         try {
             user = openSearchOperations.getEmployeeById(otpRequest.getUsername(), otpRequest.getCompany());
-          CompanyEntity  employee = openSearchOperations.getCompanyById(otpRequest.getCompanyName());
+          List<CompanyEntity>  employee = openSearchOperations.getCompanyByData(null, Constants.COMPANY, otpRequest.getCompany());
             if (user == null) {
                 log.debug("checking the user details..");
                 throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.USER_NOT_FOUND),
@@ -281,9 +280,11 @@ public class LoginServiceImpl implements LoginService {
 
             String newPassword = Base64.getEncoder().encodeToString(otpRequest.getPassword().toString().getBytes());
 
-            if (employee !=null){
-                employee.setPassword(newPassword);
-                openSearchOperations.updateCompany(employee);
+            for (CompanyEntity companyEntity:employee) {
+                if (companyEntity != null) {
+                    companyEntity.setPassword(newPassword);
+                    openSearchOperations.updateCompany(companyEntity);
+                }
             }
             user.setPassword(newPassword);
             openSearchOperations.updateEmployee(user,otpRequest.getCompany());
