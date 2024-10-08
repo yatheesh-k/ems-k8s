@@ -1,5 +1,5 @@
 server:
-  port: 2900
+  port: 9002
   servlet:
     contextPath: /ems
   ssl:
