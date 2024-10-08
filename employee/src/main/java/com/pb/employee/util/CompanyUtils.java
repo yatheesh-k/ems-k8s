@@ -529,14 +529,14 @@ public class CompanyUtils {
             }
 
             if (companyUpdateRequest.getPersonalMailId() != null && companyEntity.getPersonalMailId() != null) {
-                personalMail = companyEntity.getPersonalMailId();
+                personalMail = new String(Base64.getDecoder().decode(companyEntity.getPersonalMailId()));
                 if (personalMail.equals(companyUpdateRequest.getPersonalMailId())){
                     responseBody.put(Constants.DUPLICATE_PERSONAL_MAIL, companyUpdateRequest.getPersonalMailId());
                 }
 
             }
             if (companyUpdateRequest.getPersonalMobileNo() != null && companyEntity.getPersonalMobileNo() != null) {
-                personalMobile = companyEntity.getPersonalMobileNo();
+                personalMobile = new String(Base64.getDecoder().decode(companyEntity.getPersonalMobileNo()));
                 if (personalMobile.equals(companyUpdateRequest.getPersonalMobileNo())){
                     responseBody.put(Constants.DUPLICATE_PERSONAL_MOBILE, companyUpdateRequest.getPersonalMobileNo());
                 }
