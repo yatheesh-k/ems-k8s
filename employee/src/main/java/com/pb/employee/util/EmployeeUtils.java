@@ -116,7 +116,7 @@ public class EmployeeUtils {
                 if (employeeEntity.getMobileNo()!=null) {
                     mobileNo = new String((Base64.getDecoder().decode(employeeEntity.getMobileNo().toString().getBytes())));
                     if (mobileNo.equals(employeeRequest.getMobileNo())) {
-                        responseBody.put(Constants.DUPLICATE_AADHAAR_ID, employeeRequest.getMobileNo());
+                        responseBody.put(Constants.DUPLICATE_MOBILE_NO, employeeRequest.getMobileNo());
                     }
                 }
                 if (employeeEntity.getPanNo() != null) {
