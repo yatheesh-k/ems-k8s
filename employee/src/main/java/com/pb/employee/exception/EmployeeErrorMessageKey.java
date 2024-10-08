@@ -74,7 +74,8 @@ public enum EmployeeErrorMessageKey {
     COMPANY_SALARY_ALREADY_EXIST("company.salary.already.exist"),
     INVALID_NO_DAYA("invalid.no.days"),
     COMPANY_CIN_NO_REQUIRED("company.cin.no.required"),
-    COMPANY_REG_NO_REQUIRED("company.reg.no.required");
+    COMPANY_REG_NO_REQUIRED("company.reg.no.required"),
+    COMPANY_NOT_EXIST("company.not.exist");
 
     private final String key;
 
