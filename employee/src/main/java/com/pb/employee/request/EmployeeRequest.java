@@ -4,6 +4,7 @@ package com.pb.employee.request;
 import com.pb.employee.config.ValidAge;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -33,13 +34,12 @@ public class EmployeeRequest {
     private String employeeId;
 
     @Schema(example = "firstName")
-    @Pattern(regexp ="^[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*$", message = "{firstname.format}")
+    @Pattern(regexp ="^(?!.*\\b([A-Z])\\s\\1\\s\\1)(?:[A-Z][a-z]+(?: [A-Z][a-z]+)*|[A-Z](?:\\.? ?[A-Z])? ?[A-Z][a-z]+)$", message = "{firstname.format}")
     @Size(min = 3, max = 20, message = "{firstName.size.message}")
     private String firstName;
 
     @Schema(example = "lastName")
-    @Pattern(regexp = "^[A-Z](?:[a-z]+)?(?:\\s[A-Z][a-z]+)*$", message = "{lastname.format}")
-    @Size(min = 1, max = 20, message = "{lastName.size.message}")
+    @Pattern(regexp = "^([A-Z]|[A-Z][a-z]*|[a-z]|)$", message = "{lastname.format}")
     private String lastName;
 
     @Schema(example = "emailId")
@@ -73,7 +73,7 @@ public class EmployeeRequest {
     private String department;
 
     @Schema(example = "location")
-    @Pattern(regexp = "^(?:[A-Za-z0-9]+(?:[\\s.,'#&*()^/][A-Za-z0-9]+)*)+(?:[\\s.,'#&*()/-]*[A-Za-z0-9]+)*(?:[\\s]*[.,#&*()/-]*\\s*)*$", message = "{location.format}")
+    @Pattern(regexp = "^(?!.*\\s{2,})(?!^([a-zA-Z]{1}\\s?){2,}$)(?!^[A-Z](?:\\s[A-Z])*$)(?!^[\\s]*$)[A-Za-z0-9]+(?:[\\s.,'#&*()^/][A-Za-z0-9]+)*(?:[\\s.,'#&*()/-]*[A-Za-z0-9]+)*(?:[\\s]*[.,#&*()/-]*\\s*)*$", message = "{location.format}")
     @Size(min = 2, max = 200, message = "{location.notnull.message}")
     private String location;
 
@@ -82,16 +82,20 @@ public class EmployeeRequest {
     @Size(min = 3, max = 30, message = "{manager.notnull.message}")
     private String manager;
 
+    @Schema(example = "mobileNo")
+    @NotNull(message = "{mobileNo.notnull.message}")
+    @Pattern(regexp = "^\\d{10}$", message = "{invalid.mobileNo}")
+    private String mobileNo;
+
    /* @NotNull(message = "{roles.format}")
     @Size(min = 1, message = "{roles.size}")
     private List<@NotBlank(message = "{role.notnull.message}")
     @Pattern(regexp = "^[A-Z][a-z]+$", message = "{roles.format}") String> roles;*/
 
-    @Schema(example = "status")//
-    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{status.format}")
+    @Schema(example = "Active")
+    @Pattern(regexp = "^(Active|InActive)$", message = "{status.format}")
     @NotBlank(message = "{status.notnull.message}")
     private String status;
-
 
     @Schema(example = "panNo")
     @Pattern(regexp = "^[A-Z]{5}[0-9]{4}[A-Z]{1}$", message = "{invalid.panNo}")
@@ -119,8 +123,8 @@ public class EmployeeRequest {
     private String ifscCode;
 
     @Schema(example = "bankName")
-    @Pattern(regexp = "^(?!.*\\s{2})(?!.*\\s$)(?!^\\s)([A-Z]+[a-z]*)(?:\\s[A-Za-z]+)*$", message = "{bankName.format}")
-    @Size(min = 3, max = 20, message = "{bankName.size.message}")
+    @Pattern(regexp = "^(?!\\b([A-Z])\\s([A-Z])\\b)(?!\\b([A-Z])\\s([A-Z])\\s([A-Z])\\b)(?:(?:[A-Z][a-zA-Z]*(?:[-\\s][A-Za-z]+)*)(?:[,.]? [A-Za-z]+)*(?:\\.)?)?$", message = "{bankName.format}")
+    @Size(min = 3, max = 100, message = "{bankName.size.message}")
     private String bankName;
 
 }

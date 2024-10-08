@@ -6,15 +6,13 @@ import com.pb.employee.persistance.model.EmployeeSalaryEntity;
 import com.pb.employee.persistance.model.PayslipEntity;
 import com.pb.employee.persistance.model.SalaryEntity;
 import com.pb.employee.request.PayslipRequest;
+import com.pb.employee.request.PayslipUpdateRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Service
@@ -26,6 +24,7 @@ public class PayslipUtils {
         Double te = null, pfE = null, pfEmployer = null, lop = null, tax = null, itax = null, ttax = null, tded = null, net = null;
         int totalWorkingDays = 0, noOfWorkingDays=0;
         double basic;
+        String email=null, firstname=null, lastName=null;
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -43,6 +42,22 @@ public class PayslipUtils {
             byte[] decodedFix = Base64.getDecoder().decode(attendance.getTotalWorkingDays());
             totalWorkingDays= Integer.parseInt(new String(decodedFix));
             attendance.setTotalWorkingDays(String.valueOf(totalWorkingDays));
+        }
+        if (attendance.getEmailId() !=null){
+            byte[] decodedFix = Base64.getDecoder().decode(attendance.getEmailId());
+            email= new String(decodedFix);
+            attendance.setEmailId(email);
+
+        }
+        if (attendance.getFirstName() !=null){
+            byte[] decodedFix = Base64.getDecoder().decode(attendance.getFirstName());
+            firstname= new String(decodedFix);
+            attendance.setFirstName(firstname);
+        }
+        if (attendance.getLastName() !=null){
+            byte[] decodedFix = Base64.getDecoder().decode(attendance.getLastName());
+            lastName= new String(decodedFix);
+            attendance.setLastName(lastName);
         }
         if (salaryRequest.getVariableAmount() != null) {
             byte[] decodedVar = Base64.getDecoder().decode(salaryRequest.getVariableAmount());
@@ -101,10 +116,6 @@ public class PayslipUtils {
             te = Double.parseDouble(new String(decodedTax));
             te = te/12.0;
             salary.setTotalEarnings(String.valueOf(Math.round(te)));
-        }
-        if (salaryRequest.getBasicSalary() != null) {
-            basic = Double.parseDouble(new String(Base64.getDecoder().decode(salaryRequest.getBasicSalary()))) / 12.0;
-            salary.setBasicSalary(String.valueOf(basic));
         }
 
         double totalDeduction = 0.0;
@@ -190,9 +201,6 @@ public class PayslipUtils {
         if (payslipRequest.getSalary().getGrossAmount() != null) { //annual
             gross  = Base64.getEncoder().encodeToString((payslipRequest.getSalary().getGrossAmount()).getBytes());
         }
-        if (payslipRequest.getSalary().getBasicSalary() != null) { //annual
-            bas  = Base64.getEncoder().encodeToString((payslipRequest.getSalary().getBasicSalary()).getBytes());
-        }
         if (payslipRequest.getSalary().getTotalEarnings() != null) { //annual
             te  =Base64.getEncoder().encodeToString((payslipRequest.getSalary().getTotalEarnings()).getBytes());
         }
@@ -235,7 +243,6 @@ public class PayslipUtils {
         salary.setFixedAmount(fix);
         salary.setGrossAmount(gross);
         salary.setVariableAmount(var);
-        salary.setBasicSalary(bas);
         salary.setTotalEarnings(te);
         salary.setNetSalary(net);
         salary.setTotalDeductions(tded);
@@ -275,9 +282,7 @@ public class PayslipUtils {
         if (payslipRequest.getSalary().getGrossAmount() != null) {
             gross = new String(Base64.getDecoder().decode(payslipRequest.getSalary().getGrossAmount()));
         }
-        if (payslipRequest.getSalary().getBasicSalary() != null) {
-            bas = new String(Base64.getDecoder().decode(payslipRequest.getSalary().getBasicSalary()));
-        }
+
         if (payslipRequest.getSalary().getSalaryConfigurationEntity().getAllowances() != null) {
             Map<String, String> decodedAllowances = new HashMap<>();
             for (Map.Entry<String, String> entry : payslipRequest.getSalary().getSalaryConfigurationEntity().getAllowances().entrySet()) {
@@ -335,7 +340,6 @@ public class PayslipUtils {
         payslipRequest.getSalary().setFixedAmount(fix);
         payslipRequest.getSalary().setGrossAmount(gross);
         payslipRequest.getSalary().setVariableAmount(var);
-        payslipRequest.getSalary().setBasicSalary(bas);
         payslipRequest.getSalary().setTotalEarnings(te);
         payslipRequest.getSalary().setNetSalary(net);
         payslipRequest.getSalary().setTotalTax(ttax);
@@ -406,7 +410,6 @@ public class PayslipUtils {
     public static void forFormatNumericalFields(PayslipEntity payslipProperties) {
         if (payslipProperties.getSalary() != null) {
             payslipProperties.getSalary().setFixedAmount(formatValue(payslipProperties.getSalary().getFixedAmount()));
-            payslipProperties.getSalary().setBasicSalary(formatValue(payslipProperties.getSalary().getBasicSalary()));
             payslipProperties.getSalary().setNetSalary(formatValue(payslipProperties.getSalary().getNetSalary()));
             payslipProperties.getSalary().setGrossAmount(formatValue(payslipProperties.getSalary().getGrossAmount()));
             payslipProperties.getSalary().setTotalEarnings(formatValue(payslipProperties.getSalary().getTotalEarnings()));
@@ -459,4 +462,82 @@ public class PayslipUtils {
     }
 
 
+    public static PayslipEntity maskEmployeePayslipUpdateProperties(PayslipUpdateRequest payslipRequest, String payslipId ,String employeeId) {
+
+        String var = null, fix = null, bas = null, gross = null;
+        String hra = null, trav = null, pfc = null, other = null, spa = null;
+        String te = null, pfE = null, pfEmployer = null, lop = null, tax = null, itax = null, ttax = null, tded = null, net = null;
+        Map<String, String> allowances = new HashMap<>();
+        Map<String, String> deductions = new HashMap<>();
+
+
+        if (payslipRequest.getSalary().getFixedAmount() != null) {
+            fix = Base64.getEncoder().encodeToString((payslipRequest.getSalary().getFixedAmount()).getBytes());
+        }
+        if (payslipRequest.getSalary().getVariableAmount() != null) {
+            var = Base64.getEncoder().encodeToString((payslipRequest.getSalary().getVariableAmount()).getBytes());
+        }
+        if (payslipRequest.getSalary().getGrossAmount() != null) { //annual
+            gross  = Base64.getEncoder().encodeToString((payslipRequest.getSalary().getGrossAmount()).getBytes());
+        }
+        if (payslipRequest.getSalary().getTotalEarnings() != null) { //annual
+            te  =Base64.getEncoder().encodeToString((payslipRequest.getSalary().getTotalEarnings()).getBytes());
+        }
+        if (payslipRequest.getSalary().getNetSalary() != null) { //annual
+            net  = Base64.getEncoder().encodeToString((payslipRequest.getSalary().getNetSalary()).getBytes());
+        }
+        if (payslipRequest.getSalary().getTotalDeductions() != null) { //annual
+            tded  = Base64.getEncoder().encodeToString((payslipRequest.getSalary().getTotalDeductions()).getBytes());
+        }
+        if (payslipRequest.getSalary().getIncomeTax() != null) { //annual
+            itax  = Base64.getEncoder().encodeToString((payslipRequest.getSalary().getIncomeTax()).getBytes());
+        }
+        if (payslipRequest.getSalary().getPfTax() != null) { //annual
+            tax  = Base64.getEncoder().encodeToString((payslipRequest.getSalary().getPfTax()).getBytes());
+        }
+        if (payslipRequest.getSalary().getTotalTax() != null) { //annual
+            ttax  = Base64.getEncoder().encodeToString((payslipRequest.getSalary().getTotalTax()).getBytes());
+        }
+
+        if (payslipRequest.getSalary().getSalaryConfigurationEntity().getAllowances() != null) {
+            for (Map.Entry<String, String> entry : payslipRequest.getSalary().getSalaryConfigurationEntity().getAllowances().entrySet()) {
+                allowances.put(entry.getKey(), maskValue(entry.getValue()));
+            }
+        }
+        if (payslipRequest.getSalary().getSalaryConfigurationEntity().getDeductions() != null) {
+            for (Map.Entry<String, String> entry : payslipRequest.getSalary().getSalaryConfigurationEntity().getDeductions().entrySet()) {
+                deductions.put(entry.getKey(), maskValue(entry.getValue()));
+            }
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        AttendanceEntity attendanceEntity = objectMapper.convertValue(payslipRequest.getAttendance(),AttendanceEntity.class);
+        attendanceEntity.setMonth(attendanceEntity.getMonth());
+        attendanceEntity.setYear(attendanceEntity.getYear());
+        attendanceEntity.setTotalWorkingDays(attendanceEntity.getTotalWorkingDays());
+        attendanceEntity.setNoOfWorkingDays(attendanceEntity.getNoOfWorkingDays());
+
+        PayslipEntity payslipEntity = objectMapper.convertValue(payslipRequest, PayslipEntity.class);
+        payslipEntity.setPayslipId(payslipId);
+        payslipEntity.setEmployeeId(employeeId);
+        payslipEntity.setSalaryId(payslipEntity.getSalary().getSalaryId());
+        payslipEntity.setAttendanceId(payslipEntity.getAttendance().getAttendanceId());
+
+        EmployeeSalaryEntity salary = objectMapper.convertValue(payslipRequest.getSalary(),EmployeeSalaryEntity.class);
+        salary.setFixedAmount(fix);
+        salary.setGrossAmount(gross);
+        salary.setVariableAmount(var);
+        salary.setTotalEarnings(te);
+        salary.setNetSalary(net);
+        salary.setTotalDeductions(tded);
+        salary.setIncomeTax(itax);
+        salary.getSalaryConfigurationEntity().setAllowances(allowances);
+        salary.getSalaryConfigurationEntity().setDeductions(deductions);
+        salary.setPfTax(tax);
+        salary.setTotalTax(ttax);
+        payslipEntity.setSalary(salary);
+        payslipEntity.setAttendance(attendanceEntity);
+        payslipEntity.setType(Constants.PAYSLIP);
+        return payslipEntity;
+    }
 }

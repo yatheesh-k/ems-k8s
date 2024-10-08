@@ -15,7 +15,7 @@ public class CompanyUtils {
 
     public static Entity maskCompanyProperties(CompanyRequest companyRequest, String id) {
         String password = Base64.getEncoder().encodeToString(companyRequest.getPassword().getBytes());
-        String hra = null, pan = null, pf = null, spa = null, ta = null, regNo = null, mobileNo=null, landNo= null, gstNo=null, cinNo=null;
+        String hra = null, pan = null, pf = null, spa = null, ta = null, regNo = null, mobileNo=null, landNo= null, gstNo=null, cinNo=null, pmNo=null;
         ObjectMapper objectMapper = new ObjectMapper();
 
         CompanyEntity entity = objectMapper.convertValue(companyRequest, CompanyEntity.class);
@@ -48,9 +48,12 @@ public class CompanyUtils {
             mobileNo = Base64.getEncoder().encodeToString(companyRequest.getMobileNo().toString().getBytes());
             entity.setMobileNo(mobileNo);
         }
-        if(companyRequest.getLandNo() != null) {
-            landNo = Base64.getEncoder().encodeToString(companyRequest.getLandNo().toString().getBytes());
-            entity.setLandNo(landNo);
+        if(companyRequest.getAlternateNo() != null) {
+            landNo = Base64.getEncoder().encodeToString(companyRequest.getAlternateNo().toString().getBytes());
+            entity.setAlternateNo(landNo);
+        } if(companyRequest.getPersonalMobileNo() != null) {
+            pmNo = Base64.getEncoder().encodeToString(companyRequest.getPersonalMobileNo().toString().getBytes());
+            entity.setPersonalMobileNo(pmNo);
         }
         if(companyRequest.getGstNo() != null) {
             gstNo = Base64.getEncoder().encodeToString(companyRequest.getGstNo().toString().getBytes());
@@ -98,9 +101,9 @@ public class CompanyUtils {
             mobileNo = new String(Base64.getDecoder().decode(companyEntity.getMobileNo().getBytes()));
             companyEntity.setMobileNo(mobileNo);
         }
-        if(companyEntity.getLandNo() != null) {
-            landNo = new String(Base64.getDecoder().decode(companyEntity.getLandNo().getBytes()));
-            companyEntity.setLandNo(landNo);
+        if(companyEntity.getAlternateNo() != null) {
+            landNo = new String(Base64.getDecoder().decode(companyEntity.getAlternateNo().getBytes()));
+            companyEntity.setAlternateNo(landNo);
         }
         if(companyEntity.getGstNo() != null) {
             gstNo = new String(Base64.getDecoder().decode(companyEntity.getGstNo().getBytes()));
@@ -122,7 +125,7 @@ public class CompanyUtils {
 
     public static CompanyEntity maskCompanyUpdateProperties(CompanyEntity existingEntity, CompanyUpdateRequest companyRequest) {
 
-        String hra = null, pf = null, spa = null, ta = null, mobileNo=null, landNo=null;
+        String hra = null, pf = null, spa = null, ta = null, mobileNo=null, landNo=null, pmNo=null;
 
         if(companyRequest.getHraPercentage() != null) {
             hra = Base64.getEncoder().encodeToString(companyRequest.getHraPercentage().toString().getBytes());
@@ -144,9 +147,12 @@ public class CompanyUtils {
             mobileNo = Base64.getEncoder().encodeToString(companyRequest.getMobileNo().toString().getBytes());
             existingEntity.setMobileNo(mobileNo);
         }
-        if(companyRequest.getLandNo() != null) {
-            landNo = Base64.getEncoder().encodeToString(companyRequest.getLandNo().toString().getBytes());
-            existingEntity.setLandNo(landNo);
+        if(companyRequest.getAlternateNo() != null) {
+            landNo = Base64.getEncoder().encodeToString(companyRequest.getAlternateNo().toString().getBytes());
+            existingEntity.setAlternateNo(landNo);
+        }if(companyRequest.getPersonalMobileNo() != null) {
+            pmNo = Base64.getEncoder().encodeToString(companyRequest.getPersonalMobileNo().toString().getBytes());
+            existingEntity.setPersonalMobileNo(pmNo);
         }
         if(companyRequest.getName() != null) {
             existingEntity.setName(companyRequest.getName());
@@ -211,7 +217,7 @@ public class CompanyUtils {
 
     public static Entity maskEmployeeUpdateProperties(EmployeeEntity user, EmployeeUpdateRequest employeeUpdateRequest) {
 
-        String accountNo=null,ifscCode=null;
+        String accountNo=null,ifscCode=null, mobileNo=null;
         if (employeeUpdateRequest.getEmployeeType() != null){
             user.setEmployeeType(employeeUpdateRequest.getEmployeeType());
         }
@@ -227,9 +233,6 @@ public class CompanyUtils {
 //        if (employeeUpdateRequest.getRoles() != null){
 //            user.setRoles(Collections.singletonList(String.valueOf(employeeUpdateRequest.getRoles())));
 //        }
-        if (employeeUpdateRequest.getEmailId() != null){
-            user.setEmailId(employeeUpdateRequest.getEmailId());
-        }
         if (employeeUpdateRequest.getLocation() != null){
             user.setLocation(employeeUpdateRequest.getLocation());
         }
@@ -239,6 +242,10 @@ public class CompanyUtils {
         if (employeeUpdateRequest.getAccountNo() != null) {
             accountNo = Base64.getEncoder().encodeToString(employeeUpdateRequest.getAccountNo().getBytes());
             user.setAccountNo(accountNo);
+        }
+        if (employeeUpdateRequest.getMobileNo() != null) {
+            mobileNo = Base64.getEncoder().encodeToString(employeeUpdateRequest.getMobileNo().getBytes());
+            user.setMobileNo(mobileNo);
         }
 
         if (employeeUpdateRequest.getIfscCode() != null) {
@@ -267,17 +274,28 @@ public class CompanyUtils {
             var = Base64.getEncoder().encodeToString(salaryRequest.getVariableAmount().toString().getBytes());
             salary.setVariableAmount(var);
         }
+        if (salaryRequest.getIncomeTax().equals(Constants.NEW)){
+            incomeTax = String.valueOf(TaxCalculatorUtils.getNewTax(Double.parseDouble(salaryRequest.getGrossAmount())));
+        }else if(salaryRequest.getIncomeTax().equals(Constants.OLD)){
+            incomeTax = String.valueOf(TaxCalculatorUtils.getOldTax(Double.parseDouble(salaryRequest.getGrossAmount())));
+        }
         if (salaryRequest.getGrossAmount() != null) {
-            Double itax = TaxCalculatorUtils.getNewTax(Double.parseDouble(salaryRequest.getGrossAmount()));
-            Double ptax = TaxCalculatorUtils.getPfTax(Double.valueOf(salaryRequest.getGrossAmount()));
-            incomeTax=Base64.getEncoder().encodeToString(itax.toString().getBytes());
-            pfTax = Base64.getEncoder().encodeToString(ptax.toString().getBytes());
-            ttax= String.valueOf(itax+ptax);
+            pfTax  = String.valueOf(TaxCalculatorUtils.getPfTax(Double.parseDouble(salaryRequest.getGrossAmount())));
             gross= (Base64.getEncoder().encodeToString(salaryRequest.getGrossAmount().toString().getBytes()));
             salary.setGrossAmount(gross);
-            salary.setIncomeTax(incomeTax);
-            salary.setPfTax(pfTax);
+        }
 
+        ttax = String.valueOf(Double.parseDouble(pfTax)+ Double.parseDouble(incomeTax));
+
+        ttax = Base64.getEncoder().encodeToString(ttax.getBytes());
+        salary.setTotalTax(ttax);
+        if (pfTax != null){
+            pfTax = Base64.getEncoder().encodeToString(pfTax.getBytes());;
+            salary.setPfTax(pfTax);
+        }
+        if (incomeTax!=null){
+            incomeTax = Base64.getEncoder().encodeToString(incomeTax.getBytes());
+            salary.setIncomeTax(incomeTax);
         }
         double totalAllowance = 0.0;
         if (salaryRequest.getSalaryConfigurationRequest().getAllowances()!=null){
@@ -285,8 +303,6 @@ public class CompanyUtils {
             for (Map.Entry<String, String> entry : salaryRequest.getSalaryConfigurationRequest().getAllowances().entrySet()){
                 String encodedValue = Base64.getEncoder().encodeToString(entry.getValue().getBytes());
                 allowance.put(entry.getKey(), encodedValue);
-
-                totalAllowance += Double.parseDouble(entry.getValue());
             }
             salary.getSalaryConfigurationEntity().setAllowances(allowance);
 
@@ -297,35 +313,32 @@ public class CompanyUtils {
             for (Map.Entry<String, String> entry : salaryRequest.getSalaryConfigurationRequest().getDeductions().entrySet()){
                 String encodedValue = Base64.getEncoder().encodeToString(entry.getValue().getBytes());
                 deductions.put(entry.getKey(), encodedValue);
-
-                totalDeduction += Double.parseDouble(entry.getValue());
             }
             salary.getSalaryConfigurationEntity().setDeductions(deductions);
 
         }
-        assert salaryRequest.getGrossAmount() != null;
-        double basicSalary= Double.parseDouble(salaryRequest.getGrossAmount())-totalAllowance;
-        te = String.valueOf(basicSalary+totalAllowance);
-
-        bas = Base64.getEncoder().encodeToString(String.valueOf(basicSalary).getBytes());
-        salary.setBasicSalary(bas);
-            tded = Base64.getEncoder().encodeToString(String.valueOf(totalDeduction).getBytes());
-            salary.setTotalDeductions(tded); // or set it to a specific field if needed
-
-
-        net = String.valueOf(Double.valueOf(te)-totalDeduction-Double.valueOf(ttax));
-        if (net!= null){
-            net=Base64.getEncoder().encodeToString(net.getBytes());
+        if (salaryRequest.getNetSalary()!= null){
+            net=Base64.getEncoder().encodeToString(salaryRequest.getNetSalary().getBytes());
             salary.setNetSalary(net);
         }
-        if (te!= null){
-            te=Base64.getEncoder().encodeToString(te.getBytes());
+        if (salaryRequest.getTotalEarnings()!= null){
+            te=Base64.getEncoder().encodeToString(salaryRequest.getTotalEarnings().getBytes());
             salary.setTotalEarnings(te);
         }
+        if (salaryRequest.getTotalDeductions() !=null){
+            tded= Base64.getEncoder().encodeToString(salaryRequest.getTotalDeductions().getBytes());
+            salary.setTotalDeductions(tded);
+        }
+
+
         if (ttax!=null){
             ttax = Base64.getEncoder().encodeToString(ttax.getBytes());
             salary.setTotalTax(ttax);
         }
+        if (salaryRequest.getStatus() !=null){
+            salary.setStatus(salaryRequest.getStatus());
+        }
+
 
         salary.setType(Constants.SALARY);
         return salary;
@@ -402,9 +415,15 @@ public class CompanyUtils {
 
     public static Map<String, Object> duplicateValues(CompanyRequest companyRequest, List<CompanyEntity> companyEntities) {
         Map<String, Object> responseBody = new HashMap<>();
-           String cinNo = null, regNo = null, mobileNo = null, landNo =  null, gstNo = null, panNo= null, personalMail = null, personalMobile = null;
+           String cinNo = null, regNo = null, mobileNo = null, landNo =  null, gstNo = null, panNo= null, personalMail = null, personalMobile = null, emailId=null;
         for (CompanyEntity companyEntity :companyEntities) {
 
+            if (companyRequest.getEmailId() != null && companyEntity.getEmailId() != null) {
+                if (companyEntity.getEmailId().equals(companyRequest.getCompanyRegNo())){
+                    responseBody.put(Constants.DUPLICATE_EMAIL_ID, companyRequest.getEmailId());
+                }
+
+            }
             if (companyRequest.getCompanyRegNo() != null && companyEntity.getCompanyRegNo() != null) {
                 regNo = new String(Base64.getDecoder().decode(companyEntity.getCompanyRegNo().getBytes()));
                 if (regNo.equals(companyRequest.getCompanyRegNo())){
@@ -419,13 +438,20 @@ public class CompanyUtils {
                 }
 
             }
-            if (companyRequest.getLandNo() != null && companyEntity.getLandNo() != null) {
-                landNo = new String(Base64.getDecoder().decode(companyEntity.getLandNo().getBytes()));
-                if (landNo.equals(companyRequest.getLandNo())){
-                    responseBody.put(Constants.DUPLICATE_LAND_NO, companyRequest.getLandNo());
+            if (companyRequest.getAlternateNo() != null && companyEntity.getAlternateNo() != null ) {
+                landNo = new String(Base64.getDecoder().decode(companyEntity.getAlternateNo().getBytes()));
+                if (landNo.equals(companyRequest.getAlternateNo())){
+                    responseBody.put(Constants.DUPLICATE_ALTERNATE_NO, companyRequest.getAlternateNo());
                 }
-
             }
+
+            if (companyRequest.getAlternateNo().equals(companyRequest.getMobileNo())){
+                responseBody.put(Constants.DUPLICATE_AS_MOBILE_NO, companyRequest.getAlternateNo());
+            }
+            if (companyRequest.getEmailId().equals(companyRequest.getPersonalMailId())){
+                responseBody.put(Constants.DUPLICATE_AS_EMAIL_NO, companyRequest.getEmailId());
+            }
+
             if (companyRequest.getGstNo() != null && companyEntity.getGstNo() != null) {
                 gstNo = new String(Base64.getDecoder().decode(companyEntity.getGstNo().getBytes()));
                 if (gstNo.equals(companyRequest.getGstNo())){
@@ -477,13 +503,20 @@ public class CompanyUtils {
                 }
 
             }
-            if (companyUpdateRequest.getLandNo() != null && companyEntity.getLandNo() != null) {
-                landNo = new String(Base64.getDecoder().decode(companyEntity.getLandNo().getBytes()));
-                if (landNo.equals(companyUpdateRequest.getLandNo())){
-                    responseBody.put(Constants.DUPLICATE_LAND_NO, companyUpdateRequest.getLandNo());
+            if (companyUpdateRequest.getAlternateNo().equals(companyUpdateRequest.getMobileNo())){
+                responseBody.put(Constants.DUPLICATE_AS_MOBILE_NO, companyUpdateRequest.getAlternateNo());
+            }
+            if (companyEntity.getEmailId().equals(companyUpdateRequest.getPersonalMailId())){
+                responseBody.put(Constants.DUPLICATE_AS_EMAIL_NO, companyEntity.getEmailId());
+            }
+            if (companyUpdateRequest.getAlternateNo() != null && companyEntity.getAlternateNo() != null) {
+                landNo = new String(Base64.getDecoder().decode(companyEntity.getAlternateNo().getBytes()));
+                if (landNo.equals(companyUpdateRequest.getAlternateNo())){
+                    responseBody.put(Constants.DUPLICATE_ALTERNATE_NO, companyUpdateRequest.getAlternateNo());
                 }
 
             }
+
             if (companyUpdateRequest.getPersonalMailId() != null && companyEntity.getPersonalMailId() != null) {
                 personalMail = companyEntity.getPersonalMailId();
                 if (personalMail.equals(companyUpdateRequest.getPersonalMailId())){
@@ -678,10 +711,6 @@ public class CompanyUtils {
             gross= (Base64.getEncoder().encodeToString(salaryRequest.getGrossAmount().toString().getBytes()));
             entity.setGrossAmount(gross);
         }
-        if (salaryRequest.getBasicSalary() != null){
-            basic = Base64.getEncoder().encodeToString(salaryRequest.getBasicSalary().getBytes());
-            entity.setBasicSalary(basic);
-        }
 
         ttax = String.valueOf(Double.parseDouble(pfTax)+ Double.parseDouble(incomeTax));
         ttax = Base64.getEncoder().encodeToString(ttax.getBytes());
@@ -718,7 +747,7 @@ public class CompanyUtils {
             net=Base64.getEncoder().encodeToString(salaryRequest.getNetSalary().getBytes());
             entity.setNetSalary(net);
         }
-        if (salaryRequest.getNetSalary()!= null){
+        if (salaryRequest.getTotalEarnings()!= null){
             te=Base64.getEncoder().encodeToString(salaryRequest.getTotalEarnings().getBytes());
             entity.setTotalEarnings(te);
         }

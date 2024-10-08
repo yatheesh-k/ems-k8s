@@ -35,6 +35,7 @@ import ForgotPassword from '../Login/ForgotPassword'
 import EmployeeProfile from '../EmployeeModule/EmployeeProfile';
 import EmployeeSalaryUpdate from '../CompanyModule/PayRoll/EmployeeSalaryUpdate';
 import CompanySalaryView from '../CompanyModule/PayRoll/CompanySalaryView';
+import PayslipUpdate from '../Login/PayslipUpdate';
 
 const Rout = () => {
   const location = useLocation();
@@ -124,6 +125,7 @@ const Rout = () => {
       <Route path='/increment' element={<AddIncrement />}></Route>
       <Route path='/incrementList' element={<ViewIncrement />}></Route>
       <Route path='/payslip' element={<PaySlipDoc/>}></Route>
+      <Route path='/payslipUpdate' element={<PayslipUpdate/>}></Route>
       <Route path='/addAttendance' element={<ManageAttendance />}></Route>
       <Route path='/attendanceList' element={<AttendanceList />}></Route>
       <Route path='/attendanceReport' element={<AttendanceReport />}></Route>

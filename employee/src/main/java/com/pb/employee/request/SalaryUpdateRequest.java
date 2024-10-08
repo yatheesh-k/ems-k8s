@@ -27,12 +27,32 @@ public class SalaryUpdateRequest {
     @Size(min = 4, max = 20, message = "{variableAmount.size.message}")
     private String variableAmount;
 
-    private SalaryConfigurationUpdate salaryConfigurationRequest;
-
     @Schema(example = "grossAmount")
     @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{grossAmount.format}")
     @Size(min = 4, max = 20, message = "{grossAmount.size.message}")
     private String grossAmount;
+
+    private SalaryConfigurationUpdate salaryConfigurationRequest;
+
+    @Schema(example = "totalEarnings")
+    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{totalEarnings.format}")
+    @Size(min = 4, max = 20, message = "{totalEarnings.size.message}")
+    private String totalEarnings;
+
+    @Schema(example = "netSalary")
+    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{netSalary.format}")
+    @Size(min = 4, max = 20, message = "{netSalary.size.message}")
+    private String netSalary;
+
+    @Schema(example = "totalDeduction")
+    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{totalDeduction.format}")
+    @Size(min = 2, max = 20, message = "{totalDeduction.size.message}")
+    private String totalDeductions;
+
+    @Schema(example = "incomeTax")
+    @Pattern(regexp = "^(new|old)$", message = "{incomeTax.format}")
+    @Size(min = 3, max = 4, message = "{incomeTax.size.message}")
+    private String incomeTax;
 
     @Schema(example = "status")
     @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{status.format}")

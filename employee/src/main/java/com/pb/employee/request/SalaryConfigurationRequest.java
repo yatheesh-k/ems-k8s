@@ -36,8 +36,8 @@ public class SalaryConfigurationRequest {
             @Pattern(regexp = "^(\\d+|\\d+%)$", message = "{deduction.format}")
             @Size(min = 1, max = 30, message = "{deduction.size}") String> deductions;
 
-    @Schema(example = "status")
-    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{status.format}")
+    @Schema(example = "Active")
+    @Pattern(regexp = "^(Active|InActive)$", message = "{status.format}")
     @NotBlank(message = "{status.notnull.message}")
     private String status;
 }

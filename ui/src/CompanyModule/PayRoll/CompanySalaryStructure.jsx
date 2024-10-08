@@ -15,8 +15,10 @@ const CompanySalaryStructure = () => {
   const [deductionFields, setDeductionFields] = useState([{ label: '', type: 'number', value: '' }]);
   const [isEditing, setIsEditing] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [allowanceError, setAllowanceError] = useState("");
+  const [selectedAllowances, setSelectedAllowances] = useState([]);
   const [allowances, setAllowances] = useState([]);
-  const [deductions, setDeductions] = useState([]); 
+  const [deductions, setDeductions] = useState([]);
   const [newFieldName, setNewFieldName] = useState('');
   const [modalType, setModalType] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -79,18 +81,37 @@ const CompanySalaryStructure = () => {
     const fields = activeTab === 'nav-home' ? allowanceFields : deductionFields;
     const fieldLabel = fields[index].label;
 
-    setFieldCheckboxes((prev) => ({
-      ...prev,
-      [activeTab === 'nav-home' ? 'allowances' : 'deductions']: {
-        ...prev[activeTab === 'nav-home' ? 'allowances' : 'deductions'],
-        [fieldLabel]: !prev[activeTab === 'nav-home' ? 'allowances' : 'deductions'][fieldLabel],
-      }
-    }));
+    setFieldCheckboxes((prev) => {
+      const newCheckboxes = {
+        ...prev,
+        [activeTab === 'nav-home' ? 'allowances' : 'deductions']: {
+          ...prev[activeTab === 'nav-home' ? 'allowances' : 'deductions'],
+          [fieldLabel]: !prev[activeTab === 'nav-home' ? 'allowances' : 'deductions'][fieldLabel],
+        }
+      };
 
-    if (!fieldCheckboxes[activeTab === 'nav-home' ? 'allowances' : 'deductions'][fieldLabel]) {
+      const selected = Object.values(newCheckboxes[activeTab === 'nav-home' ? 'allowances' : 'deductions']).filter(Boolean);
+
+      if (activeTab === 'nav-home' && selected.length > 0) {
+        setAllowanceError('');
+      }
+
+      return newCheckboxes;
+    });
+
+    const isChecked = !fieldCheckboxes[activeTab === 'nav-home' ? 'allowances' : 'deductions'][fieldLabel];
+    if (isChecked) {
       validateField(fields[index]);
+    } else {
+
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[fieldLabel];
+        return newErrors;
+      });
     }
   };
+
 
   const validateField = (field) => {
     const errors = { ...validationErrors };
@@ -288,6 +309,23 @@ const CompanySalaryStructure = () => {
     e.target.value = newValue;
   };
 
+  const isSubmitEnabled = () => {
+    const hasSelectedAllowance = allowanceFields.some((field, index) => fieldCheckboxes.allowances[field.label]);
+    const hasSelectedDeduction = deductionFields.some((field, index) => fieldCheckboxes.deductions[field.label]);
+    return hasSelectedAllowance && hasSelectedDeduction;
+  };
+
+  const handleTabChange = (tab) => {
+    if (tab === 'nav-profile') {
+      if (Object.values(fieldCheckboxes.allowances).every(checkbox => !checkbox)) {
+        setAllowanceError('Please select at least one allowance.');
+        return;
+      }
+    }
+    setAllowanceError('');
+    setActiveTab(tab);
+  };
+
   return (
     <LayOut>
       <div className="container-fluid p-0">
@@ -315,13 +353,13 @@ const CompanySalaryStructure = () => {
                   <div className="nav nav-tabs" id="nav-tab" role="tablist">
                     <button type='button'
                       className={`nav-link ${activeTab === 'nav-home' ? 'active' : ''}`}
-                      onClick={() => setActiveTab('nav-home')}
+                      onClick={() => handleTabChange('nav-home')}
                     >
                       Allowance
                     </button>
                     <button type='button'
                       className={`nav-link ${activeTab === 'nav-profile' ? 'active' : ''}`}
-                      onClick={() => setActiveTab('nav-profile')}
+                      onClick={() => handleTabChange('nav-profile')}
                     >
                       Deductions
                     </button>
@@ -329,14 +367,7 @@ const CompanySalaryStructure = () => {
                 </nav>
                 <div className="tab-content companyTabContent" id="nav-tabContent">
                   <div className={`tab-pane fade ${activeTab === 'nav-home' ? 'show active' : ''}`} id="nav-home" role="tabpanel">
-                    <div className="row">
-                      <div className="col-sm-12">
-                        <button type="button" onClick={() => {
-                          setModalType('allowances');
-                          setShowModal(true);
-                        }} className="btn btn-primary pull-right float-end">Add Field</button>
-                      </div>
-                    </div>
+                    {allowanceError && <div className="text-danger">{allowanceError}</div>}
                     {allowanceFields.map((field, index) => (
                       <div className="row bbl ptb25" key={index}>
                         <div className="col-auto mt-2">
@@ -350,6 +381,7 @@ const CompanySalaryStructure = () => {
                           <input
                             type='text'
                             className='form-control'
+                            readOnly
                             value={formatFieldName(field.label)}
                             onChange={(e) => handleLabelChange(index, e.target.value)}
                             placeholder="Label Name"
@@ -385,16 +417,16 @@ const CompanySalaryStructure = () => {
                         </div>
                       </div>
                     ))}
-                  </div>
-                  <div className={`tab-pane fade ${activeTab === 'nav-profile' ? 'show active' : ''}`} id="nav-profile" role="tabpanel">
                     <div className="row">
                       <div className="col-sm-12">
                         <button type="button" onClick={() => {
-                          setModalType('deductions');
+                          setModalType('allowances');
                           setShowModal(true);
-                        }} className="btn btn-primary pull-right float-end">Add New</button>
+                        }} className="btn btn-primary mt-4">Add Field</button>
                       </div>
                     </div>
+                  </div>
+                  <div className={`tab-pane fade ${activeTab === 'nav-profile' ? 'show active' : ''}`} id="nav-profile" role="tabpanel">
                     {deductionFields.map((field, index) => (
                       <div className="row bbl ptb25" key={index}>
                         <div className="col-auto mt-2">
@@ -408,6 +440,7 @@ const CompanySalaryStructure = () => {
                           <input
                             type='text'
                             className='form-control'
+                            readOnly
                             value={formatFieldName(field.label)}
                             onChange={(e) => handleLabelChange(index, e.target.value)}
                             placeholder="Label Name"
@@ -443,6 +476,19 @@ const CompanySalaryStructure = () => {
                         </div>
                       </div>
                     ))}
+                    <div className="mt-4">
+                      <div className="alert alert-info" role="alert">
+                        <strong>Note:</strong> LOP is calculated based on your Attendance.
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="col-sm-12">
+                        <button type="button" onClick={() => {
+                          setModalType('deductions');
+                          setShowModal(true);
+                        }} className="btn btn-primary mt-4">Add Field</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="row mt-3 align-items-center">
@@ -468,6 +514,7 @@ const CompanySalaryStructure = () => {
                               : null
                           }
                           onChange={(val) => field.onChange(val.value)}
+                          isDisabled={!isSubmitEnabled()}
                           placeholder="Select Status"
                         />
                       )}
@@ -475,7 +522,13 @@ const CompanySalaryStructure = () => {
                     {errors.status && <p className="errorMsg text-danger">Status is required</p>}
                   </div>
                   <div className="col-4 text-end">
-                    <button type="submit" className="btn btn-primary">Submit All</button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={!isSubmitEnabled()}
+                    >
+                      Submit All
+                    </button>
                   </div>
                 </div>
               </div>

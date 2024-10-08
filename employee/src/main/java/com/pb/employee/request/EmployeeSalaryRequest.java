@@ -37,11 +37,6 @@ public class EmployeeSalaryRequest {
     @Size(min = 4, max = 20, message = "{grossAmount.size.message}")
     private String grossAmount;
 
-    @Schema(example = "basicSalary")
-    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{basicSalary.format}")
-    @Size(min = 4, max = 20, message = "{basicSalary.size.message}")
-    private String basicSalary;
-
     private SalaryConfigurationUpdate salaryConfigurationEntity;
 
     @Schema(example = "totalEarnings")
@@ -59,19 +54,14 @@ public class EmployeeSalaryRequest {
     @Size(min = 2, max = 20, message = "{totalDeduction.size.message}")
     private String totalDeductions;
 
-    @Schema(example = "pfTax")
-    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{pf.format}")
-    @Size(min = 2, max = 5, message = "{pf.size.message}")
-    private String pfTax;
-
     @Schema(example = "incomeTax")
     @Pattern(regexp = "^(new|old)$", message = "{incomeTax.format}")
     @Size(min = 3, max = 4, message = "{incomeTax.size.message}")
     private String incomeTax;
 
-    
-    @Schema(example = "status")
-    @Pattern(regexp = "^[A-Za-z]+(?:\\s[A-Za-z]+)*$", message = "{status.format}")
+    @Schema(example = "Active")
+    @Pattern(regexp = "^(Active|InActive)$", message = "{status.format}")
     @NotBlank(message = "{status.notnull.message}")
     private String status;
+
     }

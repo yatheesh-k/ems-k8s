@@ -3,10 +3,9 @@ import { useLocation } from "react-router-dom";
 import { CompanyImageGetApi, companyViewByIdApi, EmployeeGetApiById, EmployeePaySlipDownloadById, EmployeePayslipGetById } from "../Utils/Axios";
 import { toast } from "react-toastify";
 import LayOut from "../LayOut/LayOut";
-import { Download } from "react-bootstrap-icons";
 import { useAuth } from "../Context/AuthContext";
 
-const PayslipDoc = () => {
+const PayslipUpdate = () => {
   const [companyData, setCompanyData] = useState({});
   const [payslipData, setPayslipData] = useState(null);
   const [employeeDetails, setEmployeeDetails] = useState(null);
@@ -51,7 +50,7 @@ const PayslipDoc = () => {
     }
   };
 
-  const handleDownload = async () => {
+  const handleUpdate = async () => {
     if (employeeId && payslipId) {
       try {
         await EmployeePaySlipDownloadById(employeeId, payslipId);
@@ -84,13 +83,6 @@ const PayslipDoc = () => {
     return <div>No data available</div>;
   }
 
-  const maskPanNumber = (panNumber) => {
-    if (!panNumber || panNumber.length < 4) return panNumber;
-    const maskedPart = panNumber.slice(0, -4).replace(/./g, '*');
-    const visiblePart = panNumber.slice(-4);
-    return maskedPart + visiblePart;
-  };
-
   const formatFieldName = (fieldName) => {
     return fieldName
       .replace(/([A-Z])/g, ' $1')
@@ -112,8 +104,8 @@ const PayslipDoc = () => {
               <li className="breadcrumb-item">
                 <a href="/main">Home</a>
               </li>
-              <li className="breadcrumb-item"><a href="/payslipsList">Payslip View</a></li>
-              <li className="breadcrumb-item active">PaySlipForm</li>
+              <li className="breadcrumb-item"><a href="/payslipGeneration">PayRoll</a></li>
+              <li className="breadcrumb-item active">Edit Payslip</li>
             </ol>
           </nav>
         </div>
@@ -156,13 +148,13 @@ const PayslipDoc = () => {
                       <th style={{ padding: "4px", width: "150px", textAlign: "left" }}>Bank Name</th>
                       <td style={{ padding: "4px", textAlign: "left" }}>{employeeDetails.bankName}</td>
                       <th style={{ padding: "4px", width: "150px", textAlign: "left" }}>Account Number</th>
-                      <td style={{ padding: "4px", textAlign: "left" }}>{maskPanNumber(employeeDetails.accountNo)}</td>
+                      <td style={{ padding: "4px", textAlign: "left" }}>{employeeDetails.accountNo}</td>
                     </tr>
                     <tr>
                       <th style={{ padding: "4px", width: "150px", textAlign: "left" }}>UAN Number</th>
-                      <td style={{ padding: "4px", textAlign: "left" }}>{maskPanNumber(employeeDetails.uanNo)}</td>
+                      <td style={{ padding: "4px", textAlign: "left" }}>{employeeDetails.uanNo}</td>
                       <th style={{ padding: "4px", width: "150px", textAlign: "left" }}>PAN Number</th>
-                      <td style={{ padding: "4px", textAlign: "left" }}>{maskPanNumber(employeeDetails.panNo)}</td>
+                      <td style={{ padding: "4px", textAlign: "left" }}>{employeeDetails.panNo}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -205,56 +197,16 @@ const PayslipDoc = () => {
                         </tr>
                       );
                     })}
-
-                    {Object.entries(payslipData.salary?.salaryConfigurationEntity?.deductions || {})
-                      .slice(Object.keys(payslipData.salary?.salaryConfigurationEntity?.allowances || {}).length)
-                      .map(([key, value]) => (
-                        <tr key={key}>
-                          <td className="earnings" style={{ padding: "4px", textAlign: "left" }}></td>
-                          <td className="earnings" style={{ textAlign: "left" }}></td>
-                          <td className="deductions" style={{ padding: "4px", textAlign: "left" }}>{formatFieldName(key)}</td>
-                          <td className="deductions" style={{ textAlign: "left" }}>{value}</td>
-                        </tr>
-                      ))}
-
-                    {/* Static rows for specific deductions */}
+                    {Object.entries(payslipData.salary?.salaryConfigurationEntity?.deductions || {}).slice(Object.keys(payslipData.salary?.salaryConfigurationEntity?.allowances || {}).length).map(([key, value]) => (
+                      <tr key={key}>
+                        <td className="earnings" style={{ padding: "4px", textAlign: "left" }}></td>
+                        <td className="earnings" style={{ textAlign: "left" }}></td>
+                        <td className="deductions" style={{ padding: "4px", textAlign: "left" }}>{formatFieldName(key)}</td>
+                        <td className="deductions" style={{ textAlign: "left" }}>{value}</td>
+                      </tr>
+                    ))}
                     <tr>
-                      <td className="earnings" style={{ padding: "4px", textAlign: "left" }}></td>
-                      <td className="earnings" style={{ textAlign: "left" }}></td>
-                      <td className="deductions" style={{ padding: "4px", textAlign: "left" }}>LOP</td>
-                      <td className="deductions" style={{ textAlign: "left" }}>{payslipData.salary?.lop || 0}</td>
-                    </tr>
-                    <tr>
-                      <td className="earnings" style={{ padding: "4px", textAlign: "left" }}></td>
-                      <td className="earnings" style={{ textAlign: "left" }}></td>
-                      <td className="deductions" style={{ padding: "4px", textAlign: "left" }}><b>Total Deductions (B)</b></td>
-                      <td className="deductions" style={{ textAlign: "left" }}><b>{payslipData.salary?.totalDeductions || 0}</b></td>
-                    </tr>
-                    <tr>
-                      <td className="earnings" style={{ padding: "4px", textAlign: "left" }}></td>
-                      <td className="earnings" style={{ textAlign: "left" }}></td>
-                      <td className="deductions" style={{ padding: "4px", textAlign: "left" }}>PF Tax</td>
-                      <td className="deductions" style={{ textAlign: "left" }}>{payslipData.salary?.pfTax || 0}</td>
-                    </tr>
-                    <tr>
-                      <td className="earnings" style={{ padding: "4px", textAlign: "left" }}></td>
-                      <td className="earnings" style={{ textAlign: "left" }}></td>
-                      <td className="deductions" style={{ padding: "4px", textAlign: "left" }}>Income Tax</td>
-                      <td className="deductions" style={{ textAlign: "left" }}>{payslipData.salary?.incomeTax || 0}</td>
-                    </tr>
-                    <tr>
-                      <td className="earnings" style={{ padding: "4px", textAlign: "left" }}>
-                       <b> Total Earnings (A)</b>
-                      </td>
-                      <td className="earnings" style={{ textAlign: "left" }}><b>{payslipData.salary?.totalEarnings || 0}</b></td>
-                      <td className="deductions" style={{ padding: "4px", textAlign: "left" }}><b>Total Tax(C)</b></td>
-                      <td className="deductions" style={{ textAlign: "left" }}><b>{payslipData.salary?.totalTax || 0}</b></td>
-                    </tr>
-
-
-                    {/* Remaining rows for net salary and in words */}
-                    <tr>
-                      <td className="earnings" colSpan={1} style={{ padding: "4px", textAlign: "left" }}>Net Salary (A-B-C)</td>
+                      <td className="earnings" colSpan={1} style={{ padding: "4px", textAlign: "left" }}>Net Salary (A-B)</td>
                       <td className="earnings" colSpan={3} style={{ textAlign: "left" }}><b>{payslipData.salary?.netSalary || 0}</b></td>
                     </tr>
                     <tr>
@@ -281,12 +233,12 @@ const PayslipDoc = () => {
         </div>
       </div>
       <div className="d-flex justify-content-end align-items-center me-4">
-        <button type="button" className="btn btn-outline-primary" onClick={handleDownload}>
-          <span className="m-2">Download</span> <Download size={18} className="ml-1" />
+        <button type="button" className="btn btn-danger" onClick={handleUpdate}>
+          <span className="m-2">Update</span>
         </button>
       </div>
     </LayOut>
   );
 };
 
-export default PayslipDoc;
+export default PayslipUpdate;

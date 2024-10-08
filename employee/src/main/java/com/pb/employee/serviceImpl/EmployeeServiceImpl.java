@@ -200,6 +200,12 @@ public class EmployeeServiceImpl implements EmployeeService {
                     ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_DESIGNATION)))),
                     HttpStatus.CONFLICT);
         }
+        int noOfChanges = EmployeeUtils.duplicateEmployeeProperties(user, employeeUpdateRequest);
+        if (noOfChanges==0){
+            return new ResponseEntity<>(
+                    ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_DATA_EXIST)))),
+                    HttpStatus.CONFLICT);
+        }
         Entity entity = CompanyUtils.maskEmployeeUpdateProperties(user, employeeUpdateRequest);
         openSearchOperations.saveEntity(entity, employeeId, index);
         return new ResponseEntity<>(
@@ -209,27 +215,42 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
     @Override
-    public ResponseEntity<?> deleteEmployeeById(String companyName,String employeeId) throws EmployeeException {
-        log.info("getting details of {}", employeeId);
-        Object entity = null;
+    public ResponseEntity<?> deleteEmployeeById(String companyName, String employeeId) throws EmployeeException {
+        log.info("Attempting to delete employee with ID: {}", employeeId);
+        EmployeeEntity entity = null;
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
 
         try {
-            entity = openSearchOperations.getById(employeeId, null, index);
-
-            if (entity!=null) {
-                openSearchOperations.deleteEntity(employeeId,index);
-            }
+            entity = openSearchOperations.getEmployeeById(employeeId, null, index);
         } catch (Exception ex) {
-            log.error("Exception while fetching company details {}", ex);
-            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_DELETE_EMPLOYEE),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("Exception while fetching employee details: {}", ex.getMessage(), ex);
+            throw new EmployeeException(
+                    ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_DELETE_EMPLOYEE),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
 
+        if (entity == null) {
+            log.error("Employee not found in company: {}", companyName);
+            throw new EmployeeException(
+                    String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_NOT_FOUND), employeeId),
+                    HttpStatus.NOT_FOUND
+            );
+        }
 
+        try {
+            openSearchOperations.deleteEntity(employeeId, index);
+        } catch (Exception ex) {
+            log.error("Exception while deleting employee: {}", ex.getMessage(), ex);
+            throw new EmployeeException(
+                    ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_DELETE_EMPLOYEE),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
         return new ResponseEntity<>(
-                ResponseBuilder.builder().build().createSuccessResponse(Constants.DELETED), HttpStatus.OK);
-
+                ResponseBuilder.builder().build().createSuccessResponse(Constants.DELETED),
+                HttpStatus.OK
+        );
     }
 
 

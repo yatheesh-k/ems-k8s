@@ -14,7 +14,7 @@ import lombok.*;
 public class CompanyUpdateRequest {
 
     @Schema(example = "companyAddress")
-    @Pattern(regexp = "^(?:[A-Za-z0-9]+(?:[\\s.,'#&*()^/][A-Za-z0-9]+)*)+(?:[\\s.,'#&*()/-]*[A-Za-z0-9]+)*(?:[\\s]*[.,#&*()/-]*\\s*)*$", message = "{companyAddress.pattern.message}")
+    @Pattern(regexp = "^(?!.*\\s{2,})(?!^([a-zA-Z]{1}\\s?){2,}$)(?!^[A-Z](?:\\s[A-Z])*$)(?!^[\\s]*$)[A-Za-z0-9]+(?:[\\s.,'#&*()^/][A-Za-z0-9]+)*(?:[\\s.,'#&*()/-]*[A-Za-z0-9]+)*(?:[\\s]*[.,#&*()/-]*\\s*)*$", message = "{companyAddress.pattern.message}")
     @Size(min = 1, max = 200, message = "{companyAddress.notnull.message}")
     private String companyAddress;
 
@@ -23,14 +23,13 @@ public class CompanyUpdateRequest {
     @Pattern(regexp = "^\\d{10}$", message = "{invalid.mobileNo}")
     private String mobileNo;
 
-    @Schema(example = "landNo")
-    @NotBlank(message = "{landNo.notnull.message}")
-    @Pattern(regexp = "^\\d{10}$", message = "{invalid.mobileNo")
-    private String landNo;
+    @Schema(example = "alternateNo")
+    @Pattern(regexp = "^(|0|\\d{10})$", message = "{invalid.alternateNo}")
+    private String alternateNo;
 
     @Schema(example = "name")
-    @Size(min = 3, max = 20, message = "{name.notnull.message}")
-    @Pattern(regexp = "^[A-Z][a-z]+(?:\\s[A-Z][A-Za-z]*)*$", message = "{name.message}")
+    @Size(min = 3, max = 35, message = "{name.notnull.message}")
+    @Pattern(regexp = "^(?!.*\\b([A-Z])\\s\\1\\s\\1)(?:[A-Z][a-z]+(?: [A-Z][a-z]+)*|[A-Z](?:\\.? ?[A-Z])? ?[A-Z][a-z]+)$", message = "{name.message}")
     private String name;
 
     @Schema(example = "personalMailId")
@@ -44,11 +43,13 @@ public class CompanyUpdateRequest {
     private String personalMobileNo;
 
     @Schema(example = "address")
-    @Pattern(regexp = "^(?:[A-Za-z0-9]+(?:[\\s.,'#&*()^/][A-Za-z0-9]+)*)+(?:[\\s.,'#&*()/-]*[A-Za-z0-9]+)*(?:[\\s]*[.,#&*()/-]*\\s*)*$", message = "{companyAddress.pattern.message}")
-    @Size(min = 1, max = 200, message = "{address.notnull.message}")
+    @Pattern(regexp = "^(?!.*\\s{2,})(?!^([a-zA-Z]{1}\\s?){2,}$)(?!^[A-Z](?:\\s[A-Z])*$)(?!^[\\s]*$)[A-Za-z0-9]+(?:[\\s.,'#&*()^/][A-Za-z0-9]+)*(?:[\\s.,'#&*()/-]*[A-Za-z0-9]+)*(?:[\\s]*[.,#&*()/-]*\\s*)*$",
+            message = "{address.pattern.message}")
+    @Size(min = 10, max = 300, message = "{address.notnull.message}")
     private String address;
 
-//    @Pattern(regexp = "^[A-Za-z]+$", message = "{company.type}")
+
+    //    @Pattern(regexp = "^[A-Za-z]+$", message = "{company.type}")
     private String companyType;
 
 //    @NotBlank(message = "{notnull.message}")

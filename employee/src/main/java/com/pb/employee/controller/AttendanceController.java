@@ -29,7 +29,7 @@ public class AttendanceController {
     @Autowired
     private AttendanceService attendanceService;
 
-    @RequestMapping(value = "/{company}/employee/attendance", method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequestMapping(value = "/{companyName}/employee/attendance", method = RequestMethod.POST,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(security = { @SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.attendance.company.tag}", description = "${api.attendance.company.description}")
     @ResponseStatus(HttpStatus.CREATED)
@@ -38,9 +38,9 @@ public class AttendanceController {
             @Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
             @RequestHeader(Constants.AUTH_KEY) String authToken,
             @Parameter(required = true, description = "${api.attendance.Payload.description}")
-            @PathVariable String company,
+            @PathVariable String companyName,
             @RequestParam(Constants.FILE) MultipartFile file) throws EmployeeException {
-        return attendanceService.uploadAttendanceFile(company,file);
+        return attendanceService.uploadAttendanceFile(companyName,file);
     }
 
     @RequestMapping(value = "/{companyName}/attendance", method = RequestMethod.GET)
@@ -56,18 +56,18 @@ public class AttendanceController {
         return attendanceService.getAllEmployeeAttendance(companyName,employeeId,month,year);
     }
 
-    @RequestMapping(value = "/{company}/employee/{employeeId}/attendance/{attendanceId}", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{companyName}/employee/{employeeId}/attendance/{attendanceId}", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.updateAttendance.tag}", description = "${api.updateAttendance.description}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "202", description= "Accepted")
     public ResponseEntity<?> updateEmployeeAttendanceById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                                       @RequestHeader(Constants.AUTH_KEY) String authToken,
-                                                          @PathVariable String company,
+                                                          @PathVariable String companyName,
                                                           @PathVariable String employeeId,
                                                           @PathVariable String attendanceId,
                                                           @RequestBody @Valid AttendanceUpdateRequest updateRequest) throws EmployeeException {
-        return attendanceService.updateEmployeeAttendanceById(company,employeeId, attendanceId,updateRequest);
+        return attendanceService.updateEmployeeAttendanceById(companyName,employeeId, attendanceId,updateRequest);
     }
 
     @RequestMapping(value = "/{companyName}/employee/{employeeId}/attendance/{attendanceId}", method = RequestMethod.DELETE)

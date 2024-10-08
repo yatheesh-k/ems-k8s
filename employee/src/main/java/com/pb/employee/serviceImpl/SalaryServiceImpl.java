@@ -83,9 +83,6 @@ public class SalaryServiceImpl implements SalaryService {
                 if (employeesSalaryProperties != null) {
                     log.debug("Prepared salary entity: {}", employeesSalaryProperties);
                     Entity result = openSearchOperations.saveEntity(employeesSalaryProperties, salaryId, index);
-                } else {
-                    log.error("No active salary configuration found for the company");
-                    throw new EmployeeException("No active salary configuration found", HttpStatus.BAD_REQUEST);
                 }
             } else {
                 log.error("Employee not found");
@@ -204,6 +201,12 @@ public class SalaryServiceImpl implements SalaryService {
                 log.error("Exception while fetching employee for salary {}", employeeId);
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES_SALARY),
                         HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            employee = openSearchOperations.getEmployeeById(employeeId, null, index);
+            if (employee != null &&employee.getStatus().equals(EmployeeStatus.INACTIVE.getStatus())){
+                log.error("Employee is inActive {}", employee.getFirstName());
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_INACTIVE),
+                        HttpStatus.CONFLICT);
             }
             if (!entity.getEmployeeId().equals(employeeId)) {
                 log.error("Employee ID mismatch for salary {}: expected {}, found", salaryId, employeeId);

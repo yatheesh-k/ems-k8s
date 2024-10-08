@@ -1,244 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Pay Slip</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PaySlip Template 2</title>
     <style>
         @page {
             size: A4;
             margin: 6mm;
         }
+
         body {
-            margin: 0;
-            padding: 0;
+            border: 1px solid black;
         }
-        .main {
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .pdfPage {
-            width: 100%;
-            margin: 0 auto;
-            box-sizing: border-box;
-        }
-         .top {
-         display: flex;
-         justify-content: space-between; /* Aligns the content on opposite ends */
-         align-items: center; /* Align items vertically in the center */
-         margin-bottom: 20px;
-         }
-        .date-info {
-            text-align: left;
-            flex: 1;
-        }
+
         .logo {
-            text-align: end;
-            flex-shrink: 0;
-            margin-bottom:20px;
-            margin-top:0px;
-            margin-left:300px
-        }
-        .logo img {
-            max-width: 120px;
-            height: 100px;
-            display: flex;
-        }
-        .details {
-            width: 100%;
-            margin-bottom: 20px;
-            border-collapse: collapse;
-        }
-        .details table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .details th, .details td {
-            border: 0.5px solid black;
-            padding: 4px;
-            text-align: left;
-        }
-        .employee-details {
+            background-color: #9EEAF9;
+            height: 160px;
+            padding-bottom: 20px;
             text-align: center;
         }
+
+        .logo img {
+            width: 200px;
+            height: 100px;
+        }
+
+        .company {
+            font-size: medium;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .title {
+            text-align: center;
+            color: #1a3241;
+            margin: 0px;
+            font-size: 18px;
+            margin-top: 5px;
+        }
+
+        .employee-table {
+            width: 100%;
+            margin-top: 10px;
+            font-size: medium;
+            border-collapse: collapse;
+        }
+
+        .employee-table th,
+        .employee-table td {
+            padding: 8px;
+            text-align: left;
+            font-size: medium;
+
+        }
+
+        .salary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .salary-table th,
+        .salary-table td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+            font-size: medium;
+
+        }
+
+        .emp-netpay {
+         background-color: #9EEAF9;
+            width: 97%;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        .emp-netpay table {
+
+            width: 100%;
+            text-align: center;
+        }
+
+        .allowance-fields,
+        .allowance-values {
+            border: none;
+            font-size: medium;
+
+        }
+
+        .allowance-fields td,
+        .allowance-values td,
+        .deduction-fields td,
+        .deduction-values td {
+            padding: 4px;
+            border: none;
+            font-size: medium;
+        }
+
         .text {
             margin: 20px 0;
-        }
-        .address {
-            margin-top: 160px;
+            font-size: 15px;
             text-align: center;
         }
-          th {
-                    background-color: #ffcc80; /* Light orange background */
-                    color: black; /* Text color */
-                    padding: 8px;
-                }
-                .company {
-                margin-top: 30px;
-                }
     </style>
 </head>
+
 <body>
-    <div class="main">
-        <div class="pdfPage">
-            <table>
-                <tr>
-                    <td>
-                        <div class="date-info">
-                            <h4 id="month-year">${payslipEntity.month}-${payslipEntity.year} Pay Slip</h4>
-                            <h4 id="employee-name"> Name: ${employee.firstName} ${employee.lastName}</h4>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="logo">
-                            <img src="${company.imageFile}"/>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-
-            <div class="details">
-                <table>
-                    <tr>
-                        <th colspan="4" class="employee-details">Employee Details</th>
-                    </tr>
-                    <tr>
-                        <th>EmployeeId</th>
-                        <td>${employee.employeeId}</td>
-                        <th>Joining Date</th>
-                        <td>${employee.dateOfHiring}</td>
-                    </tr>
-                    <tr>
-                        <th>Department</th>
-                        <td>${employee.departmentName}</td>
-                        <th>PAN</th>
-                        <td>${employee.panNo}</td>
-                    </tr>
-                    <tr>
-                        <th>Designation</th>
-                        <td>${employee.designationName}</td>
-                        <th>UAN</th>
-                        <td>${employee.uanNo}</td>
-                    </tr>
-                    <tr>
-                         <th>Bank ACC No</th>
-                         <td>${employee.accountNo}</td>
-                        <th>IFSC</th>
-                        <td>${employee.ifscCode}</td>
-                    </tr>
-                    <tr>
-                    <th>Bank Name:</th>
-                                            <td>${employee.bankName}</td>
-                                            <th>Location</th>
-                                            <td>${employee.location}</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="details">
-                <table>
-            <tr>
-                       <th>Days Paid</th>
-                       <td>${payslipEntity.attendance.totalWorkingDays?number}</td>
-                       <th>Days Present</th>
-                       <td>${payslipEntity.attendance.noOfWorkingDays?number}</td>
-                       <th>LOP Days</th>
-                       <td>
-                           <#assign totalWorkingDays = payslipEntity.attendance.totalWorkingDays?number>
-                           <#assign noOfWorkingDays = payslipEntity.attendance.noOfWorkingDays?number>
-                           <#if (totalWorkingDays - noOfWorkingDays) < 0>
-                               N/A
-                           <#else>
-                               ${totalWorkingDays - noOfWorkingDays}
-                           </#if>
-                       </td>
-                   </tr>
-
-                </table>
-            </div>
-
-            <div class="details">
-                <table>
-                    <tr>
-                        <th class="earnings">Earnings (A)</th>
-                        <th class="earnings">Amount</th>
-                        <th class="deductions">Deductions (B)</th>
-                        <th class="deductions">Amount</th>
-                    </tr>
-                    <tr>
-                        <td>Basic Salary</td>
-                        <td>${payslipEntity.salary.basicSalary}</td>
-                        <td>PF Employee</td>
-                        <td>${payslipEntity.salary.deductions.pfEmployee}</td>
-                    </tr>
-                    <tr>
-                        <td>HRA</td>
-                        <td>${payslipEntity.salary.allowances.hra}</td>
-                        <td>PF Employer</td>
-                        <td>${payslipEntity.salary.deductions.pfEmployer}</td>
-                    </tr>
-                    <tr>
-                        <td>Travel Allowance</td>
-                        <td>${payslipEntity.salary.allowances.travelAllowance}</td>
-                        <td>LOP</td>
-                        <td>${payslipEntity.salary.deductions.lop}</td>
-                    </tr>
-                    <tr>
-                        <td>PF Contribution Employee</td>
-                        <td>${payslipEntity.salary.allowances.pfContributionEmployee}</td>
-                        <td>Total Deductions (B)</td>
-                        <td>${payslipEntity.salary.deductions.totalDeductions}</td>
-                    </tr>
-                    <tr>
-                        <td>Special Allowance</td>
-                        <td>${payslipEntity.salary.allowances.specialAllowance}</td>
-                        <th class="deductions">Taxes (C)</th>
-                         <th class="deductions">Amount</th>
-                    </tr>
-                    <tr>
-                        <td>Other Allowances</td>
-                        <td>${payslipEntity.salary.allowances.otherAllowances}</td>
-                        <td>Professional Tax</td>
-                        <td>${payslipEntity.salary.deductions.pfTax}</td>
-                    </tr>
-                    <tr>
-                        <td>Total Earnings (A)</td>
-                        <td>${payslipEntity.salary.totalEarnings}</td>
-                        <td>Income Tax</td>
-                        <td>${payslipEntity.salary.deductions.incomeTax}</td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td>Total Tax (C)</td>
-                        <td>${payslipEntity.salary.deductions.totalTax}</td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <th>Net Pay (A-B-C)</th>
-                        <td><strong>${payslipEntity.salary.netSalary}</strong></td>
-                    </tr>
-                    <tr>
-                        <th>Net Salary (In Words)</th>
-                        <td colspan="3"><strong>${payslipEntity.inWords}</strong></td>
-                    </tr>
-                </table>
-            </div>
-
-           <div class="text">
-               <p><em>This is computer-generated payslip and does not require authentication</em></p>
-           </div>
-           <div class="address">
-               <hr/>
-               <p class="company">
-                  Company Address: ${company.companyAddress}<br/>
-                   Mobile No: ${company.mobileNo}<br />
-                   Email ID: ${company.emailId}
-               </p>
-           </div>
-
-        </div>
+    <div class="logo">
+        <img src="${company.imageFile}"
+            alt="Company Logo" />
+        <p class="company">
+            ${company.companyAddress}<br />
+            ${company.mobileNo}<br />
+            ${company.emailId}
+        </p>
     </div>
+    <div class="title"><b>SALARY SLIP</b></div>
+
+    <div class="emp-netpay">
+        <table>
+            <tr>
+                <td><b>Employee Details</b></td>
+                <td><b>Month-Year: ${payslipEntity.month}-${payslipEntity.year}</b></td>
+            </tr>
+        </table>
+    </div>
+
+    <table class="employee-table">
+        <tr>
+            <th>EmployeeId</th>
+            <td>${employee.employeeId}</td>
+            <th>Name</th>
+            <td>${employee.firstName} ${employee.lastName}</td>
+        </tr>
+        <tr>
+            <th>Department</th>
+            <td>${employee.departmentName}</td>
+            <th>PAN</th>
+            <td>${employee.panNo}</td>
+        </tr>
+        <tr>
+            <th>Designation</th>
+            <td>${employee.designationName}</td>
+            <th>UAN</th>
+            <td>${employee.uanNo}</td>
+        </tr>
+        <tr>
+            <th>Bank ACC No</th>
+            <td>${employee.accountNo}</td>
+            <th>IFSC</th>
+            <td>${employee.ifscCode}</td>
+        </tr>
+        <tr>
+            <th>Total Days</th>
+            <td>${payslipEntity.attendance.totalWorkingDays}</td>
+            <th>Worked Days</th>
+            <td>${payslipEntity.attendance.noOfWorkingDays}</td>
+        </tr>
+        <tr>
+            <th>LOP Days</th>
+            <td>
+                <#assign totalWorkingDays=payslipEntity.attendance.totalWorkingDays?number>
+                    <#assign noOfWorkingDays=payslipEntity.attendance.noOfWorkingDays?number>
+                        <#if (totalWorkingDays - noOfWorkingDays) < 0>
+                            N/A
+                            <#else>
+                                ${totalWorkingDays - noOfWorkingDays}
+                        </#if>
+            </td>
+            <th>Date of Birth</th>
+            <td>${employee.dateOfBirth}</td>
+        </tr>
+    </table>
+
+    <table class="salary-table">
+        <tr>
+            <th style="width:30%;">Earnings (A)</th>
+            <th>Amount (A)</th>
+            <th>Deductions (B)</th>
+            <th>Amount (B)</th>
+        </tr>
+        <tr>
+            <td>
+                <table class="allowance-fields">
+
+                    <#list allowanceList as allowance>
+                        <#list allowance?keys as key>
+                            <tr><td>${key}</td></tr>
+                        </#list>
+                    </#list>
+                    <tr><td>Total Earnings (A)</td></tr>
+                </table>
+            </td>
+            <td>
+                <table class="allowance-values">
+                    <#list allowanceList as allowance>
+                        <#list allowance?keys as key>
+                            <tr><td>${allowance[key]}</td></tr>
+                        </#list>
+                    </#list>
+                    <tr><td>${payslipEntity.salary.totalEarnings}</td></tr>
+                </table>
+            </td>
+            <td>
+                <table class="deduction-fields">
+                    <#list deductionList as deduction>
+                        <#list deduction?keys as key>
+                            <tr><td>${key}</td></tr>
+                        </#list>
+                    </#list>
+                </table>
+            </td>
+            <td>
+                <table class="deduction-values">
+                    <#list deductionList as deduction>
+                        <#list deduction?keys as key>
+                            <tr><td>${deduction[key]}</td></tr>
+                        </#list>
+                    </#list>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <th style= "background-color: #9EEAF9; ">Net Pay (A-B-C)</th>
+            <td colspan="3"><strong>${payslipEntity.salary.netSalary}</strong></td>
+        </tr>
+        <tr>
+            <th style= "background-color: #9EEAF9; ">Net Salary (In Words)</th>
+            <td colspan="3"><strong>${payslipEntity.inWords}</strong></td>
+        </tr>
+    </table>
 </body>
+     <div class="text">
+        <p><em>This is a computer-generated payslip and does not require authentication</em></p>
+    </div>
+
 </html>

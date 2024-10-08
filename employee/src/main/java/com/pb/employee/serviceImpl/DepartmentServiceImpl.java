@@ -163,10 +163,21 @@ public class DepartmentServiceImpl implements DepartmentService {
         log.info("getting details of {}", departmentId);
         Object entity = null;
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
+        List<EmployeeEntity> employeeEntities;
 
         try {
             entity = openSearchOperations.getById(departmentId, null, index);
-
+            employeeEntities = openSearchOperations.getCompanyEmployees(companyName);
+            for (EmployeeEntity employee: employeeEntities){
+                    if (employee.getDepartment()!=null && employee.getDepartment().equals(departmentId)) {
+                        log.error("department details existed in employee{}", departmentId);
+                        return new ResponseEntity<>(
+                                ResponseBuilder.builder().build().
+                                        createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler
+                                                .getMessage(EmployeeErrorMessageKey.DEPARTMENT_IS_EXIST_EMPLOYEE)))),
+                                HttpStatus.CONFLICT);
+                    }
+            }
             if (entity!=null) {
                 openSearchOperations.deleteEntity(departmentId,index);
             } else {

@@ -1,17 +1,13 @@
 package com.pb.employee.util;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pb.employee.exception.EmployeeErrorMessageKey;
 import com.pb.employee.exception.EmployeeException;
-import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.persistance.model.*;
 import com.pb.employee.request.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
+import java.sql.Struct;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +19,7 @@ public class EmployeeUtils {
 
 
     public static Entity maskEmployeeProperties(EmployeeRequest employeeRequest,String resourceId, String companyId) {
-        String uan = null, pan = null, adharId = null, accountNo=null, ifscCode = null,password=null;
+        String uan = null, pan = null, adharId = null, accountNo=null, ifscCode = null,password=null, mobileNo=null;
         if(employeeRequest.getPanNo() != null) {
             pan = Base64.getEncoder().encodeToString(employeeRequest.getPanNo().getBytes());
         }
@@ -42,6 +38,9 @@ public class EmployeeUtils {
         if(employeeRequest.getAccountNo() != null) {
             accountNo = Base64.getEncoder().encodeToString(employeeRequest.getAccountNo().getBytes());
         }
+        if(employeeRequest.getMobileNo() != null) {
+            mobileNo = Base64.getEncoder().encodeToString(employeeRequest.getMobileNo().getBytes());
+        }
         ObjectMapper objectMapper = new ObjectMapper();
 
         EmployeeEntity entity = objectMapper.convertValue(employeeRequest, EmployeeEntity.class);
@@ -53,13 +52,14 @@ public class EmployeeUtils {
         entity.setUanNo(uan);
         entity.setIfscCode(ifscCode);
         entity.setAccountNo(accountNo);
+        entity.setMobileNo(mobileNo);
         entity.setType(Constants.EMPLOYEE);
         return entity;
     }
 
 
     public static Entity unmaskEmployeeProperties(EmployeeEntity employeeEntity, DepartmentEntity entity, DesignationEntity designationEntity) {
-        String pan = null,uanNo=null,aadhaarId=null,accountNo=null,ifscCode=null;
+        String pan = null,uanNo=null,aadhaarId=null,accountNo=null,ifscCode=null, mobileNo=null;
         if(employeeEntity.getPanNo() != null) {
             pan = new String((Base64.getDecoder().decode(employeeEntity.getPanNo().toString().getBytes())));
         }
@@ -74,6 +74,9 @@ public class EmployeeUtils {
         }
         if(employeeEntity.getIfscCode() != null) {
             ifscCode = new String((Base64.getDecoder().decode(employeeEntity.getIfscCode().toString().getBytes())));
+        }
+        if(employeeEntity.getMobileNo() != null) {
+            mobileNo = new String((Base64.getDecoder().decode(employeeEntity.getMobileNo().toString().getBytes())));
         }
         if (entity != null && employeeEntity.getDepartment() != null) {
             employeeEntity.setDepartmentName(entity.getName());
@@ -91,6 +94,7 @@ public class EmployeeUtils {
         employeeEntity.setUanNo(uanNo);
         employeeEntity.setPassword("**********");
         employeeEntity.setPanNo(pan);
+        employeeEntity.setMobileNo(mobileNo);
         return employeeEntity;
     }
 
@@ -149,6 +153,45 @@ public class EmployeeUtils {
         return responseBody;
     }
 
+    public static int duplicateEmployeeProperties(EmployeeEntity user, EmployeeUpdateRequest employeeUpdateRequest) {
+        int noOfChanges = 0;
+        String type=null, email=null;
+        if (!user.getEmployeeType().equals(employeeUpdateRequest.getEmployeeType())){
+            noOfChanges+=1;
+        }
+        if (!user.getDesignation().equals(employeeUpdateRequest.getDesignation())){
+            noOfChanges +=1;
+        }
+        if (!user.getDepartment().equals(employeeUpdateRequest.getDepartment())){
+            noOfChanges +=1;
+        }
+        if (!user.getLocation().equals(employeeUpdateRequest.getLocation())){
+            noOfChanges +=1;
+        }if (!user.getManager().equals(employeeUpdateRequest.getManager())){
+            noOfChanges +=1;
+        }if (!user.getMobileNo().isEmpty()) {
+            String mobile = new String(Base64.getDecoder().decode(user.getMobileNo().getBytes()));
+            if (!mobile.equals(employeeUpdateRequest.getMobileNo())) {
+                noOfChanges += 1;
+            }
+        }if (!user.getStatus().equals(employeeUpdateRequest.getStatus())){
+            noOfChanges +=1;
+        }if (!user.getIfscCode().isEmpty()) {
+           String ifsc = new String((Base64.getDecoder().decode(user.getIfscCode().toString().getBytes())));
+
+            if (!ifsc.equals(employeeUpdateRequest.getIfscCode())) {
+                noOfChanges += 1;
+            }
+        }if (!user.getAccountNo().isEmpty()) {
+            String account = new String(Base64.getDecoder().decode(user.getAccountNo().toString().getBytes()));
+            if (!account.equals(employeeUpdateRequest.getAccountNo())) {
+                noOfChanges += 1;
+            }
+        }if (!user.getBankName().equals(employeeUpdateRequest.getBankName())){
+            noOfChanges +=1;
+        }
+        return noOfChanges;
+    }
     public static EmployeeSalaryEntity unMaskEmployeeSalaryProperties(EmployeeSalaryEntity salaryEntity) {
 
         String var = null, fix = null, bas = null, gross = null;
@@ -166,10 +209,6 @@ public class EmployeeUtils {
         if(salaryEntity.getGrossAmount() != null) {
             gross = new String((Base64.getDecoder().decode(salaryEntity.getGrossAmount().toString().getBytes())));
             salaryEntity.setGrossAmount(gross);
-        }
-        if(salaryEntity.getBasicSalary() != null) {
-            bas = new String((Base64.getDecoder().decode(salaryEntity.getBasicSalary().toString().getBytes())));
-            salaryEntity.setBasicSalary(bas);
         }
 
         if(salaryEntity.getTotalEarnings() != null) {
