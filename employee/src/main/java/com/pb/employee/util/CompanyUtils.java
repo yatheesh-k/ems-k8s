@@ -163,21 +163,15 @@ public class CompanyUtils {
             landNo = Base64.getEncoder().encodeToString(companyRequest.getAlternateNo().toString().getBytes());
             existingEntity.setAlternateNo(landNo);
         }if(companyRequest.getPersonalMobileNo() != null) {
-            pmNo = Base64.getEncoder().encodeToString(companyRequest.getPersonalMobileNo().toString().getBytes());
-            existingEntity.setPersonalMobileNo(pmNo);
+            String pesMobileNumber = Base64.getEncoder().encodeToString(companyRequest.getPersonalMobileNo().toString().getBytes());
+            existingEntity.setPersonalMobileNo(pesMobileNumber);
         }
         if(companyRequest.getPersonalMailId() != null) {
-            persMailId = Base64.getEncoder().encodeToString(companyRequest.getPersonalMailId().toString().getBytes());
-            existingEntity.setPersonalMailId(persMailId);
+           String personalMailId = Base64.getEncoder().encodeToString(companyRequest.getPersonalMailId().toString().getBytes());
+            existingEntity.setPersonalMailId(personalMailId);
         }
         if(companyRequest.getName() != null) {
             existingEntity.setName(companyRequest.getName());
-        }
-        if(companyRequest.getPersonalMailId() != null) {
-            existingEntity.setPersonalMailId(companyRequest.getPersonalMailId());
-        }
-        if(companyRequest.getPersonalMobileNo() != null) {
-            existingEntity.setPersonalMobileNo(companyRequest.getPersonalMobileNo());
         }
         if(companyRequest.getAddress() != null) {
             existingEntity.setAddress(companyRequest.getAddress());

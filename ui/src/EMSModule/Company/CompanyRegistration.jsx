@@ -58,7 +58,7 @@ const CompanyRegistration = () => {
         password: data.password,
         companyAddress: data.companyAddress,
         mobileNo: data.mobileNo,
-        landNo: data.landNo,
+        alternateNo: data.alternateNo,
         name: data.name,
         personalMailId: data.personalMailId,
         personalMobileNo: data.personalMobileNo,
