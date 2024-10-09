@@ -264,7 +264,7 @@ public class LoginServiceImpl implements LoginService {
 
         try {
             user = openSearchOperations.getEmployeeById(otpRequest.getUsername(), otpRequest.getCompany());
-            List<CompanyEntity>  employee = openSearchOperations.getCompanyByData(null, Constants.COMPANY, otpRequest.getCompany());
+          List<CompanyEntity>  employee = openSearchOperations.getCompanyByData(null, Constants.COMPANY, otpRequest.getCompany());
             if (user == null) {
                 log.debug("checking the user details..");
                 throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.USER_NOT_FOUND),

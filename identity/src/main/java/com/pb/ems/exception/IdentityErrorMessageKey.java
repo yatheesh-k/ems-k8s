@@ -14,7 +14,6 @@ public enum IdentityErrorMessageKey {
     USER_NOT_FOUND("user.not.found"),
     USED_PASSWORD("user.password"),
     UNABLE_TO_SEARCH("unable.search");
-
     private final String key;
 
     IdentityErrorMessageKey(String keyVal) {
