@@ -107,11 +107,11 @@ public class LoginServiceImpl implements LoginService {
         Long otp = generateOtp();
         sendOtpByEmail(request.getUsername(), otp);
         openSearchOperations.saveOtpToUser(employee, otp,request.getCompany());
-         List<String> roles = new ArrayList<>();
+        List<String> roles = new ArrayList<>();
         String token= null;
         if (employee.getEmployeeType().equals(Constants.EMPLOYEE_TYPE)) {
             roles.add(Constants.COMPANY_ADMIN);
-        } 
+        }
         token = JwtTokenUtil.generateEmployeeToken(employee.getId(), roles, request.getCompany(), request.getUsername());
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(new LoginResponse(token, null)), HttpStatus.OK);

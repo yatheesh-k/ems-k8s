@@ -160,6 +160,7 @@ public class OpenSearchOperations {
         }
         return null;
     }
+
     public void updateCompany(CompanyEntity company) throws IOException {
         String index = Constants.INDEX_EMS;
         String comapanyId = company.getId();
@@ -175,6 +176,7 @@ public class OpenSearchOperations {
             throw new IOException("Failed to update employee: " + comapanyId);
         }
     }
+
     public List<CompanyEntity> getCompanyByData(String companyName, String type, String shortName) throws IdentityException {
         logger.debug("Getting the Resource by name {}, {},{}", companyName, type, shortName);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
@@ -209,5 +211,4 @@ public class OpenSearchOperations {
         }
         return subscriberEntities;
     }
-
 }

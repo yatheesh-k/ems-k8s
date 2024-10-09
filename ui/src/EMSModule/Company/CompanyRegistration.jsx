@@ -622,8 +622,8 @@ const CompanyRegistration = () => {
                           }
                         })}
                       />
-                      {errors.landNo && (
-                        <p className="errorMsg">{errors.landNo.message}</p>
+                      {errors.alternateNo && (
+                        <p className="errorMsg">{errors.alternateNo.message}</p>
                       )}
                     </div>
                     {editMode && (
