@@ -71,7 +71,8 @@ public class CompanyUtils {
     }
 
     public static Entity unmaskCompanyProperties(CompanyEntity companyEntity,  HttpServletRequest request) {
-        String hra = null, pan = null, pf = null, spa = null, ta = null, regNo = null, mobileNo=null, landNo= null, gstNo=null, cinNo=null;
+        String hra = null, pan = null, pf = null, spa = null, ta = null, regNo = null,
+                mobileNo=null, landNo= null, gstNo=null, cinNo=null;
         if(companyEntity.getHraPercentage() != null) {
             hra = new String(Base64.getDecoder().decode(companyEntity.getHraPercentage().getBytes()));
             companyEntity.setHraPercentage(hra);
