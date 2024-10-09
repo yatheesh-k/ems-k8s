@@ -272,9 +272,8 @@ public class CompanyUtils {
 
     public static Entity maskUpdateSalary(SalaryUpdateRequest salaryRequest, EmployeeSalaryEntity salary) {
 
-        String var = null, fix = null, bas = null, gross = null;
-        String hra = null, trav = null, pfc = null, other = null,spa=null;
-        String te= null, pfE = null, pfEmployer =null, lop = null, pfTax = null, incomeTax = null, ttax = null, tded = null, net = null;
+        String var = null, fix = null, gross = null;
+        String te= null, pfTax = null, ttax = null, tded = null, net = null;
 
         if(salaryRequest.getFixedAmount() != null) {
             fix = (Base64.getEncoder().encodeToString(salaryRequest.getFixedAmount().toString().getBytes()));
@@ -284,28 +283,10 @@ public class CompanyUtils {
             var = Base64.getEncoder().encodeToString(salaryRequest.getVariableAmount().toString().getBytes());
             salary.setVariableAmount(var);
         }
-        if (salaryRequest.getIncomeTax().equals(Constants.NEW)){
-            incomeTax = String.valueOf(TaxCalculatorUtils.getNewTax(Double.parseDouble(salaryRequest.getGrossAmount())));
-        }else if(salaryRequest.getIncomeTax().equals(Constants.OLD)){
-            incomeTax = String.valueOf(TaxCalculatorUtils.getOldTax(Double.parseDouble(salaryRequest.getGrossAmount())));
-        }
         if (salaryRequest.getGrossAmount() != null) {
             pfTax  = String.valueOf(TaxCalculatorUtils.getPfTax(Double.parseDouble(salaryRequest.getGrossAmount())));
             gross= (Base64.getEncoder().encodeToString(salaryRequest.getGrossAmount().toString().getBytes()));
             salary.setGrossAmount(gross);
-        }
-
-        ttax = String.valueOf(Double.parseDouble(pfTax)+ Double.parseDouble(incomeTax));
-
-        ttax = Base64.getEncoder().encodeToString(ttax.getBytes());
-        salary.setTotalTax(ttax);
-        if (pfTax != null){
-            pfTax = Base64.getEncoder().encodeToString(pfTax.getBytes());;
-            salary.setPfTax(pfTax);
-        }
-        if (incomeTax!=null){
-            incomeTax = Base64.getEncoder().encodeToString(incomeTax.getBytes());
-            salary.setIncomeTax(incomeTax);
         }
         double totalAllowance = 0.0;
         if (salaryRequest.getSalaryConfigurationRequest().getAllowances()!=null){
