@@ -51,7 +51,8 @@ public class CompanyUtils {
         if(companyRequest.getAlternateNo() != null) {
             landNo = Base64.getEncoder().encodeToString(companyRequest.getAlternateNo().toString().getBytes());
             entity.setAlternateNo(landNo);
-        } if(companyRequest.getPersonalMobileNo() != null) {
+        }
+        if(companyRequest.getPersonalMobileNo() != null) {
             pmNo = Base64.getEncoder().encodeToString(companyRequest.getPersonalMobileNo().toString().getBytes());
             entity.setPersonalMobileNo(pmNo);
         }
@@ -798,4 +799,32 @@ public class CompanyUtils {
     }
 
 
+    public static Map<String, Object> duplicateValuesInTheCompany(CompanyUpdateRequest companyUpdateRequest, List<CompanyEntity> companyEntities) {
+
+        Map<String, Object> responseBody = new HashMap<>();
+        String cinNo = null, regNo = null, mobileNo = null, landNo =  null, gstNo = null, panNo= null, personalMail = null, personalMobile = null, emailId=null;
+        for (CompanyEntity companyEntity :companyEntities) {
+
+            if (companyUpdateRequest.getAlternateNo().equals(companyUpdateRequest.getMobileNo())){
+                responseBody.put(Constants.DUPLICATE_AS_MOBILE_NO, companyUpdateRequest.getAlternateNo());
+            }
+
+        }
+        return responseBody;
+    }
+    public static Map<String, Object> duplicateValuesInCompany(CompanyRequest companyRequest) {
+
+        Map<String, Object> responseBody = new HashMap<>();
+        String cinNo = null, regNo = null, mobileNo = null, landNo =  null, gstNo = null, panNo= null, personalMail = null, personalMobile = null, emailId=null;
+
+
+            if (companyRequest.getAlternateNo().equals(companyRequest.getMobileNo())){
+                responseBody.put(Constants.DUPLICATE_AS_MOBILE_NO, companyRequest.getAlternateNo());
+            }
+            if (companyRequest.getEmailId().equals(companyRequest.getPersonalMailId())){
+                responseBody.put(Constants.DUPLICATE_AS_EMAIL_NO, companyRequest.getEmailId());
+            }
+
+        return responseBody;
+    }
 }

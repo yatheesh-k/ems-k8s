@@ -266,8 +266,8 @@ const CompanyRegistration = () => {
     return true; // Return true if all checks pass
   };
   const validateGST = (value) => {
-    const spaceError = "Spaces are not allowed in the CIN Number.";
-    const patternError = "Invalid CIN Number format";
+    const spaceError = "Spaces are not allowed in the GST Number.";
+    const patternError = "Invalid GST Number format";
 
     if (/\s/.test(value)) {
       return spaceError; // Return space error if spaces are found
@@ -281,8 +281,8 @@ const CompanyRegistration = () => {
     return true; // Return true if all checks pass
   };
   const validatePAN = (value) => {
-    const spaceError = "Spaces are not allowed in the CIN Number.";
-    const patternError = "Invalid CIN Number format";
+    const spaceError = "Spaces are not allowed in the PAN Number.";
+    const patternError = "Invalid PAN Number format";
 
     if (/\s/.test(value)) {
       return spaceError; // Return space error if spaces are found
