@@ -23,8 +23,8 @@ public class EmployeeRequest {
     @Size(min = 2, max = 30, message = "{size.message}")
     private String companyName;
 
-    @Schema(example = "employeeId")
-    @Pattern(regexp = "^[a-zA-Z]+( [a-zA-Z]+)*$", message = "{employee.type}")
+    @Schema(example = "employeeType")
+    @Pattern(regexp = "^(?!.*\\b([A-Z])\\s\\1\\s\\1)(?:[A-Z][a-z]+(?: [A-Z][a-z]+)*|[A-Z](?:\\.? ?[A-Z])? ?[A-Z][a-z]+)$", message = "{employee.type}")
     @Size(min = 3, max = 20, message = "{employeeType.size.message}")
     private String employeeType;
 
@@ -71,7 +71,7 @@ public class EmployeeRequest {
     private String department;
 
     @Schema(example = "location")
-    @Pattern(regexp = "^(?!.*\\s{2,})(?!^([a-zA-Z]{1}\\s?){2,}$)(?!^[A-Z](?:\\s[A-Z])*$)(?!^[\\s]*$)[A-Za-z0-9]+(?:[\\s.,'#&*()^/][A-Za-z0-9]+)*(?:[\\s.,'#&*()/-]*[A-Za-z0-9]+)*(?:[\\s]*[.,#&*()/-]*\\s*)*$", message = "{location.format}")
+    @Pattern(regexp = "^(?!\\d+$)(?!^[A-Za-z]+$)(?!^[A-Za-z]+\\s*,?\\s*[A-Za-z]+$)(?:(?:[A-Z][a-z]*)(?:\\s+[A-Z][a-z0-9]*)*(?:[\\s,./'-]+[A-Za-z0-9]+)*(?:\\s*,\\s*[A-Z][a-z]+(?:\\s+[A-Z][a-z]+)*,\\s*[A-Z][a-z]+(?:\\s+[A-Z][a-z]+)*)?)?$", message = "{location.format}")
     @Size(min = 2, max = 200, message = "{location.notnull.message}")
     private String location;
 
