@@ -117,7 +117,7 @@ const CompanySalaryStructure = () => {
     const errors = { ...validationErrors };
 
     if (field.value === '') {
-      errors[field.label] = "Value is required";
+      errors[field.label] = "Value is Required";
     } else if (!/^\d+$/.test(field.value)) {
       errors[field.label] = "This field accepts only Integers";
     } else {
@@ -212,6 +212,7 @@ const CompanySalaryStructure = () => {
       toast.success("Salary structure submitted successfully!");
       reset();
       navigate('/companySalaryView');
+      window.location.reload();
     } catch (error) {
       if (error.response) {
         console.error("Error response from backend:", error.response.data);
@@ -355,7 +356,7 @@ const CompanySalaryStructure = () => {
                       className={`nav-link ${activeTab === 'nav-home' ? 'active' : ''}`}
                       onClick={() => handleTabChange('nav-home')}
                     >
-                      Allowance
+                      Allowances
                     </button>
                     <button type='button'
                       className={`nav-link ${activeTab === 'nav-profile' ? 'active' : ''}`}
@@ -386,7 +387,7 @@ const CompanySalaryStructure = () => {
                             onChange={(e) => handleLabelChange(index, e.target.value)}
                             placeholder="Label Name"
                             disabled={!isEditing}
-                          />
+                          />   
                         </div>
                         <div className="col-sm-3">
                           <select
@@ -519,7 +520,7 @@ const CompanySalaryStructure = () => {
                         />
                       )}
                     />
-                    {errors.status && <p className="errorMsg text-danger">Status is required</p>}
+                    {errors.status && <p className="errorMsg text-danger">Status is Required</p>}
                   </div>
                   <div className="col-4 text-end">
                     <button

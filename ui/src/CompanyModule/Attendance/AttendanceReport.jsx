@@ -269,11 +269,6 @@ const AttendanceReport = () => {
                 selector: (row) => `${row.firstName} ${row.lastName}`,
                 width: "200px",
             }] : []),
-            ...(!isAllAttendance && selectedYear ? [{
-                name: <h6><b>Name</b></h6>,
-                selector: (row) => `${row.firstName} ${row.lastName}`,
-                width: "150px",
-            }] : []),
             ...(!isAttendance && selectedYear ? [{
                 name: <h6><b>Name</b></h6>,
                 selector: (row) => `${row.firstName} ${row.lastName}`,

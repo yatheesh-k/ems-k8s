@@ -165,7 +165,16 @@ const PayslipDoc = () => {
                       <th style={{ padding: "4px", width: "150px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black" }}>Designation</th>
                       <td style={{ padding: "4px", textAlign: "left", border: "1px solid black" }}>{employeeDetails.designationName}</td>
                       <th style={{ padding: "4px", width: "150px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black" }}>Location</th>
-                      <td style={{ padding: "4px", textAlign: "left", border: "1px solid black" }}>{employeeDetails.location ? employeeDetails.location.trim().split(',').pop().trim() : ''}
+                      <td style={{ padding: "4px", textAlign: "left", border: "1px solid black" }}>
+                        {employeeDetails.location ?
+                          (() => {
+                            const parts = employeeDetails.location.trim().split(',');
+                            const state = parts.slice(-2, -1)[0].trim();
+                            const address = parts.slice(-3, -2)[0].trim();
+                            return `${address}, ${state}`;
+                          })() :
+                          ''
+                        }
                       </td>
                     </tr>
                     <tr>

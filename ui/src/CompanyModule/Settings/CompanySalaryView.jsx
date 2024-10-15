@@ -153,12 +153,12 @@ const CompanySalaryView = () => {
                                                         <p>No deductions found.</p>
                                                     )}
                                                 </div>
-                                                <div className="col-lg-1"></div>
+                                                {/* <div className="col-lg-1"></div>
                                                 <div className="col-12 d-flex justify-content-end mt-5">
                                                     <button type="submit" className="btn btn-primary">
                                                         Update
                                                     </button>
-                                                </div>
+                                                </div> */}
                                             </div>
                                         </div>
                                     )}
