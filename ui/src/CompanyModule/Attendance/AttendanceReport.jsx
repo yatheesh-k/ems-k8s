@@ -163,6 +163,13 @@ const AttendanceReport = () => {
     };
 
     const handleDelete = async () => {
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1;
+        const currentYear = now.getFullYear();
+
+        const monthNames = getMonthNames();
+        const currentMonthName = monthNames[currentMonth - 1];
+
         try {
             await AttendanceDeleteById(selectedEmployeeId, selectedAttendanceId);
             toast.success("Attendance Record Deleted Successfully", {
@@ -174,7 +181,7 @@ const AttendanceReport = () => {
             });
             setTimeout(() => {
                 handleCloseDeleteModal();
-                fetchAttendanceData(employeeId, selectedMonth, selectedYear);
+                fetchAllAttendanceData(null, currentMonthName, currentYear);
                 setRefreshData((prev) => !prev);
             }, 1500);
         } catch (error) {
