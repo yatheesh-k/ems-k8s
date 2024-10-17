@@ -492,46 +492,46 @@ const CompanySalaryStructure = () => {
                     </div>
                   </div>
                 </div>
-                <div className="row mt-3 align-items-center">
-                  <div className="col-2">
-                    <label className="form-label mb-0">Status :- </label>
-                  </div>
-                  <div className="col-6">
-                    <Controller
-                      name="status"
-                      control={control}
-                      defaultValue=""
-                      rules={{ required: true }}
-                      render={({ field }) => (
-                        <Select
-                          {...field}
-                          options={[
+                <div className="row col-12 mt-3 align-items-center">
+    <div className="col-6">
+        <div className="row d-flex flex-column">
+            <label className="form-label mb-0">Status: {errors.status && <p className="errorMsg text-danger">Status is required</p>}
+            </label>
+            <Controller
+                name="status"
+                control={control}
+                defaultValue=""
+                rules={{ required: true }}
+                render={({ field }) => (
+                    <Select
+                        {...field}
+                        options={[
                             { value: "Active", label: "Active" },
                             { value: "InActive", label: "InActive" },
-                          ]}
-                          value={
+                        ]}
+                        value={
                             field.value
-                              ? { value: field.value, label: ["Active", "InActive"].find(option => option === field.value) }
-                              : null
-                          }
-                          onChange={(val) => field.onChange(val.value)}
-                          isDisabled={!isSubmitEnabled()}
-                          placeholder="Select Status"
-                        />
-                      )}
+                                ? { value: field.value, label: field.value }
+                                : null
+                        }
+                        onChange={(val) => field.onChange(val.value)}
+                        isDisabled={!isSubmitEnabled()}
+                        placeholder="Select Status"
                     />
-                    {errors.status && <p className="errorMsg text-danger">Status is Required</p>}
-                  </div>
-                  <div className="col-4 text-end">
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      disabled={!isSubmitEnabled()}
-                    >
-                      Submit All
-                    </button>
-                  </div>
-                </div>
+                )}
+            />
+        </div>
+    </div>
+    <div className="col-4 text-end">
+        <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={!isSubmitEnabled()}
+        >
+            Submit All
+        </button>
+    </div>
+</div>
               </div>
             </div>
           </form>

@@ -808,6 +808,9 @@ public class CompanyUtils {
             if (companyUpdateRequest.getAlternateNo().equals(companyUpdateRequest.getMobileNo())){
                 responseBody.put(Constants.DUPLICATE_AS_MOBILE_NO, companyUpdateRequest.getAlternateNo());
             }
+            if (companyUpdateRequest.getPersonalMailId().equals(companyEntity.getEmailId())){
+                responseBody.put(Constants.DUPLICATE_PERSONAL_MAIL, companyUpdateRequest.getPersonalMailId());
+            }
 
         }
         return responseBody;

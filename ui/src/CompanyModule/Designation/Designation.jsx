@@ -144,6 +144,29 @@ const Designation = () => {
     console.error(error.response);
   };
   
+  const validateName = (value) => {
+    if (!value || value.trim().length === 0) {
+      return "Designation Name is Required.";
+    } else if (!/^[A-Za-z ]+$/.test(value)) {
+      return "Only Alphabetic Characters are Allowed.";
+    } else {
+      const words = value.split(" ");
+      
+      for (const word of words) {
+        if (word.length < 2 || word.length > 40) {
+          return "Invalid Format of Designation.";
+        }
+      }
+      
+      if (/^\s|\s$/.test(value)) {
+        return "No Leading or Trailing Spaces Allowed.";
+      } else if (/\s{2,}/.test(value)) {
+        return "No Multiple Spaces Between Words Allowed.";
+      }
+    }
+  
+    return true; // Return true if all conditions are satisfied
+  };
 
   const getFilteredList = (searchData) => {
     setSearch(searchData);
@@ -350,6 +373,12 @@ const Designation = () => {
                   <div className="modal-content">
                     <ModalHeader>
                       <ModalTitle>{editingUserId ? "Update Designation" : "Add Designation"}</ModalTitle>
+                      <button
+                        type="button"
+                        className="btn-close" // Bootstrap's close button class
+                        aria-label="Close"
+                        onClick={handleCloseAddDesignationModal} // Function to close the modal
+                      ></button>
                     </ModalHeader>
                     <ModalBody>
                       <form onSubmit={handleSubmit(onSubmit)} id='designationForm'>
@@ -367,18 +396,9 @@ const Designation = () => {
                                 autoComplete='off'
                                 {...register("name", {
                                   required: "Designation is Required",
-                                  pattern: {
-                                    value: /^[A-Za-z ]+$/,
-                                    message: "This Field accepts only Alphabetic Characters",
-                                  },
-                                  minLength:{
-                                    value:2,
-                                    message:"Minimun 2 characters required"
-                                  },
-                                  maxLength:{
-                                    value:20,
-                                    message:"Maximum 20 characters required"
-                                  }
+                                 validate:{
+                                  validateName,
+                                 },
                                 })}
                               />
                               {errors.name && (<p className='errorMsg'>{errors.name.message}</p>)}
