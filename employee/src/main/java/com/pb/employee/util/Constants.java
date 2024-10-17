@@ -94,4 +94,6 @@ public class Constants {
     public static final String PRIVATE = "Private Limited";
     public static final String FIRM = "Firm";
 
+    public static final String EXPERIENCE_LETTER = "experienceletter.ftl";
+
 }
