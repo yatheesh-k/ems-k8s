@@ -24,7 +24,7 @@ public class CompanyUpdateRequest {
     private String mobileNo;
 
     @Schema(example = "alternateNo")
-    @Pattern(regexp = "^(?!([0-9])\\1{9})\\d{10}$", message = "{invalid.alternateNo}")
+    @Pattern(regexp = "^((?!([0-9])\\1{9})\\d{10}|null|0|)$", message = "{invalid.alternateNo}")
     private String alternateNo;
 
     @Schema(example = "name")

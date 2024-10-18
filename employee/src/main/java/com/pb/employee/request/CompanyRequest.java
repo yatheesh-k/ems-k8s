@@ -44,6 +44,7 @@ public class CompanyRequest {
     private String mobileNo;
 
     @Schema(example = "alternateNo")
+    @Pattern(regexp = "^((?!([0-9])\\1{9})\\d{10}|null|0|)$", message = "{invalid.alternateNo}")
     private String alternateNo;
 
     @Schema(example = "12ABCDE3456Z1")
