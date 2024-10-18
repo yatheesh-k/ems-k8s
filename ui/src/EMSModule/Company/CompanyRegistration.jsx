@@ -459,8 +459,8 @@ const CompanyRegistration = () => {
 
                           },
                           maxLength: {
-                            value: 16,
-                            message: "minimum 2 and maximum 16 characters allowed",
+                            value: 30,
+                            message: "minimum 2 and maximum 30 characters allowed",
                           },
                         })}
                         disabled={editMode}
@@ -662,8 +662,8 @@ const CompanyRegistration = () => {
                             message: "minimum 3 characters allowed",
                           },
                           maxLength: {
-                            value: 100,
-                            message: "maximum 100 characters allowed",
+                            value: 200,
+                            message: "maximum 200 characters allowed",
                           },
                         })}
                       />
@@ -931,8 +931,8 @@ const CompanyRegistration = () => {
                         {...register("address", {
                           required: "Address is Required",
                           maxLength: {
-                            value: 100,
-                            message: "Name must not exceed 100 characters",
+                            value: 200,
+                            message: "Name must not exceed 200 characters",
                           },
                           minLength: {
                             value: 3,
