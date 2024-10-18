@@ -172,19 +172,26 @@ public class PayslipServiceImpl implements PayslipService {
                     if (salary.getStatus().equals(EmployeeStatus.ACTIVE.getStatus())) {
                         // Iterate through the active salary configurations
                         for (SalaryConfigurationEntity salaryConfig : activeSalaryConfigurations) {
-                            salary.setSalaryConfigurationEntity(salaryConfig);
 
-                            // Create payslip based on active salary and salary configuration
-                            PayslipEntity payslipProperties = PayslipUtils.unMaskEmployeePayslipProperties(salary, payslipRequest, paySlipId, employee.getId(), attendanceEntities);
+                            if (salaryConfig.getId().equals(salary.getSalaryConfigurationEntity().getId())) {
 
-                            PayslipUtils.forFormatNumericalFields(payslipProperties);
 
-                            // Pass salary and salaryConfig to maskEmployeePayslip
-                            payslipProperties = PayslipUtils.maskEmployeePayslip(payslipProperties, salary, attendanceEntities);
+                                // Create payslip based on active salary and salary configuration
+                                PayslipEntity payslipProperties = PayslipUtils.unMaskEmployeePayslipProperties(salary, payslipRequest, paySlipId, employee.getId(), attendanceEntities);
 
-                            // Add the generated payslip to the list
-                            generatedPayslips.add(payslipProperties);
-                            payslipPropertiesList.add(payslipProperties);
+                                PayslipUtils.forFormatNumericalFields(payslipProperties);
+
+                                // Pass salary and salaryConfig to maskEmployeePayslip
+                                payslipProperties = PayslipUtils.maskEmployeePayslip(payslipProperties, salary, attendanceEntities);
+
+                                // Add the generated payslip to the list
+                                generatedPayslips.add(payslipProperties);
+                                payslipPropertiesList.add(payslipProperties);
+                            }else {
+                                log.error("Employee Salary Entity is not a active one {}", employee.getEmployeeId());
+                                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_COMPANY_SALARY_INACTIVE),
+                                        HttpStatus.INTERNAL_SERVER_ERROR);
+                            }
                         }
                     }
                 }
