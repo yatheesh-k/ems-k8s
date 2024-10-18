@@ -305,7 +305,7 @@ function Profile() {
                         src={`${logoFileName}`}
                         accept=".png, .jpg. ,svg ,.jpeg, .pdf"
                         alt="Company Logo"
-                        style={{ height: "55px", width: "160px" }}
+                        style={{ height: "80px", width: "200px" }}
                       />
                     )}
                   </div>
@@ -551,7 +551,7 @@ function Profile() {
                             required: "Personal Email Id is Required",
                             pattern: {
                               value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
-                              message: "Invalid email format it allows Only .com, .in, .org, .net, .edu, .gov are allowed",
+                              message: "Invalid Email Format",
                             },
                           })}
                         />

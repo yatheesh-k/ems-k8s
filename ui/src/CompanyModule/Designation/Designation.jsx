@@ -27,6 +27,7 @@ const Designation = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [addDesignation, setAddDesignation] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null); // State to store the ID of the item to be deleted
   const { user} = useAuth();
   const navigate = useNavigate();
@@ -319,10 +320,11 @@ const Designation = () => {
                   <div className='col-12 col-md-6 col-lg-4'>
                     <button
                       onClick={() => setAddDesignation(true)}
-                      className={editingUserId ? "btn btn-danger" : "btn btn-primary"}
+                      className="btn btn-primary"
                       type='submit'
                     >
-                   {editingUserId ? "Update Designation" : "Add Designation"}
+                      Add Designation
+                   
                     </button>
                   </div>
                   <div className='col-12 col-md-6 col-lg-4'></div>
