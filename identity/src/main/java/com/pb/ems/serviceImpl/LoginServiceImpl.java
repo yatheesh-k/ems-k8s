@@ -105,16 +105,17 @@ public class LoginServiceImpl implements LoginService {
             throw new IdentityException(ErrorMessageHandler.getMessage(IdentityErrorMessageKey.INVALID_CREDENTIALS),
                     HttpStatus.FORBIDDEN);
         }
+        Long otp = generateOtp();
+
         CompletableFuture.runAsync(() -> {
             try {
-                Long otp = generateOtp();
                 sendOtpByEmail(request.getUsername(), otp);
-                openSearchOperations.saveOtpToUser(employee, otp,request.getCompany());
-            } catch (IdentityException e) {
+            } catch (Exception e) {
                 log.error("Unable to generate and send otp ");
                 throw new RuntimeException(e);
             }
         });
+        openSearchOperations.saveOtpToUser(employee, otp,request.getCompany());
         List<String> roles = new ArrayList<>();
         String token= null;
         if (employee.getEmployeeType().equals(Constants.EMPLOYEE_TYPE)) {
