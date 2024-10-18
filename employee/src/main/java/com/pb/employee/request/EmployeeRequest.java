@@ -96,8 +96,7 @@ public class EmployeeRequest {
     private String panNo;
 
     @Schema(example = "uanNo")
-    @Pattern(regexp = "^\\d{12}$", message = "{invalid.uanNo}")
-    @NotBlank(message = "{uanNo.notnull.message}")
+    @Pattern(regexp = "^(\\d{12}|null|)$", message = "{invalid.uanNo}")
     private String uanNo;
 
     @Schema(example = "aadhaarId")
