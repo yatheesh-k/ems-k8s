@@ -92,6 +92,8 @@ public class PayslipServiceImpl implements PayslipService {
             attendance=openSearchOperations.getAttendanceById(attendanceId,null,index);
             PayslipEntity payslipProperties = PayslipUtils.unMaskEmployeePayslipProperties(entity, payslipRequest, paySlipId, employeeId, attendance);
             PayslipUtils.forFormatNumericalFields(payslipProperties);
+            payslipProperties.setDepartment(employee.getDepartmentName());
+            payslipProperties.setDesignation(employee.getDesignationName());
             payslipProperties = PayslipUtils.maskEmployeePayslip(payslipProperties,entity,attendance);
             Entity result = openSearchOperations.saveEntity(payslipProperties, paySlipId, index);
         } catch (Exception exception) {
@@ -175,10 +177,11 @@ public class PayslipServiceImpl implements PayslipService {
 
                             if (salaryConfig.getId().equals(salary.getSalaryConfigurationEntity().getId())) {
 
-
                                 // Create payslip based on active salary and salary configuration
                                 PayslipEntity payslipProperties = PayslipUtils.unMaskEmployeePayslipProperties(salary, payslipRequest, paySlipId, employee.getId(), attendanceEntities);
 
+                                payslipProperties.setDepartment(employee.getDepartmentName());
+                                payslipProperties.setDesignation(employee.getDesignationName());
                                 PayslipUtils.forFormatNumericalFields(payslipProperties);
 
                                 // Pass salary and salaryConfig to maskEmployeePayslip

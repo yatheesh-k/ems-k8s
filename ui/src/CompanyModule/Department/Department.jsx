@@ -320,10 +320,10 @@ const Department = () => {
                   <div className='col-12 col-md-6 col-lg-4'>
                     <button
                       onClick={() => setAddDeparment(true)}
-                      className={editingId ? "btn btn-danger" : "btn btn-primary"}
+                      className= "btn btn-primary"
                       type='submit'
                     >
-                      {loading ? "Loading..." : (editingId ? "Update Department" : "Add Department")}
+                    Add Department
 
                     </button>
                   </div>
