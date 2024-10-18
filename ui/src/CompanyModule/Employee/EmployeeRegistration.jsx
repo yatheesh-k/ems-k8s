@@ -604,8 +604,8 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                             message: "Minimum 3 characters Required",
                           },
                           maxLength: {
-                            value: 60,
-                            message: "Maximum 60 characters Required",
+                            value: 100,
+                            message: "Maximum 100 characters Required",
                           },
                         })}
                       />
@@ -637,8 +637,8 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                             message: "Minimum 1 character Required",
                           },
                           maxLength: {
-                            value: 60,
-                            message: "Maximum 60 characters Required",
+                            value: 100,
+                            message: "Maximum 100 characters Required",
                           },
                         })}
                       />
@@ -661,7 +661,7 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                           required: "Email Id is Required",
                           pattern: {
                             value: /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
-                            message: "Invalid email format it allows Only .com, .in, .org, .net, .edu, .gov are allowed",
+                            message: "Invalid Email Format",
                           },
                         })}
                       />
@@ -783,6 +783,7 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                         onKeyDown={handleEmailChange}
                         {...register("manager", {
                           required: "Manager is Required",
+
                         validate:{
                           validateName,
                         }

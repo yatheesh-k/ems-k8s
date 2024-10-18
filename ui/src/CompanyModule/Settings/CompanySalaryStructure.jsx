@@ -55,6 +55,7 @@ const CompanySalaryStructure = () => {
     }
   };
 
+  /**Tab Navigation */
   const handleLabelChange = (index, value) => {
     const fields = activeTab === 'nav-home' ? allowanceFields : deductionFields;
     const newFields = [...fields];
@@ -66,6 +67,7 @@ const CompanySalaryStructure = () => {
     }
   };
 
+  /**OnChange event for tab navigation */
   const handleTypeChange = (index, value) => {
     const fields = activeTab === 'nav-home' ? allowanceFields : deductionFields;
     const newFields = [...fields];
@@ -77,6 +79,7 @@ const CompanySalaryStructure = () => {
     }
   };
 
+  /**Checkbox functionality */
   const handleCheckboxChange = (index) => {
     const fields = activeTab === 'nav-home' ? allowanceFields : deductionFields;
     const fieldLabel = fields[index].label;
@@ -184,45 +187,67 @@ const CompanySalaryStructure = () => {
 
   const onSubmit = async (data) => {
     const jsonData = {
-      companyName: user.company,
-      status: data.status,
-      allowances: {},
-      deductions: {},
+        companyName: user.company,
+        status: data.status,
+        allowances: {},
+        deductions: {},
     };
 
     const selectedAllowances = allowanceFields.filter((field) => fieldCheckboxes.allowances[field.label]);
     const selectedDeductions = deductionFields.filter((field) => fieldCheckboxes.deductions[field.label]);
 
+    // Validation: Check if any selected allowance or deduction has an empty value
+    const errors = {};
     selectedAllowances.forEach((field) => {
-      if (field.label && field.value) {
-        jsonData.allowances[field.label] = field.type === "percentage" ? `${field.value}%` : field.value;
-      }
+        if (!field.value) {
+            errors[field.label] = "Value is required for selected allowance.";
+        }
     });
 
     selectedDeductions.forEach((field) => {
-      if (field.label && field.value) {
-        jsonData.deductions[field.label] = field.type === "percentage" ? `${field.value}%` : field.value;
-      }
+        if (!field.value) {
+            errors[field.label] = "Value is required for selected deduction.";
+        }
+    });
+
+    // If there are errors, show alert and return early
+    if (Object.keys(errors).length > 0) {
+        alert("Please fill in the required values for the selected allowances and deductions.");
+        setValidationErrors(errors);
+        return; // Prevent submission
+    }
+
+    selectedAllowances.forEach((field) => {
+        if (field.label && field.value) {
+            jsonData.allowances[field.label] = field.type === "percentage" ? `${field.value}%` : field.value;
+        }
+    });
+
+    selectedDeductions.forEach((field) => {
+        if (field.label && field.value) {
+            jsonData.deductions[field.label] = field.type === "percentage" ? `${field.value}%` : field.value;
+        }
     });
 
     console.log("Submitting data:", jsonData);
 
     try {
-      const response = await CompanySalaryStructurePostApi(jsonData);
-      toast.success("Salary structure submitted successfully!");
-      reset();
-      navigate('/companySalaryView');
-      window.location.reload();
+        const response = await CompanySalaryStructurePostApi(jsonData);
+        toast.success("Salary structure submitted successfully!");
+        reset();
+        navigate('/companySalaryView');
+        window.location.reload();
     } catch (error) {
-      if (error.response) {
-        console.error("Error response from backend:", error.response.data);
-        toast.error(`Error: ${error.response.data.message || 'An error occurred'}`);
-      } else {
-        console.error("Fetch error:", error);
-        toast.error("An unexpected error occurred. Please try again.");
-      }
+        if (error.response) {
+            console.error("Error response from backend:", error.response.data);
+            toast.error(`Error: ${error.response.data.message || 'An error occurred'}`);
+        } else {
+            console.error("Fetch error:", error);
+            toast.error("An unexpected error occurred. Please try again.");
+        }
     }
-  };
+};
+
 
   const formatFieldName = (fieldName) => {
     return fieldName
