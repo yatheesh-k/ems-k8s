@@ -127,7 +127,7 @@ public class EmployeeUtils {
                 }
                 if (employeeEntity.getUanNo() != null) {
                     uanNo = new String((Base64.getDecoder().decode(employeeEntity.getUanNo().toString().getBytes())));
-                    if (uanNo.equals(employeeRequest.getUanNo())) {
+                    if (uanNo.equals(employeeRequest.getUanNo()) && !uanNo.isEmpty()) {
                         responseBody.put(Constants.DUPLICATE_UAN_NO, employeeRequest.getUanNo());
                     }
                 }
