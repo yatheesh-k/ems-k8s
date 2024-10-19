@@ -82,7 +82,8 @@ public enum EmployeeErrorMessageKey {
     UNABLE_DELETE_ATTENDANCE("unable.delete.attendance"),
     UNABLE_UPDATE_ATTENDANCE("unable.update.attendance"),
     UNABLE_GET_EMPLOYEES_SALARY_STRUCTURE("unable.get.employee.salary.structure"),
-    EMPLOYEE_COMPANY_SALARY_INACTIVE("employee.company.salary.inactive");
+    EMPLOYEE_COMPANY_SALARY_INACTIVE("employee.company.salary.inactive"),
+    COMPANY_DATA_EXIST("company.data.exist");
 
     private final String key;
 
