@@ -511,7 +511,7 @@ public class CompanyUtils {
             }
             if (companyUpdateRequest.getAlternateNo() != null && companyEntity.getAlternateNo() != null) {
                 landNo = new String(Base64.getDecoder().decode(companyEntity.getAlternateNo().getBytes()));
-x                if (!companyEntity.getAlternateNo().isEmpty() && landNo.equals(companyUpdateRequest.getAlternateNo())){
+                if (!companyEntity.getAlternateNo().isEmpty() && landNo.equals(companyUpdateRequest.getAlternateNo())){
                     responseBody.put(Constants.DUPLICATE_ALTERNATE_NO, companyUpdateRequest.getAlternateNo());
                 }
 
