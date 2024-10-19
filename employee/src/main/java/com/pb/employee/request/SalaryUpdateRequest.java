@@ -24,7 +24,6 @@ public class SalaryUpdateRequest {
 
     @Schema(example = "variableAmount")
     @Pattern(regexp = "^(|0|null|\\d+(\\.\\d{1,2})?)$", message = "{variableAmount.format}")
-    @Size(min = 4, max = 20, message = "{variableAmount.size.message}")
     private String variableAmount;
 
     @Schema(example = "grossAmount")
