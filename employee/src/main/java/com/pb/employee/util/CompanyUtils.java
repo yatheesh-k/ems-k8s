@@ -439,6 +439,7 @@ public class CompanyUtils {
             if (companyRequest.getAlternateNo() != null && companyEntity.getAlternateNo() != null) {
                 landNo = new String(Base64.getDecoder().decode(companyEntity.getAlternateNo().getBytes()));
                 if (!companyEntity.getAlternateNo().isEmpty() && landNo.equals(companyRequest.getAlternateNo())){
+
                     responseBody.put(Constants.DUPLICATE_ALTERNATE_NO, companyRequest.getAlternateNo());
                 }
             }
@@ -510,7 +511,7 @@ public class CompanyUtils {
             }
             if (companyUpdateRequest.getAlternateNo() != null && companyEntity.getAlternateNo() != null) {
                 landNo = new String(Base64.getDecoder().decode(companyEntity.getAlternateNo().getBytes()));
-                if (!companyEntity.getAlternateNo().isEmpty() && landNo.equals(companyUpdateRequest.getAlternateNo())){
+x                if (!companyEntity.getAlternateNo().isEmpty() && landNo.equals(companyUpdateRequest.getAlternateNo())){
                     responseBody.put(Constants.DUPLICATE_ALTERNATE_NO, companyUpdateRequest.getAlternateNo());
                 }
 
