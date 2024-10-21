@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 public class Constants {
 
     public static final String REMOTE_SERVICE_UNAVAILABLE = "Remote service is not available at the moment";
-    ;
     public static final String REQUEST_PAYLOAD_INVALID = "Request payload is not valid";
     public static final String REQUEST_UNAUTHORIZED = "Request is unauthorized";
     public static final String REQUEST_RESOURCE_DUPLICATE = "Resource already exists";

@@ -119,4 +119,6 @@ public class EmployeeRequest {
     @Size(min = 3, max = 100, message = "{bankName.size.message}")
     private String bankName;
 
+    private String pfNo;
+
 }

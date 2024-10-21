@@ -188,6 +188,7 @@ public class PayslipServiceImpl implements PayslipService {
 
                                 DepartmentEntity departmentEntity =null;
                                 DesignationEntity designationEntity = null;
+                                log.debug("Adding the department and designation to the payslip");
                                 if (employee.getDepartment() !=null && employee.getDesignation() !=null) {
                                     departmentEntity = openSearchOperations.getDepartmentById(employee.getDepartment(), null, index);
                                     designationEntity = openSearchOperations.getDesignationById(employee.getDesignation(), null, index);
@@ -216,8 +217,6 @@ public class PayslipServiceImpl implements PayslipService {
                     openSearchOperations.saveEntity(payslipProperties, paySlipId, index);
                 }
             }
-
-
 
         } catch (EmployeeException e) {
             // Handle specific EmployeeException for employee salary structures
@@ -532,7 +531,6 @@ public class PayslipServiceImpl implements PayslipService {
                 }
             }
         }
-
         // Add the found Allowance fields after HRA
         orderedAllowances.addAll(allowancesWithAllowance);
 
@@ -552,12 +550,10 @@ public class PayslipServiceImpl implements PayslipService {
                 break; // Exit loop after adding Pf Contribution Employee
             }
         }
-
         // Finally, add "Other Allowance" last if it exists
         if (otherAllowance != null) {
             orderedAllowances.add(otherAllowance);
         }
-
         // Clear the original allowance list and add ordered allowances
         allowanceList.clear();
         allowanceList.addAll(orderedAllowances);

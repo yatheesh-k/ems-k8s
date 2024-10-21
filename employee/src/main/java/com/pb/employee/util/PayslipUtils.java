@@ -505,6 +505,9 @@ public class PayslipUtils {
         if (payslipRequest.getSalary().getFixedAmount() != null) {
             fix = Base64.getEncoder().encodeToString((payslipRequest.getSalary().getFixedAmount()).getBytes());
         }
+        if (payslipRequest.getSalary().getLop() != null) {
+            lop = Base64.getEncoder().encodeToString((payslipRequest.getSalary().getLop()).getBytes());
+        }
         if (payslipRequest.getSalary().getVariableAmount() != null) {
             var = Base64.getEncoder().encodeToString((payslipRequest.getSalary().getVariableAmount()).getBytes());
         }
@@ -543,10 +546,13 @@ public class PayslipUtils {
 
         ObjectMapper objectMapper = new ObjectMapper();
         AttendanceEntity attendanceEntity = objectMapper.convertValue(payslipRequest.getAttendance(),AttendanceEntity.class);
-        attendanceEntity.setMonth(attendanceEntity.getMonth());
-        attendanceEntity.setYear(attendanceEntity.getYear());
-        attendanceEntity.setTotalWorkingDays(attendanceEntity.getTotalWorkingDays());
-        attendanceEntity.setNoOfWorkingDays(attendanceEntity.getNoOfWorkingDays());
+        attendanceEntity.setMonth(Base64.getEncoder().encodeToString((attendanceEntity.getMonth()).getBytes()));
+        attendanceEntity.setYear(Base64.getEncoder().encodeToString((attendanceEntity.getYear()).getBytes()));
+        attendanceEntity.setTotalWorkingDays(Base64.getEncoder().encodeToString((attendanceEntity.getTotalWorkingDays()).getBytes()));
+        attendanceEntity.setNoOfWorkingDays(Base64.getEncoder().encodeToString((attendanceEntity.getNoOfWorkingDays()).getBytes()));
+        attendanceEntity.setLastName(Base64.getEncoder().encodeToString((attendanceEntity.getLastName()).getBytes()));
+        attendanceEntity.setFirstName(Base64.getEncoder().encodeToString((attendanceEntity.getFirstName()).getBytes()));
+        attendanceEntity.setEmailId(Base64.getEncoder().encodeToString((attendanceEntity.getEmailId()).getBytes()));
 
         PayslipEntity payslipEntity = objectMapper.convertValue(payslipRequest, PayslipEntity.class);
         payslipEntity.setPayslipId(payslipId);
@@ -561,6 +567,7 @@ public class PayslipUtils {
         salary.setTotalEarnings(te);
         salary.setNetSalary(net);
         salary.setTotalDeductions(tded);
+        salary.setLop(lop);
         salary.setIncomeTax(itax);
         salary.getSalaryConfigurationEntity().setAllowances(allowances);
         salary.getSalaryConfigurationEntity().setDeductions(deductions);
