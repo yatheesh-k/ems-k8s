@@ -185,14 +185,15 @@
                     <tr>
                         <th>Designation</th>
                         <td>${employee.designationName}</td>
-                        <th>Location</th>
-                        <td>${employee.location}</td>
+                        <th></th>
+                       <td>
+                       </td>
                     </tr>
                     <tr>
-                        <td colspan="4" class="employee-details">Bank ACC No:
-                            ${employee.accountNo}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IFSC:
-                            ${employee.ifscCode}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            Bank: ${employee.bankName}</td>
+                        <td colspan="4" class="employee-details"> Bank: ${employee.bankName}
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            IFSC: ${employee.ifscCode}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            ACC No:  ${employee.accountNo}</td>
                     </tr>
                 </table>
             </div>
@@ -221,10 +222,10 @@
             <div class="salary-details">
                 <table class="salary-table">
                     <tr>
-                        <th style="width:30%;">Earnings (A)</th>
-                        <th>Amount (A)</th>
-                        <th>Deductions (B)</th>
-                        <th>Amount (B)</th>
+                        <th style="width:30%;">Earnings</th>
+                        <th>Amount</th>
+                        <th>Deductions</th>
+                        <th>Amount</th>
                     </tr>
                     <tr>
                         <!-- Column for Allowances and Amounts -->
@@ -282,7 +283,7 @@
                                     <td>Total Deductions (B)</td> <!-- Add LOP -->
                                 </tr>
                                 <tr>
-                                    <th style="border-left: 900px ; border-right: 900px;">Taxes (C)</th> <!-- Add LOP -->
+                                    <th style="border-left: 900px ; border-right: 900px;">Taxes</th> <!-- Add LOP -->
                                 </tr>
                                 <tr>
                                     <td>Income Tax</td> <!-- Add Income Tax -->
@@ -315,7 +316,7 @@
                                     <td>${payslipEntity.salary.totalDeductions}</td>
                                 </tr> <!-- Display LOP amount -->
                                 <tr>
-                                    <th style="border-left: 900px ; border-right: 900px;">Amount (C)</th>
+                                    <th style="border-left: 900px ; border-right: 900px;">Amount</th>
                                 </tr> <!-- Display Income Tax amount -->
                                 <tr>
                                     <td>${payslipEntity.salary.incomeTax}</td>

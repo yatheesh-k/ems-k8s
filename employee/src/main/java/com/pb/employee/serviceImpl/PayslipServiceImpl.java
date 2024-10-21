@@ -92,8 +92,14 @@ public class PayslipServiceImpl implements PayslipService {
             attendance=openSearchOperations.getAttendanceById(attendanceId,null,index);
             PayslipEntity payslipProperties = PayslipUtils.unMaskEmployeePayslipProperties(entity, payslipRequest, paySlipId, employeeId, attendance);
             PayslipUtils.forFormatNumericalFields(payslipProperties);
-            payslipProperties.setDepartment(employee.getDepartmentName());
-            payslipProperties.setDesignation(employee.getDesignationName());
+            DepartmentEntity departmentEntity =null;
+            DesignationEntity designationEntity = null;
+            if (employee.getDepartment() !=null && employee.getDesignation() !=null) {
+                departmentEntity = openSearchOperations.getDepartmentById(employee.getDepartment(), null, index);
+                designationEntity = openSearchOperations.getDesignationById(employee.getDesignation(), null, index);
+            }
+            payslipProperties.setDepartment(departmentEntity.getName());
+            payslipProperties.setDesignation(designationEntity.getName());
             payslipProperties = PayslipUtils.maskEmployeePayslip(payslipProperties,entity,attendance);
             Entity result = openSearchOperations.saveEntity(payslipProperties, paySlipId, index);
         } catch (Exception exception) {
@@ -180,8 +186,14 @@ public class PayslipServiceImpl implements PayslipService {
                                 // Create payslip based on active salary and salary configuration
                                 PayslipEntity payslipProperties = PayslipUtils.unMaskEmployeePayslipProperties(salary, payslipRequest, paySlipId, employee.getId(), attendanceEntities);
 
-                                payslipProperties.setDepartment(employee.getDepartmentName());
-                                payslipProperties.setDesignation(employee.getDesignationName());
+                                DepartmentEntity departmentEntity =null;
+                                DesignationEntity designationEntity = null;
+                                if (employee.getDepartment() !=null && employee.getDesignation() !=null) {
+                                    departmentEntity = openSearchOperations.getDepartmentById(employee.getDepartment(), null, index);
+                                    designationEntity = openSearchOperations.getDesignationById(employee.getDesignation(), null, index);
+                                }
+                                payslipProperties.setDepartment(departmentEntity.getName());
+                                payslipProperties.setDesignation(designationEntity.getName());
                                 PayslipUtils.forFormatNumericalFields(payslipProperties);
 
                                 // Pass salary and salaryConfig to maskEmployeePayslip
@@ -485,7 +497,16 @@ public class PayslipServiceImpl implements PayslipService {
         // Create a list to hold the ordered allowances
         List<Map<String, Object>> orderedAllowances = new ArrayList<>();
 
-        // First, add the HRA if it exists
+        // Add Basic Salary if it exists
+        for (Map<String, Object> allowance : unorderedAllowances) {
+            if (allowance.containsKey(Constants.BASIC_SALARY)) {
+                orderedAllowances.add(allowance);
+                unorderedAllowances.remove(allowance); // Remove from unordered list
+                break; // Exit loop after adding Basic Salary
+            }
+        }
+
+        // Then, add HRA if it exists
         for (Map<String, Object> allowance : unorderedAllowances) {
             if (allowance.containsKey(Constants.HRA)) {
                 orderedAllowances.add(allowance);
@@ -494,45 +515,56 @@ public class PayslipServiceImpl implements PayslipService {
             }
         }
 
-        // Add all other dynamic allowances
-        List<String> dynamicAllowanceKeys = new ArrayList<>();
+        // Add allowances containing "Allowance" (excluding Other Allowance) after HRA
+        List<Map<String, Object>> allowancesWithAllowance = new ArrayList<>();
+        List<Map<String, Object>> otherAllowances = new ArrayList<>();
+        Map<String, Object> otherAllowance = null;
+
         for (Map<String, Object> allowance : unorderedAllowances) {
             for (String key : allowance.keySet()) {
-                // Add to dynamic allowances if it is not HRA, PF Contribution Employee or Other Allowance
-                if (!key.equals(Constants.HRA) && !key.equals(Constants.PF_CONTRIBUTION_EMPLOYEE)) {
-                    dynamicAllowanceKeys.add(key);
+                if (key.contains(Constants.ALLOWANCE) && !key.equalsIgnoreCase(Constants.OTHER_ALLOWANCES)) {
+                    allowancesWithAllowance.add(allowance);
+                    break; // Break the inner loop to avoid adding the same allowance twice
+                } else if (key.equalsIgnoreCase(Constants.OTHER_ALLOWANCES)) {
+                    otherAllowance = allowance; // Hold "Other Allowance" for later
+                } else {
+                    otherAllowances.add(allowance);
                 }
             }
         }
 
-        // Now add all dynamic allowances found
-        for (String key : dynamicAllowanceKeys) {
-            for (Map<String, Object> allowance : unorderedAllowances) {
-                if (allowance.containsKey(key)) {
-                    orderedAllowances.add(allowance);
-                    unorderedAllowances.remove(allowance); // Remove from unordered list
-                    break; // Exit loop after adding the key
-                }
+        // Add the found Allowance fields after HRA
+        orderedAllowances.addAll(allowancesWithAllowance);
+
+        // Now, add all remaining dynamic allowances (excluding Pf Contribution Employee)
+        List<Map<String, Object>> remainingAllowances = new ArrayList<>();
+        for (Map<String, Object> allowance : otherAllowances) {
+            if (!allowance.containsKey(Constants.PF_CONTRIBUTION_EMPLOYEE)) {
+                remainingAllowances.add(allowance);
             }
         }
+        orderedAllowances.addAll(remainingAllowances);
 
-        // Add the PF Contribution Employee if it exists
-        for (Map<String, Object> allowance : unorderedAllowances) {
+        // Add Pf Contribution Employee if it exists
+        for (Map<String, Object> allowance : otherAllowances) {
             if (allowance.containsKey(Constants.PF_CONTRIBUTION_EMPLOYEE)) {
                 orderedAllowances.add(allowance);
-                unorderedAllowances.remove(allowance); // Remove from unordered list
-                break; // Exit loop after adding PF Contribution Employee
+                break; // Exit loop after adding Pf Contribution Employee
             }
         }
 
-
-        // Add any remaining allowances (if any) that don't match above criteria
-        orderedAllowances.addAll(unorderedAllowances);
+        // Finally, add "Other Allowance" last if it exists
+        if (otherAllowance != null) {
+            orderedAllowances.add(otherAllowance);
+        }
 
         // Clear the original allowance list and add ordered allowances
         allowanceList.clear();
         allowanceList.addAll(orderedAllowances);
     }
+
+
+
 
     private void handleDeductions(PayslipEntity entity, List<Map<String, Object>> deductionList) {
         // Get the deductions from the entity
