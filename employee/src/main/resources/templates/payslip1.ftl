@@ -217,7 +217,18 @@
                 <div class="space"></div>
                 <th>Location</th>
                 <div class="space-right"></div>
-                <td>${employee.location}</td>
+                       <td>
+                         <#if employee.location??>
+                           <#assign parts = employee.location?trim?split(",")>
+                           <#if (parts?size >= 2)>
+                             <#assign state = parts[parts?size - 1]?trim>
+                             <#assign city = parts[parts?size - 2]?trim>
+                             ${city}, ${state}
+                           <#else>
+                             ${employee.location} <!-- If there are fewer than 2 parts, show the entire location -->
+                           </#if>
+                         </#if>
+                       </td>
             </tr>
             <tr>
                 <th>Total Days</th>

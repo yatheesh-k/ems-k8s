@@ -71,4 +71,7 @@ public class EmployeeUpdateRequest {
     @Pattern(regexp = "^(?!\\b([A-Z])\\s([A-Z])\\b)(?!\\b([A-Z])\\s([A-Z])\\s([A-Z])\\b)(?:(?:[A-Z][a-zA-Z]*(?:[-\\s][A-Za-z]+)*)(?:[,.]? [A-Za-z]+)*(?:\\.)?)?$", message = "{bankName.format}")
     @Size(min = 3, max = 100, message = "{bankName.size.message}")
     private String bankName;
+
+    private String pfNo;
+
 }
