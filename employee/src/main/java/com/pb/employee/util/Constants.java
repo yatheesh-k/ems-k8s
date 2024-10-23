@@ -98,4 +98,9 @@ public class Constants {
     public static final String ALLOWANCE = "Allowance";
     public static final String OTHER_ALLOWANCES = "Other Allowances";
 
+    public static final String OFFER_LETTER_TEMPLATE1 = "offerTemplate1.ftl";
+    public static final String OFFER_LETTER_REQUEST = "offerLetter";
+    public static final String ATTACHMENT = "attachment";
+    public static final String OFFER_LETTER = "offer_letter.pdf";
+    public static final String ACTIVE = "Active";
 }
