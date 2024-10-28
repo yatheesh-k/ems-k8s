@@ -113,13 +113,13 @@ const CompanyView = () => {
       wrap: true,
     },
     {
-      name: <h6><b>Authorized Name</b></h6>,
+      name: <h6><b>Service Name</b></h6>,
       selector: row => (
-        <div title={row.name}>
-          {row.name.slice(0, 8)}
+        <div title={row.shortName}>
+          {row.shortName.slice(0, 8)}
         </div>
       ),
-      width: "220px",
+      width: "180px",
       wrap: true,
     },
     {
@@ -132,9 +132,9 @@ const CompanyView = () => {
       width: "200px",
     },
     {
-      name: <h6><b>Mobile No</b></h6>,
-      selector: (row) => row.mobileNo,
-      width: "160px",
+      name: <h6><b>Type</b></h6>,
+      selector: (row) => row.companyType,
+      width: "200px",
       wrap: true,
     },
     {

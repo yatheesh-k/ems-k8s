@@ -86,13 +86,13 @@ const EmployeeSalaryById = () => {
                   <div className="col mb-3">
                       <div className="form-group">
                         <label>Basic Salary:</label>
-                        <input type="text" className="form-control" value={item.basicSalary} readOnly />
+                        <input type="text" className="form-control" value={item.salaryConfigurationEntity?.allowances.basicSalary} readOnly />
                       </div>
                     </div>
                     <div className="col mb-3">
                       <div className="form-group">
                         <label>Travel Allowance:</label>
-                        <input type="text" className="form-control" value={item.allowances.travelAllowance} readOnly />
+                        <input type="text" className="form-control" value={item.salaryConfigurationEntity?.allowances.travelAllowance} readOnly />
                       </div>
                     </div>
                     {/* <div className="col mb-3">
@@ -104,7 +104,7 @@ const EmployeeSalaryById = () => {
                     <div className="col mb-3">
                       <div className="form-group">
                         <label>HRA:</label>
-                        <input type="text" className="form-control" value={item.allowances.hra} readOnly />
+                        <input type="text" className="form-control" value={item.salaryConfigurationEntity?.allowances.hra} readOnly />
                       </div>
                     </div>
                   </div>
@@ -112,13 +112,13 @@ const EmployeeSalaryById = () => {
                     <div className="col mb-3">
                       <div className="form-group">
                         <label>Special Allowance:</label>
-                        <input type="text" className="form-control" value={item.allowances.specialAllowance} readOnly />
+                        <input type="text" className="form-control" value={item.salaryConfigurationEntity?.allowances.specialAllowance} readOnly />
                       </div>
                     </div>
                     <div className="col mb-3">
                       <div className="form-group">
                         <label>Other Allowances:</label>
-                        <input type="text" className="form-control" value={item.allowances.otherAllowances} readOnly />
+                        <input type="text" className="form-control" value={item.salaryConfigurationEntity?.allowances.otherAllowances} readOnly />
                       </div>
                     </div>
                     <div className="col-12 mb-3">
@@ -138,13 +138,13 @@ const EmployeeSalaryById = () => {
                     <div className="col mb-3">
                       <div className="form-group">
                         <label>PF (Employee):</label>
-                        <input type="text" className="form-control" value={item.deductions.pfEmployee} readOnly />
+                        <input type="text" className="form-control" value={item.salaryConfigurationEntity?.deductions.pfEmployee} readOnly />
                       </div>
                     </div>
                     <div className="col mb-3">
                       <div className="form-group">
                         <label>PF (Employer):</label>
-                        <input type="text" className="form-control" value={item.deductions.pfEmployer} readOnly />
+                        <input type="text" className="form-control" value={item.salaryConfigurationEntity?.deductions.pfEmployer} readOnly />
                       </div>
                     </div>
                   </div>
@@ -152,19 +152,19 @@ const EmployeeSalaryById = () => {
                     <div className="col mb-3">
                       <div className="form-group">
                         <label>PF Tax:</label>
-                        <input type="text" className="form-control" value={item.deductions.pfTax} readOnly />
+                        <input type="text" className="form-control" value={item.pfTax} readOnly />
                       </div>
                     </div>
                     <div className="col mb-3">
                       <div className="form-group">
                         <label>Income Tax:</label>
-                        <input type="text" className="form-control" value={item.deductions.incomeTax} readOnly />
+                        <input type="text" className="form-control" value={item.incomeTax} readOnly />
                       </div>
                     </div>
                     <div className="col mb-3">
                       <div className="form-group">
                         <label>Total Tax:</label>
-                        <input type="text" className="form-control" value={item.deductions.totalTax} readOnly />
+                        <input type="text" className="form-control" value={item.totalTax} readOnly />
                       </div>
                     </div>
                   </div>

@@ -131,6 +131,11 @@ public class CompanyUtils {
             String image = baseUrl + "var/www/ems/assets/img/" + companyEntity.getImageFile();
             companyEntity.setImageFile(image);
         }
+        if (companyEntity.getStampImage() != null){
+            String baseUrl = getBaseUrl(request);
+            String image = baseUrl + "var/www/ems/assets/img/" + companyEntity.getStampImage();
+            companyEntity.setStampImage(image);
+        }
         companyEntity.setPassword("**********");
         companyEntity.setType(Constants.COMPANY);
         return companyEntity;
@@ -201,6 +206,13 @@ public class CompanyUtils {
     public static CompanyEntity maskCompanyImageUpdateProperties(CompanyEntity existingEntity, CompanyImageUpdate companyRequest, String id) {
         if(companyRequest.getImage() != null){
             existingEntity.setImageFile(companyRequest.getImage());
+        }
+
+        return existingEntity;
+    }
+    public static CompanyEntity maskCompanyStampImageUpdateProperties(CompanyEntity existingEntity, CompanyStampUpdate companyRequest) {
+        if(companyRequest.getImage() != null){
+            existingEntity.setStampImage(companyRequest.getImage());
         }
 
         return existingEntity;

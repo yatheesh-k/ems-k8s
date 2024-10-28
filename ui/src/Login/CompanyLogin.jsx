@@ -388,20 +388,20 @@ const CompanyLogin = () => {
                         </div>
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <div class="formgroup">
-                                <label class="form-label">Email</label>
+                                <label class="form-label">Email Id</label>
                                 <input class="form-control form-control-lg"
                                   type="email"
                                   name="email"
-                                  placeholder="Email"
+                                  placeholder="Email Id"
                                   autoComplete="off"
                                   onInput={toInputLowerCase}
                                   onKeyDown={handleEmailChange}
                                   readOnly={otpSent}
                                   {...register("username", {
-                                    required: "Email is Required.",
+                                    required: "Email Id is Required.",
                                     pattern: {
                                       value: /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
-                                      message: "Invalid Email Format",
+                                      message: "Invalid Email Id Format",
                                     },
                                     })}
                                   />
@@ -436,7 +436,7 @@ const CompanyLogin = () => {
                                 )}
                                 <span toggle="#password-field" class="bi bi-eye-fill field-icon toggle-password"></span>
                                 <small>
-                                    <a href="/forgotPassword">Forgot password?</a>
+                                    <a href="/forgotPassword">Forgot Password?</a>
                                 </small>
                             </div>
                           

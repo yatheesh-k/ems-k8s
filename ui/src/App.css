@@ -15994,7 +15994,7 @@ td {
 
 td:hover {
 	cursor: pointer;
-	background-color: gray;
+	/* background-color: gray; */
 }
 
 .calendar {

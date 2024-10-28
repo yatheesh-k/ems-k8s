@@ -37,6 +37,7 @@ import EmployeeSalaryUpdate from '../CompanyModule/PayRoll/EmployeeSalaryUpdate'
 import CompanySalaryView from '../CompanyModule/Settings/CompanySalaryView';
 import PayslipUpdate from '../Login/PayslipUpdate';
 import OfferLetters from '../CompanyModule/Settings/OfferLetters';
+import Template from '../CompanyModule/Settings/Template';
 import ExperienceLetter from '../CompanyModule/Settings/Experience/ExperienceLetter';
 
 const Rout = () => {
@@ -101,11 +102,11 @@ const Rout = () => {
 
   return (
     <Routes>
-      <Route path='/' element={<Message/>}></Route>
+      <Route path='/' element={<Message />}></Route>
       <Route path='/login' element={<EmsLogin />}></Route>
       <Route path='/:company/login' element={<CompanyLogin />}></Route>
-      <Route path='/resetPassword' element={<Reset/>}></Route>
-      <Route path='/profile' element={<Profile/>}></Route>
+      <Route path='/resetPassword' element={<Reset />}></Route>
+      <Route path='/profile' element={<Profile />}></Route>
       <Route path='/main' element={<Body />}></Route>
       <Route path='/companyRegistration' element={<CompanyRegistration />}></Route>
       <Route path='/companyView' element={<CompanyView />}></Route>
@@ -115,11 +116,12 @@ const Rout = () => {
       <Route path='/employeeView' element={<EmployeeView />}></Route>
       <Route path='/existingProcess' element={<ExistsEmpRegistration />}></Route>
       <Route path='/existingList' element={<ExistsEmployeeView />}></Route>
-      <Route path='/employeeProfile' element={<EmployeeProfile/>}></Route>
+      <Route path='/employeeProfile' element={<EmployeeProfile />}></Route>
       {/* <Route path='/payroll'> */}
       <Route path='/companySalaryStructure' element={<CompanySalaryStructure />}></Route>
-      <Route path='/companySalaryView' element={<CompanySalaryView/>}></Route>
-      <Route path='/offerLetters' element={<OfferLetters/>}></Route>
+      <Route path='/companySalaryView' element={<CompanySalaryView />}></Route>
+      <Route path='/offerLetters' element={<OfferLetters />}></Route>
+      <Route path='/template' element={<Template />}></Route>
       <Route path='/employeeSalaryStructure' element={<EmployeeSalaryStructure />}></Route>
       <Route path='/employeeSalaryUpdate' element={<EmployeeSalaryUpdate />}></Route>
       <Route path='/employeeSalaryList' element={<EmployeeSalaryList />}></Route>
@@ -127,19 +129,19 @@ const Rout = () => {
       <Route path='/payslipsList' element={<ViewPaySlips />}></Route>
       <Route path='/increment' element={<AddIncrement />}></Route>
       <Route path='/incrementList' element={<ViewIncrement />}></Route>
-      <Route path='/payslip' element={<PaySlipDoc/>}></Route>
-      <Route path='/payslipUpdate' element={<PayslipUpdate/>}></Route>
+      <Route path='/payslip' element={<PaySlipDoc />}></Route>
+      <Route path='/payslipUpdate' element={<PayslipUpdate />}></Route>
       <Route path='/addAttendance' element={<ManageAttendance />}></Route>
       <Route path='/attendanceList' element={<AttendanceList />}></Route>
       <Route path='/attendanceReport' element={<AttendanceReport />}></Route>
       <Route path='/employeePayslip' element={<EmployeePayslips />}></Route>
-      <Route path='/employeeSalary' element={<EmployeeSalaryById/>}></Route>
+      <Route path='/employeeSalary' element={<EmployeeSalaryById />}></Route>
       <Route path='/offerLetter' element={<OfferLetter />}></Route>
       <Route path='/payslipLetter' element={<PaySlipLetter />}></Route>
       <Route path='/hikeLetter' element={<HikeLetter />}></Route>
       <Route path='/experienceLetter' element={<ExperienceLetter/>}></Route>
       <Route path='/existingEmployee' element={<ExistingLetter />}></Route>
-      <Route path='/forgotPassword' element={<ForgotPassword/>}></Route>
+      <Route path='/forgotPassword' element={<ForgotPassword />}></Route>
     </Routes>
   );
 };
