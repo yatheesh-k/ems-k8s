@@ -83,7 +83,8 @@ public enum EmployeeErrorMessageKey {
     UNABLE_UPDATE_ATTENDANCE("unable.update.attendance"),
     UNABLE_GET_EMPLOYEES_SALARY_STRUCTURE("unable.get.employee.salary.structure"),
     EMPLOYEE_COMPANY_SALARY_INACTIVE("employee.company.salary.inactive"),
-    COMPANY_DATA_EXIST("company.data.exist");
+    COMPANY_DATA_EXIST("company.data.exist"),
+    IMAGE_NOT_LOADED("image.not.loaded");
 
     private final String key;
 
