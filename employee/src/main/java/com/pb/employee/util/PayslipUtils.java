@@ -1,10 +1,7 @@
 package com.pb.employee.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pb.employee.persistance.model.AttendanceEntity;
-import com.pb.employee.persistance.model.EmployeeSalaryEntity;
-import com.pb.employee.persistance.model.PayslipEntity;
-import com.pb.employee.persistance.model.SalaryEntity;
+import com.pb.employee.persistance.model.*;
 import com.pb.employee.request.PayslipRequest;
 import com.pb.employee.request.PayslipUpdateRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -151,25 +148,25 @@ public class PayslipUtils {
             lop = te;
             totalDeduction +=lop;
         }else {
-        int noOfLeaves = totalWorkingDays - noOfWorkingDays;
-        if (noOfLeaves > 1) {
-            double monthlySalary = (gross / 12);
-            double perDaySalary = (monthlySalary / totalWorkingDays);
-            lop = (noOfLeaves - 1) * perDaySalary;
-            lop = (double) Math.round(lop);
-            totalDeduction += lop;
+            int noOfLeaves = totalWorkingDays - noOfWorkingDays;
+            if (noOfLeaves > 1) {
+                double monthlySalary = (gross / 12);
+                double perDaySalary = (monthlySalary / totalWorkingDays);
+                lop = (noOfLeaves - 1) * perDaySalary;
+                lop = (double) Math.round(lop);
+                totalDeduction += lop;
 
-        }else {
-            lop = (double) 0;
-        }
+            }else {
+                lop = (double) 0;
+            }
         }
         salary.setLop(String.valueOf(lop));
         salary.setTotalDeductions(String.valueOf(Math.round(totalDeduction)));
 
 
 
-            net = te-totalDeduction-ttax;
-            salary.setNetSalary(String.valueOf(Math.round(net)));
+        net = te-totalDeduction-ttax;
+        salary.setNetSalary(String.valueOf(Math.round(net)));
 
 
         PayslipEntity payslipEntity = objectMapper.convertValue(payslipRequest, PayslipEntity.class);
@@ -180,8 +177,7 @@ public class PayslipUtils {
         payslipEntity.setYear(payslipRequest.getYear());
         payslipEntity.setEmployeeId(employeeId);
         payslipEntity.setSalaryId(salaryRequest.getSalaryId());
-
-            payslipEntity.setSalary(salary);
+        payslipEntity.setSalary(salary);
         payslipEntity.setAttendance(attendance);
         payslipEntity.setType(Constants.PAYSLIP);
 
@@ -193,13 +189,13 @@ public class PayslipUtils {
         if (decodedString.endsWith("%")){
             String percentageString = decodedString.replace("%", "");
             double percentage = Double.parseDouble(percentageString)/100;
-            double monthlyValue = (percentage*grossAmount)/12;
+            double monthlyValue = (percentage*grossAmount);
             monthlyValue = Math.round(monthlyValue);
             result = String.valueOf(monthlyValue);
 
             return result;
         }else {
-            double monthlyValue = Double.parseDouble(decodedString)/12;
+            double monthlyValue = Double.parseDouble(decodedString);
             result = String.valueOf(Math.round(monthlyValue));
             return result;
         }
@@ -322,7 +318,7 @@ public class PayslipUtils {
             Map<String, String> decodedDeductions = new HashMap<>();
 
             for (Map.Entry<String, String> entry : payslipRequest.getSalary().getSalaryConfigurationEntity().getDeductions().entrySet()) {
-               String unMaskValue =  unMaskValue(entry.getValue());
+                String unMaskValue =  unMaskValue(entry.getValue());
                 decodedDeductions.put(entry.getKey(), unMaskValue);
             }
             payslipRequest.getSalary().getSalaryConfigurationEntity().setDeductions(decodedDeductions);
@@ -469,7 +465,7 @@ public class PayslipUtils {
         }
     }
 
-        private static String formatValue(String value) {
+    private static String formatValue(String value) {
         if (value == null || value.isEmpty()) {
             return value;
         }
@@ -578,4 +574,107 @@ public class PayslipUtils {
         payslipEntity.setType(Constants.PAYSLIP);
         return payslipEntity;
     }
+    public static Map<String, Map<String, String>> calculateSalaryComponents(SalaryConfigurationEntity salaryConfiguration, Double grossAnnualSalary) {
+        Map<String, Map<String, String>> components = new LinkedHashMap<>(); // Use LinkedHashMap to maintain order
+
+        // Convert annual gross salary to monthly salary for Basic Salary
+        Double grossMonthlySalary = grossAnnualSalary / 12;
+
+        // Store Basic Salary breakdown without adding to total initially
+        Map<String, String> basicSalaryData = new HashMap<>();
+        basicSalaryData.put(Constants.MONTH, formatValue(String.valueOf(grossMonthlySalary)));
+        basicSalaryData.put(Constants.ANNUAL, formatValue(String.valueOf(grossAnnualSalary)));
+        components.put(Constants.BASIC_SALARY, basicSalaryData); // Add Basic Salary first but don’t yet add to total
+
+        double totalMonthlySalary = 0.0;
+        double totalAnnualSalary = 0.0;
+
+        double totalDedMonthlySalary = 0.0;
+        double totalDedAnnualSalary = 0.0;
+        // Calculate allowances and accumulate totals
+        Map<String, String> allowances = salaryConfiguration.getAllowances();
+        if (allowances != null) {
+            for (Map.Entry<String, String> entry : allowances.entrySet()) {
+                // Calculate allowance values
+                double allowanceAnnualValue = Double.parseDouble(persentageOrValue(entry.getValue(), grossAnnualSalary));
+                double allowanceMonthlyValue = allowanceAnnualValue / 12;
+
+                // Accumulate allowance totals for later addition to Gross Salary
+                totalMonthlySalary += allowanceMonthlyValue;
+                totalAnnualSalary += allowanceAnnualValue;
+
+                // Add the formatted allowance to components
+                Map<String, String> allowanceData = new HashMap<>();
+                allowanceData.put(Constants.MONTH, formatValue(String.valueOf(allowanceMonthlyValue)));
+                allowanceData.put(Constants.ANNUAL, formatValue(String.valueOf(allowanceAnnualValue)));
+                components.put(formatComponentName(entry.getKey()), allowanceData);
+
+            }
+        }
+        Map<String, String> grossSalaryData = new HashMap<>();
+        grossSalaryData.put(Constants.MONTH, "<b>"+formatValue(String.valueOf(totalMonthlySalary))+"</b>");
+        grossSalaryData.put(Constants.ANNUAL,  "<b>"+ formatValue(String.valueOf(totalAnnualSalary))+"</b>");
+        components.put("<b>"+Constants.GROSS_CTC+"</b>", grossSalaryData);
+        // Calculate deductions without affecting Gross Salary
+        Map<String, String> deductions = salaryConfiguration.getDeductions();
+        if (deductions != null) {
+            for (Map.Entry<String, String> entry : deductions.entrySet()) {
+                double deductionAnnualValue = Double.parseDouble(persentageOrValue(entry.getValue(), grossAnnualSalary));
+                double deductionMonthlyValue = deductionAnnualValue / 12;
+
+                totalDedMonthlySalary +=deductionMonthlyValue;
+                totalDedAnnualSalary +=deductionAnnualValue;
+                // Add formatted deduction to components only
+                Map<String, String> deductionData = new HashMap<>();
+                deductionData.put(Constants.MONTH, formatValue(String.valueOf(deductionMonthlyValue)));
+                deductionData.put(Constants.ANNUAL, formatValue(String.valueOf(deductionAnnualValue)));
+                components.put(formatComponentName(entry.getKey()), deductionData);
+            }
+        }
+
+
+
+        // Add Gross Salary to components
+
+        Map<String, String> grossSalaryCtcData = new HashMap<>();
+        grossSalaryCtcData.put(Constants.MONTH,  "<b>"+formatValue(String.valueOf(totalDedMonthlySalary))+"</b>");
+        grossSalaryCtcData.put(Constants.ANNUAL, "<b>"+ formatValue(String.valueOf(totalDedAnnualSalary))+"</b>");
+        components.put("<b>"+Constants.TOTAL_DEDUCTIONS+"</b>", grossSalaryCtcData);
+        Map<String, String> netSalary = new HashMap<>();
+        netSalary.put(Constants.MONTH,  "<b>"+formatValue(String.valueOf(totalMonthlySalary-totalDedMonthlySalary))+"</b>");
+        netSalary.put(Constants.ANNUAL,  "<b>"+formatValue(String.valueOf(totalAnnualSalary-totalDedAnnualSalary))+"</b>");
+        components.put("<b>"+Constants.NET_SALARY+"</b>", netSalary);
+        return components;
+    }
+
+
+
+    private static String formatComponentName(String componentName) {
+        if (componentName == null || componentName.isEmpty()) {
+            return componentName; // Return the original name if it's null or empty
+        }
+
+        // Special case for "hra" to format it as "HRA"
+        if (componentName.equalsIgnoreCase(Constants.HRA_SMALL)) {
+            return Constants.HRA;
+        }
+
+        // General case: Convert camel case to a space-separated format
+        String spacedName = componentName.replaceAll("([a-z])([A-Z])", "$1 $2"); // Add space before capital letters
+        spacedName = spacedName.replaceAll("([A-Z]+)([A-Z][a-z])", "$1 $2"); // Handle consecutive uppercase letters
+
+        // Capitalize each word in the formatted string
+        String[] words = spacedName.split(" ");
+        StringBuilder formattedName = new StringBuilder();
+        for (String word : words) {
+            if (formattedName.length() > 0) {
+                formattedName.append(" "); // Add space before subsequent words
+            }
+            formattedName.append(word.substring(0, 1).toUpperCase()); // Capitalize the first letter
+            formattedName.append(word.substring(1).toLowerCase()); // Lowercase the rest
+        }
+
+        return formattedName.toString();
+    }
+
 }

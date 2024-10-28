@@ -105,7 +105,13 @@ public class Constants {
     public static final String ATTACHMENT = "attachment";
     public static final String OFFER_LETTER = "offer_letter.pdf";
     public static final String ACTIVE = "Active";
-    public static final String EXPERIENCE_LETTER_PDF = "experience_letter.pdf";
+    public static final String ANNUAL = "annually";
+    public static final String TOTAL_DEDUCTIONS = "Total Deductions";
+    public static final String NET_SALARY = "Net Salary";
+    public static final String GROSS_CTC = "Gross (CTC)";
     public static final String BLURRED_IMAGE = "blurredImage";
-    public static final Object IMAGE_TYPE = "data:image/png;base64,";
+    public static final String DATA = "data:image/png;base64,";
+    public static final String EXPERIENCE_LETTER_PDF = "experience_letter.pdf";
+    public static final String APPRAISAL_LETTER_TEMPLATE = "appraisalLetter.ftl";
+    public static final String APPRAISAL_LETTER = "appraisal_letter.pdf";
 }

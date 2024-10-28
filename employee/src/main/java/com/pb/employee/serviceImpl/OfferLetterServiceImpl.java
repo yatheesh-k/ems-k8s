@@ -21,9 +21,15 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URL;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +50,8 @@ public class OfferLetterServiceImpl implements OfferLetterService {
         CompanyEntity entity;
         Entity companyEntity;
         SalaryConfigurationEntity salaryConfiguration;
-        PayslipEntity payslipEntity;
         try {
+            SSLUtil.disableSSLVerification();
             // Fetch companyEntity by companyId
             entity = openSearchOperations.getCompanyById(offerLetterRequest.getCompanyId(), null, Constants.INDEX_EMS);
             if (entity == null) {
@@ -53,13 +59,12 @@ public class OfferLetterServiceImpl implements OfferLetterService {
                 throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.COMPANY_NOT_EXIST), offerLetterRequest.getCompanyId()), HttpStatus.NOT_FOUND);
             }
             companyEntity = CompanyUtils.unmaskCompanyProperties(entity,request);
-
             salaryConfiguration =  openSearchOperations.getSalaryStructureById(offerLetterRequest.getSalaryConfigurationId(),null,Constants.INDEX_EMS+"_"+entity.getShortName());
-
-//            CompanyUtils.unMaskCompanySalaryStructureProperties(salaryConfiguration);
+            CompanyUtils.unMaskCompanySalaryStructureProperties(salaryConfiguration);
+            Map<String, Map<String, String>> salaryComponents = PayslipUtils.calculateSalaryComponents(salaryConfiguration,offerLetterRequest.getGrossCompensation());
 
             // Check if the salary configuration is active
-            if (salaryConfiguration == null || !salaryConfiguration.getStatus().equals(Constants.ACTIVE)) {
+            if (salaryConfiguration==null || !salaryConfiguration.getStatus().equals(Constants.ACTIVE)) {
                 log.error("Active salary configuration not found: {}", offerLetterRequest.getSalaryConfigurationId());
                 throw new EmployeeException("Salary configuration is not active or does not exist", HttpStatus.NOT_FOUND);
             }
@@ -67,7 +72,28 @@ public class OfferLetterServiceImpl implements OfferLetterService {
             Map<String, Object> dataModel = new HashMap<>();
             dataModel.put(Constants.COMPANY, companyEntity);
             dataModel.put(Constants.OFFER_LETTER_REQUEST, offerLetterRequest);
-            dataModel.put(Constants.SALARY, salaryConfiguration); // Add the active salary configuration
+            dataModel.put(Constants.SALARY, salaryComponents);
+
+            // Load the company image from a URL
+            String imageUrl = entity.getImageFile();
+            BufferedImage originalImage = ImageIO.read(new URL(imageUrl));
+            if (originalImage == null) {
+                log.error("Failed to load image from URL: {}", imageUrl);
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPTY_FILE),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            // Apply the watermark effect
+            float opacity = 0.5f;
+            double scaleFactor = 1.6d;
+            BufferedImage watermarkedImage = applyOpacity(originalImage, opacity, scaleFactor, 30);
+
+            // Convert BufferedImage to Base64 string for HTML
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(watermarkedImage, "png", baos);
+            String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
+            dataModel.put(Constants.BLURRED_IMAGE, Constants.DATA + base64Image);
+
 
             // Get FreeMarker template and process it with the dataModel
             Template template = freeMarkerConfig.getTemplate(Constants.OFFER_LETTER_TEMPLATE1);
@@ -116,6 +142,38 @@ public class OfferLetterServiceImpl implements OfferLetterService {
         } catch (DocumentException e) {
             throw new IOException(e.getMessage());
         }
+    }
+    private BufferedImage applyOpacity(BufferedImage originalImage, float opacity, double scaleFactor, double rotationDegrees) {
+        int newWidth = (int) (originalImage.getWidth() * scaleFactor);
+        int newHeight = (int) (originalImage.getHeight() * scaleFactor);
+        double radians = Math.toRadians(-rotationDegrees);
+
+        int rotatedWidth = (int) Math.abs(newWidth * Math.cos(radians)) + (int) Math.abs(newHeight * Math.sin(radians));
+        int rotatedHeight = (int) Math.abs(newWidth * Math.sin(radians)) + (int) Math.abs(newHeight * Math.cos(radians));
+
+        BufferedImage watermarkedImage = new BufferedImage(rotatedWidth, rotatedHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = watermarkedImage.createGraphics();
+
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+        int centerX = rotatedWidth / 2;
+        int centerY = rotatedHeight / 2;
+
+        g2d.translate(centerX, centerY);
+        g2d.rotate(radians);
+        g2d.translate(-newWidth / 2, -newHeight / 2);
+
+        Image scaledImage = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+        g2d.drawImage(scaledImage, 0, 0, null);
+
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, rotatedWidth, rotatedHeight);
+
+        g2d.dispose();
+
+        return watermarkedImage;
     }
 
 

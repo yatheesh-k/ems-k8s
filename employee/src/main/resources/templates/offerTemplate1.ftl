@@ -176,8 +176,7 @@
             border-collapse: collapse;
         }
 
-        .employee-table th,
-        td {
+        .employee-table th, td {
             border: 1px solid black;
             padding: 3px;
             text-align: left;
@@ -211,16 +210,14 @@
             width: 100%;
             height: auto;
             opacity: 0.05;
-            /* Lighter opacity */
         }
     </style>
 </head>
 
 <body>
-    <img src="${company.imageFile}" alt="Company Logo" class="watermark" />
+    <img src= "${blurredImage}" alt="Company Logo" class="watermark" />
     <div class="logo">
-        <img src="${company.imageFile}"
-            alt="Company Logo" />
+        <img src= "${company.imageFile}" alt="Company Logo"/>
     </div>
 
     <h5 class="confidential-text">Private & Confidential</h5>
@@ -252,13 +249,13 @@
             mentioned details:
         </p>
         <div class="top-navbar">
-            <p class="with-arrow">You would join us on or before “${offerLetter.joiningDate}” or else this offer
+            <p class="with-arrow">You would join us on or before ‘${offerLetter.joiningDate}’ or else this offer
                 would be null and
                 void.</p>
             <p class="with-arrow">You will be deployed at our office site and your job location would be at
-                “${offerLetter.jobLocation}”.
+                ‘${offerLetter.jobLocation}’.
             </p>
-            <p class="with-arrow">Your gross compensation per annum is “${offerLetter.grossCompensation}/”</p>
+            <p class="with-arrow">Your gross compensation per annum is ‘${offerLetter.grossCompensation}’</p>
             <p class="with-dot"><b>The proposed compensation details are attached as Annexure '1' , And details of
                     required
                     documents at the time of joining are attached as Annexure '2'.</b></p>
@@ -273,7 +270,7 @@
             appraisal process.
         </p>
     </div>
-    <h5 style="text-align: center;margin-top:30px;">CIN: ${company.cinNo}</h5>
+    <h5 style="text-align: center; margin-top: 30px;">CIN: ${company.cinNo}</h5>
     <hr style="color: rgb(10, 53, 248);" />
     <div style="text-align: center; font-size: 14px;">
         <p>
@@ -283,7 +280,7 @@
         </p>
     </div>
     <div class="logo">
-        <img src="${company.imageFile}" alt="Company Logo" />
+        <img src= "${company.imageFile}" alt="Company Logo" />
     </div>
     <div style="margin-top: -27px;">
         <p>
@@ -411,91 +408,13 @@
                 <th>Per Month (INR)</th>
                 <th>Per Annum (INR)</th>
             </tr>
-            <tr>
-                <td>Basic</td>
-                <td>6000</td>
-                <td>72000</td>
-            </tr>
-            <tr>
-                <td>HRA</td>
-                <td>1800</td>
-                <td>21600</td>
-            </tr>
-            <tr>
-                <td>Medical Reimb</td>
-                <td>500</td>
-                <td>6000</td>
-            </tr>
-            <tr>
-                <td>Conveyance All</td>
-                <td>800</td>
-                <td>9600</td>
-            </tr>
-            <tr>
-                <td>Special allowance</td>
-                <td>1780</td>
-                <td>21360</td>
-            </tr>
-            <tr>
-                <td>Phone Allowance</td>
-                <td>100</td>
-                <td>1200</td>
-            </tr>
-            <tr>
-                <td>Travel Allowance</td>
-                <td>150</td>
-                <td>1800</td>
-            </tr>
-            <tr>
-                <td><b>Gross Salary</b></td>
-                <td><b>11130</b></td>
-                <td><b>133560</b></td>
-            </tr>
-            <tr>
-                <td>PF Employer Contribution</td>
-                <td>870</td>
-                <td>10440</td>
-            </tr>
-            <tr>
-                <td>ESIC Employer Contribution</td>
-                <td>0</td>
-                <td>0</td>
-            </tr>
-            <tr>
-                <td><b>Gross CTC</b></td>
-                <td><b>12000</b></td>
-                <td><b>144000</b></td>
-            </tr>
-            <tr>
-                <td>PF Employee Contribution</td>
-                <td>720</td>
-                <td>8640</td>
-            </tr>
-            <tr>
-                <td>PT</td>
-                <td>0</td>
-                <td>0</td>
-            </tr>
-            <tr>
-                <td>Insurance</td>
-                <td>0</td>
-                <td>0</td>
-            </tr>
-            <tr>
-                <td>ESIC Employee Contribution</td>
-                <td>0</td>
-                <td>0</td>
-            </tr>
-            <tr>
-                <td><b>Total Deductions</b></td>
-                <td><b>720</b></td>
-                <td><b>8640</b></td>
-            </tr>
-            <tr>
-                <td><b>Net Salary (Pre-Taxation)</b></td>
-                <td><b>10410</b></td>
-                <td><b>124920</b></td>
-            </tr>
+            <#list salary?keys as key>
+                <tr>
+                    <td>${key}</td>
+                    <td>${salary[key].month}</td>
+                    <td>${salary[key].annually}</td>
+                </tr>
+            </#list>
         </table>
         <p>Net Salary (Pretaxation) may vary due to change in applicable statutory deductions such as
             P. Tax, PF, ESIC, LWF etc.</p>
@@ -504,7 +423,7 @@
         <p>*Income Tax deduction is subjected to timely submission of the investment details.</p>
         <p>*Pan Card submission is mandatory for the disbursement of the salary.</p>
     </div>
-    <h5 style="text-align: center; margin-top: 60px;">CIN: ${company.cinNo}</h5>
+    <h5 style="text-align: center; margin-top: 150px;">CIN: ${company.cinNo}</h5>
     <hr style="color: rgb(10, 53, 248);" />
     <div style="text-align: center; font-size: 14px;">
         <p>
@@ -545,7 +464,6 @@
                 <li>AADHAR Card</li>
             </ul>
         </ul>
-
     </div>
     <div class="employee-table">
         <table>
@@ -628,7 +546,7 @@
             numbers.
         </p>
     </div>
-    <h5 style="text-align: center; margin-top: 450px; margin-top: 530px;">CIN: ${company.cinNo}</h5>
+    <h5 style="text-align: center; margin-top: 500px; ">CIN: ${company.cinNo}</h5>
     <hr style="color: rgb(10, 53, 248);" />
     <div style="text-align: center; font-size: 14px;">
         <p>
