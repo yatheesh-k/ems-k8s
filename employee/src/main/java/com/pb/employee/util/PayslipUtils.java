@@ -184,7 +184,24 @@ public class PayslipUtils {
 
         return payslipEntity;
     }
+
     private static String persentageOrValue(String decodedString, double grossAmount) {
+        String result;
+        if (decodedString.endsWith("%")){
+            String percentageString = decodedString.replace("%", "");
+            double percentage = Double.parseDouble(percentageString)/100;
+            double monthlyValue = (percentage*grossAmount);
+            monthlyValue = Math.round(monthlyValue);
+            result = String.valueOf(monthlyValue/12);
+
+            return result;
+        }else {
+            double monthlyValue = Double.parseDouble(decodedString);
+            result = String.valueOf(Math.round(monthlyValue/12));
+            return result;
+        }
+    }
+    private static String persentageOrValueForYearly(String decodedString, double grossAmount) {
         String result;
         if (decodedString.endsWith("%")){
             String percentageString = decodedString.replace("%", "");
@@ -200,6 +217,7 @@ public class PayslipUtils {
             return result;
         }
     }
+
 
     public static PayslipEntity maskEmployeePayslip(PayslipEntity payslipRequest, EmployeeSalaryEntity salaryRequest, AttendanceEntity attendance) {
         String var = null, fix = null, bas = null, gross = null;
@@ -596,7 +614,7 @@ public class PayslipUtils {
         if (allowances != null) {
             for (Map.Entry<String, String> entry : allowances.entrySet()) {
                 // Calculate allowance values
-                double allowanceAnnualValue = Double.parseDouble(persentageOrValue(entry.getValue(), grossAnnualSalary));
+                double allowanceAnnualValue = Double.parseDouble(persentageOrValueForYearly(entry.getValue(), grossAnnualSalary));
                 double allowanceMonthlyValue = allowanceAnnualValue / 12;
 
                 // Accumulate allowance totals for later addition to Gross Salary
@@ -619,7 +637,7 @@ public class PayslipUtils {
         Map<String, String> deductions = salaryConfiguration.getDeductions();
         if (deductions != null) {
             for (Map.Entry<String, String> entry : deductions.entrySet()) {
-                double deductionAnnualValue = Double.parseDouble(persentageOrValue(entry.getValue(), grossAnnualSalary));
+                double deductionAnnualValue = Double.parseDouble(persentageOrValueForYearly(entry.getValue(), grossAnnualSalary));
                 double deductionMonthlyValue = deductionAnnualValue / 12;
 
                 totalDedMonthlySalary +=deductionMonthlyValue;

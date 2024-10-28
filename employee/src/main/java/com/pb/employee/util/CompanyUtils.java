@@ -434,7 +434,7 @@ public class CompanyUtils {
                 }
 
             }
-            if (companyRequest.getCompanyRegNo() != null && companyEntity.getCompanyRegNo() != null) {
+            if (companyRequest.getCompanyRegNo() != null && !companyEntity.getCompanyRegNo().isEmpty() && companyEntity.getCompanyRegNo() != null) {
                 regNo = new String(Base64.getDecoder().decode(companyEntity.getCompanyRegNo().getBytes()));
                 if (regNo.equals(companyRequest.getCompanyRegNo())){
                     responseBody.put(Constants.DUPLICATE_REGISTER_NO, companyRequest.getCompanyRegNo());
@@ -451,7 +451,6 @@ public class CompanyUtils {
             if (companyRequest.getAlternateNo() != null && companyEntity.getAlternateNo() != null) {
                 landNo = new String(Base64.getDecoder().decode(companyEntity.getAlternateNo().getBytes()));
                 if (!companyEntity.getAlternateNo().isEmpty() && landNo.equals(companyRequest.getAlternateNo())){
-
                     responseBody.put(Constants.DUPLICATE_ALTERNATE_NO, companyRequest.getAlternateNo());
                 }
             }
@@ -493,9 +492,9 @@ public class CompanyUtils {
 
             }
 
-            if (companyRequest.getCinNo() != null && companyEntity.getCinNo() != null) {
+            if (companyRequest.getCinNo() != null && !companyEntity.getCinNo().isEmpty() && companyEntity.getCinNo() != null) {
                 cinNo = new String(Base64.getDecoder().decode(companyEntity.getCinNo().getBytes()));
-                if (cinNo.equals(companyRequest.getCinNo())){
+                if (cinNo.isEmpty() && cinNo.equals(companyRequest.getCinNo())){
                     responseBody.put(Constants.DUPLICATE_CIN_NO, companyRequest.getCinNo());
                 }
 
@@ -842,5 +841,15 @@ public class CompanyUtils {
             }
 
         return responseBody;
+    }
+
+    public static RelievingEntity maskRelievingProperties(RelievingRequest request, String id) {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        RelievingEntity relievingEntity = objectMapper.convertValue(request, RelievingEntity.class);
+        relievingEntity.setId(id);
+        relievingEntity.setType(Constants.RELIEVING);
+
+        return relievingEntity;
     }
 }

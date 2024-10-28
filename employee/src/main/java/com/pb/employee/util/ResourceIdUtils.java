@@ -52,6 +52,9 @@ public class ResourceIdUtils {
     public static String generateSalaryConfigurationResourceId(String companyName, String timestamp) {
         return generateGlobalResourceId(ResourceType.SALARY_STRUCTURE, companyName, timestamp);
     }
+    public static String generateRelievingId(String companyName, String relievingDate) {
+        return generateGlobalResourceId(ResourceType.RELIEVING, companyName, relievingDate);
+    }
 
     /**
      * Generate a global resource ID based on the resource type
@@ -85,6 +88,10 @@ public class ResourceIdUtils {
         }
         if (type == ResourceType.SALARY_STRUCTURE) {
             prefix = Constants.SALARY_STRUCTURE + "-";
+
+        }
+        if (type == ResourceType.RELIEVING) {
+            prefix = Constants.RELIEVING + "-";
 
         }
         if (type == ResourceType.PAYSLIP) {

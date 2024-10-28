@@ -105,6 +105,7 @@ public class Constants {
     public static final String ATTACHMENT = "attachment";
     public static final String OFFER_LETTER = "offer_letter.pdf";
     public static final String ACTIVE = "Active";
+    public static final String RELIEVING = "relieving";
     public static final String STAMP = "stamp";
     public static final String EXPERIENCE_LETTER_PDF = "experience_letter.pdf";
     public static final String ANNUAL = "annually";

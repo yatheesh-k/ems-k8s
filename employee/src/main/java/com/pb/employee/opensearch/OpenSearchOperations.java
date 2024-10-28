@@ -698,4 +698,18 @@ public class OpenSearchOperations {
         }
         return null;
     }
+
+    public RelievingEntity getRelievingById(String resourceId, String type, String index) throws IOException {
+
+        if(type != null) {
+            resourceId = type+"_"+resourceId;
+        }
+        GetRequest getRequest = new GetRequest.Builder().id(resourceId)
+                .index(index).build();
+        GetResponse<RelievingEntity> searchResponse = esClient.get(getRequest, RelievingEntity.class);
+        if(searchResponse != null && searchResponse.source() != null){
+            return searchResponse.source();
+        }
+        return null;
+    }
 }
