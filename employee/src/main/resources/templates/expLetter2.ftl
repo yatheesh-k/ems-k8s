@@ -8,26 +8,34 @@
         body {
             position: relative;
         }
-        .watermark {
-               position: absolute;
-               top: 40%;
-               left: 15%; /* Move watermark to the left side */
-               transform: translateY(-10%); /* Adjust vertical position if needed */
-               opacity: 0.9; /* Adjust the opacity for visibility */
-               z-index: -1; /* Make sure the watermark is behind other content */
-        }
+         .watermark {
+                          position: fixed;
+                          top: 25%;
+                          left: 20%;
+                          transform: translate(-50%, -50%) rotate(30deg);
+                          z-index: -1;
+                          width: 400px;
+                          height: auto;
+                          text-align: center;
+                      }
+
+                      .watermark img {
+                          width: 100%;
+                          height: auto;
+                          opacity: 0.05;
+                      }
         .header {
             text-align: center;
             margin-top: 20px;
         }
-        .logo {
+       .logo {
             text-align: right;
-            padding: 20px;
             background-size: contain;
-        }
+       }
         .date {
-            margin: 30px 0px 0px 20px;
-        }
+            text-align: left;
+            padding: 20px;
+         }
         .title {
             margin-top: 30px;
             text-align: center;
@@ -43,44 +51,37 @@
     </style>
 </head>
 <body>
+   <div>
 
-    <div class="watermark">
-        <img src="${blurredImage}" alt="Blurred Company Logo" />
-    </div>
 
     <div class="logo">
-        <img style="height: 120px; width: 120px;" src="${request.image}" alt="Company Logo" />
+         <img style="height: 90px; width: 200px;" src="${company[0].imageFile}" alt="Company Logo" />
     </div>
 
     <div class="header"><b>EXPERIENCE CERTIFICATE</b></div>
     <div class="date">Date: <b>${request.date}</b></div>
     <div class="title"><b>TO WHOMSOEVER IT MAY CONCERN</b></div>
     <div class="content">
-        <p>It is to certify that ${employee.firstName} ${employee.lastName}, was employed at ${company[0].companyName}from
-           ${employee.dateOfHiring} to ${request.date} as a
-           <#if employee.designationName?has_content>
-               ${employee.designationName}
-           <#else>
-               null
-           </#if>
-           with the period of 4 months and 18 days.
+        <div class="watermark">
+            <img src="${blurredImage}" alt="Blurred Company Logo" />
+        </div>
+        <p>This letter certifies that <b>${employee.firstName} ${employee.lastName}</b> was a valued member of our team at ${company[0].companyName}.
+         as a <#if employee.designationName?has_content>
+                   as a <b>${employee.designationName}.</b>
+              </#if> in the <#if employee.designationName?has_content> ${employee.departmentName}
+                                            </#if> Department from ${employee.dateOfHiring} to ${request.date}.
         </p>
-        <p>As a {employee.designation}, {employee.firstName} performed the following responsibilities:</p>
-        <ul class="responsibilities">
-            <li>Designing and architecting the backend systems based on requirements and scalability needs.</li>
-            <li>Writing clean, efficient, and maintainable code using Java and related technologies like Spring Framework, Hibernate, etc.</li>
-            <li>Designing and implementing database schemas, writing SQL queries, and managing database interactions.</li>
-            <li>Creating RESTful APIs to facilitate communication between the frontend and backend systems.</li>
-            <li>Implementing security measures such as authentication, authorization, and data encryption to protect the backend systems from unauthorized access and attacks.</li>
-            <li>Documenting code, APIs, and system architecture for other developers and for future reference.</li>
-            <li>Deploying backend applications to production environments, monitoring system performance, and handling bug fixes and updates as needed.</li>
-            <li>Working closely with frontend developers, designers, and other stakeholders to ensure smooth integration and functionality of the entire application.</li>
-        </ul>
-        <p>We are sure that their hard work will help them to excel in whatever they choose to do next in their life. They have shown good commitment throughout their time with our company. We wish him all the best in his future endeavours.</p>
+        <p>During ${employee.firstName} ${employee.lastName}’s employment, he exhibited exceptional proficiency in coding and <#if employee.designationName?has_content>
+                                                                                                                                                  as a ${employee.designationName}.
+                                                                                                                                             </#if>. He actively participated in multiple projects, demonstrating strong problem-solving abilities and meticulous attention to detail. ${employee.firstName} ${employee.lastName} consistently met project deadlines and collaborated seamlessly with team members to ensure the delivery of high-quality software solutions.</p>
+
+        <p>${employee.firstName} ${employee.lastName}’s dedication and hard work significantly contributed to the success of our projects. His innovative ideas and proactive approach were instrumental in overcoming challenges and achieving project objectives.</p>
+        <p>We commend ${employee.firstName} ${employee.lastName} for his outstanding performance and professionalism throughout his tenure with ${company[0].companyName}.. His contributions have been invaluable to our team, and we have no doubt that he will continue to excel in his future endeavors.</p>
+        <p>Sincerely,</p>
 
         <div>For ${company[0].companyName}</div>
-
         <div style="margin-top:100px">Authorized Signature</div>
+    </div>
     </div>
 </body>
 </html>

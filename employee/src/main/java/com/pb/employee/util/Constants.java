@@ -113,6 +113,7 @@ public class Constants {
     public static final String GROSS_CTC = "Gross (CTC)";
     public static final String BLURRED_IMAGE = "blurredImage";
     public static final String DATA = "data:image/png;base64,";
+    public static final String DYNAMIC_EXPERIENCE_LETTER_PDF = "dynamicExpLetter.ftl";
     public static final String APPRAISAL_LETTER_TEMPLATE = "appraisalLetter.ftl";
     public static final String APPRAISAL_LETTER = "appraisal_letter.pdf";
 }

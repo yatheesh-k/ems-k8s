@@ -6,12 +6,12 @@ import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.opensearch.OpenSearchOperations;
 import com.pb.employee.persistance.model.CompanyEntity;
+import com.pb.employee.persistance.model.DepartmentEntity;
+import com.pb.employee.persistance.model.DesignationEntity;
 import com.pb.employee.persistance.model.EmployeeEntity;
 import com.pb.employee.request.*;
 import com.pb.employee.service.ExperienceLetterService;
-import com.pb.employee.util.Constants;
-import com.pb.employee.util.ResourceIdUtils;
-import com.pb.employee.util.SSLUtil;
+import com.pb.employee.util.*;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -64,37 +64,50 @@ public class ExperienceLetterServiceImpl implements ExperienceLetterService {
                 throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_NOT_FOUND), experienceLetterFieldsRequest.getEmployeeId()), HttpStatus.NOT_FOUND);
             }
 
+            DepartmentEntity departmentEntity =null;
+            DesignationEntity designationEntity = null;
+            if (employee.getDepartment() !=null && employee.getDesignation() !=null) {
+                departmentEntity = openSearchOperations.getDepartmentById(employee.getDepartment(), null, index);
+                designationEntity = openSearchOperations.getDesignationById(employee.getDesignation(), null, index);
+                EmployeeUtils.unmaskEmployeeProperties(employee, departmentEntity, designationEntity);
+
+            }
             // Fetch company details
             companyEntity = openSearchOperations.getCompanyByData(null, Constants.COMPANY, experienceLetterFieldsRequest.getCompanyName());
             if (companyEntity.isEmpty()) {
                 log.error("Company not found: {}", experienceLetterFieldsRequest.getCompanyName());
                 throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.COMPANY_NOT_EXIST), experienceLetterFieldsRequest.getCompanyName()), HttpStatus.NOT_FOUND);
             }
+            CompanyUtils.unmaskCompanyProperties(companyEntity.getFirst(), request);
+
 
             // Load the company image from a URL
-            String imageUrl = experienceLetterFieldsRequest.getImage();
-            BufferedImage originalImage = ImageIO.read(new URL(imageUrl));
-            if (originalImage == null) {
-                log.error("Failed to load image from URL: {}", imageUrl);
-                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.IMAGE_NOT_LOADED),experienceLetterFieldsRequest.getImage()), HttpStatus.NOT_FOUND);
-            }
-
-            // Apply the watermark effect
-            float opacity = 0.5f;
-            double scaleFactor = 1.6d;
-            BufferedImage watermarkedImage = applyOpacity(originalImage, opacity, scaleFactor, 30);
-
-            // Convert BufferedImage to Base64 string for HTML
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(watermarkedImage, "png", baos);
-            String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
 
             Map<String, Object> model = new HashMap<>();
             model.put(Constants.EMPLOYEE, employee);
             model.put(Constants.COMPANY, companyEntity);
             model.put(Constants.REQUEST, experienceLetterFieldsRequest);
-            model.put(Constants. BLURRED_IMAGE, Constants.DATA + base64Image);
 
+            if (!companyEntity.getFirst().getImageFile().isEmpty()) {
+                String imageUrl = companyEntity.getFirst().getImageFile();
+                BufferedImage originalImage = ImageIO.read(new URL(imageUrl));
+                if (originalImage == null) {
+                    log.error("Failed to load image from URL: {}", imageUrl);
+                    throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.IMAGE_NOT_LOADED), companyEntity.getFirst().getImageFile()), HttpStatus.NOT_FOUND);
+                }
+
+                // Apply the watermark effect
+                float opacity = 0.7f;
+                double scaleFactor = 1.6d;
+                BufferedImage watermarkedImage = applyOpacity(originalImage, opacity, scaleFactor, 30);
+
+                // Convert BufferedImage to Base64 string for HTML
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(watermarkedImage, "png", baos);
+                String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
+
+                model.put(Constants.BLURRED_IMAGE, Constants.DATA + base64Image);
+            }
             // Determine the template name
             String templateName = switch (templateNo) {
                 case 1 -> Constants.EXPERIENCE_LETTER;

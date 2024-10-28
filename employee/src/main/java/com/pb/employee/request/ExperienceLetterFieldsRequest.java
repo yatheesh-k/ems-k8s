@@ -11,9 +11,6 @@ public class ExperienceLetterFieldsRequest {
 
     private String companyName;
     private String employeeId;
-    private String image;
     private String Date;
-    private String tillDate;
-    private String signatureImage;
 
 }
