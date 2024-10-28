@@ -21,7 +21,7 @@ const EmployeeRegistration = () => {
     setValue,
   } = useForm({
     defaultValues: {
-      status: "", // Initialize with default value or leave empty if fetching dynamically
+      status: "Active", // Initialize with default value or leave empty if fetching dynamically
       roles: null
     },
     mode: "onChange",
@@ -215,6 +215,7 @@ const EmployeeRegistration = () => {
   const onSubmit = async (data) => {
     // const roles = data.roles ? [data.roles] : []; 
     // Constructing the payload
+    const status = data.status || "Active";
     let payload = {
       companyName: company,
       employeeType: data.employeeType,
@@ -244,7 +245,6 @@ const EmployeeRegistration = () => {
         dateOfBirth: data.dateOfBirth
       };
     } else {
-      // Include these fields for the create request
       payload = {
         ...payload,
         employeeId: data.employeeId,
@@ -277,7 +277,7 @@ const EmployeeRegistration = () => {
     } catch (error) {
       if (error.response && error.response.data) {
         const { error: errorData } = error.response.data;
-  
+
         if (errorData && errorData.messages && Array.isArray(errorData.messages)) {
           const message = errorData.messages.join('\n'); // Join messages with new lines
           setErrorMessage(message);
@@ -356,108 +356,108 @@ const EmployeeRegistration = () => {
   const validateDate = (value) => {
     const selectedDate = new Date(value);
     if (selectedDate > new Date(threeMonthsFromNow)) {
-        return "Date of Hiring cannot be more than 3 months from today.";
+      return "Date of Hiring cannot be more than 3 months from today.";
     }
     return true; // Return true if no errors
-};
+  };
 
-// Custom validation function for date of birth based on date of hiring
-const validateDateOfBirth = (value, dateOfHiring) => {
-  const selectedDateOfBirth = new Date(value);
-  const selectedDateOfHiring = new Date(dateOfHiring); // Ensure this is a Date object
-  // Calculate limits
-  const minDateOfBirth = new Date(selectedDateOfHiring);
-  minDateOfBirth.setFullYear(selectedDateOfHiring.getFullYear() - 21); // 21 years ago from date of hiring
+  // Custom validation function for date of birth based on date of hiring
+  const validateDateOfBirth = (value, dateOfHiring) => {
+    const selectedDateOfBirth = new Date(value);
+    const selectedDateOfHiring = new Date(dateOfHiring); // Ensure this is a Date object
+    // Calculate limits
+    const minDateOfBirth = new Date(selectedDateOfHiring);
+    minDateOfBirth.setFullYear(selectedDateOfHiring.getFullYear() - 21); // 21 years ago from date of hiring
 
-  const maxDateOfBirth = new Date(selectedDateOfHiring);
-  maxDateOfBirth.setFullYear(selectedDateOfHiring.getFullYear() - 80); // 80 years ago from date of hiring
+    const maxDateOfBirth = new Date(selectedDateOfHiring);
+    maxDateOfBirth.setFullYear(selectedDateOfHiring.getFullYear() - 80); // 80 years ago from date of hiring
 
-  // Validate against the limits
-  if (selectedDateOfBirth > minDateOfBirth) {
+    // Validate against the limits
+    if (selectedDateOfBirth > minDateOfBirth) {
 
       return "Date of Birth must be at least 21 years before the Date of Hiring.";
-  }
-  if (selectedDateOfBirth < maxDateOfBirth) {
+    }
+    if (selectedDateOfBirth < maxDateOfBirth) {
       return "Date of Birth must not exceed 80 years before the Date of Hiring.";
-  }
+    }
 
-  return true; // Return true if no errors
-};
+    return true; // Return true if no errors
+  };
 
-const validatePassword = (value) => {
-  const errors = [];
-  if (!/(?=.*[0-9])/.test(value)) {
-    errors.push("at least one digit");
-  }
-  if (!/(?=.*[a-z])/.test(value)) {
-    errors.push("at least one lowercase letter");
-  }
-  if (!/(?=.*[A-Z])/.test(value)) {
-    errors.push("at least one uppercase letter");
-  }
-  if (!/(?=.*\W)/.test(value)) {
-    errors.push("at least one special character");
-  }
-  if (value.includes(" ")) {
-    errors.push("no spaces");
-  }
+  const validatePassword = (value) => {
+    const errors = [];
+    if (!/(?=.*[0-9])/.test(value)) {
+      errors.push("at least one digit");
+    }
+    if (!/(?=.*[a-z])/.test(value)) {
+      errors.push("at least one lowercase letter");
+    }
+    if (!/(?=.*[A-Z])/.test(value)) {
+      errors.push("at least one uppercase letter");
+    }
+    if (!/(?=.*\W)/.test(value)) {
+      errors.push("at least one special character");
+    }
+    if (value.includes(" ")) {
+      errors.push("no spaces");
+    }
 
-  if (errors.length > 0) {
-    return `Password must contain ${errors.join(", ")}.`;
-  }
-  return true; // Return true if all conditions are satisfied
-};
+    if (errors.length > 0) {
+      return `Password must contain ${errors.join(", ")}.`;
+    }
+    return true; // Return true if all conditions are satisfied
+  };
 
-const validateName = (value) => {
-  if (!value || value.trim().length === 0) {
-    return "Manager Name is Required.";
-  } else if (!/^[A-Za-z ]+$/.test(value)) {
-    return "Only Alphabetic Characters are Allowed.";
-  } else {
-    const words = value.split(" ");
-    
-    for (const word of words) {
-      if (word.length < 3 || word.length > 30) {
-        return "Invalid Format of Manager.";
+  const validateName = (value) => {
+    if (!value || value.trim().length === 0) {
+      return "Manager Name is Required.";
+    } else if (!/^[A-Za-z ]+$/.test(value)) {
+      return "Only Alphabetic Characters are Allowed.";
+    } else {
+      const words = value.split(" ");
+
+      for (const word of words) {
+        if (word.length < 3 || word.length > 30) {
+          return "Invalid Format of Manager.";
+        }
+      }
+
+      if (/^\s|\s$/.test(value)) {
+        return "No Leading or Trailing Spaces Allowed.";
+      } else if (/\s{2,}/.test(value)) {
+        return "No Multiple Spaces Between Words Allowed.";
       }
     }
-    
-    if (/^\s|\s$/.test(value)) {
-      return "No Leading or Trailing Spaces Allowed.";
-    } else if (/\s{2,}/.test(value)) {
-      return "No Multiple Spaces Between Words Allowed.";
-    }
-  }
 
-  return true; // Return true if all conditions are satisfied
-};
+    return true; // Return true if all conditions are satisfied
+  };
 
-const validateLocation = (value) => {
-  if (!value || value.trim().length === 0) {
-    return "Location is Required.";
-  } else if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*.()^\-/]*$/.test(value)) {
-    return "Only Alphabetic Characters are Allowed.";
-  } else {
-    const words = value.split(" ");
-    
-    for (const word of words) {
-      if (word.length < 3 || word.length > 200) {
-        return "Invalid Format of Location.";
+  const validateLocation = (value) => {
+    if (!value || value.trim().length === 0) {
+      return "Location is Required.";
+    } else if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*.()^\-/]*$/.test(value)) {
+      return "Only Alphabetic Characters are Allowed.";
+    } else {
+      const words = value.split(" ");
+
+      for (const word of words) {
+        if (word.length < 3 || word.length > 200) {
+          return "Invalid Format of Location.";
+        }
+      }
+
+      if (/^\s|\s$/.test(value)) {
+        return "No Leading or Trailing Spaces Allowed.";
+      } else if (/\s{2,}/.test(value)) {
+        return "No Multiple Spaces Between Words Allowed.";
       }
     }
-    
-    if (/^\s|\s$/.test(value)) {
-      return "No Leading or Trailing Spaces Allowed.";
-    } else if (/\s{2,}/.test(value)) {
-      return "No Multiple Spaces Between Words Allowed.";
-    }
-  }
 
-  return true; // Return true if all conditions are satisfied
-};
+    return true; // Return true if all conditions are satisfied
+  };
 
-// In your component
-const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
+  // In your component
+  const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
 
   return (
     <LayOut>
@@ -682,11 +682,11 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                         max={threeMonthsFromNow}
                         {...register("dateOfHiring", {
                           required: true,
-                          validate:validateDate
+                          validate: validateDate
                         })}
                       />
                       {errors.dateOfHiring && (
-                        <p className="errorMsg">{errors.dateOfHiring.message||"Date of Joining is Required"}</p>
+                        <p className="errorMsg">{errors.dateOfHiring.message || "Date of Joining is Required"}</p>
                       )}
                     </div>
                     <div className="col-lg-1"></div>
@@ -784,9 +784,9 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                         {...register("manager", {
                           required: "Manager is Required",
 
-                        validate:{
-                          validateName,
-                        }
+                          validate: {
+                            validateName,
+                          }
                         })}
                       />
                       {errors.manager && (
@@ -805,9 +805,9 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                         onKeyDown={handleEmailChange}
                         {...register("location", {
                           required: "Location is Required",
-                         validate:{
-                          validateLocation
-                         }
+                          validate: {
+                            validateLocation
+                          }
                         })}
                       />
                       {errors.location && (
@@ -833,7 +833,7 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                               type={passwordShown ? "text" : "password"}
                               {...register("password", {
                                 required: "Password is Required",
-                               validate:validatePassword,
+                                validate: validatePassword,
                                 minLength: {
                                   value: 6,
                                   message: "minimum 6 characters are Required",
@@ -863,9 +863,9 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
 
                       </>
                     )}
-                   {!isUpdating && (
+                    {!isUpdating && (
                       <div className="col-lg-1"></div>
-                    )}                  
+                    )}
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Date of Birth <span style={{ color: "red" }}>*</span></label>
                       <input
@@ -886,18 +886,20 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                         })}
                       />
                       {errors.dateOfBirth && (
-                        <p className="errorMsg">{errors.dateOfBirth.message|| "Date of Birth is Required"}</p>
+                        <p className="errorMsg">{errors.dateOfBirth.message || "Date of Birth is Required"}</p>
                       )}
                     </div>
                     {isUpdating && (
                       <div className="col-lg-1"></div>
                     )}
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
-                      <label className="form-label">Status <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">
+                        Status <span style={{ color: "red" }}>*</span>
+                      </label>
                       <Controller
                         name="status"
                         control={control}
-                        defaultValue=""
+                        defaultValue="Active" 
                         rules={{ required: true }}
                         render={({ field }) => (
                           <Select
@@ -908,48 +910,48 @@ const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
                             ]}
                             value={
                               field.value
-                                ? { value: field.value, label: ["Active", "InActive"].find(option => option === field.value) }
-                                : null
+                                ? { value: field.value, label: field.value }
+                                : { value: "Active", label: "Active" } 
                             }
                             onChange={(val) => field.onChange(val.value)}
                             placeholder="Select Status"
                           />
                         )}
                       />
-                      {errors.status && <p className="errorMsg"> Status is Required</p>}
+                      {errors.status && <p className="errorMsg">Status is Required</p>}
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                          <label className="form-label">
-                            Mobile Number <span style={{ color: "red" }}>*</span>
-                          </label>
-                          <input
-                            type="tel"
-                            className="form-control"
-                            placeholder="Enter Contact Number"
-                            autoComplete="off"
-                            maxLength={10}
-                            onInput={toInputSpaceCase}
-                            onKeyDown={handleEmailChange}
-                            {...register("mobileNo", {
-                              required: "Mobile Number is Required",
-                              pattern: {
-                                value: /^(?!0000000000)[0-9]{10}$/,
-                                message:
-                                "Mobile Number should be exactly 10 digits long, should contain only numbers, and cannot be all zeros.",
-                              },
-                              validate: {
-                                notRepeatingDigits: value => {
-                                  const isRepeating = /^(\d)\1{9}$/.test(value); // Check for repeated digits
-                                  return !isRepeating || "Mobile Number cannot consist of the same digit repeated.";
-                                }
-                              }
-                            })}
-                          />
-                          {errors.mobileNo && (
-                            <p className="errorMsg">{errors.mobileNo.message}</p>
-                          )}
-                        </div>
+                      <label className="form-label">
+                        Mobile Number <span style={{ color: "red" }}>*</span>
+                      </label>
+                      <input
+                        type="tel"
+                        className="form-control"
+                        placeholder="Enter Contact Number"
+                        autoComplete="off"
+                        maxLength={10}
+                        onInput={toInputSpaceCase}
+                        onKeyDown={handleEmailChange}
+                        {...register("mobileNo", {
+                          required: "Mobile Number is Required",
+                          pattern: {
+                            value: /^(?!0000000000)[0-9]{10}$/,
+                            message:
+                              "Mobile Number should be exactly 10 digits long, should contain only numbers, and cannot be all zeros.",
+                          },
+                          validate: {
+                            notRepeatingDigits: value => {
+                              const isRepeating = /^(\d)\1{9}$/.test(value); // Check for repeated digits
+                              return !isRepeating || "Mobile Number cannot consist of the same digit repeated.";
+                            }
+                          }
+                        })}
+                      />
+                      {errors.mobileNo && (
+                        <p className="errorMsg">{errors.mobileNo.message}</p>
+                      )}
+                    </div>
                     {/* {isUpdating ? (
                       <div className="col-12 col-md-6 col-lg-5 mb-3">
                         <label className="form-label">Role <span style={{ color: "red" }}>*</span></label>

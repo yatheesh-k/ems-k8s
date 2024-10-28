@@ -661,7 +661,7 @@ const EmployeeSalaryStructure = () => {
                             </div>
                           </div>
                           <div className="card">
-                            <div className="card-header ">
+                            <div className="card-header">
                               <div className="d-flex justify-content-start align-items-start">
                                 <h5 className="card-title me-2">Status</h5>
                                 <span className="text-danger">
@@ -685,6 +685,7 @@ const EmployeeSalaryStructure = () => {
                                         name="status"
                                         value="Active"
                                         style={{ marginRight: "10px" }}
+                                        defaultChecked // Set Active as the default
                                         {...register("status", {
                                           required: "Please Select Status",
                                         })}

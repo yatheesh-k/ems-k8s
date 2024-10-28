@@ -279,12 +279,12 @@ const AttendanceReport = () => {
                                             onChange={handleEmployeeChange}
                                             placeholder="Select Employee"
                                             menuPortalTarget={document.body}
-                                            styles={{
-                                                control: (base) => ({
-                                                    ...base,
-                                                    zIndex: 9999,
-                                                }),
-                                            }}
+                                            // styles={{
+                                            //     control: (base) => ({
+                                            //         ...base,
+                                            //         zIndex: 9999,
+                                            //     }),
+                                            // }}
                                         />
                                         {selectedEmployee && <p>Selected: {selectedEmployee.label}</p>}
                                     </div>
