@@ -93,7 +93,7 @@ public class ExperienceLetterServiceImpl implements ExperienceLetterService {
             model.put(Constants.EMPLOYEE, employee);
             model.put(Constants.COMPANY, companyEntity);
             model.put(Constants.REQUEST, experienceLetterFieldsRequest);
-            model.put(Constants. BLURRED_IMAGE, Constants.IMAGE_TYPE + base64Image);
+            model.put(Constants. BLURRED_IMAGE, Constants.DATA + base64Image);
 
             // Determine the template name
             String templateName = switch (templateNo) {
