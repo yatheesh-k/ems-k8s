@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Select from "react-select";
 import LayOut from "../../LayOut/LayOut";
 import { EmployeeGetApi, EmployeeSalaryPostApi, EmployeeSalaryGetApiById, EmployeeSalaryPatchApiById, CompanySalaryStructureGetApi } from "../../Utils/Axios";
@@ -47,21 +46,15 @@ const EmployeeSalaryStructure = () => {
   const [pfEmployee, setPfEmployee] = useState(0);
   const [pfEmployer, setPfEmployer] = useState(0);
   const [travelAllowance, setTravelAllowance] = useState(0);
-  const [specialAllowance, setSpecialAllowance] = useState(0);
-  const [otherAllowances, setOtherAllowances] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("Active");
   const [isReadOnly, setIsReadOnly] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-
   const [calculatedAllowances, setCalculatedAllowances] = useState({});
   const [error, setError] = useState('');
   const [showCards, setShowCards] = useState(false);
   const [loading, setLoading] = useState(false);
-
-
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -71,7 +64,6 @@ const EmployeeSalaryStructure = () => {
       setShowFields(false);
     }
   }, [id, salaryId]);
-
 
   useEffect(() => {
     EmployeeGetApi().then((data) => {
@@ -309,7 +301,6 @@ const EmployeeSalaryStructure = () => {
     }
   }, [variableAmount, fixedAmount, hra, travelAllowance, pfEmployee, pfEmployer, salaryId, id, setValue]);
 
-
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
       const errorMessage = error.response.data.error.message;
@@ -322,7 +313,7 @@ const EmployeeSalaryStructure = () => {
 
   const handleGoClick = () => {
     if (!employeeId) {
-      setMessage("Please select Employee Name");
+      setMessage("Please Select Employee Name");
       setShowFields(false);
     } else {
       setShowFields(true);
@@ -721,7 +712,6 @@ const EmployeeSalaryStructure = () => {
                             </div>
                           </div>
                         </div>
-
                         {/* Deductions Card */}
                         <div className="col-6 mb-4">
                           <div className="card">
@@ -729,7 +719,6 @@ const EmployeeSalaryStructure = () => {
                               <h5 className="card-title">Deductions</h5>
                             </div>
                             <div className="card-body">
-
                               {Object.entries(deductions).map(([key, value]) => (
                                 <div key={key} className="mb-3">
                                   <label>

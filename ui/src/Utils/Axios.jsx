@@ -263,8 +263,16 @@ export const EmployeePayslipGenerationPostById = (employeeId, salaryId, data) =>
   return axiosInstance.post(`/${employeeId}/salary/${salaryId}`, data);
 }
 
+export const EmployeePayslipResponse = (data) => {
+  return axiosInstance.post("/payslip", data);
+}
+
 export const EmployeePayslipGeneration = (data) => {
   return axiosInstance.post("/salary", data);
+}
+
+export const EmployeePayslipUpdate = (employeeId, payslipId, payload) => {
+  return axiosInstance.post(`/employee/${employeeId}/payslip/${payslipId}`, payload);
 }
 
 export const EmployeePayslipGetById = (employeeId, payslipId, month, year) => {

@@ -1,17 +1,24 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import LayOut from '../../LayOut/LayOut';
 
 const OfferLetters = () => {
-  const [templateName, setTemplateName] = useState('');
-  const [description, setDescription] = useState('');
+  const [header, setHeader] = useState('');
+  const [body, setBody] = useState('');
+  const [footer, setFooter] = useState('');
+
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleCreateTemplate = (e) => {
     e.preventDefault();
-    // Handle template creation logic here (e.g., API call)
-    console.log("Creating template:", { templateName, description });
-    // Reset form fields after submission
-    setTemplateName('');
-    setDescription('');
+    console.log("Creating template:", { header, body, footer });
+    setHeader('');
+    setBody('');
+    setFooter('');
+  };
+
+  const handleViewTemplate = () => {
+    navigate('/template'); // Navigate to the template page
   };
 
   return (
@@ -30,38 +37,13 @@ const OfferLetters = () => {
         </div>
       </div>
       <div className="row">
-        <div className="col-md-4 mb-4">
+        <div className="col-md-4">
           <div className="card">
             <div className="card-body">
-              <h5 className="card-title" style={{ color: "black" }}>Template 1</h5>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-4 mb-4">
-          <div className="card">
-            <div className="card-body">
-              <h5 className="card-title" style={{ color: "black" }}>Template 2</h5>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-4 mb-4">
-          <div className="card">
-            <div className="card-body">
-              <h5 className="card-title" style={{ color: "black" }}>Template 3</h5>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="col mt-4">
-        <h1 className="h3 mb-3"><strong>Create New Template</strong></h1>
-        <div className="card">
-          <div className="card-body">
-            <div className="mb-3">
-              <label className="form-label">Title</label>
-              <input
-                type='text'
-                className='form-control'
-              />
+              <h1 className="card-title" style={{ color: "black" }}>Template 1</h1>
+              <button type='button' className='btn btn-primary mt-2' onClick={handleViewTemplate}>
+                View Template
+              </button>
             </div>
           </div>
         </div>

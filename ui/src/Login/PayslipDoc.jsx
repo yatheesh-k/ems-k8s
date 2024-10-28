@@ -210,10 +210,10 @@ const PayslipDoc = () => {
                 <table style={{ borderCollapse: "collapse", border: "1px solid black", width: "100%" }}>
                   <thead>
                     <tr>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black" }}>Earnings (A)</th>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black" }}>Amount (A)</th>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black" }}>Deductions (B)</th>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black" }}>Amount (B)</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black" }}>Earnings</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black" }}>Amount</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black" }}>Deductions</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black" }}>Amount</th>
                     </tr>
                   </thead>
                   <tbody style={{ borderCollapse: "collapse" }}>
@@ -255,8 +255,8 @@ const PayslipDoc = () => {
                     <tr>
                       <td className="earnings" style={{ padding: "4px", textAlign: "left", border: "none", borderRight: "1px solid black" }}></td>
                       <td className="earnings" style={{ textAlign: "left", border: "none", borderRight: "1px solid black" }}></td>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "left", background: "#ffcc80", color: 'black', border: "none", border: "1px solid black" }}>Taxes (C)</th>
-                      <th style={{ padding: "4px", width: "300px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black" }}>Amount (C)</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "left", background: "#ffcc80", color: 'black', border: "none", border: "1px solid black" }}>Taxes</th>
+                      <th style={{ padding: "4px", width: "300px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black" }}>Amount</th>
                     </tr>
                     <tr>
                       <td className="earnings" style={{ padding: "4px", textAlign: "left", border: "none", borderRight: "1px solid black" }}></td>

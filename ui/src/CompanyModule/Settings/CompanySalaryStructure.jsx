@@ -187,10 +187,10 @@ const CompanySalaryStructure = () => {
 
   const onSubmit = async (data) => {
     const jsonData = {
-        companyName: user.company,
-        status: data.status,
-        allowances: {},
-        deductions: {},
+      companyName: user.company,
+      status: data.status,
+      allowances: {},
+      deductions: {},
     };
 
     const selectedAllowances = allowanceFields.filter((field) => fieldCheckboxes.allowances[field.label]);
@@ -199,54 +199,54 @@ const CompanySalaryStructure = () => {
     // Validation: Check if any selected allowance or deduction has an empty value
     const errors = {};
     selectedAllowances.forEach((field) => {
-        if (!field.value) {
-            errors[field.label] = "Value is required for selected allowance.";
-        }
+      if (!field.value) {
+        errors[field.label] = "Value is required for selected allowance.";
+      }
     });
 
     selectedDeductions.forEach((field) => {
-        if (!field.value) {
-            errors[field.label] = "Value is required for selected deduction.";
-        }
+      if (!field.value) {
+        errors[field.label] = "Value is required for selected deduction.";
+      }
     });
 
     // If there are errors, show alert and return early
     if (Object.keys(errors).length > 0) {
-        alert("Please fill in the required values for the selected allowances and deductions.");
-        setValidationErrors(errors);
-        return; // Prevent submission
+      alert("Please fill in the required values for the selected allowances and deductions.");
+      setValidationErrors(errors);
+      return; // Prevent submission
     }
 
     selectedAllowances.forEach((field) => {
-        if (field.label && field.value) {
-            jsonData.allowances[field.label] = field.type === "percentage" ? `${field.value}%` : field.value;
-        }
+      if (field.label && field.value) {
+        jsonData.allowances[field.label] = field.type === "percentage" ? `${field.value}%` : field.value;
+      }
     });
 
     selectedDeductions.forEach((field) => {
-        if (field.label && field.value) {
-            jsonData.deductions[field.label] = field.type === "percentage" ? `${field.value}%` : field.value;
-        }
+      if (field.label && field.value) {
+        jsonData.deductions[field.label] = field.type === "percentage" ? `${field.value}%` : field.value;
+      }
     });
 
     console.log("Submitting data:", jsonData);
 
     try {
-        const response = await CompanySalaryStructurePostApi(jsonData);
-        toast.success("Salary structure submitted successfully!");
-        reset();
-        navigate('/companySalaryView');
-        window.location.reload();
+      const response = await CompanySalaryStructurePostApi(jsonData);
+      toast.success("Salary structure submitted successfully!");
+      reset();
+      navigate('/companySalaryView');
+      window.location.reload();
     } catch (error) {
-        if (error.response) {
-            console.error("Error response from backend:", error.response.data);
-            toast.error(`Error: ${error.response.data.message || 'An error occurred'}`);
-        } else {
-            console.error("Fetch error:", error);
-            toast.error("An unexpected error occurred. Please try again.");
-        }
+      if (error.response) {
+        console.error("Error response from backend:", error.response.data);
+        toast.error(`Error: ${error.response.data.message || 'An error occurred'}`);
+      } else {
+        console.error("Fetch error:", error);
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     }
-};
+  };
 
 
   const formatFieldName = (fieldName) => {
@@ -351,6 +351,7 @@ const CompanySalaryStructure = () => {
     setAllowanceError('');
     setActiveTab(tab);
   };
+  
 
   return (
     <LayOut>
@@ -412,7 +413,7 @@ const CompanySalaryStructure = () => {
                             onChange={(e) => handleLabelChange(index, e.target.value)}
                             placeholder="Label Name"
                             disabled={!isEditing}
-                          />   
+                          />
                         </div>
                         <div className="col-sm-3">
                           <select
@@ -443,6 +444,25 @@ const CompanySalaryStructure = () => {
                         </div>
                       </div>
                     ))}
+
+                    {/* Other Allowance Field
+                     <div className="row bbl ptb25">
+                      <div className="col-auto mt-2">
+                        <input
+                          type="checkbox"
+                          checked={true}
+                          disabled={true}
+                        />
+                      </div>
+                      <div className="col-sm-3">
+                        <input
+                          type='text'
+                          className='form-control'
+                          readOnly
+                          value="Other Allowance"
+                        />
+                      </div>
+                    </div> */}
                     <div className="row">
                       <div className="col-sm-12">
                         <button type="button" onClick={() => {
@@ -518,45 +538,45 @@ const CompanySalaryStructure = () => {
                   </div>
                 </div>
                 <div className="row col-12 mt-3 align-items-center">
-    <div className="col-6">
-        <div className="row d-flex flex-column">
-            <label className="form-label mb-0">Status: {errors.status && <p className="errorMsg text-danger">Status is required</p>}
-            </label>
-            <Controller
-                name="status"
-                control={control}
-                defaultValue=""
-                rules={{ required: true }}
-                render={({ field }) => (
-                    <Select
-                        {...field}
-                        options={[
-                            { value: "Active", label: "Active" },
-                            { value: "InActive", label: "InActive" },
-                        ]}
-                        value={
-                            field.value
+                  <div className="col-6">
+                    <div className="row d-flex flex-column">
+                      <label className="form-label mb-0">Status: {errors.status && <p className="errorMsg text-danger">Status is required</p>}
+                      </label>
+                      <Controller
+                        name="status"
+                        control={control}
+                        defaultValue=""
+                        rules={{ required: true }}
+                        render={({ field }) => (
+                          <Select
+                            {...field}
+                            options={[
+                              { value: "Active", label: "Active" },
+                              { value: "InActive", label: "InActive" },
+                            ]}
+                            value={
+                              field.value
                                 ? { value: field.value, label: field.value }
                                 : null
-                        }
-                        onChange={(val) => field.onChange(val.value)}
-                        isDisabled={!isSubmitEnabled()}
-                        placeholder="Select Status"
-                    />
-                )}
-            />
-        </div>
-    </div>
-    <div className="col-4 text-end">
-        <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={!isSubmitEnabled()}
-        >
-            Submit All
-        </button>
-    </div>
-</div>
+                            }
+                            onChange={(val) => field.onChange(val.value)}
+                            isDisabled={!isSubmitEnabled()}
+                            placeholder="Select Status"
+                          />
+                        )}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-4 text-end">
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={!isSubmitEnabled()}
+                    >
+                      Submit All
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </form>

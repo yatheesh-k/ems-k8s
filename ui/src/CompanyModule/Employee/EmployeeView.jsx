@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { HandbagFill, PencilSquare, Wallet, XSquareFill } from "react-bootstrap-icons";
 import DataTable from "react-data-table-component";
@@ -35,7 +34,7 @@ const EmployeeView = () => {
 
   const getMonthNames = () => {
     return Array.from({ length: 12 }, (_, i) =>
-      (i + 1).toLocaleString("en-US", { minimumIntegerDigits: 2 })
+      new Date(0, i).toLocaleString("en-US", { month: "long" })
     );
   };
 
@@ -62,24 +61,24 @@ const EmployeeView = () => {
   };
 
 
-    const fetchData = async () => {
-      try {
-        const data = await EmployeeGetApi(); // Assuming EmployeeGetApi is a function returning a Promise
-        const filteredData = data
-          .filter(employee => employee.firstName !== null)
-          .map(({ referenceId, ...rest }) => rest);
-        // Set state only if data is valid
-        if (Array.isArray(filteredData)) {
-          setEmployees(filteredData);
-          setFilteredData(filteredData);
-        } else {
-          console.error('Employee data is not an array:', data);
-        }
-      } catch (error) {
-        handleApiErrors(error);
+  const fetchData = async () => {
+    try {
+      const data = await EmployeeGetApi(); // Assuming EmployeeGetApi is a function returning a Promise
+      const filteredData = data
+        .filter(employee => employee.firstName !== null)
+        .map(({ referenceId, ...rest }) => rest);
+      // Set state only if data is valid
+      if (Array.isArray(filteredData)) {
+        setEmployees(filteredData);
+        setFilteredData(filteredData);
+      } else {
+        console.error('Employee data is not an array:', data);
       }
-    };
-    useEffect(() => {
+    } catch (error) {
+      handleApiErrors(error);
+    }
+  };
+  useEffect(() => {
     fetchData();
   }, []); // Ensure the dependency array is empty to run once on mount
 
@@ -100,7 +99,7 @@ const EmployeeView = () => {
 
 
   const handleEdit = (id) => {
-    Navigate(`/employeeRegistration`, { state: { id } }); 
+    Navigate(`/employeeRegistration`, { state: { id } });
   };
 
   const statusMappings = {
@@ -171,11 +170,11 @@ const EmployeeView = () => {
     {
       name: <h6><b>Department</b></h6>,
       selector: row => row.departmentName,
-      width:"130px",
+      width: "130px",
     },
     {
       name: <h6><b>Date Of Hiring</b></h6>,
-      selector:row=> row.dateOfHiring,
+      selector: row => row.dateOfHiring,
       format: row => {
         const date = new Date(row.dateOfHiring);
         const day = date.getDate().toString().padStart(2, '0');
@@ -183,14 +182,14 @@ const EmployeeView = () => {
         const year = date.getFullYear();
         return `${day}-${month}-${year}`;
       },
-      width:'160px'
+      width: '160px'
     },
 
     {
       name: <h6><b>Status</b></h6>,
       selector: row => row.status,
       cell: (row) => statusMappings[row.status]?.label || "Unknown",
-      width:"120px"
+      width: "120px"
     },
     {
       name: <h5><b>Actions</b></h5>,
@@ -227,19 +226,19 @@ const EmployeeView = () => {
         .toLowerCase();
       const employeeId = item.employeeId.toString().toLowerCase();
       const status = item.status.toLowerCase();
-  
+
       return (
         fullName.includes(searchTerm.toLowerCase()) ||
         email.includes(searchTerm.toLowerCase()) ||
         departmentName.includes(searchTerm.toLowerCase()) ||
         dateOfHiring.includes(searchTerm.toLowerCase()) ||
         employeeId.includes(searchTerm.toLowerCase()) ||
-        status.includes(searchTerm.toLowerCase()) 
+        status.includes(searchTerm.toLowerCase())
       );
     });
     setFilteredData(filtered);
   };
-  
+
   console.log(filteredData)
 
   const filterByMonthYear = (selectedMonth, selectedYear) => {
@@ -376,11 +375,11 @@ const EmployeeView = () => {
                 </div>
               </div>
               <DataTable
-               columns={columns}
-               data={filteredData.length > 0 ? filteredData : view}
-               pagination
-               onChangePage={page => setCurrentPage(page)}
-               onChangeRowsPerPage={perPage => setRowsPerPage(perPage)}
+                columns={columns}
+                data={filteredData.length > 0 ? filteredData : view}
+                pagination
+                onChangePage={page => setCurrentPage(page)}
+                onChangeRowsPerPage={perPage => setRowsPerPage(perPage)}
               />
             </div>
           </div>
