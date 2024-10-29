@@ -5,12 +5,9 @@ import com.pb.employee.exception.EmployeeErrorMessageKey;
 import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.opensearch.OpenSearchOperations;
-import com.pb.employee.persistance.model.CompanyEntity;
-import com.pb.employee.persistance.model.Entity;
-import com.pb.employee.persistance.model.PayslipEntity;
-import com.pb.employee.persistance.model.SalaryConfigurationEntity;
-import com.pb.employee.request.OfferLetterRequest;
-import com.pb.employee.service.OfferLetterService;
+import com.pb.employee.persistance.model.*;
+import com.pb.employee.request.AppraisalLetterRequest;
+import com.pb.employee.service.AppraisalLetterService;
 import com.pb.employee.util.*;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -22,21 +19,18 @@ import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
 @Slf4j
-public class OfferLetterServiceImpl implements OfferLetterService {
+public class AppraisalLetterServiceImpl implements AppraisalLetterService {
 
     @Autowired
     private OpenSearchOperations openSearchOperations;
@@ -46,35 +40,50 @@ public class OfferLetterServiceImpl implements OfferLetterService {
 
 
     @Override
-    public ResponseEntity<byte[]> downloadOfferLetter(OfferLetterRequest offerLetterRequest, HttpServletRequest request) {
+    public ResponseEntity<byte[]> downloadAppraisalLetter(AppraisalLetterRequest appraisalLetterRequest, HttpServletRequest request) {
         CompanyEntity entity;
         Entity companyEntity;
         SalaryConfigurationEntity salaryConfiguration;
+        EmployeeEntity employee;
+        DepartmentEntity department;
+        DesignationEntity designation;
+
         try {
             SSLUtil.disableSSLVerification();
-            // Fetch companyEntity by companyId
-            entity = openSearchOperations.getCompanyById(offerLetterRequest.getCompanyId(), null, Constants.INDEX_EMS);
-            if (entity == null) {
-                log.error("Company not found: {}", offerLetterRequest.getCompanyId());
-                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.COMPANY_NOT_EXIST), offerLetterRequest.getCompanyId()), HttpStatus.NOT_FOUND);
-            }
-            companyEntity = CompanyUtils.unmaskCompanyProperties(entity,request);
-            salaryConfiguration =  openSearchOperations.getSalaryStructureById(offerLetterRequest.getSalaryConfigurationId(),null,Constants.INDEX_EMS+"_"+entity.getShortName());
-            CompanyUtils.unMaskCompanySalaryStructureProperties(salaryConfiguration);
-            Map<String, Map<String, String>> salaryComponents = PayslipUtils.calculateSalaryComponents(salaryConfiguration,offerLetterRequest.getGrossCompensation());
 
-            // Check if the salary configuration is active
-            if (salaryConfiguration==null || !salaryConfiguration.getStatus().equals(Constants.ACTIVE)) {
-                log.error("Active salary configuration not found: {}", offerLetterRequest.getSalaryConfigurationId());
+            // Fetch and validate the company
+            entity = openSearchOperations.getCompanyById(appraisalLetterRequest.getCompanyId(), null, Constants.INDEX_EMS);
+            if (entity == null) {
+                log.error("Company not found: {}", appraisalLetterRequest.getCompanyId());
+                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.COMPANY_NOT_EXIST), appraisalLetterRequest.getCompanyId()), HttpStatus.NOT_FOUND);
+            }
+            companyEntity = CompanyUtils.unmaskCompanyProperties(entity, request);
+            String index = ResourceIdUtils.generateCompanyIndex(entity.getShortName());
+
+            // Fetch and validate the salary configuration
+            salaryConfiguration = openSearchOperations.getSalaryStructureById(appraisalLetterRequest.getSalaryConfigurationId(), null, index);
+            if (salaryConfiguration == null || !Constants.ACTIVE.equals(salaryConfiguration.getStatus())) {
+                log.error("Active salary configuration not found: {}", appraisalLetterRequest.getSalaryConfigurationId());
                 throw new EmployeeException("Salary configuration is not active or does not exist", HttpStatus.NOT_FOUND);
             }
-            // Prepare the data model for FreeMarker template
+            CompanyUtils.unMaskCompanySalaryStructureProperties(salaryConfiguration);
+            // Calculate salary components
+            Map<String, Map<String, String>> salaryComponents = PayslipUtils.calculateSalaryYearlyComponents(salaryConfiguration, appraisalLetterRequest.getGrossCompensation());
+
+            // Fetch and unmask employee, department, and designation information
+            employee = openSearchOperations.getEmployeeById(appraisalLetterRequest.getEmployeeId(), null, index);
+            department = openSearchOperations.getDepartmentById(employee.getDepartment(), null, index);
+            designation = openSearchOperations.getDesignationById(employee.getDesignation(), null, index);
+            EmployeeUtils.unmaskEmployeeProperties(employee, department, designation);
+
+            // Prepare data model for FreeMarker template
             Map<String, Object> dataModel = new HashMap<>();
             dataModel.put(Constants.COMPANY, companyEntity);
-            dataModel.put(Constants.OFFER_LETTER_REQUEST, offerLetterRequest);
             dataModel.put(Constants.SALARY, salaryComponents);
+            dataModel.put(Constants.EMPLOYEE, employee);
+            dataModel.put(Constants.APPRAISAL_LETTER_REQUEST, appraisalLetterRequest);
 
-            // Load the company image from a URL
+            // Load and watermark company image
             String imageUrl = entity.getImageFile();
             BufferedImage originalImage = ImageIO.read(new URL(imageUrl));
             if (originalImage == null) {
@@ -84,7 +93,7 @@ public class OfferLetterServiceImpl implements OfferLetterService {
             }
 
             // Apply the watermark effect
-            float opacity = 0.5f;
+            float opacity = 0.7f;
             double scaleFactor = 1.6d;
             BufferedImage watermarkedImage = CompanyUtils.applyOpacity(originalImage, opacity, scaleFactor, 30);
 
@@ -94,41 +103,29 @@ public class OfferLetterServiceImpl implements OfferLetterService {
             String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
             dataModel.put(Constants.BLURRED_IMAGE, Constants.DATA + base64Image);
 
-
-            // Get FreeMarker template and process it with the dataModel
-            Template template = freeMarkerConfig.getTemplate(Constants.OFFER_LETTER_TEMPLATE1);
+            // Process the FreeMarker template
+            Template template = freeMarkerConfig.getTemplate(Constants.APPRAISAL_LETTER_TEMPLATE);
             StringWriter stringWriter = new StringWriter();
+            template.process(dataModel, stringWriter);
 
-            try {
-                // Process the template with the data model
-                template.process(dataModel, stringWriter);
-            } catch (Exception e) {
-                log.error("Exception occurred while processing the offer letter: {}", e.getMessage(), e);
-                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.FAILED_TO_PROCESS),
-                        HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-
-            // Get the processed HTML content
+            // Convert processed HTML content to PDF
             String htmlContent = stringWriter.toString();
-
-            // Convert the HTML content to PDF
             byte[] pdfBytes = generatePdfFromHtml(htmlContent);
 
             // Set HTTP headers for PDF download
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
-            headers.setContentDisposition(ContentDisposition.builder(Constants.ATTACHMENT)
-                    .filename(Constants.OFFER_LETTER)
-                    .build());
+            headers.setContentDisposition(ContentDisposition.builder(Constants.ATTACHMENT).filename(Constants.APPRAISAL_LETTER).build());
 
             // Return the PDF as the HTTP response
             return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
 
         } catch (Exception e) {
-            log.error("Error occurred while generating offer letter: {}", e.getMessage(), e);
+            log.error("Error occurred while generating appraisal letter: {}", e.getMessage(), e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 
     private byte[] generatePdfFromHtml(String html) throws IOException {

@@ -101,6 +101,7 @@ public class Constants {
     public static final String REQUEST = "request";
     public static final String EXPERIENCE_LETTER_TWO = "expLetter2.ftl";
     public static final String OFFER_LETTER_TEMPLATE1 = "offerTemplate1.ftl";
+    public static final String APPRAISAL_LETTER_TEMPLATE = "appraisalLetter.ftl";
     public static final String OFFER_LETTER_REQUEST = "offerLetter";
     public static final String ATTACHMENT = "attachment";
     public static final String OFFER_LETTER = "offer_letter.pdf";
@@ -114,7 +115,8 @@ public class Constants {
     public static final String GROSS_CTC = "Gross (CTC)";
     public static final String BLURRED_IMAGE = "blurredImage";
     public static final String DATA = "data:image/png;base64,";
+
+    public static final String APPRAISAL_LETTER_REQUEST = "appraisal";
     public static final String DYNAMIC_EXPERIENCE_LETTER_PDF = "dynamicExpLetter.ftl";
-    public static final String APPRAISAL_LETTER_TEMPLATE = "appraisalLetter.ftl";
     public static final String APPRAISAL_LETTER = "appraisal_letter.pdf";
 }

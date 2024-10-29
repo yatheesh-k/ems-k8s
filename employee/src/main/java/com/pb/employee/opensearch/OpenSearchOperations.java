@@ -699,7 +699,7 @@ public class OpenSearchOperations {
         return null;
     }
 
-    public RelievingEntity getRelievingById(String resourceId, String type, String index) throws IOException {
+/*    public RelievingEntity getRelievingById(String resourceId, String type, String index) throws IOException {
 
         if(type != null) {
             resourceId = type+"_"+resourceId;
@@ -711,5 +711,5 @@ public class OpenSearchOperations {
             return searchResponse.source();
         }
         return null;
-    }
+    }*/
 }

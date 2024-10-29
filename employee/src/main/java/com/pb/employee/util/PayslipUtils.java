@@ -665,6 +665,51 @@ public class PayslipUtils {
         return components;
     }
 
+    public static Map<String, Map<String, String>> calculateSalaryYearlyComponents(SalaryConfigurationEntity salaryConfiguration, Double grossAnnualSalary) {
+        Map<String, Map<String, String>> components = new LinkedHashMap<>(); // Use LinkedHashMap to maintain order
+
+        // Store Basic Salary breakdown without adding to total initially
+        Map<String, String> basicSalaryData = new HashMap<>();
+        basicSalaryData.put(Constants.ANNUAL, formatValue(String.valueOf(grossAnnualSalary)));
+        components.put(Constants.BASIC_SALARY, basicSalaryData); // Add Basic Salary first but don’t yet add to total
+
+        double totalAnnualSalary = 0.0;
+        // Calculate allowances and accumulate totals
+        Map<String, String> allowances = salaryConfiguration.getAllowances();
+        if (allowances != null) {
+            for (Map.Entry<String, String> entry : allowances.entrySet()) {
+                // Calculate allowance values
+                double allowanceAnnualValue = Double.parseDouble(persentageOrValue(entry.getValue(), grossAnnualSalary));
+
+                // Accumulate allowance totals for later addition to Gross Salary
+                totalAnnualSalary += allowanceAnnualValue;
+
+                // Add the formatted allowance to components
+                Map<String, String> allowanceData = new HashMap<>();
+                allowanceData.put(Constants.ANNUAL, formatValue(String.valueOf(allowanceAnnualValue)));
+                components.put(formatComponentName(entry.getKey()), allowanceData);
+
+            }
+        }
+        Map<String, String> grossSalaryData = new HashMap<>();
+        grossSalaryData.put(Constants.ANNUAL,  "<b>"+ formatValue(String.valueOf(totalAnnualSalary))+"</b>");
+        // Calculate deductions without affecting Gross Salary
+        Map<String, String> deductions = salaryConfiguration.getDeductions();
+        if (deductions != null) {
+            for (Map.Entry<String, String> entry : deductions.entrySet()) {
+                double deductionAnnualValue = Double.parseDouble(persentageOrValue(entry.getValue(), grossAnnualSalary));
+                double deductionMonthlyValue = deductionAnnualValue / 12;
+
+                // Add formatted deduction to components only
+                Map<String, String> deductionData = new HashMap<>();
+                deductionData.put(Constants.MONTH, formatValue(String.valueOf(deductionMonthlyValue)));
+                deductionData.put(Constants.ANNUAL, formatValue(String.valueOf(deductionAnnualValue)));
+                components.put(formatComponentName(entry.getKey()), deductionData);
+            }
+        }
+        return components;
+    }
+
 
 
     private static String formatComponentName(String componentName) {

@@ -238,7 +238,7 @@
         <h6>Subject: Offer Of Employment</h6>
     </div>
     <div class="company-about">
-        <h6>Dear ${offerLetter.employeeFirstName}</h6>
+        <h6>Dear ${offerLetter.employeeName}</h6>
         <p>We welcome you to our pursuit of excellence and we feel proud to have a professional of your stature as a
             member of the ${company.companyName} family and wish you a long, rewarding, and satisfying career with
             us.
@@ -348,7 +348,16 @@
             been duly served.
         </p>
     </div>
-    <h5 style="text-align: center; margin-top: 55px;">CIN: ${company.cinNo}</h5>
+    <h5 style="text-align: center; margin-top: 55px;">
+        <#if company.cinNo?has_content>
+            CIN: ${company.cinNo}
+        <#elseif company.companyRegNo?has_content>
+            Registration No: ${company.companyRegNo}
+        <#else>
+            <!-- Optionally, you can add a default text if both are null -->
+            Company Information Not Available
+        </#if>
+    </h5>
     <hr style="color: rgb(10, 53, 248);" />
     <div style="text-align: center; font-size: 14px;">
         <p>
@@ -386,8 +395,16 @@
                 by a written mail and signed copy within the next 24 hours.</b>
         </p>
         <p>Please do not hesitate to contact us in case you have any queries.</p>
-        <h5 style="text-align: center; margin-top: 430px;">CIN: ${company.cinNo}</h5>
-        <hr style="color: rgb(10, 53, 248);" />
+      <h5 style="text-align: center; margin-top: 55px;">
+        <#if company.cinNo?has_content>
+            CIN: ${company.cinNo}
+        <#elseif company.companyRegNo?has_content>
+            Registration No: ${company.companyRegNo}
+        <#else>
+            <!-- Optionally, you can add a default text if both are null -->
+            Company Information Not Available
+        </#if>
+     </h5>        <hr style="color: rgb(10, 53, 248);" />
         <div style="text-align: center; font-size: 14px;">
             <p>
                 ${company.companyName}<br />
@@ -423,7 +440,16 @@
         <p>*Income Tax deduction is subjected to timely submission of the investment details.</p>
         <p>*Pan Card submission is mandatory for the disbursement of the salary.</p>
     </div>
-    <h5 style="text-align: center; margin-top: 150px;">CIN: ${company.cinNo}</h5>
+       <h5 style="text-align: center; margin-top: 55px;">
+          <#if company.cinNo?has_content>
+              CIN: ${company.cinNo}
+          <#elseif company.companyRegNo?has_content>
+              Registration No: ${company.companyRegNo}
+          <#else>
+              <!-- Optionally, you can add a default text if both are null -->
+              Company Information Not Available
+          </#if>
+      </h5>
     <hr style="color: rgb(10, 53, 248);" />
     <div style="text-align: center; font-size: 14px;">
         <p>
@@ -518,7 +544,16 @@
             </tr>
         </table>
     </div>
-    <h5 style="text-align: center; margin-top: 90px;">CIN: ${company.cinNo}</h5>
+     <h5 style="text-align: center; margin-top: 55px;">
+            <#if company.cinNo?has_content>
+                CIN: ${company.cinNo}
+            <#elseif company.companyRegNo?has_content>
+                Registration No: ${company.companyRegNo}
+            <#else>
+                <!-- Optionally, you can add a default text if both are null -->
+                Company Information Not Available
+            </#if>
+        </h5>
     <hr style="color: rgb(10, 53, 248);" />
     <div style="text-align: center; font-size: 14px;">
         <p>
@@ -546,8 +581,16 @@
             numbers.
         </p>
     </div>
-    <h5 style="text-align: center; margin-top: 500px; ">CIN: ${company.cinNo}</h5>
-    <hr style="color: rgb(10, 53, 248);" />
+     <h5 style="text-align: center; margin-top: 55px;">
+        <#if company.cinNo?has_content>
+            CIN: ${company.cinNo}
+        <#elseif company.companyRegNo?has_content>
+            Registration No: ${company.companyRegNo}
+        <#else>
+            <!-- Optionally, you can add a default text if both are null -->
+            Company Information Not Available
+        </#if>
+    </h5>    <hr style="color: rgb(10, 53, 248);" />
     <div style="text-align: center; font-size: 14px;">
         <p>
             ${company.companyName}<br />

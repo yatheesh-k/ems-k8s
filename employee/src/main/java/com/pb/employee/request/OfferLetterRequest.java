@@ -44,11 +44,6 @@ public class OfferLetterRequest {
     @Size(min = 2, max = 200, message = "{location.notnull.message}")
     private String employeeAddress;
 
-    @Schema(example = "employeeFirstName")
-    @Pattern(regexp ="^(?!.*\\b([A-Z])\\s\\1\\s\\1)(?:[A-Z][a-z]+(?: [A-Z][a-z]+)*|[A-Z](?:\\.? ?[A-Z])? ?[A-Z][a-z]+|[A-Z][a-z]+(?: [A-Z](?:\\.? ?[A-Z])?)+)$",
-            message = "{firstname.format}")
-    @Size(min = 3, max = 20, message = "{firstName.size.message}")
-    private String employeeFirstName;
 
     @Schema(example = "contactNo")
     @NotNull(message = "{mobileNo.notnull.message}")

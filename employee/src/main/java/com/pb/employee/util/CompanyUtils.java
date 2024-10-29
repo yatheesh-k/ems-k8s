@@ -7,7 +7,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.*;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -843,7 +846,40 @@ public class CompanyUtils {
         return responseBody;
     }
 
-    public static RelievingEntity maskRelievingProperties(RelievingRequest request, String id) {
+    public static BufferedImage applyOpacity(BufferedImage originalImage, float opacity, double scaleFactor, double rotationDegrees) {
+        int newWidth = (int) (originalImage.getWidth() * scaleFactor);
+        int newHeight = (int) (originalImage.getHeight() * scaleFactor);
+        double radians = Math.toRadians(-rotationDegrees);
+
+        int rotatedWidth = (int) Math.abs(newWidth * Math.cos(radians)) + (int) Math.abs(newHeight * Math.sin(radians));
+        int rotatedHeight = (int) Math.abs(newWidth * Math.sin(radians)) + (int) Math.abs(newHeight * Math.cos(radians));
+
+        BufferedImage watermarkedImage = new BufferedImage(rotatedWidth, rotatedHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = watermarkedImage.createGraphics();
+
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+        int centerX = rotatedWidth / 2;
+        int centerY = rotatedHeight / 2;
+
+        g2d.translate(centerX, centerY);
+        g2d.rotate(radians);
+        g2d.translate(-newWidth / 2, -newHeight / 2);
+
+        Image scaledImage = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+        g2d.drawImage(scaledImage, 0, 0, null);
+
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, rotatedWidth, rotatedHeight);
+
+        g2d.dispose();
+
+        return watermarkedImage;
+    }
+
+/*    public static RelievingEntity maskRelievingProperties(RelievingRequest request, String id) {
 
         ObjectMapper objectMapper = new ObjectMapper();
         RelievingEntity relievingEntity = objectMapper.convertValue(request, RelievingEntity.class);
@@ -851,5 +887,5 @@ public class CompanyUtils {
         relievingEntity.setType(Constants.RELIEVING);
 
         return relievingEntity;
-    }
+    }*/
 }
