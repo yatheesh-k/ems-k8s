@@ -407,17 +407,17 @@ const EmsLogin = () => {
                 <div className="newLoginRightSecTitle">Login</div>
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="formgroup">
-                    <label className="form-label">Email</label>
+                    <label className="form-label">Email Id</label>
                     <input className="form-control form-control-lg"
                       type="email"
-                      placeholder="Email"
+                      placeholder="Email Id"
                       autoComplete="off"
                       onKeyDown={handleEmailChange}
                       {...register("username", {
-                        required: "Email is Required.",
+                        required: "Email Id is Required.",
                         pattern: {
                           value: /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
-                          message: "Invalid email format. Only .com, .in, .org, .net, .edu, .gov are allowed.",
+                          message: "Invalid email Id format. Only .com, .in, .org, .net, .edu, .gov are allowed.",
                         },
                       })}
                     />

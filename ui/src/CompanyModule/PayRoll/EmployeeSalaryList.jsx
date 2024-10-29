@@ -186,7 +186,7 @@ const EmployeeSalaryList = () => {
                       </div>
                       <div className="col mb-3">
                         <div className="form-group">
-                          <label>Variable Amount:</label>
+                          <label style={{color:"white"}}>Variable Amount:</label>
                           <input type="text" className="form-control" defaultValue={editingData?.variableAmount || ''} {...register('variableAmount')} />
                         </div>
                       </div>

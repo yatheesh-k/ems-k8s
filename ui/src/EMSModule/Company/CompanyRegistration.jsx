@@ -294,6 +294,7 @@ const CompanyRegistration = () => {
 
     return true; // Return true if all checks pass
   };
+
   const validatePAN = (value) => {
     const spaceError = "Spaces are not allowed in the PAN Number.";
     const patternError = "Invalid PAN Number format";

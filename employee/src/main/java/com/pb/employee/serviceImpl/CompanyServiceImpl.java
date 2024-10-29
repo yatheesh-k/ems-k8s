@@ -1,7 +1,6 @@
 package com.pb.employee.serviceImpl;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pb.employee.common.ResponseBuilder;
 import com.pb.employee.exception.EmployeeErrorMessageKey;
 import com.pb.employee.exception.EmployeeException;
@@ -10,10 +9,7 @@ import com.pb.employee.opensearch.OpenSearchOperations;
 import com.pb.employee.persistance.model.CompanyEntity;
 import com.pb.employee.persistance.model.EmployeeEntity;
 import com.pb.employee.persistance.model.Entity;
-import com.pb.employee.request.CompanyImageUpdate;
-import com.pb.employee.request.CompanyRequest;
-import com.pb.employee.request.CompanyUpdateRequest;
-import com.pb.employee.request.EmployeePasswordReset;
+import com.pb.employee.request.*;
 import com.pb.employee.service.CompanyService;
 import com.pb.employee.util.CompanyUtils;
 import com.pb.employee.util.Constants;
@@ -228,11 +224,47 @@ public class CompanyServiceImpl implements CompanyService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
     }
+
+
+    @Override
+    public ResponseEntity<?> updateCompanyStampImageById(String companyId, CompanyStampUpdate companyStampUpdate, MultipartFile multipartFile) throws EmployeeException, IOException {
+        CompanyEntity user;
+        try {
+            user = openSearchOperations.getCompanyById(companyId, null, Constants.INDEX_EMS);
+            if (user == null) {
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_COMPANY),
+                        HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception ex) {
+            log.error("Exception while fetching user {}, {}", companyId, ex);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_COMPANY),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        CompanyEntity entity = CompanyUtils.maskCompanyStampImageUpdateProperties(user, companyStampUpdate);
+        if (!multipartFile.isEmpty()){
+            multiPartFileStoreForStamp(multipartFile, entity);
+        }
+        openSearchOperations.saveEntity(entity, companyId, Constants.INDEX_EMS);
+        return new ResponseEntity<>(
+                ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
+    }
+
+
     private void multiPartFileStore(MultipartFile file, CompanyEntity company) throws IOException, EmployeeException {
         if(!file.isEmpty()){
             String filename = folderPath+company.getShortName()+"_"+file.getOriginalFilename();
             file.transferTo(new File(filename));
             company.setImageFile(company.getShortName()+"_"+file.getOriginalFilename());
+            ResponseEntity.ok(filename);
+        }
+    }
+
+    private void multiPartFileStoreForStamp(MultipartFile file, CompanyEntity company) throws IOException, EmployeeException {
+        if(!file.isEmpty()){
+            String filename = folderPath+company.getShortName()+"_"+Constants.STAMP+"_"+file.getOriginalFilename();
+            file.transferTo(new File(filename));
+            company.setStampImage(company.getShortName()+"_"+Constants.STAMP+"_"+file.getOriginalFilename());
             ResponseEntity.ok(filename);
         }
     }

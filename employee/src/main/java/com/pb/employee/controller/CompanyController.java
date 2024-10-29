@@ -2,10 +2,7 @@ package com.pb.employee.controller;
 
 
 import com.pb.employee.exception.EmployeeException;
-import com.pb.employee.request.CompanyImageUpdate;
-import com.pb.employee.request.CompanyRequest;
-import com.pb.employee.request.CompanyUpdateRequest;
-import com.pb.employee.request.EmployeePasswordReset;
+import com.pb.employee.request.*;
 import com.pb.employee.service.CompanyService;
 import com.pb.employee.util.Constants;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -84,6 +81,19 @@ public class CompanyController {
                                                @ModelAttribute @Valid CompanyImageUpdate companyImageUpdate,
                                                @RequestPart(Constants.FILE) MultipartFile file ) throws IOException, EmployeeException {
         return companyService.updateCompanyImageById(companyId,companyImageUpdate, file);
+    }
+
+    @RequestMapping(value = "/stampImage/{companyId}", method = RequestMethod.PATCH,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
+            summary = "${api.updateCompanyStamp.tag}", description = "${api.updateCompanyStamp.description}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "202", description= "Accepted")
+    public ResponseEntity<?> updateCompanyStampImageById(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
+                                                    @RequestHeader(Constants.AUTH_KEY) String authToken,
+                                                    @PathVariable String companyId,
+                                                    @ModelAttribute @Valid CompanyStampUpdate companyStampUpdate,
+                                                    @RequestPart(Constants.FILE) MultipartFile file ) throws IOException, EmployeeException {
+        return companyService.updateCompanyStampImageById(companyId,companyStampUpdate, file);
     }
 
     @RequestMapping(value = "/employee/{employeeId}/password", method = RequestMethod.PATCH,consumes = MediaType.APPLICATION_JSON_VALUE)

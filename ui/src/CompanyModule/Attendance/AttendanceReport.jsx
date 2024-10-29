@@ -1,13 +1,13 @@
+
 import React, { useEffect, useState } from 'react';
 import LayOut from '../../LayOut/LayOut';
 import Select from 'react-select';
 import { useForm } from 'react-hook-form';
 import { Bounce, toast } from 'react-toastify';
-import { EmployeeGetApi, AttendanceReportApi, AttendanceDeleteById, AttendancePatchById } from '../../Utils/Axios';
-import { PencilSquare, XSquareFill } from 'react-bootstrap-icons';
+import { EmployeeGetApi, AttendanceReportApi, AttendancePatchById } from '../../Utils/Axios';
+import { PencilSquare } from 'react-bootstrap-icons';
 import DataTable from 'react-data-table-component';
 import { useNavigate } from 'react-router-dom';
-import DeletePopup from '../../Utils/DeletePopup';
 import { ModalTitle, ModalHeader, ModalBody } from 'react-bootstrap';
 
 const AttendanceReport = () => {
@@ -44,20 +44,6 @@ const AttendanceReport = () => {
         setEmployeeId(selectedOption.value);
         const selectedEmployee = employees.find(emp => emp.value === selectedOption.value);
         setSelectedEmployeeDetails(selectedEmployee);
-    };
-
-    const handleCloseDeleteModal = () => {
-        setShowDeleteModal(false);
-        setSelectedItemId(null);
-        setSelectedEmployeeId("");
-        setSelectedAttendanceId("");
-    };
-
-    const handleShowDeleteModal = (row) => {
-        setSelectedItemId(row.id);
-        setSelectedEmployeeId(row.employeeId);
-        setSelectedAttendanceId(row.attendanceId);
-        setShowDeleteModal(true);
     };
 
     const handleShowEditModal = (row) => {
@@ -162,33 +148,6 @@ const AttendanceReport = () => {
         return Array.from({ length: 11 }, (_, i) => (currentYear - i).toString());
     };
 
-    const handleDelete = async () => {
-        const now = new Date();
-        const currentMonth = now.getMonth() + 1;
-        const currentYear = now.getFullYear();
-
-        const monthNames = getMonthNames();
-        const currentMonthName = monthNames[currentMonth - 1];
-
-        try {
-            await AttendanceDeleteById(selectedEmployeeId, selectedAttendanceId);
-            toast.success("Attendance Record Deleted Successfully", {
-                position: "top-right",
-                transition: Bounce,
-                hideProgressBar: true,
-                theme: "colored",
-                autoClose: 3000,
-            });
-            setTimeout(() => {
-                handleCloseDeleteModal();
-                fetchAllAttendanceData(null, currentMonthName, currentYear);
-                setRefreshData((prev) => !prev);
-            }, 1500);
-        } catch (error) {
-            handleApiErrors(error);
-        }
-    };
-
     const onSubmit = async (data) => {
         try {
             await AttendancePatchById(selectedEmployeeId, selectedAttendanceId, data);
@@ -246,19 +205,11 @@ const AttendanceReport = () => {
                     <div>
                         <button
                             className="btn btn-sm"
-                            style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }}
+                            style={{ backgroundColor: "transparent", border: "none", padding: "10px", marginLeft: "5px" }}
                             onClick={() => handleShowEditModal(row)}
                             title='Edit'
                         >
                             <PencilSquare size={22} color="#2255a4" />
-                        </button>
-                        <button
-                            className="btn btn-sm"
-                            style={{ backgroundColor: "transparent", border: "none", padding: "0", marginLeft: "5px" }}
-                            onClick={() => handleShowDeleteModal(row)}
-                            title='Delete'
-                        >
-                            <XSquareFill size={22} color="#da542e" />
                         </button>
                     </div>
                 ),
@@ -328,12 +279,12 @@ const AttendanceReport = () => {
                                             onChange={handleEmployeeChange}
                                             placeholder="Select Employee"
                                             menuPortalTarget={document.body}
-                                            styles={{
-                                                control: (base) => ({
-                                                    ...base,
-                                                    zIndex: 9999,
-                                                }),
-                                            }}
+                                            // styles={{
+                                            //     control: (base) => ({
+                                            //         ...base,
+                                            //         zIndex: 9999,
+                                            //     }),
+                                            // }}
                                         />
                                         {selectedEmployee && <p>Selected: {selectedEmployee.label}</p>}
                                     </div>
@@ -426,14 +377,6 @@ const AttendanceReport = () => {
                     </div>
                 </div>
             </div>
-
-            <DeletePopup
-                show={showDeleteModal}
-                handleClose={handleCloseDeleteModal}
-                handleConfirm={handleDelete}
-                id={selectedItemId}
-                pageName="Attendance"
-            />
             {showEditModal && (
                 <div
                     role='dialog'
