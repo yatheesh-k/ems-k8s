@@ -437,7 +437,7 @@ public class CompanyUtils {
                 }
 
             }
-            if (companyRequest.getCompanyRegNo() != null && !companyEntity.getCompanyRegNo().isEmpty()) {
+            if (companyEntity.getCompanyRegNo() !=null &&companyRequest.getCompanyRegNo() != null && !companyEntity.getCompanyRegNo().isEmpty()) {
                 regNo = new String(Base64.getDecoder().decode(companyEntity.getCompanyRegNo().getBytes()));
                 if (regNo.equals(companyRequest.getCompanyRegNo())){
                     responseBody.put(Constants.DUPLICATE_REGISTER_NO, companyRequest.getCompanyRegNo());
@@ -495,7 +495,7 @@ public class CompanyUtils {
 
             }
 
-            if (companyRequest.getCinNo() != null && !companyEntity.getCinNo().isEmpty()) {
+            if (companyEntity.getCinNo() !=null && companyRequest.getCinNo() != null && !companyEntity.getCinNo().isEmpty()) {
                 cinNo = new String(Base64.getDecoder().decode(companyEntity.getCinNo().getBytes()));
                 if (cinNo.equals(companyRequest.getCinNo())){
                     responseBody.put(Constants.DUPLICATE_CIN_NO, companyRequest.getCinNo());
