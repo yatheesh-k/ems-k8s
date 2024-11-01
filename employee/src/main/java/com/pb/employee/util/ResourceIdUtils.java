@@ -24,6 +24,9 @@ public class ResourceIdUtils {
     public static String generateEmployeeResourceId(String id) {
         return generateGlobalResourceId(ResourceType.EMPLOYEE, id);
     }
+    public static String generateTemplateResourceId(String id) {
+        return generateGlobalResourceId(ResourceType.TEMPLATE, id);
+    }
     public static String generateSalaryResourceId(String employeeId, String time) {
         return generateGlobalResourceId(ResourceType.SALARY,employeeId, time);
     }
@@ -96,6 +99,10 @@ public class ResourceIdUtils {
         }
         if (type == ResourceType.PAYSLIP) {
             prefix = Constants.PAYSLIP +"-"+ args[0] + "-"+args[1]+"-";
+
+        }
+        if (type == ResourceType.TEMPLATE) {
+            prefix = Constants.TEMPLATE +"-";
 
         }
            

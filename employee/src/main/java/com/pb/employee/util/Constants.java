@@ -119,4 +119,5 @@ public class Constants {
     public static final String APPRAISAL_LETTER_REQUEST = "appraisal";
     public static final String DYNAMIC_EXPERIENCE_LETTER_PDF = "dynamicExpLetter.ftl";
     public static final String APPRAISAL_LETTER = "appraisal_letter.pdf";
+    public static final String TEMPLATE = "template";
 }

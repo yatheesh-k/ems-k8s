@@ -22,7 +22,8 @@ public enum ResourceType {
     SALARY("salary"),
     PAYSLIP("payslip"),
     SALARY_STRUCTURE("salary_structure"),
-    RELIEVING("relieving");
+    RELIEVING("relieving"),
+    TEMPLATE("template");
 
 
     private final String value;
