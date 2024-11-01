@@ -386,3 +386,28 @@ export const CompanySalaryStructureGetApi = () => {
   const company = localStorage.getItem("companyName")
   return axiosInstance.get(`${company}/salary`);
 }
+
+export const OfferLetterDownload = async (payload) => {
+  try {
+    const response = await axiosInstance.post(`/upload/offerletter`,payload, {
+      responseType: 'blob', 
+      headers: {
+        'Accept': 'application/pdf', 
+      }
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `offerLettre.pdf`; 
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+
+    return true; 
+
+  } catch (error) {
+    console.error('Download error:', error);
+    throw error; 
+  }
+};

@@ -16,28 +16,36 @@ function Profile() {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [error, setError] = useState(null);
-  const [imgError,setImgError]=useState(null);
+  const [imgError, setImgError] = useState(null);
   const { user = {}, logoFileName } = useAuth();
   const navigate = useNavigate();
-
+  const [response, setResponse] = useState({ data: {} });
+  const [hasCinNo, setHasCinNo] = useState(false);
+  const [hasCompanyRegNo, setHasCompanyRegNo] = useState(false);
 
 
   useEffect(() => {
     const fetchCompanyData = async () => {
       if (!user.companyId) return;
+
       try {
         const response = await companyViewByIdApi(user.companyId);
         const data = response.data;
         setCompanyData(data);
+
         // Set form values
         Object.keys(data).forEach(key => setValue(key, data[key]));
+
+        // Determine CIN and Registration number presence
+        setHasCinNo(!!data.cinNo);
+        setHasCompanyRegNo(!!data.companyRegNo);
       } catch (err) {
         setError(err);
       }
     };
 
     fetchCompanyData();
-  }, [setValue, user.companyId]);
+  }, [user.companyId, setValue, setError]);
 
 
   const handleDetailsSubmit = async (data) => {
@@ -161,7 +169,7 @@ function Profile() {
 
     }
   };
-  
+
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
 
@@ -292,9 +300,9 @@ function Profile() {
                         }}
                       >
                         <CameraFill />
-                       
+
                       </div>
-                    
+
                     </div>
                     <span className="text-danger align-start">Max-Height=80px; Max-Width=200px; Max-Size=200 KB </span>
                   </div>
@@ -458,14 +466,31 @@ function Profile() {
                   <div className="card-body">
                     <div className="row">
                       <div className="col-12 col-md-6 col-lg-5 mb-3">
-                        <label className="form-label">Company CIN Number</label>
-                        <input
-                          type="text"
-                          id="cinNo"
-                          className="form-control"
-                          {...register("cinNo")}
-                          readOnly
-                        />
+                        {hasCinNo ? (
+                          <>
+                            <label className="form-label">Company CIN Number</label>
+                            <input
+                              type="text"
+                              id="cinNo"
+                              className="form-control"
+                              value={response.data.cinNo}
+                              {...register("cinNo")}
+                              readOnly
+                            />
+                          </>
+                        ) : hasCompanyRegNo ? (
+                          <>
+                            <label className="form-label">Company Registration Number</label>
+                            <input
+                              type="text"
+                              id="companyRegNo"
+                              className="form-control"
+                              value={response.data.companyRegNo}
+                              {...register("companyRegNo")}
+                              readOnly
+                            />
+                          </>
+                        ) : null}
                       </div>
                       <div className="col-lg-1"></div>
                       <div className="col-12 col-md-6 col-lg-5 mb-3">
@@ -645,7 +670,7 @@ function Profile() {
               type="file"
               className="form-control"
               accept=".png, .jpg, .svg, .jpeg, .pdf"
-              
+
               onChange={onChangePicture}
             />
             {errorMessage && (

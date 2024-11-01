@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { companyViewByIdApi, EmployeeGetApiById, EmployeePayslipResponse, EmployeePayslipUpdate } from "../Utils/Axios";
 import { toast } from "react-toastify";
 import LayOut from "../LayOut/LayOut";
@@ -32,7 +32,7 @@ const PayslipUpdate = () => {
     taxes: ''
   });
 
-
+  const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const employeeId = queryParams.get("employeeId");
@@ -138,6 +138,7 @@ const PayslipUpdate = () => {
 
         await EmployeePayslipUpdate(employeeId, payslipId, payload);
         toast.success("Payslip generated successfully");
+        navigate('/payslipsList');
       } catch (err) {
         console.error("Error generating payslip:", err);
         toast.error("Failed to generate payslip");

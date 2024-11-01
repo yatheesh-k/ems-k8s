@@ -233,7 +233,7 @@ const AttendanceReport = () => {
                 width: "150px",
             }] : []),
             ...(!isAttendance && selectedYear ? [{
-                name: <h6><b>month</b></h6>,
+                name: <h6><b>Month</b></h6>,
                 selector: (row) => row.month,
                 width: "150px",
             }] : []),

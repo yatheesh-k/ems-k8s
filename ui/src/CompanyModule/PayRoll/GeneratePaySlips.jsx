@@ -180,6 +180,7 @@ const GeneratePaySlip = () => {
         theme: "colored",
         autoClose: 3000,
       });
+      navigate('/payslipsList'); 
     } catch (error) {
       console.error("Error generating payslips:", error);
       toast.error("Failed to generate payslips.");

@@ -567,12 +567,12 @@ const EmployeeRegistration = () => {
                             message: "These fields accepts only Integers and Alphanumerical Characters",
                           },
                           minLength: {
-                            value: 1,
-                            message: "minimum 1 character Required",
+                            value: 2,
+                            message: "Minimum 2 Character Required",
                           },
                           maxLength: {
-                            value: 10,
-                            message: "not exceed 10 characters",
+                            value: 20,
+                            message: "not exceed 20 characters",
                           },
                         })}
                       />
@@ -601,11 +601,11 @@ const EmployeeRegistration = () => {
                           },
                           minLength: {
                             value: 3,
-                            message: "Minimum 3 characters Required",
+                            message: "Minimum 3 Characters Required",
                           },
                           maxLength: {
                             value: 100,
-                            message: "Maximum 100 characters Required",
+                            message: "Maximum 100 Characters Required",
                           },
                         })}
                       />
@@ -634,11 +634,11 @@ const EmployeeRegistration = () => {
                           },
                           minLength: {
                             value: 1,
-                            message: "Minimum 1 character Required",
+                            message: "Minimum 1 Character Required",
                           },
                           maxLength: {
                             value: 100,
-                            message: "Maximum 100 characters Required",
+                            message: "Maximum 100 Characters Required",
                           },
                         })}
                       />
@@ -836,11 +836,11 @@ const EmployeeRegistration = () => {
                                 validate: validatePassword,
                                 minLength: {
                                   value: 6,
-                                  message: "minimum 6 characters are Required",
+                                  message: "Minimum 6 Characters are Required",
                                 },
                                 maxLength: {
                                   value: 16,
-                                  message: "maximum 16 characters!",
+                                  message: "Maximum 16 Characters!",
                                 },
                               })}
                             />
@@ -1027,11 +1027,11 @@ const EmployeeRegistration = () => {
                           },
                           minLength: {
                             value: 9,
-                            message: "Account Number minimum 9 numbers Required",
+                            message: "Account Number Minimum 9 Numbers Required",
                           },
                           maxLength: {
                             value: 18,
-                            message: "Account Number must not exceed 18 characters",
+                            message: "Account Number must not exceed 18 Characters",
                           },
                         })}
                       />
@@ -1086,11 +1086,11 @@ const EmployeeRegistration = () => {
                           },
                           minLength: {
                             value: 3,
-                            message: "Minimum 3 characters Required",
+                            message: "Minimum 3 Characters Required",
                           },
                           maxLength: {
                             value: 50,
-                            message: "Maximum 50 characters Required",
+                            message: "Maximum 50 Characters Required",
                           },
                         })}
                       // disabled={editMode}
@@ -1119,11 +1119,11 @@ const EmployeeRegistration = () => {
                           },
                           minLength: {
                             value: 12,
-                            message: "MInimum 12 characters required",
+                            message: "MInimum 12 Characters Required",
                           },
                           maxLength: {
                             value: 12,
-                            message: "UAN Number must not exceed 12 characters",
+                            message: "UAN Number must not exceed 12 Characters",
                           },
                         })}
                       />
@@ -1147,7 +1147,7 @@ const EmployeeRegistration = () => {
                           required: "PAN Number is Required",
                           maxLength: {
                             value: 10,
-                            message: "Pan Number must not exceed 10 characters",
+                            message: "Pan Number must not exceed 10 Characters",
                           },
                           pattern: {
                             value: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
@@ -1181,7 +1181,7 @@ const EmployeeRegistration = () => {
                           },
                           maxLength: {
                             value: 12,
-                            message: "Aadhar Number must not exceed 12 characters",
+                            message: "Aadhar Number must not exceed 12 Characters",
                           },
                         })}
                       />

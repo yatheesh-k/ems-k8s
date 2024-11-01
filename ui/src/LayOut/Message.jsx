@@ -118,8 +118,8 @@ function Message() {
                                                 message: "Minimum 2 Characters Required",
                                             },
                                             maxLength: {
-                                                value: 16,
-                                                message: "Maximum 16 Characters allowed",
+                                                value: 30,
+                                                message: "Maximum 30 Characters allowed",
                                             },
                                         })}
                                     />

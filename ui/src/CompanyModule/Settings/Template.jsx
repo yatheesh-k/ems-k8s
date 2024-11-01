@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import LayOut from '../../LayOut/LayOut';
+import { Download } from 'react-bootstrap-icons';
+import { CompanySalaryStructureGetApi, companyViewByIdApi, OfferLetterDownload } from '../../Utils/Axios';
+import { toast } from 'react-toastify';
+import { useAuth } from '../../Context/AuthContext';
+import { useForm } from 'react-hook-form';
 
 const Template = () => {
     const date = new Date().toLocaleDateString();
-
-    // State for editable fields
+    const { setValue, formState: { errors } } = useForm();
     const [isEditing, setIsEditing] = useState(false);
+    const [error, setError] = useState(null);
+    const [calculatedValues, setCalculatedValues] = useState({});
+    const [salaryStructures, setSalaryStructures] = useState([]);
+    const [salaryConfigurationId, setSalaryConfigurationId] = useState(null);
+    const [refNo, setRefNo] = useState('OFLTR-09');
+    const [companyDetails, setCompanyDetails] = useState(null);
     const [recipientName, setRecipientName] = useState("[Recipient's Name]");
     const [fatherName, setFatherName] = useState("[Recipient's Father's Name]");
     const [address, setAddress] = useState("[Recipient's Address]");
@@ -16,29 +26,151 @@ const Template = () => {
     const [location, setLocation] = useState("[Location]");
     const [grossAmount, setGrossAmount] = useState("[Gross Amount]");
     const [companyName, setCompanyName] = useState("[Company Name]");
+    const [hasCinNo, setHasCinNo] = useState(false);
+    const [hasCompanyRegNo, setHasCompanyRegNo] = useState(false);
+    const { user, logoFileName } = useAuth();
 
     const handleEditToggle = () => {
         setIsEditing(!isEditing);
     };
 
     const handleSave = () => {
-        // Here you can add any logic to save the edited data
+        calculateValues();
         setIsEditing(false);
+    };
+
+    useEffect(() => {
+        const fetchCompanyData = async () => {
+            if (!user.companyId) return;
+
+            try {
+                const response = await companyViewByIdApi(user.companyId);
+                const data = response.data;
+                setCompanyDetails(data);
+                Object.keys(data).forEach(key => setValue(key, data[key]));
+                setHasCinNo(!!data.cinNo);
+                setHasCompanyRegNo(!!data.companyRegNo);
+            } catch (err) {
+                setError(err);
+            }
+        };
+
+        fetchCompanyData();
+    }, [user.companyId, setValue, setError]);
+
+    const fetchSalary = async () => {
+        try {
+            const response = await CompanySalaryStructureGetApi();
+            const structures = response.data.data;
+            setSalaryStructures(structures);
+            const activeStructure = structures.find(structure => structure.status === "Active");
+            if (activeStructure) {
+                setSalaryConfigurationId(activeStructure.id);
+            } else {
+                toast.error("No active salary structure found.");
+            }
+        } catch (error) {
+            console.error("API fetch error:", error);
+        }
+    };
+    useEffect(() => {
+        fetchSalary();
+    }, []);
+
+    const calculateValues = () => {
+        if (salaryStructures.length === 0) {
+            toast.error("No salary structure available for calculation.");
+            return;
+        }
+
+        const structure = salaryStructures[0];
+        const deductions = structure.deductions;
+        const totalDeductions = Object.entries(deductions).reduce((acc, [key, percentage]) => {
+            const deductionAmount = (grossAmount * (parseFloat(percentage) / 100));
+            return acc + deductionAmount;
+        }, 0);
+
+        const netSalary = grossAmount - totalDeductions;
+
+        setCalculatedValues({
+            totalDeductions,
+            netSalary,
+        });
+    };
+
+    const handleDownload = async () => {
+        const payload = {
+            offerDate: date,
+            referenceNo: refNo,
+            employeeName: recipientName,
+            employeeFatherName: fatherName,
+            employeeAddress: address,
+            employeeFirstName: recipientName,
+            employeeContactNo: contactNumber,
+            joiningDate: joiningDate,
+            jobLocation: location,
+            salaryConfigurationId: salaryConfigurationId,
+            grossCompensation: Number(grossAmount),
+            companyId: user.companyId,
+            employeePosition: role,
+        };
+
+        console.log("Payload being sent:", payload);
+
+        try {
+            const success = await OfferLetterDownload(payload);
+            if (success) {
+                toast.success("Offer Letter downloaded successfully");
+            } else {
+                toast.error("Failed to download Offer Letter");
+            }
+        } catch (err) {
+            console.error("Error:", err.response ? err.response.data : err);
+            toast.error("Failed to save or download Offer Letter");
+        }
     };
 
     return (
         <LayOut>
-            <div className='card'>
-                <div className='card-body'>
+            <div className='card' style={{ position: "relative", overflow: "hidden" }}>
+                <div
+                    style={{
+                        position: "absolute",
+                        top: "30%",
+                        left: "20%",
+                        width: "50%",
+                        height: "50%",
+                        backgroundImage: `url(${logoFileName})`,
+                        transform: "rotate(340deg)",
+                        backgroundSize: "contain",
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "center",
+                        opacity: 0.3,
+                        zIndex: 1,
+                        pointerEvents: "none",
+                    }}
+                />
+                <div className='card-body' style={{ paddingLeft: "20px", paddingRight: "20px", position: "relative", zIndex: "2" }}>
                     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
                         <div style={{ textAlign: "right" }}>
-                            <img src='assets/img/pathbreaker_logo.png' alt="" style={{ height: "100px", width: "250px" }} />
+                            {logoFileName ? (
+                                <img className="align-middle" src={logoFileName} alt="Logo" style={{ height: "80px", width: "180px" }} />
+                            ) : (
+                                <p>Logo</p>
+                            )}
                         </div>
-                        <h1 style={{ textAlign: "center", fontFamily: "serif", textDecoration: "underline", paddingTop: "30px" }}>Private & Confidential</h1>
+                        <h1 style={{ textAlign: "center", fontFamily: "serif", textDecoration: "underline", paddingTop: "20px" }}>Private & Confidential</h1>
                         <div style={{ display: "flex", justifyContent: "space-between" }}>
                             <p>Date: {date}</p>
-                            <p>Ref No: {date}</p>
+                            <p>
+                                Ref No: {isEditing ?
+                                    <input
+                                        type="text"
+                                        value={refNo}
+                                        onChange={e => setRefNo(e.target.value)} />
+                                    : <b>{refNo || 'N/A'}</b>}</p>
                         </div>
+                        <div style={{ position: "relative", width: "100%", height: "100%" }}></div>
                         <p><strong>To, {isEditing ? <input type="text" value={recipientName} onChange={e => setRecipientName(e.target.value)} /> : recipientName}</strong></p>
                         <p><strong>D/o {isEditing ? <input type="text" value={fatherName} onChange={e => setFatherName(e.target.value)} /> : fatherName}</strong></p>
                         <p><strong>{isEditing ? <input type="text" value={address} onChange={e => setAddress(e.target.value)} /> : address}</strong></p>
@@ -79,22 +211,47 @@ const Template = () => {
                             <p>
                                 <strong>Background Check:</strong> The Company reserves the right to verify the information furnished by you in your application for employment and through other documents. If it is found that you have misinterpreted any information in your application or have furnished any false information or have concealed/suppressed any relevant material facts, your services are liable to terminate any time, without any notice or compensation in lieu thereof. You will also not be eligible for any relieving or experience letter for your tenure with the Company.
                             </p>
-                            <p style={{ textAlign: "center" }}>CIN:- U72900AP2022PTC122622</p>
+                            <p style={{ textAlign: "center" }}>
+                                {hasCinNo ? `CIN:- ${companyDetails?.cinNo} ` :
+                                    hasCompanyRegNo ? `Registration:- ${companyDetails?.companyRegNo}` :
+                                        null}
+                            </p>
                             <hr />
-                            <div style={{ textAlign: "center" }}>
-                                <p>Pathbreaker Technologies</p>
-                                <p style={{ marginTop: "-15px" }}>2nd floor, Shilpi Valley, Nasuja, Plot.no. 36, Hyderabad, Telangana 500081</p>
-                                <p style={{ marginTop: "-15px" }}>PH: 040 48583619, Email: info@pathbreakertech.com | Web: https://pathbreakertech.com</p>
+                            <div style={{ padding: "2px", textAlign: "center" }}>
+                                <h6>{companyDetails?.companyName}</h6>
+                                <h6>{companyDetails?.companyAddress}</h6>
+                                <h6>PH: {companyDetails?.mobileNo}, Email: {companyDetails?.emailId} | Web: https://{companyDetails?.shortName}.com </h6>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className='card'>
-                <div className='card-body'>
+            <div className='card' style={{ position: "relative", overflow: "hidden" }}>
+                <div
+                    style={{
+                        position: "absolute",
+                        top: "30%",
+                        left: "20%",
+                        width: "50%",
+                        height: "50%",
+                        backgroundImage: `url(${logoFileName})`,
+                        transform: "rotate(340deg)",
+                        backgroundSize: "contain",
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "center",
+                        opacity: 0.3,
+                        zIndex: 1,
+                        pointerEvents: "none",
+                    }}
+                />
+                <div className='card-body' style={{ paddingLeft: "20px", paddingRight: "20px", position: "relative", zIndex: "2" }}>
                     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
                         <div style={{ textAlign: "right" }}>
-                            <img src='assets/img/pathbreaker_logo.png' alt="" style={{ height: "100px", width: "250px" }} />
+                            {logoFileName ? (
+                                <img className="align-middle" src={logoFileName} alt="Logo" style={{ height: "80px", width: "180px" }} />
+                            ) : (
+                                <p>Logo</p>
+                            )}
                         </div>
                         <p style={{ paddingTop: "30px" }}>
                             <strong>Place of Employment and Transfer:</strong>
@@ -105,7 +262,15 @@ const Template = () => {
                             Public/festival holidays would be divided into fixed holidays and an optional holiday (floater) for per Calendar year, Total Number of holidays may vary as per work location and / or operation
                         </p>
                         <p>
-                            You would be eligible for the annual leaves of 21 days (on pro rata basis) i.e. you would be eligible for the leaves of 1.75 days per month for every calendar (January to December) year. However, you can utilize the same only after completion of probation period with VBRS. These leaves of six months will get credited to your leave balance account.
+                            You would be eligible for the annual leaves of 21 days (on pro rata basis) i.e. you would be eligible for the leaves of 1.75 days per month for every calendar (January to December) year. However, you can utilize the same only after completion of probation period with  <strong>
+                                {isEditing ?
+                                    <input
+                                        type="text"
+                                        value={companyName}
+                                        onChange={e => setCompanyName(e.target.value)}
+                                    />
+                                    : <b>Company Name</b>}
+                            </strong> . These leaves of six months will get credited to your leave balance account.
                         </p>
                         <p>
                             <strong> Un-availed Leave cannot be encashed at the end of your service.</strong> Leaves can be accumulated till the end of calendar year only.
@@ -117,7 +282,15 @@ const Template = () => {
                         <p>
                             <strong> Cessation of Services and Notice Period:</strong>
                             If you wish to leave the services of the Company you may do so under the following conditions:
-                            You need to share formal resignation email during working hours to VBRS HR Team after formal discussion with your reporting manager. Resignation sent on weekly / public holidays, after working hours will be considered with effect from next business day. Resignation will not be considered if you have tendered the same while being on leave. You need to serve 30 days’ notice period from the date of resignation based on designation.
+                            You need to share formal resignation email during working hours to  <strong>
+                                {isEditing ?
+                                    <input
+                                        type="text"
+                                        value={companyName}
+                                        onChange={e => setCompanyName(e.target.value)}
+                                    />
+                                    : <b>Company Name</b>}
+                            </strong>  HR Team after formal discussion with your reporting manager. Resignation sent on weekly / public holidays, after working hours will be considered with effect from next business day. Resignation will not be considered if you have tendered the same while being on leave. You need to serve 30 days’ notice period from the date of resignation based on designation.
                         </p>
                         <p>
                             <strong> Notice Period without Cause:</strong>
@@ -134,7 +307,13 @@ const Template = () => {
                             You are requested to keep the compensation information highly confidential.
                         </p>
                         <p style={{ marginTop: "-15px" }}>
-                            We look forward to your joining <strong>[Company Name]</strong> soon.
+                            We look forward to your joining <strong> {isEditing ?
+                                <input
+                                    type="text"
+                                    value={companyName}
+                                    onChange={e => setCompanyName(e.target.value)}
+                                />
+                                : companyName}</strong> soon.
                         </p>
                         <p>
                             Would appreciate you acknowledging the receipt of this offer and kindly <strong>send us your acceptance of this offer by a written mail and signed copy within the next 24 hours.</strong>
@@ -142,118 +321,103 @@ const Template = () => {
                         <p>
                             Please do not hesitate to contact us in case you have any queries.
                         </p>
-                        <p style={{ textAlign: "center" }}>CIN:- U72900AP2022PTC122622</p>
+                        <p style={{ textAlign: "center" }}>
+                            {hasCinNo ? `CIN:- ${companyDetails?.cinNo}` :
+                                hasCompanyRegNo ? ` Registration:- ${companyDetails?.companyRegNo}` :
+                                    null}
+                        </p>
                         <hr />
-                        <div style={{ textAlign: "center" }}>
-                            <p>Pathbreaker Technologies</p>
-                            <p style={{ marginTop: "-15px" }}>2nd floor, Shilpi Valley, Nasuja, Plot.no. 36, Hyderabad, Telangana 500081</p>
-                            <p style={{ marginTop: "-15px" }}>PH: 040 48583619, Email: info@pathbreakertech.com | Web: https://pathbreakertech.com</p>
+                        <div style={{ padding: "2px", textAlign: "center" }}>
+                            <h6>{companyDetails?.companyName}</h6>
+                            <h6>{companyDetails?.companyAddress}</h6>
+                            <h6>PH: {companyDetails?.mobileNo}, Email: {companyDetails?.emailId} | Web: https://{companyDetails?.shortName}.com </h6>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className='card'>
-                <div className='card-body'>
+            <div className='card' style={{ position: "relative", overflow: "hidden" }}>
+                <div
+                    style={{
+                        position: "absolute",
+                        top: "30%",
+                        left: "20%",
+                        width: "50%",
+                        height: "50%",
+                        backgroundImage: `url(${logoFileName})`,
+                        transform: "rotate(340deg)",
+                        backgroundSize: "contain",
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "center",
+                        opacity: 0.3,
+                        zIndex: 1,
+                        pointerEvents: "none",
+                    }}
+                />
+                <div className='card-body' style={{ paddingLeft: "20px", paddingRight: "20px", position: "relative", zIndex: "2" }}>
                     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
                         <div style={{ textAlign: "right" }}>
-                            <img src='assets/img/pathbreaker_logo.png' alt="" style={{ height: "100px", width: "250px" }} />
+                            {logoFileName ? (
+                                <img className="align-middle" src={logoFileName} alt="Logo" style={{ height: "80px", width: "180px" }} />
+                            ) : (
+                                <p>Logo</p>
+                            )}
                         </div>
                         <h3 style={{ textAlign: "center", fontFamily: "serif", textDecoration: "underline", paddingTop: "30px" }}>Annexure - 1</h3>
                         <p>
                             Fixed Salary breakup
                         </p>
                     </div>
-                    <table>
-                        <tr>
-                            <th>Particulars</th>
-                            <th>Per Month (INR)</th>
-                            <th>Per Annum (INR)</th>
-                        </tr>
-                        <tr>
-                            <td>Basic</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>HRA</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>Medical Reimb</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>Conveyance All</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>Special allowance</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>Phone Allowance</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>Travel Allowance</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Gross Salary</strong> </td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>PF Employer Contribution</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>ESIC Employer Contribution</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Gross CTC</strong></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>ESIC Employer Contribution</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>PT</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>Insurance</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>ESIC Employee Contribution</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Total Deductions</strong></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Net Salary (Pre-Taxation)</strong></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
+                    <table className="table">
+                        <thead>
+                            <tr>
+                                <th>Particulars</th>
+                                <th>Per Month (INR)</th>
+                                <th>Per Annum (INR)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {salaryStructures.map(structure => (
+                                <React.Fragment key={structure.id}>
+                                    {/* Display Allowances */}
+                                    {Object.entries(structure.allowances).map(([key, value]) => {
+                                        const allowanceAmount = (grossAmount * (parseFloat(value) / 100));
+                                        return (
+                                            <tr key={key}>
+                                                <td>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</td>
+                                                <td>{allowanceAmount.toFixed(2) / 12}</td>
+                                                <td>{allowanceAmount.toFixed(2)}</td>
+                                            </tr>
+                                        );
+                                    })}
+                                    <tr>
+                                        <td><strong>Gross (CTC)</strong></td>
+                                        <td>{grossAmount / 12}</td>
+                                        <td>{grossAmount}</td>
+                                    </tr>
+                                    {/* Display Deductions */}
+                                    {Object.entries(structure.deductions).map(([key, value]) => {
+                                        const deductionAmount = (grossAmount * (parseFloat(value) / 100));
+                                        return (
+                                            <tr key={key}>
+                                                <td>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</td>
+                                                <td>{deductionAmount.toFixed(2) / 12}</td>
+                                                <td>{deductionAmount.toFixed(2)}</td>
+                                            </tr>
+                                        );
+                                    })}
+                                    <tr>
+                                        <td><strong>Total Deductions</strong></td>
+                                        <td>{calculatedValues.totalDeductions ? calculatedValues.totalDeductions.toFixed(2) / 12 : 0}</td>
+                                        <td>{calculatedValues.totalDeductions ? calculatedValues.totalDeductions.toFixed(2) : 0}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Net Salary</strong></td>
+                                        <td>{calculatedValues.netSalary ? (calculatedValues.netSalary / 12).toFixed(2) : 0}</td>
+                                        <td>{calculatedValues.netSalary ? calculatedValues.netSalary.toFixed(2) : 0}</td>
+                                    </tr>
+                                </React.Fragment>
+                            ))}
+                        </tbody>
                     </table>
                     <p style={{ paddingTop: "30px" }}>
                         Net Salary (Pretaxation) may vary due to change in applicable statutory deductions such as P. Tax, PF, ESIC, LWF etc.
@@ -267,20 +431,45 @@ const Template = () => {
                     <p>
                         * Pan Card submission is mandatory for the disbursement of the salary.
                     </p>
-                    <p style={{ textAlign: "center" }}>CIN:- U72900AP2022PTC122622</p>
+                    <p style={{ textAlign: "center" }}>
+                        {hasCinNo ? ` CIN:- ${companyDetails?.cinNo} ` :
+                            hasCompanyRegNo ? `Registration:- ${companyDetails?.companyRegNo}` :
+                                null}
+                    </p>
                     <hr />
-                    <div style={{ textAlign: "center" }}>
-                        <p>Pathbreaker Technologies</p>
-                        <p style={{ marginTop: "-15px" }}>2nd floor, Shilpi Valley, Nasuja, Plot.no. 36, Hyderabad, Telangana 500081</p>
-                        <p style={{ marginTop: "-15px" }}>PH: 040 48583619, Email: info@pathbreakertech.com | Web: https://pathbreakertech.com</p>
+                    <div style={{ padding: "2px", textAlign: "center" }}>
+                        <h6>{companyDetails?.companyName}</h6>
+                        <h6>{companyDetails?.companyAddress}</h6>
+                        <h6>PH: {companyDetails?.mobileNo}, Email: {companyDetails?.emailId} | Web: https://{companyDetails?.shortName}.com </h6>
                     </div>
                 </div>
             </div>
-            <div className='card'>
-                <div className='card-body'>
+            <div className='card' style={{ position: "relative", overflow: "hidden" }}>
+                <div
+                    style={{
+                        position: "absolute",
+                        top: "30%",
+                        left: "20%",
+                        width: "50%",
+                        height: "50%",
+                        backgroundImage: `url(${logoFileName})`,
+                        transform: "rotate(340deg)",
+                        backgroundSize: "contain",
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "center",
+                        opacity: 0.3,
+                        zIndex: 3,
+                        pointerEvents: "none",
+                    }}
+                />
+                <div className='card-body' style={{ paddingLeft: "20px", paddingRight: "20px", position: "relative", zIndex: "2" }}>
                     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
                         <div style={{ textAlign: "right" }}>
-                            <img src='assets/img/pathbreaker_logo.png' alt="" style={{ height: "100px", width: "250px" }} />
+                            {logoFileName ? (
+                                <img className="align-middle" src={logoFileName} alt="Logo" style={{ height: "80px", width: "180px" }} />
+                            ) : (
+                                <p>Logo</p>
+                            )}
                         </div>
                         <h3 style={{ textAlign: "center", fontFamily: "serif", textDecoration: "underline", paddingTop: "30px" }}>Annexure - 2</h3>
                         <p>
@@ -318,84 +507,96 @@ const Template = () => {
                             <li>AADHAR Card</li>
                         </ul>
                     </div>
-                    <table>
+                    <table className="table" style={{zIndex:"-1"}}>
                         <tr>
                             <td colSpan={2}>Fill the following information and Submit on your Date of Joining along with your other documents.</td>
 
                         </tr>
                         <tr>
+                            <td style={{textAlign:"left"}}>Emergency Contact No.</td>
                             <td>Emergency Contact No.</td>
-                            <td>Emergency Contact No.</td>
                         </tr>
                         <tr>
-                            <td>Blood Group (Self)</td>
+                            <td style={{textAlign:"left"}}>Blood Group (Self)</td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td>PAN Card No (Mandatory)</td>
+                            <td style={{textAlign:"left"}}>PAN Card No (Mandatory)</td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td>Marital Status (Single /Married)</td>
+                            <td style={{textAlign:"left"}}>Marital Status (Single /Married)</td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td>Husband’s / Wife’s Full Name </td>
+                            <td style={{textAlign:"left"}}>Husband’s / Wife’s Full Name </td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td>Husband’s / Wife’s Date of Birth, Age </td>
+                            <td style={{textAlign:"left"}}>Husband’s / Wife’s Date of Birth, Age </td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td>Husband’s / Wife’s blood group</td>
+                            <td style={{textAlign:"left"}}>Husband’s / Wife’s blood group</td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td>Father's Full Name </td>
+                            <td style={{textAlign:"left"}}>Father's Full Name </td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td>Father's Date of Birth, Age</td>
+                            <td style={{textAlign:"left"}}>Father's Date of Birth, Age</td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td>Mother's Full Name </td>
+                            <td style={{textAlign:"left"}}>Mother's Full Name </td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td>Mother's Date of Birth, Age</td>
+                            <td style={{textAlign:"left"}}>Mother's Date of Birth, Age</td>
                             <td></td>
                         </tr>
                     </table>
                     <p style={{ marginTop: "30px" }}><strong>Please Note:</strong></p>
-                    <ul style={{listStyleType:"none"}}>
+                    <ul style={{ listStyleType: "none" }}>
                         <li>Completion and submission of all the above-mentioned documents/forms, which would be given to you along with the joining kit, is mandatory.</li>
-                        <li style={{paddingTop:"15px"}}>Noncompliance with this would entail your joining kit being declared as incomplete for which you as
+                        <li style={{ paddingTop: "15px" }}>Noncompliance with this would entail your joining kit being declared as incomplete for which you as
                             the employee would be solely responsible. Consequently, this would delay/impact on joining process.
                         </li>
-                        <li style={{paddingTop:"15px"}}>Your present and permanent addresses/ contact details, as mentioned in your application form, are put on company’s record. You would be expected to inform the company about any change in your address and telephone numbers.</li>
+                        <li style={{ paddingTop: "15px" }}>Your present and permanent addresses/ contact details, as mentioned in your application form, are put on company’s record. You would be expected to inform the company about any change in your address and telephone numbers.</li>
                     </ul>
-                    <p style={{ textAlign: "center" }}>CIN:- U72900AP2022PTC122622</p>
+                    <p style={{ textAlign: "center" }}>
+                        {hasCinNo ? ` CIN:- ${companyDetails?.cinNo} ` :
+                            hasCompanyRegNo ? `Registration:- ${companyDetails?.companyRegNo}` :
+                                null}
+                    </p>
                     <hr />
-                    <div style={{ textAlign: "center" }}>
-                        <p>Pathbreaker Technologies</p>
-                        <p style={{ marginTop: "-15px" }}>2nd floor, Shilpi Valley, Nasuja, Plot.no. 36, Hyderabad, Telangana 500081</p>
-                        <p style={{ marginTop: "-15px" }}>PH: 040 48583619, Email: info@pathbreakertech.com | Web: https://pathbreakertech.com</p>
+                    <div style={{ padding: "2px", textAlign: "center" }}>
+                        <h6>{companyDetails?.companyName}</h6>
+                        <h6>{companyDetails?.companyAddress}</h6>
+                        <h6>PH: {companyDetails?.mobileNo}, Email: {companyDetails?.emailId} | Web: https://{companyDetails?.shortName}.com </h6>
                     </div>
                 </div>
             </div>
-            {/* <div className="col-12 mt-4  d-flex justify-content-end" style={{ background: "none" }}>
-                <button onClick={handleEditToggle}
-                    className={
-                        isEditing
-                            ? "btn btn-secondary"
-                            : "btn btn-danger bt-lg"
-                    }>
-                    {isEditing ? "Cancel" : "Edit"}{" "}
+            <div className="col-12 mt-4 d-flex justify-content-between" style={{ background: "none" }}>
+                <button
+                    onClick={handleEditToggle}
+                    className={isEditing ? "btn btn-secondary" : "btn btn-danger"}
+                >
+                    {isEditing ? "Cancel" : "Edit"}
                 </button>
-                {isEditing && <button style={{ marginLeft: '20px' }} className='btn btn-primary' onClick={handleSave}>Save</button>}
-            </div> */}
+
+                <button
+                    type="button"
+                    className={isEditing ? "btn btn-primary" : "btn btn-outline-primary"}
+                    onClick={isEditing ? handleSave : handleDownload}
+                    style={{ marginLeft: '20px' }}
+                >
+                    <span className="m-2">{isEditing ? "Save" : "Download"}</span>
+                    {!isEditing && <Download size={18} className="ml-1" />}
+                </button>
+            </div>
+
         </LayOut >
     );
 };

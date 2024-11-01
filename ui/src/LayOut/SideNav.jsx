@@ -7,6 +7,7 @@ const SideNav = () => {
   const [isAttendanceOpen, setIsAttendanceOpen] = useState(false); // State for managing Attendance dropdown
   const [isCompanyOpen, setIsCompanyOpen] = useState(false); // State for managing Company dropdown
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isLettresOpen, setIsLettersOpen] = useState(false);
   const location = useLocation();
   const { user = {}, logoFileName, loading } = useAuth();
 
@@ -38,6 +39,19 @@ const SideNav = () => {
 
   useEffect(() => {
     if (
+      location.pathname === "/offerLetters" ||
+      location.pathname === "/experienceLetter" ||
+      location.pathname === "/appraisalLetter" ||
+      location.pathname === "/relievingLetter" 
+    ) {
+      setIsLettersOpen(true);
+    } else {
+      setIsLettersOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
       location.pathname === "/addAttendance" ||
       location.pathname === "/attendanceList" ||
       location.pathname === "/attendanceReport"
@@ -59,125 +73,12 @@ const SideNav = () => {
     }
   }, [location]);
 
-  useEffect(() => {
-    if (
-      location.pathname === "/companyRegistration" ||
-      location.pathname.startsWith("/companyView")
-    ) {
-      setIsCompanyOpen(true);
-    } else {
-      setIsCompanyOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/employeeSalaryStructure" ||
-      location.pathname === "/employeeSalaryList" ||
-      location.pathname === "/payslipGeneration" ||
-      location.pathname === "/payslipsList" ||
-      location.pathname === "/increment" ||
-      location.pathname === "/incrementList"
-    ) {
-      setIsPayrollOpen(true);
-    } else {
-      setIsPayrollOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/addAttendance" ||
-      location.pathname === "/attendanceList" ||
-      location.pathname === "/attendanceReport"
-    ) {
-      setIsAttendanceOpen(true);
-    } else {
-      setIsAttendanceOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/companyRegistration" ||
-      location.pathname.startsWith("/companyView")
-    ) {
-      setIsCompanyOpen(true);
-    } else {
-      setIsCompanyOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/employeeSalaryStructure" ||
-      location.pathname === "/employeeSalaryList" ||
-      location.pathname === "/payslipGeneration" ||
-      location.pathname === "/payslipsList" ||
-      location.pathname === "/increment" ||
-      location.pathname === "/incrementList"
-    ) {
-      setIsPayrollOpen(true);
-    } else {
-      setIsPayrollOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/addAttendance" ||
-      location.pathname === "/attendanceList" ||
-      location.pathname === "/attendanceReport"
-    ) {
-      setIsAttendanceOpen(true);
-    } else {
-      setIsAttendanceOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/companyRegistration" ||
-      location.pathname.startsWith("/companyView")
-    ) {
-      setIsCompanyOpen(true);
-    } else {
-      setIsCompanyOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/employeeSalaryStructure" ||
-      location.pathname === "/employeeSalaryList" ||
-      location.pathname === "/payslipGeneration" ||
-      location.pathname === "/payslipsList" ||
-      location.pathname === "/increment" ||
-      location.pathname === "/incrementList"
-    ) {
-      setIsPayrollOpen(true);
-    } else {
-      setIsPayrollOpen(false);
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (
-      location.pathname === "/addAttendance" ||
-      location.pathname === "/attendanceList" ||
-      location.pathname === "/attendanceReport"
-    ) {
-      setIsAttendanceOpen(true);
-    } else {
-      setIsAttendanceOpen(false);
-    }
-  }, [location]);
-
   const togglePayroll = (e) => {
     e.preventDefault(); // Prevent default anchor behavior
     setIsPayrollOpen(!isPayrollOpen);
     setIsCompanyOpen(false);
     setIsAttendanceOpen(false);
+    setIsLettersOpen(false);
   };
 
   const toggleCompany = (e) => {
@@ -185,6 +86,7 @@ const SideNav = () => {
     setIsCompanyOpen(!isCompanyOpen);
     setIsAttendanceOpen(false);
     setIsPayrollOpen(false);
+    setIsLettersOpen(false);
   };
 
   const toggleAttendance = (e) => {
@@ -192,6 +94,7 @@ const SideNav = () => {
     setIsAttendanceOpen(!isAttendanceOpen);
     setIsCompanyOpen(false);
     setIsPayrollOpen(false);
+    setIsLettersOpen(false);
   };
 
   const toggleSettings = (e) => {
@@ -200,6 +103,16 @@ const SideNav = () => {
     setIsCompanyOpen(false);
     setIsAttendanceOpen(false);
     setIsPayrollOpen(false);
+    setIsLettersOpen(false);
+  }; 
+
+  const toggleLetters = (e) => {
+    e.preventDefault(); // Prevent default anchor behavior
+    setIsSettingsOpen(false);
+    setIsCompanyOpen(false);
+    setIsAttendanceOpen(false);
+    setIsPayrollOpen(false);
+    setIsLettersOpen(!isLettresOpen);
   }; 
 
 
@@ -367,6 +280,73 @@ const SideNav = () => {
                     Employees
                   </span>
                 </a>
+              </li>
+              <li className="sidebar-item has-dropdown">
+                <a
+                  className="sidebar-link collapsed d-flex justify-content-between align-items-center"
+                  data-bs-target="#attendenceManagement"
+                  data-bs-toggle="collapse"
+                  href
+                  onClick={toggleLetters}
+                >
+                  <span className="align-middle">
+                    <i
+                      className="bi bi-calendar-check-fill"
+                      style={{ fontSize: "medium" }}
+                    ></i>
+                  </span>{" "}
+                  <span className="align-middle" >
+                    Letters
+                  </span>
+                  <i
+                    className={`bi ${isLettresOpen ? "bi-chevron-up" : "bi-chevron-down"
+                      } ms-auto`}
+                  ></i>
+                </a>
+                <ul
+                  id="attendenceManagement"
+                  className={`sidebar-dropDown list-unstyled collapse ${isLettresOpen ? "show" : ""
+                    }`}
+                >
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${location.pathname === "/offerLetters" ? "active" : ""
+                      }`}
+                  >
+                    <a className="sidebar-link" href={"/offerLetters"}>
+                      Offer Letters
+                    </a>
+                  </li>
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${location.pathname === "/experienceLetter" ? "active" : ""
+                      }`}
+                  >
+                    <a className="sidebar-link" href={"/experienceLetter"}>
+                     Experience Letters
+                    </a>
+                  </li>
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${
+                      location.pathname === "/appraisalLetter" ? "active" : ""
+                    }`}
+                  >
+                    <Link className="sidebar-link" to={"/appraisalLetter"}>
+                      Appraisal Letters
+                    </Link>
+                  </li>
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${
+                      location.pathname === "/relievingLetter" ? "active" : ""
+                    }`}
+                  >
+                    <Link className="sidebar-link" to={"/relievingLetter"}>
+                      Relieving Letters
+                    </Link>
+                  </li>
+                </ul>
               </li>
               {/* <li
                             className={`sidebar-item ${
@@ -628,7 +608,7 @@ const SideNav = () => {
                       }`}
                   >
                     <a className="sidebar-link" href={"/offerLetters"}>
-                      Offer Letters
+                      Offer Letter Templates
                     </a>
                   </li>
                 </ul>
@@ -643,7 +623,7 @@ const SideNav = () => {
                       }`}
                   >
                     <a className="sidebar-link" href={"/experienceLetter"}>
-                      Experience Letter
+                      Experience Letter Templates
                     </a>
                   </li>
                 </ul>
