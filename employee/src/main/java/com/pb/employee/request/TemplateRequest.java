@@ -1,18 +1,17 @@
 package com.pb.employee.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TemplateRequest {
 
+    @NotBlank(message = "{companyId.required}")
     private String companyId;
-
     private String payslipTemplateNo;
     private String experienceTemplateNo;
     private String relievingTemplateNo;

@@ -1,6 +1,7 @@
 package com.pb.employee.persistance.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,14 +16,20 @@ import lombok.experimental.SuperBuilder;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TemplateEntity implements Entity  {
 
-    private String templateId;
+    private String id;
     private String companyId;
-
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String payslipTemplateNo;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String experienceTemplateNo;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String relievingTemplateNo;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String joiningTemplateNo;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String offerLetterTemplateNo;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String serviceLetterTemplateNo;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String type;
 }

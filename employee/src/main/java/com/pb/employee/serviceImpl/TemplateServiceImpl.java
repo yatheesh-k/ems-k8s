@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -47,25 +48,15 @@ public class TemplateServiceImpl implements TemplateService {
         if (companyEntity == null) {
             log.error("CompanyId not exists : {} ", templateRequest.getCompanyId());
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.COMPANY_NOT_EXIST),
-                     HttpStatus.NOT_FOUND);
+                    HttpStatus.NOT_FOUND);
         }
         CompanyUtils.unmaskCompanyProperties(companyEntity,request);
         String index = ResourceIdUtils.generateCompanyIndex(companyEntity.getShortName());
-
         templateEntity = openSearchOperations.getTemplateById(resourceId, null,index);
-            if (templateEntity != null) {
-            // Check if templateEntity exists
-            // If the resourceId already exists, return a conflict response
-            log.error("Template with resourceId {} already exists for companyId: {}", resourceId, templateRequest.getCompanyId());
-            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.TEMPLATE_EXIST),
-                    HttpStatus.CONFLICT);
-        }
-        try {
-            // Step 3: If no templates exist, save the new templates
-            Entity maskTemplateProperties = CompanyUtils.maskTemplateProperties(templateRequest, resourceId, companyEntity.getId());
 
+        try {
             // Use the generated index for saving the entity
-            Entity result = openSearchOperations.saveEntity(maskTemplateProperties, resourceId, index);
+            openSearchOperations.saveEntity(templateEntity, resourceId, index);
 
             log.info("Successfully saved template for companyId: {}", templateRequest.getCompanyId());
             return new ResponseEntity<>(
@@ -89,8 +80,6 @@ public class TemplateServiceImpl implements TemplateService {
 
         try {
             templateEntities = openSearchOperations.getCompanyTemplates(companyName);
-
-            CompanyUtils.unmaskTemplateProperties(templateEntities);
 
         } catch (Exception ex) {
             log.error("Exception while fetching employees for company {}: {}", companyName, ex.getMessage());

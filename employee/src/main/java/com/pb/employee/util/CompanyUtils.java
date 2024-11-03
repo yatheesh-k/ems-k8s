@@ -497,7 +497,7 @@ public class CompanyUtils {
 
             if (companyRequest.getCinNo() != null && !companyEntity.getCinNo().isEmpty() && companyEntity.getCinNo() != null) {
                 cinNo = new String(Base64.getDecoder().decode(companyEntity.getCinNo().getBytes()));
-                if (cinNo.isEmpty() && cinNo.equals(companyRequest.getCinNo())){
+                if (cinNo.equals(companyRequest.getCinNo())){
                     responseBody.put(Constants.DUPLICATE_CIN_NO, companyRequest.getCinNo());
                 }
 
@@ -868,82 +868,13 @@ public class CompanyUtils {
         g2d.translate(-newWidth / 2, -newHeight / 2);
 
         Image scaledImage = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-        g2d.drawImage(scaledImage, 0, 0, null);
 
+        // Apply opacity directly to the image being drawn without background color.
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, rotatedWidth, rotatedHeight);
+        g2d.drawImage(scaledImage, 0, 0, null);
 
         g2d.dispose();
 
         return watermarkedImage;
-    }
-    public static Entity maskTemplateProperties(TemplateRequest templateRequest, String resourceId, String companyId) {
-        String experienceTemplateNo = null, payslipTemplateNo = null, relievingTemplateNo = null,
-                joiningTemplateNo=null, offerLetterTemplateNo = null,serviceLetterTemplateNo=null;
-        if(templateRequest.getExperienceTemplateNo() != null) {
-            experienceTemplateNo = Base64.getEncoder().encodeToString(templateRequest.getExperienceTemplateNo().toString().getBytes());
-        }
-        if(templateRequest.getPayslipTemplateNo() != null) {
-            payslipTemplateNo = Base64.getEncoder().encodeToString(templateRequest.getPayslipTemplateNo().toString().getBytes());
-        }
-        if(templateRequest.getRelievingTemplateNo() != null) {
-            relievingTemplateNo = Base64.getEncoder().encodeToString(templateRequest.getRelievingTemplateNo().toString().getBytes());
-        }
-        if(templateRequest.getJoiningTemplateNo() != null) {
-            joiningTemplateNo = Base64.getEncoder().encodeToString(templateRequest.getJoiningTemplateNo().toString().getBytes());
-        }
-        if(templateRequest.getOfferLetterTemplateNo() != null) {
-            offerLetterTemplateNo = Base64.getEncoder().encodeToString(templateRequest.getOfferLetterTemplateNo().toString().getBytes());
-        }
-        if(templateRequest.getServiceLetterTemplateNo() != null) {
-            serviceLetterTemplateNo = Base64.getEncoder().encodeToString(templateRequest.getServiceLetterTemplateNo().toString().getBytes());
-        }
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        TemplateEntity entity = objectMapper.convertValue(templateRequest, TemplateEntity.class);
-        entity.setTemplateId(resourceId);
-        entity.setCompanyId(companyId);
-        entity.setJoiningTemplateNo(joiningTemplateNo);
-        entity.setExperienceTemplateNo(experienceTemplateNo);
-        entity.setPayslipTemplateNo(payslipTemplateNo);
-        entity.setRelievingTemplateNo(relievingTemplateNo);
-        entity.setOfferLetterTemplateNo(offerLetterTemplateNo);
-        entity.setServiceLetterTemplateNo(serviceLetterTemplateNo);
-        entity.setType(Constants.TEMPLATE);
-        return entity;
-    }
-
-    public static void unmaskTemplateProperties(TemplateEntity template) {
-        String experienceTemplateNo = null, payslipTemplateNo = null, relievingTemplateNo = null,
-                joiningTemplateNo = null, offerLetterTemplateNo = null, serviceLetterTemplateNo = null;
-
-        // Decode each template number field if it exists
-        if (template.getExperienceTemplateNo() != null) {
-            experienceTemplateNo = new String(Base64.getDecoder().decode(template.getExperienceTemplateNo()));
-        }
-        if (template.getPayslipTemplateNo() != null) {
-            payslipTemplateNo = new String(Base64.getDecoder().decode(template.getPayslipTemplateNo()));
-        }
-        if (template.getRelievingTemplateNo() != null) {
-            relievingTemplateNo = new String(Base64.getDecoder().decode(template.getRelievingTemplateNo()));
-        }
-        if (template.getJoiningTemplateNo() != null) {
-            joiningTemplateNo = new String(Base64.getDecoder().decode(template.getJoiningTemplateNo()));
-        }
-        if (template.getOfferLetterTemplateNo() != null) {
-            offerLetterTemplateNo = new String(Base64.getDecoder().decode(template.getOfferLetterTemplateNo()));
-        }
-        if (template.getServiceLetterTemplateNo() != null) {
-            serviceLetterTemplateNo = new String(Base64.getDecoder().decode(template.getServiceLetterTemplateNo()));
-        }
-
-        template.setJoiningTemplateNo(joiningTemplateNo);
-        template.setExperienceTemplateNo(experienceTemplateNo);
-        template.setPayslipTemplateNo(payslipTemplateNo);
-        template.setRelievingTemplateNo(relievingTemplateNo);
-        template.setOfferLetterTemplateNo(offerLetterTemplateNo);
-        template.setServiceLetterTemplateNo(serviceLetterTemplateNo);
-
     }
 }

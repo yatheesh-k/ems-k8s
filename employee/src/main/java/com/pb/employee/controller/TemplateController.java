@@ -2,10 +2,8 @@ package com.pb.employee.controller;
 
 
 import com.pb.employee.exception.EmployeeException;
-import com.pb.employee.request.EmployeeRequest;
-import com.pb.employee.request.EmployeeUpdateRequest;
 import com.pb.employee.request.TemplateRequest;
-import com.pb.employee.service.EmployeeService;
+
 import com.pb.employee.service.TemplateService;
 import com.pb.employee.util.Constants;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +24,7 @@ public class TemplateController {
     @Autowired
     private TemplateService templateService;
 
-    @RequestMapping(value = "template", method = RequestMethod.POST)
+    @RequestMapping(value = "template", method = RequestMethod.PATCH)
     @io.swagger.v3.oas.annotations.Operation(security = { @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY) },
             summary = "${api.addTemplate.tag}", description = "${api.addTemplate.description}")
     @ResponseStatus(HttpStatus.CREATED)
