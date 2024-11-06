@@ -592,16 +592,17 @@ public class PayslipUtils {
         payslipEntity.setType(Constants.PAYSLIP);
         return payslipEntity;
     }
-    public static Map<String, Map<String, String>> calculateSalaryComponents(SalaryConfigurationEntity salaryConfiguration, Double grossAnnualSalary) {
+    public static Map<String, Map<String, String>> calculateSalaryComponents(SalaryConfigurationEntity salaryConfiguration, String grossAnnualSalary) {
         Map<String, Map<String, String>> components = new LinkedHashMap<>(); // Use LinkedHashMap to maintain order
 
+        Double grossAmount = Double.parseDouble(grossAnnualSalary);
         // Convert annual gross salary to monthly salary for Basic Salary
-        Double grossMonthlySalary = grossAnnualSalary / 12;
+        Double grossMonthlySalary = grossAmount / 12;
 
         // Store Basic Salary breakdown without adding to total initially
         Map<String, String> basicSalaryData = new HashMap<>();
         basicSalaryData.put(Constants.MONTH, formatValue(String.valueOf(grossMonthlySalary)));
-        basicSalaryData.put(Constants.ANNUAL, formatValue(String.valueOf(grossAnnualSalary)));
+        basicSalaryData.put(Constants.ANNUAL, formatValue(String.valueOf(grossAmount)));
         components.put(Constants.BASIC_SALARY, basicSalaryData); // Add Basic Salary first but don’t yet add to total
 
         double totalMonthlySalary = 0.0;
@@ -614,7 +615,7 @@ public class PayslipUtils {
         if (allowances != null) {
             for (Map.Entry<String, String> entry : allowances.entrySet()) {
                 // Calculate allowance values
-                double allowanceAnnualValue = Double.parseDouble(persentageOrValueForYearly(entry.getValue(), grossAnnualSalary));
+                double allowanceAnnualValue = Double.parseDouble(persentageOrValueForYearly(entry.getValue(), grossAmount));
                 double allowanceMonthlyValue = allowanceAnnualValue / 12;
 
                 // Accumulate allowance totals for later addition to Gross Salary
@@ -637,7 +638,7 @@ public class PayslipUtils {
         Map<String, String> deductions = salaryConfiguration.getDeductions();
         if (deductions != null) {
             for (Map.Entry<String, String> entry : deductions.entrySet()) {
-                double deductionAnnualValue = Double.parseDouble(persentageOrValueForYearly(entry.getValue(), grossAnnualSalary));
+                double deductionAnnualValue = Double.parseDouble(persentageOrValueForYearly(entry.getValue(), grossAmount));
                 double deductionMonthlyValue = deductionAnnualValue / 12;
 
                 totalDedMonthlySalary +=deductionMonthlyValue;
@@ -649,9 +650,6 @@ public class PayslipUtils {
                 components.put(formatComponentName(entry.getKey()), deductionData);
             }
         }
-
-
-
         // Add Gross Salary to components
 
         Map<String, String> grossSalaryCtcData = new HashMap<>();
@@ -665,7 +663,7 @@ public class PayslipUtils {
         return components;
     }
 
-    public static Map<String, Map<String, String>> calculateSalaryYearlyComponents(SalaryConfigurationEntity salaryConfiguration, Double grossAnnualSalary) {
+    public static Map<String, Map<String, String>> calculateSalaryYearlyComponents(SalaryConfigurationEntity salaryConfiguration, String grossAnnualSalary) {
         Map<String, Map<String, String>> components = new LinkedHashMap<>(); // Use LinkedHashMap to maintain order
 
         // Store Basic Salary breakdown without adding to total initially
@@ -679,7 +677,7 @@ public class PayslipUtils {
         if (allowances != null) {
             for (Map.Entry<String, String> entry : allowances.entrySet()) {
                 // Calculate allowance values
-                double allowanceAnnualValue = Double.parseDouble(persentageOrValue(entry.getValue(), grossAnnualSalary));
+                double allowanceAnnualValue = Double.parseDouble(persentageOrValue(entry.getValue(), Double.parseDouble(grossAnnualSalary)));
 
                 // Accumulate allowance totals for later addition to Gross Salary
                 totalAnnualSalary += allowanceAnnualValue;
@@ -697,7 +695,7 @@ public class PayslipUtils {
         Map<String, String> deductions = salaryConfiguration.getDeductions();
         if (deductions != null) {
             for (Map.Entry<String, String> entry : deductions.entrySet()) {
-                double deductionAnnualValue = Double.parseDouble(persentageOrValue(entry.getValue(), grossAnnualSalary));
+                double deductionAnnualValue = Double.parseDouble(persentageOrValue(entry.getValue(), Double.parseDouble(grossAnnualSalary)));
                 double deductionMonthlyValue = deductionAnnualValue / 12;
 
                 // Add formatted deduction to components only

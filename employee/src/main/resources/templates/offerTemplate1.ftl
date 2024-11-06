@@ -359,7 +359,7 @@
             been duly served.
         </p>
     </div>
-    <h5 style="text-align: center; margin-top: 55px;">
+    <h5 style="text-align: center; margin-top: 40px;">
         <#if company.cinNo?has_content>
             CIN: ${company.cinNo}
         <#elseif company.companyRegNo?has_content>
