@@ -35,10 +35,13 @@ import ForgotPassword from '../Login/ForgotPassword'
 import EmployeeProfile from '../EmployeeModule/EmployeeProfile';
 import EmployeeSalaryUpdate from '../CompanyModule/PayRoll/EmployeeSalaryUpdate';
 import CompanySalaryView from '../CompanyModule/Settings/CompanySalaryView';
-import PayslipUpdate from '../Login/PayslipUpdate';
 import OfferLetters from '../CompanyModule/Settings/OfferLetters';
 import Template from '../CompanyModule/Settings/Template';
 import ExperienceLetter from '../CompanyModule/Settings/Experience/ExperienceLetter';
+import PayslipUpdate1 from '../CompanyModule/PayRoll/PayslipUpdate/PayslipUpdate1';
+import PayslipUpdate2 from '../CompanyModule/PayRoll/PayslipUpdate/PayslipUpdate2';
+import PayslipUpdate3 from '../CompanyModule/PayRoll/PayslipUpdate/PayslipUpdate3';
+import PayslipUpdate4 from '../CompanyModule/PayRoll/PayslipUpdate/PayslipUpdate4';
 import PayslipTemplates from '../CompanyModule/Settings/PayslipTemplates';
 import PayslipTemplate1 from '../CompanyModule/Settings/Payslip/PayslipTemplate1';
 import PayslipTemplate3 from '../CompanyModule/Settings/Payslip/PayslipTemplate3';
@@ -140,7 +143,6 @@ const Rout = () => {
       <Route path='/increment' element={<AddIncrement />}></Route>
       <Route path='/incrementList' element={<ViewIncrement />}></Route>
       <Route path='/payslip' element={<PaySlipDoc />}></Route>
-      <Route path='/payslipUpdate' element={<PayslipUpdate />}></Route>
       <Route path='/addAttendance' element={<ManageAttendance />}></Route>
       <Route path='/attendanceList' element={<AttendanceList />}></Route>
       <Route path='/attendanceReport' element={<AttendanceReport />}></Route>
@@ -152,6 +154,10 @@ const Rout = () => {
       <Route path='/experienceLetter' element={<ExperienceLetter />}></Route>
       <Route path='/existingEmployee' element={<ExistingLetter />}></Route>
       <Route path='/forgotPassword' element={<ForgotPassword />}></Route>
+      <Route path='/payslipUpdate1' element={<PayslipUpdate1 />}></Route>
+      <Route path='/payslipUpdate2' element={<PayslipUpdate2 />}></Route>
+      <Route path='/payslipUpdate3' element={<PayslipUpdate3 />}></Route>
+      <Route path='/payslipUpdate4' element={<PayslipUpdate4 />}></Route>
       <Route path='/payslipTemplate1' element={<PayslipTemplate1 />}></Route>
       <Route path='/payslipTemplate2' element={<PayslipTemplate2 />}></Route>
       <Route path='/payslipTemplate3' element={<PayslipTemplate3 />}></Route>

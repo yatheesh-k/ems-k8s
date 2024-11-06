@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 
 const Template = () => {
     const date = new Date().toLocaleDateString();
-    const { setValue, formState: { errors } } = useForm();
+    const { setValue,register, formState: { errors } } = useForm({mode:"onChange"});
     const [isEditing, setIsEditing] = useState(false);
     const [error, setError] = useState(null);
     const [calculatedValues, setCalculatedValues] = useState({});
@@ -47,6 +47,7 @@ const Template = () => {
                 const response = await companyViewByIdApi(user.companyId);
                 const data = response.data;
                 setCompanyDetails(data);
+                setCompanyName(data?.companyName || "[Company Name]");
                 Object.keys(data).forEach(key => setValue(key, data[key]));
                 setHasCinNo(!!data.cinNo);
                 setHasCompanyRegNo(!!data.companyRegNo);
@@ -105,12 +106,11 @@ const Template = () => {
             employeeName: recipientName,
             employeeFatherName: fatherName,
             employeeAddress: address,
-            employeeFirstName: recipientName,
             employeeContactNo: contactNumber,
             joiningDate: joiningDate,
             jobLocation: location,
             salaryConfigurationId: salaryConfigurationId,
-            grossCompensation: Number(grossAmount),
+            grossCompensation: grossAmount,
             companyId: user.companyId,
             employeePosition: role,
         };
@@ -181,17 +181,96 @@ const Template = () => {
                             <p>Dear {isEditing ? <input type="text" value={recipientName} onChange={e => setRecipientName(e.target.value)} /> : recipientName},</p>
 
                             <p>
-                                We welcome you to our pursuit of excellence and we feel proud to have a professional of your stature as a member of the <strong>{isEditing ? <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} /> : companyName}</strong> family and wish you a long, rewarding and satisfying career with us.
+                                We welcome you to our pursuit of excellence and we feel proud to have a professional of your stature as a member of the <strong>{companyName}</strong> family and wish you a long, rewarding and satisfying career with us.
                             </p>
 
                             <p>
-                                On behalf of <strong>{isEditing ? <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)} /> : companyName}</strong>, hereinafter referred to as ‘the Company’, we are pleased to extend an offer for the position of <strong>{isEditing ? <input type="text" value={role} onChange={e => setRole(e.target.value)} /> : role}</strong> in our organization with the following mentioned details:
+                                On behalf of <strong>{companyName}</strong>, hereinafter referred to as ‘the Company’, we are pleased to extend an offer for the position of <strong>{isEditing ? <input type="text" value={role} onChange={e => setRole(e.target.value)} /> : role}</strong> in our organization with the following mentioned details:
                             </p>
 
                             <ul style={{ listStyleType: "none", paddingLeft: "20px" }}>
-                                <li>&rarr; You would join us on or before <strong>{isEditing ? <input type="text" value={joiningDate} onChange={e => setJoiningDate(e.target.value)} /> : joiningDate}</strong> or else this offer would be null and void.</li>
-                                <li>&rarr; You will be deployed at our office site and your job location would be at <strong>{isEditing ? <input type="text" value={location} onChange={e => setLocation(e.target.value)} /> : location}</strong>.</li>
-                                <li>&rarr; Your gross compensation per annum is <strong>{isEditing ? <input type="text" value={grossAmount} onChange={e => setGrossAmount(e.target.value)} /> : grossAmount}</strong>.</li>
+                                <li>
+                                    &rarr; You would join us on or before&nbsp;
+                                     <strong>
+                                        {isEditing ? (
+                                            <input
+                                                type="date"
+                                                {...register("joiningDate", {
+                                                    required: "Joining Date is required",
+                                                    validate: (value) => {
+                                                        return value ? true : "Invalid date";
+                                                    },
+                                                })}
+                                                onChange={(e) => setJoiningDate(e.target.value)}
+                                            />
+                                        ) : (
+                                            joiningDate
+                                        )}
+                                    </strong>
+                                    {errors.joiningDate && (
+                                        <p className="errorMsg">{errors.joiningDate.message}</p>
+                                    )}
+                                </li>
+
+                                {/* Location */}
+                                <li>
+                                    &rarr; You will be deployed at our office site and your job location would be at&nbsp;
+                                     <strong>
+                                        {isEditing ? (
+                                            <input
+                                                type="text"
+                                                {...register("location", {
+                                                    required: "Location is required",
+                                                    pattern: {
+                                                        value: /^[A-Za-z ]+$/,
+                                                        message: "Location can only contain alphabetic characters and spaces",
+                                                    },
+                                                })}
+                                                value={location}
+                                                onChange={(e) => setLocation(e.target.value)}
+                                            />
+                                        ) : (
+                                            location
+                                        )}
+                                    </strong>
+                                    {errors.location && (
+                                        <p className="errorMsg">{errors.location.message}</p>
+                                    )}
+                                </li>
+
+                                {/* Gross Compensation */}
+                                <li>
+                                    &rarr; Your gross compensation per annum is&nbsp;
+                                     <strong>
+                                        {isEditing ? (
+                                            <input
+                                                type="number"
+                                                placeholder="Enter Gross Amount"
+                                                min={1}
+                                                max={99999999} // Maximum value you expect
+                                                {...register("grossAmount", {
+                                                    required: "Gross Amount is required",
+                                                    valueAsNumber: true,
+                                                    min: {
+                                                        value: 1,
+                                                        message: "Gross Amount should be a positive number",
+                                                    },
+                                                    max: {
+                                                        value: 99999999,
+                                                        message: "Gross Amount should not exceed the maximum limit",
+                                                    },
+                                                })}
+                                                value={grossAmount}
+                                                onChange={(e) => setGrossAmount(e.target.value)}
+                                            />
+                                        ) : (
+                                            grossAmount
+                                        )}
+                                    </strong>
+                                    {errors.grossAmount && (
+                                        <p className="errorMsg">{errors.grossAmount.message}</p>
+                                    )}
+                                </li>
                             </ul>
                             <ul>
                                 <li><strong>The proposed compensation details are attached as Annexure ’1’, and details of required documents at the time of joining are attached as Annexure ’2’.</strong></li>
@@ -263,13 +342,7 @@ const Template = () => {
                         </p>
                         <p>
                             You would be eligible for the annual leaves of 21 days (on pro rata basis) i.e. you would be eligible for the leaves of 1.75 days per month for every calendar (January to December) year. However, you can utilize the same only after completion of probation period with  <strong>
-                                {isEditing ?
-                                    <input
-                                        type="text"
-                                        value={companyName}
-                                        onChange={e => setCompanyName(e.target.value)}
-                                    />
-                                    : <b>Company Name</b>}
+                                {companyName}
                             </strong> . These leaves of six months will get credited to your leave balance account.
                         </p>
                         <p>
@@ -283,13 +356,7 @@ const Template = () => {
                             <strong> Cessation of Services and Notice Period:</strong>
                             If you wish to leave the services of the Company you may do so under the following conditions:
                             You need to share formal resignation email during working hours to  <strong>
-                                {isEditing ?
-                                    <input
-                                        type="text"
-                                        value={companyName}
-                                        onChange={e => setCompanyName(e.target.value)}
-                                    />
-                                    : <b>Company Name</b>}
+                                {companyName}
                             </strong>  HR Team after formal discussion with your reporting manager. Resignation sent on weekly / public holidays, after working hours will be considered with effect from next business day. Resignation will not be considered if you have tendered the same while being on leave. You need to serve 30 days’ notice period from the date of resignation based on designation.
                         </p>
                         <p>
@@ -307,13 +374,7 @@ const Template = () => {
                             You are requested to keep the compensation information highly confidential.
                         </p>
                         <p style={{ marginTop: "-15px" }}>
-                            We look forward to your joining <strong> {isEditing ?
-                                <input
-                                    type="text"
-                                    value={companyName}
-                                    onChange={e => setCompanyName(e.target.value)}
-                                />
-                                : companyName}</strong> soon.
+                            We look forward to your joining <strong> {companyName}</strong> soon.
                         </p>
                         <p>
                             Would appreciate you acknowledging the receipt of this offer and kindly <strong>send us your acceptance of this offer by a written mail and signed copy within the next 24 hours.</strong>
@@ -384,15 +445,15 @@ const Template = () => {
                                         return (
                                             <tr key={key}>
                                                 <td>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</td>
-                                                <td>{allowanceAmount.toFixed(2) / 12}</td>
-                                                <td>{allowanceAmount.toFixed(2)}</td>
+                                                <td>{Math.floor(allowanceAmount.toFixed(2) / 12)}</td>
+                                                <td>{Math.floor(allowanceAmount.toFixed(2))}</td>
                                             </tr>
                                         );
                                     })}
                                     <tr>
                                         <td><strong>Gross (CTC)</strong></td>
-                                        <td>{grossAmount / 12}</td>
-                                        <td>{grossAmount}</td>
+                                        <td>{Math.floor(grossAmount / 12)}</td>
+                                        <td>{Math.floor(grossAmount)}</td>
                                     </tr>
                                     {/* Display Deductions */}
                                     {Object.entries(structure.deductions).map(([key, value]) => {
@@ -400,20 +461,20 @@ const Template = () => {
                                         return (
                                             <tr key={key}>
                                                 <td>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</td>
-                                                <td>{deductionAmount.toFixed(2) / 12}</td>
-                                                <td>{deductionAmount.toFixed(2)}</td>
+                                                <td>{Math.floor(deductionAmount.toFixed(2) / 12)}</td>
+                                                <td>{Math.floor(deductionAmount.toFixed(2))}</td>
                                             </tr>
                                         );
                                     })}
                                     <tr>
                                         <td><strong>Total Deductions</strong></td>
-                                        <td>{calculatedValues.totalDeductions ? calculatedValues.totalDeductions.toFixed(2) / 12 : 0}</td>
-                                        <td>{calculatedValues.totalDeductions ? calculatedValues.totalDeductions.toFixed(2) : 0}</td>
+                                        <td>{Math.floor(calculatedValues.totalDeductions ? calculatedValues.totalDeductions.toFixed(2) / 12 : 0)}</td>
+                                        <td>{Math.floor(calculatedValues.totalDeductions ? calculatedValues.totalDeductions.toFixed(2) : 0)}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Net Salary</strong></td>
-                                        <td>{calculatedValues.netSalary ? (calculatedValues.netSalary / 12).toFixed(2) : 0}</td>
-                                        <td>{calculatedValues.netSalary ? calculatedValues.netSalary.toFixed(2) : 0}</td>
+                                        <td>{Math.floor(calculatedValues.netSalary ? (calculatedValues.netSalary / 12).toFixed(2) : 0)}</td>
+                                        <td>{Math.floor(calculatedValues.netSalary ? calculatedValues.netSalary.toFixed(2) : 0)}</td>
                                     </tr>
                                 </React.Fragment>
                             ))}
@@ -507,53 +568,53 @@ const Template = () => {
                             <li>AADHAR Card</li>
                         </ul>
                     </div>
-                    <table className="table" style={{zIndex:"-1"}}>
+                    <table className="table" style={{ zIndex: "-1" }}>
                         <tr>
                             <td colSpan={2}>Fill the following information and Submit on your Date of Joining along with your other documents.</td>
 
                         </tr>
                         <tr>
-                            <td style={{textAlign:"left"}}>Emergency Contact No.</td>
+                            <td style={{ textAlign: "left" }}>Emergency Contact No.</td>
                             <td>Emergency Contact No.</td>
                         </tr>
                         <tr>
-                            <td style={{textAlign:"left"}}>Blood Group (Self)</td>
+                            <td style={{ textAlign: "left" }}>Blood Group (Self)</td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td style={{textAlign:"left"}}>PAN Card No (Mandatory)</td>
+                            <td style={{ textAlign: "left" }}>PAN Card No (Mandatory)</td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td style={{textAlign:"left"}}>Marital Status (Single /Married)</td>
+                            <td style={{ textAlign: "left" }}>Marital Status (Single /Married)</td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td style={{textAlign:"left"}}>Husband’s / Wife’s Full Name </td>
+                            <td style={{ textAlign: "left" }}>Husband’s / Wife’s Full Name </td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td style={{textAlign:"left"}}>Husband’s / Wife’s Date of Birth, Age </td>
+                            <td style={{ textAlign: "left" }}>Husband’s / Wife’s Date of Birth, Age </td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td style={{textAlign:"left"}}>Husband’s / Wife’s blood group</td>
+                            <td style={{ textAlign: "left" }}>Husband’s / Wife’s blood group</td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td style={{textAlign:"left"}}>Father's Full Name </td>
+                            <td style={{ textAlign: "left" }}>Father's Full Name </td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td style={{textAlign:"left"}}>Father's Date of Birth, Age</td>
+                            <td style={{ textAlign: "left" }}>Father's Date of Birth, Age</td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td style={{textAlign:"left"}}>Mother's Full Name </td>
+                            <td style={{ textAlign: "left" }}>Mother's Full Name </td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td style={{textAlign:"left"}}>Mother's Date of Birth, Age</td>
+                            <td style={{ textAlign: "left" }}>Mother's Date of Birth, Age</td>
                             <td></td>
                         </tr>
                     </table>

@@ -4,7 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Bounce, toast } from "react-toastify";
 import DataTable from "react-data-table-component";
 import LayOut from "../../LayOut/LayOut";
-import { EmployeePayslipGeneration, EmployeePayslipResponse } from "../../Utils/Axios";
+import { EmployeePayslipGeneration, EmployeePayslipResponse, PayslipTemplateGetApi,   } from "../../Utils/Axios";
 import { useAuth } from "../../Context/AuthContext";
 import { PencilSquare } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
@@ -24,6 +24,7 @@ const GeneratePaySlip = () => {
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentTemplate, setCurrentTemplate] = useState(null);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -145,9 +146,33 @@ const GeneratePaySlip = () => {
     },
   ];
 
-  const handleEditClick = (employeeId, payslipId, month, year) => {
-    navigate(`/payslipUpdate?employeeId=${employeeId}&payslipId=${payslipId}&month=${month}&year=${year}`);
+  const fetchTemplate = async () => {
+    try {
+      const response = await PayslipTemplateGetApi();
+      const templateData = response.data.data;
+      setCurrentTemplate(templateData);
+      if (!templateData.payslipTemplateNo) {
+        toast.error("Invalid payslip template number.");
+      }
+    } catch (error) {
+      console.error("API fetch error:", error);
+      toast.error("Failed to fetch payslip templates. Please try again.");
+    }
   };
+  const handleEditClick = (employeeId, payslipId, month, year) => {
+    const payslipTemplateNo = currentTemplate?.payslipTemplateNo;
+
+    if (payslipTemplateNo) {
+      navigate(`/payslipUpdate${payslipTemplateNo}?employeeId=${employeeId}&payslipId=${payslipId}&month=${month}&year=${year}`);
+    } else {
+      toast.error("Payslip template number not found.");
+    }
+  };
+
+  useEffect(() => {
+    fetchTemplate();
+  }, []);
+
 
   const handleGeneratePaySlips = async () => {
     // Check if at least one employee is selected
@@ -186,7 +211,6 @@ const GeneratePaySlip = () => {
       toast.error("Failed to generate payslips.");
     }
   };
-
 
   return (
     <LayOut>
