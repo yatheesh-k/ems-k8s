@@ -304,12 +304,12 @@ export const AllEmployeePayslipsGet = (month, year) => {
   });
 }
 
-export const EmployeePaySlipDownloadById = async (employeeId, payslipId) => {
+export const EmployeePaySlipDownloadById = async (employeeId, payslipId, templateNumber) => {
   const company = localStorage.getItem("companyName");
 
   try {
     // Make the API request with specific headers for this request
-    const response = await axiosInstance.get(`/${company}/employee/${employeeId}/template/3/download/${payslipId}`, {
+    const response = await axiosInstance.get(`/${company}/employee/${employeeId}/template/${templateNumber}/download/${payslipId}`, {
       responseType: 'blob', // Handle the response as a binary blob
       headers: {
         'Accept': 'application/pdf', // Accept PDF format
@@ -333,7 +333,6 @@ export const EmployeePaySlipDownloadById = async (employeeId, payslipId) => {
     throw error; // Rethrow error for handling in the calling function
   }
 };
-
 
 export const EmployeePayslipDeleteById = (employeeId, payslipId) => {
   const company = localStorage.getItem("comapnyName")
@@ -410,4 +409,13 @@ export const OfferLetterDownload = async (payload) => {
     console.error('Download error:', error);
     throw error; 
   }
+};
+
+export const PayslipTemplate = (data) => {
+  return axiosInstance.post(`/template`, data);
+};
+
+export const PayslipTemplateGetApi = (data) => {
+  const companyName = localStorage.getItem("companyName")
+  return axiosInstance.get(`/${companyName}/template`, data);
 };

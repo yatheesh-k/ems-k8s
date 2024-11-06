@@ -292,7 +292,7 @@ const AttendanceReport = () => {
                                         <label className="card-title">Select Year <span className='text-danger fw-100'>*</span></label>
                                         <select
                                             className="form-select"
-                                            style={{ paddingBottom: '6px', zIndex: "1" }}
+                                            style={{ paddingBottom: '6px', zIndex: "1", height:"37px" }}
                                             value={selectedYear}
                                             onChange={(e) => {
                                                 setSelectedYear(e.target.value); // Update state
@@ -311,7 +311,7 @@ const AttendanceReport = () => {
                                         <label className="card-title">Select Month</label>
                                         <select
                                             className="form-select"
-                                            style={{ paddingBottom: '6px' }}
+                                            style={{ paddingBottom: '6px', height:"37px" }}
                                             value={selectedMonth}
                                             onChange={(e) => {
                                                 setSelectedMonth(e.target.value); // Update state
@@ -326,7 +326,7 @@ const AttendanceReport = () => {
                                             ))}
                                         </select>
                                     </div>
-                                    <div className="col-md-3 mt-5">
+                                    <div className="col-md-3" style={{marginTop:"45px"}}>
                                         <button
                                             style={{ paddingBottom: "8px" }}
                                             className="btn btn-primary"

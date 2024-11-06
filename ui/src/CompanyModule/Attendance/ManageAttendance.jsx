@@ -141,9 +141,9 @@ const ManageAttendance = () => {
                           <p className="errorMsg">{errors.attendanceFile.message}</p>
                         )}
                       </div>
-                      <div className="col-4 col-md-4 col-lg-4 mt-5">
+                      <div className="col-4 col-md-4 col-lg-4" style={{marginTop:'40px'}}>
                         <button
-                          type="submit" // Change type to submit to trigger form onSubmit
+                          type="submit" 
                           className="btn btn-primary"
                         >
                           Submit

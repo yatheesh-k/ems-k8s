@@ -39,6 +39,15 @@ import PayslipUpdate from '../Login/PayslipUpdate';
 import OfferLetters from '../CompanyModule/Settings/OfferLetters';
 import Template from '../CompanyModule/Settings/Template';
 import ExperienceLetter from '../CompanyModule/Settings/Experience/ExperienceLetter';
+import PayslipTemplates from '../CompanyModule/Settings/PayslipTemplates';
+import PayslipTemplate1 from '../CompanyModule/Settings/Payslip/PayslipTemplate1';
+import PayslipTemplate3 from '../CompanyModule/Settings/Payslip/PayslipTemplate3';
+import PayslipTemplate4 from '../CompanyModule/Settings/Payslip/PayslipTemplate4';
+import PayslipTemplate2 from '../CompanyModule/Settings/Payslip/PayslipTemplate2';
+import PayslipDoc1 from '../CompanyModule/PayRoll/Payslips/PayslipDoc1';
+import PayslipDoc3 from '../CompanyModule/PayRoll/Payslips/PayslipDoc3';
+import PayslipDoc2 from '../CompanyModule/PayRoll/Payslips/PayslipDoc2';
+import PayslipDoc4 from '../CompanyModule/PayRoll/Payslips/PayslipDoc4';
 
 const Rout = () => {
   const location = useLocation();
@@ -122,6 +131,7 @@ const Rout = () => {
       <Route path='/companySalaryView' element={<CompanySalaryView />}></Route>
       <Route path='/offerLetters' element={<OfferLetters />}></Route>
       <Route path='/template' element={<Template />}></Route>
+      <Route path='/payslipTemplates' element={<PayslipTemplates />}></Route>
       <Route path='/employeeSalaryStructure' element={<EmployeeSalaryStructure />}></Route>
       <Route path='/employeeSalaryUpdate' element={<EmployeeSalaryUpdate />}></Route>
       <Route path='/employeeSalaryList' element={<EmployeeSalaryList />}></Route>
@@ -139,9 +149,17 @@ const Rout = () => {
       <Route path='/offerLetter' element={<OfferLetter />}></Route>
       <Route path='/payslipLetter' element={<PaySlipLetter />}></Route>
       <Route path='/hikeLetter' element={<HikeLetter />}></Route>
-      <Route path='/experienceLetter' element={<ExperienceLetter/>}></Route>
+      <Route path='/experienceLetter' element={<ExperienceLetter />}></Route>
       <Route path='/existingEmployee' element={<ExistingLetter />}></Route>
       <Route path='/forgotPassword' element={<ForgotPassword />}></Route>
+      <Route path='/payslipTemplate1' element={<PayslipTemplate1 />}></Route>
+      <Route path='/payslipTemplate2' element={<PayslipTemplate2 />}></Route>
+      <Route path='/payslipTemplate3' element={<PayslipTemplate3 />}></Route>
+      <Route path='/payslipTemplate4' element={<PayslipTemplate4 />}></Route>
+      <Route path='/payslipDoc1' element={<PayslipDoc1 />}></Route>
+      <Route path='/payslipDoc2' element={<PayslipDoc2/>}></Route>
+      <Route path='/payslipDoc3' element={<PayslipDoc3 />}></Route>
+      <Route path='/payslipDoc4' element={<PayslipDoc4/>}></Route>
     </Routes>
   );
 };

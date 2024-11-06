@@ -73,6 +73,133 @@ const SideNav = () => {
     }
   }, [location]);
 
+  useEffect(() => {
+    if (
+      location.pathname === "/companyRegistration" ||
+      location.pathname.startsWith("/companyView")
+    ) {
+      setIsCompanyOpen(true);
+    } else {
+      setIsCompanyOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
+      location.pathname === "/employeeSalaryStructure" ||
+      location.pathname === "/employeeSalaryList" ||
+      location.pathname === "/payslipGeneration" ||
+      location.pathname === "/payslipsList" ||
+      location.pathname === "/increment" ||
+      location.pathname === "/incrementList"
+    ) {
+      setIsPayrollOpen(true);
+    } else {
+      setIsPayrollOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
+      location.pathname === "/addAttendance" ||
+      location.pathname === "/attendanceList" ||
+      location.pathname === "/attendanceReport"
+    ) {
+      setIsAttendanceOpen(true);
+    } else {
+      setIsAttendanceOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
+      location.pathname === "/companyRegistration" ||
+      location.pathname.startsWith("/companyView")
+    ) {
+      setIsCompanyOpen(true);
+    } else {
+      setIsCompanyOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
+      location.pathname === "/employeeSalaryStructure" ||
+      location.pathname === "/employeeSalaryList" ||
+      location.pathname === "/payslipGeneration" ||
+      location.pathname === "/payslipsList" ||
+      location.pathname === "/increment" ||
+      location.pathname === "/incrementList"
+    ) {
+      setIsPayrollOpen(true);
+    } else {
+      setIsPayrollOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
+      location.pathname === "/addAttendance" ||
+      location.pathname === "/attendanceList" ||
+      location.pathname === "/attendanceReport"
+    ) {
+      setIsAttendanceOpen(true);
+    } else {
+      setIsAttendanceOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
+      location.pathname === "/companyRegistration" ||
+      location.pathname.startsWith("/companyView")
+    ) {
+      setIsCompanyOpen(true);
+    } else {
+      setIsCompanyOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
+      location.pathname === "/employeeSalaryStructure" ||
+      location.pathname === "/employeeSalaryList" ||
+      location.pathname === "/payslipGeneration" ||
+      location.pathname === "/payslipsList" ||
+      location.pathname === "/increment" ||
+      location.pathname === "/incrementList"
+    ) {
+      setIsPayrollOpen(true);
+    } else {
+      setIsPayrollOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
+      location.pathname === "/addAttendance" ||
+      location.pathname === "/attendanceList" ||
+      location.pathname === "/attendanceReport"
+    ) {
+      setIsAttendanceOpen(true);
+    } else {
+      setIsAttendanceOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
+      location.pathname === "/companySalaryView" ||
+      location.pathname === "/offerLetters" ||
+      location.pathname === "/experienceLetter" ||
+      location.pathname === "/payslipTemplates"
+    ) {
+      setIsSettingsOpen(true);
+    } else {
+      setIsSettingsOpen(false);
+    }
+  }, [location]);
+
   const togglePayroll = (e) => {
     e.preventDefault(); // Prevent default anchor behavior
     setIsPayrollOpen(!isPayrollOpen);
@@ -624,6 +751,21 @@ const SideNav = () => {
                   >
                     <a className="sidebar-link" href={"/experienceLetter"}>
                       Experience Letter Templates
+                    </a>
+                  </li>
+                </ul>
+                <ul
+                  id="settingsManagement"
+                  className={`sidebar-dropDown list-unstyled collapse ${isSettingsOpen ? "show" : ""
+                    }`}
+                >
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${location.pathname === "/payslipTemplates" ? "active" : ""
+                      }`}
+                  >
+                    <a className="sidebar-link" href={"/payslipTemplates"}>
+                      Payslip Templates
                     </a>
                   </li>
                 </ul>
