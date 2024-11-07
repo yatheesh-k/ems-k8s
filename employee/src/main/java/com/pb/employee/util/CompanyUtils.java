@@ -868,24 +868,13 @@ public class CompanyUtils {
         g2d.translate(-newWidth / 2, -newHeight / 2);
 
         Image scaledImage = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-        g2d.drawImage(scaledImage, 0, 0, null);
 
+        // Apply opacity directly to the image being drawn without background color.
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, rotatedWidth, rotatedHeight);
+        g2d.drawImage(scaledImage, 0, 0, null);
 
         g2d.dispose();
 
         return watermarkedImage;
     }
-
-/*    public static RelievingEntity maskRelievingProperties(RelievingRequest request, String id) {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        RelievingEntity relievingEntity = objectMapper.convertValue(request, RelievingEntity.class);
-        relievingEntity.setId(id);
-        relievingEntity.setType(Constants.RELIEVING);
-
-        return relievingEntity;
-    }*/
 }

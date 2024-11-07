@@ -44,48 +44,48 @@ public class PayslipServiceImpl implements PayslipService {
         EmployeeEntity employee = null;
         AttendanceEntity attendance = null;
         String index = ResourceIdUtils.generateCompanyIndex(payslipRequest.getCompanyName());
-            try{
-                payslipEntity = openSearchOperations.getById(paySlipId, null, index);
-                if(payslipEntity != null) {
-                    log.error("employee details existed{}", payslipRequest.getCompanyName());
-                    throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_PAYSLIP_ALREADY_EXISTS),employeeId),
-                            HttpStatus.CONFLICT);
-                }
-                String attendanceId = ResourceIdUtils.generateAttendanceId(payslipRequest.getCompanyName(), employeeId, payslipRequest.getYear(),payslipRequest.getMonth());
+        try{
+            payslipEntity = openSearchOperations.getById(paySlipId, null, index);
+            if(payslipEntity != null) {
+                log.error("employee details existed{}", payslipRequest.getCompanyName());
+                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_PAYSLIP_ALREADY_EXISTS),employeeId),
+                        HttpStatus.CONFLICT);
+            }
+            String attendanceId = ResourceIdUtils.generateAttendanceId(payslipRequest.getCompanyName(), employeeId, payslipRequest.getYear(),payslipRequest.getMonth());
 
-                attendance = openSearchOperations.getAttendanceById(attendanceId, null, index);
-                if (attendance == null){
-                    log.error("Employee Attendance is not found fot {} employee", employeeId);
-                    throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_GET_ATTENDANCE),
-                            HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-            } catch (IOException e) {
-                log.error("Unable to get the company details {}", payslipRequest.getCompanyName());
-                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_EMPLOYEE),employeeId),
-                        HttpStatus.BAD_REQUEST);
-            }
-            employee = openSearchOperations.getEmployeeById(employeeId, null, index);
-            if(employee ==null){
-                log.error("Employee with this {}, is not found", employeeId);
-                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+            attendance = openSearchOperations.getAttendanceById(attendanceId, null, index);
+            if (attendance == null){
+                log.error("Employee Attendance is not found fot {} employee", employeeId);
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_GET_ATTENDANCE),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            entity = openSearchOperations.getSalaryById(salaryId, null, index);
-            if (entity==null){
-                log.error("Exception while fetching employee for salary {}", employeeId);
-                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES_SALARY),
-                        HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-            if (!entity.getEmployeeId().equals(employeeId)) {
-                log.error("Employee ID mismatch for salary {}: expected {}, found", salaryId, employeeId);
-                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_NOT_MATCHING),
-                        HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-            if (entity.getStatus().equals(EmployeeStatus.INACTIVE.getStatus())){
-                log.error("Employee{} Salary {}: is inActive", salaryId, employeeId);
-                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.SALARY_INACTIVE),
-                        HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+        } catch (IOException e) {
+            log.error("Unable to get the company details {}", payslipRequest.getCompanyName());
+            throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_EMPLOYEE),employeeId),
+                    HttpStatus.BAD_REQUEST);
+        }
+        employee = openSearchOperations.getEmployeeById(employeeId, null, index);
+        if(employee ==null){
+            log.error("Employee with this {}, is not found", employeeId);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        entity = openSearchOperations.getSalaryById(salaryId, null, index);
+        if (entity==null){
+            log.error("Exception while fetching employee for salary {}", employeeId);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES_SALARY),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (!entity.getEmployeeId().equals(employeeId)) {
+            log.error("Employee ID mismatch for salary {}: expected {}, found", salaryId, employeeId);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_NOT_MATCHING),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (entity.getStatus().equals(EmployeeStatus.INACTIVE.getStatus())){
+            log.error("Employee{} Salary {}: is inActive", salaryId, employeeId);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.SALARY_INACTIVE),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         try {
             // Retrieve attendance details
             String attendanceId = ResourceIdUtils.generateAttendanceId(payslipRequest.getCompanyName(),employeeId,payslipRequest.getYear(),payslipRequest.getMonth());
@@ -98,9 +98,10 @@ public class PayslipServiceImpl implements PayslipService {
                 departmentEntity = openSearchOperations.getDepartmentById(employee.getDepartment(), null, index);
                 designationEntity = openSearchOperations.getDesignationById(employee.getDesignation(), null, index);
             }
+
+            payslipProperties = PayslipUtils.maskEmployeePayslip(payslipProperties,entity,attendance);
             payslipProperties.setDepartment(departmentEntity.getName());
             payslipProperties.setDesignation(designationEntity.getName());
-            payslipProperties = PayslipUtils.maskEmployeePayslip(payslipProperties,entity,attendance);
             Entity result = openSearchOperations.saveEntity(payslipProperties, paySlipId, index);
         } catch (Exception exception) {
             log.error("Unable to save the employee details  {}",exception.getMessage());
@@ -193,10 +194,11 @@ public class PayslipServiceImpl implements PayslipService {
                                     departmentEntity = openSearchOperations.getDepartmentById(employee.getDepartment(), null, index);
                                     designationEntity = openSearchOperations.getDesignationById(employee.getDesignation(), null, index);
                                 }
+
+                                PayslipUtils.forFormatNumericalFields(payslipProperties);
+                                assert departmentEntity != null;
                                 payslipProperties.setDepartment(departmentEntity.getName());
                                 payslipProperties.setDesignation(designationEntity.getName());
-                                PayslipUtils.forFormatNumericalFields(payslipProperties);
-
                                 // Pass salary and salaryConfig to maskEmployeePayslip
                                 payslipProperties = PayslipUtils.maskEmployeePayslip(payslipProperties, salary, attendanceEntities);
 
@@ -255,25 +257,25 @@ public class PayslipServiceImpl implements PayslipService {
         EmployeeEntity employee = null;
         PayslipEntity entity = null;
         try {
-           employee = openSearchOperations.getEmployeeById(employeeId, null, index);
-           if (employee == null){
-               log.error("Employee with this {}, is not found", employeeId);
-               throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
-                       HttpStatus.INTERNAL_SERVER_ERROR);
-           }
-           entity=openSearchOperations.getPayslipById(payslipId, null, index);
-           PayslipUtils.unmaskEmployeePayslip(entity);
+            employee = openSearchOperations.getEmployeeById(employeeId, null, index);
+            if (employee == null){
+                log.error("Employee with this {}, is not found", employeeId);
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            entity=openSearchOperations.getPayslipById(payslipId, null, index);
+            PayslipUtils.unmaskEmployeePayslip(entity);
 
             if (entity==null){
-               log.error("Employee with this payslip {}, is not found", payslipId);
-               throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES_PAYSLIP),
-                       HttpStatus.INTERNAL_SERVER_ERROR);
-           }
-           if (!entity.getEmployeeId().equals(employeeId)){
-               log.error("Employee ID mismatch for payslipId {}: expected {}, found {}", payslipId, employeeId, entity.getEmployeeId());
-               throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_NOT_MATCHING),
-                       HttpStatus.INTERNAL_SERVER_ERROR);
-           }
+                log.error("Employee with this payslip {}, is not found", payslipId);
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES_PAYSLIP),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            if (!entity.getEmployeeId().equals(employeeId)){
+                log.error("Employee ID mismatch for payslipId {}: expected {}, found {}", payslipId, employeeId, entity.getEmployeeId());
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_NOT_MATCHING),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
         catch (Exception ex) {
             log.error("Exception while fetching salaries for employees {}: {}", employeeId, ex.getMessage());
@@ -687,11 +689,20 @@ public class PayslipServiceImpl implements PayslipService {
                     continue; // Skip to the next employee if payslip already exists
                 }
 
+                DepartmentEntity departmentEntity =null;
+                DesignationEntity designationEntity = null;
+                if (employee.getDepartment() !=null && employee.getDesignation() !=null) {
+                    departmentEntity = openSearchOperations.getDepartmentById(employee.getDepartment(), null, index);
+                    designationEntity = openSearchOperations.getDesignationById(employee.getDesignation(), null, index);
+                }
                 // Generate and save payslip for the current employee
                 List<PayslipEntity> payslipPropertiesList = new ArrayList<>();
                 for (EmployeeSalaryEntity salary : salaryEntities) {
                     if (salary.getStatus().equals(EmployeeStatus.ACTIVE.getStatus())){
                         PayslipEntity payslipProperties = PayslipUtils.unMaskEmployeePayslipProperties(salary, payslipRequest, paySlipId, employee.getId(), attendanceEntities);
+                        assert designationEntity != null;
+                        payslipProperties.setDesignation(designationEntity.getName());
+                        payslipProperties.setDepartment(departmentEntity.getName());
                         generatedPayslips.add(payslipProperties);
                         payslipPropertiesList.add(payslipProperties);
                     }

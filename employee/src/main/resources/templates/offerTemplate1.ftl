@@ -211,6 +211,8 @@
             height: auto;
             opacity: 0.05;
         }
+
+
     </style>
 </head>
 
@@ -270,7 +272,16 @@
             appraisal process.
         </p>
     </div>
-    <h5 style="text-align: center; margin-top: 30px;">CIN: ${company.cinNo}</h5>
+    <h5 style="text-align: center; margin-top: 55px;">
+    <#if company.cinNo?has_content>
+                CIN: ${company.cinNo}
+            <#elseif company.companyRegNo?has_content>
+                Registration No: ${company.companyRegNo}
+            <#else>
+                <!-- Optionally, you can add a default text if both are null -->
+                Company Information Not Available
+    </#if>
+    </h5>
     <hr style="color: rgb(10, 53, 248);" />
     <div style="text-align: center; font-size: 14px;">
         <p>
@@ -348,7 +359,7 @@
             been duly served.
         </p>
     </div>
-    <h5 style="text-align: center; margin-top: 55px;">
+    <h5 style="text-align: center; margin-top: 40px;">
         <#if company.cinNo?has_content>
             CIN: ${company.cinNo}
         <#elseif company.companyRegNo?has_content>
@@ -395,7 +406,7 @@
                 by a written mail and signed copy within the next 24 hours.</b>
         </p>
         <p>Please do not hesitate to contact us in case you have any queries.</p>
-      <h5 style="text-align: center; margin-top: 55px;">
+      <h5 style="text-align: center; margin-top: 440px;">
         <#if company.cinNo?has_content>
             CIN: ${company.cinNo}
         <#elseif company.companyRegNo?has_content>
@@ -416,7 +427,7 @@
     <div class="logo">
         <img src="${company.imageFile}" alt="Company Logo" />
     </div>
-    <div class="salary-table">
+    <div class="salary-table" style= "page-break-after: always;">
         <h5 class="annexure-text">Annexure -1 </h5>
         <p style="text-align: left; font-size: 15px; ">Fixed Salary breakup</p>
         <table>
@@ -439,25 +450,30 @@
             salary on a monthly basis as per Government Policy.</p>
         <p>*Income Tax deduction is subjected to timely submission of the investment details.</p>
         <p>*Pan Card submission is mandatory for the disbursement of the salary.</p>
-    </div>
-       <h5 style="text-align: center; margin-top: 55px;">
-          <#if company.cinNo?has_content>
-              CIN: ${company.cinNo}
-          <#elseif company.companyRegNo?has_content>
-              Registration No: ${company.companyRegNo}
-          <#else>
-              <!-- Optionally, you can add a default text if both are null -->
-              Company Information Not Available
-          </#if>
-      </h5>
-    <hr style="color: rgb(10, 53, 248);" />
-    <div style="text-align: center; font-size: 14px;">
-        <p>
-            ${company.companyName}<br />
-            ${company.companyAddress}<br />
-            PH: ${company.mobileNo}, Email: ${company.emailId} | Web: https://${company.shortName}.com
-        </p>
-    </div>
+
+       <div style="margin-top: 90px;">
+           <h5 style="text-align: center;">
+               <#if company.cinNo?has_content>
+                   CIN: ${company.cinNo}
+               <#elseif company.companyRegNo?has_content>
+                   Registration No: ${company.companyRegNo}
+               <#else>
+                   <!-- Optionally, you can add a default text if both are null -->
+                   Company Information Not Available
+               </#if>
+           </h5>
+           <hr style="color: rgb(10, 53, 248);" />
+           <div style="text-align: center; font-size: 14px;">
+               <p>
+                   ${company.companyName}<br />
+                   ${company.companyAddress}<br />
+                   PH: ${company.mobileNo}, Email: ${company.emailId} | Web: https://${company.shortName}.com
+               </p>
+           </div>
+       </div>
+
+   </div>
+
     <div class="logo">
         <img src="${company.imageFile}" alt="Company Logo" />
     </div>
@@ -544,7 +560,7 @@
             </tr>
         </table>
     </div>
-     <h5 style="text-align: center; margin-top: 55px;">
+     <h5 style="text-align: center; margin-top: 100px;">
             <#if company.cinNo?has_content>
                 CIN: ${company.cinNo}
             <#elseif company.companyRegNo?has_content>
@@ -581,7 +597,7 @@
             numbers.
         </p>
     </div>
-     <h5 style="text-align: center; margin-top: 55px;">
+     <h5 style="text-align: center; margin-top: 549px;">
         <#if company.cinNo?has_content>
             CIN: ${company.cinNo}
         <#elseif company.companyRegNo?has_content>

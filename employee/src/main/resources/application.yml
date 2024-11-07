@@ -39,3 +39,4 @@ springdoc:
 file:
   upload:
     path: '/var/www/ems-testing/assets/img/'
+

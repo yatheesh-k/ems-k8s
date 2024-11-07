@@ -646,8 +646,11 @@ const EmployeeSalaryStructure = () => {
                                     className="form-control"
                                     type="text" // Allow for '%' characters
                                     value={allowances[key]}
-                                    onChange={(e) => handleAllowanceChange(key, e.target.value)} // Use e.target.value
-                                  />
+                                    onChange={(e) => {
+                                      // Allow only numbers and '%' characters
+                                      const newValue = e.target.value.replace(/[^0-9%]/g, '');
+                                      handleAllowanceChange(key, newValue);
+                                    }} />
                                 </div>
                               ))}
                               <label>Total Allowances: </label>
@@ -729,7 +732,11 @@ const EmployeeSalaryStructure = () => {
                                     className="form-control"
                                     type="text"
                                     value={deductions[key]}
-                                    onChange={(e) => handleDeductionChange(key, e.target.value)} // Use e.target.value
+                                    onChange={(e) => {
+                                      // Allow only numbers and '%' characters
+                                      const newValue = e.target.value.replace(/[^0-9%]/g, '');
+                                      handleDeductionChange(key, newValue);
+                                    }}
                                   />
                                 </div>
                               ))}

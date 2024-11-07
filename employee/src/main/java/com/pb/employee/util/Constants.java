@@ -22,6 +22,7 @@ public class Constants {
     public static final String EMS_ADMIN = "ems_admin";
     public static final String LOGIN_SUCCESS = "success";
     public static final String COMPANY = "company";
+    public static final String COMPANY_ID = "companyId";
     public static final String ATTENDANCE = "attendance";
     public static final String SALARY = "salary";
     public static final String DEFAULT = "default";
@@ -119,4 +120,8 @@ public class Constants {
     public static final String APPRAISAL_LETTER_REQUEST = "appraisal";
     public static final String DYNAMIC_EXPERIENCE_LETTER_PDF = "dynamicExpLetter.ftl";
     public static final String APPRAISAL_LETTER = "appraisal_letter.pdf";
+    public static final String INTERNSHIP_CERT = "internship_certificate.pdf";
+    public static final String TEMPLATE = "template";
+    public static final String INTERNSHIP = "internship";
+    public static final String INTERNSHIP_TEMPLATE = "internship.ftl";
 }

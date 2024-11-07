@@ -304,12 +304,12 @@ export const AllEmployeePayslipsGet = (month, year) => {
   });
 }
 
-export const EmployeePaySlipDownloadById = async (employeeId, payslipId) => {
+export const EmployeePaySlipDownloadById = async (employeeId, payslipId, templateNumber) => {
   const company = localStorage.getItem("companyName");
 
   try {
     // Make the API request with specific headers for this request
-    const response = await axiosInstance.get(`/${company}/employee/${employeeId}/template/3/download/${payslipId}`, {
+    const response = await axiosInstance.get(`/${company}/employee/${employeeId}/template/${templateNumber}/download/${payslipId}`, {
       responseType: 'blob', // Handle the response as a binary blob
       headers: {
         'Accept': 'application/pdf', // Accept PDF format
@@ -333,7 +333,6 @@ export const EmployeePaySlipDownloadById = async (employeeId, payslipId) => {
     throw error; // Rethrow error for handling in the calling function
   }
 };
-
 
 export const EmployeePayslipDeleteById = (employeeId, payslipId) => {
   const company = localStorage.getItem("comapnyName")
@@ -386,3 +385,37 @@ export const CompanySalaryStructureGetApi = () => {
   const company = localStorage.getItem("companyName")
   return axiosInstance.get(`${company}/salary`);
 }
+
+export const OfferLetterDownload = async (payload) => {
+  try {
+    const response = await axiosInstance.post(`/upload/offerletter`,payload, {
+      responseType: 'blob', 
+      headers: {
+        'Accept': 'application/pdf', 
+      }
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `offerLettre.pdf`; 
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+
+    return true; 
+
+  } catch (error) {
+    console.error('Download error:', error);
+    throw error; 
+  }
+};
+
+export const PayslipTemplate = (data) => {
+  return axiosInstance.post(`/template`, data);
+};
+
+export const PayslipTemplateGetApi = (data) => {
+  const companyName = localStorage.getItem("companyName")
+  return axiosInstance.get(`/${companyName}/template`, data);
+};

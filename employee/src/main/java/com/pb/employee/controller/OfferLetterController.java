@@ -5,6 +5,7 @@ import com.pb.employee.service.OfferLetterService;
 import com.pb.employee.util.Constants;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class OfferLetterController {
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK")
     public ResponseEntity<byte[]> downloadOfferLetter(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                                       @RequestHeader(Constants.AUTH_KEY) String authToken,
-                                                      @RequestBody OfferLetterRequest offerLetterRequest,
+                                                      @RequestBody @Valid OfferLetterRequest offerLetterRequest,
                                                       HttpServletRequest request) {
         return offerLetterService.downloadOfferLetter(offerLetterRequest,request);
     }

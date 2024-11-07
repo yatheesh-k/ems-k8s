@@ -130,7 +130,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 LocalDate now = LocalDate.now();
                 int currentYear = now.getYear();
                 int currentMonth = now.getMonthValue();
-                if (Integer.parseInt(attendanceRequest.getYear()) == currentYear && MONTH_NAME_MAP.get(attendanceRequest.getMonth()).getValue() == currentMonth) {
+                if (Integer.parseInt(attendanceRequest.getYear()) == currentYear && MONTH_NAME_MAP.get(attendanceRequest.getMonth()).getValue() == currentMonth && MONTH_NAME_MAP.get(attendanceRequest.getMonth()).getValue() > currentMonth) {
                     // If the current month, check if it's before or on the 25th
                     if (now.getDayOfMonth() <= 25) {
                         return new ResponseEntity<>(
