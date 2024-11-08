@@ -15,7 +15,7 @@ public class TemplateRequest {
     private String payslipTemplateNo;
     private String experienceTemplateNo;
     private String relievingTemplateNo;
-    private String joiningTemplateNo;
+    private String appraisalTemplateNo;
     private String offerLetterTemplateNo;
-    private String serviceLetterTemplateNo;
+    private String internshipTemplateNo;
 }

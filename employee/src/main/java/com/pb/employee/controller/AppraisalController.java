@@ -20,7 +20,7 @@ public class AppraisalController {
     private AppraisalLetterService appraisalLetterService;
 
 
-    @RequestMapping(value = "/upload/appraisal/letter", method = RequestMethod.POST)
+    @RequestMapping(value = "/appraisal/template/{id}/upload", method = RequestMethod.POST)
     @io.swagger.v3.oas.annotations.Operation(security = {@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY)},
             summary = "${api.getAppraisalLetter.tag}", description = "${api.getAppraisalLetter.description}")
     @ResponseStatus(HttpStatus.OK)
@@ -29,8 +29,10 @@ public class AppraisalController {
             description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                                   @RequestHeader(Constants.AUTH_KEY) String authToken,
                                                   @RequestBody @Valid AppraisalLetterRequest appraisalLetterRequest,
-                                                  HttpServletRequest request) {
-        return appraisalLetterService.downloadAppraisalLetter(appraisalLetterRequest,request);
+                                                  HttpServletRequest request,
+                                                  @PathVariable  int templateNumber) {
+        return appraisalLetterService.downloadAppraisalLetter(appraisalLetterRequest, request, templateNumber);
     }
+
 
 }

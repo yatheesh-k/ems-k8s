@@ -42,7 +42,8 @@ public class InternshipServiceImpl implements InternshipService {
 
 
     @Override
-    public ResponseEntity<byte[]> downloadInternship(InternshipRequest internshipRequest, HttpServletRequest request) {
+    public ResponseEntity<byte[]> downloadInternship(InternshipRequest internshipRequest, HttpServletRequest request,int templateNumber) {
+
         CompanyEntity entity;
         Entity companyEntity;
 
@@ -81,8 +82,15 @@ public class InternshipServiceImpl implements InternshipService {
             String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
             dataModel.put(Constants.BLURRED_IMAGE, Constants.DATA + base64Image);
 
+            // Choose the template based on the template number
+            String templateName = switch (templateNumber) {
+                case 1 -> Constants.INTERNSHIP_TEMPLATE1;
+                case 2 -> Constants.INTERNSHIP_TEMPLATE2;
+                default -> throw new IllegalArgumentException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_TEMPLATE_NUMBER));
+            };
+
             // Process the FreeMarker template
-            Template template = freeMarkerConfig.getTemplate(Constants.INTERNSHIP_TEMPLATE);
+            Template template = freeMarkerConfig.getTemplate(templateName);
             StringWriter stringWriter = new StringWriter();
             template.process(dataModel, stringWriter);
 

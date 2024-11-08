@@ -40,7 +40,7 @@ public class AppraisalLetterServiceImpl implements AppraisalLetterService {
 
 
     @Override
-    public ResponseEntity<byte[]> downloadAppraisalLetter(AppraisalLetterRequest appraisalLetterRequest, HttpServletRequest request) {
+    public ResponseEntity<byte[]> downloadAppraisalLetter(AppraisalLetterRequest appraisalLetterRequest, HttpServletRequest request,  int templateNumber) {
         CompanyEntity entity;
         Entity companyEntity;
         SalaryConfigurationEntity salaryConfiguration;
@@ -103,8 +103,13 @@ public class AppraisalLetterServiceImpl implements AppraisalLetterService {
             String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
             dataModel.put(Constants.BLURRED_IMAGE, Constants.DATA + base64Image);
 
+            String templateName = switch (templateNumber) {
+                case 1 -> Constants.APPRAISAL_LETTER_TEMPLATE1;
+                case 2 -> Constants.APPRAISAL_LETTER_TEMPLATE2;
+                default -> throw new IllegalArgumentException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_TEMPLATE_NUMBER));
+            };
             // Process the FreeMarker template
-            Template template = freeMarkerConfig.getTemplate(Constants.APPRAISAL_LETTER_TEMPLATE);
+            Template template = freeMarkerConfig.getTemplate(templateName);
             StringWriter stringWriter = new StringWriter();
             template.process(dataModel, stringWriter);
 

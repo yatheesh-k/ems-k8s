@@ -877,4 +877,36 @@ public class CompanyUtils {
 
         return watermarkedImage;
     }
+    public static TemplateEntity addTemplateProperties(TemplateEntity existingEntity, TemplateRequest templateRequest, String resourceId, String companyId) {
+        // If no existing entity is found, initialize a new TemplateEntity
+        TemplateEntity entity = (existingEntity != null) ? existingEntity : new TemplateEntity();
+
+        // Set the resource ID and company ID
+        entity.setId(resourceId);
+        entity.setCompanyId(companyId);
+        entity.setType(Constants.TEMPLATE);
+
+        // Update template numbers if they are present in templateRequest, otherwise keep the existing value
+        if (templateRequest.getAppraisalTemplateNo() != null) {
+            entity.setAppraisalTemplateNo(templateRequest.getAppraisalTemplateNo());
+        }
+        if (templateRequest.getExperienceTemplateNo() != null) {
+            entity.setExperienceTemplateNo(templateRequest.getExperienceTemplateNo());
+        }
+        if (templateRequest.getPayslipTemplateNo() != null) {
+            entity.setPayslipTemplateNo(templateRequest.getPayslipTemplateNo());
+        }
+        if (templateRequest.getRelievingTemplateNo() != null) {
+            entity.setRelievingTemplateNo(templateRequest.getRelievingTemplateNo());
+        }
+        if (templateRequest.getOfferLetterTemplateNo() != null) {
+            entity.setOfferLetterTemplateNo(templateRequest.getOfferLetterTemplateNo());
+        }
+        if (templateRequest.getInternshipTemplateNo() != null) {
+            entity.setInternshipTemplateNo(templateRequest.getInternshipTemplateNo());
+        }
+
+        return entity;
+    }
+
 }

@@ -39,7 +39,7 @@ public class PayslipServiceImpl implements PayslipService {
     @Override
     public ResponseEntity<?> generatePaySlip(PayslipRequest payslipRequest, String salaryId, String employeeId) throws EmployeeException, IOException {
         String paySlipId = ResourceIdUtils.generatePayslipId(payslipRequest.getMonth(), payslipRequest.getYear(), employeeId);
-        EmployeeSalaryEntity entity = null;
+            EmployeeSalaryEntity entity = null;
         Object payslipEntity = null;
         EmployeeEntity employee = null;
         AttendanceEntity attendance = null;
@@ -432,7 +432,6 @@ public class PayslipServiceImpl implements PayslipService {
                 case 4 -> Constants.PAYSLIP_TEMPLATE_FOUR;
                 default -> throw new IllegalArgumentException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_TEMPLATE_NUMBER));
             };
-            System.out.println(model);
 
             // Generate HTML from FreeMarker template
             Template template = freeMarkerConfig.getTemplate(templateName);

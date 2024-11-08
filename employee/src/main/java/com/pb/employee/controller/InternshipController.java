@@ -1,8 +1,6 @@
 package com.pb.employee.controller;
 
-import com.pb.employee.request.AppraisalLetterRequest;
 import com.pb.employee.request.InternshipRequest;
-import com.pb.employee.service.AppraisalLetterService;
 import com.pb.employee.service.InternshipService;
 import com.pb.employee.util.Constants;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,7 +20,7 @@ public class InternshipController {
     private InternshipService internshipService;
 
 
-    @RequestMapping(value = "/upload/internship", method = RequestMethod.POST)
+    @RequestMapping(value = "/internship/{id}/upload", method = RequestMethod.POST)
     @io.swagger.v3.oas.annotations.Operation(security = {@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY)},
             summary = "${api.getInternship.tag}", description = "${api.getInternship.description}")
     @ResponseStatus(HttpStatus.OK)
@@ -31,8 +29,10 @@ public class InternshipController {
             description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                                   @RequestHeader(Constants.AUTH_KEY) String authToken,
                                                   @RequestBody @Valid InternshipRequest internshipRequest,
-                                                  HttpServletRequest request) {
-        return internshipService.downloadInternship(internshipRequest,request);
+                                                  HttpServletRequest request,
+                                                  @PathVariable int id) {
+        return internshipService.downloadInternship(internshipRequest, request, id);
     }
+
 
 }

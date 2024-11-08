@@ -99,7 +99,7 @@ public class ExperienceLetterServiceImpl implements ExperienceLetterService {
                 // Apply the watermark effect
                 float opacity = 0.7f;
                 double scaleFactor = 1.6d;
-                BufferedImage watermarkedImage = applyOpacity(originalImage, opacity, scaleFactor, 30);
+                BufferedImage watermarkedImage = CompanyUtils.applyOpacity(originalImage, opacity, scaleFactor, 30);
 
                 // Convert BufferedImage to Base64 string for HTML
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -144,38 +144,6 @@ public class ExperienceLetterServiceImpl implements ExperienceLetterService {
         }
     }
 
-    private BufferedImage applyOpacity(BufferedImage originalImage, float opacity, double scaleFactor, double rotationDegrees) {
-        int newWidth = (int) (originalImage.getWidth() * scaleFactor);
-        int newHeight = (int) (originalImage.getHeight() * scaleFactor);
-        double radians = Math.toRadians(-rotationDegrees);
-
-        int rotatedWidth = (int) Math.abs(newWidth * Math.cos(radians)) + (int) Math.abs(newHeight * Math.sin(radians));
-        int rotatedHeight = (int) Math.abs(newWidth * Math.sin(radians)) + (int) Math.abs(newHeight * Math.cos(radians));
-
-        BufferedImage watermarkedImage = new BufferedImage(rotatedWidth, rotatedHeight, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = watermarkedImage.createGraphics();
-
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
-        int centerX = rotatedWidth / 2;
-        int centerY = rotatedHeight / 2;
-
-        g2d.translate(centerX, centerY);
-        g2d.rotate(radians);
-        g2d.translate(-newWidth / 2, -newHeight / 2);
-
-        Image scaledImage = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-        g2d.drawImage(scaledImage, 0, 0, null);
-
-        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, rotatedWidth, rotatedHeight);
-
-        g2d.dispose();
-
-        return watermarkedImage;
-    }
 
     public ResponseEntity<byte[]> uploadExperienceLetter(ExperienceLetterRequest request) {
         try {

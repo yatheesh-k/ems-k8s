@@ -39,7 +39,6 @@ public class TemplateServiceImpl implements TemplateService {
     public ResponseEntity<?> addTemplate(TemplateRequest templateRequest, HttpServletRequest request) throws EmployeeException,IOException{
 
         CompanyEntity companyEntity;
-        TemplateEntity templateEntity;
         String resourceId = ResourceIdUtils.generateTemplateResourceId(templateRequest.getCompanyId());
 
         log.debug("Validating template existence for companyId: {}", templateRequest.getCompanyId());
@@ -52,8 +51,10 @@ public class TemplateServiceImpl implements TemplateService {
         }
         CompanyUtils.unmaskCompanyProperties(companyEntity,request);
         String index = ResourceIdUtils.generateCompanyIndex(companyEntity.getShortName());
-        templateEntity = openSearchOperations.getTemplateById(resourceId, null,index);
+        TemplateEntity existingTemplateEntity = openSearchOperations.getTemplateById(resourceId,null,index);
 
+        // Update template properties with retention of existing fields
+        TemplateEntity templateEntity = CompanyUtils.addTemplateProperties(existingTemplateEntity, templateRequest, resourceId, companyEntity.getId());
         try {
             // Use the generated index for saving the entity
             openSearchOperations.saveEntity(templateEntity, resourceId, index);

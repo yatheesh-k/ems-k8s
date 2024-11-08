@@ -102,7 +102,7 @@ public class Constants {
     public static final String REQUEST = "request";
     public static final String EXPERIENCE_LETTER_TWO = "expLetter2.ftl";
     public static final String OFFER_LETTER_TEMPLATE1 = "offerTemplate1.ftl";
-    public static final String APPRAISAL_LETTER_TEMPLATE = "appraisalLetter.ftl";
+    public static final String APPRAISAL_LETTER_TEMPLATE1 = "appraisalLetter1.ftl";
     public static final String OFFER_LETTER_REQUEST = "offerLetter";
     public static final String ATTACHMENT = "attachment";
     public static final String OFFER_LETTER = "offer_letter.pdf";
@@ -123,5 +123,8 @@ public class Constants {
     public static final String INTERNSHIP_CERT = "internship_certificate.pdf";
     public static final String TEMPLATE = "template";
     public static final String INTERNSHIP = "internship";
-    public static final String INTERNSHIP_TEMPLATE = "internship.ftl";
+    public static final String INTERNSHIP_TEMPLATE1 = "internship1.ftl";
+    public static final String INTERNSHIP_TEMPLATE2 = "internship2.ftl";
+    public static final String APPRAISAL_LETTER_TEMPLATE2 = "appraisalLetter2.ftl";
+
 }
