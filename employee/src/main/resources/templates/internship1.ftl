@@ -65,29 +65,27 @@
     <div class="date-info">
         <h5>Date: ${internship.date}</h5>
     </div>
-    <h5 style="text-align:center; font-size: 15px;">TO WHOMSOEVER IT MAY CONCERN</h5>
 
     <div class = "details">
-        <p>This letter is to certify that <b>${internship.employeeName}</b> has successfully completed his internship program of ${internship.period} in our
-            organization’s <b>${internship.department}</b>.</p>
+       <p> This is to certify that<strong>${internship.employeeName}</strong>has successfully completed an
+       internship program with <strong>${company.companyName}</strong> as a <strong>${internship.designation}</strong>
+       in the <strong>${internship.department}</strong> department from <strong>${internship.startDate}</strong>
+       to <strong>${internship.endDate}</strong>.</p>
         <p>
-            His internship tenure was from <b>${internship.startDate}</b> to <b>${internship.endDate}</b>.
+           Throughout the internship, <b>${internship.employeeName}</b> demonstrated professionalism and dedication. We believe that
+            <b>${internship.employeeName}</b> has gained valuable experience that will aid in future professional endeavors.
         </p>
         <p>
-            He has worked on a project titled <b>“${internship.projectTitle}”</b>. This project was aimed to launch
-            petroleum products online. As part of the project, he has involved web development, as part of development
-            he designed user interface screens, banners, mailers based on the design briefs.
-        </p>
-        <p>
-            During his internship, he has demonstrated his skills with self-motivation to learn new skills. His
-            performance exceeded our expectations and he was able to complete the project on time.
-        </p>
-        <p>
-            We wish him all the success in his future endeavours.
+           We wish ${internship.employeeName} the best of luck in all future endeavors and are confident that ${internship.employeeName} will continue to excel in their career path.
         </p>
         <p style="margin-top: 50px;">For <span style="font-weight: bold; text-transform: uppercase;">${company.companyName}</span></p>
         <p style="margin-top: 110px;">Authorized Signature</p>
-    </div>
+
+
+     <h4>${company.companyName},</h4>
+     <p>${company.mobileNo} ,${company.emailId}</p>
+     <p>${company.companyAddress}.</p>
+     </div>
 
 </body>
 
