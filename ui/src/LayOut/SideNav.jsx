@@ -40,9 +40,10 @@ const SideNav = () => {
   useEffect(() => {
     if (
       location.pathname === "/offerLetters" ||
-      location.pathname === "/experienceLetter" ||
+      location.pathname === "/experienceForm" ||
       location.pathname === "/appraisalLetter" ||
-      location.pathname === "/relievingLetter" 
+      location.pathname === "/relievingLetter" ||
+      location.pathname === "/internsLetter"
     ) {
       setIsLettersOpen(true);
     } else {
@@ -65,7 +66,10 @@ const SideNav = () => {
   useEffect(() => {
     if (
       location.pathname === "/companySalaryView" ||
-      location.pathname === "/companySalaryStructure"
+      location.pathname === "/companySalaryStructure"||
+      location.pathname === "/"||
+      location.pathname==="/appraisalLetter"||
+      location.pathname==="/internsTemplates"
     ) {
       setIsSettingsOpen(true);
     } else {
@@ -411,14 +415,15 @@ const SideNav = () => {
               <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  data-bs-target="#attendenceManagement"
+                  data-bs-target="#letterManagement"
                   data-bs-toggle="collapse"
                   href
                   onClick={toggleLetters}
                 >
                   <span className="align-middle">
                     <i
-                      className="bi bi-calendar-check-fill"
+                      className="bi bi-files"
+
                       style={{ fontSize: "medium" }}
                     ></i>
                   </span>{" "}
@@ -431,7 +436,7 @@ const SideNav = () => {
                   ></i>
                 </a>
                 <ul
-                  id="attendenceManagement"
+                  id="letterManagement"
                   className={`sidebar-dropDown list-unstyled collapse ${isLettresOpen ? "show" : ""
                     }`}
                 >
@@ -446,15 +451,26 @@ const SideNav = () => {
                   </li>
                   <li
                     style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${location.pathname === "/experienceLetter" ? "active" : ""
+
+                    className={`sidebar-item ${location.pathname === "/experieneSummary" ? "active" : ""
                       }`}
                   >
-                    <a className="sidebar-link" href={"/experienceLetter"}>
+                    <a className="sidebar-link" href={"/experienceForm"}>
                      Experience Letters
                     </a>
                   </li>
                   <li
                     style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${location.pathname === "/experieneSummary" ? "active" : ""
+                      }`}
+                  >
+                    <a className="sidebar-link" href={"/existingSummary"}>
+                     Exists Letters
+                    </a>
+                  </li>
+                  <li
+                    style={{ paddingLeft: "40px" }}
+
                     className={`sidebar-item ${
                       location.pathname === "/appraisalLetter" ? "active" : ""
                     }`}
@@ -463,15 +479,20 @@ const SideNav = () => {
                       Appraisal Letters
                     </Link>
                   </li>
+                </ul>
+                <ul
+                  id="letterManagement"
+                  className={`sidebar-dropDown list-unstyled collapse ${isLettresOpen ? "show" : ""
+                    }`}
+                >
                   <li
                     style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${
-                      location.pathname === "/relievingLetter" ? "active" : ""
-                    }`}
+                    className={`sidebar-item ${location.pathname === "/internsLetter" ? "active" : ""
+                      }`}
                   >
-                    <Link className="sidebar-link" to={"/relievingLetter"}>
-                      Relieving Letters
-                    </Link>
+                    <a className="sidebar-link" href={"/internsLetter"}>
+                      Interns Letter
+                    </a>
                   </li>
                 </ul>
               </li>
@@ -746,11 +767,57 @@ const SideNav = () => {
                 >
                   <li
                     style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${location.pathname === "/appraisalTemplates" ? "active" : ""
+                      }`}
+                  >
+                    <a className="sidebar-link" href={"/appraisalTemplates"}>
+                      Appraisal Templates
+                    </a>
+                  </li>
+                </ul>
+                <ul
+                  id="settingsManagement"
+                  className={`sidebar-dropDown list-unstyled collapse ${isSettingsOpen ? "show" : ""
+                    }`}
+                >
+                  <li
+                    style={{ paddingLeft: "40px" }}
                     className={`sidebar-item ${location.pathname === "/experienceLetter" ? "active" : ""
                       }`}
                   >
                     <a className="sidebar-link" href={"/experienceLetter"}>
-                      Experience Letter Templates
+                      Experience Templates
+                    </a>
+                  </li>
+                </ul>
+                <ul
+                  id="settingsManagement"
+                  className={`sidebar-dropDown list-unstyled collapse ${isSettingsOpen ? "show" : ""
+                    }`}
+                >
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${location.pathname === "/relievingTemplates" ? "active" : ""
+                      }`}
+                  >
+                    <a className="sidebar-link" href={"/relievingTemplates"}>
+                      Exists Templates
+
+                    </a>
+                  </li>
+                </ul>
+                <ul
+                  id="settingsManagement"
+                  className={`sidebar-dropDown list-unstyled collapse ${isSettingsOpen ? "show" : ""
+                    }`}
+                >
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${location.pathname === "/internsTemplates" ? "active" : ""
+                      }`}
+                  >
+                    <a className="sidebar-link" href={"/internsTemplates"}>
+                      Interns Templates
                     </a>
                   </li>
                 </ul>

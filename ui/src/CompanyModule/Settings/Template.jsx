@@ -7,7 +7,14 @@ import { useAuth } from '../../Context/AuthContext';
 import { useForm } from 'react-hook-form';
 
 const Template = () => {
-    const date = new Date().toLocaleDateString();
+    const formatDate = (date) => {
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+    const date = formatDate(new Date());
     const { setValue,register, formState: { errors } } = useForm({mode:"onChange"});
     const [isEditing, setIsEditing] = useState(false);
     const [error, setError] = useState(null);

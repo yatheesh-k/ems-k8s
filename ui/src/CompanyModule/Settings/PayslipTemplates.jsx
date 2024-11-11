@@ -15,10 +15,10 @@ const PayslipTemplates = () => {
     const { user } = useAuth();
 
     const templates = [
-        { id: 1, title: 'Template 1', bgColor: '#d3d3ef', headingColor: '#cd1456', component: <PayslipTemplate1 /> },
-        { id: 2, title: 'Template 2', bgColor: '#ffe4e1', headingColor: '#4682b4', component: <PayslipTemplate2 /> },
-        { id: 3, title: 'Template 3', bgColor: '#e6e6fa', headingColor: '#6a5acd', component: <PayslipTemplate3 /> },
-        { id: 4, title: 'Template 4', bgColor: '#ffebcd', headingColor: '#32cd32', component: <PayslipTemplate4 /> },
+        { id: 1, title: 'Template 1', bgColor: '#e6e6fa', headingColor: '#4682b4', component: <PayslipTemplate1 /> },
+        { id: 2, title: 'Template 2', bgColor: '#e6e6fa', headingColor: '#4682b4', component: <PayslipTemplate2 /> },
+        { id: 3, title: 'Template 3', bgColor: '#e6e6fa', headingColor: '#4682b4', component: <PayslipTemplate3 /> },
+        { id: 4, title: 'Template 4', bgColor: '#e6e6fa', headingColor: '#4682b4', component: <PayslipTemplate4 /> },
     ];
 
     const handleSelectTemplate = async () => {
