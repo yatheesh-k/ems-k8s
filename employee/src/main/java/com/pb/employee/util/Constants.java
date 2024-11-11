@@ -120,6 +120,9 @@ public class Constants {
     public static final String APPRAISAL_LETTER_REQUEST = "appraisal";
     public static final String DYNAMIC_EXPERIENCE_LETTER_PDF = "dynamicExpLetter.ftl";
     public static final String APPRAISAL_LETTER = "appraisal_letter.pdf";
+    public static final String RELIEVING_LETTER1 = "relievingLetter.ftl";
+    public static final String RELIEVING_LETTER_PDF = "relievingLetter";
+    public static final String RELIEVING_LETTER2 = "relievingLetter2.ftl";
     public static final String INTERNSHIP_CERT = "internship_certificate.pdf";
     public static final String TEMPLATE = "template";
     public static final String INTERNSHIP = "internship";

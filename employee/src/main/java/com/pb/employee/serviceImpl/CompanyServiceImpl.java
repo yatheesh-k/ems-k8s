@@ -217,8 +217,6 @@ public class CompanyServiceImpl implements CompanyService {
         CompanyEntity entity = CompanyUtils.maskCompanyImageUpdateProperties(user, companyImageUpdate, companyId);
         if (!multipartFile.isEmpty()){
             multiPartFileStore(multipartFile, entity);
-
-
         }
         openSearchOperations.saveEntity(entity, companyId, Constants.INDEX_EMS);
         return new ResponseEntity<>(
