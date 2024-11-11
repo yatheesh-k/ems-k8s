@@ -38,6 +38,14 @@ import CompanySalaryView from '../CompanyModule/Settings/CompanySalaryView';
 import OfferLetters from '../CompanyModule/Settings/OfferLetters';
 import Template from '../CompanyModule/Settings/Template';
 import ExperienceLetter from '../CompanyModule/Settings/Experience/ExperienceLetter';
+import InternShipForm from '../CompanyModule/Internship/Internship/InternShipForm';
+import InternShipPreview from '../CompanyModule/Internship/Internship/InternShipPreview';
+import InternShipTemplate2 from '../CompanyModule/Internship/Internship/InternShipTemplate2';
+import InternshipTemplate1 from '../CompanyModule/Internship/Internship/InternshipTemplate1';
+import InternShipTemplates from '../CompanyModule/Internship/Internship/InternShipTemplates';
+import AppraisalTemplate from '../CompanyModule/Appraisal/AppraisalTemplate';
+import AppraisalTemplate1 from '../CompanyModule/Appraisal/AppraisalTemplate1';
+import AppraisalTemplate2 from '../CompanyModule/Appraisal/AppraisalTemplate2';
 import PayslipUpdate1 from '../CompanyModule/PayRoll/PayslipUpdate/PayslipUpdate1';
 import PayslipUpdate2 from '../CompanyModule/PayRoll/PayslipUpdate/PayslipUpdate2';
 import PayslipUpdate3 from '../CompanyModule/PayRoll/PayslipUpdate/PayslipUpdate3';
@@ -51,6 +59,7 @@ import PayslipDoc1 from '../CompanyModule/PayRoll/Payslips/PayslipDoc1';
 import PayslipDoc3 from '../CompanyModule/PayRoll/Payslips/PayslipDoc3';
 import PayslipDoc2 from '../CompanyModule/PayRoll/Payslips/PayslipDoc2';
 import PayslipDoc4 from '../CompanyModule/PayRoll/Payslips/PayslipDoc4';
+import AppraisalPreview from '../CompanyModule/Appraisal/AppraisalPreview';
 
 const Rout = () => {
   const location = useLocation();
@@ -154,6 +163,16 @@ const Rout = () => {
       <Route path='/experienceLetter' element={<ExperienceLetter />}></Route>
       <Route path='/existingEmployee' element={<ExistingLetter />}></Route>
       <Route path='/forgotPassword' element={<ForgotPassword />}></Route>
+      <Route path='/internsLetter' element={<InternShipForm/>}></Route>
+      <Route path='/internshipPreview' element={<InternShipPreview/>}></Route>
+      <Route path='/internshipTemplate1' element={<InternshipTemplate1/>}></Route>
+      <Route path='/internshipTemplate2' element={<InternShipTemplate2/>}></Route>
+      <Route path='/internsTemplates' element={<InternShipTemplates/>}></Route>
+      <Route path='/appraisalLetter' element={<AddIncrement/>}></Route>
+      <Route path='/appraisalPreview' element={<AppraisalPreview/>}></Route>
+      <Route path='/appraisalTemplates' element={<AppraisalTemplate/>}></Route>
+      <Route path='/appraisalTemplate1' element={<AppraisalTemplate1/>}></Route>
+      <Route path='/appraisalTemplate2' element={<AppraisalTemplate2/>}></Route>
       <Route path='/payslipUpdate1' element={<PayslipUpdate1 />}></Route>
       <Route path='/payslipUpdate2' element={<PayslipUpdate2 />}></Route>
       <Route path='/payslipUpdate3' element={<PayslipUpdate3 />}></Route>

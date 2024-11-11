@@ -438,6 +438,7 @@ public class CompanyUtils {
 
             }
             if (companyEntity.getCompanyRegNo() !=null &&companyRequest.getCompanyRegNo() != null && !companyEntity.getCompanyRegNo().isEmpty()) {
+
                 regNo = new String(Base64.getDecoder().decode(companyEntity.getCompanyRegNo().getBytes()));
                 if (regNo.equals(companyRequest.getCompanyRegNo())){
                     responseBody.put(Constants.DUPLICATE_REGISTER_NO, companyRequest.getCompanyRegNo());
@@ -496,6 +497,7 @@ public class CompanyUtils {
             }
 
             if (companyEntity.getCinNo() !=null && companyRequest.getCinNo() != null && !companyEntity.getCinNo().isEmpty()) {
+
                 cinNo = new String(Base64.getDecoder().decode(companyEntity.getCinNo().getBytes()));
                 if (cinNo.equals(companyRequest.getCinNo())){
                     responseBody.put(Constants.DUPLICATE_CIN_NO, companyRequest.getCinNo());
@@ -846,6 +848,7 @@ public class CompanyUtils {
         return responseBody;
     }
 
+
     public static BufferedImage applyOpacity(BufferedImage originalImage, float opacity, double scaleFactor, double rotationDegrees) {
         int newWidth = (int) (originalImage.getWidth() * scaleFactor);
         int newHeight = (int) (originalImage.getHeight() * scaleFactor);
@@ -877,4 +880,64 @@ public class CompanyUtils {
 
         return watermarkedImage;
     }
+
+    public static RelievingEntity relievingProperties(RelievingRequest request, String id, String employeeId) {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        RelievingEntity relievingEntity = objectMapper.convertValue(request, RelievingEntity.class);
+        relievingEntity.setId(id);
+        relievingEntity.setEmployeeId(employeeId);
+        relievingEntity.setType(Constants.RELIEVING);
+
+        return relievingEntity;
+    }
+
+    public static RelievingEntity maskUpdateRelievingProperties(RelievingRequest relievingRequest, RelievingEntity relievingEntity) {
+        if (relievingRequest.getRelievingDate() != null) {
+            relievingEntity.setRelievingDate(relievingRequest.getRelievingDate());
+        }
+        if (relievingRequest.getNoticePeriod() != null) {
+            relievingEntity.setNoticePeriod(relievingRequest.getNoticePeriod());
+        }
+        if (relievingRequest.getResignationDate() != null) {
+            relievingEntity.setResignationDate(relievingRequest.getResignationDate());
+        }
+
+        return relievingEntity;
+    }
+
+
+
+    public static TemplateEntity addTemplateProperties(TemplateEntity existingEntity, TemplateRequest templateRequest, String resourceId, String companyId) {
+        // If no existing entity is found, initialize a new TemplateEntity
+        TemplateEntity entity = (existingEntity != null) ? existingEntity : new TemplateEntity();
+
+        // Set the resource ID and company ID
+        entity.setId(resourceId);
+        entity.setCompanyId(companyId);
+        entity.setType(Constants.TEMPLATE);
+
+        // Update template numbers if they are present in templateRequest, otherwise keep the existing value
+        if (templateRequest.getAppraisalTemplateNo() != null) {
+            entity.setAppraisalTemplateNo(templateRequest.getAppraisalTemplateNo());
+        }
+        if (templateRequest.getExperienceTemplateNo() != null) {
+            entity.setExperienceTemplateNo(templateRequest.getExperienceTemplateNo());
+        }
+        if (templateRequest.getPayslipTemplateNo() != null) {
+            entity.setPayslipTemplateNo(templateRequest.getPayslipTemplateNo());
+        }
+        if (templateRequest.getRelievingTemplateNo() != null) {
+            entity.setRelievingTemplateNo(templateRequest.getRelievingTemplateNo());
+        }
+        if (templateRequest.getOfferLetterTemplateNo() != null) {
+            entity.setOfferLetterTemplateNo(templateRequest.getOfferLetterTemplateNo());
+        }
+        if (templateRequest.getInternshipTemplateNo() != null) {
+            entity.setInternshipTemplateNo(templateRequest.getInternshipTemplateNo());
+        }
+
+        return entity;
+    }
+
 }

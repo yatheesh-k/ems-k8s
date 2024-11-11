@@ -7,6 +7,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface InternshipService {
 
-    ResponseEntity<byte[]> downloadInternship(InternshipRequest internshipRequest, HttpServletRequest request);
-
+    ResponseEntity<byte[]> downloadInternship(InternshipRequest internshipRequest, HttpServletRequest request,int templateNumber);
 }

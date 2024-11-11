@@ -86,9 +86,12 @@ public enum EmployeeErrorMessageKey {
     COMPANY_DATA_EXIST("company.data.exist"),
     RELIEVING_ALREADY_EXIST("relieving.already.exist"),
     IMAGE_NOT_LOADED("image.not.loaded"),
+    UNABLE_GET_RELIEVING("unable.get.relieving"),
+    RELIEVING_NOT_EXIST("relieving.not.exist"),
     UNABLE_SAVE_TEMPLATE("unable.save.template"),
     TEMPLATE_EXIST("template.already.exists"),
-    UNABLE_TO_GET_TEMPLATE("unable.template");
+    UNABLE_TO_GET_TEMPLATE("unable.template"),
+    INVALID_RELIVING("invalid.relieving");
 
     private final String key;
 

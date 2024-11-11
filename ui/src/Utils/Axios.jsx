@@ -397,7 +397,7 @@ export const OfferLetterDownload = async (payload) => {
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const a = document.createElement('a');
     a.href = url;
-    a.download = `offerLettre.pdf`; 
+    a.download = `offer_letter.pdf`; 
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -412,10 +412,60 @@ export const OfferLetterDownload = async (payload) => {
 };
 
 export const PayslipTemplate = (data) => {
-  return axiosInstance.post(`/template`, data);
+  return axiosInstance.patch(`/template`, data);
 };
 
 export const PayslipTemplateGetApi = (data) => {
   const companyName = localStorage.getItem("companyName")
   return axiosInstance.get(`/${companyName}/template`, data);
+};
+
+export const InternshipCertificateDownload = async (payload) => {
+  try {
+    const response = await axiosInstance.post(`/upload/internship`,payload, {
+      responseType: 'blob', 
+      headers: {
+        'Accept': 'application/pdf', 
+      }
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `internship.pdf`; 
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+
+    return true; 
+
+  } catch (error) {
+    console.error('Download error:', error);
+    throw error; 
+  }
+};
+
+export const AppraisalLetterDownload = async (payload) => {
+  try {
+    const response = await axiosInstance.post(`/upload/appraisal/letter`,payload, {
+      responseType: 'blob', 
+      headers: {
+        'Accept': 'application/pdf', 
+      }
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `offerLettre.pdf`; 
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+
+    return true; 
+
+  } catch (error) {
+    console.error('Download error:', error);
+    throw error; 
+  }
 };

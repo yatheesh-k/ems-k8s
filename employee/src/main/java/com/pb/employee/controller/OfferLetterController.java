@@ -19,7 +19,7 @@ public class OfferLetterController {
     @Autowired
     private OfferLetterService offerLetterService;
 
-    @RequestMapping(value = "/upload/offerletter", method = RequestMethod.POST)
+    @RequestMapping(value = "/offerletter/upload", method = RequestMethod.POST)
     @io.swagger.v3.oas.annotations.Operation(security = {@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY)},
             summary = "${api.getOfferLetter.tag}", description = "${api.getOfferLetter.description}")
     @ResponseStatus(HttpStatus.OK)

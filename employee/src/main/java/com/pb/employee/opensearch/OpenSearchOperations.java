@@ -729,6 +729,7 @@ public class OpenSearchOperations {
         return null;
     }
 
+
     public TemplateEntity getTemplateById(String resourceId, String type, String index) throws IOException {
         if(type != null) {
             resourceId = type+"_"+resourceId;
@@ -736,6 +737,80 @@ public class OpenSearchOperations {
         GetRequest getRequest = new GetRequest.Builder().id(resourceId)
                 .index(index).build();
         GetResponse<TemplateEntity> searchResponse = esClient.get(getRequest, TemplateEntity.class);
+        if(searchResponse != null && searchResponse.source() != null){
+            return searchResponse.source();
+        }
+        return null;
+    }
+    public RelievingEntity getRelievingByEmployeeId(String employeeId, String type, String companyName) throws IOException, EmployeeException {
+
+        logger.debug("Getting employee for salary details {}", companyName);
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        boolQueryBuilder = boolQueryBuilder
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.RELIEVING)))
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.EMPLOYEE_ID).query(employeeId)));
+        BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
+        SearchResponse<RelievingEntity> searchResponse = null;
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+
+        try {
+            // Set size to 1 to get a single entity
+            searchResponse = esClient.search(t -> t.index(index).size(1)
+                    .query(finalBoolQueryBuilder.build().toQuery()), RelievingEntity.class);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        List<Hit<RelievingEntity>> hits = searchResponse.hits().hits();
+        logger.info("Number of employee hits for company is {}: {}", companyName, hits.size());
+
+        // Return the first hit if available, otherwise return null or throw an exception
+        if (!hits.isEmpty()) {
+            return hits.get(0).source();
+        } else {
+            logger.warn("No relieving entity found for employeeId {}", employeeId);
+            return null; // or throw a custom exception
+        }
+    }
+
+    public List<RelievingEntity> getEmployeeRelieving(String companyName, Object o) throws EmployeeException {
+        logger.debug("Getting the Resource by id {} ", companyName);
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        boolQueryBuilder =
+                boolQueryBuilder.filter(q -> q.term(t -> t.field(Constants.TYPE).value(FieldValue.of(Constants.RELIEVING))));
+
+        BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
+        SearchResponse<RelievingEntity> searchResponse = null;
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+        try {
+            searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                    .query(finalBoolQueryBuilder.build()._toQuery()), RelievingEntity.class);
+        } catch (IOException e) {
+            e.getStackTrace();
+            logger.error(e.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        List<Hit<RelievingEntity>> hits = searchResponse.hits().hits();
+        logger.info("Number of hits {}", hits.size());
+        List<RelievingEntity> relievingEntities = new ArrayList<>();
+        if(hits.size() > 0) {
+            for(Hit<RelievingEntity> hit : hits){
+                relievingEntities.add(hit.source());
+            }
+        }
+        return relievingEntities;
+
+    }
+
+
+    public RelievingEntity getRelievingById(String resourceId, String type, String index) throws IOException {
+        if(type != null) {
+            resourceId = type+"_"+resourceId;
+        }
+        GetRequest getRequest = new GetRequest.Builder().id(resourceId)
+                .index(index).build();
+        GetResponse<RelievingEntity> searchResponse = esClient.get(getRequest, RelievingEntity.class);
         if(searchResponse != null && searchResponse.source() != null){
             return searchResponse.source();
         }

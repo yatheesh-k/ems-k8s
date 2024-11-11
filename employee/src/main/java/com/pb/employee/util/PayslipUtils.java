@@ -190,14 +190,14 @@ public class PayslipUtils {
         if (decodedString.endsWith("%")){
             String percentageString = decodedString.replace("%", "");
             double percentage = Double.parseDouble(percentageString)/100;
-            double monthlyValue = (percentage*grossAmount);
+            double monthlyValue = (percentage*grossAmount)/12;
             monthlyValue = Math.round(monthlyValue);
-            result = String.valueOf(monthlyValue/12);
+            result = String.valueOf(monthlyValue);
 
             return result;
         }else {
-            double monthlyValue = Double.parseDouble(decodedString);
-            result = String.valueOf(Math.round(monthlyValue/12));
+            double monthlyValue = Double.parseDouble(decodedString)/12;
+            result = String.valueOf(Math.round(monthlyValue));
             return result;
         }
     }
