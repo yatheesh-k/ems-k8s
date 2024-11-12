@@ -155,7 +155,6 @@ const PayslipTemplates = () => {
                     className="btn btn-primary btn-lg"
                     style={{ marginRight: "35px" }}
                     onClick={handleSelectTemplate}
-                    disabled={payslipTemplateNo}
                 >
                     Select Template
                 </button>
