@@ -28,11 +28,6 @@ public class InternshipRequest {
     @Size(min = 3, max = 20, message = "{firstName.size.message}")
     private String employeeName;
 
-
-    @Schema(example = "period")
-    @Pattern(regexp = "^(?:(\\d+)\\s*(\\w+)|([a-zA-Z]+))$", message = "{invalid.period.format}")
-    private String period;
-
     @Schema(example = "department")
     @Pattern(regexp = "^(?!.*\\b([A-Z])\\s\\1\\s\\1)(?:[A-Z][a-z]+(?: [A-Z][a-z]+)*|[A-Z](?:\\.? ?[A-Z])? ?[A-Z][a-z]+)$",
             message = "{department.format}")
@@ -48,11 +43,6 @@ public class InternshipRequest {
     @Pattern(regexp =  "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$", message = "{date.format}")
     @NotBlank(message = "{date.notnull.message}")
     private String endDate;
-
-
-    @Schema(example = "projectTitle")
-    @Pattern(regexp = "^[A-Za-z\\s]+$", message = "{invalid.project.title.format}")
-    private String projectTitle;
 
     @Schema(example = "designation")
     @Pattern(regexp = "^(?!.*\\b([A-Z])\\s\\1\\s\\1)(?:[A-Z][a-z]+(?: [A-Z][a-z]+)*|[A-Z](?:\\.? ?[A-Z])? ?[A-Z][a-z]+)$",
