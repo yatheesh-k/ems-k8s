@@ -16,7 +16,6 @@ const InternShipTemplates = () => {
   const [isFetched, setIsFetched] = useState(false);
 
   const { user,logoFileName } = useAuth();
-  const logo = "/assets/img/adapt_adapt_logo.png";
 
   const fetchCompanyData = async (companyId) => {
     try {
@@ -130,7 +129,7 @@ const InternShipTemplates = () => {
   const handleSubmitTemplate = async () => {
     const dataToSubmit = {
       companyId: companyData.id, // Ensure this is correct
-      offerLetterTemplateNo: selectedTemplate.name,
+      internshipTemplateNo: selectedTemplate.name,
       // Add other necessary fields if required
     };
     try {

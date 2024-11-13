@@ -50,7 +50,7 @@ const AppraisalTemplate1 = ({
       }
     } catch (err) {
       console.error("Error fetching employee details:", err);
-      toast.error("Failed to fetch employee details");
+      // toast.error("Failed to fetch employee details");
     }
   };
 

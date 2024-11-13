@@ -114,16 +114,18 @@ const AppraisalPreview = ({ previewData, selectedTemplate }) => {
         });
         return (
           <AppraisalTemplate2
-            companyLogo={companyLogo}
-            companyData={companyData}
-            employeeName={employeeName}
-            employeeId={employeeId}  // Pass employeeId to Template 2
-            designation={designationName}
-            joiningDate={dateOfHiring}
-            salaryIncrease={grossAmount} // Using grossAmount for Template 2
-            period={timePeriod}
-            effectiveDate={dateOfSalaryIncrement}
-            allowances={allowances}
+          companyLogo={companyLogo}
+          companyData={companyData}
+          employeeName={employeeName}
+          employeeId={employeeId}  
+          designation={designationName}
+          joiningDate={dateOfHiring}
+          resignationDate={resignationDate}
+          lastWorkingDate={lastWorkingDate}
+          salaryIncrease={grossCompensation}
+          period={timePeriod}
+          effectiveDate={dateOfSalaryIncrement}
+          allowances={allowances}
           />
         );
       },

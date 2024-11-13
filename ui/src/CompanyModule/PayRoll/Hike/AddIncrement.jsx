@@ -141,7 +141,7 @@ const AddIncrement = () => {
   const fetchTemplate = async (companyId) => {
     try {
       const res = await PayslipTemplateGetApi(companyId);
-      const templateNumber = res.data.data.offerLetterTemplateNo;
+      const templateNumber = res.data.data.appraisalTemplateNo;
       setSelectedTemplate(templateNumber)
       setTemplateAvailable(!!templateNumber);
     } catch (error) {
@@ -455,19 +455,20 @@ const AddIncrement = () => {
       return;
     }
     const salaryStructureId = salaryStructures.length > 0 ? salaryStructures[0].id : ""; 
-    const appraisalPayload = {
+    const payload = {
       companyId : user.companyId,
       employeeId: employeeId, 
       date: new Date().toISOString().split('T')[0],  
       dateOfSalaryIncrement: previewData?.dateOfSalaryIncrement || "",
-      grossCompensation: grossAmount || "", 
+      grossCompensation: String(grossAmount || ""),  
       salaryConfigurationId: salaryStructureId || "",   
+      appraisalTemplateNo: selectedTemplate,
     };
 
     try {
        await Promise.all([
         EmployeeSalaryPostApi(employeeId, dataToSubmit), // API call for updating salary
-        AppraisalLetterDownload(appraisalPayload), // API call for downloading the appraisal letter
+        AppraisalLetterDownload(selectedTemplate,payload), // API call for downloading the appraisal letter
       ]);
 
       // If both APIs succeed
@@ -515,8 +516,6 @@ const AddIncrement = () => {
     setData(data)
     console.log(submissionData);
   };
-
-
 
   const clearForm = () => {
     reset();
