@@ -38,7 +38,6 @@ public class AppraisalLetterServiceImpl implements AppraisalLetterService {
     @Autowired
     private Configuration freeMarkerConfig;
 
-
     @Override
     public ResponseEntity<byte[]> downloadAppraisalLetter(AppraisalLetterRequest appraisalLetterRequest, HttpServletRequest request,  int templateNumber) {
         CompanyEntity entity;
@@ -47,7 +46,6 @@ public class AppraisalLetterServiceImpl implements AppraisalLetterService {
         EmployeeEntity employee;
         DepartmentEntity department;
         DesignationEntity designation;
-
         try {
             SSLUtil.disableSSLVerification();
 
@@ -96,7 +94,6 @@ public class AppraisalLetterServiceImpl implements AppraisalLetterService {
             float opacity = 0.7f;
             double scaleFactor = 1.6d;
             BufferedImage watermarkedImage = CompanyUtils.applyOpacity(originalImage, opacity, scaleFactor, 30);
-
             // Convert BufferedImage to Base64 string for HTML
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(watermarkedImage, "png", baos);
@@ -131,8 +128,6 @@ public class AppraisalLetterServiceImpl implements AppraisalLetterService {
         }
     }
 
-
-
     private byte[] generatePdfFromHtml(String html) throws IOException {
         html = html.replaceAll("&(?![a-zA-Z]{2,6};|#\\d{1,5};)", "&amp;");
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -145,6 +140,4 @@ public class AppraisalLetterServiceImpl implements AppraisalLetterService {
             throw new IOException(e.getMessage());
         }
     }
-
-
 }

@@ -30,8 +30,8 @@ public class AppraisalController {
                                                   @RequestHeader(Constants.AUTH_KEY) String authToken,
                                                   @RequestBody @Valid AppraisalLetterRequest appraisalLetterRequest,
                                                   HttpServletRequest request,
-                                                  @PathVariable  int templateNumber) {
-        return appraisalLetterService.downloadAppraisalLetter(appraisalLetterRequest, request, templateNumber);
+                                                  @PathVariable  int id) {
+        return appraisalLetterService.downloadAppraisalLetter(appraisalLetterRequest, request, id);
     }
 
 

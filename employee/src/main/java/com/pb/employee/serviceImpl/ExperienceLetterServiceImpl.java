@@ -48,7 +48,6 @@ public class ExperienceLetterServiceImpl implements ExperienceLetterService {
     @Autowired
     private Configuration freeMarkerConfig;
 
-
     @Override
     public ResponseEntity<byte[]> downloadServiceLetter(HttpServletRequest request, int templateNo, ExperienceLetterFieldsRequest experienceLetterFieldsRequest) {
         List<CompanyEntity> companyEntity = null;
@@ -143,7 +142,6 @@ public class ExperienceLetterServiceImpl implements ExperienceLetterService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     public ResponseEntity<byte[]> uploadExperienceLetter(ExperienceLetterRequest request) {
         try {

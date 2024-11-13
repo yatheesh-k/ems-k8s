@@ -40,7 +40,6 @@ public class InternshipServiceImpl implements InternshipService {
     @Autowired
     private Configuration freeMarkerConfig;
 
-
     @Override
     public ResponseEntity<byte[]> downloadInternship(InternshipRequest internshipRequest, HttpServletRequest request,int templateNumber) {
 
@@ -88,7 +87,6 @@ public class InternshipServiceImpl implements InternshipService {
                 case 2 -> Constants.INTERNSHIP_TEMPLATE2;
                 default -> throw new IllegalArgumentException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_TEMPLATE_NUMBER));
             };
-
             // Process the FreeMarker template
             Template template = freeMarkerConfig.getTemplate(templateName);
             StringWriter stringWriter = new StringWriter();
@@ -112,8 +110,6 @@ public class InternshipServiceImpl implements InternshipService {
         }
     }
 
-
-
     private byte[] generatePdfFromHtml(String html) throws IOException {
         html = html.replaceAll("&(?![a-zA-Z]{2,6};|#\\d{1,5};)", "&amp;");
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -126,6 +122,4 @@ public class InternshipServiceImpl implements InternshipService {
             throw new IOException(e.getMessage());
         }
     }
-
-
 }

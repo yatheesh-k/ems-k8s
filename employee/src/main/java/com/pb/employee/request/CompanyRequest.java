@@ -29,8 +29,7 @@ public class CompanyRequest {
 
     @Schema(example = "companyAddress")
     @Size(min = 2, max = 200, message = "{companyAddress.notnull.message}")
-    @Pattern(regexp = "^(?!.*\\s{2,})(?!^([a-zA-Z]{1}\\s?){2,}$)(?!^[A-Z](?:\\s[A-Z])*$)(?!^[\\s]*$)[A-Za-z0-9]+(?:[\\s.,'#&*()^/][A-Za-z0-9]+)*(?:[\\s.,'#&*()/-]*[A-Za-z0-9]+)*(?:[\\s]*[.,#&*()/-]*\\s*)*$",
-            /*"^(?!\\d+$)(?!^[A-Za-z]+$)(?!^[A-Za-z]+\\s*,?\\s*[A-Za-z]+$)(?:(?:[A-Z][a-z]*)(?:\\s+[A-Z][a-z0-9]*)*(?:[\\s,./'-]+[A-Za-z0-9]+)*(?:\\s*,\\s*[A-Z][a-z]+(?:\\s+[A-Z][a-z]+)*,\\s*[A-Z][a-z]+(?:\\s+[A-Z][a-z]+)*)?)?$",*/
+    @Pattern(regexp = "^([A-Z][a-z]*[\\x20\\x2D\\x2F\\x2C\\x2E\\x3A\\x3B\\x27\\x22\\x28\\x29\\x5B\\x5D\\x7B\\x7D\\x2A\\x5F\\x40\\x23\\x24\\x25\\x5C\\x21\\x60\\x7E]*)*$",
             message = "{companyAddress.pattern.message}")
     private String companyAddress;
 
@@ -40,11 +39,11 @@ public class CompanyRequest {
 
     @Schema(example = "mobileNo")
     @NotNull(message = "{mobileNo.notnull.message}")
-    @Pattern(regexp ="^(?!([0-9])\\1{9})\\d{10}$", message = "{invalid.mobileNo}")
+    @Pattern(regexp ="^(?!([0-9])\\1{9})\\d{10,15}$", message = "{invalid.mobileNo}")
     private String mobileNo;
 
     @Schema(example = "alternateNo")
-    @Pattern(regexp = "^((?!([0-9])\\1{9})\\d{10}|null|0|)$", message = "{invalid.alternateNo}")
+    @Pattern(regexp = "^((?!([0-9])\\1{9})\\d{10,15}|null|0|)$", message = "{invalid.alternateNo}")
     private String alternateNo;
 
     @Schema(example = "12ABCDE3456Z1")
@@ -69,11 +68,11 @@ public class CompanyRequest {
 
     @Schema(example = "personalMobileNo")
     @NotNull(message = "{personalMobileNo.notnull.message}")
-    @Pattern(regexp = "^(?!([0-9])\\1{9})\\d{10}$", message = "{invalid.mobileNo}")
+    @Pattern(regexp = "^(?!([0-9])\\1{9})\\d{10,15}$", message = "{invalid.mobileNo}")
     private String personalMobileNo;
 
     @Schema(example = "address")
-    @Pattern(regexp = "^(?!.*\\s{2,})(?!^([a-zA-Z]{1}\\s?){2,}$)(?!^[A-Z](?:\\s[A-Z])*$)(?!^[\\s]*$)[A-Za-z0-9]+(?:[\\s.,'#&*()^/][A-Za-z0-9]+)*(?:[\\s.,'#&*()/-]*[A-Za-z0-9]+)*(?:[\\s]*[.,#&*()/-]*\\s*)*$",
+    @Pattern(regexp = "^([A-Z][a-z]*[\\x20\\x2D\\x2F\\x2C\\x2E\\x3A\\x3B\\x27\\x22\\x28\\x29\\x5B\\x5D\\x7B\\x7D\\x2A\\x5F\\x40\\x23\\x24\\x25\\x5C\\x21\\x60\\x7E]*)*$",
             message = "{address.pattern.message}")
     @Size(min = 10, max = 300, message = "{address.notnull.message}")
     private String address;

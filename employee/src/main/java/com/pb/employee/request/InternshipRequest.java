@@ -23,7 +23,7 @@ public class InternshipRequest {
     private String date;
 
     @Schema(example = "employeeName")
-    @Pattern(regexp = "^[A-Z][a-z]+(\\s[A-Z][a-z]+){0,2}$",
+    @Pattern(regexp = "^[A-Za-z][a-zA-Z]*(\\s[A-Za-z][a-zA-Z]*)*$",
             message = "{firstname.format}")
     @Size(min = 3, max = 20, message = "{firstName.size.message}")
     private String employeeName;

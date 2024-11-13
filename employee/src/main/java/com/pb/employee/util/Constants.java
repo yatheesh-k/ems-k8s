@@ -130,4 +130,7 @@ public class Constants {
     public static final String INTERNSHIP_TEMPLATE2 = "internship2.ftl";
     public static final String APPRAISAL_LETTER_TEMPLATE2 = "appraisalLetter2.ftl";
 
+    public static final String NOTICE_PERIOD = "NoticePeriod";
+    public static final String INACTIVE = "InActive";
+    public static final String STATUS = "status";
 }

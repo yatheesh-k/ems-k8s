@@ -25,6 +25,6 @@ public class RelievingRequest {
     @NotBlank(message = "{dateOfApply.notnull.message}")
     private String resignationDate;
 
-    @Schema(example = "yyyy-mm-dd")
+    @Schema(example = "noticePeriod")
     private String noticePeriod;
 }
