@@ -39,7 +39,6 @@ import OfferLetters from '../CompanyModule/Settings/OfferLetters';
 import Template from '../CompanyModule/Settings/Template';
 import ExperienceLetter from '../CompanyModule/Settings/Experience/ExperienceLetter';
 import InternShipForm from '../CompanyModule/Internship/Internship/InternShipForm';
-import InternShipPreview from '../CompanyModule/Internship/Internship/InternShipPreview';
 import InternShipTemplates from '../CompanyModule/Internship/Internship/InternShipTemplates';
 import AppraisalTemplate from '../CompanyModule/Appraisal/AppraisalTemplate';
 import PayslipUpdate1 from '../CompanyModule/PayRoll/PayslipUpdate/PayslipUpdate1';
@@ -51,8 +50,6 @@ import PayslipDoc1 from '../CompanyModule/PayRoll/Payslips/PayslipDoc1';
 import PayslipDoc3 from '../CompanyModule/PayRoll/Payslips/PayslipDoc3';
 import PayslipDoc2 from '../CompanyModule/PayRoll/Payslips/PayslipDoc2';
 import PayslipDoc4 from '../CompanyModule/PayRoll/Payslips/PayslipDoc4';
-import AppraisalPreview from '../CompanyModule/Appraisal/AppraisalPreview';
-import RelievingLetter from '../CompanyModule/Settings/Relieving/RelievingLetter';
 
 const Rout = () => {
   const location = useLocation();
@@ -160,7 +157,6 @@ const Rout = () => {
       <Route path='/internsTemplates' element={<InternShipTemplates/>}></Route>
       <Route path='/appraisalLetter' element={<AddIncrement/>}></Route>
       <Route path='/appraisalTemplates' element={<AppraisalTemplate/>}></Route>
-      <Route path='/relievingTemplates' element={<RelievingLetter/>}></Route>
       <Route path='/payslipUpdate1' element={<PayslipUpdate1 />}></Route>
       <Route path='/payslipUpdate2' element={<PayslipUpdate2 />}></Route>
       <Route path='/payslipUpdate3' element={<PayslipUpdate3 />}></Route>
