@@ -160,7 +160,7 @@ const AppraisalTemplate = () => {
   const handleSubmitTemplate = async () => {
     const dataToSubmit = {
       companyId: companyData.id, // Ensure this is correct
-      relievingTemplateNo: selectedTemplate.name,
+      appraisalTemplateNo: selectedTemplate.name,
       // Add other necessary fields if required
     };
     try {

@@ -11,7 +11,6 @@ const InternShipPreview = ({ previewData, selectedTemplate }) => { // Accept pre
   const [loading, setLoading] = useState(false);
   const { user,companyLogo } = useAuth();
   const navigate=useNavigate();
-  const logo = "/assets/img/adapt_adapt_logo.png";
 
   const fetchCompanyData = async (companyId) => {
     try {
@@ -128,7 +127,6 @@ const InternShipPreview = ({ previewData, selectedTemplate }) => { // Accept pre
   
 
   return (
-
       <div className="container-fluid p-0">
         <div>
           {selectedTemplate && (

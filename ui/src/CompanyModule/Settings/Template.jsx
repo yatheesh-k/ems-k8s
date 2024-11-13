@@ -15,7 +15,7 @@ const Template = () => {
         return `${year}-${month}-${day}`;
     };
     const date = formatDate(new Date());
-    const { setValue,register, formState: { errors } } = useForm({mode:"onChange"});
+    const { setValue, register, formState: { errors } } = useForm({ mode: "onChange" });
     const [isEditing, setIsEditing] = useState(false);
     const [error, setError] = useState(null);
     const [calculatedValues, setCalculatedValues] = useState({});
@@ -69,9 +69,16 @@ const Template = () => {
     const fetchSalary = async () => {
         try {
             const response = await CompanySalaryStructureGetApi();
-            const structures = response.data.data;
-            setSalaryStructures(structures);
+            console.log("API Response:", response); // Check the full response
+
+            const structures = response.data.data; // Assuming this is where your structures are
+            setSalaryStructures(structures); // Update state with the structures
+
+            // Find the active salary structure
             const activeStructure = structures.find(structure => structure.status === "Active");
+            console.log("Active Structure:", activeStructure); // Log the active structure
+
+            // If an active structure is found, set the ID
             if (activeStructure) {
                 setSalaryConfigurationId(activeStructure.id);
             } else {
@@ -79,11 +86,14 @@ const Template = () => {
             }
         } catch (error) {
             console.error("API fetch error:", error);
+            toast.error("Error fetching salary structures.");
         }
     };
+
     useEffect(() => {
         fetchSalary();
     }, []);
+
 
     const calculateValues = () => {
         if (salaryStructures.length === 0) {
@@ -91,8 +101,14 @@ const Template = () => {
             return;
         }
 
-        const structure = salaryStructures[0];
-        const deductions = structure.deductions;
+        // Filter for active structures only
+        const activeStructure = salaryStructures.find(structure => structure.status === "Active");
+        if (!activeStructure) {
+            toast.error("No active salary structure available.");
+            return;
+        }
+
+        const deductions = activeStructure.deductions;
         const totalDeductions = Object.entries(deductions).reduce((acc, [key, percentage]) => {
             const deductionAmount = (grossAmount * (parseFloat(percentage) / 100));
             return acc + deductionAmount;
@@ -198,7 +214,7 @@ const Template = () => {
                             <ul style={{ listStyleType: "none", paddingLeft: "20px" }}>
                                 <li>
                                     &rarr; You would join us on or before&nbsp;
-                                     <strong>
+                                    <strong>
                                         {isEditing ? (
                                             <input
                                                 type="date"
@@ -222,7 +238,7 @@ const Template = () => {
                                 {/* Location */}
                                 <li>
                                     &rarr; You will be deployed at our office site and your job location would be at&nbsp;
-                                     <strong>
+                                    <strong>
                                         {isEditing ? (
                                             <input
                                                 type="text"
@@ -248,7 +264,7 @@ const Template = () => {
                                 {/* Gross Compensation */}
                                 <li>
                                     &rarr; Your gross compensation per annum is&nbsp;
-                                     <strong>
+                                    <strong>
                                         {isEditing ? (
                                             <input
                                                 type="number"
@@ -444,47 +460,49 @@ const Template = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {salaryStructures.map(structure => (
-                                <React.Fragment key={structure.id}>
-                                    {/* Display Allowances */}
-                                    {Object.entries(structure.allowances).map(([key, value]) => {
-                                        const allowanceAmount = (grossAmount * (parseFloat(value) / 100));
-                                        return (
-                                            <tr key={key}>
-                                                <td>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</td>
-                                                <td>{Math.floor(allowanceAmount.toFixed(2) / 12)}</td>
-                                                <td>{Math.floor(allowanceAmount.toFixed(2))}</td>
-                                            </tr>
-                                        );
-                                    })}
-                                    <tr>
-                                        <td><strong>Gross (CTC)</strong></td>
-                                        <td>{Math.floor(grossAmount / 12)}</td>
-                                        <td>{Math.floor(grossAmount)}</td>
-                                    </tr>
-                                    {/* Display Deductions */}
-                                    {Object.entries(structure.deductions).map(([key, value]) => {
-                                        const deductionAmount = (grossAmount * (parseFloat(value) / 100));
-                                        return (
-                                            <tr key={key}>
-                                                <td>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</td>
-                                                <td>{Math.floor(deductionAmount.toFixed(2) / 12)}</td>
-                                                <td>{Math.floor(deductionAmount.toFixed(2))}</td>
-                                            </tr>
-                                        );
-                                    })}
-                                    <tr>
-                                        <td><strong>Total Deductions</strong></td>
-                                        <td>{Math.floor(calculatedValues.totalDeductions ? calculatedValues.totalDeductions.toFixed(2) / 12 : 0)}</td>
-                                        <td>{Math.floor(calculatedValues.totalDeductions ? calculatedValues.totalDeductions.toFixed(2) : 0)}</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Net Salary</strong></td>
-                                        <td>{Math.floor(calculatedValues.netSalary ? (calculatedValues.netSalary / 12).toFixed(2) : 0)}</td>
-                                        <td>{Math.floor(calculatedValues.netSalary ? calculatedValues.netSalary.toFixed(2) : 0)}</td>
-                                    </tr>
-                                </React.Fragment>
-                            ))}
+                            {salaryStructures
+                                .filter(structure => structure.status === "Active") // Display only active structures
+                                .map(structure => (
+                                    <React.Fragment key={structure.id}>
+                                        {/* Display Allowances */}
+                                        {Object.entries(structure.allowances).map(([key, value]) => {
+                                            const allowanceAmount = (grossAmount * (parseFloat(value) / 100));
+                                            return (
+                                                <tr key={key}>
+                                                    <td>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</td>
+                                                    <td>{Math.floor(allowanceAmount.toFixed(2) / 12)}</td>
+                                                    <td>{Math.floor(allowanceAmount.toFixed(2))}</td>
+                                                </tr>
+                                            );
+                                        })}
+                                        <tr>
+                                            <td><strong>Gross (CTC)</strong></td>
+                                            <td>{Math.floor(grossAmount / 12)}</td>
+                                            <td>{Math.floor(grossAmount)}</td>
+                                        </tr>
+                                        {/* Display Deductions */}
+                                        {Object.entries(structure.deductions).map(([key, value]) => {
+                                            const deductionAmount = (grossAmount * (parseFloat(value) / 100));
+                                            return (
+                                                <tr key={key}>
+                                                    <td>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</td>
+                                                    <td>{Math.floor(deductionAmount.toFixed(2) / 12)}</td>
+                                                    <td>{Math.floor(deductionAmount.toFixed(2))}</td>
+                                                </tr>
+                                            );
+                                        })}
+                                        <tr>
+                                            <td><strong>Total Deductions</strong></td>
+                                            <td>{Math.floor(calculatedValues.totalDeductions ? calculatedValues.totalDeductions.toFixed(2) / 12 : 0)}</td>
+                                            <td>{Math.floor(calculatedValues.totalDeductions ? calculatedValues.totalDeductions.toFixed(2) : 0)}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Net Salary</strong></td>
+                                            <td>{Math.floor(calculatedValues.netSalary ? (calculatedValues.netSalary / 12).toFixed(2) : 0)}</td>
+                                            <td>{Math.floor(calculatedValues.netSalary ? calculatedValues.netSalary.toFixed(2) : 0)}</td>
+                                        </tr>
+                                    </React.Fragment>
+                                ))}
                         </tbody>
                     </table>
                     <p style={{ paddingTop: "30px" }}>

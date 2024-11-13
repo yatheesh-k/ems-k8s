@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { companyViewByIdApi, EmployeeGetApiById } from '../../Utils/Axios';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../Context/AuthContext';
+import { useLocation } from 'react-router-dom';
 
 const AppraisalTemplate2 = ({
   companyLogo,
@@ -20,7 +21,10 @@ const AppraisalTemplate2 = ({
   const [employeeDetails, setEmployeeDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [companyDetails, setCompanyDetails] = useState(null);
-  const { user, logoFileName } = useAuth();  // Destructuring user from AuthContext
+  const { user, logoFileName } = useAuth();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const idFromQuery = queryParams.get('employeeId'); // Extract employeeId from URL query params if needed
 
   // Function to fetch company data
   const fetchCompanyData = async (companyId) => {
@@ -37,26 +41,28 @@ const AppraisalTemplate2 = ({
   // Function to fetch employee details using employeeId
   const fetchEmployeeDetails = async (id) => {
     try {
+      console.log("Fetching details for employeeId:", id);
       const response = await EmployeeGetApiById(id);
-      console.log(response.data);  // Check the structure of the response data
+      console.log(response.data); // Inspect the structure of the response
       setEmployeeDetails(response.data);
       if (response.data.companyId) {
         fetchCompanyData(response.data.companyId);
       }
     } catch (err) {
       console.error("Error fetching employee details:", err);
-      toast.error("Failed to fetch employee details");
+      // toast.error("Failed to fetch employee details");
     }
   };
 
   useEffect(() => {
-    const idToUse = employeeId || user.userId;  // Fallback to userId from AuthContext if employeeId is not passed
+    const idToUse = employeeId || idFromQuery || user.userId; // Fallback to employeeId, query param, or userId
     setLoading(true);
     if (idToUse) {
-      fetchEmployeeDetails(idToUse);  // Fetch employee details using the available employeeId or userId
+      fetchEmployeeDetails(idToUse); // Fetch employee details using employeeId
     }
     setLoading(false);
-  }, [employeeId, user.userId]);  // Dependencies to trigger when employeeId or userId changes
+  }, [employeeId, idFromQuery, user.userId]);
+
 
   return (
     <div className="watermarked" style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
@@ -127,8 +133,8 @@ const AppraisalTemplate2 = ({
           </thead>
           <tbody>
             {allowances && Object.keys(allowances).map((key, index) => {
-              const value = allowances[key]; // Assuming value is the percentage
-              const allowanceAmount = (salaryIncrease * (parseFloat(value) / 100)); // Calculate the allowance amount
+              const value = allowances[key]; 
+              const allowanceAmount = (salaryIncrease * (parseFloat(value) / 100)); 
               return (
                 <tr key={index}>
                   <td>{key}</td>

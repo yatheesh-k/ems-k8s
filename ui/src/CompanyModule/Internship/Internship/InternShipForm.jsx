@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useNavigate, useLocation } from "react-router-dom";
-import Select from "react-select";
 import { Bounce, toast } from "react-toastify";
 import LayOut from "../../../LayOut/LayOut";
+import Select from "react-select";
 import { EmployeeGetApi, EmployeeGetApiById, InternshipCertificateDownload, PayslipTemplateGetApi } from "../../../Utils/Axios";
 import { useAuth } from "../../../Context/AuthContext";
 import InternShipPreview from "./InternShipPreview";
@@ -29,38 +29,10 @@ const InternShipForm = () => {
   const [templateNo, setTemplateNo] = useState(null);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [error, setError] = useState(null);
-  const [selectedEmployee, setSelectedEmployee] = useState(null); // New state to store the selected employee
+  const [selectedEmployee, setSelectedEmployee] = useState(null); 
   const [templateAvailable, setTemplateAvailable] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
-
-  const calculateNoticePeriod = (dateOfHiring, lastWorkingDate) => {
-    if (dateOfHiring && lastWorkingDate) {
-      const hiringDate = new Date(dateOfHiring);
-      const lastWorking = new Date(lastWorkingDate);
-
-      // Ensure last working date is after date of hiring
-      if (lastWorking <= hiringDate) {
-        setError("Last working date must be after the date of hiring.");
-        setNoticePeriod(0);
-        return;
-      }
-
-      // Calculate difference in months
-      const monthDiff = (lastWorking.getFullYear() - hiringDate.getFullYear()) * 12 + (lastWorking.getMonth() - hiringDate.getMonth());
-      setNoticePeriod(monthDiff);
-    } else {
-      setNoticePeriod(0);
-    }
-  };
-
-
-  useEffect(() => {
-    const subscription = watch((value) => {
-      calculateNoticePeriod(value.resignationDate, value.lastWorkingDate, value.dateOfHiring);
-    });
-    return () => subscription.unsubscribe();
-  }, [watch]);
 
   useEffect(() => {
     EmployeeGetApi().then((data) => {
@@ -84,23 +56,30 @@ const InternShipForm = () => {
   const fetchTemplate = async (companyId) => {
     try {
       const res = await PayslipTemplateGetApi(companyId);
-      const templateNumber = res.data.data.offerLetterTemplateNo;
-      setSelectedTemplate(templateNumber)
-      setTemplateAvailable(!!templateNumber);
+      const internshipTemplateNo = res.data.data.internshipTemplateNo; // assuming this field is called internshipTemplateNo
+      if (internshipTemplateNo) {
+        setSelectedTemplate(internshipTemplateNo);  // Save the internshipTemplateNo to state
+        setTemplateAvailable(true);
+      } else {
+        setTemplateAvailable(false);  // If there's no internshipTemplateNo
+      }
     } catch (error) {
       handleApiErrors(error);
       setTemplateAvailable(false);
     }
   };
+
   useEffect(() => {
-    fetchTemplate()
-  }, []);
+    if (user?.companyId) {
+      fetchTemplate(user?.companyId);
+    }
+  }, [user?.companyId]);
 
   const onSubmit = (data) => {
     const submissionData = {
       employeeId: data.employeeId,
       companyName: user.company,
-      date: data.lastWorkingDate
+      date: data.lastWorkingDate,
     };
     const preview = {
       employeeName: selectedEmployee ? selectedEmployee.employeeName : data.employeeName,
@@ -121,8 +100,19 @@ const InternShipForm = () => {
   };
 
   const handleConfirmSubmission = async () => {
+    if (!templateAvailable) {
+      toast.error("Template not available, unable to generate certificate.");
+      return;
+    }
+    const formatDate = (date) => {
+      const d = new Date(date);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0'); 
+      const day = String(d.getDate()).padStart(2, '0'); 
+      return `${year}-${month}-${day}`;
+    };
     const payload = {
-      date: date, 
+      date: formatDate(date),
       employeeName: submissionData?.employeeName || selectedEmployee?.employeeName, 
       period: noticePeriod, 
       department: submissionData?.departmentName || selectedEmployee?.departmentName,  
@@ -130,13 +120,14 @@ const InternShipForm = () => {
       endDate: submissionData?.lastWorkingDate || new Date().toISOString().split('T')[0],
       designation: submissionData?.designationName || selectedEmployee?.designationName, 
       companyId: user?.companyId, 
-      projectTitle: "EMS"
+      projectTitle: "EMS",
+      internshipTemplateNo: selectedTemplate, // Pass the internshipTemplateNo (ID)
     };
   
     console.log('Payload before sending:', payload);  
   
     try {
-      const success = await InternshipCertificateDownload(payload);  
+      const success = await InternshipCertificateDownload(selectedTemplate, payload);  // Pass the template number (selectedTemplate) to the API
       if (success) {
         toast.success("Internship Certificate generated successfully");
         reset();  
@@ -149,9 +140,54 @@ const InternShipForm = () => {
       toast.error("Failed to save or download the Internship Certificate");
     }
   };
-  
-  
+
   const handleError = (errors) => {
+    if (errors.response) {
+      const status = errors.response.status;
+      let errorMessage = "";
+
+      switch (status) {
+        case 403:
+          errorMessage = "Session Timeout!";
+          navigate("/");
+          break;
+        case 404:
+          errorMessage = "Resource Not Found!";
+          break;
+        case 406:
+          errorMessage = "Invalid Details!";
+          break;
+        case 500:
+          errorMessage = "Server Error!";
+          break;
+        default:
+          errorMessage = "An Error Occurred!";
+          break;
+      }
+
+      toast.error(errorMessage, {
+        position: "top-right",
+        transition: Bounce,
+        hideProgressBar: true,
+        theme: "colored",
+        autoClose: 3000,
+      });
+    } else {
+      toast.error("Network Error!", {
+        position: "top-right",
+        transition: Bounce,
+        hideProgressBar: true,
+        theme: "colored",
+        autoClose: 3000,
+      });
+    }
+  };
+
+  const nextSixMonths = new Date();
+  nextSixMonths.setMonth(nextSixMonths.getMonth() + 6);
+  const sixMonthsFromNow = nextSixMonths.toISOString().split("T")[0];
+
+  const handleApiErrors = (errors) => {
     if (errors.response) {
       const status = errors.response.status;
       let errorMessage = "";
@@ -211,54 +247,6 @@ const InternShipForm = () => {
     }
   }, [location.state, reset]);
 
-  const nextSixMonths = new Date();
-  nextSixMonths.setMonth(nextSixMonths.getMonth() + 6);
-  const sixMonthsFromNow = nextSixMonths.toISOString().split("T")[0];
-
-  const handleApiErrors = (errors) => {
-    if (errors.response) {
-      const status = errors.response.status;
-      let errorMessage = "";
-
-      switch (status) {
-        case 403:
-          errorMessage = "Session Timeout!";
-          navigate("/");
-          break;
-        case 404:
-          errorMessage = "Resource Not Found!";
-          break;
-        case 406:
-          errorMessage = "Invalid Details!";
-          break;
-        case 500:
-          errorMessage = "Server Error!";
-          break;
-        default:
-          errorMessage = "An Error Occurred!";
-          break;
-      }
-
-      toast.error(errorMessage, {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
-    } else {
-      toast.error("Network Error!", {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
-    }
-  };
-
-
-  // Render loading message or template not available message
   if (!templateAvailable) {
     return (
       <LayOut>
