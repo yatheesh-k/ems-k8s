@@ -38,7 +38,6 @@ import java.util.Map;
 @Slf4j
 public class RelievingServiceImpl implements RelievingService {
 
-
     @Autowired
     private OpenSearchOperations openSearchOperations;
     @Autowired
@@ -83,7 +82,6 @@ public class RelievingServiceImpl implements RelievingService {
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.CREATED);
     }
 
-
     @Override
     public ResponseEntity<?> getRelievingByEmployeeId(String companyName, String employeeId) throws EmployeeException {
         log.info("getting details of {}", employeeId);
@@ -116,7 +114,6 @@ public class RelievingServiceImpl implements RelievingService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(entity), HttpStatus.OK);
     }
-
 
     @Override
     public ResponseEntity<?> updateEmployeeRelievingById(String relieveId, String companyName, String employeeId, RelievingRequest relievingRequest) throws EmployeeException {
@@ -181,7 +178,6 @@ public class RelievingServiceImpl implements RelievingService {
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.DELETED), HttpStatus.OK);
 
     }
-
 
     @Override
     public ResponseEntity<byte[]> downloadRelievingLetter(HttpServletRequest request, String companyName, String employeeId) {
@@ -295,7 +291,6 @@ public class RelievingServiceImpl implements RelievingService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     private byte[] generatePdfFromHtml(String html) throws IOException {
         // Escape unescaped ampersands

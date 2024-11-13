@@ -112,8 +112,6 @@ public class PayslipServiceImpl implements PayslipService {
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.CREATED);
     }
 
-
-
     @Override
     public ResponseEntity<?> generatePaySlipForAllEmployees(PayslipRequest payslipRequest) throws EmployeeException, IOException {
         String index = ResourceIdUtils.generateCompanyIndex(payslipRequest.getCompanyName());
@@ -248,9 +246,6 @@ public class PayslipServiceImpl implements PayslipService {
                 ResponseBuilder.builder().build().createSuccessResponse(responseBody), HttpStatus.CREATED);
     }
 
-
-
-
     @Override
     public ResponseEntity<?> getPayslipById(String companyName, String employeeId, String payslipId) throws EmployeeException, IOException {
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
@@ -346,7 +341,6 @@ public class PayslipServiceImpl implements PayslipService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(allPayslips), HttpStatus.OK);
     }
-
 
     @Override
     public ResponseEntity<?> deleteEmployeePayslipById(String companyName, String employeeId,String payslipId) throws EmployeeException{
@@ -491,8 +485,6 @@ public class PayslipServiceImpl implements PayslipService {
         reorderAllowances(allowanceList, unorderedAllowances);
     }
 
-
-
     private void reorderAllowances(List<Map<String, Object>> allowanceList, List<Map<String, Object>> unorderedAllowances) {
         // Create a list to hold the ordered allowances
         List<Map<String, Object>> orderedAllowances = new ArrayList<>();
@@ -559,10 +551,6 @@ public class PayslipServiceImpl implements PayslipService {
         allowanceList.clear();
         allowanceList.addAll(orderedAllowances);
     }
-
-
-
-
     private void handleDeductions(PayslipEntity entity, List<Map<String, Object>> deductionList) {
         // Get the deductions from the entity
         Map<String, String> deductionsObj = entity.getSalary().getSalaryConfigurationEntity().getDeductions();
@@ -607,8 +595,6 @@ public class PayslipServiceImpl implements PayslipService {
         deductionList.clear();
         deductionList.addAll(orderedDeductions);
     }
-
-
     private String formatFieldName(String fieldName) {
         // Special cases for specific fields
         if (fieldName.equalsIgnoreCase(Constants.HRA_SMALL)) {
@@ -635,7 +621,6 @@ public class PayslipServiceImpl implements PayslipService {
         return formattedName.toString().trim(); // Return the formatted name
     }
 
-
     private byte[] generatePdfFromHtml(String html) throws IOException {
         html = html.replaceAll("&(?![a-zA-Z]{2,6};|#\\d{1,5};)", "&amp;");
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -648,8 +633,6 @@ public class PayslipServiceImpl implements PayslipService {
             throw new IOException(e.getMessage());
         }
     }
-
-
 
     @Override
     public ResponseEntity<?> generatePaySlipForEmployees(PayslipRequest payslipRequest) throws EmployeeException, IOException {
@@ -731,7 +714,6 @@ public class PayslipServiceImpl implements PayslipService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(responseBody), HttpStatus.CREATED);
     }
-
 
     public ResponseEntity<?> savePayslip(PayslipUpdateRequest payslipsRequest, String payslipId, String employeeId) throws EmployeeException {
         PayslipEntity payslipEntity = null;

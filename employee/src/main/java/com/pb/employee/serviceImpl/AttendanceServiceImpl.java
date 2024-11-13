@@ -39,7 +39,6 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Autowired
     private  OpenSearchOperations openSearchOperations;
 
-
     private static final Map<String, Month> MONTH_NAME_MAP = createMonthNameMap();
 
     private static Map<String, Month> createMonthNameMap() {
@@ -163,7 +162,6 @@ public class AttendanceServiceImpl implements AttendanceService {
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.CREATED);
     }
 
-
     @Override
     public ResponseEntity<?> getAllEmployeeAttendance(String companyName, String employeeId, String month, String year) throws IOException, EmployeeException {
         List<AttendanceEntity> attendanceEntities;
@@ -224,8 +222,6 @@ public class AttendanceServiceImpl implements AttendanceService {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
 
     @Override
     public ResponseEntity<?> deleteEmployeeAttendanceById(String companyName, String employeeId, String attendanceId) throws EmployeeException {
@@ -419,8 +415,6 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
         return attendanceRequests;
     }
-
-
     private String getCellValue(Cell cell) {
         if (cell == null) {
             return "";

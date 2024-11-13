@@ -11,8 +11,10 @@ import com.pb.employee.persistance.model.DepartmentEntity;
 import com.pb.employee.persistance.model.DesignationEntity;
 import com.pb.employee.persistance.model.EmployeeEntity;
 import com.pb.employee.persistance.model.Entity;
+import com.pb.employee.request.EmployeeStatus;
 import com.pb.employee.util.Constants;
 import com.pb.employee.util.ResourceIdUtils;
+import org.opensearch.client.RequestOptions;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.Result;
@@ -33,6 +35,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class OpenSearchOperations {
@@ -729,7 +732,6 @@ public class OpenSearchOperations {
         return null;
     }
 
-
     public TemplateEntity getTemplateById(String resourceId, String type, String index) throws IOException {
         if(type != null) {
             resourceId = type+"_"+resourceId;
@@ -803,7 +805,6 @@ public class OpenSearchOperations {
 
     }
 
-
     public RelievingEntity getRelievingById(String resourceId, String type, String index) throws IOException {
         if(type != null) {
             resourceId = type+"_"+resourceId;
@@ -815,5 +816,26 @@ public class OpenSearchOperations {
             return searchResponse.source();
         }
         return null;
+    }
+
+    public void partialUpdate(String employeeId, Map<String, Object> partialData, String index) throws IOException {
+        try {
+            // Create an UpdateRequest using the builder pattern
+            UpdateRequest updateRequest = new UpdateRequest.Builder()
+                    .index(index)                   // The index where the document is stored
+                    .id(employeeId)                  // Document ID
+                    .doc(partialData)                // The fields to update
+                    .docAsUpsert(false)              // Only update if the document exists
+                    .retryOnConflict(3)              // Retry in case of conflicts
+                    .build();                        // Build the request
+            // Execute the update request
+            UpdateResponse response = esClient.update(updateRequest, EmployeeEntity.class);
+            // Optionally, log the response result or handle it
+            logger.info("Update successful, status: " + response.result());
+        } catch (IOException e) {
+            // Handle errors and throw as a specific exception
+            logger.error("Error occurred while updatingstatus: " + e.getMessage());
+            throw new IOException("Error updating employee status in OpenSearch", e);
+        }
     }
 }

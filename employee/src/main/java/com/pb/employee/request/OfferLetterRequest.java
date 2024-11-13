@@ -23,18 +23,17 @@ public class OfferLetterRequest {
     private String offerDate;
 
     @Schema(example = "referenceNo")
-    @Pattern(regexp ="^[A-Z0-9/]+$", message = "{referenceNo.format}")
+    @Pattern(regexp ="^[A-Z0-9/-]+$", message = "{referenceNo.format}")
     @Size(min = 3, max = 20, message = "{referenceNo.size.message}")
     private String referenceNo;
 
     @Schema(example = "employeeName")
-    @Pattern(regexp = "^[A-Z][a-z]+(\\s[A-Z][a-z]+){0,2}$",
-            message = "{firstname.format}")
-    @Size(min = 3, max = 20, message = "{firstName.size.message}")
+    @Pattern(regexp = "^[A-Za-z][a-zA-Z]*(\\s[A-Za-z][a-zA-Z]*)*$", message = "{firstname.format}")
+    @Size(min = 3, max = 100, message = "{firstName.size.message}")
     private String employeeName;
 
-    @Schema(example = "employeeName")
-    @Pattern(regexp = "^[A-Z][a-z]+(\\s[A-Z][a-z]+){0,2}$",
+    @Schema(example = "employeeFatherName")
+    @Pattern(regexp = "^[A-Za-z][a-zA-Z]*(\\s[A-Za-z][a-zA-Z]*)*$",
             message = "{fathername.format}")
     @Size(min = 3, max = 20, message = "{firstName.size.message}")
     private String employeeFatherName;
@@ -44,7 +43,6 @@ public class OfferLetterRequest {
             message = "{invalid.location.format}")
     @Size(min = 2, max = 200, message = "{location.notnull.message}")
     private String employeeAddress;
-
 
     @Schema(example = "contactNo")
     @NotNull(message = "{mobileNo.notnull.message}")

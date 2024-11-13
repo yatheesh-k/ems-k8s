@@ -44,7 +44,6 @@ public class OfferLetterServiceImpl implements OfferLetterService {
     @Autowired
     private Configuration freeMarkerConfig;
 
-
     @Override
     public ResponseEntity<byte[]> downloadOfferLetter(OfferLetterRequest offerLetterRequest, HttpServletRequest request) {
         CompanyEntity entity;
@@ -82,7 +81,6 @@ public class OfferLetterServiceImpl implements OfferLetterService {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPTY_FILE),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
             // Apply the watermark effect
             float opacity = 0.5f;
             double scaleFactor = 1.6d;
@@ -93,8 +91,6 @@ public class OfferLetterServiceImpl implements OfferLetterService {
             ImageIO.write(watermarkedImage, "png", baos);
             String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
             dataModel.put(Constants.BLURRED_IMAGE, Constants.DATA + base64Image);
-
-
             // Get FreeMarker template and process it with the dataModel
             Template template = freeMarkerConfig.getTemplate(Constants.OFFER_LETTER_TEMPLATE1);
             StringWriter stringWriter = new StringWriter();
@@ -107,13 +103,10 @@ public class OfferLetterServiceImpl implements OfferLetterService {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.FAILED_TO_PROCESS),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
             // Get the processed HTML content
             String htmlContent = stringWriter.toString();
-
             // Convert the HTML content to PDF
             byte[] pdfBytes = generatePdfFromHtml(htmlContent);
-
             // Set HTTP headers for PDF download
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
@@ -130,7 +123,6 @@ public class OfferLetterServiceImpl implements OfferLetterService {
         }
     }
 
-
     private byte[] generatePdfFromHtml(String html) throws IOException {
         html = html.replaceAll("&(?![a-zA-Z]{2,6};|#\\d{1,5};)", "&amp;");
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -143,6 +135,4 @@ public class OfferLetterServiceImpl implements OfferLetterService {
             throw new IOException(e.getMessage());
         }
     }
-
-
 }

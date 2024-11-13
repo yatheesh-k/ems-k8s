@@ -71,14 +71,10 @@ public class TemplateServiceImpl implements TemplateService {
         }
     }
 
-
-
     @Override
     public ResponseEntity<?> getTemplateNo(String companyName) throws EmployeeException {
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
-
         TemplateEntity templateEntities;
-
         try {
             templateEntities = openSearchOperations.getCompanyTemplates(companyName);
 
@@ -87,7 +83,6 @@ public class TemplateServiceImpl implements TemplateService {
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_GET_TEMPLATE),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(templateEntities), HttpStatus.OK);
     }

@@ -41,7 +41,6 @@ public class SalaryServiceImpl implements SalaryService {
     @Autowired
     private EmployeeServiceImpl employeeService;
 
-
     @Override
     public ResponseEntity<?> addSalary(EmployeeSalaryRequest employeeSalaryRequest, String employeeId) throws EmployeeException {
         LocalDateTime currentDateTime = LocalDateTime.now();

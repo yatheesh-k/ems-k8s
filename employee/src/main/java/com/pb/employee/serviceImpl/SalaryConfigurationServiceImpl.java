@@ -117,7 +117,6 @@ public class SalaryConfigurationServiceImpl implements SalaryConfigurationServic
         if (existingAllowances.size() != newAllowances.size()) {
             return false;
         }
-
         for (Map.Entry<String, String> entry : existingAllowances.entrySet()) {
             String key = entry.getKey();
             String existingValue = new String(Base64.getDecoder().decode(entry.getValue()));
@@ -130,12 +129,9 @@ public class SalaryConfigurationServiceImpl implements SalaryConfigurationServic
                 return false;
             }
         }
-
         // All allowances matched
         return true;
     }
-
-
 
     @Override
     public ResponseEntity<?> getSalaryStructureByCompany(String companyName) throws EmployeeException {
@@ -155,7 +151,5 @@ public class SalaryConfigurationServiceImpl implements SalaryConfigurationServic
         }
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(salaryConfigurationEntity), HttpStatus.OK);
-
     }
-
 }
