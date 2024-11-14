@@ -6,7 +6,7 @@ import { companyViewByIdApi, EmployeeGetApiById, TemplateGetAPI } from "../../..
 import InternShipTemplate2 from "./InternShipTemplate2";
 import InternshipTemplate1 from "./InternshipTemplate1";
 
-const InternShipPreview = ({ previewData, selectedTemplate }) => { // Accept previewData as a prop
+const InternShipPreview = ({ previewData, selectedTemplate }) => { 
   const [companyData, setCompanyData] = useState({});
   const [loading, setLoading] = useState(false);
   const { user,companyLogo } = useAuth();

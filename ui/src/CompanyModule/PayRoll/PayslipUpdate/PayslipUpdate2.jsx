@@ -87,8 +87,13 @@ const PayslipUpdate2 = () => {
     const handleUpdate = async () => {
         if (employeeId && payslipId) {
             try {
+                // Ensure totals are available
+                console.log("Using latest totals:", totals);  // Log latest totals before updating
+
                 const allowances = payslipData.salary.salaryConfigurationEntity.allowances || {};
                 const deductions = payslipData.salary.salaryConfigurationEntity.deductions || {};
+
+                // Combine updated fields with existing ones
                 const updatedAllowances = {
                     ...allowances,
                     ...allowanceFields.reduce((acc, field) => {
@@ -96,6 +101,7 @@ const PayslipUpdate2 = () => {
                         return acc;
                     }, {}),
                 };
+
                 const updatedDeductions = {
                     ...deductions,
                     ...deductionFields.reduce((acc, field) => {
@@ -103,10 +109,10 @@ const PayslipUpdate2 = () => {
                         return acc;
                     }, {}),
                 };
-
-                const totalEarnings = Object.values(updatedAllowances).reduce((sum, value) => sum + Number(value), 0);
-                const totalDeductions = Object.values(updatedDeductions).reduce((sum, value) => sum + Number(value), 0);
-                const totalTax = Number(payslipData.salary.incomeTax) + Number(payslipData.salary.pfTax);
+                const totalEarnings = totals.totalEarnings;
+                const totalDeductions = totals.totalDeductions;
+                const totalTax = totals.totalTax;
+                const netSalary = totals.netPay;
 
                 if (totalDeductions + totalTax > totalEarnings) {
                     setErrorMessages(prev => ({
@@ -117,6 +123,7 @@ const PayslipUpdate2 = () => {
                 }
 
                 setErrorMessages({ deductions: '' });
+
                 const payload = {
                     companyName: user.company,
                     salary: {
@@ -125,23 +132,25 @@ const PayslipUpdate2 = () => {
                             ...payslipData.salary.salaryConfigurationEntity,
                             allowances: updatedAllowances,
                             deductions: updatedDeductions,
-                            totalEarnings: totals.totalEarnings,
-                            totalDeductions: totals.totalDeductions,
-                            totalTax: totals.totalTax,
-                            netSalary: totals.netPay,
                         },
+                        totalEarnings: totals.totalEarnings,
+                        totalDeductions,
+                        totalTax,
+                        netSalary,
                     },
                     attendance: payslipData.attendance,
                     month,
                     year,
                 };
 
+                console.log("Payload being sent:", payload);  // Debugging payload
+
                 await EmployeePayslipUpdate(employeeId, payslipId, payload);
-                toast.success("Payslip generated successfully");
+                toast.success("Payslip updated successfully");
                 navigate('/payslipsList');
             } catch (err) {
-                console.error("Error generating payslip:", err);
-                toast.error("Failed to generate payslip");
+                console.error("Error updating payslip:", err);
+                toast.error("Failed to update payslip");
             }
         } else {
             console.error("Employee ID or Payslip ID is missing");
