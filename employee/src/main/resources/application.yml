@@ -38,4 +38,5 @@ springdoc:
     path: /api-docs
 file:
   upload:
-    path: '/var/www/ems/assets/img/'
+    path: '/var/www/ems-testing/assets/img/'
+
