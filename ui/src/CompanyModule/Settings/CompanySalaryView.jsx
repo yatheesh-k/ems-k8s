@@ -14,7 +14,7 @@ const CompanySalaryView = () => {
         try {
             const response = await CompanySalaryStructureGetApi();
             setSalaryStructures(response.data.data);
-            console.log("Fetched salary structures:", response.data.data); // Log the fetched data
+            console.log("Fetched salary structures:", response.data.data); 
         } catch (error) {
             console.error("API fetch error:", error);
         }

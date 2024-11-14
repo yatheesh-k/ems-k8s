@@ -191,7 +191,6 @@ const CompanyRegistration = () => {
     return true; // Return true if all conditions are satisfied
   };
 
-
   const toInputLowerCase = (e) => {
     const input = e.target;
     let value = input.value;
@@ -428,11 +427,11 @@ const CompanyRegistration = () => {
                           },
                           minLength: {
                             value: 2,
-                            message: "minimum 2 characters Required",
+                            message: "Minimum 2 Characters Required",
                           },
                           maxLength: {
                             value: 100,
-                            message: "maximum 100 characters allowed",
+                            message: "Maximum 100 Characters allowed",
                           },
                         })}
                         disabled={editMode}
@@ -461,12 +460,12 @@ const CompanyRegistration = () => {
                           },
                           minLength: {
                             value: 2,
-                            message: "minimum 2 characters Required",
+                            message: "Minimum 2 Characters Required",
 
                           },
                           maxLength: {
                             value: 30,
-                            message: "minimum 2 and maximum 30 characters allowed",
+                            message: "Minimum 2 and Maximum 30 Characters allowed",
                           },
                         })}
                         disabled={editMode}
@@ -556,11 +555,11 @@ const CompanyRegistration = () => {
                                 validate: validatePassword,
                                 minLength: {
                                   value: 6,
-                                  message: "Minimum 6 characters Required",
+                                  message: "Minimum 6 Characters Required",
                                 },
                                 maxLength: {
                                   value: 16,
-                                  message: "Minimum 6 & maximum 16 characters allowed",
+                                  message: "Minimum 6 & Maximum 16 Characters allowed",
                                 },
                               })}
                             />
@@ -665,11 +664,11 @@ const CompanyRegistration = () => {
                           },
                           minLength: {
                             value: 3,
-                            message: "minimum 3 characters allowed",
+                            message: "Minimum 3 Characters allowed",
                           },
                           maxLength: {
                             value: 200,
-                            message: "maximum 200 characters allowed",
+                            message: "Maximum 200 Characters allowed",
                           },
                         })}
                       />

@@ -7,6 +7,7 @@ const SideNav = () => {
   const [isAttendanceOpen, setIsAttendanceOpen] = useState(false); // State for managing Attendance dropdown
   const [isCompanyOpen, setIsCompanyOpen] = useState(false); // State for managing Company dropdown
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isLettresOpen, setIsLettersOpen] = useState(false);
   const location = useLocation();
   const { user = {}, logoFileName, loading } = useAuth();
 
@@ -38,6 +39,20 @@ const SideNav = () => {
 
   useEffect(() => {
     if (
+      location.pathname === "/offerLetters" ||
+      location.pathname === "/experienceForm" ||
+      location.pathname === "/appraisalLetter" ||
+      location.pathname === "/relievingLetter" ||
+      location.pathname === "/internsLetter"
+    ) {
+      setIsLettersOpen(true);
+    } else {
+      setIsLettersOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (
       location.pathname === "/addAttendance" ||
       location.pathname === "/attendanceList" ||
       location.pathname === "/attendanceReport"
@@ -51,7 +66,10 @@ const SideNav = () => {
   useEffect(() => {
     if (
       location.pathname === "/companySalaryView" ||
-      location.pathname === "/companySalaryStructure"
+      location.pathname === "/companySalaryStructure"||
+      location.pathname === "/"||
+      location.pathname==="/appraisalLetter"||
+      location.pathname==="/internsTemplates"
     ) {
       setIsSettingsOpen(true);
     } else {
@@ -173,11 +191,25 @@ const SideNav = () => {
     }
   }, [location]);
 
+  useEffect(() => {
+    if (
+      location.pathname === "/companySalaryView" ||
+      location.pathname === "/offerLetters" ||
+      location.pathname === "/experienceLetter" ||
+      location.pathname === "/payslipTemplates"
+    ) {
+      setIsSettingsOpen(true);
+    } else {
+      setIsSettingsOpen(false);
+    }
+  }, [location]);
+
   const togglePayroll = (e) => {
     e.preventDefault(); // Prevent default anchor behavior
     setIsPayrollOpen(!isPayrollOpen);
     setIsCompanyOpen(false);
     setIsAttendanceOpen(false);
+    setIsLettersOpen(false);
   };
 
   const toggleCompany = (e) => {
@@ -185,6 +217,7 @@ const SideNav = () => {
     setIsCompanyOpen(!isCompanyOpen);
     setIsAttendanceOpen(false);
     setIsPayrollOpen(false);
+    setIsLettersOpen(false);
   };
 
   const toggleAttendance = (e) => {
@@ -192,6 +225,7 @@ const SideNav = () => {
     setIsAttendanceOpen(!isAttendanceOpen);
     setIsCompanyOpen(false);
     setIsPayrollOpen(false);
+    setIsLettersOpen(false);
   };
 
   const toggleSettings = (e) => {
@@ -200,6 +234,16 @@ const SideNav = () => {
     setIsCompanyOpen(false);
     setIsAttendanceOpen(false);
     setIsPayrollOpen(false);
+    setIsLettersOpen(false);
+  }; 
+
+  const toggleLetters = (e) => {
+    e.preventDefault(); // Prevent default anchor behavior
+    setIsSettingsOpen(false);
+    setIsCompanyOpen(false);
+    setIsAttendanceOpen(false);
+    setIsPayrollOpen(false);
+    setIsLettersOpen(!isLettresOpen);
   }; 
 
 
@@ -367,6 +411,90 @@ const SideNav = () => {
                     Employees
                   </span>
                 </a>
+              </li>
+              <li className="sidebar-item has-dropdown">
+                <a
+                  className="sidebar-link collapsed d-flex justify-content-between align-items-center"
+                  data-bs-target="#letterManagement"
+                  data-bs-toggle="collapse"
+                  href
+                  onClick={toggleLetters}
+                >
+                  <span className="align-middle">
+                    <i
+                      className="bi bi-files"
+
+                      style={{ fontSize: "medium" }}
+                    ></i>
+                  </span>{" "}
+                  <span className="align-middle" >
+                    Letters
+                  </span>
+                  <i
+                    className={`bi ${isLettresOpen ? "bi-chevron-up" : "bi-chevron-down"
+                      } ms-auto`}
+                  ></i>
+                </a>
+                <ul
+                  id="letterManagement"
+                  className={`sidebar-dropDown list-unstyled collapse ${isLettresOpen ? "show" : ""
+                    }`}
+                >
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${location.pathname === "/offerLetters" ? "active" : ""
+                      }`}
+                  >
+                    <a className="sidebar-link" href={"/offerLetters"}>
+                      Offer Letters
+                    </a>
+                  </li>
+                  <li
+                    style={{ paddingLeft: "40px" }}
+
+                    className={`sidebar-item ${location.pathname === "/experieneSummary" ? "active" : ""
+                      }`}
+                  >
+                    <a className="sidebar-link" href={"/experienceForm"}>
+                     Experience Letters
+                    </a>
+                  </li>
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${location.pathname === "/experieneSummary" ? "active" : ""
+                      }`}
+                  >
+                    <a className="sidebar-link" href={"/existingSummary"}>
+                     Exists Letters
+                    </a>
+                  </li>
+                  <li
+                    style={{ paddingLeft: "40px" }}
+
+                    className={`sidebar-item ${
+                      location.pathname === "/appraisalLetter" ? "active" : ""
+                    }`}
+                  >
+                    <Link className="sidebar-link" to={"/appraisalLetter"}>
+                      Appraisal Letters
+                    </Link>
+                  </li>
+                </ul>
+                <ul
+                  id="letterManagement"
+                  className={`sidebar-dropDown list-unstyled collapse ${isLettresOpen ? "show" : ""
+                    }`}
+                >
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${location.pathname === "/internsLetter" ? "active" : ""
+                      }`}
+                  >
+                    <a className="sidebar-link" href={"/internsLetter"}>
+                      Interns Letter
+                    </a>
+                  </li>
+                </ul>
               </li>
               {/* <li
                             className={`sidebar-item ${
@@ -628,7 +756,22 @@ const SideNav = () => {
                       }`}
                   >
                     <a className="sidebar-link" href={"/offerLetters"}>
-                      Offer Letters
+                      Offer Letter Templates
+                    </a>
+                  </li>
+                </ul>
+                <ul
+                  id="settingsManagement"
+                  className={`sidebar-dropDown list-unstyled collapse ${isSettingsOpen ? "show" : ""
+                    }`}
+                >
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${location.pathname === "/appraisalTemplates" ? "active" : ""
+                      }`}
+                  >
+                    <a className="sidebar-link" href={"/appraisalTemplates"}>
+                      Appraisal Templates
                     </a>
                   </li>
                 </ul>
@@ -643,7 +786,53 @@ const SideNav = () => {
                       }`}
                   >
                     <a className="sidebar-link" href={"/experienceLetter"}>
-                      Experience Letter
+                      Experience Templates
+                    </a>
+                  </li>
+                </ul>
+                <ul
+                  id="settingsManagement"
+                  className={`sidebar-dropDown list-unstyled collapse ${isSettingsOpen ? "show" : ""
+                    }`}
+                >
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${location.pathname === "/relievingTemplates" ? "active" : ""
+                      }`}
+                  >
+                    <a className="sidebar-link" href={"/relievingTemplates"}>
+                      Exists Templates
+
+                    </a>
+                  </li>
+                </ul>
+                <ul
+                  id="settingsManagement"
+                  className={`sidebar-dropDown list-unstyled collapse ${isSettingsOpen ? "show" : ""
+                    }`}
+                >
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${location.pathname === "/internsTemplates" ? "active" : ""
+                      }`}
+                  >
+                    <a className="sidebar-link" href={"/internsTemplates"}>
+                      Interns Templates
+                    </a>
+                  </li>
+                </ul>
+                <ul
+                  id="settingsManagement"
+                  className={`sidebar-dropDown list-unstyled collapse ${isSettingsOpen ? "show" : ""
+                    }`}
+                >
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${location.pathname === "/payslipTemplates" ? "active" : ""
+                      }`}
+                  >
+                    <a className="sidebar-link" href={"/payslipTemplates"}>
+                      Payslip Templates
                     </a>
                   </li>
                 </ul>

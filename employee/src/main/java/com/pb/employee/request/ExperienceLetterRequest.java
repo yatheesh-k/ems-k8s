@@ -11,9 +11,9 @@ import java.util.List;
 @AllArgsConstructor
 public class ExperienceLetterRequest {
 
-    private String image;
-    private String title;
+    private String companyName;
+    private String employeeId;
     private String Date;
-    private String heading;
     private List<String> content;
+
 }

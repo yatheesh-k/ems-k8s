@@ -8,25 +8,33 @@
         body {
             position: relative;
         }
-         .watermark {
-                    position: absolute;
-                    top: 40%;
-                    left: 15%; /* Move watermark to the left side */
-                    transform: translateY(-10%); /* Adjust vertical position if needed */
-                    opacity: 0.9; /* Adjust the opacity for visibility */
-                    z-index: -1; /* Make sure the watermark is behind other content */
-         }
+        .watermark {
+                   position: fixed;
+                   top: 25%;
+                   left: 20%;
+                   transform: translate(-50%, -50%) rotate(30deg);
+                   z-index: -1;
+                   width: 400px;
+                   height: auto;
+                   text-align: center;
+               }
+
+               .watermark img {
+                   width: 100%;
+                   height: auto;
+                   opacity: 0.05;
+               }
         .header {
             text-align: center;
             margin-top: 20px;
         }
         .logo {
             text-align: right;
-            padding: 20px;
             background-size: contain;
         }
         .date {
-            margin: 30px 0px 0px 20px;
+            text-align: left;
+            padding: 20px;
         }
         .title {
             margin-top: 30px;
@@ -35,25 +43,27 @@
     </style>
 </head>
 <body>
+    <div>
 
-    <div class="watermark">
-    <img src="${blurredImage}" alt="Blurred Company Logo" />
-    </div>
-
-    <div class="logo">
-        <img style="height: 120px; width: 120px; " src="${request.image}" alt="Company Logo" />
-    </div>
-
-    <div class="header"><b>EXPERIENCE CERTIFICATE</b></div>
-    <div class="date">Date: <b>${request.date}</b></div>
-    <div class="title"><b>TO WHOMSOEVER IT MAY CONCERN</b></div>
-    <div class="content">
-        <p>This is to certify that ${employee.firstName} was employed with our company ${company[0].companyName} from ${employee.dateOfHiring} to ${request.date}
+      <div class="logo">
+               <#if company[0].imageFile?has_content>
+               <img style="height: 90px; width: 200px;" src="${company[0].imageFile}" alt="Company Logo" />
+               </#if>
+           </div>
+      </div>
+          <div class="header"><b>EXPERIENCE CERTIFICATE</b></div>
+          <div class="date">Date: <b>${request.date}</b></div>
+      <div class="title"><b>TO WHOMSOEVER IT MAY CONCERN</b></div>
+      <div class="content">
+           <div class="watermark">
+               <img src="${blurredImage}" alt="Blurred Company Logo" />
+           </div>
+        <p>This is to certify that <b>${employee.firstName} ${employee.lastName}</b> was employed with our company ${company[0].companyName} from ${employee.dateOfHiring} to ${request.date}
         <#if employee.designationName?has_content>
-            as a ${employee.designationName}.
+            as a <b>${employee.designationName}</b>.
         </#if>
         </p>
-        <p>We found ${employee.firstName} to be very dedicated to the work assigned. He was result-oriented, professional, and sincere. He carries excellent interpersonal skills and knowledge which helped in completing many valuable business assignments. He is a true team player and a fun-loving individual who mixed well with both his seniors and juniors.</p>
+        <p>We found ${employee.firstName} ${employee.lastName} to be very dedicated to the work assigned. He was result-oriented, professional, and sincere. He carries excellent interpersonal skills and knowledge which helped in completing many valuable business assignments. He is a true team player and a fun-loving individual who mixed well with both his seniors and juniors.</p>
         <p>We wish him all the best for future ventures. Please feel free to contact us for any other information required.</p>
 
         <div>For company ${company[0].companyName}</div>

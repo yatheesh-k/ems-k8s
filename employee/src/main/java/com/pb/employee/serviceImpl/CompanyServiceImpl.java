@@ -39,7 +39,6 @@ public class CompanyServiceImpl implements CompanyService {
     @Autowired
     private  OpenSearchOperations openSearchOperations;
 
-
     @Override
     public ResponseEntity<?> registerCompany(CompanyRequest companyRequest) throws EmployeeException{
         // Check if a company with the same short or company name already exists
@@ -48,7 +47,6 @@ public class CompanyServiceImpl implements CompanyService {
         String index = ResourceIdUtils.generateCompanyIndex(companyRequest.getShortName());
         Object entity = null;
         try{
-
             entity = openSearchOperations.getById(resourceId, null, Constants.INDEX_EMS);
             if(entity != null) {
                 log.error("Company details existed{}", companyRequest.getCompanyName());
@@ -76,7 +74,6 @@ public class CompanyServiceImpl implements CompanyService {
             throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_COMPANY), companyRequest.getCompanyName()),
                     HttpStatus.BAD_REQUEST);
         }
-
         String companyType = companyRequest.getCompanyType();
         if (companyType.equals(Constants.PRIVATE)){
             if (companyRequest.getCinNo()==null || companyRequest.getCinNo().isEmpty()){
@@ -198,7 +195,6 @@ public class CompanyServiceImpl implements CompanyService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
     }
-
     @Override
     public ResponseEntity<?> updateCompanyImageById(String companyId,  CompanyImageUpdate companyImageUpdate, MultipartFile multipartFile) throws EmployeeException, IOException {
         CompanyEntity user;
@@ -217,15 +213,11 @@ public class CompanyServiceImpl implements CompanyService {
         CompanyEntity entity = CompanyUtils.maskCompanyImageUpdateProperties(user, companyImageUpdate, companyId);
         if (!multipartFile.isEmpty()){
             multiPartFileStore(multipartFile, entity);
-
-
         }
         openSearchOperations.saveEntity(entity, companyId, Constants.INDEX_EMS);
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
     }
-
-
     @Override
     public ResponseEntity<?> updateCompanyStampImageById(String companyId, CompanyStampUpdate companyStampUpdate, MultipartFile multipartFile) throws EmployeeException, IOException {
         CompanyEntity user;
@@ -249,8 +241,6 @@ public class CompanyServiceImpl implements CompanyService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
     }
-
-
     private void multiPartFileStore(MultipartFile file, CompanyEntity company) throws IOException, EmployeeException {
         if(!file.isEmpty()){
             String filename = folderPath+company.getShortName()+"_"+file.getOriginalFilename();
@@ -352,5 +342,4 @@ public class CompanyServiceImpl implements CompanyService {
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
     }
-
 }

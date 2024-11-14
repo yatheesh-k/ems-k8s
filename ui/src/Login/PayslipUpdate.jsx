@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { companyViewByIdApi, EmployeeGetApiById, EmployeePayslipResponse, EmployeePayslipUpdate } from "../Utils/Axios";
 import { toast } from "react-toastify";
 import LayOut from "../LayOut/LayOut";
@@ -32,7 +32,7 @@ const PayslipUpdate = () => {
     taxes: ''
   });
 
-
+  const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const employeeId = queryParams.get("employeeId");
@@ -138,6 +138,7 @@ const PayslipUpdate = () => {
 
         await EmployeePayslipUpdate(employeeId, payslipId, payload);
         toast.success("Payslip generated successfully");
+        navigate('/payslipsList');
       } catch (err) {
         console.error("Error generating payslip:", err);
         toast.error("Failed to generate payslip");
@@ -550,7 +551,7 @@ const PayslipUpdate = () => {
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 8px" }}>
                       <span style={{ color: "black" }}>Total Deductions (B)</span>
-                      <span style={{ marginRight: "15px", color: "black" }}>{totals.totalDeductions}</span>
+                      <span style={{ marginRight: "15px", color: "black" }}>{Math.floor(totals.totalDeductions)}</span>
                     </div>
                     <button type="button" onClick={() => {
                       setModalType('deductions');
@@ -604,7 +605,7 @@ const PayslipUpdate = () => {
                     <tbody>
                       <tr>
                         <td className="earnings" colSpan={1} style={{ padding: "4px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black", width: "25%" }}><b>Net Pay (A-B-C)</b></td>
-                        <td className="earnings" colSpan={3} style={{ textAlign: "left", border: "1px solid black" }}><b>{totals.netPay || 0}</b></td>
+                        <td className="earnings" colSpan={3} style={{ textAlign: "left", border: "1px solid black" }}><b>{Math.floor(totals.netPay || 0)}</b></td>
                       </tr>
                       <tr>
                         <td className="earnings" colSpan={1} style={{ padding: "4px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black", width: "25%" }}><b>Net Salary (in words)</b></td>

@@ -304,12 +304,12 @@ export const AllEmployeePayslipsGet = (month, year) => {
   });
 }
 
-export const EmployeePaySlipDownloadById = async (employeeId, payslipId) => {
+export const EmployeePaySlipDownloadById = async (employeeId, payslipId, templateNumber) => {
   const company = localStorage.getItem("companyName");
 
   try {
     // Make the API request with specific headers for this request
-    const response = await axiosInstance.get(`/${company}/employee/${employeeId}/template/3/download/${payslipId}`, {
+    const response = await axiosInstance.get(`/${company}/employee/${employeeId}/template/${templateNumber}/download/${payslipId}`, {
       responseType: 'blob', // Handle the response as a binary blob
       headers: {
         'Accept': 'application/pdf', // Accept PDF format
@@ -333,7 +333,6 @@ export const EmployeePaySlipDownloadById = async (employeeId, payslipId) => {
     throw error; // Rethrow error for handling in the calling function
   }
 };
-
 
 export const EmployeePayslipDeleteById = (employeeId, payslipId) => {
   const company = localStorage.getItem("comapnyName")
@@ -386,3 +385,147 @@ export const CompanySalaryStructureGetApi = () => {
   const company = localStorage.getItem("companyName")
   return axiosInstance.get(`${company}/salary`);
 }
+
+export const OfferLetterDownload = async (payload) => {
+  try {
+    const response = await axiosInstance.post(`/offerletter/upload`,payload, {
+      responseType: 'blob', 
+      headers: {
+        'Accept': 'application/pdf', 
+      }
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `offer_letter.pdf`; 
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+
+    return true; 
+
+  } catch (error) {
+    console.error('Download error:', error);
+    throw error; 
+  }
+};
+
+export const PayslipTemplate = (data) => {
+  return axiosInstance.patch(`/template`, data);
+};
+
+export const PayslipTemplateGetApi = (data) => {
+  const companyName = localStorage.getItem("companyName")
+  return axiosInstance.get(`/${companyName}/template`, data);
+};
+
+export const InternshipCertificateDownload = async (id,payload) => {
+  try {
+    const response = await axiosInstance.post(`/internship/${id}/upload`,payload, {
+      responseType: 'blob', 
+      headers: {
+        'Accept': 'application/pdf', 
+      }
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `internship.pdf`; 
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+
+    return true; 
+
+  } catch (error) {
+    console.error('Download error:', error);
+    throw error; 
+  }
+};
+
+export const AppraisalLetterDownload = async (id,payload) => {
+  try {
+    const response = await axiosInstance.post(`/appraisal/template/${id}/upload`,payload, {
+      responseType: 'blob', 
+      headers: {
+        'Accept': 'application/pdf', 
+      }
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Appraisal.pdf`; 
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+
+    return true; 
+
+  } catch (error) {
+    console.error('Download error:', error);
+    throw error; 
+  }
+};
+
+export const RelievingDownloadPostApi = (employeeId,templateNo, data) => {
+  const company = localStorage.getItem("companyName")
+  return axiosInstance.post(`/${company}/employee/${employeeId}/template/${templateNo}/download`, data);
+}
+export const RelievingFormPostApi = (employeeId, data) => {
+  const company = localStorage.getItem("companyName")
+  return axiosInstance.post(`/company/${company}/employee/${employeeId}/relieving`, data);
+}
+
+export const RelievingGetApiById = (employeeId) => {
+  const company = localStorage.getItem("companyName")
+  return axiosInstance.get(`/${company}/relieving/${employeeId}`);
+}
+
+export const RelievingGetAllApi=()=>{
+  const company = localStorage.getItem("companyName")
+  return axiosInstance.get(`/${company}/relieving`);
+}
+
+export const RelievingDeleteApiById = (employeeId,id) => {
+  const company = localStorage.getItem("companyName")
+  return axiosInstance.delete(`/${company}/employee/${employeeId}/relieve/${id}`)
+    .then(response => {
+      return response.data;
+    })
+    .catch(error => {
+      console.error('Error fetching company by ID:', error);
+      throw error;
+    });
+}
+
+export const RelievingPatchApiById = (employeeId,relieveId, data) => {
+  const company = localStorage.getItem("companyName")
+  return axiosInstance.patch(`/${company}/employee/${employeeId}/relieve/${relieveId}`, data)
+};
+
+export const RelievingLetterDownload = async (employeeId,payload) => {
+  const company = localStorage.getItem("companyName")
+  try {
+    const response = await axiosInstance.post(`/${company}/employee/${employeeId}/download`,payload, {
+      responseType: 'blob',
+      headers: {
+        'Accept': 'application/pdf',
+      }
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `offerLetter.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+    return true;
+  } catch (error) {
+    console.error('Download error:', error);
+    throw error;
+  }
+};

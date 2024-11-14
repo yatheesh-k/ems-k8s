@@ -22,6 +22,7 @@ public class Constants {
     public static final String EMS_ADMIN = "ems_admin";
     public static final String LOGIN_SUCCESS = "success";
     public static final String COMPANY = "company";
+    public static final String COMPANY_ID = "companyId";
     public static final String ATTENDANCE = "attendance";
     public static final String SALARY = "salary";
     public static final String DEFAULT = "default";
@@ -101,10 +102,12 @@ public class Constants {
     public static final String REQUEST = "request";
     public static final String EXPERIENCE_LETTER_TWO = "expLetter2.ftl";
     public static final String OFFER_LETTER_TEMPLATE1 = "offerTemplate1.ftl";
+    public static final String APPRAISAL_LETTER_TEMPLATE1 = "appraisalLetter1.ftl";
     public static final String OFFER_LETTER_REQUEST = "offerLetter";
     public static final String ATTACHMENT = "attachment";
     public static final String OFFER_LETTER = "offer_letter.pdf";
     public static final String ACTIVE = "Active";
+    public static final String RELIEVING = "relieving";
     public static final String STAMP = "stamp";
     public static final String EXPERIENCE_LETTER_PDF = "experience_letter.pdf";
     public static final String ANNUAL = "annually";
@@ -113,6 +116,21 @@ public class Constants {
     public static final String GROSS_CTC = "Gross (CTC)";
     public static final String BLURRED_IMAGE = "blurredImage";
     public static final String DATA = "data:image/png;base64,";
-    public static final String APPRAISAL_LETTER_TEMPLATE = "appraisalLetter.ftl";
+
+    public static final String APPRAISAL_LETTER_REQUEST = "appraisal";
+    public static final String DYNAMIC_EXPERIENCE_LETTER_PDF = "dynamicExpLetter.ftl";
     public static final String APPRAISAL_LETTER = "appraisal_letter.pdf";
+    public static final String RELIEVING_LETTER1 = "relievingLetter.ftl";
+    public static final String RELIEVING_LETTER_PDF = "relievingLetter";
+    public static final String RELIEVING_LETTER2 = "relievingLetter2.ftl";
+    public static final String INTERNSHIP_CERT = "internship_certificate.pdf";
+    public static final String TEMPLATE = "template";
+    public static final String INTERNSHIP = "internship";
+    public static final String INTERNSHIP_TEMPLATE1 = "internship1.ftl";
+    public static final String INTERNSHIP_TEMPLATE2 = "internship2.ftl";
+    public static final String APPRAISAL_LETTER_TEMPLATE2 = "appraisalLetter2.ftl";
+
+    public static final String NOTICE_PERIOD = "NoticePeriod";
+    public static final String INACTIVE = "InActive";
+    public static final String STATUS = "status";
 }

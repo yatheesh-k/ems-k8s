@@ -28,9 +28,8 @@ public class CompanyRequest {
     private String password;
 
     @Schema(example = "companyAddress")
-    @Size(min = 2, max = 200, message = "{companyAddress.notnull.message}")
-    @Pattern(regexp = "^(?!.*\\s{2,})(?!^([a-zA-Z]{1}\\s?){2,}$)(?!^[A-Z](?:\\s[A-Z])*$)(?!^[\\s]*$)[A-Za-z0-9]+(?:[\\s.,'#&*()^/][A-Za-z0-9]+)*(?:[\\s.,'#&*()/-]*[A-Za-z0-9]+)*(?:[\\s]*[.,#&*()/-]*\\s*)*$",
-            /*"^(?!\\d+$)(?!^[A-Za-z]+$)(?!^[A-Za-z]+\\s*,?\\s*[A-Za-z]+$)(?:(?:[A-Z][a-z]*)(?:\\s+[A-Z][a-z0-9]*)*(?:[\\s,./'-]+[A-Za-z0-9]+)*(?:\\s*,\\s*[A-Z][a-z]+(?:\\s+[A-Z][a-z]+)*,\\s*[A-Z][a-z]+(?:\\s+[A-Z][a-z]+)*)?)?$",*/
+    @Size(min = 2, max = 200)
+    @Pattern(regexp = "^(?!\\s)(.*?)(?<!\\s)$",
             message = "{companyAddress.pattern.message}")
     private String companyAddress;
 
@@ -38,13 +37,13 @@ public class CompanyRequest {
     @Pattern(regexp = "^(|null|(L|U)\\d{5}[A-Z]{2}\\d{4}[A-Z]{3}\\d{6}$)", message = "{companyRegNo.pattern.message}")
     private String companyRegNo;
 
-    @Schema(example = "mobileNo")
+    @Schema(example = "+91-XX-XX-XX-XX-XX")
     @NotNull(message = "{mobileNo.notnull.message}")
-    @Pattern(regexp ="^(?!([0-9])\\1{9})\\d{10}$", message = "{invalid.mobileNo}")
+    @Pattern(regexp ="^\\+91 [6-9]\\d{9}$", message = "{invalid.mobileNo}")
     private String mobileNo;
 
     @Schema(example = "alternateNo")
-    @Pattern(regexp = "^((?!([0-9])\\1{9})\\d{10}|null|0|)$", message = "{invalid.alternateNo}")
+    @Pattern(regexp = "^\\+91 [6-9]\\d{9}$", message = "{invalid.alternateNo}")
     private String alternateNo;
 
     @Schema(example = "12ABCDE3456Z1")
@@ -69,13 +68,12 @@ public class CompanyRequest {
 
     @Schema(example = "personalMobileNo")
     @NotNull(message = "{personalMobileNo.notnull.message}")
-    @Pattern(regexp = "^(?!([0-9])\\1{9})\\d{10}$", message = "{invalid.mobileNo}")
+    @Pattern(regexp = "^\\+91 [6-9]\\d{9}$", message = "{invalid.mobileNo}")
     private String personalMobileNo;
 
     @Schema(example = "address")
-    @Pattern(regexp = "^(?!.*\\s{2,})(?!^([a-zA-Z]{1}\\s?){2,}$)(?!^[A-Z](?:\\s[A-Z])*$)(?!^[\\s]*$)[A-Za-z0-9]+(?:[\\s.,'#&*()^/][A-Za-z0-9]+)*(?:[\\s.,'#&*()/-]*[A-Za-z0-9]+)*(?:[\\s]*[.,#&*()/-]*\\s*)*$",
-            message = "{address.pattern.message}")
-    @Size(min = 10, max = 300, message = "{address.notnull.message}")
+    @Pattern(regexp = "^(?!\\s)(.*?)(?<!\\s)$", message = "{companyAddress.pattern.message}")
+    @Size(min = 2, max = 300)
     private String address;
 
     private String imageFile;

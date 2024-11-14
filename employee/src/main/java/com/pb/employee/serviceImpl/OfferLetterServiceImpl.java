@@ -44,7 +44,6 @@ public class OfferLetterServiceImpl implements OfferLetterService {
     @Autowired
     private Configuration freeMarkerConfig;
 
-
     @Override
     public ResponseEntity<byte[]> downloadOfferLetter(OfferLetterRequest offerLetterRequest, HttpServletRequest request) {
         CompanyEntity entity;
@@ -82,19 +81,16 @@ public class OfferLetterServiceImpl implements OfferLetterService {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPTY_FILE),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
             // Apply the watermark effect
             float opacity = 0.5f;
             double scaleFactor = 1.6d;
-            BufferedImage watermarkedImage = applyOpacity(originalImage, opacity, scaleFactor, 30);
+            BufferedImage watermarkedImage = CompanyUtils.applyOpacity(originalImage, opacity, scaleFactor, 30);
 
             // Convert BufferedImage to Base64 string for HTML
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(watermarkedImage, "png", baos);
             String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
             dataModel.put(Constants.BLURRED_IMAGE, Constants.DATA + base64Image);
-
-
             // Get FreeMarker template and process it with the dataModel
             Template template = freeMarkerConfig.getTemplate(Constants.OFFER_LETTER_TEMPLATE1);
             StringWriter stringWriter = new StringWriter();
@@ -107,13 +103,10 @@ public class OfferLetterServiceImpl implements OfferLetterService {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.FAILED_TO_PROCESS),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
             // Get the processed HTML content
             String htmlContent = stringWriter.toString();
-
             // Convert the HTML content to PDF
             byte[] pdfBytes = generatePdfFromHtml(htmlContent);
-
             // Set HTTP headers for PDF download
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
@@ -130,7 +123,6 @@ public class OfferLetterServiceImpl implements OfferLetterService {
         }
     }
 
-
     private byte[] generatePdfFromHtml(String html) throws IOException {
         html = html.replaceAll("&(?![a-zA-Z]{2,6};|#\\d{1,5};)", "&amp;");
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -143,38 +135,4 @@ public class OfferLetterServiceImpl implements OfferLetterService {
             throw new IOException(e.getMessage());
         }
     }
-    private BufferedImage applyOpacity(BufferedImage originalImage, float opacity, double scaleFactor, double rotationDegrees) {
-        int newWidth = (int) (originalImage.getWidth() * scaleFactor);
-        int newHeight = (int) (originalImage.getHeight() * scaleFactor);
-        double radians = Math.toRadians(-rotationDegrees);
-
-        int rotatedWidth = (int) Math.abs(newWidth * Math.cos(radians)) + (int) Math.abs(newHeight * Math.sin(radians));
-        int rotatedHeight = (int) Math.abs(newWidth * Math.sin(radians)) + (int) Math.abs(newHeight * Math.cos(radians));
-
-        BufferedImage watermarkedImage = new BufferedImage(rotatedWidth, rotatedHeight, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = watermarkedImage.createGraphics();
-
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
-        int centerX = rotatedWidth / 2;
-        int centerY = rotatedHeight / 2;
-
-        g2d.translate(centerX, centerY);
-        g2d.rotate(radians);
-        g2d.translate(-newWidth / 2, -newHeight / 2);
-
-        Image scaledImage = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-        g2d.drawImage(scaledImage, 0, 0, null);
-
-        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, rotatedWidth, rotatedHeight);
-
-        g2d.dispose();
-
-        return watermarkedImage;
-    }
-
-
 }

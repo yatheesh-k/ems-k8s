@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import LayOut from '../../LayOut/LayOut';
 import DataTable from 'react-data-table-component';
 import { Eye } from 'react-bootstrap-icons';
-import { AllEmployeePayslipsGet, EmployeeGetApi, EmployeeGetApiById, EmployeePayslipsGet } from '../../Utils/Axios';
+import { AllEmployeePayslipsGet, EmployeeGetApi, EmployeeGetApiById, EmployeePayslipsGet, PayslipTemplateGetApi } from '../../Utils/Axios';
 
 const ViewPaySlips = () => {
   const { control, formState: { errors } } = useForm();
@@ -22,6 +22,9 @@ const ViewPaySlips = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [showSpinner, setShowSpinner] = useState(false);
   const [noRecords, setNoRecords] = useState(false);
+  const [payslipTemplates, setPayslipTemplates] = useState([]); 
+  const [selectedTemplate, setSelectedTemplate] = useState(null); 
+  const [currentTemplate, setCurrentTemplate] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -104,14 +107,51 @@ const ViewPaySlips = () => {
     fetchData(selectedEmployeeId, monthName, selectedYear);
   };
 
+  const fetchTemplate = async () => {
+    try {
+      const response = await PayslipTemplateGetApi();
+      const templateData = response.data.data; // Assuming this is where your template details are
+      setCurrentTemplate(templateData); // Set the template data correctly
+      console.log("Fetched Payslip Template:", templateData); // Log for debugging
+    } catch (error) {
+      console.error("API fetch error:", error);
+      toast.error("Failed to fetch payslip templates. Please try again.");
+    }
+  };
+  
+  useEffect(() => {
+    fetchTemplate();
+  }, []);
+
   const handleViewSalary = (employeeId, payslipId) => {
-    navigate(`/payslip?employeeId=${employeeId}&payslipId=${payslipId}`, {
+    const payslipTemplateNo = currentTemplate?.payslipTemplateNo || "default"; 
+    let url;
+    switch (payslipTemplateNo) {
+      case "1":
+        url = `/payslipDoc1?employeeId=${employeeId}&payslipId=${payslipId}`;
+        break;
+      case "2":
+        url = `/payslipDoc2?employeeId=${employeeId}&payslipId=${payslipId}`;
+        break;
+      case "3":
+        url = `/payslipDoc3?employeeId=${employeeId}&payslipId=${payslipId}`;
+        break;
+      case "4":
+        url = `/payslipDoc4?employeeId=${employeeId}&payslipId=${payslipId}`;
+        break;
+      default:
+        console.error("Invalid payslip template number:", payslipTemplateNo);
+        return;
+    }
+  
+    navigate(url, {
       state: {
         employeeDetails: selectedEmployeeDetails,
       },
     });
   };
-
+  
+  
   const getMonthAndYear = () => {
     if (employeeSalaryView.length > 0) {
       const firstRecord = employeeSalaryView[0];
@@ -164,7 +204,7 @@ const ViewPaySlips = () => {
     }
     console.error(error.response || error);
   };
-  
+
   const isGoButtonEnabled = selectedEmployeeId && selectedMonth && selectedYear;
 
   const columns = apiSource === 'all'
@@ -246,7 +286,7 @@ const ViewPaySlips = () => {
             <div className="row d-flex justify-content-around">
               <div className="col-12 col-md-3">
                 <div className="form-group">
-                  <label className="form-label" style={{paddingTop:"10px"}}>Select Employee</label>
+                  <label className="form-label" style={{ paddingTop: "10px" }}>Select Employee</label>
                   <Controller
                     name="employeeId"
                     control={control}
@@ -273,7 +313,7 @@ const ViewPaySlips = () => {
               </div>
               <div className="col-12 col-md-3">
                 <div className="form-group">
-                  <label className="form-label" style={{paddingTop:"10px"}}>Select Year</label>
+                  <label className="form-label" style={{ paddingTop: "10px" }}>Select Year</label>
                   <Select
                     options={years}
                     value={years.find((option) => option.value === selectedYear) || ""}
@@ -284,7 +324,7 @@ const ViewPaySlips = () => {
               </div>
               <div className="col-12 col-md-3">
                 <div className="form-group">
-                  <label className="form-label" style={{paddingTop:"10px"}}>Select Month</label>
+                  <label className="form-label" style={{ paddingTop: "10px" }}>Select Month</label>
                   <Select
                     options={months}
                     value={months.find((month) => month.value === selectedMonth) || ""}

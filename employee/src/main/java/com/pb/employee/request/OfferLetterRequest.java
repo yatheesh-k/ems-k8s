@@ -23,36 +23,30 @@ public class OfferLetterRequest {
     private String offerDate;
 
     @Schema(example = "referenceNo")
-    @Pattern(regexp ="^[A-Z]{4}/[A-Z]{5}/\\\\d{6}$", message = "{referenceNo.format}")
+    @Pattern(regexp ="^[A-Z0-9/-]+$", message = "{referenceNo.format}")
     @Size(min = 3, max = 20, message = "{referenceNo.size.message}")
     private String referenceNo;
 
     @Schema(example = "employeeName")
-    @Pattern(regexp ="^(?!.*\\b([A-Z])\\s\\1\\s\\1)(?:[A-Z][a-z]+(?: [A-Z][a-z]+)*|[A-Z](?:\\.? ?[A-Z])? ?[A-Z][a-z]+|[A-Z][a-z]+(?: [A-Z](?:\\.? ?[A-Z])?)+)$",
-            message = "{firstname.format}")
-    @Size(min = 3, max = 20, message = "{firstName.size.message}")
+    @Pattern(regexp = "^[A-Za-z][a-zA-Z]*(\\s[A-Za-z][a-zA-Z]*)*$", message = "{firstname.format}")
+    @Size(min = 3, max = 100, message = "{firstName.size.message}")
     private String employeeName;
 
-    @Schema(example = "employeeName")
-    @Pattern(regexp ="^(?!.*\\b([A-Z])\\s\\1\\s\\1)(?:[A-Z][a-z]+(?: [A-Z][a-z]+)*|[A-Z](?:\\.? ?[A-Z])? ?[A-Z][a-z]+|[A-Z][a-z]+(?: [A-Z](?:\\.? ?[A-Z])?)+)$",
-            message = "{firstname.format}")
+    @Schema(example = "employeeFatherName")
+    @Pattern(regexp = "^[A-Za-z][a-zA-Z]*(\\s[A-Za-z][a-zA-Z]*)*$",
+            message = "{fathername.format}")
     @Size(min = 3, max = 20, message = "{firstName.size.message}")
     private String employeeFatherName;
 
     @Schema(example = "address")
-    @Pattern(regexp = "^(?!.*\\s{2,})(?!^([a-zA-Z]{1}\\s?){2,}$)(?!^[A-Z](?:\\s[A-Z])*$)(?!^[\\s]*$)[A-Za-z0-9]+(?:[\\s.,'#&*()^/][A-Za-z0-9]+)*(?:[\\s.,'#&*()/-]*[A-Za-z0-9]+)*(?:[\\s]*[.,#&*()/-]*\\s*)*$", message = "{location.format}")
+    @Pattern(regexp = "^(?!\\s)[A-Z][a-z](?<!\\s)$",
+            message = "{invalid.location.format}")
     @Size(min = 2, max = 200, message = "{location.notnull.message}")
     private String employeeAddress;
 
-    @Schema(example = "employeeFirstName")
-    @Pattern(regexp ="^(?!.*\\b([A-Z])\\s\\1\\s\\1)(?:[A-Z][a-z]+(?: [A-Z][a-z]+)*|[A-Z](?:\\.? ?[A-Z])? ?[A-Z][a-z]+|[A-Z][a-z]+(?: [A-Z](?:\\.? ?[A-Z])?)+)$",
-            message = "{firstname.format}")
-    @Size(min = 3, max = 20, message = "{firstName.size.message}")
-    private String employeeFirstName;
-
     @Schema(example = "contactNo")
     @NotNull(message = "{mobileNo.notnull.message}")
-    @Pattern(regexp ="^(?!([0-9])\\1{9})\\d{10}$", message = "{invalid.mobileNo}")
+    @Pattern(regexp ="^\\+91 [6-9]\\d{9}$", message = "{invalid.mobileNo}")
     private String employeeContactNo;
 
     @Schema(example = "yyyy-mm-dd")
@@ -61,20 +55,20 @@ public class OfferLetterRequest {
     private String joiningDate;
 
     @Schema(example = "jobLocation")
-    @Pattern(regexp = "^(?!.*\\s{2,})(?!^([a-zA-Z]{1}\\s?){2,}$)(?!^[A-Z](?:\\s[A-Z])*$)(?!^[\\s]*$)[A-Za-z0-9]+(?:[\\s.,'#&*()^/][A-Za-z0-9]+)*(?:[\\s.,'#&*()/-]*[A-Za-z0-9]+)*(?:[\\s]*[.,#&*()/-]*\\s*)*$", message = "{location.format}")
+    @Pattern(regexp = "^[A-Z][a-z]+$", message = "{invalid.location.format}")
     @Size(min = 2, max = 200, message = "{location.notnull.message}")
     private String jobLocation;
 
     @Schema(example = "grossAmount")
-    @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "{grossAmount.format}")
-    @Size(min = 4, max = 20, message = "{grossAmount.size.message}")
-    private Double grossCompensation;
+    @Pattern(regexp = "^\\d{5,20}$", message = "{grossAmount.format}")
+    private String grossCompensation;
 
     private String companyId;
     private String salaryConfigurationId;
 
     @Schema(example = "employeePosition")
-    @Pattern(regexp = "^(?!.*\\b([A-Z])\\s\\1\\s\\1)(?:[A-Z][a-z]+(?: [A-Z][a-z]+)*|[A-Z](?:\\.? ?[A-Z])? ?[A-Z][a-z]+)$", message = "{invalid.format}")
+    @Pattern(regexp =  "^([A-Z][a-z]+)(\\s[A-Z][a-z]+)*$",
+            message = "{invalid.position.format}")
     private String employeePosition;
 
 }
