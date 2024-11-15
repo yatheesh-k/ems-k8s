@@ -29,6 +29,7 @@ import java.io.*;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -82,6 +83,21 @@ public class AttendanceServiceImpl implements AttendanceService {
                                             .getMessage(EmployeeErrorMessageKey.EMPLOYEE_NOT_FOUND)))),
                             HttpStatus.NOT_FOUND);
                 }
+                LocalDate hiringDate = LocalDate.parse(employee.getDateOfHiring());
+                YearMonth hiringMonthYear = YearMonth.from(hiringDate);  // Extract year and month from hiring date
+                YearMonth attendanceMonthYear = YearMonth.of(
+                        Integer.parseInt(attendanceRequest.getYear()),
+                        MONTH_NAME_MAP.get(attendanceRequest.getMonth()).getValue()
+                );
+               // Check if the attendance date is before the hiring date
+                if (attendanceMonthYear.isBefore(hiringMonthYear)) {
+                    log.error("Attendance date is before the hiring date for employee ID: {}", employeeId);
+                    return new ResponseEntity<>(
+                            ResponseBuilder.builder().build().createFailureResponse(
+                                    new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_HIRING_DATE)))),
+                            HttpStatus.BAD_REQUEST);
+                }
+
                 String requestEmployeeId = attendanceRequest.getEmployeeId();
                 log.debug("Received employee ID as a string: " + requestEmployeeId);
 

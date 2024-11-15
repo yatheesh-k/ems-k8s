@@ -71,7 +71,7 @@ public class EmployeeRequest {
     private String department;
 
     @Schema(example = "location")
-    @Pattern(regexp = "^([A-Z][a-z]*[\\x20\\x2D\\x2F\\x2C\\x2E\\x3A\\x3B\\x27\\x22\\x28\\x29\\x5B\\x5D\\x7B\\x7D\\x2A\\x5F\\x40\\x23\\x24\\x25\\x5C\\x21\\x60\\x7E]*)*$", message = "{location.format}")
+    @Pattern(regexp = "^(?!\\s)(.*?)(?<!\\s)$", message = "{location.format}")
     @Size(min = 2, max = 200, message = "{location.notnull.message}")
     private String location;
 
@@ -82,7 +82,7 @@ public class EmployeeRequest {
 
     @Schema(example = "mobileNo")
     @NotNull(message = "{mobileNo.notnull.message}")
-    @Pattern(regexp = "^(?!([0-9])\\1{9})\\d{10,15}$", message = "{invalid.mobileNo}")
+    @Pattern(regexp = "^\\+91 [6-9]\\d{9}$", message = "{invalid.mobileNo}")
     private String mobileNo;
 
     @Schema(example = "Active")

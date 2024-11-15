@@ -49,7 +49,6 @@ const Template = () => {
     useEffect(() => {
         const fetchCompanyData = async () => {
             if (!user.companyId) return;
-
             try {
                 const response = await companyViewByIdApi(user.companyId);
                 const data = response.data;
@@ -62,7 +61,6 @@ const Template = () => {
                 setError(err);
             }
         };
-
         fetchCompanyData();
     }, [user.companyId, setValue, setError]);
 
@@ -109,10 +107,18 @@ const Template = () => {
         }
 
         const deductions = activeStructure.deductions;
-        const totalDeductions = Object.entries(deductions).reduce((acc, [key, percentage]) => {
-            const deductionAmount = (grossAmount * (parseFloat(percentage) / 100));
+        const totalDeductions = Object.entries(deductions).reduce((acc, [key, value]) => {
+            let deductionAmount = 0;
+            if (typeof value === 'string' && value.includes('%')) {
+                const percentageValue = parseFloat(value.slice(0, -1));
+                deductionAmount = grossAmount * (percentageValue / 100);
+            } else {
+                deductionAmount = parseFloat(value);
+            }
             return acc + deductionAmount;
-        }, 0);
+        }, 0); 
+
+        console.log(totalDeductions);
 
         const netSalary = grossAmount - totalDeductions;
 
@@ -198,7 +204,7 @@ const Template = () => {
                         <p><strong>D/o {isEditing ? <input type="text" value={fatherName} onChange={e => setFatherName(e.target.value)} /> : fatherName}</strong></p>
                         <p><strong>{isEditing ? <input type="text" value={address} onChange={e => setAddress(e.target.value)} /> : address}</strong></p>
                         <p><strong>{isEditing ? <input type="text" value={cityStateZip} onChange={e => setCityStateZip(e.target.value)} /> : cityStateZip}</strong></p>
-                        <p><strong>Contact Number: {isEditing ? <input type="text" value={contactNumber} onChange={e => setContactNumber(e.target.value)} /> : contactNumber}</strong></p>
+                        <p><strong>Contact Number: {isEditing ? <input type="number" value={contactNumber} onChange={e => setContactNumber(e.target.value)} /> : contactNumber}</strong></p>
                         <div style={{ margin: '40px 0' }}>
                             <p>Subject: Offer of Employment</p>
                             <p>Dear {isEditing ? <input type="text" value={recipientName} onChange={e => setRecipientName(e.target.value)} /> : recipientName},</p>
@@ -461,15 +467,24 @@ const Template = () => {
                         </thead>
                         <tbody>
                             {salaryStructures
-                                .filter(structure => structure.status === "Active") // Display only active structures
+                                .filter(structure => structure.status === "Active")
                                 .map(structure => (
                                     <React.Fragment key={structure.id}>
-                                        {/* Display Allowances */}
                                         {Object.entries(structure.allowances).map(([key, value]) => {
-                                            const allowanceAmount = (grossAmount * (parseFloat(value) / 100));
+                                            let allowanceAmount;
+                                            if (value.includes('%')) {
+                                                allowanceAmount = grossAmount * (parseFloat(value) / 100);
+                                            } else {
+                                                allowanceAmount = parseFloat(value);
+                                            }
                                             return (
                                                 <tr key={key}>
-                                                    <td>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</td>
+                                                    <td>
+                                                        {key
+                                                            .replace(/([A-Z])/g, ' $1')
+                                                            .replace(/^./, str => str.toUpperCase())
+                                                        }
+                                                    </td>
                                                     <td>{Math.floor(allowanceAmount.toFixed(2) / 12)}</td>
                                                     <td>{Math.floor(allowanceAmount.toFixed(2))}</td>
                                                 </tr>
@@ -480,12 +495,21 @@ const Template = () => {
                                             <td>{Math.floor(grossAmount / 12)}</td>
                                             <td>{Math.floor(grossAmount)}</td>
                                         </tr>
-                                        {/* Display Deductions */}
                                         {Object.entries(structure.deductions).map(([key, value]) => {
-                                            const deductionAmount = (grossAmount * (parseFloat(value) / 100));
+                                            let deductionAmount;
+                                            if (value.includes('%')) {
+                                                deductionAmount = grossAmount * (parseFloat(value) / 100);
+                                            } else {
+                                                deductionAmount = parseFloat(value);
+                                            }
                                             return (
                                                 <tr key={key}>
-                                                    <td>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</td>
+                                                    <td>
+                                                        {key
+                                                            .replace(/([A-Z])/g, ' $1')
+                                                            .replace(/^./, str => str.toUpperCase())
+                                                        }
+                                                    </td>
                                                     <td>{Math.floor(deductionAmount.toFixed(2) / 12)}</td>
                                                     <td>{Math.floor(deductionAmount.toFixed(2))}</td>
                                                 </tr>

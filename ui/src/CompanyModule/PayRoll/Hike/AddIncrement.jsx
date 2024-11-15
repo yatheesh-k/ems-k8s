@@ -462,7 +462,7 @@ const AddIncrement = () => {
       dateOfSalaryIncrement: previewData?.dateOfSalaryIncrement || "",
       grossCompensation: String(grossAmount || ""),  
       salaryConfigurationId: salaryStructureId || "",   
-      appraisalTemplateNo: selectedTemplate,
+      // appraisalTemplateNo: selectedTemplate,
     };
 
     try {
@@ -470,7 +470,6 @@ const AddIncrement = () => {
         EmployeeSalaryPostApi(employeeId, dataToSubmit), // API call for updating salary
         AppraisalLetterDownload(selectedTemplate,payload), // API call for downloading the appraisal letter
       ]);
-
       // If both APIs succeed
       toast.success("Employee Salary Updated and Appraisal Letter Generated Successfully");
       setError(''); // Clear error message on success

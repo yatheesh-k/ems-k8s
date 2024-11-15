@@ -132,16 +132,29 @@ const AppraisalTemplate1 = ({
           </thead>
           <tbody>
             {allowances && Object.keys(allowances).map((key, index) => {
-              const value = allowances[key]; 
-              const allowanceAmount = (salaryIncrease * (parseFloat(value) / 100)); 
+              const value = allowances[key];
+
+              let allowanceAmount = 0;
+
+              // Check if the value contains a '%' (percentage)
+              if (typeof value === 'string' && value.includes('%')) {
+                // Extract the numeric part and calculate the allowance as a percentage of salaryIncrease
+                const percentageValue = parseFloat(value.slice(0, -1)); // Remove '%' and convert to a number
+                allowanceAmount = salaryIncrease * (percentageValue / 100);
+              } else {
+                // Otherwise, treat the value as a fixed amount
+                allowanceAmount = parseFloat(value); // Convert to number directly
+              }
+
               return (
                 <tr key={index}>
                   <td>{key}</td>
+                  {/* Show the allowance amount (rounded to nearest integer) */}
                   <td>{Math.floor(allowanceAmount.toFixed(2))}</td>
                 </tr>
               );
             })}
-
+            
             {/* Add a row for Gross Salary after the allowances */}
             {salaryIncrease && (
               <tr>

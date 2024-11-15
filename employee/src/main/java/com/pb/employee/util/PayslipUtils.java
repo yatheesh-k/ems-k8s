@@ -120,26 +120,34 @@ public class PayslipUtils {
 
 
         double totalDeduction = 0.0;
-        if (salaryRequest.getSalaryConfigurationEntity().getDeductions()!=null){
+        if (salaryRequest.getSalaryConfigurationEntity().getDeductions() != null) {
             Map<String, String> decodeDeductions = new HashMap<>();
-            if (noOfWorkingDays == 0){
-                for (Map.Entry<String, String> entry : salaryRequest.getSalaryConfigurationEntity().getDeductions().entrySet()){
+
+            if (noOfWorkingDays == 0) {
+                for (Map.Entry<String, String> entry : salaryRequest.getSalaryConfigurationEntity().getDeductions().entrySet()) {
                     decodeDeductions.put(entry.getKey(), String.valueOf(0));
                     totalDeduction = 0;
                 }
                 salary.getSalaryConfigurationEntity().setDeductions(decodeDeductions);
-            }else {
+            } else {
                 for (Map.Entry<String, String> entry : salaryRequest.getSalaryConfigurationEntity().getDeductions().entrySet()) {
+                    String key = entry.getKey();
                     String unmaskValues = unMaskValue(entry.getValue());
                     String calculatedValue = persentageOrValue(unmaskValues, gross);
-                    decodeDeductions.put(entry.getKey(), calculatedValue);
 
+                    // Check if working days are less than 15 and deduction type is PF Employee or PF Employer
+                    if (noOfWorkingDays < 15 && (key.equalsIgnoreCase(Constants.PF_EMPLOYEE) || key.equalsIgnoreCase(Constants.PF_EMPLOYER))) {
+                        // Divide by 2 if noOfWorkingDays < 15 for PF Employee and PF Employer
+                        calculatedValue = String.valueOf(Double.parseDouble(calculatedValue) / 2);
+                    }
+                    decodeDeductions.put(key, calculatedValue);
                     totalDeduction += Double.parseDouble(calculatedValue);
                 }
 
                 salary.getSalaryConfigurationEntity().setDeductions(decodeDeductions);
             }
         }
+
         if (salaryRequest.getTotalEarnings() != null){
             te = allowance;
             salary.setTotalEarnings(String.valueOf(Math.round(te)));
@@ -668,45 +676,39 @@ public class PayslipUtils {
 
         // Store Basic Salary breakdown without adding to total initially
         Map<String, String> basicSalaryData = new HashMap<>();
-        basicSalaryData.put(Constants.ANNUAL, formatValue(String.valueOf(grossAnnualSalary)));
+        basicSalaryData.put(Constants.ANNUAL, formatValue(grossAnnualSalary));
         components.put(Constants.BASIC_SALARY, basicSalaryData); // Add Basic Salary first but don’t yet add to total
 
-        double totalAnnualSalary = 0.0;
+        double totalAllowances = 0.0;
+        double grossAnnual = Double.parseDouble(grossAnnualSalary); // Convert gross annual salary to double for calculations
+
         // Calculate allowances and accumulate totals
         Map<String, String> allowances = salaryConfiguration.getAllowances();
         if (allowances != null) {
             for (Map.Entry<String, String> entry : allowances.entrySet()) {
                 // Calculate allowance values
-                double allowanceAnnualValue = Double.parseDouble(persentageOrValue(entry.getValue(), Double.parseDouble(grossAnnualSalary)));
-
-                // Accumulate allowance totals for later addition to Gross Salary
-                totalAnnualSalary += allowanceAnnualValue;
+                double allowanceAnnualValue = Double.parseDouble(persentageOrValueForYearly(entry.getValue(), grossAnnual));
+                // Accumulate allowance totals
+                totalAllowances += allowanceAnnualValue;
 
                 // Add the formatted allowance to components
                 Map<String, String> allowanceData = new HashMap<>();
                 allowanceData.put(Constants.ANNUAL, formatValue(String.valueOf(allowanceAnnualValue)));
                 components.put(formatComponentName(entry.getKey()), allowanceData);
-
             }
         }
-        Map<String, String> grossSalaryData = new HashMap<>();
-        grossSalaryData.put(Constants.ANNUAL,  "<b>"+ formatValue(String.valueOf(totalAnnualSalary))+"</b>");
-        // Calculate deductions without affecting Gross Salary
-        Map<String, String> deductions = salaryConfiguration.getDeductions();
-        if (deductions != null) {
-            for (Map.Entry<String, String> entry : deductions.entrySet()) {
-                double deductionAnnualValue = Double.parseDouble(persentageOrValue(entry.getValue(), Double.parseDouble(grossAnnualSalary)));
-                double deductionMonthlyValue = deductionAnnualValue / 12;
+        // Calculate Total Deductions as the difference between gross annual and total allowances
+        double totalDeductions = grossAnnual - totalAllowances;
 
-                // Add formatted deduction to components only
-                Map<String, String> deductionData = new HashMap<>();
-                deductionData.put(Constants.MONTH, formatValue(String.valueOf(deductionMonthlyValue)));
-                deductionData.put(Constants.ANNUAL, formatValue(String.valueOf(deductionAnnualValue)));
-                components.put(formatComponentName(entry.getKey()), deductionData);
-            }
-        }
+        // Add Total Deductions to components
+        Map<String, String> deductionsData = new HashMap<>();
+        deductionsData.put(Constants.ANNUAL, formatValue(String.valueOf(totalDeductions)));
+        components.put(Constants.OTHER_ALLOWANCES, deductionsData);
+
         return components;
     }
+
+
 
 
 

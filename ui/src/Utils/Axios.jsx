@@ -456,7 +456,7 @@ export const AppraisalLetterDownload = async (id,payload) => {
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const a = document.createElement('a');
     a.href = url;
-    a.download = `appraisal.pdf`; 
+    a.download = `Appraisal.pdf`; 
     document.body.appendChild(a);
     a.click();
     a.remove();

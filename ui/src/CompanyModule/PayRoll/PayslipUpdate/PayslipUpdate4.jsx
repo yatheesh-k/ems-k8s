@@ -103,10 +103,10 @@ const PayslipUpdate4 = () => {
                         return acc;
                     }, {}),
                 };
-
-                const totalEarnings = Object.values(updatedAllowances).reduce((sum, value) => sum + Number(value), 0);
-                const totalDeductions = Object.values(updatedDeductions).reduce((sum, value) => sum + Number(value), 0);
-                const totalTax = Number(payslipData.salary.incomeTax) + Number(payslipData.salary.pfTax);
+                const totalEarnings = totals.totalEarnings;
+                const totalDeductions = totals.totalDeductions;
+                const totalTax = totals.totalTax;
+                const netSalary = totals.netPay;
 
                 if (totalDeductions + totalTax > totalEarnings) {
                     setErrorMessages(prev => ({
@@ -115,7 +115,6 @@ const PayslipUpdate4 = () => {
                     }));
                     return;
                 }
-
                 setErrorMessages({ deductions: '' });
                 const payload = {
                     companyName: user.company,
@@ -125,11 +124,11 @@ const PayslipUpdate4 = () => {
                             ...payslipData.salary.salaryConfigurationEntity,
                             allowances: updatedAllowances,
                             deductions: updatedDeductions,
-                            totalEarnings: totals.totalEarnings,
-                            totalDeductions: totals.totalDeductions,
-                            totalTax: totals.totalTax,
-                            netSalary: totals.netPay,
                         },
+                        totalEarnings: totals.totalEarnings,
+                        totalDeductions,
+                        totalTax,
+                        netSalary,
                     },
                     attendance: payslipData.attendance,
                     month,

@@ -91,7 +91,8 @@ public enum EmployeeErrorMessageKey {
     UNABLE_SAVE_TEMPLATE("unable.save.template"),
     TEMPLATE_EXIST("template.already.exists"),
     UNABLE_TO_GET_TEMPLATE("unable.template"),
-    INVALID_RELIVING("invalid.relieving");
+    INVALID_RELIVING("invalid.relieving"),
+    INVALID_HIRING_DATE("invalid.hiring");
 
     private final String key;
 

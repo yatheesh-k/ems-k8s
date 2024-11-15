@@ -39,14 +39,14 @@ public class OfferLetterRequest {
     private String employeeFatherName;
 
     @Schema(example = "address")
-    @Pattern(regexp = "^[A-Z][A-Za-z0-9\\s,.-]+(?:\\s[A-Za-z0-9]+)*,?\\s?[A-Za-z]+(?:\\s[A-Za-z]+)*\\s?-?(\\s?\\d{6})?$",
+    @Pattern(regexp = "^(?!\\s)(.*?)(?<!\\s)$",
             message = "{invalid.location.format}")
     @Size(min = 2, max = 200, message = "{location.notnull.message}")
     private String employeeAddress;
 
     @Schema(example = "contactNo")
     @NotNull(message = "{mobileNo.notnull.message}")
-    @Pattern(regexp ="^(?!([0-9])\\1{9})\\d{10}$", message = "{invalid.mobileNo}")
+    @Pattern(regexp ="^\\+91 [6-9]\\d{9}$", message = "{invalid.mobileNo}")
     private String employeeContactNo;
 
     @Schema(example = "yyyy-mm-dd")
