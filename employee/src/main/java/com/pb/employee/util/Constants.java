@@ -133,4 +133,6 @@ public class Constants {
     public static final String NOTICE_PERIOD = "NoticePeriod";
     public static final String INACTIVE = "InActive";
     public static final String STATUS = "status";
+    public static final String PF_EMPLOYEE = "pfEmployee";
+    public static final String PF_EMPLOYER = "pfEmployer";
 }

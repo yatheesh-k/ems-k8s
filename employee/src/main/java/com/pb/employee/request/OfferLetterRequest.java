@@ -39,7 +39,7 @@ public class OfferLetterRequest {
     private String employeeFatherName;
 
     @Schema(example = "address")
-    @Pattern(regexp = "^(?!\\s)[A-Z][a-z](?<!\\s)$",
+    @Pattern(regexp = "^(?!\\s)(.*?)(?<!\\s)$",
             message = "{invalid.location.format}")
     @Size(min = 2, max = 200, message = "{location.notnull.message}")
     private String employeeAddress;

@@ -120,26 +120,34 @@ public class PayslipUtils {
 
 
         double totalDeduction = 0.0;
-        if (salaryRequest.getSalaryConfigurationEntity().getDeductions()!=null){
+        if (salaryRequest.getSalaryConfigurationEntity().getDeductions() != null) {
             Map<String, String> decodeDeductions = new HashMap<>();
-            if (noOfWorkingDays == 0){
-                for (Map.Entry<String, String> entry : salaryRequest.getSalaryConfigurationEntity().getDeductions().entrySet()){
+
+            if (noOfWorkingDays == 0) {
+                for (Map.Entry<String, String> entry : salaryRequest.getSalaryConfigurationEntity().getDeductions().entrySet()) {
                     decodeDeductions.put(entry.getKey(), String.valueOf(0));
                     totalDeduction = 0;
                 }
                 salary.getSalaryConfigurationEntity().setDeductions(decodeDeductions);
-            }else {
+            } else {
                 for (Map.Entry<String, String> entry : salaryRequest.getSalaryConfigurationEntity().getDeductions().entrySet()) {
+                    String key = entry.getKey();
                     String unmaskValues = unMaskValue(entry.getValue());
                     String calculatedValue = persentageOrValue(unmaskValues, gross);
-                    decodeDeductions.put(entry.getKey(), calculatedValue);
 
+                    // Check if working days are less than 15 and deduction type is PF Employee or PF Employer
+                    if (noOfWorkingDays < 15 && (key.equalsIgnoreCase(Constants.PF_EMPLOYEE) || key.equalsIgnoreCase(Constants.PF_EMPLOYER))) {
+                        // Divide by 2 if noOfWorkingDays < 15 for PF Employee and PF Employer
+                        calculatedValue = String.valueOf(Double.parseDouble(calculatedValue) / 2);
+                    }
+                    decodeDeductions.put(key, calculatedValue);
                     totalDeduction += Double.parseDouble(calculatedValue);
                 }
 
                 salary.getSalaryConfigurationEntity().setDeductions(decodeDeductions);
             }
         }
+
         if (salaryRequest.getTotalEarnings() != null){
             te = allowance;
             salary.setTotalEarnings(String.valueOf(Math.round(te)));
