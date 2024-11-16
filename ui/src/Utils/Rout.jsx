@@ -38,9 +38,13 @@ import CompanySalaryView from '../CompanyModule/Settings/CompanySalaryView';
 import OfferLetters from '../CompanyModule/Settings/OfferLetters';
 import Template from '../CompanyModule/Settings/Template';
 import ExperienceLetter from '../CompanyModule/Settings/Experience/ExperienceLetter';
-import InternShipForm from '../CompanyModule/Internship/Internship/InternShipForm';
-import InternShipTemplates from '../CompanyModule/Internship/Internship/InternShipTemplates';
-import AppraisalTemplate from '../CompanyModule/Appraisal/AppraisalTemplate';
+import ExperienceForm from '../CompanyModule/Settings/Experience/ExperienceForm';
+import ExperienceView from '../CompanyModule/Settings/Experience/ExperienceView';
+import RelievingLetter from '../CompanyModule/Settings/Relieving/RelievingLetter';
+import Preview from '../CompanyModule/Settings/Relieving/Preview';
+import AppraisalTemplate from '../CompanyModule/Settings/Appraisal/AppraisalTemplate';
+import InternShipTemplates from '../CompanyModule/Settings/Internship/InternShipTemplates';
+import InternShipForm from '../CompanyModule/Settings/Internship/InternShipForm';
 import PayslipUpdate1 from '../CompanyModule/PayRoll/PayslipUpdate/PayslipUpdate1';
 import PayslipUpdate2 from '../CompanyModule/PayRoll/PayslipUpdate/PayslipUpdate2';
 import PayslipUpdate3 from '../CompanyModule/PayRoll/PayslipUpdate/PayslipUpdate3';
@@ -103,13 +107,6 @@ const Rout = () => {
     }
   }, []);
 
-  const handleLogout = () => {
-    // Clear sessionStorage on logout
-    sessionStorage.clear();
-
-    // Optionally redirect the user to the login page or another route
-    window.location.href = '/login';
-  };
 
   return (
     <Routes>
@@ -125,10 +122,9 @@ const Rout = () => {
       <Route path='/designation' element={<Designation />}></Route>
       <Route path='/employeeRegistration' element={<EmployeeRegistration />}></Route>
       <Route path='/employeeView' element={<EmployeeView />}></Route>
-      <Route path='/existingProcess' element={<ExistsEmpRegistration />}></Route>
-      <Route path='/existingList' element={<ExistsEmployeeView />}></Route>
+      <Route path='/relievingProcess' element={<ExistsEmpRegistration />}></Route>
+      <Route path='/relievingSummary' element={<ExistsEmployeeView />}></Route>
       <Route path='/employeeProfile' element={<EmployeeProfile />}></Route>
-      {/* <Route path='/payroll'> */}
       <Route path='/companySalaryStructure' element={<CompanySalaryStructure />}></Route>
       <Route path='/companySalaryView' element={<CompanySalaryView />}></Route>
       <Route path='/offerLetters' element={<OfferLetters />}></Route>
@@ -139,7 +135,7 @@ const Rout = () => {
       <Route path='/employeeSalaryList' element={<EmployeeSalaryList />}></Route>
       <Route path='/payslipGeneration' element={<GeneratePaySlip />}></Route>
       <Route path='/payslipsList' element={<ViewPaySlips />}></Route>
-      <Route path='/increment' element={<AddIncrement />}></Route>
+      <Route path='/appraisal' element={<AddIncrement />}></Route>
       <Route path='/incrementList' element={<ViewIncrement />}></Route>
       <Route path='/payslip' element={<PaySlipDoc />}></Route>
       <Route path='/addAttendance' element={<ManageAttendance />}></Route>
@@ -152,7 +148,11 @@ const Rout = () => {
       <Route path='/hikeLetter' element={<HikeLetter />}></Route>
       <Route path='/experienceLetter' element={<ExperienceLetter />}></Route>
       <Route path='/existingEmployee' element={<ExistingLetter />}></Route>
+      <Route path='/experienceSummary' element={<ExperienceView/>}></Route>
+      <Route path='/experienceForm' element={<ExperienceForm/>}></Route>
       <Route path='/forgotPassword' element={<ForgotPassword />}></Route>
+      <Route path='/relievingTemplates' element={<RelievingLetter/>}></Route>
+      <Route path='/relivingReview' element={<Preview/>}></Route>
       <Route path='/internsLetter' element={<InternShipForm/>}></Route>
       <Route path='/internsTemplates' element={<InternShipTemplates/>}></Route>
       <Route path='/appraisalLetter' element={<AddIncrement/>}></Route>

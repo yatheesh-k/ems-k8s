@@ -1,13 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
+import LayOut from "../../../LayOut/LayOut";
+import { companyViewByIdApi, EmployeeGetApiById, TemplateGetAPI, TemplateSelectionPatchAPI } from "../../../Utils/Axios";
 import { toast } from "react-toastify";
+import { useAuth } from "../../../Context/AuthContext";
+import InternshipTemplate1 from "./InternshipTemplate1";
+import InternShipTemplate2 from "./InternShipTemplate2";
 
-import AppraisalTemplate1 from "./AppraisalTemplate1";
-import AppraisalTemplate2 from "./AppraisalTemplate2";
-import LayOut from "../../LayOut/LayOut";
-import { CompanySalaryStructureGetApi, companyViewByIdApi, EmployeeGetApiById, PayslipTemplate, TemplateGetAPI } from "../../Utils/Axios";
-import { useAuth } from "../../Context/AuthContext";
-
-const AppraisalTemplate = () => {
+const InternShipTemplates = () => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [companyData, setCompanyData] = useState({});
   const [activeCardIndex, setActiveCardIndex] = useState(null);
@@ -15,44 +14,9 @@ const AppraisalTemplate = () => {
   const [employeeDetails, setEmployeeDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isFetched, setIsFetched] = useState(false);
-  
-  // Salary Structure State
-  const [salaryStructure, setSalaryStructure] = useState([]);
-  const [allowances, setAllowances] = useState({});
-  const [error, setError] = useState("");
 
-  const { user, logoFileName } = useAuth();
+  const { user,logoFileName } = useAuth();
   const logo = "/assets/img/adapt_adapt_logo.png";
-
-  // Fetching Salary Structures
-  useEffect(() => {
-    const fetchSalaryStructures = async () => {
-      try {
-        const response = await CompanySalaryStructureGetApi();
-        const allSalaryStructures = response.data.data;
-
-        if (allSalaryStructures.length === 0) {
-          setError('Company Salary Structure is not defined');
-          setSalaryStructure([]);
-        } else {
-          const activeSalaryStructures = allSalaryStructures.filter(structure => structure.status === "Active");
-
-          if (activeSalaryStructures.length > 0) {
-            setSalaryStructure(activeSalaryStructures);
-            setAllowances(activeSalaryStructures[0].allowances);
-            setError(''); // Clear error if salary structures are found
-          } else {
-            setError('No active salary structure found');
-          }
-        }
-      } catch (error) {
-        setError('Error fetching salary structures.');
-        console.error("API fetch error:", error);
-      }
-    };
-
-    fetchSalaryStructures();
-  }, []);
 
   const fetchCompanyData = async (companyId) => {
     try {
@@ -89,7 +53,7 @@ const AppraisalTemplate = () => {
   const fetchTemplate = async (companyId) => {
     try {
       const res = await TemplateGetAPI(companyId);
-      const templateNo = res.data.data.relievingTemplateNo; // Get the experience template number
+      const templateNo = res.data.data.internshipTemplateNo; // Get the experience template number
       setFetchedTemplate(res.data.data); // Store fetched data
       setIsFetched(true); // Mark template as fetched
       // Find the corresponding template and set it as selected
@@ -113,11 +77,13 @@ const AppraisalTemplate = () => {
     {
       title: "Template 1",
       name: "1",
-      content: () => (
-        <AppraisalTemplate1
+      content: (data) => (
+        <InternshipTemplate1
           companyLogo={logoFileName}
-          companyData={companyData}
-          allowances={allowances}   // Passing allowances dynamically
+          companyName={companyData.companyName}
+          companyAddress={companyData.companyAddress}
+          contactNumber={companyData.mobileNo}
+          mailId={companyData.emailId}
           date="October 28, 2024"
           employeeName="John Doe"
           employeeId="E123456"
@@ -130,20 +96,24 @@ const AppraisalTemplate = () => {
     {
       title: "Template 2",
       name: "2",
-      content: () => (
-        <AppraisalTemplate2
+      content: (data) => (
+        <InternShipTemplate2
           companyLogo={logoFileName}
-          companyData={companyData}
-          allowances={allowances}   // Passing allowances dynamically
+          companyName={companyData.companyName}
+          companyAddress={companyData.companyAddress}
+          contactNumber={companyData.mobileNo}
+          mailId={companyData.emailId}
           date="October 28, 2024"
           employeeName="John Doe"
           employeeId="E123456"
           jobTitle="Software Engineer"
           effectiveDate="November,2024"
+
         />
       ),
     },
-  ], [companyData, allowances, logoFileName]);
+
+  ], [user, logoFileName]);
 
   useEffect(() => {
     // Set default template as Template 1
@@ -164,7 +134,7 @@ const AppraisalTemplate = () => {
       // Add other necessary fields if required
     };
     try {
-      const response = await PayslipTemplate(dataToSubmit);
+      const response = await TemplateSelectionPatchAPI(dataToSubmit);
       
       // Assuming a successful submission is indicated by the presence of a specific property
       if (response.data) { // Adjust this condition based on your API's response structure
@@ -189,7 +159,7 @@ const AppraisalTemplate = () => {
       }
     }
   };
-
+  
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
       const errorMessage = error.response.data.error.message;
@@ -243,9 +213,9 @@ const AppraisalTemplate = () => {
             <div className="card mb-3">
               <div className="card-body">
                 <h5 className="card-title text-center">{selectedTemplate.title}</h5>
-                {selectedTemplate.content()}
+                {selectedTemplate.content("")}
                 <div className="text-end">
-                  {!isFetched && (
+                {!isFetched && (
                     <>
                       <button
                         className="btn btn-secondary mt-3 me-2"
@@ -272,4 +242,4 @@ const AppraisalTemplate = () => {
   );
 };
 
-export default AppraisalTemplate;
+export default InternShipTemplates;

@@ -248,7 +248,10 @@ const CompanySalaryStructure = () => {
     }
   };
 
-
+const clearForm =()=>{
+  reset();
+  navigate('/companySalaryView');
+}
   const formatFieldName = (fieldName) => {
     return fieldName
       .replace(/([A-Z])/g, ' $1')
@@ -558,25 +561,33 @@ const CompanySalaryStructure = () => {
                               field.value
                                 ? { value: field.value, label: field.value }
                                 : null
-                            }
-                            onChange={(val) => field.onChange(val.value)}
-                            isDisabled={!isSubmitEnabled()}
-                            placeholder="Select Status"
-                          />
-                        )}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-4 text-end">
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      disabled={!isSubmitEnabled()}
-                    >
-                      Submit All
-                    </button>
-                  </div>
-                </div>
+                        }
+                        onChange={(val) => field.onChange(val.value)}
+                        isDisabled={!isSubmitEnabled()}
+                        placeholder="Select Status"
+                    />
+                )}
+            />
+        </div>
+    </div>
+    <div className="col-4 text-end">
+    <button
+            type="button"
+            onClick={clearForm}
+            className="btn btn-secondary me-2"
+        >
+          Cancel
+        </button>
+        <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={!isSubmitEnabled()}
+        >
+            Submit All
+        </button>
+    </div>
+</div>
+
               </div>
             </div>
           </form>

@@ -23,16 +23,16 @@ const Template = () => {
     const [salaryConfigurationId, setSalaryConfigurationId] = useState(null);
     const [refNo, setRefNo] = useState('OFLTR-09');
     const [companyDetails, setCompanyDetails] = useState(null);
-    const [recipientName, setRecipientName] = useState("[Recipient's Name]");
-    const [fatherName, setFatherName] = useState("[Recipient's Father's Name]");
-    const [address, setAddress] = useState("[Recipient's Address]");
-    const [cityStateZip, setCityStateZip] = useState("[City, State, Zip]");
-    const [contactNumber, setContactNumber] = useState("[Contact Number]");
+    const [recipientName, setRecipientName] = useState("Recipient's Name");
+    const [fatherName, setFatherName] = useState("Recipient's Father's Name");
+    const [address, setAddress] = useState("Recipient's Address");
+    const [cityStateZip, setCityStateZip] = useState("City, State, Zip");
+    const [contactNumber, setContactNumber] = useState("+91 ");
     const [role, setRole] = useState("[Role]");
-    const [joiningDate, setJoiningDate] = useState("[Joining date]");
-    const [location, setLocation] = useState("[Location]");
-    const [grossAmount, setGrossAmount] = useState("[Gross Amount]");
-    const [companyName, setCompanyName] = useState("[Company Name]");
+    const [joiningDate, setJoiningDate] = useState("Joining date");
+    const [location, setLocation] = useState("Location");
+    const [grossAmount, setGrossAmount] = useState(0);
+    const [companyName, setCompanyName] = useState("Company Name");
     const [hasCinNo, setHasCinNo] = useState(false);
     const [hasCompanyRegNo, setHasCompanyRegNo] = useState(false);
     const { user, logoFileName } = useAuth();
@@ -92,21 +92,23 @@ const Template = () => {
         fetchSalary();
     }, []);
 
-
     const calculateValues = () => {
+        console.log("Gross Amount: ", grossAmount); // Log the grossAmount
+    
         if (salaryStructures.length === 0) {
             toast.error("No salary structure available for calculation.");
             return;
         }
-
-        // Filter for active structures only
+    
         const activeStructure = salaryStructures.find(structure => structure.status === "Active");
         if (!activeStructure) {
             toast.error("No active salary structure available.");
             return;
         }
-
+    
         const deductions = activeStructure.deductions;
+        console.log("Deductions: ", deductions); // Log deductions to check the structure
+    
         const totalDeductions = Object.entries(deductions).reduce((acc, [key, value]) => {
             let deductionAmount = 0;
             if (typeof value === 'string' && value.includes('%')) {
@@ -116,18 +118,20 @@ const Template = () => {
                 deductionAmount = parseFloat(value);
             }
             return acc + deductionAmount;
-        }, 0); 
-
-        console.log(totalDeductions);
-
+        }, 0);
+    
+        console.log("Calculated Total Deductions: ", totalDeductions); // Log totalDeductions
+    
         const netSalary = grossAmount - totalDeductions;
-
+        console.log("Net Salary: ", netSalary); // Log netSalary
+    
         setCalculatedValues({
             totalDeductions,
             netSalary,
         });
     };
-
+    
+console.log("calculateValues",calculatedValues)
     const handleDownload = async () => {
         const payload = {
             offerDate: date,
@@ -201,10 +205,10 @@ const Template = () => {
                         </div>
                         <div style={{ position: "relative", width: "100%", height: "100%" }}></div>
                         <p><strong>To, {isEditing ? <input type="text" value={recipientName} onChange={e => setRecipientName(e.target.value)} /> : recipientName}</strong></p>
-                        <p><strong>D/o {isEditing ? <input type="text" value={fatherName} onChange={e => setFatherName(e.target.value)} /> : fatherName}</strong></p>
+                        <p><strong>S/o,D/o {isEditing ? <input type="text" value={fatherName} onChange={e => setFatherName(e.target.value)} /> : fatherName}</strong></p>
                         <p><strong>{isEditing ? <input type="text" value={address} onChange={e => setAddress(e.target.value)} /> : address}</strong></p>
                         <p><strong>{isEditing ? <input type="text" value={cityStateZip} onChange={e => setCityStateZip(e.target.value)} /> : cityStateZip}</strong></p>
-                        <p><strong>Contact Number: {isEditing ? <input type="number" value={contactNumber} onChange={e => setContactNumber(e.target.value)} /> : contactNumber}</strong></p>
+                        <p><strong>Contact Number: {isEditing ? <input type="text" defaultValue="+91 " value={contactNumber} onChange={e => setContactNumber(e.target.value)} /> : contactNumber}</strong></p>
                         <div style={{ margin: '40px 0' }}>
                             <p>Subject: Offer of Employment</p>
                             <p>Dear {isEditing ? <input type="text" value={recipientName} onChange={e => setRecipientName(e.target.value)} /> : recipientName},</p>
@@ -515,15 +519,15 @@ const Template = () => {
                                                 </tr>
                                             );
                                         })}
-                                        <tr>
+                                       <tr>
                                             <td><strong>Total Deductions</strong></td>
-                                            <td>{Math.floor(calculatedValues.totalDeductions ? calculatedValues.totalDeductions.toFixed(2) / 12 : 0)}</td>
-                                            <td>{Math.floor(calculatedValues.totalDeductions ? calculatedValues.totalDeductions.toFixed(2) : 0)}</td>
+                                            <td>{calculatedValues.totalDeductions ? Math.floor(calculatedValues.totalDeductions / 12) : 0}</td>
+                                            <td>{calculatedValues.totalDeductions ? Math.floor(calculatedValues.totalDeductions) : 0}</td>
                                         </tr>
                                         <tr>
                                             <td><strong>Net Salary</strong></td>
-                                            <td>{Math.floor(calculatedValues.netSalary ? (calculatedValues.netSalary / 12).toFixed(2) : 0)}</td>
-                                            <td>{Math.floor(calculatedValues.netSalary ? calculatedValues.netSalary.toFixed(2) : 0)}</td>
+                                            <td>{calculatedValues.netSalary ? Math.floor(calculatedValues.netSalary / 12) : 0}</td>
+                                            <td>{calculatedValues.netSalary ? Math.floor(calculatedValues.netSalary) : 0}</td>
                                         </tr>
                                     </React.Fragment>
                                 ))}

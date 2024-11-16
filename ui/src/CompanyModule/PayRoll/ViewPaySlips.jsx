@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import LayOut from '../../LayOut/LayOut';
 import DataTable from 'react-data-table-component';
 import { Eye } from 'react-bootstrap-icons';
-import { AllEmployeePayslipsGet, EmployeeGetApi, EmployeeGetApiById, EmployeePayslipsGet, PayslipTemplateGetApi } from '../../Utils/Axios';
+import { AllEmployeePayslipsGet, EmployeeGetApi, EmployeeGetApiById, EmployeePayslipsGet, TemplateGetAPI } from '../../Utils/Axios';
 
 const ViewPaySlips = () => {
   const { control, formState: { errors } } = useForm();
@@ -109,7 +109,7 @@ const ViewPaySlips = () => {
 
   const fetchTemplate = async () => {
     try {
-      const response = await PayslipTemplateGetApi();
+      const response = await TemplateGetAPI();
       const templateData = response.data.data; // Assuming this is where your template details are
       setCurrentTemplate(templateData); // Set the template data correctly
       console.log("Fetched Payslip Template:", templateData); // Log for debugging
@@ -185,6 +185,7 @@ const ViewPaySlips = () => {
       } catch (error) {
         console.error('Error fetching all employee payslips:', error);
         setNoRecords(true);
+        handleApiErrors(error)
       }
     };
     fetchAllPayslips();
@@ -349,7 +350,7 @@ const ViewPaySlips = () => {
             </div>
             {showFields ? (
               <div>
-                <h5 className="card-title mt-4 text-dark" >
+                <h5 className="card-title mt-4 text-secondary" >
                   PaySlip Details for {selectedEmployeeDetails.firstName ? `${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})` : 'All Employees'}
                   {selectedYear && ` - ${selectedYear}`}
                   {selectedMonth && ` - ${getMonthNames()[selectedMonth - 1]}`}

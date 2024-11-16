@@ -58,7 +58,6 @@ const Department = () => {
         companyName: user.company,
         name: data.name,
       };
-
       if (editingId) {
         await DepartmentPutApiById(editingId, formData);
         setTimeout(() => {
@@ -100,14 +99,7 @@ const Department = () => {
         
         // Fetch departments after deletion
         const updatedDepartments = departments.filter(department => department.id !== selectedItemId);
-        setDepartments(updatedDepartments);
-  
-        // If no departments are left, we can force a fetch or reset state
-        if (updatedDepartments.length === 0) {
-          // Optionally fetch the departments again if needed
-          // fetchDepartments(); // Uncomment this if you want to refetch from API
-        }
-  
+        setDepartments(updatedDepartments) 
         setTimeout(() => {
           // Only if you want to refetch after a delay
           fetchDepartments();
@@ -180,17 +172,19 @@ const Department = () => {
 
   const validateName = (value) => {
     if (!value || value.trim().length === 0) {
-      return "Department Name is Required.";
+      return "Deparment Name is Required.";
     } else if (!/^[A-Za-z ]+$/.test(value)) {
       return "Only Alphabetic Characters are Allowed.";
     } else {
       const words = value.split(" ");
       
-      for (const word of words) {
-        if (word.length < 2 || word.length > 40) {
-          return "Invalid Length of Department";
+        for (const word of words) {
+          if (word.length < 2) {
+            return "Minimum Length 2 characters.";  // If any word is shorter than 2 characters, return this message
+          } else if (word.length > 40) {
+            return "Max Length 40 characters.";  // If any word is longer than 40 characters, return this message
+          }
         }
-      }
       
       if (/^\s|\s$/.test(value)) {
         return "No Leading or Trailing Spaces Allowed.";
@@ -207,7 +201,6 @@ const Department = () => {
   const getFilteredList = (searchTerm) => {
     setSearch(searchTerm);
     if (searchTerm === '') {
-      console.log(departments)
       setFilteredDepartments(departments);
     } else {
       const filteredList = departments.filter(department =>
@@ -216,9 +209,6 @@ const Department = () => {
       setFilteredDepartments(filteredList);
     }
   };
-
-  console.log(filteredDepartments);
-
 
   const handlePageChange = page => {
     setCurrentPage(page);

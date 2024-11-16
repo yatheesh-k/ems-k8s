@@ -20,17 +20,15 @@ const Designation = () => {
   const [designations, setDesignations] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [search, setSearch] = useState('');
-  const [editingId, setEditingId] = useState(null);
   const [editingUserId, setEditingUserId] = useState(null);
-  const [pending, setPending] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [addDesignation, setAddDesignation] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [selectedItemId, setSelectedItemId] = useState(null); // State to store the ID of the item to be deleted
   const { user} = useAuth();
-  const navigate = useNavigate();
+  
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
     setSelectedItemId(null); 
@@ -44,7 +42,6 @@ const Designation = () => {
   const handleCloseAddDesignationModal = () => {
     setAddDesignation(false);
     reset();
-    setEditingId(null);
   };
 
    const fetchDesignation = async () => {
@@ -52,7 +49,6 @@ const Designation = () => {
       const designations = await DesignationGetApi();
       const sortedDesignations = designations.sort((a, b) => a.name.localeCompare(b.name));
       setDesignations(sortedDesignations);
-      setFilteredData(sortedDesignations);
     } catch (error) {
       // handleApiErrors(error);
     }
@@ -63,7 +59,7 @@ const Designation = () => {
   }, []);
 
   const onSubmit = async (data) => {
-    setPending(true);
+    setLoading(true);
     try {
       const formData = {
         companyName: user.company,
@@ -75,7 +71,7 @@ const Designation = () => {
           toast.success('Designation Updated Successfully');
             fetchDesignation(); // Fetch updated list of departments after delay
             setAddDesignation(false);
-          }, 900);
+          }, 1500);
       
       } else {
         await DesignationPostApi(formData);
@@ -84,25 +80,19 @@ const Designation = () => {
           toast.success('Designation Created Successfully');
           fetchDesignation(); // Fetch updated list of departments after delay
           setAddDesignation(false);
-          }, 1000);
+          }, 1500);
       }
-      console.log("data:",designations);
       reset();
       setEditingUserId(null);
-      reset();
     } catch (error) {
       handleApiErrors(error);
     } finally {
-      setPending(false);
+      setLoading(false);
     }
   };
 
   const handleConfirmDelete = async () => {
     if (selectedItemId) {
-      // Optimistically update the state
-      const updatedDesignations = designations.filter(designation => designation.id !== selectedItemId);
-      setDesignations(updatedDesignations);
-      
       try {
         await DesignationDeleteApiById(selectedItemId);
         toast.success("Designation Deleted Successfully", {
@@ -112,18 +102,12 @@ const Designation = () => {
           theme: "colored",
           autoClose: 1000,
         });
-  
-        // If no designations are left, you can choose to refetch
-        if (updatedDesignations.length === 0) {
-          // Optionally refetch the designations again if needed
-          // fetchDesignations(); // Uncomment this if you want to refetch from API
-        }
-  
+        const updatedDesignations = designations.filter(designation => designation.id !== selectedItemId);
+        setDesignations(updatedDesignations);
         setTimeout(() => {
-          // Fetch the updated list after a delay, if needed
           fetchDesignation();
           handleCloseDeleteModal();
-        }, 1500);
+        }, 2000);
       } catch (error) {
         handleApiErrors(error);
         // If there's an error, revert to the original state (not shown in your code)
@@ -154,8 +138,10 @@ const Designation = () => {
       const words = value.split(" ");
       
       for (const word of words) {
-        if (word.length < 2 || word.length > 40) {
-          return "Invalid Length of Designation.";
+        if (word.length < 2) {
+          return "Minimum Length 2 characters.";  // If any word is shorter than 2 characters, return this message
+        } else if (word.length > 40) {
+          return "Maximum Length 40 characters.";  // If any word is longer than 40 characters, return this message
         }
       }
       
@@ -169,20 +155,21 @@ const Designation = () => {
     return true; // Return true if all conditions are satisfied
   };
 
-  const getFilteredList = (searchData) => {
-    setSearch(searchData);
-    const filtered = designations.filter((item) => {
-      // Convert all fields to lowercase for case-insensitive search
-      const searchTerm = searchData.toLowerCase();
-      const id = item.id.toString().toLowerCase(); // Convert id to string and then to lowercase
-      const name = item.name.toLowerCase();
-      // Check if any field contains the search term
-      return id.includes(searchTerm) || name.includes(searchTerm);
-    });
-    setFilteredData(filtered);
-  };
-  const paginationComponentOptions = {
-    noRowsPerPage: true,
+  
+  useEffect(() => {
+    setFilteredData(designations);
+  }, [designations]);
+
+  const getFilteredList = (searchTerm) => {
+    setSearch(searchTerm);
+    if (searchTerm === '') {
+      setFilteredData(designations);
+    } else {
+      const filteredList = designations.filter(designation =>
+        designation.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredData(filteredList);
+    }
   };
 
   const handlePageChange = (page) => {

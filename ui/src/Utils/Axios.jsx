@@ -415,7 +415,11 @@ export const PayslipTemplate = (data) => {
   return axiosInstance.patch(`/template`, data);
 };
 
-export const PayslipTemplateGetApi = (data) => {
+export const TemplateSelectionPatchAPI = (data) => {
+  return axiosInstance.patch(`/template`, data);
+};
+
+export const TemplateGetAPI = (data) => {
   const companyName = localStorage.getItem("companyName")
   return axiosInstance.get(`/${companyName}/template`, data);
 };
@@ -518,7 +522,30 @@ export const RelievingLetterDownload = async (employeeId,payload) => {
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const a = document.createElement('a');
     a.href = url;
-    a.download = `offerLetter.pdf`;
+    a.download = `RelievingLetter.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+    return true;
+  } catch (error) {
+    console.error('Download error:', error);
+    throw error;
+  }
+};
+export const ExperienceFormPostApi = async (templateNo,payload) => {
+  const company = localStorage.getItem("companyName")
+  try {
+    const response = await axiosInstance.post(`/${company}/template/${templateNo}/upload`,payload, {
+      responseType: 'blob',
+      headers: {
+        'Accept': 'application/pdf',
+      }
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ExperienceLetter.pdf`;
     document.body.appendChild(a);
     a.click();
     a.remove();

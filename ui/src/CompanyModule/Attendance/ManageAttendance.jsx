@@ -42,10 +42,6 @@ const ManageAttendance = () => {
     fetchEmployees();
   }, []);
 
-  const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
-  };
-
   const onSubmit = async (data) => {
     const formData = new FormData();
     formData.append("file", data.attendanceFile[0]);
@@ -55,6 +51,7 @@ const ManageAttendance = () => {
       if (response.data.path) {
         toast.success("Attendance Added Successfully");
         reset();
+        setSelectedFile(null)
       } else {
         toast.error(response.data.error.message);
       }
@@ -87,6 +84,11 @@ const ManageAttendance = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Employees");
     XLSX.writeFile(workbook, "attendance_data.xlsx");
+  };
+
+  const clearForm = () => {
+    reset();
+    setSelectedFile(null); // Clear the file selection
   };
 
 
@@ -126,8 +128,8 @@ const ManageAttendance = () => {
               <div className="card-body">
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="mb-4">
-                    <div className="row d-flex justify-content-center">
-                      <div className="col-6 col-md-6 col-lg-6 mt-3" style={{ maxWidth: "400px" }}>
+                    <div className="col-12 row d-flex justify-content-center">
+                      <div className="col-6 col-md-6 col-lg-6 mt-2" style={{ maxWidth: "400px" }}>
                         <label className="form-label">Select Attendance File</label>
                         <input
                           className="form-control"
@@ -141,10 +143,17 @@ const ManageAttendance = () => {
                           <p className="errorMsg">{errors.attendanceFile.message}</p>
                         )}
                       </div>
-                      <div className="col-4 col-md-4 col-lg-4" style={{marginTop:'40px'}}>
+                      <div className="col-4 col-md-4 col-lg-4 mt-4">
+                      <button
+                          type="button" 
+                          className="btn btn-secondary me-1 mt-2"
+                          onClick={clearForm}
+                        >
+                          Cancel
+                        </button>
                         <button
                           type="submit" 
-                          className="btn btn-primary"
+                          className="btn btn-primary mt-2"
                         >
                           Submit
                         </button>
