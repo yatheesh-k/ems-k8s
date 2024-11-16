@@ -48,7 +48,7 @@ const PayslipDoc = () => {
     } catch (err) {
       console.error("Error fetching payslip data:", err);
       toast.error("Failed to fetch payslip data");
-    }
+    }   
   };
 
   const handleDownload = async () => {

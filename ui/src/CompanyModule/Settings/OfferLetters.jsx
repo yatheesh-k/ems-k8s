@@ -1,21 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import LayOut from '../../LayOut/LayOut';
 
 const OfferLetters = () => {
-  const [header, setHeader] = useState('');
-  const [body, setBody] = useState('');
-  const [footer, setFooter] = useState('');
-
   const navigate = useNavigate(); // Initialize useNavigate
-
-  const handleCreateTemplate = (e) => {
-    e.preventDefault();
-    console.log("Creating template:", { header, body, footer });
-    setHeader('');
-    setBody('');
-    setFooter('');
-  };
 
   const handleViewTemplate = () => {
     navigate('/template'); // Navigate to the template page

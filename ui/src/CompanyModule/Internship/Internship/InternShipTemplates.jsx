@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import LayOut from "../../../LayOut/LayOut";
-import { companyViewByIdApi, EmployeeGetApiById, TemplateGetAPI, PayslipTemplate, PayslipTemplateGetApi } from "../../../Utils/Axios";
+import { companyViewByIdApi, EmployeeGetApiById, TemplateGetAPI, PayslipTemplate, TemplateGetAPI } from "../../../Utils/Axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../../../Context/AuthContext";
 import InternshipTemplate1 from "./InternshipTemplate1";
@@ -51,7 +51,7 @@ const InternShipTemplates = () => {
 
   const fetchTemplate = async (companyId) => {
     try {
-      const res = await PayslipTemplateGetApi(companyId);
+      const res = await TemplateGetAPI(companyId);
       const templateNo = res.data.data.offerLetterTemplateNo; // Get the experience template number
       setFetchedTemplate(res.data.data); // Store fetched data
       setIsFetched(true); // Mark template as fetched

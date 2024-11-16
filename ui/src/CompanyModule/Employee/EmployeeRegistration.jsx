@@ -5,7 +5,7 @@ import { Eye, EyeSlash } from "react-bootstrap-icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import LayOut from "../../LayOut/LayOut";
-import { DepartmentGetApi, DesignationGetApi, EmployeeGetApiById, EmployeePatchApiById, EmployeePostApi, EmployeePutApiById, employeeUpdateByIdApi, employeeViewApi } from "../../Utils/Axios";
+import { DepartmentGetApi, DesignationGetApi, EmployeeGetApiById, EmployeePatchApiById, EmployeePostApi } from "../../Utils/Axios";
 import { useAuth } from "../../Context/AuthContext";
 
 const EmployeeRegistration = () => {
@@ -33,6 +33,7 @@ const EmployeeRegistration = () => {
   const [employeeId, setEmployeeId] = useState("");
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
   const [companyName, setCompanyName] = useState("");
+  const [showNoticePeriodOption, setShowNoticePeriodOption] = useState(false);
   const [errorMessage, setErrorMessage] = useState(''); // State for error message
   const navigate = useNavigate();
   const location = useLocation();
@@ -70,11 +71,6 @@ const EmployeeRegistration = () => {
     { value: "Hr", label: "Hr" },
     { value: "Manager", label: "Manager" },
     { value: "Accountant", label: "Accountant" },
-  ];
-
-  const status = [
-    { value: "Active", label: "Active" },
-    { value: "InActive", label: "InActive" },
   ];
 
   useEffect(() => {
@@ -214,7 +210,6 @@ const EmployeeRegistration = () => {
   const onSubmit = async (data) => {
     // const roles = data.roles ? [data.roles] : []; 
     // Constructing the payload
-    const status = data.status || "Active";
     let payload = {
       companyName: company,
       employeeType: data.employeeType,
@@ -274,19 +269,30 @@ const EmployeeRegistration = () => {
 
       reset();
     } catch (error) {
-      if (error.response && error.response.data) {
-        const { error: errorData } = error.response.data;
-
-        if (errorData && errorData.messages && Array.isArray(errorData.messages)) {
-          const message = errorData.messages.join('\n'); // Join messages with new lines
-          setErrorMessage(message);
+      if (error.response) {
+        const { status, data } = error.response;
+        
+        if (status === 409) {
+            // Handling conflict errors (duplicates)
+            toast.error('Conflict error: Check for duplicate entries or unique constraints.');
         } else {
-          const message = error.response.data.message || "An unexpected error occurred.";
-          setErrorMessage(message);
+            // Safely destructure the error response
+            const { message, data: errorData } = data || {};
+            let errorMessage = message || 'An unknown error occurred.';
+            
+            if (errorData) {
+                errorMessage += `
+                Issues:
+                ${Object.entries(errorData).map(([key, value]) => `${key}: ${value || 'N/A'}`).join('\n')}`;
+            }
+
+            toast.error(errorMessage);
+            setErrorMessage(errorMessage); // Display it in your UI
         }
-      } else {
-        handleApiErrors(error);
-      }
+    } else {
+        console.error('An unexpected error occurred:', error);
+        toast.error('An unexpected error occurred. Please try again.');
+    }
     }
   };
 
@@ -314,7 +320,14 @@ const EmployeeRegistration = () => {
           reset(response.data);
           setIsUpdating(true);
           // Assuming roles is an array and setting the first role
-          setValue('status', response.data.data.status.toString());
+          const status = response.data.data.status;
+          setValue('status', status.toString());
+
+          // Conditionally show the "Notice Period" option based on the status
+          if (status === 'NoticePeriod') {
+            setShowNoticePeriodOption(true);
+          }
+
           // Check if roles array has any items
           const role = response.data.data.roles[0]; // Assuming roles is an array
           const selectedRole = Roles.find(option => option.value === role);
@@ -329,11 +342,6 @@ const EmployeeRegistration = () => {
   }, [location.state, reset, setValue]);
 
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const formattedDate = date.toISOString().split("T")[0];
-    return formattedDate;
-  };
   const today = new Date();
   const threeMonthsFromNow = new Date(today.getFullYear(), today.getMonth() + 3, today.getDate()).toISOString().split('T')[0];
   const getCurrentDate = () => {
@@ -416,8 +424,10 @@ const EmployeeRegistration = () => {
       const words = value.split(" ");
 
       for (const word of words) {
-        if (word.length < 3 || word.length > 30) {
-          return "Invalid Format of Manager.";
+        if (word.length < 2) {
+          return "Minimum Length 2 characters.";  // If any word is shorter than 2 characters, return this message
+        } else if (word.length > 40) {
+          return "Maximum Length 40 characters.";  // If any word is longer than 40 characters, return this message
         }
       }
 
@@ -435,13 +445,15 @@ const EmployeeRegistration = () => {
     if (!value || value.trim().length === 0) {
       return "Location is Required.";
     } else if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*.()^\-/]*$/.test(value)) {
-      return "Only Alphabetic Characters are Allowed.";
+      return "Invalid Format of Location.";
     } else {
       const words = value.split(" ");
 
       for (const word of words) {
-        if (word.length < 3 || word.length > 200) {
-          return "Invalid Format of Location.";
+        if (word.length < 3) {
+          return "Minimum Length 3 characters.";  // If any word is shorter than 2 characters, return this message
+        } else if (word.length > 200) {
+          return "Maximum Length 200 characters.";  // If any word is longer than 40 characters, return this message
         }
       }
 
@@ -454,6 +466,32 @@ const EmployeeRegistration = () => {
 
     return true; // Return true if all conditions are satisfied
   };
+
+  // Function to handle input formatting
+function handlePhoneNumberChange(event) {
+  let value = event.target.value;
+
+  // Ensure only one space is allowed after +91
+  if (value.startsWith("+91 ") && value.charAt(3) !== " ") {
+    value = "+91 " + value.slice(3); // Ensure one space after +91
+  }
+
+  // Update the value in the input
+  event.target.value = value;
+
+  // You can do any other formatting logic here if needed (e.g., auto-formatting on every keystroke)
+}
+
+// Function to handle keydown for specific actions (e.g., prevent multiple spaces)
+function handlePhoneNumberKeyDown(event) {
+  let value = event.target.value;
+
+  // Prevent multiple spaces after +91
+  if (event.key === " " && value.charAt(3) === " ") {
+    event.preventDefault();
+  }
+}
+
 
   // In your component
   const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
@@ -556,7 +594,7 @@ const EmployeeRegistration = () => {
                         className="form-control"
                         placeholder="Enter Employee Id"
                         name="employeeId"
-                        minLength={1} maxLength={10}
+                        minLength={1} maxLength={20}
                         onKeyDown={handleEmailChange}
                         autoComplete='off'
                         {...register("employeeId", {
@@ -902,19 +940,27 @@ const EmployeeRegistration = () => {
                         rules={{ required: true }}
                         render={({ field }) => (
                           <Select
-                            {...field}
-                            options={[
-                              { value: "Active", label: "Active" },
-                              { value: "InActive", label: "InActive" },
-                            ]}
-                            value={
-                              field.value
-                                ? { value: field.value, label: field.value }
-                                : { value: "Active", label: "Active" } 
-                            }
-                            onChange={(val) => field.onChange(val.value)}
-                            placeholder="Select Status"
-                          />
+                          {...field}
+                          options={
+                            showNoticePeriodOption
+                              ? [
+                                  { value: "Active", label: "Active" },
+                                  { value: "InActive", label: "InActive" },
+                                  { value: "NoticePeriod", label: "Notice Period" }, // Show Notice Period
+                                ]
+                              : [
+                                  { value: "Active", label: "Active" },
+                                  { value: "InActive", label: "InActive" }, // Show only Active and InActive
+                                ]
+                          }
+                          value={
+                            field.value
+                              ? { value: field.value, label: field.value }
+                              : { value: "Active", label: "Active" }
+                          }
+                          onChange={(val) => field.onChange(val.value)}
+                          placeholder="Select Status"
+                        />
                         )}
                       />
                       {errors.status && <p className="errorMsg">Status is Required</p>}
@@ -925,27 +971,35 @@ const EmployeeRegistration = () => {
                         Mobile Number <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
-                        type="tel"
-                        className="form-control"
-                        placeholder="Enter Contact Number"
-                        autoComplete="off"
-                        maxLength={10}
-                        onInput={toInputSpaceCase}
-                        onKeyDown={handleEmailChange}
-                        {...register("mobileNo", {
-                          required: "Mobile Number is Required",
-                          pattern: {
-                            value: /^(?!0000000000)[0-9]{10}$/,
-                            message:
-                              "Mobile Number should be exactly 10 digits long, should contain only numbers, and cannot be all zeros.",
-                          },
-                          validate: {
-                            notRepeatingDigits: value => {
-                              const isRepeating = /^(\d)\1{9}$/.test(value); // Check for repeated digits
-                              return !isRepeating || "Mobile Number cannot consist of the same digit repeated.";
-                            }
-                          }
-                        })}
+                          type="tel"
+                          className="form-control"
+                          placeholder="Enter Personal Mobile Number"
+                          autoComplete="off"
+                          maxLength={15} // Limit input to 15 characters
+                          defaultValue="+91 " // Set the initial value to +91 with a space
+                          onInput={handlePhoneNumberChange} // Handle input changes
+                          onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
+                          {...register("mobileNo", {
+                            required: "Personal Mobile Number is Required",
+                            validate: {
+                              startsWithPlus91: (value) => {
+                                if (!value.startsWith("+91 ")) {
+                                  return "Personal Mobile Number must start with +91.";
+                                }
+                                return true;
+                              },
+                              correctLength: (value) => {
+                                if (value.length !== 14) {
+                                  return "Personal Mobile Number must be exactly 14 characters.";
+                                }
+                                return true;
+                              },
+                              notRepeatingDigits: (value) => {
+                                const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
+                                return !isRepeating || "Personal Mobile Number cannot consist of the same digit repeated.";
+                              },
+                            },
+                          })}
                       />
                       {errors.mobileNo && (
                         <p className="errorMsg">{errors.mobileNo.message}</p>
@@ -1032,6 +1086,12 @@ const EmployeeRegistration = () => {
                             value: 18,
                             message: "Account Number must not exceed 18 Characters",
                           },
+                          validate: {
+                            notRepeatingDigits: value => {
+                              const isRepeating = /^(\d)\1{9}$/.test(value); // Check for repeated digits
+                              return !isRepeating || "Account Number cannot consist of the same digit repeated.";
+                            }
+                          }
                         })}
                       />
                       {errors.accountNo && (
@@ -1124,6 +1184,12 @@ const EmployeeRegistration = () => {
                             value: 12,
                             message: "UAN Number must not exceed 12 Characters",
                           },
+                          validate: {
+                            notRepeatingDigits: value => {
+                              const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeated digits
+                              return !isRepeating || "UAN Number cannot consist of the same digit repeated.";
+                            }
+                          }
                         })}
                       />
                       {errors.uanNo && (
@@ -1153,6 +1219,12 @@ const EmployeeRegistration = () => {
                             message:
                               "Pan Number should be in the format: ABCDE1234F",
                           },
+                          validate: {
+                            notRepeatingDigits: value => {
+                              const isRepeating = /^(\d)\1{9}$/.test(value); // Check for repeated digits
+                              return !isRepeating || " PAN cannot consist of the same digit repeated.";
+                            }
+                          }
                         })}
                       />
                       {errors.panNo && (
@@ -1182,6 +1254,12 @@ const EmployeeRegistration = () => {
                             value: 12,
                             message: "Aadhar Number must not exceed 12 Characters",
                           },
+                          validate: {
+                            notRepeatingDigits: value => {
+                              const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeated digits
+                              return !isRepeating || "Aadhar Number cannot consist of the same digit repeated.";
+                            }
+                          }
                         })}
                       />
                       {errors.aadhaarId && (

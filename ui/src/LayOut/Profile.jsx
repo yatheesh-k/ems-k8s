@@ -138,38 +138,21 @@ function Profile() {
         setImgError("File size must be less than 200KB.");
         return;
       }
-
+  
       // Check file type
       const validTypes = ["image/png", "image/jpeg", "image/svg+xml", "application/pdf"];
       if (!validTypes.includes(file.type)) {
         setImgError("Only .png, .jpg, .jpeg, .svg, and .pdf files are allowed.");
         return;
       }
-
-      // Create an image element to check dimensions
-      const img = new Image();
-      img.src = URL.createObjectURL(file);
-
-      img.onload = () => {
-        // Check dimensions
-        if (img.height > 80) {
-          setImgError("Image height must be less than or equal to 80px.");
-        } else if (img.width > 200) {
-          setImgError("Image width must be less than or equal to 200px.");
-        } else {
-          setImgError(''); // Clear errors if all checks pass
-          setPostImage(file); // Set the valid image file
-          console.log("File is valid and ready for upload:", file);
-        }
-      };
-
-      img.onerror = () => {
-        setImgError("Invalid image file.");
-      };
-
+  
+      // Clear errors if all checks pass
+      setImgError('');
+      setPostImage(file); // Set the valid image file
+      console.log("File is valid and ready for upload:", file);
     }
   };
-
+  
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
 
@@ -304,7 +287,7 @@ function Profile() {
                       </div>
 
                     </div>
-                    <span className="text-danger align-start">Max-Height=80px; Max-Width=200px; Max-Size=200 KB </span>
+                    <span className="text-info align-start">Max-Size=200 KB </span>
                   </div>
                   <div className="col-12 col-md-6 mb-3">
                     {logoFileName && (

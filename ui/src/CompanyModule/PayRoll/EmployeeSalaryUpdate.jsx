@@ -14,7 +14,6 @@ const EmployeeSalaryUpdate = () => {
   const {
     register,
     control,
-    watch,
     handleSubmit,
     setValue,
     formState: { errors },

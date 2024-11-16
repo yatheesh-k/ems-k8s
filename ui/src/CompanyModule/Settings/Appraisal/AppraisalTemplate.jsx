@@ -1,11 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
+import LayOut from "../../../LayOut/LayOut";
+import { CompanySalaryStructureGetApi, companyViewByIdApi, EmployeeGetApiById, TemplateGetAPI, TemplateSelectionPatchAPI } from "../../../Utils/Axios";
 import { toast } from "react-toastify";
-
+import { useAuth } from "../../../Context/AuthContext";
 import AppraisalTemplate1 from "./AppraisalTemplate1";
 import AppraisalTemplate2 from "./AppraisalTemplate2";
-import LayOut from "../../LayOut/LayOut";
-import { CompanySalaryStructureGetApi, companyViewByIdApi, EmployeeGetApiById, PayslipTemplate, TemplateGetAPI } from "../../Utils/Axios";
-import { useAuth } from "../../Context/AuthContext";
 
 const AppraisalTemplate = () => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -15,7 +14,6 @@ const AppraisalTemplate = () => {
   const [employeeDetails, setEmployeeDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isFetched, setIsFetched] = useState(false);
-  
   // Salary Structure State
   const [salaryStructure, setSalaryStructure] = useState([]);
   const [allowances, setAllowances] = useState({});
@@ -89,7 +87,7 @@ const AppraisalTemplate = () => {
   const fetchTemplate = async (companyId) => {
     try {
       const res = await TemplateGetAPI(companyId);
-      const templateNo = res.data.data.relievingTemplateNo; // Get the experience template number
+      const templateNo = res.data.data.appraisalTemplateNo; // Get the experience template number
       setFetchedTemplate(res.data.data); // Store fetched data
       setIsFetched(true); // Mark template as fetched
       // Find the corresponding template and set it as selected
@@ -164,7 +162,7 @@ const AppraisalTemplate = () => {
       // Add other necessary fields if required
     };
     try {
-      const response = await PayslipTemplate(dataToSubmit);
+      const response = await TemplateSelectionPatchAPI(dataToSubmit);
       
       // Assuming a successful submission is indicated by the presence of a specific property
       if (response.data) { // Adjust this condition based on your API's response structure

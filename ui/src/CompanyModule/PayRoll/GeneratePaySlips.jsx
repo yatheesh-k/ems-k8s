@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useState,useEffect } from "react";
 import Select from "react-select";
 import { Controller, useForm } from "react-hook-form";
 import { Bounce, toast } from "react-toastify";
 import DataTable from "react-data-table-component";
 import LayOut from "../../LayOut/LayOut";
-import { EmployeePayslipGeneration, EmployeePayslipResponse, PayslipTemplateGetApi,   } from "../../Utils/Axios";
+import { EmployeePayslipGeneration, EmployeePayslipResponse, TemplateGetAPI,   } from "../../Utils/Axios";
 import { useAuth } from "../../Context/AuthContext";
 import { PencilSquare } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 
 const GeneratePaySlip = () => {
   const {
-    register,
     handleSubmit,
     control,
     formState: { errors },
@@ -148,7 +147,7 @@ const GeneratePaySlip = () => {
 
   const fetchTemplate = async () => {
     try {
-      const response = await PayslipTemplateGetApi();
+      const response = await TemplateGetAPI();
       const templateData = response.data.data;
       setCurrentTemplate(templateData);
       if (!templateData.payslipTemplateNo) {

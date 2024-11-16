@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { HandbagFill, PencilSquare, Wallet, XSquareFill } from "react-bootstrap-icons";
+import { PencilSquare, Wallet} from "react-bootstrap-icons";
 import DataTable from "react-data-table-component";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { Bounce, toast } from "react-toastify";
-import DeletePopup from "../../Utils/DeletePopup";
+import { toast } from "react-toastify";
 import LayOut from "../../LayOut/LayOut";
-import { EmployeeDeleteApiById, EmployeeGetApi } from "../../Utils/Axios";
+import { EmployeeGetApi } from "../../Utils/Axios";
 
 const EmployeeView = () => {
   const [view, setView] = useState([]);
@@ -18,19 +16,6 @@ const EmployeeView = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const Navigate = useNavigate();
-
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState(null); // State to store the ID of the item to be deleted
-
-  const handleCloseDeleteModal = () => {
-    setShowDeleteModal(false);
-    setSelectedItemId(null); // Reset the selected item ID
-  };
-
-  const handleShowDeleteModal = (id) => {
-    setSelectedItemId(id); // Set the ID of the item to be deleted
-    setShowDeleteModal(true);
-  };
 
   const getMonthNames = () => {
     return Array.from({ length: 12 }, (_, i) =>
@@ -46,20 +31,6 @@ const EmployeeView = () => {
     }
     return years;
   };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    let month = date.getMonth() + 1;
-    let day = date.getDate();
-
-    // Ensure two-digit month and day
-    month = month < 10 ? `0${month}` : month;
-    day = day < 10 ? `0${day}` : day;
-
-    return `${year}-${month}-${day}`;
-  };
-
 
   const fetchData = async () => {
     try {
@@ -107,13 +78,25 @@ const EmployeeView = () => {
       label: (
         <b
           style={{
-            backgroundColor: "green",
-            color: "white",
+            borderRadius: "5px",
+            padding: "3px",
+          }}
+          className="bg-primary"
+        >
+          Active
+        </b>
+      ),
+    },
+    NoticePeriod: {
+      label: (
+        <b
+          style={{
             borderRadius: "5px",
             padding: "2px",
           }}
+          className="bg-warning"
         >
-          Active
+          Notice Period
         </b>
       ),
     },
@@ -121,22 +104,16 @@ const EmployeeView = () => {
       label: (
         <b
           style={{
-            backgroundColor: "red",
-            color: "white",
             borderRadius: "5px",
             padding: "2px",
           }}
+          className="bg-danger"
         >
           InActive
         </b>
       ),
     },
   };
-
-  const paginationComponentOptions = {
-    noRowsPerPage: true,
-  };
-
 
   const columns = [
     {
@@ -206,14 +183,7 @@ const EmployeeView = () => {
     }
   ];
 
-  const dateFormatting = (dateString) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Pad month with leading zero if needed
-    const day = date.getDate().toString().padStart(2, "0"); // Pad day with leading zero if needed
 
-    return `${year}-${month}-${day}`;
-  };
 
   const getFilteredList = (searchTerm) => {
     setSearch(searchTerm);

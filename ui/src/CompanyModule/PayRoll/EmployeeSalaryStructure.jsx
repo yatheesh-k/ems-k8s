@@ -5,7 +5,7 @@ import LayOut from "../../LayOut/LayOut";
 import { EmployeeGetApi, EmployeeSalaryPostApi, EmployeeSalaryGetApiById, EmployeeSalaryPatchApiById, CompanySalaryStructureGetApi } from "../../Utils/Axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useAuth } from "../../Context/AuthContext";
 import Loader from "../../Utils/Loader";
 
@@ -14,7 +14,7 @@ const EmployeeSalaryStructure = () => {
     register,
     handleSubmit,
     setValue,
-    control,
+    reset,
     formState: { errors },
   } = useForm({ mode: 'onChange' });
   const { user } = useAuth();
@@ -31,17 +31,14 @@ const EmployeeSalaryStructure = () => {
   const [totalAllowances, setTotalAllowances] = useState({});
   const [totalDeductions, setTotalDeductions] = useState({});
   const [netSalary, setNetSalary] = useState(0);
-  const [basicSalary, setBasicSalary] = useState(0)
   const [hra, setHra] = useState(0);
   const [monthlySalary, setMonthlySalary] = useState(0);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [lossOfPayPerDay, setLossOfPayPerDay] = useState(0);
-  const [totalPF, setTotalPF] = useState(0);
   const [showFields, setShowFields] = useState(false);
   const [employeeId, setEmployeeId] = useState("");
   const [variableAmount, setVariableAmount] = useState(0);
   const [fixedAmount, setFixedAmount] = useState(0);
-  const [incomeTax, setIncomeTax] = useState(0);
   const [pfTax, setPfTax] = useState(0);
   const [pfEmployee, setPfEmployee] = useState(0);
   const [pfEmployer, setPfEmployer] = useState(0);
@@ -51,7 +48,6 @@ const EmployeeSalaryStructure = () => {
   const [status, setStatus] = useState("Active");
   const [isReadOnly, setIsReadOnly] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [calculatedAllowances, setCalculatedAllowances] = useState({});
   const [error, setError] = useState('');
   const [showCards, setShowCards] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -60,6 +56,7 @@ const EmployeeSalaryStructure = () => {
   useEffect(() => {
     if (id && salaryId) {
       setShowFields(true);
+      
     } else {
       setShowFields(false);
     }
@@ -350,77 +347,6 @@ const EmployeeSalaryStructure = () => {
   }, [grossAmount]);
 
   const companyName = user.company;
-
-  // const onSubmit = (data) => {
-  //   // Get the values from the state/props before using them
-  //   const fixedAmount = parseFloat(data.fixedAmount) || 0; // Ensure this is parsed
-  //   const variableAmount = parseFloat(data.variableAmount) || 0; // Ensure this is parsed
-  //   const grossAmountValue = parseFloat(grossAmount) || 0; // Ensure this is defined and parsed
-  //   const totalEarningsValue = parseFloat(totalAllowances) || 0; // Ensure this is defined and parsed
-  //   const netSalaryValue = parseFloat(netSalary) || 0; // Use state netSalary
-  //   const totalDeductionsValue = parseFloat(totalDeductions) || 0; // Ensure this is defined and parsed
-  //   const pfTaxValue = parseFloat(pfTax) || 0; // Ensure this is defined and parsed
-  //   const incomeTax = data.incomeTax; // Ensure this is defined
-  //   const statusValue = data.status; // Set as needed
-
-  //   // Check if variableAmount, fixedAmount, and grossAmount are all 0
-  //   if (variableAmount === 0 && fixedAmount === 0 && grossAmountValue === 0) {
-  //     return; // Exit if all amounts are zero
-  //   }
-
-  //   // Construct the allowances and deductions objects
-  //   const allowancesData = {}; // Initialize allowances object
-  //   const deductionsData = {}; // Initialize deductions object
-
-  //   // Populate allowances based on your application logic
-  //   Object.entries(allowances).forEach(([key, value]) => {
-  //     allowancesData[key] = value; // Adjust according to your logic
-  //   });
-
-  //   // Extract "Basic Salary" from allowances
-  //   // const basicSalaryValue = parseFloat(allowancesData["Basic Salary"]) || 0; // Ensure it's a number
-
-  //   // Populate deductions similarly
-  //   Object.entries(deductions).forEach(([key, value]) => {
-  //     deductionsData[key] = value; // Adjust according to your logic
-  //   });
-
-  //   // Construct the final data object
-  //   const dataToSubmit = {
-  //     companyName: companyName, // Replace with actual value from state/props
-  //     fixedAmount: fixedAmount.toFixed(2), // Convert to string if necessary
-  //     variableAmount: variableAmount.toFixed(2), // Convert to string if necessary
-  //     grossAmount: grossAmountValue.toFixed(2), // Convert to string if necessary
-  //     // "Basic Salary": basicSalaryValue.toFixed(2), // Place with the key as "Basic Salary"
-  //     salaryConfigurationEntity: {
-  //       allowances: allowancesData,
-  //       deductions: deductionsData,
-  //     },
-  //     totalEarnings: totalEarningsValue.toFixed(2), // Convert to string if necessary
-  //     netSalary: netSalaryValue.toFixed(2), 
-  //     totalDeductions: totalDeductionsValue.toFixed(2), // Convert to string if necessary
-  //     pfTax: pfTaxValue.toFixed(2), // Convert to string if necessary
-  //     incomeTax: incomeTax, // Convert to string if necessary
-  //     status: statusValue,
-  //   };
-
-  //   console.log("Post Data:", dataToSubmit);
-  //   const apiCall = salaryId
-  //     ? () => EmployeeSalaryPatchApiById(employeeId, salaryId, dataToSubmit) // Update existing data
-  //     : () => EmployeeSalaryPostApi(employeeId, dataToSubmit); // Add new data
-
-  //   apiCall()
-  //     .then((response) => {
-  //       toast.success(salaryId ? "Employee Salary Updated Successfully" : "Employee Salary Added Successfully");
-  //       setErrorMessage(""); // Clear error message on success
-  //       setShowFields(false);
-  //       navigate('/employeeview');
-  //     })
-  //     .catch((error) => {
-  //       handleApiErrors(error);
-  //     });
-  // };
-
   const onSubmit = (data) => {
     // Check if there's an error related to salary structures
     if (error) {
@@ -472,7 +398,6 @@ const EmployeeSalaryStructure = () => {
       incomeTax: incomeTax,
       status: statusValue,
     };
-
     const apiCall = salaryId
       ? () => EmployeeSalaryPatchApiById(employeeId, salaryId, dataToSubmit)
       : () => EmployeeSalaryPostApi(employeeId, dataToSubmit);
@@ -489,12 +414,17 @@ const EmployeeSalaryStructure = () => {
       });
   };
 
-  {
+  
     error && (
       <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>
         {error}
       </div>
     )
+  
+
+  const clearForm=()=>{
+      reset();
+      setShowFields(false);
   }
 
   return (
@@ -629,7 +559,7 @@ const EmployeeSalaryStructure = () => {
                 ) : (
                   showCards && (
                     <>
-                      <div className="row d-flex">
+                  <div className="row d-flex">
                         <div className="col-6 mb-4">
                           <div className="card">
                             <div className="card-header">
@@ -640,11 +570,21 @@ const EmployeeSalaryStructure = () => {
                               {Object.keys(allowances).map((key) => (
                                 <div key={key} className="mb-3">
                                   <label>
-                                    {key}: <span className="text-danger" data-toggle="tooltip" title="This value from Company Salary Structure">({allowances[key]})</span>
+                                    {key}:
+                                    <span className="text-danger me-1">({allowances[key]})</span>
+                                    {allowances[key].endsWith('%') && (
+                                    <span
+                                      className="m-1"
+                                      data-toggle="tooltip"
+                                      title="Percentage values are calculated based on Gross Amount."
+                                    >
+                                      <span className="text-primary"><i className="bi bi-info-circle"></i></span>
+                                    </span>
+                                  )}
                                   </label>
                                   <input
                                     className="form-control"
-                                    type="text" // Allow for '%' characters
+                                    type="text"
                                     value={allowances[key]}
                                     onChange={(e) => {
                                       // Allow only numbers and '%' characters
@@ -653,61 +593,54 @@ const EmployeeSalaryStructure = () => {
                                     }} />
                                 </div>
                               ))}
-                              <label>Total Allowances: </label>
-                              <input
-                                className="form-control"
-                                type="number"
-                                name="totalAllowance"
-                                value={totalAllowances}
-                                readOnly // Keep total as read-only if calculated automatically
-                              />
+                              <div className="mb-3">
+                                <label>Total Allowances:</label>
+                                <input
+                                  className="form-control"
+                                  type="number"
+                                  name="totalAllowance"
+                                  value={totalAllowances}
+                                  readOnly
+                                  data-toggle="tooltip"
+                                  title="This is the total of all allowances."
+                                />
+                              </div>
                             </div>
                           </div>
+
                           <div className="card">
                             <div className="card-header">
                               <div className="d-flex justify-content-start align-items-start">
                                 <h5 className="card-title me-2">Status</h5>
                                 <span className="text-danger">
-                                  {errors.status && (
-                                    <p className="mb-0">{errors.status.message}</p>
-                                  )}
+                                  {errors.status && <p className="mb-0">{errors.status.message}</p>}
                                 </span>
                               </div>
-                              <hr
-                                className="dropdown-divider"
-                                style={{ borderTopColor: "#d7d9dd", width: "100%" }}
-                              />
                             </div>
                             <div className="card-body">
                               <div className="row">
                                 <div className="col-12 col-md-6 col-lg-5 mb-3">
-                                  <div>
-                                    <label>
-                                      <input
-                                        type="radio"
-                                        name="status"
-                                        value="Active"
-                                        style={{ marginRight: "10px" }}
-                                        defaultChecked // Set Active as the default
-                                        {...register("status", {
-                                          required: "Please Select Status",
-                                        })}
-                                      />
-                                      Active
-                                    </label>
-                                  </div>
+                                  <label>
+                                    <input
+                                      type="radio"
+                                      name="status"
+                                      defaultChecked
+                                      value="Active"
+                                      style={{ marginRight: "10px" }}
+                                      {...register("status", { required: "Please Select Status" })}
+                                    />
+                                    Active
+                                  </label>
                                 </div>
                                 <div className="col-lg-1"></div>
                                 <div className="col-12 col-md-6 col-lg-5 mb-3">
-                                  <label className="ml-3">
+                                  <label>
                                     <input
                                       type="radio"
                                       name="status"
                                       value="InActive"
                                       style={{ marginRight: "10px" }}
-                                      {...register("status", {
-                                        required: "Please Select Status",
-                                      })}
+                                      {...register("status", { required: "Please Select Status" })}
                                     />
                                     InActive
                                   </label>
@@ -716,6 +649,7 @@ const EmployeeSalaryStructure = () => {
                             </div>
                           </div>
                         </div>
+
                         {/* Deductions Card */}
                         <div className="col-6 mb-4">
                           <div className="card">
@@ -726,7 +660,17 @@ const EmployeeSalaryStructure = () => {
                               {Object.entries(deductions).map(([key, value]) => (
                                 <div key={key} className="mb-3">
                                   <label>
-                                    {key}: <span className="text-danger">({deductions[key]})</span>
+                                    {key}: 
+                                    <span className="text-danger">({deductions[key]})</span>
+                                    {deductions[key].endsWith('%') && (
+                                    <span
+                                      className="m-1"
+                                      data-toggle="tooltip"
+                                      title="Percentage values are calculated based on Gross Amount."
+                                    >
+                                      <span className="text-primary"><i className="bi bi-info-circle"></i></span>
+                                    </span>
+                                  )}
                                   </label>
                                   <input
                                     className="form-control"
@@ -745,8 +689,10 @@ const EmployeeSalaryStructure = () => {
                                 <input
                                   className="form-control"
                                   type="number"
-                                  value={totalDeductions.toFixed(2)} // Display total deductions
-                                  readOnly // Make it read-only
+                                  value={totalDeductions.toFixed(2)}
+                                  readOnly
+                                  data-toggle="tooltip" 
+                                  title="This is the total of all deductions."
                                 />
                               </div>
                             </div>
@@ -756,45 +702,34 @@ const EmployeeSalaryStructure = () => {
                               <div className="d-flex justify-content-start align-items-start">
                                 <h5 className="card-title me-2">TDS</h5>
                                 <span className="text-danger">
-                                  {errors.incomeTax && (
-                                    <p className="mb-0">{errors.incomeTax.message}</p>
-                                  )}
+                                  {errors.incomeTax && <p className="mb-0">{errors.incomeTax.message}</p>}
                                 </span>
                               </div>
-                              <hr
-                                className="dropdown-divider"
-                                style={{ borderTopColor: "#d7d9dd", width: "100%" }}
-                              />
                             </div>
                             <div className="card-body">
                               <div className="row">
                                 <div className="col-12 col-md-6 col-lg-5 mb-3">
-                                  <div>
-                                    <label>
-                                      <input
-                                        type="radio"
-                                        name="incomeTax"
-                                        value="old"
-                                        style={{ marginRight: "10px" }}
-                                        {...register("incomeTax", {
-                                          required: "Please Select Tax",
-                                        })}
-                                      />
-                                      Old Regime
-                                    </label>
-                                  </div>
+                                  <label>
+                                    <input
+                                      type="radio"
+                                      name="incomeTax"
+                                      value="old"
+                                      style={{ marginRight: "10px" }}
+                                      {...register("incomeTax", { required: "Please Select Tax" })}
+                                    />
+                                    Old Regime
+                                  </label>
                                 </div>
                                 <div className="col-lg-1"></div>
                                 <div className="col-12 col-md-6 col-lg-5 mb-3">
-                                  <label className="ml-3">
+                                  <label>
                                     <input
                                       type="radio"
                                       name="incomeTax"
                                       value="new"
+                                      defaultChecked
                                       style={{ marginRight: "10px" }}
-                                      {...register("incomeTax", {
-                                        required: "Please Select Tax",
-                                      })}
+                                      {...register("incomeTax", { required: "Please Select Tax" })}
                                     />
                                     New Regime
                                   </label>
@@ -802,6 +737,7 @@ const EmployeeSalaryStructure = () => {
                               </div>
                             </div>
                           </div>
+
                           <div className="card">
                             <div className="card-header">
                               <h5 className="card-title">Net Salary</h5>
@@ -814,10 +750,23 @@ const EmployeeSalaryStructure = () => {
                                   type="text"
                                   name="netSalary"
                                   value={netSalary.toFixed(2)}
-                                  readOnly // Make it read-only
+                                  readOnly
+                                  data-toggle="tooltip" 
+                                  title="This is the final salary after all deductions and allowances."
                                 />
                               </div>
                             </div>
+                          </div>
+
+                          <div className="text-end">
+                            <button className="btn btn-secondary me-2" onClick={clearForm}>Close</button>
+                            <button
+                              type="submit"
+                              className="btn btn-primary"
+                              disabled={!!errorMessage}
+                            >
+                              Submit
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -826,15 +775,6 @@ const EmployeeSalaryStructure = () => {
                           <b>{error}</b>
                         </div>
                       )}
-                      <div className="col-12 text-end" style={{ marginTop: "60px" }}>
-                        <button
-                          type="submit"
-                          className="btn btn-primary"
-                          disabled={!!errorMessage} // Disable button if errorMessage exists
-                        >
-                          {isUpdating ? 'Update' : 'Submit'}
-                        </button>
-                      </div>
                     </>
                   )
                 )}

@@ -48,10 +48,6 @@ const CompanyRegistration = () => {
     setCompanyType(e.target.value);
   };
 
-  const onChangePicture = (e) => {
-    setPostImage(URL.createObjectURL(e.target.files[0]));
-  };
-
   const onSubmit = async (data) => {
     try {
         const updateData = {
@@ -87,9 +83,6 @@ const CompanyRegistration = () => {
     } catch (error) {
       if (error.response) {
           const { status, data } = error.response;
-          console.error('Update error status:', status);
-          console.error('Update error data:', data);
-  
           if (status === 409) {
               toast.error('Conflict error: Check for duplicate entries or unique constraints.');
           } else {
@@ -309,12 +302,30 @@ const CompanyRegistration = () => {
 
     return true; // Return true if all checks pass
   };
-
-  const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
-    const base64 = await convertToBase64(file);
-    setPostImage(base64);
-  };
+  // Function to handle input formatting
+  function handlePhoneNumberChange(event) {
+    let value = event.target.value;
+  
+    // Ensure only one space is allowed after +91
+    if (value.startsWith("+91") && value.charAt(4) !== " ") {
+      value = "+91 " + value.slice(3); // Ensure one space after +91
+    }
+  
+    // Update the value in the input
+    event.target.value = value;
+  
+    // You can do any other formatting logic here if needed (e.g., auto-formatting on every keystroke)
+  }
+  
+  // Function to handle keydown for specific actions (e.g., prevent multiple spaces)
+  function handlePhoneNumberKeyDown(event) {
+    let value = event.target.value;
+  
+    // Prevent multiple spaces after +91
+    if (event.key === " " && value.charAt(4) === " ") {
+      event.preventDefault();
+    }
+  }
 
   return (
     <LayOut>
@@ -510,23 +521,30 @@ const CompanyRegistration = () => {
                             className="form-control"
                             placeholder="Enter Contact Number"
                             autoComplete="off"
-                            maxLength={10}
-                            onKeyDown={handleEmailChange}
-                            onInput={toInputSpaceCase}
+                            maxLength={15} // Limit input to 15 characters
+                            defaultValue="+91 " // Set the initial value to +91 with a space
+                            onInput={handlePhoneNumberChange} // Handle input changes
+                            onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                             {...register("mobileNo", {
                               required: "Contact Number is Required",
-                              pattern: {
-                                value: /^(?!0000000000)[0-9]{10}$/,
-                                message:
-                                "Contact Number should be exactly 10 digits long, should contain only numbers, and cannot be all zeros.",
-                              },
                               validate: {
-                                notRepeatingDigits: value => {
-                                  const isRepeating = /^(\d)\1{9}$/.test(value); // Check for repeated digits
+                                startsWithPlus91: (value) => {
+                                  if (!value.startsWith("+91 ")) {
+                                    return "Contact Number must start with +91.";
+                                  }
+                                  return true;
+                                },
+                                correctLength: (value) => {
+                                  if (value.length !== 14) {
+                                    return "Contact Number must be exactly 10 characters.";
+                                  }
+                                  return true;
+                                },
+                                notRepeatingDigits: (value) => {
+                                  const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
                                   return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
-                                }
-                              }
-
+                                },
+                              },
                             })}
                           />
                           {errors.mobileNo && (
@@ -584,22 +602,30 @@ const CompanyRegistration = () => {
                             className="form-control"
                             placeholder="Enter Contact Number"
                             autoComplete="off"
-                            maxLength={10}
-                            onInput={toInputSpaceCase}
-                            onKeyDown={handleEmailChange}
+                            maxLength={15} // Limit input to 15 characters
+                            defaultValue="+91 " // Set the initial value to +91 with a space
+                            onInput={handlePhoneNumberChange} // Handle input changes
+                            onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                             {...register("mobileNo", {
                               required: "Contact Number is Required",
-                              pattern: {
-                                value: /^(?!0000000000)[0-9]{10}$/,
-                                message:
-                                "Contact Number should be exactly 10 digits long, should contain only numbers, and cannot be all zeros.",
-                              },
                               validate: {
-                                notRepeatingDigits: value => {
-                                  const isRepeating = /^(\d)\1{9}$/.test(value); // Check for repeated digits
+                                startsWithPlus91: (value) => {
+                                  if (!value.startsWith("+91 ")) {
+                                    return "Contact Number must start with +91.";
+                                  }
+                                  return true;
+                                },
+                                correctLength: (value) => {
+                                  if (value.length !== 14) {
+                                    return "Contact Number must be exactly 10 characters.";
+                                  }
+                                  return true;
+                                },
+                                notRepeatingDigits: (value) => {
+                                  const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
                                   return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
-                                }
-                              }
+                                },
+                              },
                             })}
                           />
                           {errors.mobileNo && (
@@ -619,21 +645,29 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Alternate Number"
                         autoComplete="off"
-                        maxLength={10}
-                        onInput={toInputSpaceCase}
-                        onKeyDown={handleEmailChange}
+                        maxLength={15}
+                        defaultValue="+91 " // Set the initial value to +91 with a space
+                        onInput={handlePhoneNumberChange} // Handle input changes
+                        onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                         {...register("alternateNo", {
-                          pattern: {
-                            value: /^(?!0000000000)[0-9]{10}$/,
-                            message:
-                            "Alternate Number should be exactly 10 digits long, should contain only numbers, and cannot be all zeros.",
-                          },
                           validate: {
-                            notRepeatingDigits: value => {
-                              const isRepeating = /^(\d)\1{9}$/.test(value); // Check for repeated digits
+                            startsWithPlus91: (value) => {
+                              if (!value.startsWith("+91 ")) {
+                                return "Alternate Number must start with +91.";
+                              }
+                              return true;
+                            },
+                            correctLength: (value) => {
+                              if (value.length !== 14) {
+                                return "Alternate Number must be exactly 10 characters.";
+                              }
+                              return true;
+                            },
+                            notRepeatingDigits: (value) => {
+                              const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
                               return !isRepeating || "Alternate Number cannot consist of the same digit repeated.";
-                            }
-                          }
+                            },
+                          },
                         })}
                       />
                       {errors.alternateNo && (
@@ -890,29 +924,40 @@ const CompanyRegistration = () => {
                         <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
-                        type="tel"
-                        className="form-control"
-                        placeholder="Enter Personal Mobile Number"
-                        autoComplete="off"
-                        onKeyDown={handleEmailChange}
-                        maxLength={10}
-                        onInput={toInputSpaceCase}
-                        {...register("personalMobileNo", {
-                          required: "Personal Mobile Number is Required",
-                          pattern: {
-                            value: /^(?!0000000000)[0-9]{10}$/,
-                            message:
-
-                              "Mobile Number should contain only 10 numbers",
-                          },
-                          validate: {
-                            notRepeatingDigits: value => {
-                              const isRepeating = /^(\d)\1{9}$/.test(value); // Check for repeated digits
-                              return !isRepeating || "Personal Mobile Number cannot consist of the same Digit repeated.";
-                            }
-                          }
-                        })}
-                      />
+                          type="tel"
+                          className="form-control"
+                          placeholder="Enter Personal Mobile Number"
+                          autoComplete="off"
+                          onKeyDown={handleEmailChange}
+                          maxLength={10}
+                          onInput={toInputSpaceCase}
+                          {...register("personalMobileNo", {
+                            required: "Personal Mobile Number is Required",
+                            validate: {
+                              startsWithPlus91: (value) => {
+                                if (!value.startsWith("+91 ")) {
+                                  return "Personal Mobile Number must start with +91.";
+                                }
+                                return true;
+                              },
+                              correctLength: (value) => {
+                                if (value.length !== 14) {
+                                  return "Personal Mobile Number must be exactly 10 characters.";
+                                }
+                                return true;
+                              },
+                              notRepeatingDigits: (value) => {
+                                const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
+                                return !isRepeating || "Personal Mobile Number cannot consist of the same digit repeated.";
+                              },
+                            },
+                          })}
+                        />
+                        {errors.personalMobileNo && (
+                          <p className="errorMsg">
+                            {errors.personalMobileNo.message}
+                          </p>
+                        )}
                       {errors.personalMobileNo && (
                         <p className="errorMsg">
                           {errors.personalMobileNo.message}
@@ -944,7 +989,7 @@ const CompanyRegistration = () => {
                             message: "Mimium 3 characters Required",
                           },
                           pattern: {
-                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*.()^\-/]*$/,
+                            value: /^(?=.*\b\d+\s+(?:door|plot|flat|apartment|unit|number)?\b)(?=.*\b(?:street|st|road|rd|lane|ln|avenue|ave|blvd|court|ct|square|sq|circle|cir|place|pl)\b)(?=.*\b(?:village|town|city)\b)(?=.*\b(?:district|state)\b)(?=.*\b\d{6}\b).*$/i,
                             message: "Please enter valid Address",
                           },
                         })}

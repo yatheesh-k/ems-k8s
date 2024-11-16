@@ -42,7 +42,7 @@ const SideNav = () => {
       location.pathname === "/offerLetters" ||
       location.pathname === "/experienceForm" ||
       location.pathname === "/appraisalLetter" ||
-      location.pathname === "/relievingLetter" ||
+      location.pathname === "/relievingSummary" ||
       location.pathname === "/internsLetter"
     ) {
       setIsLettersOpen(true);
@@ -67,7 +67,7 @@ const SideNav = () => {
     if (
       location.pathname === "/companySalaryView" ||
       location.pathname === "/companySalaryStructure"||
-      location.pathname === "/"||
+      location.pathname === "/relievingTemplates"||
       location.pathname==="/appraisalLetter"||
       location.pathname==="/internsTemplates"
     ) {
@@ -446,7 +446,7 @@ const SideNav = () => {
                       }`}
                   >
                     <a className="sidebar-link" href={"/offerLetters"}>
-                      Offer Letters
+                      Offer Letter
                     </a>
                   </li>
                   <li
@@ -456,16 +456,16 @@ const SideNav = () => {
                       }`}
                   >
                     <a className="sidebar-link" href={"/experienceForm"}>
-                     Experience Letters
+                     Experience
                     </a>
                   </li>
                   <li
                     style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${location.pathname === "/experieneSummary" ? "active" : ""
+                    className={`sidebar-item ${location.pathname === "/relievingSummary" ? "active" : ""
                       }`}
                   >
-                    <a className="sidebar-link" href={"/existingSummary"}>
-                     Exists Letters
+                    <a className="sidebar-link" href={"/relievingSummary"}>
+                     Relieving
                     </a>
                   </li>
                   <li
@@ -476,7 +476,7 @@ const SideNav = () => {
                     }`}
                   >
                     <Link className="sidebar-link" to={"/appraisalLetter"}>
-                      Appraisal Letters
+                      Appraisal
                     </Link>
                   </li>
                 </ul>
@@ -491,7 +491,7 @@ const SideNav = () => {
                       }`}
                   >
                     <a className="sidebar-link" href={"/internsLetter"}>
-                      Interns Letter
+                      Interns
                     </a>
                   </li>
                 </ul>
@@ -801,7 +801,7 @@ const SideNav = () => {
                       }`}
                   >
                     <a className="sidebar-link" href={"/relievingTemplates"}>
-                      Exists Templates
+                      Relieving Templates
 
                     </a>
                   </li>
