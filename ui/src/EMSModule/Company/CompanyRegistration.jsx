@@ -226,20 +226,6 @@ const CompanyRegistration = () => {
     e.target.value = newValue;
   };
 
-
-  const convertToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const fileReader = new FileReader();
-      fileReader.readAsDataURL(file);
-      fileReader.onload = () => {
-        resolve(fileReader.result);
-      };
-      fileReader.onerror = (error) => {
-        reject(error);
-      };
-    });
-  };
-
   const validateREGISTER = (value) => {
     const spaceError = "Spaces are not allowed in the Register Number.";
     const patternError = "Invalid Register Number format";
@@ -302,12 +288,11 @@ const CompanyRegistration = () => {
 
     return true; // Return true if all checks pass
   };
-  // Function to handle input formatting
   function handlePhoneNumberChange(event) {
     let value = event.target.value;
   
     // Ensure only one space is allowed after +91
-    if (value.startsWith("+91") && value.charAt(4) !== " ") {
+    if (value.startsWith("+91 ") && value.charAt(3) !== " ") {
       value = "+91 " + value.slice(3); // Ensure one space after +91
     }
   
@@ -322,7 +307,7 @@ const CompanyRegistration = () => {
     let value = event.target.value;
   
     // Prevent multiple spaces after +91
-    if (event.key === " " && value.charAt(4) === " ") {
+    if (event.key === " " && value.charAt(3) === " ") {
       event.preventDefault();
     }
   }
@@ -928,9 +913,9 @@ const CompanyRegistration = () => {
                           className="form-control"
                           placeholder="Enter Personal Mobile Number"
                           autoComplete="off"
-                          onKeyDown={handleEmailChange}
-                          maxLength={10}
-                          onInput={toInputSpaceCase}
+                          defaultValue="+91 " // Set the initial value to +91 with a space
+                          onInput={handlePhoneNumberChange} // Handle input changes
+                          onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                           {...register("personalMobileNo", {
                             required: "Personal Mobile Number is Required",
                             validate: {
@@ -958,11 +943,6 @@ const CompanyRegistration = () => {
                             {errors.personalMobileNo.message}
                           </p>
                         )}
-                      {errors.personalMobileNo && (
-                        <p className="errorMsg">
-                          {errors.personalMobileNo.message}
-                        </p>
-                      )}
                     </div>
 
                     <div className="col-lg-1"></div>
@@ -980,17 +960,18 @@ const CompanyRegistration = () => {
                         maxLength={200}
                         {...register("address", {
                           required: "Address is Required",
-                          maxLength: {
-                            value: 200,
-                            message: "Name must not exceed 200 characters",
+                          pattern: {
+                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*.()^\-/]*$/,
+                            message:
+                              "Please enter valid Address",
                           },
                           minLength: {
                             value: 3,
-                            message: "Mimium 3 characters Required",
+                            message: "Minimum 3 Characters allowed",
                           },
-                          pattern: {
-                            value: /^(?=.*\b\d+\s+(?:door|plot|flat|apartment|unit|number)?\b)(?=.*\b(?:street|st|road|rd|lane|ln|avenue|ave|blvd|court|ct|square|sq|circle|cir|place|pl)\b)(?=.*\b(?:village|town|city)\b)(?=.*\b(?:district|state)\b)(?=.*\b\d{6}\b).*$/i,
-                            message: "Please enter valid Address",
+                          maxLength: {
+                            value: 200,
+                            message: "Maximum 200 Characters allowed",
                           },
                         })}
                       />
