@@ -6,6 +6,6 @@ import org.springframework.http.ResponseEntity;
 
 public interface AppraisalLetterService {
 
-    ResponseEntity<byte[]> downloadAppraisalLetter(AppraisalLetterRequest appraisalLetterRequest, HttpServletRequest request, int templateNumber);
+    ResponseEntity<byte[]> downloadAppraisalLetter(AppraisalLetterRequest appraisalLetterRequest, HttpServletRequest request);
 
 }

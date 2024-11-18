@@ -373,15 +373,22 @@ public class PayslipServiceImpl implements PayslipService {
 
     }
 
-    public ResponseEntity<byte[]> downloadPayslip(String companyName, String payslipId, String employeeId, int templateNumber, HttpServletRequest request) {
+    public ResponseEntity<byte[]> downloadPayslip(String companyName, String payslipId, String employeeId, HttpServletRequest request) {
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
         EmployeeEntity employee;
         PayslipEntity entity;
         DepartmentEntity department;
         DesignationEntity designation;
         CompanyEntity company;
+        TemplateEntity templateNo;
 
         try {
+            templateNo=openSearchOperations.getCompanyTemplates(companyName);
+            if (templateNo ==null){
+                log.error("company templates are not exist ");
+                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_GET_TEMPLATE), companyName),
+                        HttpStatus.NOT_FOUND);
+            }
             SSLUtil.disableSSLVerification();
             employee = openSearchOperations.getEmployeeById(employeeId, null, index);
             if (employee == null) {
@@ -419,7 +426,7 @@ public class PayslipServiceImpl implements PayslipService {
             model.put(Constants.DEDUCTION_LIST, deductionList); // Add deduction list to the model
 
             // Choose the template based on the template number
-            String templateName = switch (templateNumber) {
+            String templateName = switch (Integer.parseInt(templateNo.getPayslipTemplateNo())) {
                 case 1 -> Constants.PAYSLIP_TEMPLATE_ONE;
                 case 2 -> Constants.PAYSLIP_TEMPLATE_TWO;
                 case 3 -> Constants.PAYSLIP_TEMPLATE_THREE;

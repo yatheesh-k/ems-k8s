@@ -260,6 +260,7 @@ public class RelievingServiceImpl implements RelievingService {
             String templateName = switch (Integer.parseInt(templateNo.getRelievingTemplateNo())) {
                 case 1 -> Constants.RELIEVING_LETTER1;
                 case 2 -> Constants.RELIEVING_LETTER2;
+                case 3 -> Constants.RELIEVING_LETTER3;
                 default -> throw new IllegalArgumentException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_TEMPLATE_NUMBER));
             };
 

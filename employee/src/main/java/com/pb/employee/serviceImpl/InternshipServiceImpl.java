@@ -41,12 +41,14 @@ public class InternshipServiceImpl implements InternshipService {
     private Configuration freeMarkerConfig;
 
     @Override
-    public ResponseEntity<byte[]> downloadInternship(InternshipRequest internshipRequest, HttpServletRequest request,int templateNumber) {
+    public ResponseEntity<byte[]> downloadInternship(InternshipRequest internshipRequest, HttpServletRequest request) {
 
         CompanyEntity entity;
         Entity companyEntity;
+        TemplateEntity templateNo;
 
         try {
+
             SSLUtil.disableSSLVerification();
             // Fetch and validate the company
             entity = openSearchOperations.getCompanyById(internshipRequest.getCompanyId(), null, Constants.INDEX_EMS);
@@ -55,6 +57,13 @@ public class InternshipServiceImpl implements InternshipService {
                 throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.COMPANY_NOT_EXIST), internshipRequest.getCompanyId()), HttpStatus.NOT_FOUND);
             }
             companyEntity = CompanyUtils.unmaskCompanyProperties(entity, request);
+
+            templateNo=openSearchOperations.getCompanyTemplates(entity.getShortName());
+            if (templateNo ==null){
+                log.error("company templates are not exist ");
+                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_GET_TEMPLATE), entity.getCompanyName()),
+                        HttpStatus.NOT_FOUND);
+            }
 
             // Prepare data model for FreeMarker template
             Map<String, Object> dataModel = new HashMap<>();
@@ -82,7 +91,7 @@ public class InternshipServiceImpl implements InternshipService {
             dataModel.put(Constants.BLURRED_IMAGE, Constants.DATA + base64Image);
 
             // Choose the template based on the template number
-            String templateName = switch (templateNumber) {
+            String templateName = switch (Integer.parseInt(templateNo.getInternshipTemplateNo())) {
                 case 1 -> Constants.INTERNSHIP_TEMPLATE1;
                 case 2 -> Constants.INTERNSHIP_TEMPLATE2;
                 default -> throw new IllegalArgumentException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_TEMPLATE_NUMBER));

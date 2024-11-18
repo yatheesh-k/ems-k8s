@@ -20,7 +20,7 @@ public class InternshipController {
     private InternshipService internshipService;
 
 
-    @RequestMapping(value = "/internship/{id}/upload", method = RequestMethod.POST)
+    @RequestMapping(value = "/internship/upload", method = RequestMethod.POST)
     @io.swagger.v3.oas.annotations.Operation(security = {@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY)},
             summary = "${api.getInternship.tag}", description = "${api.getInternship.description}")
     @ResponseStatus(HttpStatus.OK)
@@ -29,9 +29,8 @@ public class InternshipController {
             description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                                   @RequestHeader(Constants.AUTH_KEY) String authToken,
                                                   @RequestBody @Valid InternshipRequest internshipRequest,
-                                                  HttpServletRequest request,
-                                                  @PathVariable int id) {
-        return internshipService.downloadInternship(internshipRequest, request, id);
+                                                  HttpServletRequest request) {
+        return internshipService.downloadInternship(internshipRequest, request);
     }
 
 
