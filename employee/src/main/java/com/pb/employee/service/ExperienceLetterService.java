@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface ExperienceLetterService {
 
-    ResponseEntity<byte[]> downloadServiceLetter(HttpServletRequest request, int templateNumber, ExperienceLetterFieldsRequest experienceLetterFieldsRequest);
+    ResponseEntity<byte[]> downloadServiceLetter(HttpServletRequest request,ExperienceLetterFieldsRequest experienceLetterFieldsRequest);
 
     ResponseEntity<byte[]> uploadExperienceLetter(ExperienceLetterRequest request);
 

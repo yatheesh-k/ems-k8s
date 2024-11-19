@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import AppraisalTemplate1 from "./AppraisalTemplate1";
 import AppraisalTemplate2 from "./AppraisalTemplate2";
 import LayOut from "../../LayOut/LayOut";
-import { CompanySalaryStructureGetApi, companyViewByIdApi, EmployeeGetApiById, PayslipTemplate, PayslipTemplateGetApi } from "../../Utils/Axios";
+import { CompanySalaryStructureGetApi, companyViewByIdApi, EmployeeGetApiById, PayslipTemplate, TemplateGetAPI } from "../../Utils/Axios";
 import { useAuth } from "../../Context/AuthContext";
 
 const AppraisalTemplate = () => {
@@ -88,7 +88,7 @@ const AppraisalTemplate = () => {
 
   const fetchTemplate = async (companyId) => {
     try {
-      const res = await PayslipTemplateGetApi(companyId);
+      const res = await TemplateGetAPI(companyId);
       const templateNo = res.data.data.relievingTemplateNo; // Get the experience template number
       setFetchedTemplate(res.data.data); // Store fetched data
       setIsFetched(true); // Mark template as fetched

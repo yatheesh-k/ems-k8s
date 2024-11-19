@@ -21,17 +21,16 @@ public class ExperienceLetterController {
     @Autowired
     private ExperienceLetterService serviceLetterService;
 
-    @RequestMapping(value = "/{companyName}/template/{id}/upload", method = RequestMethod.POST)
+    @RequestMapping(value = "/experienceletter/upload", method = RequestMethod.POST)
     @io.swagger.v3.oas.annotations.Operation(security = {@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY)},
             summary = "${api.getPayslip.tag}", description = "${api.getPayslip.description}")
     @ResponseStatus(HttpStatus.OK)
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK")
     public ResponseEntity<byte[]> downloadPayslip(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                                   @RequestHeader(Constants.AUTH_KEY) String authToken,
-                                                  @PathVariable int id,
                                                   HttpServletRequest request,
                                                   @RequestBody @Valid ExperienceLetterFieldsRequest experienceLetterFieldsRequest) {
-        return serviceLetterService.downloadServiceLetter(request, id, experienceLetterFieldsRequest);
+        return serviceLetterService.downloadServiceLetter(request, experienceLetterFieldsRequest);
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)

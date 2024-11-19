@@ -5,10 +5,7 @@ import com.pb.employee.exception.EmployeeErrorMessageKey;
 import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.exception.ErrorMessageHandler;
 import com.pb.employee.opensearch.OpenSearchOperations;
-import com.pb.employee.persistance.model.CompanyEntity;
-import com.pb.employee.persistance.model.DepartmentEntity;
-import com.pb.employee.persistance.model.DesignationEntity;
-import com.pb.employee.persistance.model.EmployeeEntity;
+import com.pb.employee.persistance.model.*;
 import com.pb.employee.request.*;
 import com.pb.employee.service.ExperienceLetterService;
 import com.pb.employee.util.*;
@@ -49,12 +46,20 @@ public class ExperienceLetterServiceImpl implements ExperienceLetterService {
     private Configuration freeMarkerConfig;
 
     @Override
-    public ResponseEntity<byte[]> downloadServiceLetter(HttpServletRequest request, int templateNo, ExperienceLetterFieldsRequest experienceLetterFieldsRequest) {
+    public ResponseEntity<byte[]> downloadServiceLetter(HttpServletRequest request, ExperienceLetterFieldsRequest experienceLetterFieldsRequest) {
         List<CompanyEntity> companyEntity = null;
         EmployeeEntity employee = null;
+        TemplateEntity templateNo ;
         String index = ResourceIdUtils.generateCompanyIndex(experienceLetterFieldsRequest.getCompanyName());
 
         try {
+
+            templateNo=openSearchOperations.getCompanyTemplates(experienceLetterFieldsRequest.getCompanyName());
+            if (templateNo ==null){
+                log.error("company templates are not exist ");
+                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_GET_TEMPLATE), experienceLetterFieldsRequest.getCompanyName()),
+                        HttpStatus.NOT_FOUND);
+            }
             // Fetch employee details
             SSLUtil.disableSSLVerification();
             employee = openSearchOperations.getEmployeeById(experienceLetterFieldsRequest.getEmployeeId(), null, index);
@@ -108,7 +113,7 @@ public class ExperienceLetterServiceImpl implements ExperienceLetterService {
                 model.put(Constants.BLURRED_IMAGE, Constants.DATA + base64Image);
             }
             // Determine the template name
-            String templateName = switch (templateNo) {
+            String templateName = switch (Integer.parseInt(templateNo.getExperienceTemplateNo())) {
                 case 1 -> Constants.EXPERIENCE_LETTER;
                 case 2 -> Constants.EXPERIENCE_LETTER_TWO;
                 default -> throw new IllegalArgumentException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_TEMPLATE_NUMBER));

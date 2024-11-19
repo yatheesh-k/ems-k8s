@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import LayOut from '../../LayOut/LayOut';
-import { PayslipTemplate, PayslipTemplateGetApi } from '../../Utils/Axios';
+import { PayslipTemplate, TemplateGetAPI } from '../../Utils/Axios';
 import PayslipTemplate1 from './Payslip/PayslipTemplate1';
 import PayslipTemplate2 from './Payslip/PayslipTemplate2';
 import PayslipTemplate3 from './Payslip/PayslipTemplate3';
@@ -56,10 +56,8 @@ const PayslipTemplates = () => {
 
     const fetchTemplate = async () => {
         try {
-            const response = await PayslipTemplateGetApi();
-            console.log("Fetched salary structures:", response.data.data);
+            const response = await TemplateGetAPI();
             const defaultTemplateId = response.data.data.payslipTemplateNo;
-
             if (defaultTemplateId) {
                 const selectedTemplate = templates.find(template => template.id === parseInt(defaultTemplateId));
                 if (selectedTemplate) {

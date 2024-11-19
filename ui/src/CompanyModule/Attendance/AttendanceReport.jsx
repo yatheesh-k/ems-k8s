@@ -25,10 +25,8 @@ const AttendanceReport = () => {
     const [employeeAttendance, setEmployeeAttendance] = useState([]);
     const [employeeId, setEmployeeId] = useState("");
     const [finalEmployeeDetails, setFinalEmployeeDetails] = useState({});
-    const [selectedItemId, setSelectedItemId] = useState(null);
     const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
     const [selectedAttendanceId, setSelectedAttendanceId] = useState("");
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedAttendance, setSelectedAttendance] = useState({});
     const [isAllAttendance, setIsAllAttendance] = useState(false);
@@ -339,7 +337,7 @@ const AttendanceReport = () => {
                                 </div>
                             </div>
                             <div className="card-body">
-                                <h5 className="card-title mt-2">
+                                <h5 className="card-title mt-2 text-secondary">
                                     {isAttendance ? (
                                         <>
                                             Pay Slip Details for{" "}

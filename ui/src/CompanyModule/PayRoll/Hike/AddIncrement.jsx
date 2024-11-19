@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import { toast } from "react-toastify";
 import { Controller, useForm } from "react-hook-form";
-import { AppraisalLetterDownload, CompanySalaryStructureGetApi, EmployeeGetApi, EmployeeSalaryGetApiById, EmployeeSalaryPostApi, PayslipTemplateGetApi } from "../../../Utils/Axios";
+import { AppraisalLetterDownload, CompanySalaryStructureGetApi, EmployeeGetApi, EmployeeSalaryGetApiById, EmployeeSalaryPostApi, TemplateGetAPI } from "../../../Utils/Axios";
 import { useAuth } from "../../../Context/AuthContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import Loader from "../../../Utils/Loader";
-import AppraisalPreview from "../../Appraisal/AppraisalPreview";
 import LayOut from "../../../LayOut/LayOut";
+import AppraisalPreview from "../../Settings/Appraisal/AppraisalPreview";
 
 const AddIncrement = () => {
   const {
@@ -140,7 +140,7 @@ const AddIncrement = () => {
 
   const fetchTemplate = async (companyId) => {
     try {
-      const res = await PayslipTemplateGetApi(companyId);
+      const res = await TemplateGetAPI(companyId);
       const templateNumber = res.data.data.appraisalTemplateNo;
       setSelectedTemplate(templateNumber)
       setTemplateAvailable(!!templateNumber);
@@ -401,7 +401,6 @@ const AddIncrement = () => {
   }, []);
 
   const onSubmit = async () => {
-    console.log("onSubmit",data)
 
     if (error) {
       toast.error(error);
@@ -509,7 +508,6 @@ const AddIncrement = () => {
     };
     console.log("submissionData", submissionData);
     setPreviewData(preview);
-    console.log(preview);
     setShowPreview(true);
     setSubmissionData(submissionData);
     setData(data)
@@ -520,6 +518,7 @@ const AddIncrement = () => {
     reset();
     setShowFields(false);
   }
+
 
   if (!templateAvailable) {
     return (

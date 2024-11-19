@@ -103,7 +103,7 @@ public class PayslipController {
                                                        @PathVariable String payslipId) throws EmployeeException {
         return payslipService.deleteEmployeePayslipById(companyName, employeeId, payslipId);
     }
-    @RequestMapping(value = "/{companyName}/employee/{employeeId}/template/{templateNumber}/download/{payslipId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{companyName}/employee/{employeeId}/download/{payslipId}", method = RequestMethod.GET)
     @io.swagger.v3.oas.annotations.Operation(security = {@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = Constants.AUTH_KEY)},
             summary = "${api.getPayslip.tag}", description = "${api.getPayslip.description}")
     @ResponseStatus(HttpStatus.OK)
@@ -113,9 +113,8 @@ public class PayslipController {
                                                   @PathVariable String companyName,
                                                   @PathVariable String payslipId,
                                                   @PathVariable String employeeId,
-                                                  @PathVariable int templateNumber,
                                                   HttpServletRequest request) {
-        return payslipService.downloadPayslip(companyName, payslipId, employeeId,templateNumber, request);
+        return payslipService.downloadPayslip(companyName, payslipId, employeeId, request);
     }
 
     @RequestMapping(value = "/payslip", method = RequestMethod.POST)

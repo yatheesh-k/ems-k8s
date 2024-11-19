@@ -39,14 +39,17 @@ public class AppraisalLetterServiceImpl implements AppraisalLetterService {
     private Configuration freeMarkerConfig;
 
     @Override
-    public ResponseEntity<byte[]> downloadAppraisalLetter(AppraisalLetterRequest appraisalLetterRequest, HttpServletRequest request,  int templateNumber) {
+    public ResponseEntity<byte[]> downloadAppraisalLetter(AppraisalLetterRequest appraisalLetterRequest, HttpServletRequest request) {
         CompanyEntity entity;
         Entity companyEntity;
         SalaryConfigurationEntity salaryConfiguration;
         EmployeeEntity employee;
         DepartmentEntity department;
         DesignationEntity designation;
+        TemplateEntity templateNo ;
+
         try {
+
             SSLUtil.disableSSLVerification();
 
             // Fetch and validate the company
@@ -57,6 +60,12 @@ public class AppraisalLetterServiceImpl implements AppraisalLetterService {
             }
             companyEntity = CompanyUtils.unmaskCompanyProperties(entity, request);
             String index = ResourceIdUtils.generateCompanyIndex(entity.getShortName());
+            templateNo=openSearchOperations.getCompanyTemplates(entity.getShortName());
+            if (templateNo ==null){
+                log.error("company templates are not exist ");
+                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_GET_TEMPLATE), entity.getShortName()),
+                        HttpStatus.NOT_FOUND);
+            }
 
             // Fetch and validate the salary configuration
             salaryConfiguration = openSearchOperations.getSalaryStructureById(appraisalLetterRequest.getSalaryConfigurationId(), null, index);
@@ -100,7 +109,7 @@ public class AppraisalLetterServiceImpl implements AppraisalLetterService {
             String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
             dataModel.put(Constants.BLURRED_IMAGE, Constants.DATA + base64Image);
 
-            String templateName = switch (templateNumber) {
+            String templateName = switch (Integer.parseInt(templateNo.getAppraisalTemplateNo())) {
                 case 1 -> Constants.APPRAISAL_LETTER_TEMPLATE1;
                 case 2 -> Constants.APPRAISAL_LETTER_TEMPLATE2;
                 default -> throw new IllegalArgumentException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_TEMPLATE_NUMBER));

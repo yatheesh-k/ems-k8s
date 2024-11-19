@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 import LayOut from "../../../LayOut/LayOut";
 import Select from "react-select";
-import { EmployeeGetApi, EmployeeGetApiById, InternshipCertificateDownload, PayslipTemplateGetApi } from "../../../Utils/Axios";
+import { EmployeeGetApi, EmployeeGetApiById, InternshipCertificateDownload, TemplateGetAPI } from "../../../Utils/Axios";
 import { useAuth } from "../../../Context/AuthContext";
 import InternShipPreview from "./InternShipPreview";
 
@@ -55,7 +55,7 @@ const InternShipForm = () => {
 
   const fetchTemplate = async (companyId) => {
     try {
-      const res = await PayslipTemplateGetApi(companyId);
+      const res = await TemplateGetAPI(companyId);
       const internshipTemplateNo = res.data.data.internshipTemplateNo; // assuming this field is called internshipTemplateNo
       if (internshipTemplateNo) {
         setSelectedTemplate(internshipTemplateNo);  // Save the internshipTemplateNo to state
