@@ -7,9 +7,17 @@ import { jwtDecode } from "jwt-decode";
 import { useAuth } from "../Context/AuthContext";
 import Loader from "../Utils/Loader";
 import { Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
+import '../LayOut/NewLogin/Message.css';
 
 const EmsLogin = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm({ defaultValues: { username: "", password: "" }, mode: "onChange" });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: { username: "", password: "" },
+    mode: "onChange",
+  });
   const { setAuthUser } = useAuth();
   const navigate = useNavigate();
   const [passwordShown, setPasswordShown] = useState(false);
@@ -29,7 +37,6 @@ const EmsLogin = () => {
 
   const onSubmit = async (data) => {
     setLoading(true); // Set loading to true when the request starts
-   
 
     try {
       const response = await loginApi(data);
@@ -38,7 +45,12 @@ const EmsLogin = () => {
       if (token) {
         try {
           const decodedToken = jwtDecode(token);
-          const { sub: userId, roles: userRole, company, employeeId } = decodedToken;
+          const {
+            sub: userId,
+            roles: userRole,
+            company,
+            employeeId,
+          } = decodedToken;
           setAuthUser({ userId, userRole, company, employeeId });
           toast.success("Login Successful");
           navigate("/main");
@@ -100,16 +112,26 @@ const EmsLogin = () => {
         <div className="newLoginWrapper">
           <div className="newLoginContainer">
             <div className="newLoginLeftSectionOuter">
-              <div className="newLoginLeftTitle">Welcome to <br /> Employee Management System</div>
-              <div className="newLoginLeftImgHolder"><img src="..\assets\img\left-img.png" alt="#" /></div>
+              <div className="newLoginLeftTitle">
+                Welcome to <br /> Employee Management System
+              </div>
+              <div className="newLoginLeftImgHolder">
+                <img src="..\assets\img\left-img.png" alt="#" />
+              </div>
             </div>
-            <div className='newLoginRightSectionOuter'>
+            <div className="newLoginRightSectionOuter">
               <div className="newLoginRightSection">
                 <div className="newLoginRightSecTitle">Login</div>
+                <div className="newLoginRightSecSelectLogin">
+
+                <div className="loginBtn"><span>Continue with EMS login</span></div>
+
+                </div>
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="formgroup">
                     <label className="form-label">Email Id</label>
-                    <input className="form-control form-control-lg"
+                    <input
+                      className="form-control form-control-lg"
                       type="email"
                       placeholder="Email Id"
                       autoComplete="off"
@@ -117,38 +139,48 @@ const EmsLogin = () => {
                       {...register("username", {
                         required: "Email Id is Required.",
                         pattern: {
-                          value: /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
-                          message: "Invalid email Id format. Only .com, .in, .org, .net, .edu, .gov are allowed.",
+                          value:
+                            /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                          message:
+                            "Invalid email Id format. Only .com, .in, .org, .net, .edu, .gov are allowed.",
                         },
                       })}
                     />
-                    {errors.username && <p className="errorMsg">{errors.username.message}</p>}
-                  </div>
-                  <div class="formgroup">
-                    <label class="form-label">Password</label>
-                    <input class="form-control form-control-lg"
-                      name="password"
-                      placeholder="Password"
-                      onChange={handleEmailChange}
-                      type={passwordShown ? "text" : "password"}
-                      {...register("password", {
-                        required: "Password is Required",
-                        minLength: {
-                          value: 6,
-                          message: "Password must be at least 6 characters long",
-                        },
-                        validate: validatePassword,
-                      })}
-                    />
-                    {errors.password && (
-                      <p className="errorMsg" style={{ marginLeft: "20px" }}>
-                        {errors.password.message}
-                      </p>
+                    {errors.username && (
+                      <p className="errorMsg">{errors.username.message}</p>
                     )}
-                    <span onClick={togglePasswordVisibility} className="fa fa-fw fa-eye field-icon toggle-password"></span>
+                  </div>
+                  <div class="formgroup position-relative">
+                    <label class="form-label">Password</label>
+                    <div className="password-input-container">
+                      <input
+                        className="form-control form-control-lg"
+                        name="password"
+                        placeholder="Password"
+                        onChange={handleEmailChange}
+                        type={passwordShown ? "text" : "password"}
+                        {...register("password", {
+                          required: "Password is Required",
+                          minLength: {
+                            value: 6,
+                            message:
+                              "Password must be at least 6 characters long",
+                          },
+                          validate: validatePassword,
+                        })}
+                      />
+                      <span
+                        className={`bi bi-eye-fill field-icon mb-1 toggle-password ${
+                          passwordShown ? "text-primary" : ""
+                        }`}
+                        onClick={togglePasswordVisibility}
+                      ></span>
+                    </div>
                   </div>
                   <div className="d-grid gap-2 mt-3">
-                    <button className="btn btn-lg btn-primary" type="submit">Sign in</button>
+                    <button className="btn btn-lg btn-primary" type="submit">
+                      Sign in
+                    </button>
                   </div>
                 </form>
               </div>
@@ -168,9 +200,7 @@ const EmsLogin = () => {
         <ModalHeader closeButton>
           <ModalTitle className="text-center">Error</ModalTitle>
         </ModalHeader>
-        <ModalBody className="text-center fs-bold">
-          {errorMessage}
-        </ModalBody>
+        <ModalBody className="text-center fs-bold">{errorMessage}</ModalBody>
       </Modal>
     </div>
   );

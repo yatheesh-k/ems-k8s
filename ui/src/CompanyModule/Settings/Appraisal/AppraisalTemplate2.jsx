@@ -11,7 +11,7 @@ const AppraisalTemplate2 = ({
         employeeId,
         effectiveDate,
         salaryIncrease,
-        allowances,
+        allowances,date
     
 }) => {
 
@@ -80,7 +80,7 @@ const AppraisalTemplate2 = ({
     </p>
   </div>
   <div className="col-6">
-    <p className="mb-0 text-end">{new Date().toLocaleDateString()}</p>
+    <p className="mb-0 text-end">{date}</p>
   </div>
 </div>
   

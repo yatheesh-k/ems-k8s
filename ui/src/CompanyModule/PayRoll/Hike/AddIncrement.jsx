@@ -386,8 +386,6 @@ const AddIncrement = () => {
         // Extract the 'id' from the first salary structure
         setSalaryStructures(salaryStructures);
         setSalaryConfigurationId(salaryStructureId);  // Set the 'id' into salaryConfigurationId
-        console.log("Fetched salary structures:", salaryStructures);
-        console.log("Set salaryConfigurationId:", salaryStructureId);
       } else {
         console.error("No salary structures found in the response.");
       }
@@ -400,8 +398,8 @@ const AddIncrement = () => {
     fetchSalary();
   }, []);
 
-  const onSubmit = async () => {
 
+  const onSubmit = async () => {
     if (error) {
       toast.error(error);
       return;
@@ -463,25 +461,36 @@ const AddIncrement = () => {
       salaryConfigurationId: salaryStructureId || "",   
       // appraisalTemplateNo: selectedTemplate,
     };
-
     try {
-       await Promise.all([
-        EmployeeSalaryPostApi(employeeId, dataToSubmit), // API call for updating salary
-        AppraisalLetterDownload(selectedTemplate,payload), // API call for downloading the appraisal letter
-      ]);
-      // If both APIs succeed
-      toast.success("Employee Salary Updated and Appraisal Letter Generated Successfully");
-      setError(''); // Clear error message on success
-      setShowFields(false); // Optionally hide fields after success
-      navigate('/employeeview'); // Navigate to the employee view page
-
+      // First, call the EmployeeSalaryPostApi to update salary
+      setLoading(true); // Show loader before the delay
+      await EmployeeSalaryPostApi(employeeId, dataToSubmit);
+      // Introduce a delay before calling AppraisalLetterDownload
+      setTimeout(async () => {
+        try {
+          // Now, after the delay, call the AppraisalLetterDownload API
+          await AppraisalLetterDownload(selectedTemplate, payload);
+          
+          // If both API calls succeed
+          toast.success("Employee Salary Updated and Appraisal Letter Generated Successfully");
+          setError(''); // Clear error message on success
+          setShowFields(false); // Optionally hide fields after success
+          navigate('/employeeview'); // Navigate to the employee view page
+        } catch (err) {
+          console.error('Error occurred while downloading the appraisal letter:', err);
+          toast.error("Failed to generate appraisal letter");
+        } finally {
+          setLoading(false); // Hide loader after the delay and download process
+        }
+      }, 2000); // Delay in milliseconds (2000 ms = 2 seconds)
+  
     } catch (err) {
-      // Handle any errors that occur during the API calls
+      // Handle any errors that occur during the EmployeeSalaryPostApi call
       console.error('Error occurred:', err);
-      toast.error("Failed to update salary or generate appraisal letter");
+      toast.error("Failed to update salary");
+      setLoading(false); // Hide loader if error occurs
     }
   };
-
   // Preview Form Submission (Before submitting for API calls)
   const submitForm = (data) => {
     console.log("submitForm",data)
@@ -496,7 +505,8 @@ const AddIncrement = () => {
       totalAllowances: totalAllowances
     };
     const preview = {
-      employeeId: selectedEmployee ? selectedEmployee.employeeId : data.employeeId,
+      employeeId: data.id,
+      employeeName:data.employeeName||"",
       designationName: data.designationName || "",
       departmentName: data.departmentName || "",
       dateOfSalaryIncrement: data.dateOfSalaryIncrement || "",
@@ -504,14 +514,17 @@ const AddIncrement = () => {
       timePeriod: `${selectedMonth} ${selectedYear}`,
       grossCompensation: grossAmount || "",
       allowances: allowances,
-      totalAllowances: totalAllowances
+      totalAllowances: totalAllowances,
+      date: new Date().toISOString().split('T')[0],  
     };
     console.log("submissionData", submissionData);
     setPreviewData(preview);
+    console.log("preview",preview);
     setShowPreview(true);
     setSubmissionData(submissionData);
     setData(data)
     console.log(submissionData);
+    console.log("previewData",previewData);
   };
 
   const clearForm = () => {
@@ -921,14 +934,17 @@ const AddIncrement = () => {
 
                                         // Get selected employee details
                                         const selectedEmp = employes.find(
-                                          (emp) => emp.value === selectedOption.value
+                                          (emp) => emp.value === selectedOption.value 
                                         );
-
                                         if (selectedEmp) {
+                                          console.log("Selected Employee Details: ", selectedEmp);
+
                                           // Use setValue to populate form fields with selected employee's info
+                                          setValue("employeeName", selectedEmp.employeeName); // Add employeeName to form
                                           setValue("designationName", selectedEmp.designationName);
                                           setValue("departmentName", selectedEmp.departmentName);
                                           setValue("dateOfHiring", selectedEmp.dateOfHiring);
+                                          setValue("id",selectedEmp.employeeId);
                                         }
                                       }}
                                       placeholder="Select Employee Name"
@@ -939,6 +955,22 @@ const AddIncrement = () => {
                                   <p className="errorMsg">Employee Name Required</p>
                                 )}
                               </div>
+                              <input
+                                  type="hidden"
+                                  className="form-control"
+                                  placeholder="Resignation Date"
+                                  name="id"
+                                  readOnly
+                                  {...register("id")}
+                                />
+                                <input
+                                  type="hidden"
+                                  className="form-control"
+                                  placeholder="Resignation Date"
+                                  name="employeeName"
+                                  readOnly
+                                  {...register("id")}
+                                />
                               <div className="col-lg-1"></div>
                               <div className="col-12 col-md-6 col-lg-5 mb-3">
                                 <label className="form-label">Date of Hired</label>
@@ -1071,8 +1103,20 @@ const AddIncrement = () => {
           </div>
         </form>
         {showPreview && (
-          <div className={`modal fade ${showPreview ? 'show' : ''}`} style={{ display: showPreview ? 'block' : 'none' }} tabIndex="-1" role="dialog" aria-hidden={!showPreview}>
+          <div
+            className={`modal fade ${showPreview ? 'show' : ''}`}
+            style={{ display: showPreview ? 'block' : 'none' }}
+            tabIndex="-1"
+            role="dialog"
+            aria-hidden={!showPreview}
+          >
+
             <div className="modal-dialog modal-lg" role="document" style={{ top: "80%" }}>
+            {loading ? (
+                    <div className="text-center mt-4">
+                      <Loader /> {/* Assuming Loader is your component for showing loading indicator */}
+                    </div>
+                  ) : (
               <div className="modal-content mt-2">
                 <div className="modal-header">
                   <h5 className="modal-title">Preview Appraisal Letter</h5>
@@ -1081,13 +1125,16 @@ const AddIncrement = () => {
                   </button>
                 </div>
                 <div className="modal-body">
-                  <AppraisalPreview previewData={previewData} selectedTemplate={selectedTemplate} />
+                  
+                    <AppraisalPreview previewData={previewData} selectedTemplate={selectedTemplate} />
+                
                 </div>
                 <div className="modal-footer">
                   <button type="button" className="btn btn-secondary" onClick={() => setShowPreview(false)}>Close</button>
                   <button type="button" className="btn btn-primary" onClick={onSubmit}>Confirm Submission</button>
                 </div>
               </div>
+              )}
             </div>
           </div>
         )}

@@ -51,29 +51,29 @@ const CompanyRegistration = () => {
   const onSubmit = async (data) => {
     try {
         const updateData = {
-            password: data.password,
             companyAddress: data.companyAddress,
             mobileNo: data.mobileNo,
             alternateNo: data.alternateNo,
             name: data.name,
             personalMailId: data.personalMailId,
             personalMobileNo: data.personalMobileNo,
+            companyBranch:data.address,
             address: data.address,
             companyType: data.companyType,
         };
 
-        // Conditionally add CIN number or Company Registration Number
+       // Conditionally add CIN number or Company Registration Number
         if (data.companyType === "Private Limited") {
             updateData.cinNumber = data.cinNumber;
         } else if (data.companyType === "Firm") {
             updateData.companyRegistrationNumber = data.companyRegistrationNumber;
         }
-
         if (location.state && location.state.id) {
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Update existing company
             await companyUpdateByIdApi(location.state.id, updateData);
             toast.success("Company Updated Successfully");
         } else {
+            // Create new company
             await CompanyRegistrationApi(data);
             toast.success("Company Created Successfully");
         }
@@ -81,25 +81,61 @@ const CompanyRegistration = () => {
         navigate("/companyView");
         reset();
     } catch (error) {
-      if (error.response) {
-          const { status, data } = error.response;
-          if (status === 409) {
-              toast.error('Conflict error: Check for duplicate entries or unique constraints.');
-          } else {
-              const { message, data: duplicateData } = data;
-              const errorMessage = `
-                  ${message}
-                  Issues:
-                  ${Object.entries(duplicateData || {}).map(([key, value]) => `${key}: ${value || 'N/A'}`).join('\n')}
-              `.trim();
-              toast.error(errorMessage);
+      console.log("Entered catch block");  // Add this line
+        console.log("Full error object:", error);
+        let errorList = [];
+
+        // Check if error response exists
+        if (error.response) {
+          console.log("Axios response error:", error.response.data.error); // Log Axios error response
+    
+          // Case 1: General error message
+          if (error.response.data.error && error.response.data.error.message) {
+            const generalErrorMessage = error.response.data.error.message;
+            toast.error("Invalid Format");  // Display general error message
+            errorList.push(generalErrorMessage);
           }
-      } else {
-          console.error('An unexpected error occurred:', error);
-          toast.error('An unexpected error occurred. Please try again.');
+    
+          // Case 2: Specific error messages (multiple messages, such as form validation errors)
+          if (error.response.data.error && error.response.data.error.messages) {
+            const specificErrorMessages = error.response.data.error.messages;
+            toast.error("Invalid Format Fields"); 
+            specificErrorMessages.forEach((message) => {
+             // Display each error message individually
+              errorList.push(message);
+            });
+          }
+    
+          // Case 3: Specific error data (duplicate value conflicts)
+          if (error.response.data.data) {
+            const conflictData = error.response.data.data;
+            let conflictMessage = "Error Details:\n";
+            toast.error(error.response.data.message);
+            // Check if data contains specific conflict details (e.g., duplicate values)
+            Object.keys(conflictData).forEach((key) => {
+              const value = conflictData[key];
+              conflictMessage += `${key}: ${value}\n`;
+            });
+    
+            // Display detailed conflict message in toast and add to error list
+            errorList.push(conflictMessage);
+          }
+    
+          // Handle HTTP 409 Conflict Error (duplicate or other conflicts)
+          if (error.response.status === 409) {
+            const conflictMessage = error.response.data.message || "A conflict occurred.";
+            toast.error(conflictMessage);  // Show conflict error in toast
+          }
+    
+        } else {
+          // General error (non-Axios)
+          console.log('Error without response:', error);
+          toast.error('An unexpected error occurred. Please try again later.');
+        }
+    
+        // Update the error messages in the state
+        setErrorMessage(errorList);
       }
-  }
-  
 };
 
   useEffect(() => {
@@ -257,6 +293,7 @@ const CompanyRegistration = () => {
 
     return true; // Return true if all checks pass
   };
+
   const validateGST = (value) => {
     const spaceError = "Spaces are not allowed in the GST Number.";
     const patternError = "Invalid GST Number format";
@@ -288,24 +325,20 @@ const CompanyRegistration = () => {
 
     return true; // Return true if all checks pass
   };
+
   function handlePhoneNumberChange(event) {
     let value = event.target.value;
-  
     // Ensure only one space is allowed after +91
     if (value.startsWith("+91 ") && value.charAt(3) !== " ") {
       value = "+91 " + value.slice(3); // Ensure one space after +91
     }
-  
     // Update the value in the input
     event.target.value = value;
-  
-    // You can do any other formatting logic here if needed (e.g., auto-formatting on every keystroke)
-  }
+    }
   
   // Function to handle keydown for specific actions (e.g., prevent multiple spaces)
   function handlePhoneNumberKeyDown(event) {
     let value = event.target.value;
-  
     // Prevent multiple spaces after +91
     if (event.key === " " && value.charAt(3) === " ") {
       event.preventDefault();
@@ -413,7 +446,7 @@ const CompanyRegistration = () => {
                         type="text"
                         className="form-control"
                         placeholder="Enter Company Name"
-                        onInput={toInputTitleCase}
+                       // onInput={toInputTitleCase}
                         autoComplete="off"
                         {...register("companyName", {
                           required: "Company Name is Required",
@@ -444,13 +477,13 @@ const CompanyRegistration = () => {
                       <input
                         type="text"
                         className="form-control"
-                        onInput={toInputLowerCase}
+                        //onInput={toInputLowerCase}
                         placeholder="Enter Service Name"
                         autoComplete="off"
                         {...register("shortName", {
                           required: "Service Name is Required",
                           pattern: {
-                            value: /^[a-z]+$/,
+                            value: /^[a-zA-Z]+$/,
                             message:
                               "No Spaces allowed. These fields only accept small cases only.",
                           },
@@ -623,7 +656,7 @@ const CompanyRegistration = () => {
                     )}
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
                       <label className="form-label">
-                        Alternate Number
+                        Alternate Number <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
                         type="tel"
@@ -636,21 +669,27 @@ const CompanyRegistration = () => {
                         onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                         {...register("alternateNo", {
                           validate: {
+                            // Custom validation for alternateNo
                             startsWithPlus91: (value) => {
-                              if (!value.startsWith("+91 ")) {
+                              // Only validate if the field is not empty
+                              if (value && !value.startsWith("+91 ")) {
                                 return "Alternate Number must start with +91.";
                               }
-                              return true;
+                              return true; // If empty, no validation needed
                             },
                             correctLength: (value) => {
-                              if (value.length !== 14) {
-                                return "Alternate Number must be exactly 10 characters.";
+                              // Only validate if the field is not empty
+                              if (value && value.length !== 14) { // 14 because +91 and 10 digits
+                                return "Alternate Number must be exactly 14 characters.";
                               }
-                              return true;
+                              return true; // If empty, no validation needed
                             },
                             notRepeatingDigits: (value) => {
-                              const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                              return !isRepeating || "Alternate Number cannot consist of the same digit repeated.";
+                              // Only validate if the field is not empty
+                              if (value && /^(\d)\1{12}$/.test(value)) {
+                                return "Alternate Number cannot consist of the same digit repeated.";
+                              }
+                              return true; // If empty, no validation needed
                             },
                           },
                         })}
@@ -985,11 +1024,14 @@ const CompanyRegistration = () => {
             </div>
           </div>
           <div className="col-lg-1"></div>
-          {errorMessage && (
-            <div className="alert alert-info mt-4 text-center">
-              {errorMessage}
-            </div>
-          )}
+          {errorMessage.length > 0 && (
+                <div className="alert alert-info mt-4 text-center">
+                    {errorMessage.map((msg, index) => (
+                        <p key={index}>{msg}</p>  // Display each message in a <p> tag
+                    ))}
+                </div>
+            )}
+
           <div className="col-12 d-flex justify-content-end mt-5"
             style={{ background: "none" }}
           >

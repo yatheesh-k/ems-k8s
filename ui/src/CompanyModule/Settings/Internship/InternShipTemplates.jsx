@@ -130,7 +130,7 @@ const InternShipTemplates = () => {
   const handleSubmitTemplate = async () => {
     const dataToSubmit = {
       companyId: companyData.id, // Ensure this is correct
-      appraisalTemplateNo: selectedTemplate.name,
+      internshipTemplateNo: selectedTemplate.name,
       // Add other necessary fields if required
     };
     try {
@@ -165,9 +165,8 @@ const InternShipTemplates = () => {
       const errorMessage = error.response.data.error.message;
       toast.error(errorMessage);
     } else {
-      toast.error("Network Error !");
+      console.error(error.response);
     }
-    console.error(error.response);
   };
 
   return (
@@ -176,7 +175,7 @@ const InternShipTemplates = () => {
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3">
-              <strong>Appraisal Templates</strong>
+              <strong>Interns Templates</strong>
             </h1>
           </div>
           <div className="col-auto" style={{ paddingBottom: "20px" }}>
@@ -185,7 +184,7 @@ const InternShipTemplates = () => {
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
-                <li className="breadcrumb-item active">Appraisal Templates</li>
+                <li className="breadcrumb-item active">Interns Templates</li>
               </ol>
             </nav>
           </div>
