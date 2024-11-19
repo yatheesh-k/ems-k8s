@@ -24,13 +24,6 @@ const CompanyLogin = () => {
     mode: "onChange",
   });
 
-  const validateEmail = (value) => {
-    if (/[^a-zA-Z0-9@._-]{3,}/.test(value)) {
-      return "Please enter a valid Email Id.";
-    }
-    return true;
-  };
-
   const { setAuthUser } = useAuth();
     const { company } = useParams();
   const navigate = useNavigate();
@@ -261,32 +254,39 @@ const CompanyLogin = () => {
                             </div>
                             {!otpSent && ( 
                               <> 
-                              <div class="formgroup">
-                                <label class="form-label">Password</label>
-                                <input class="form-control form-control-lg" 
-                                  name="password"
-                                  placeholder="Password"
-                                  onChange={handleEmailChange}
-                                  type={passwordShown ? "text" : "password"}
-                                  {...register("password", {
-                                      required: "Password is Required",
-                                      minLength: {
-                                      value: 6,
-                                      message: "Password must be at least 6 characters long",
-                                  },
-                                  validate:validatePassword,  
-                                  })}
-                                />
-                                {errors.password && (
-                                  <p className="errorMsg" style={{ marginLeft: "20px" }}>
-                                    {errors.password.message}
-                                  </p>
-                                )}
-                                <span toggle="#password-field" class="bi bi-eye-fill field-icon toggle-password"></span>
-                                <small>
+                                <div className="formgroup">
+                                  <label className="form-label">Password</label>
+                                  <div className="password-input-container">
+                                    <input 
+                                      className="form-control form-control-lg" 
+                                      name="password"
+                                      placeholder="Password"
+                                      onChange={handleEmailChange}
+                                      type={passwordShown ? "text" : "password"}
+                                      {...register("password", {
+                                        required: "Password is Required",
+                                        minLength: {
+                                          value: 6,
+                                          message: "Password must be at least 6 characters long",
+                                        },
+                                        validate: validatePassword,  
+                                      })}
+                                    />
+                                    <span
+                                      className={`bi bi-eye-fill field-icon mb-1 toggle-password ${passwordShown ? 'text-primary' : ''}`}
+                                      onClick={togglePasswordVisibility}
+                                    ></span>
+                                  </div>
+                                  {errors.password && (
+                                    <p className="errorMsg" style={{ marginLeft: "20px" }}>
+                                      {errors.password.message}
+                                    </p>
+                                  )}
+                                  <small>
                                     <a href="/forgotPassword">Forgot Password?</a>
-                                </small>
-                            </div>
+                                  </small>
+                                </div>
+
                           
                             {/* <div>
                                 <div class="form-check align-items-center">

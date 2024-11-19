@@ -13,8 +13,6 @@ const InternShipForm = () => {
     register,
     handleSubmit,
     control,
-    setValue,
-    watch,
     formState: { errors },
     reset,
   } = useForm();
@@ -31,7 +29,6 @@ const InternShipForm = () => {
   const [error,setError]=useState(null);
   const [selectedEmployee, setSelectedEmployee] = useState(null); // New state to store the selected employee
   const [templateAvailable, setTemplateAvailable] = useState(true);
-  const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -271,7 +268,6 @@ const InternShipForm = () => {
   const validateDatePeriod = (lastWorkingDate, dateOfHiring) => {
     // Reset the error before starting validation
     setError("");
-  
     if (lastWorkingDate && dateOfHiring) {
       const lastWorking = new Date(lastWorkingDate);
       const hiringDate = new Date(dateOfHiring);
@@ -297,23 +293,22 @@ const InternShipForm = () => {
             <div className="container-fluid p-0">
               <div className="row justify-content-center">
                 <div className="col-8 text-center mt-5">
-                  <h2>No Experience Template Available</h2>
-                  <p>To set up the experience templates before proceeding, Please select the Template from Settings <a href="/experienceLetter">Expereince Templates </a></p>
-                  <p>Please contact the administrator to set up the experience templates before proceeding.</p>
+                  <h2>No Intenrship Template Available</h2>
+                  <p>To set up the Intenrship templates before proceeding, Please select the Template from Settings <a href="/internsTemplates">Intenrship Templates </a></p>
+                  <p>Please contact the administrator to set up the Intenrship templates before proceeding.</p>
                 </div>
               </div>
             </div>
           </LayOut>
         );
       }
-
   return (
     <LayOut>
       <div className="container-fluid p-0">
         <div className="row d-flex align-items-center justify-content-between mt-1">
           <div className="col">
             <h1 className="h3">
-              <strong>Experience Form</strong>
+              <strong>Intenrship Form</strong>
             </h1>
           </div>
           <div className="col-auto">
@@ -322,7 +317,7 @@ const InternShipForm = () => {
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
-                <li className="breadcrumb-item active">Generate Experience</li>
+                <li className="breadcrumb-item active">Intenrship Experience</li>
               </ol>
             </nav>
           </div>
@@ -332,7 +327,7 @@ const InternShipForm = () => {
             <div className="card">
               <div className="card-header">
                 <h5 className="card-title">
-                  {isUpdating ? "Employee Experience Data" : "Employee Experience Form"}
+                  {isUpdating ? "Employee Intenrship Data" : "Employee Intenrship Form"}
                 </h5>
               </div>
               <form onSubmit={handleSubmit(onSubmit)}>
@@ -425,7 +420,7 @@ const InternShipForm = () => {
                       )}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Date of Experience</label>
+                      <label className="form-label">Date of Intenrship</label>
                       <input
                         type="date"
                         className="form-control"
@@ -464,7 +459,7 @@ const InternShipForm = () => {
                 <div className="modal-dialog modal-lg" role="document">
                   <div className="modal-content mt-2 mb-3">
                     <div className="modal-header">
-                      <h5 className="modal-title">Preview Experience Letter</h5>
+                      <h5 className="modal-title">Preview Intenrship Letter</h5>
                       <button type="button" className="close" onClick={() => setShowPreview(false)} aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                       </button>

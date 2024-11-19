@@ -98,26 +98,41 @@ const ExperienceForm = () => {
     fetchTemplate()
 }, []);
 
+// Helper function to format date as dd-mm-yyyy
+const formatDate = (date) => {
+  if (!date) return ""; // If the date is falsy, return an empty string
+  
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, "0"); // Get the day, ensuring two digits
+  const month = String(d.getMonth() + 1).padStart(2, "0"); // Get the month (0-indexed)
+  const year = d.getFullYear(); // Get the full year
+  
+  return `${day}-${month}-${year}`;
+};
+
   const onSubmit = (data) => {
     const submissionData = {
       employeeId: data.employeeId, 
       companyName: user.company,
       date:data.lastWorkingDate 
     }; 
+     // Format the date fields to dd-mm-yyyy format
+    const formattedLastWorkingDate = formatDate(data.lastWorkingDate);
+    const formattedResignationDate = formatDate(data.resignationDate);
+    const formattedHiringDate = formatDate(data.dateOfHiring);
     const preview = {
       employeeName: selectedEmployee ? selectedEmployee.employeeName : data.employeeName,
       employeeId: selectedEmployee ? selectedEmployee.employeeId : data.employeeId,
       designationName: data.designationName || "",
       departmentName: data.departmentName || "",
-      resignationDate: data.resignationDate || "",
-      lastWorkingDate: data.lastWorkingDate || "",
+      joiningDate:formattedHiringDate||"",
+      experienceDate: formattedResignationDate || "", // Resignation date formatted
+      date: formattedLastWorkingDate || "",
       noticePeriod,
       companyName: user.company,
     };
     
-    console.log("submissionData",submissionData);
     setPreviewData(preview);
-    console.log(preview);
     setShowPreview(true);
     setSubmissionData(submissionData);
   };
@@ -127,7 +142,6 @@ const ExperienceForm = () => {
     try {
         const success = await ExperienceFormPostApi(templateNo, submissionData);
         if (success) {
-          console.log('PDF downloaded successfully');
           setShowPreview(true);
           reset();
         }
@@ -136,8 +150,7 @@ const ExperienceForm = () => {
         handleError(error)
       }
   };
-  
-  
+   
   const handleError = (errors) => {
     if (errors.response) {
       const status = errors.response.status;

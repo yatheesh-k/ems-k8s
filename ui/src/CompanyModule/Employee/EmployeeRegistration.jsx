@@ -269,30 +269,60 @@ const EmployeeRegistration = () => {
 
       reset();
     } catch (error) {
-      if (error.response) {
-        const { status, data } = error.response;
-        
-        if (status === 409) {
-            // Handling conflict errors (duplicates)
-            toast.error('Conflict error: Check for duplicate entries or unique constraints.');
-        } else {
-            // Safely destructure the error response
-            const { message, data: errorData } = data || {};
-            let errorMessage = message || 'An unknown error occurred.';
-            
-            if (errorData) {
-                errorMessage += `
-                Issues:
-                ${Object.entries(errorData).map(([key, value]) => `${key}: ${value || 'N/A'}`).join('\n')}`;
-            }
+      console.log("Entered catch block");  // Add this line
+      console.log("Full error object:", error);
+      let errorList = [];
 
-            toast.error(errorMessage);
-            setErrorMessage(errorMessage); // Display it in your UI
+      // Check if error response exists
+      if (error.response) {
+        console.log("Axios response error:", error.response.data.error); // Log Axios error response
+  
+        // Case 1: General error message
+        if (error.response.data.error && error.response.data.error.message) {
+          const generalErrorMessage = error.response.data.error.message;
+          toast.error("Invalid Format");  // Display general error message
+          errorList.push(generalErrorMessage);
         }
-    } else {
-        console.error('An unexpected error occurred:', error);
-        toast.error('An unexpected error occurred. Please try again.');
-    }
+  
+        // Case 2: Specific error messages (multiple messages, such as form validation errors)
+        if (error.response.data.error && error.response.data.error.messages) {
+          const specificErrorMessages = error.response.data.error.messages;
+          toast.error("Invalid Format Fields"); 
+          specificErrorMessages.forEach((message) => {
+           // Display each error message individually
+            errorList.push(message);
+          });
+        }
+  
+        // Case 3: Specific error data (duplicate value conflicts)
+        if (error.response.data.data) {
+          const conflictData = error.response.data.data;
+          let conflictMessage = "Error Details:\n";
+          toast.error(error.response.data.message);
+          // Check if data contains specific conflict details (e.g., duplicate values)
+          Object.keys(conflictData).forEach((key) => {
+            const value = conflictData[key];
+            conflictMessage += `${key}: ${value}\n`;
+          });
+  
+          // Display detailed conflict message in toast and add to error list
+          errorList.push(conflictMessage);
+        }
+  
+        // Handle HTTP 409 Conflict Error (duplicate or other conflicts)
+        if (error.response.status === 409) {
+          const conflictMessage = error.response.data.message || "A conflict occurred.";
+          toast.error(conflictMessage);  // Show conflict error in toast
+        }
+  
+      } else {
+        // General error (non-Axios)
+        console.log('Error without response:', error);
+        toast.error('An unexpected error occurred. Please try again later.');
+      }
+  
+      // Update the error messages in the state
+      setErrorMessage(errorList);
     }
   };
 
@@ -359,7 +389,6 @@ const EmployeeRegistration = () => {
 
     return `${year}-${month}-${day}`;
   };
-
   const validateDate = (value) => {
     const selectedDate = new Date(value);
     if (selectedDate > new Date(threeMonthsFromNow)) {
@@ -367,7 +396,6 @@ const EmployeeRegistration = () => {
     }
     return true; // Return true if no errors
   };
-
   // Custom validation function for date of birth based on date of hiring
   const validateDateOfBirth = (value, dateOfHiring) => {
     const selectedDateOfBirth = new Date(value);

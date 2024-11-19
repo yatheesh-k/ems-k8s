@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import ExperienceTemplate1 from "./ExperienceTemplate1";
 import ExperienceTemplate2 from "./ExperienceTemplate2";
 import { useAuth } from "../../../Context/AuthContext";
-import { companyViewByIdApi, EmployeeGetApiById, TemplateGetAPI } from "../../../Utils/Axios";
+import { companyViewByIdApi, EmployeeGetApiById} from "../../../Utils/Axios";
 
 const ExperiencePreview = ({ previewData, selectedTemplate }) => { // Accept previewData as a prop
   const [companyData, setCompanyData] = useState({});
@@ -97,9 +97,10 @@ const ExperiencePreview = ({ previewData, selectedTemplate }) => { // Accept pre
           employeeName={previewData.employeeName}
           employeeId={previewData.employeeId}
           designation={previewData.designationName}
+          department={previewData.departmentName}
           joiningDate={previewData.dateOfHiring}
-          resignationDate={previewData.resignationDate}
-          lastWorkingDate={previewData.lastWorkingDate}
+          experienceDate={previewData.resignationDate}
+          date={previewData.date}
         />
       ),
     },
@@ -113,9 +114,10 @@ const ExperiencePreview = ({ previewData, selectedTemplate }) => { // Accept pre
           employeeName={previewData.employeeName}
           employeeId={previewData.employeeId}
           designation={previewData.designationName}
+          department={previewData.departmentName}
           joiningDate={previewData.dateOfHiring}
-          resignationDate={previewData.resignationDate}
-          lastWorkingDate={previewData.lastWorkingDate}
+          experienceDate={previewData.resignationDate}
+          date={previewData.date}
         />
       ),
     },

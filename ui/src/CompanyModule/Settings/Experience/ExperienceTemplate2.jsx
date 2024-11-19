@@ -9,6 +9,7 @@ const ExperienceTemplate2 = ({
     designation,
     department,
     joiningDate,
+    experienceDate
 
 }) => {
 
@@ -25,7 +26,7 @@ const ExperienceTemplate2 = ({
           <h4 className="text-center">EXPERIENCE CERTIFICATE</h4>
           <div className="row d-flex align-items-center p-1">
             <div className="col-6 d-flex align-items-center">
-                <p className="mb-0">{new Date().toLocaleDateString()}</p>
+                <p className="mb-0">{date}</p>
             </div>
             <div className="col-6 d-flex justify-content-end">
                 <img
@@ -66,8 +67,8 @@ const ExperienceTemplate2 = ({
             <p>
               This letter certifies that <strong>{employeeName}</strong>with and ID <strong>{employeeId}</strong> was a
               valued member of our team at {companyData.companyName} as a{" "}
-              <strong>{designation}</strong> in the <strong>{department}</strong>
-              Department from {joiningDate} to {date}.
+              <strong>{designation}</strong> in the <strong>{department} </strong>
+              Department from {joiningDate} to {experienceDate}.
             </p>
             <p>
               During <strong>{employeeName}</strong>’s employment, he exhibited exceptional

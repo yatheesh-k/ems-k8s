@@ -89,12 +89,12 @@ const ExistsEmpRegistration = () => {
       const res = await TemplateGetAPI(companyId);
       const templateNumber = res.data.data.relievingTemplateNo;
          setSelectedTemplate(templateNumber)
-         setTemplateAvailable(true)
+         setTemplateAvailable(!!templateNumber); 
     } catch (error) {
-      handleError(error);
-      setTemplateAvailable(false);
+      setTemplateAvailable(false); 
     }
   };
+  
   useEffect(() => {
     fetchTemplate()
 }, []);
@@ -104,8 +104,7 @@ const ExistsEmpRegistration = () => {
       resignationDate: data.resignationDate,
       relievingDate: data.relievingDate,
       noticePeriod: noticePeriod,
-    };
-    
+    };    
     const preview = {
       employeeName: selectedEmployee ? selectedEmployee.employeeName : data.employeeName,
       id: data.employeeId,
@@ -119,6 +118,7 @@ const ExistsEmpRegistration = () => {
     };
     setPreviewData(preview);
     setShowPreview(true);
+    console.log("preview" ,true)
     setSubmissionData(submissionData);
   };
 
@@ -140,12 +140,13 @@ const ExistsEmpRegistration = () => {
       RelievingLetterDownload(employeeId),
       timeoutPromise
     ]);      // Handle the response (you can adjust this based on your needs)
+
       toast.success(response.data.message);
-     toast.success(downloadResponse.data.message);
-  
+      toast.success(downloadResponse.data.message);
+      setShowPreview(true);
       // Optionally, reset submissionData or navigate to another page
       // resetSubmissionData();
-       navigate('/existingSummary');
+       navigate('/relievingSummary');
   
     } catch (error) {
       console.error('Error submitting experience letter:', error);
@@ -196,7 +197,7 @@ const ExistsEmpRegistration = () => {
 
   const clearForm = () => {
     reset();
-    navigate("/relievingview");
+    navigate("/relievingSummary");
   };
 
    if (loading) return  <Loader/>;
@@ -403,7 +404,7 @@ const ExistsEmpRegistration = () => {
                   </div>
                 </div>
               </form>
-              {showPreview && (
+              {showPreview && (  
             <div className={`modal fade ${showPreview ? 'show' : ''}`} style={{ display: showPreview ? 'block' : 'none' }} tabIndex="-1" role="dialog" aria-hidden={!showPreview}>
                 <div className="modal-dialog modal-lg" role="document">
                   <div className="modal-content">
@@ -415,6 +416,8 @@ const ExistsEmpRegistration = () => {
                     </div>
                     <div className="modal-body">
                       <Preview previewData={previewData} selectedTemplate={selectedTemplate} />
+                        {console.log("Preview data:", previewData)}
+                        {console.log("Selected Template:", selectedTemplate)}
                     </div>
                     <div className="modal-footer">
                       <button type="button" className="btn btn-secondary" onClick={() => setShowPreview(false)}>Close</button>

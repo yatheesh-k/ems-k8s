@@ -56,8 +56,8 @@ const AppraisalPreview = ({ previewData, selectedTemplate }) => { // Accept prev
         date={previewData.date}
         employeeName={previewData.employeeName}
         employeeId={previewData.employeeId}
-        jobTitle={previewData.designationName}
-        effectiveDate={previewData.date}
+        designation={previewData.designationName}
+        effectiveDate={previewData.dateOfSalaryIncrement}
         salaryIncrease={previewData.grossCompensation} 
         totalAllowances= {previewData.totalAllowances}
         />
@@ -77,8 +77,8 @@ const AppraisalPreview = ({ previewData, selectedTemplate }) => { // Accept prev
           date={previewData.date}
           employeeName={previewData.employeeName}
           employeeId={previewData.employeeId}
-          jobTitle={previewData.designationName}
-          effectiveDate={previewData.date}
+          designation={previewData.designationName}
+          effectiveDate={previewData.dateOfSalaryIncrement}
           salaryIncrease={previewData.grossCompensation} 
           totalAllowances= {previewData.totalAllowances}
          />

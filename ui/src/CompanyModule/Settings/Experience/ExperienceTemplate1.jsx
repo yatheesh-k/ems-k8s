@@ -9,6 +9,7 @@ const ExperienceTemplate1 = ({
     designation,
     joiningDate,
     department,
+    experienceDate
 }) => {
 
 
@@ -28,7 +29,7 @@ const ExperienceTemplate1 = ({
 
           <div className="row d-flex align-items-center p-1">
             <div className="col-6 d-flex align-items-center">
-                <p className="mb-0">{new Date().toLocaleDateString()}</p>
+                <p className="mb-0">{date}</p>
             </div>
             <div className="col-6 d-flex justify-content-end">
                 <img
@@ -70,11 +71,11 @@ const ExperienceTemplate1 = ({
           >
             <p>
               This is to certify that <strong>{employeeName}</strong> with an ID <strong>{employeeId}</strong> was
-              employed as <strong>{designation}</strong> in the{" "}
-              <strong>{department}</strong> of{" "}
-              <strong>{companyData.companyName}</strong> from{" "}
-              <strong>{joiningDate}</strong> to{" "}
-              <strong>{date}</strong>.
+              employed as <strong>{designation}</strong> in the {" "}
+              <strong>{department}</strong> of {" "}
+              <strong>{companyData.companyName}</strong> from {" "}
+              <strong>{joiningDate}</strong> to {" "}
+              <strong>{experienceDate}</strong>.
             </p>
             <p>
               We found <strong>{employeeName}</strong> to be very dedicated to
