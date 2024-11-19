@@ -230,6 +230,7 @@ public class PayslipUtils {
     public static PayslipEntity maskEmployeePayslip(PayslipEntity payslipRequest, EmployeeSalaryEntity salaryRequest, AttendanceEntity attendance) {
         String var = null, fix = null, bas = null, gross = null;
         String hra = null, trav = null, pfc = null, other = null, spa = null;
+        String department=null,designation=null;
         String te = null, pfE = null, pfEmployer = null, lop = null, tax = null, itax = null, ttax = null, tded = null, net = null;
         Map<String, String> allowances = new HashMap<>();
         Map<String, String> deductions = new HashMap<>();
@@ -276,6 +277,15 @@ public class PayslipUtils {
                 deductions.put(entry.getKey(), maskValue(entry.getValue()));
             }
         }
+        if (payslipRequest.getDepartment() != null) {
+            department  = Base64.getEncoder().encodeToString((payslipRequest.getDepartment()).getBytes());
+            payslipRequest.setDepartment(department);
+
+        }
+        if (payslipRequest.getDesignation() != null) {
+            designation  = Base64.getEncoder().encodeToString((payslipRequest.getDesignation()).getBytes());
+            payslipRequest.setDesignation(designation);
+        }
 
         ObjectMapper objectMapper = new ObjectMapper();
         AttendanceEntity attendanceEntity = objectMapper.convertValue(attendance,AttendanceEntity.class);
@@ -314,7 +324,7 @@ public class PayslipUtils {
 
     public static PayslipEntity unmaskEmployeePayslip(PayslipEntity payslipRequest) {
 
-        String var = null, fix = null, bas = null, gross = null,
+        String var = null, fix = null, bas = null, gross = null, department = null, designation = null,
                 hra = null, trav = null, pfc = null, other = null,spa=null,
                 te= null, email = null, pfEmployer =null, lop = null, tax = null,
                 itax = null, ttax = null, tded = null, net = null,noOfWorkingDays=null,totalWorkingDays=null,
@@ -385,6 +395,14 @@ public class PayslipUtils {
         }
         if (payslipRequest.getSalary().getLop() != null) {
             lop = new String(Base64.getDecoder().decode(payslipRequest.getSalary().getLop()));
+        }
+        if (payslipRequest.getDesignation() != null) {
+            designation = new String(Base64.getDecoder().decode(payslipRequest.getDesignation()));
+            payslipRequest.setDesignation(designation);
+        }
+        if (payslipRequest.getDesignation() != null) {
+            department = new String(Base64.getDecoder().decode(payslipRequest.getDepartment()));
+            payslipRequest.setDepartment(department);
         }
 
         payslipRequest.getSalary().setFixedAmount(fix);
