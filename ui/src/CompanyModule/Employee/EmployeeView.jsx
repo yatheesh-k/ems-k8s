@@ -117,9 +117,9 @@ const EmployeeView = () => {
 
   const columns = [
     {
-      name: <h6><b>S No</b></h6>,
+      name: <h6><b>#</b></h6>,
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
-      width: "70px",
+      width: "50px",
     },
     {
       name: <h6><b>ID</b></h6>,
@@ -130,24 +130,29 @@ const EmployeeView = () => {
       name: <h6><b>Name</b></h6>,
       selector: row => (
         <div title={`${row.firstName} ${row.lastName}`}>
-          {`${row.firstName.slice(0, 8)}`}
-        </div>
+           {`${row.firstName.length > 18 ? row.firstName.slice(0, 10) + '...' : row.firstName} ${row.lastName.length > 10 ? row.lastName.slice(0, 10) + '...' : row.lastName}`}
+        </div>      
       ),
-      width: "130px",
+      width: "190px",
     },
     {
       name: <h6><b>Email Id</b></h6>,
       selector: row => (
         <div title={row.emailId}>
-          {row.emailId.slice(0, 8)}
+          {/* {row.emailId.length > 10 ? `${row.emailId.slice(0, 10)}...` : row.emailId} */}
+          {row.emailId}
         </div>
       ),
-      width: "150px",
+      width: "210px",
     },
     {
       name: <h6><b>Department</b></h6>,
-      selector: row => row.departmentName,
-      width: "130px",
+      selector: row => (
+        <div title={row.departmentName}>
+        {row.departmentName.length > 10 ? `${row.departmentName.slice(0, 10)}...` : row.departmentName}
+      </div>
+      ),
+      width: "140px",
     },
     {
       name: <h6><b>Date Of Hiring</b></h6>,
@@ -159,14 +164,14 @@ const EmployeeView = () => {
         const year = date.getFullYear();
         return `${day}-${month}-${year}`;
       },
-      width: '160px'
+      width: '130px'
     },
 
     {
       name: <h6><b>Status</b></h6>,
       selector: row => row.status,
       cell: (row) => statusMappings[row.status]?.label || "Unknown",
-      width: "120px"
+      width: "130px"
     },
     {
       name: <h5><b>Actions</b></h5>,

@@ -227,7 +227,11 @@ const AttendanceReport = () => {
             }] : []),
             ...(!isAttendance && selectedYear ? [{
                 name: <h6><b>Name</b></h6>,
-                selector: (row) => `${row.firstName} ${row.lastName}`,
+                selector: row => (
+                    <div title={`${row.firstName} ${row.lastName}`}>
+                       {`${row.firstName.length > 8 ? row.firstName.slice(0, 8) + '...' : row.firstName} ${row.lastName.length > 8 ? row.lastName.slice(0, 8) + '...' : row.lastName}`}
+                    </div>      
+                  ),      
                 width: "150px",
             }] : []),
             ...(!isAttendance && selectedYear ? [{
@@ -343,7 +347,7 @@ const AttendanceReport = () => {
                                             Pay Slip Details for{" "}
                                             {finalEmployeeDetails.firstName
                                                 ? `${finalEmployeeDetails.firstName} ${finalEmployeeDetails.lastName} (${finalEmployeeDetails.employeeId})`
-                        : 'All Employees'}
+                                             : 'All Employees'}
                                             {selectedYear && ` - ${selectedYear}`}
                                             {selectedMonth && ` - ${getMonthNames()[selectedMonth - 1]}`}
                                         </>
