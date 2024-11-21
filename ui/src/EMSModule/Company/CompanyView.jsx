@@ -4,16 +4,13 @@ import DataTable from "react-data-table-component";
 import { Bounce, toast } from "react-toastify";
 import DeletePopup from "../../Utils/DeletePopup";
 import LayOut from "../../LayOut/LayOut";
-import axios from "axios";
 import { companyDeleteByIdApi, companyViewApi } from "../../Utils/Axios";
-import { useLocation, useNavigate } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 
 const CompanyView = () => {
   const [view, setView] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [search, setSearch] = useState("");
-  const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [showNoRecordsMessage, setShowNoRecordsMessage] = useState(false);
@@ -98,7 +95,7 @@ const CompanyView = () => {
 
   const columns = [
     {
-      name: <h6><b>S No</b></h6>,
+      name: <h6><b>#</b></h6>,
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
       width: "70px",
     },
@@ -106,7 +103,7 @@ const CompanyView = () => {
       name: <h6><b>Company Name</b></h6>,
       selector: row => (
         <div title={row.companyName}>
-          {row.companyName.slice(0, 12)}
+           {row.companyName.length > 20 ? `${row.companyName.slice(0, 20)}...` : row.companyName}
         </div>
       ),
       width: "220px",
@@ -116,32 +113,32 @@ const CompanyView = () => {
       name: <h6><b>Service Name</b></h6>,
       selector: row => (
         <div title={row.shortName}>
-          {row.shortName.slice(0, 8)}
-        </div>
+          {row.shortName.length > 20 ? `${row.shortName.slice(0, 20)}...` : row.shortName}
+          </div>
       ),
-      width: "180px",
+      width: "150px",
       wrap: true,
     },
     {
       name: <h6><b>Email Id</b></h6>,
       selector: row => (
         <div title={row.emailId}>
-          {row.emailId.slice(0, 15)}
-        </div>
+          {row.emailId.length > 20 ? `${row.emailId.slice(0, 20)}...` : row.emailId}
+          </div>
       ),
-      width: "200px",
+      width: "250px",
     },
     {
       name: <h6><b>Type</b></h6>,
       selector: (row) => row.companyType,
-      width: "200px",
+      width: "150px",
       wrap: true,
     },
     {
       name: <h6><b>Actions</b></h6>,
       width: "130px",
       cell: (row) => (
-        <div>
+        <div className="text-end">
           <button
             className="btn btn-sm"
             style={{
@@ -186,27 +183,6 @@ const CompanyView = () => {
     setShowNoRecordsMessage(filtered.length === 0);
   };
 
-  const handleSearch = () => {
-    console.log("Perform search with:", search, selectedMonth, selectedYear);
-  };
-
-  const toInputTitleCase = (e) => {
-    const input = e.target;
-    let value = input.value;
-    value = value.replace(/^\s+/g, '');
-    if (!/\S/.test(value)) {
-      value = value.replace(/\s+/g, '');
-    } else {
-      value = value.replace(/^\s+/g, '');
-      const words = value.split(' ');
-      const capitalizedWords = words.map(word => {
-        return word.charAt(0).toUpperCase() + word.slice(1);
-      });
-      value = capitalizedWords.join(' ');
-    }
-    input.value = value;
-  };
-
   return (
     <LayOut>
       <div className="container-fluid p-0">
@@ -236,7 +212,7 @@ const CompanyView = () => {
                   </div>
                   <div className='col-12 col-md-6 col-lg-4'></div>
                   <div className='col-12 col-md-6 col-lg-4'>
-                    <input type='search' className="form-control" placeholder='Search by Company Name, Authorized Name '
+                    <input type='search' className="form-control" placeholder='Search by Company Name'
                       value={search}
                       onChange={(e) => getFilteredList(e.target.value)}
                     />

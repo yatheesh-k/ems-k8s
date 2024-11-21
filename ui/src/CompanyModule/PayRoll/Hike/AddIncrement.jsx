@@ -469,7 +469,7 @@ const AddIncrement = () => {
       setTimeout(async () => {
         try {
           // Now, after the delay, call the AppraisalLetterDownload API
-          await AppraisalLetterDownload(selectedTemplate, payload);
+          await AppraisalLetterDownload(payload);
           
           // If both API calls succeed
           toast.success("Employee Salary Updated and Appraisal Letter Generated Successfully");
@@ -517,14 +517,10 @@ const AddIncrement = () => {
       totalAllowances: totalAllowances,
       date: new Date().toISOString().split('T')[0],  
     };
-    console.log("submissionData", submissionData);
     setPreviewData(preview);
-    console.log("preview",preview);
     setShowPreview(true);
     setSubmissionData(submissionData);
     setData(data)
-    console.log(submissionData);
-    console.log("previewData",previewData);
   };
 
   const clearForm = () => {

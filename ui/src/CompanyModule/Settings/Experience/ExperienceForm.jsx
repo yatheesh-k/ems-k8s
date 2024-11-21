@@ -138,9 +138,8 @@ const formatDate = (date) => {
   };
 
   const handleConfirmSubmission = async () => {
-    const templateNo = selectedTemplate; // Adjust as needed
     try {
-        const success = await ExperienceFormPostApi(templateNo, submissionData);
+        const success = await ExperienceFormPostApi(submissionData);
         if (success) {
           setShowPreview(true);
           reset();
