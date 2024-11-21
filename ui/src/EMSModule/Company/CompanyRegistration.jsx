@@ -156,7 +156,6 @@ const CompanyRegistration = () => {
     }
   }, [location.state]);
 
-
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
       const errorMessage = error.response.data.error.message;
@@ -165,6 +164,10 @@ const CompanyRegistration = () => {
       // toast.error("Network Error !");
     }
     console.error(error.response);
+  };
+
+  const clearForm = () => {
+    reset();
   };
 
   const toInputTitleCase = (e) => {
@@ -262,6 +265,42 @@ const CompanyRegistration = () => {
     e.target.value = newValue;
   };
 
+  const toInputAddressCase = (e) => {
+    const input = e.target;
+    let value = input.value;
+    const cursorPosition = input.selectionStart; // Save the cursor position
+    // Remove leading spaces
+    value = value.replace(/^\s+/g, '');
+    // Ensure only alphabets (upper and lower case), numbers, and allowed special characters
+    const allowedCharsRegex = /^[a-zA-Z0-9\s!@#&()*/,.\\-{}]+$/
+    value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
+    
+    // Capitalize the first letter of each word, but allow uppercase letters in the middle of the word
+    const words = value.split(' ');
+    const capitalizedWords = words.map(word => {
+      if (word.length > 0) {
+        // Capitalize the first letter, but leave the middle of the word intact
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      }
+      return '';
+    });
+    
+    // Join the words back into a string
+    let formattedValue = capitalizedWords.join(' ');
+  
+    // Remove spaces not allowed (before the first two characters)
+    if (formattedValue.length > 2) {
+      formattedValue = formattedValue.slice(0, 2) + formattedValue.slice(2).replace(/\s+/g, ' ');
+    }
+  
+    // Update input value
+    input.value = formattedValue;
+  
+    // Restore the cursor position
+    input.setSelectionRange(cursorPosition, cursorPosition);
+  };
+  
+  
   const validateREGISTER = (value) => {
     const spaceError = "Spaces are not allowed in the Register Number.";
     const patternError = "Invalid Register Number format";
@@ -339,11 +378,16 @@ const CompanyRegistration = () => {
   // Function to handle keydown for specific actions (e.g., prevent multiple spaces)
   function handlePhoneNumberKeyDown(event) {
     let value = event.target.value;
+    // Prevent backspace if the cursor is before the "+91 "
+    if (event.key === "Backspace" && value.startsWith("+91 ") && event.target.selectionStart <= 4) {
+      event.preventDefault(); // Prevent the backspace if it's before the "+91 "
+    }
     // Prevent multiple spaces after +91
     if (event.key === " " && value.charAt(3) === " ") {
       event.preventDefault();
     }
   }
+  
 
   return (
     <LayOut>
@@ -446,7 +490,7 @@ const CompanyRegistration = () => {
                         type="text"
                         className="form-control"
                         placeholder="Enter Company Name"
-                       // onInput={toInputTitleCase}
+                        onInput={toInputTitleCase}
                         autoComplete="off"
                         {...register("companyName", {
                           required: "Company Name is Required",
@@ -477,7 +521,7 @@ const CompanyRegistration = () => {
                       <input
                         type="text"
                         className="form-control"
-                        //onInput={toInputLowerCase}
+                        onInput={toInputLowerCase}
                         placeholder="Enter Service Name"
                         autoComplete="off"
                         {...register("shortName", {
@@ -548,13 +592,13 @@ const CompanyRegistration = () => {
                               validate: {
                                 startsWithPlus91: (value) => {
                                   if (!value.startsWith("+91 ")) {
-                                    return "Contact Number must start with +91.";
+                                    return "Contact Number must start with +91 and a space.";
                                   }
                                   return true;
                                 },
                                 correctLength: (value) => {
                                   if (value.length !== 14) {
-                                    return "Contact Number must be exactly 10 characters.";
+                                    return "Contact Number must be exactly 10 digits (including +91).";
                                   }
                                   return true;
                                 },
@@ -562,6 +606,10 @@ const CompanyRegistration = () => {
                                   const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
                                   return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
                                 },
+                              },
+                              pattern: {
+                                value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
+                                message: "Contact Number must start with +91 followed by 10 digits.",
                               },
                             })}
                           />
@@ -629,13 +677,13 @@ const CompanyRegistration = () => {
                               validate: {
                                 startsWithPlus91: (value) => {
                                   if (!value.startsWith("+91 ")) {
-                                    return "Contact Number must start with +91.";
+                                    return "Contact Number must start with +91 and a space.";
                                   }
                                   return true;
                                 },
                                 correctLength: (value) => {
                                   if (value.length !== 14) {
-                                    return "Contact Number must be exactly 10 characters.";
+                                    return "Contact Number must be exactly 10 digits (including +91).";
                                   }
                                   return true;
                                 },
@@ -643,6 +691,10 @@ const CompanyRegistration = () => {
                                   const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
                                   return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
                                 },
+                              },
+                              pattern: {
+                                value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
+                                message: "Contact Number must start with +91 followed by 10 digits.",
                               },
                             })}
                           />
@@ -669,28 +721,26 @@ const CompanyRegistration = () => {
                         onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                         {...register("alternateNo", {
                           validate: {
-                            // Custom validation for alternateNo
                             startsWithPlus91: (value) => {
-                              // Only validate if the field is not empty
-                              if (value && !value.startsWith("+91 ")) {
-                                return "Alternate Number must start with +91.";
+                              if (!value.startsWith("+91 ")) {
+                                return "Contact Number must start with +91 and a space.";
                               }
-                              return true; // If empty, no validation needed
+                              return true;
                             },
                             correctLength: (value) => {
-                              // Only validate if the field is not empty
-                              if (value && value.length !== 14) { // 14 because +91 and 10 digits
-                                return "Alternate Number must be exactly 14 characters.";
+                              if (value.length !== 14) {
+                                return "Contact Number must be exactly 10 digits (including +91).";
                               }
-                              return true; // If empty, no validation needed
+                              return true;
                             },
                             notRepeatingDigits: (value) => {
-                              // Only validate if the field is not empty
-                              if (value && /^(\d)\1{12}$/.test(value)) {
-                                return "Alternate Number cannot consist of the same digit repeated.";
-                              }
-                              return true; // If empty, no validation needed
+                              const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
+                              return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
                             },
+                          },
+                          pattern: {
+                            value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
+                            message: "Contact Number must start with +91 followed by 10 digits.",
                           },
                         })}
                       />
@@ -710,8 +760,8 @@ const CompanyRegistration = () => {
                         type="text"
                         className="form-control"
                         placeholder="Enter Company Address"
-                        onKeyDown={handleEmailChange}
-                        onInput={toInputTitleCase}
+                        //onKeyDown={handleEmailChange}
+                        onInput={toInputAddressCase}
                         autoComplete="off"
                         {...register("companyAddress", {
                           required: "Company Address is Required",
@@ -782,12 +832,13 @@ const CompanyRegistration = () => {
                       )}
 
                     </div>
+                    <div className="col-lg-1"></div>
 
-                     <div className="col-lg-1"></div>
                      </>
                   )}
-                   
                     {companyType === "Firm" && (
+                      <>
+                     
                       <div className="col-12 col-md-6 col-lg-5 mb-3">
                         <label className="form-label">
                           Company Registration Number <span style={{ color: "red" }}>*</span>
@@ -810,8 +861,9 @@ const CompanyRegistration = () => {
                         />
                         {errors.companyRegNo && <p className="errorMsg">{errors.companyRegNo.message}</p>}
                       </div>
+                      <div className="col-lg-1"></div>
+                       </>
                     )}
-
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Company GST Number{" "}
@@ -960,20 +1012,24 @@ const CompanyRegistration = () => {
                             validate: {
                               startsWithPlus91: (value) => {
                                 if (!value.startsWith("+91 ")) {
-                                  return "Personal Mobile Number must start with +91.";
+                                  return "Contact Number must start with +91 and a space.";
                                 }
                                 return true;
                               },
                               correctLength: (value) => {
                                 if (value.length !== 14) {
-                                  return "Personal Mobile Number must be exactly 10 characters.";
+                                  return "Contact Number must be exactly 10 digits (including +91).";
                                 }
                                 return true;
                               },
                               notRepeatingDigits: (value) => {
                                 const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                                return !isRepeating || "Personal Mobile Number cannot consist of the same digit repeated.";
+                                return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
                               },
+                            },
+                            pattern: {
+                              value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
+                              message: "Contact Number must start with +91 followed by 10 digits.",
                             },
                           })}
                         />
@@ -994,7 +1050,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Address"
                         autoComplete="off"
-                        onInput={toInputTitleCase}
+                        onInput={toInputAddressCase}
                         onKeyDown={handleEmailChange}
                         maxLength={200}
                         {...register("address", {
@@ -1024,20 +1080,25 @@ const CompanyRegistration = () => {
             </div>
           </div>
           <div className="col-lg-1"></div>
+          <div className="col-12 d-flex align-items-start mt-1">
           {errorMessage.length > 0 && (
-                <div className="alert alert-info mt-4 text-center">
+                <div className="acol-9 alert alert-danger text-center mt-1">
                     {errorMessage.map((msg, index) => (
                         <p key={index}>{msg}</p>  // Display each message in a <p> tag
                     ))}
                 </div>
             )}
-
-          <div className="col-12 d-flex justify-content-end mt-5"
-            style={{ background: "none" }}
-          >
-            <button type="submit" className="btn btn-primary btn-lg" style={{ marginRight: "65px" }}>
-              {editMode ? 'Update Company' : 'Submit'}
-            </button>
+            <div className={`col-${errorMessage ? '3' : '12'} d-flex justify-content-end mt-1`}>
+                          <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
+                            Close
+                          </button>
+                          <button
+                            className={editMode ? "btn btn-danger btn-lg" : "btn btn-primary btn-lg"}
+                            type="submit"
+                          >
+                            {editMode ? 'Update Company' : 'Submit'}
+                          </button>
+                        </div>
           </div>
         </form>
       </div >
