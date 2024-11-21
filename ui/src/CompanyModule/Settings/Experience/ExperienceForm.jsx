@@ -195,7 +195,6 @@ const formatDate = (date) => {
 
   const clearForm = () => {
     reset();
-    navigate("/relievingview");
   };
 
   useEffect(() => {

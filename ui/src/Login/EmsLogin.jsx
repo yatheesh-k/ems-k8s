@@ -113,7 +113,7 @@ const EmsLogin = () => {
           <div className="newLoginContainer">
             <div className="newLoginLeftSectionOuter">
               <div className="newLoginLeftTitle">
-                Welcome to <br /> Employee Management System
+                Welcome To <br /> Employee Management System
               </div>
               <div className="newLoginLeftImgHolder">
                 <img src="..\assets\img\left-img.png" alt="#" />
@@ -170,12 +170,15 @@ const EmsLogin = () => {
                         })}
                       />
                       <span
-                        className={`bi bi-eye-fill field-icon mb-1 toggle-password ${
+                        className={`bi bi-eye-fill field-icon pb-1 toggle-password ${
                           passwordShown ? "text-primary" : ""
                         }`}
                         onClick={togglePasswordVisibility}
                       ></span>
                     </div>
+                    {errors.password && (
+                      <p className="errorMsg">{errors.password.message}</p>
+                    )}
                   </div>
                   <div className="d-grid gap-2 mt-3">
                     <button className="btn btn-lg btn-primary" type="submit">
