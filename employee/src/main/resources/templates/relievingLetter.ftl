@@ -6,21 +6,21 @@
     <title>Relieving Letter</title>
     <style>
 
-          .watermark {
-                                  position: fixed;
-                                  left: 20%;
-                                  transform: translate(-50%, -50%) rotate(30deg);
-                                  z-index: -1;
-                                  width: 400px;
-                                  height: auto;
-                                  text-align: center;
-                              }
+         .watermark {
+           position: fixed;
+           left: 20%;
+           transform: translate(-50%, -50%) rotate(30deg);
+           z-index: -1;
+           width: 400px;
+           height: auto;
+           text-align: center;
+          }
 
-                              .watermark img {
-                                  width: 100%;
-                                  height: auto;
-                                  opacity: 0.05;
-                              }
+         .watermark img {
+            width: 100%;
+            height: auto;
+            opacity: 0.05;
+          }
          .logo {
                    text-align: right;
                    background-size: contain;
