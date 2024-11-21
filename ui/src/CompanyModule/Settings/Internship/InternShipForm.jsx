@@ -113,9 +113,9 @@ const InternShipForm = () => {
       designation:data.designationName,
       date:currentDate,
       startDate:data.dateOfHiring,
-      companyName: user.company,
       endDate:data.lastWorkingDate 
     }; 
+    console.log("submissionData",submissionData)
     const preview = {
       employeeName: selectedEmployee ? selectedEmployee.employeeName : data.employeeName,
       employeeId: selectedEmployee ? selectedEmployee.employeeId : data.employeeId,
@@ -131,9 +131,8 @@ const InternShipForm = () => {
   };
 
   const handleConfirmSubmission = async () => {
-    const templateNo = selectedTemplate; // Adjust as needed
     try {
-        const success = await InternshipCertificateDownload(templateNo, submissionData);
+        const success = await InternshipCertificateDownload(submissionData);
         if (success) {
           toast.success("InternShip Letter Downloaded Successfully")
           setShowPreview(false);
@@ -190,7 +189,6 @@ const InternShipForm = () => {
 
   const clearForm = () => {
     reset();
-    navigate("/relievingview");
   };
 
 
