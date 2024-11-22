@@ -119,13 +119,55 @@ const EmployeeSalaryUpdate = () => {
   };
 
   const handleAllowanceChange = (allowance, value) => {
+    // Check if the value ends with '%' (percentage value)
+    if (value.endsWith('%')) {
+      const numericValue = value.slice(0, -1); // Remove '%' symbol to check numeric value
+      
+      // Check for negative percentage values
+      if (numericValue.startsWith('-')) {
+        setErrorMessage("Percentage value cannot be negative.");
+        return; // Prevent the change if the value is negative
+      }
+  
+      // Check if the percentage value exceeds 100%
+      if (numericValue && parseFloat(numericValue) > 100) {
+        setErrorMessage("Percentage value cannot exceed 100%.");
+        return; // Prevent the change if the value exceeds 100%
+      }
+  
+      // Check if the length exceeds 4 characters (e.g., "100%" is 4 characters)
+      if (value.length > 4) {
+        setErrorMessage("Percentage value cannot exceed 4 characters (including '%').");
+        return; // Prevent the change if the length exceeds 4 characters (like "100%")
+      }
+    }
+  
+    // Validation for number-related fields (maximum 10 digits)
+    if (!value.endsWith('%')) {
+      const numericValue = value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+      // Check if the numeric value exceeds 10 digits
+      if (numericValue.length > 10) {
+        setErrorMessage("Numeric value cannot exceed 10 digits.");
+        return; // Prevent further input if the length exceeds 10 digits
+      }
+  
+      // Check if the value is negative
+      if (parseFloat(value) < 0) {
+        setErrorMessage("Allowance value cannot be negative.");
+        return; // Prevent the change if the value is negative
+      }
+    }
+  
+    // Clear error message if validation passes
+    setErrorMessage("");
+  
     // Update the allowance value in form state
     setValue(`allowances.${allowance}`, value);
-
+  
     // Recalculate total earnings based on new allowances
     const currentAllowances = getValues("allowances");
     let newTotalEarnings = 0;
-
+  
     // Iterate through allowances and sum up
     Object.keys(currentAllowances).forEach((key) => {
       const allowanceValue = currentAllowances[key];
@@ -136,15 +178,66 @@ const EmployeeSalaryUpdate = () => {
         newTotalEarnings += parseFloat(allowanceValue) || 0;
       }
     });
-
+  
+    // Validate if total earnings exceed gross amount
+    if (newTotalEarnings > grossAmount) {
+      setErrorMessage("Total earnings cannot exceed the gross salary.");
+      return; // Prevent update if total earnings exceed gross salary
+    }
+  
     // Update state with new total earnings
     setTotalEarnings(newTotalEarnings);
   };
+  
 
   const handleDeductionChange = (deduction, value) => {
+     // Check if the value is a percentage and validate
+  if (value.endsWith('%')) {
+    const numericValue = value.slice(0, -1); // Remove '%' symbol to check numeric value
+    if (numericValue && parseFloat(numericValue) > 100) {
+      setErrorMessage("Percentage value cannot exceed 100%.");
+      return; // Prevent deduction if percentage exceeds 100%
+    }
+    if (value.length > 4) { // E.g., "100%" is 4 characters
+      setErrorMessage("Percentage value cannot exceed 100% (4 characters including '%').");
+      return; // Prevent deduction if the length exceeds "100%"
+    }
+    // Check for negative percentage values
+    if (numericValue.startsWith('-')) {
+      setErrorMessage("Percentage value cannot be negative.");
+      return; // Prevent the change if the value is negative
+    }
+  }
+
+  // Check if it's a plain number and validate
+  if (!value.endsWith('%')) {
+    const numericValue = value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+    if (numericValue.length > 10) {
+      setErrorMessage("Numeric value cannot exceed 10 digits.");
+      return; // Prevent deduction if number exceeds 10 digits
+    }
+    if (parseFloat(value) < 0) {
+      setErrorMessage("Deduction value cannot be negative.");
+      return; // Prevent deduction if value is negative
+    }
+  }
+
+  // Clear any previous error message
+  setErrorMessage("");
     setValue(`deductions.${deduction}`, value);
     const currentDeductions = getValues("deductions");
     const newTotalDeductions = calculateTotal(currentDeductions, grossAmount);
+     // Validate if total deductions exceed total earnings or gross salary
+  if (newTotalDeductions > totalEarnings) {
+    setErrorMessage("Total deductions cannot exceed total earnings.");
+    return; // Prevent update if deductions exceed total earnings
+  }
+
+  if (newTotalDeductions > grossAmount) {
+    setErrorMessage("Total deductions cannot exceed gross salary.");
+    return; // Prevent update if deductions exceed gross salary
+  }
+
     setTotalDeductions(newTotalDeductions);
   };
 
@@ -255,7 +348,7 @@ const EmployeeSalaryUpdate = () => {
               <div className="card">
                 <div className="card-header">
                   <h5 className="card-title"> Salary Details </h5>
-                  <hr />
+                  
                 </div>
                 <div className=" card-body row">
                   <div className="col-md-5 mb-3">
@@ -333,70 +426,55 @@ const EmployeeSalaryUpdate = () => {
                         <div className="card">
                           <div className="card-header">
                             <h5 className="card-title">Allowances</h5>
-                            <hr />
+                            
                           </div>
                           <div className="card-body">
-                            {structure.salaryConfigurationEntity?.allowances &&
-                            Object.keys(
-                              structure.salaryConfigurationEntity.allowances
-                            ).length > 0 ? (
-                              Object.keys(
-                                structure.salaryConfigurationEntity.allowances
-                              ).map((allowance) => {
-                                const allowanceValue =
-                                  structure.salaryConfigurationEntity
-                                    .allowances[allowance];
-                                const isPercentage =
-                                  typeof allowanceValue === "string" &&
-                                  allowanceValue.includes("%");
-                                let displayValue = allowanceValue;
+                          {structure.salaryConfigurationEntity?.allowances &&
+                              Object.keys(structure.salaryConfigurationEntity.allowances).length > 0 ? (
+                                Object.keys(structure.salaryConfigurationEntity.allowances).map((allowance) => {
+                                  const allowanceValue = structure.salaryConfigurationEntity.allowances[allowance];
+                                  const isPercentage = typeof allowanceValue === "string" && allowanceValue.includes("%");
+                                  let displayValue = allowanceValue;
 
-                                if (!isPercentage) {
-                                  displayValue = Math.floor(allowanceValue);
-                                }
-                                const maxLength = 10;
+                                  if (!isPercentage) {
+                                    displayValue = Math.floor(allowanceValue);
+                                  }
+                                  const maxLength = 10;
 
-                                return (
-                                  <div key={allowance} className="mb-2">
-                                    <label className="form-label">
-                                      {formatFieldName(allowance)}
-                                    </label>
-                                    <input
-                                      type="text"
-                                      className="form-control"
-                                      readOnly={isReadOnly}
-                                      defaultValue={displayValue}
-                                      {...register(`allowances.${allowance}`, {
-                                        required: "Value is required",
-                                        pattern: {
-                                          value: isPercentage
-                                            ? /^\d{1,9}%$/
-                                            : /^\d{1,10}$/,
-                                          message:
-                                            "This field accepts up to 10 digits, with an optional '%' at the end",
-                                        },
-                                      })}
-                                      maxLength={maxLength}
-                                      onChange={(e) => {
-                                        const value = e.target.value;
-                                        handleAllowanceChange(allowance, value);
-                                      }}
-                                    />
-                                    {errors.allowances?.[allowance] && (
-                                      <p className="text-danger">
-                                        {errors.allowances[allowance]?.message}
-                                      </p>
-                                    )}
-                                  </div>
-                                );
-                              })
-                            ) : (
-                              <p>No allowances found.</p>
-                            )}
-                            <div
-                              className="col-12"
-                              style={{ marginTop: "10px" }}
-                            >
+                                  return (
+                                    <div key={allowance} className="mb-2">
+                                      <label className="form-label">{formatFieldName(allowance)}</label>
+                                      <input
+                                        type="text"
+                                        className="form-control"
+                                        readOnly={isReadOnly}
+                                        defaultValue={displayValue}
+                                        {...register(`allowances.${allowance}`, {
+                                          required: "Value is required",
+                                          pattern: {
+                                            value: isPercentage ? /^\d{1,9}%$/ : /^\d{1,10}$/,
+                                            message: "This field accepts up to 10 digits, with an optional '%' at the end",
+                                          },
+                                        })}
+                                        maxLength={maxLength}
+                                        onChange={(e) => {
+                                          const value = e.target.value;
+                                          handleAllowanceChange(allowance, value);
+                                        }}
+                                      />
+                                      {errors.allowances?.[allowance] && (
+                                        <p className="text-danger">
+                                          {errors.allowances[allowance]?.message}
+                                        </p>
+                                      )}
+                                    </div>
+                                  );
+                                })
+                              ) : (
+                                <p>No allowances found.</p>
+                              )}
+
+                            <div className="col-12" style={{ marginTop: "10px" }}>
                               <label className="form-label">
                                 Total Earnings
                                 <span style={{ color: "red" }}>*</span>
@@ -408,12 +486,13 @@ const EmployeeSalaryUpdate = () => {
                                 readOnly
                               />
                             </div>
+                            {errorMessage && <p className="text-danger">{errorMessage}</p>}
                           </div>
                         </div>
                         <div className="card">
                         <div className="card-header">
                           <h5 className="card-title">Status</h5>
-                          <hr />
+                          
                         </div>
                         <div className="card-body col-12">
                           <label className="form-label">
@@ -458,13 +537,12 @@ const EmployeeSalaryUpdate = () => {
                         <div className="card">
                           <div className="card-header">
                             <h5 className="card-title">Deductions</h5>
-                            <hr />
+                            
                           </div>
                           <div className="card-body">
-                            {Object.keys(deductions).length > 0 ? (
+                          {Object.keys(deductions).length > 0 ? (
                               Object.keys(deductions).map((deduction) => {
-                                const deductionValue =
-                                  deductions[deduction] || "";
+                                const deductionValue = deductions[deduction] || "";
                                 return (
                                   <div key={deduction}>
                                     <label>{deduction}</label>
@@ -477,22 +555,14 @@ const EmployeeSalaryUpdate = () => {
                                           value: deductionValue.includes("%")
                                             ? /^\d{1,9}%$/
                                             : /^\d{1,10}$/,
-                                          message:
-                                            "This field accepts up to 10 digits, with an optional '%' at the end",
+                                          message: "This field accepts up to 10 digits, with an optional '%' at the end",
                                         },
                                       })}
                                       defaultValue={deductionValue}
-                                      onChange={(e) =>
-                                        handleDeductionChange(
-                                          deduction,
-                                          e.target.value
-                                        )
-                                      }
+                                      onChange={(e) => handleDeductionChange(deduction, e.target.value)}
                                     />
                                     {errors.deductions?.[deduction] && (
-                                      <p>
-                                        {errors.deductions[deduction]?.message}
-                                      </p>
+                                      <p>{errors.deductions[deduction]?.message}</p>
                                     )}
                                   </div>
                                 );
@@ -500,19 +570,16 @@ const EmployeeSalaryUpdate = () => {
                             ) : (
                               <p>No Deductions found.</p>
                             )}
-                            <div
-                              className="col-12"
-                              style={{ marginTop: "10px" }}
-                            >
-                              <label className="form-label">
-                                Total Deductions
-                              </label>
+
+                            <div className="col-12" style={{ marginTop: "10px" }}>
+                              <label className="form-label">Total Deductions</label>
                               <input
                                 type="text"
                                 className="form-control"
                                 value={totalDeductions}
                                 readOnly
                               />
+                              {errorMessage && <p className="text-danger">{errorMessage}</p>}
                             </div>
                             <div
                               className="col-12"
@@ -520,9 +587,10 @@ const EmployeeSalaryUpdate = () => {
                             >
                               <label className="form-label">PF Tax</label>
                               <input
-                                type="number"
+                                type="text"
                                 className="form-control"
                                 value={pfTax}
+                                maxLength={10}
                                 onChange={handlePfTaxChange}
                               />
                             </div>
@@ -532,9 +600,10 @@ const EmployeeSalaryUpdate = () => {
                             >
                               <label className="form-label">Income Tax</label>
                               <input
-                                type="number"
+                                type="text"
                                 className="form-control"
                                 value={incomeTax}
+                                maxLength={10}
                                 onChange={handleIncomeTaxChange}
                               />
                             </div>
@@ -558,7 +627,7 @@ const EmployeeSalaryUpdate = () => {
                         <div className="card">
                           <div className="card-header">
                             <h5 className="card-title">Net Salary</h5>
-                            <hr />
+                            
                           </div>
                           <div className="card-body col-12">
                             <label className="form-label">

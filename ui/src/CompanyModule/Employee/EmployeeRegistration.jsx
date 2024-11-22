@@ -269,8 +269,6 @@ const EmployeeRegistration = () => {
 
       reset();
     } catch (error) {
-      console.log("Entered catch block");  // Add this line
-      console.log("Full error object:", error);
       let errorList = [];
 
       // Check if error response exists
@@ -280,8 +278,8 @@ const EmployeeRegistration = () => {
         // Case 1: General error message
         if (error.response.data.error && error.response.data.error.message) {
           const generalErrorMessage = error.response.data.error.message;
-          toast.error("Invalid Format");  // Display general error message
           errorList.push(generalErrorMessage);
+          toast.error(generalErrorMessage);
         }
   
         // Case 2: Specific error messages (multiple messages, such as form validation errors)
@@ -410,10 +408,10 @@ const EmployeeRegistration = () => {
     // Validate against the limits
     if (selectedDateOfBirth > minDateOfBirth) {
 
-      return "Date of Birth must be at least 21 years before the Date of Hiring.";
+      return "Date of Birth must be at least 21 years before the Date of Joining.";
     }
     if (selectedDateOfBirth < maxDateOfBirth) {
-      return "Date of Birth must not exceed 80 years before the Date of Hiring.";
+      return "Date of Birth must not exceed 80 years before the Date of Joining.";
     }
 
     return true; // Return true if no errors
@@ -452,10 +450,10 @@ const EmployeeRegistration = () => {
       const words = value.split(" ");
 
       for (const word of words) {
-        if (word.length < 2) {
-          return "Minimum Length 2 characters.";  // If any word is shorter than 2 characters, return this message
+        if (word.length < 1) {
+          return "Minimum Length 1 Character Required .";  // If any word is shorter than 1 characters, return this message
         } else if (word.length > 40) {
-          return "Maximum Length 40 characters.";  // If any word is longer than 40 characters, return this message
+          return "Maximum Length 40 Characters Required.";  // If any word is longer than 40 characters, return this message
         }
       }
 
@@ -464,24 +462,58 @@ const EmployeeRegistration = () => {
       } else if (/\s{2,}/.test(value)) {
         return "No Multiple Spaces Between Words Allowed.";
       }
+      // Check if there's a space after the last character in the input string
+    if (/\s$/.test(value)) {
+      return "No Trailing Space Allowed.";  // Space after the last character is not allowed
+    }
     }
 
     return true; // Return true if all conditions are satisfied
   };
+  const validateNumber = (value) => {
+    // Check if the input is empty
+    if (!value || value.trim().length === 0) {
+      return "Number is Required.";
+    }
+  
+    // Check if the value contains only digits
+    if (!/^\d+$/.test(value)) {
+      return "Only Numeric Characters Are Allowed.";
+    }
+  
+    // Check if there are any leading or trailing spaces
+    if (/^\s|\s$/.test(value)) {
+      return "No Leading or Trailing Spaces Are Allowed.";
+    }
+  
+    // Check for multiple spaces in between numbers
+    if (/\s{2,}/.test(value)) {
+      return "No Multiple Spaces Between Numbers Allowed.";
+    }
+  
+    // Optionally: Check if the number is composed of repeating digits
+    const isRepeating = /^(\d)\1{11}$/.test(value);  // Check if all digits are the same (e.g., "111111111111")
+    if (isRepeating) {
+      return "The Number Cannot Consist Of The Same Digit Repeated.";
+    }
+  
+    return true; // Return true if all validations pass
+  };
+  
 
   const validateLocation = (value) => {
     if (!value || value.trim().length === 0) {
       return "Location is Required.";
-    } else if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*.()^\-/]*$/.test(value)) {
+    } else if (!/^[a-zA-Z0-9\s!-_@#&()*/,.\\-{}]+$/.test(value)) {
       return "Invalid Format of Location.";
     } else {
       const words = value.split(" ");
 
       for (const word of words) {
-        if (word.length < 3) {
-          return "Minimum Length 3 characters.";  // If any word is shorter than 2 characters, return this message
+        if (word.length < 1) {
+          return "Minimum Length 1 Character Required.";  // If any word is shorter than 2 characters, return this message
         } else if (word.length > 200) {
-          return "Maximum Length 200 characters.";  // If any word is longer than 40 characters, return this message
+          return "Maximum Length 200 Characters Required.";  // If any word is longer than 40 characters, return this message
         }
       }
 
@@ -490,9 +522,46 @@ const EmployeeRegistration = () => {
       } else if (/\s{2,}/.test(value)) {
         return "No Multiple Spaces Between Words Allowed.";
       }
+      if (/\s$/.test(value)) {
+        return "No Trailing Space Allowed.";  // Space after the last character is not allowed
+      }
     }
 
     return true; // Return true if all conditions are satisfied
+  };
+  const toInputAddressCase = (e) => {
+    const input = e.target;
+    let value = input.value;
+    const cursorPosition = input.selectionStart; // Save the cursor position
+    // Remove leading spaces
+    value = value.replace(/^\s+/g, '');
+    // Ensure only alphabets (upper and lower case), numbers, and allowed special characters
+    const allowedCharsRegex = /^[a-zA-Z0-9\s!-_@#&()*/,.\\-{}]+$/
+    value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
+    
+    // Capitalize the first letter of each word, but allow uppercase letters in the middle of the word
+    const words = value.split(' ');
+    const capitalizedWords = words.map(word => {
+      if (word.length > 0) {
+        // Capitalize the first letter, but leave the middle of the word intact
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      }
+      return '';
+    });
+    
+    // Join the words back into a string
+    let formattedValue = capitalizedWords.join(' ');
+  
+    // Remove spaces not allowed (before the first two characters)
+    if (formattedValue.length > 2) {
+      formattedValue = formattedValue.slice(0, 2) + formattedValue.slice(2).replace(/\s+/g, ' ');
+    }
+  
+    // Update input value
+    input.value = formattedValue;
+  
+    // Restore the cursor position
+    input.setSelectionRange(cursorPosition, cursorPosition);
   };
 
   // Function to handle input formatting
@@ -519,7 +588,21 @@ function handlePhoneNumberKeyDown(event) {
     event.preventDefault();
   }
 }
+const toInputEmailCase = (e) => {
+  const input = e.target;
+  let value = input.value;
 
+  // Remove all spaces from the input
+  value = value.replace(/\s+/g, '');
+
+  // If the first character is not lowercase, make it lowercase
+  if (value.length > 0 && value[0] !== value[0].toLowerCase()) {
+    value = value.charAt(0).toLowerCase() + value.slice(1);
+  }
+
+  // Update the input value
+  input.value = value;
+};
 
   // In your component
   const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
@@ -720,7 +803,7 @@ function handlePhoneNumberKeyDown(event) {
                         placeholder="Enter Email Id"
                         name="emailId"
                         autoComplete="off"
-                        onInput={toInputLowerCase}
+                        onInput={toInputEmailCase}
                         onKeyDown={handleEmailChange}
                         {...register("emailId", {
                           required: "Email Id is Required",
@@ -865,14 +948,25 @@ function handlePhoneNumberKeyDown(event) {
                         type="text"
                         className="form-control"
                         placeholder="Enter Location"
-                        onInput={toInputTitleCase}
+                        //onInput={toInputTitleCase}
                         autoComplete="off" minLength={2}
                         onKeyDown={handleEmailChange}
+                        onInput={toInputAddressCase}
                         {...register("location", {
                           required: "Location is Required",
-                          validate: {
-                            validateLocation
-                          }
+                          pattern: {
+                            value:/^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
+                            message:
+                              "Please enter valid Address",
+                          },
+                          minLength: {
+                            value: 3,
+                            message: "Minimum 3 Characters allowed",
+                          },
+                          maxLength: {
+                            value: 200,
+                            message: "Maximum 200 Characters allowed",
+                          },
                         })}
                       />
                       {errors.location && (
@@ -888,7 +982,7 @@ function handlePhoneNumberKeyDown(event) {
                       <>
                         <div className="col-12 col-md-6 col-lg-5 mb-3">
                           <label className="form-label">Password <span style={{ color: "red" }}>*</span></label>
-                          <div className="col-sm-12 input-group">
+                          <div className="col-sm-12  password-input-container">
                             <input
                               className="form-control"
                               placeholder="Enter Password"
@@ -909,17 +1003,11 @@ function handlePhoneNumberKeyDown(event) {
                                 },
                               })}
                             />
-                            <i
-                              onClick={togglePasswordVisiblity}
-                              style={{ margin: "5px" }}
+                           <span
+                              className={`bi bi-eye-fill field-icon pb-1 toggle-password ${passwordShown ? 'text-primary' : ''}`}                              onClick={togglePasswordVisiblity}
+                              style={{background: "transparent",borderLeft:"none"}}
                             >
-                              {" "}
-                              {passwordShown ? (
-                                <Eye size={17} />
-                              ) : (
-                                <EyeSlash size={17} />
-                              )}
-                            </i>
+                            </span>
                           </div>
                           {errors.password && (
                             <p className="errorMsg">{errors.password.message}</p>
@@ -1195,29 +1283,25 @@ function handlePhoneNumberKeyDown(event) {
                         placeholder="Enter UAN Number"
                         name="uanNo"
                         readOnly={isUpdating}
-                        onInput={toInputSpaceCase}
+                        // onInput={toInputSpaceCase}
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         {...register("uanNo", {
+                          validate:validateNumber ,
                           pattern: {
                             value: /^\d{12}$/,
                             message:
-                              "Allows only Integers",
+                              "Only 12 digits are allowed.",
                           },
                           minLength: {
                             value: 12,
-                            message: "MInimum 12 Characters Required",
+                            message: "Minimum 12 Digits Required",
                           },
                           maxLength: {
                             value: 12,
-                            message: "UAN Number must not exceed 12 Characters",
+                            message: "UAN Number Must Not Exceed 12 Digits",
                           },
-                          validate: {
-                            notRepeatingDigits: value => {
-                              const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeated digits
-                              return !isRepeating || "UAN Number cannot consist of the same digit repeated.";
-                            }
-                          }
+                         
                         })}
                       />
                       {errors.uanNo && (

@@ -188,6 +188,33 @@ const EmployeeSalaryStructure = () => {
   };
 
   const handleAllowanceChange = (key, value) => {
+    // Validation for percentage-related fields (maximum 4 characters, including '%')
+  if (value.endsWith('%')) {
+    if (value.length > 4) {
+      setErrorMessage("Percentage value cannot exceed 4 characters (including '%').");
+      return; // If the value exceeds 4 characters (e.g., 100%, 150%), prevent change
+    }
+    // Check for negative percentage values
+    if (value.startsWith('-')) {
+      setErrorMessage("Percentage value cannot be negative.");
+      return; // Prevent the change if the value is negative
+    }
+  }
+
+  // Validation for number-related fields (maximum 10 digits)
+  if (!value.endsWith('%')) {
+    const numericValue = value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+    if (numericValue.length > 10) {
+      setErrorMessage("Numeric value cannot exceed 10 digits.");
+      return; // Prevent further input if the length exceeds 10 digits
+    }
+    if (parseFloat(value) < 0) {
+      setErrorMessage("Allowance value cannot be negative.");
+      return; // Prevent deduction if value is negative
+    }
+  }
+  setErrorMessage("");
+
     const newAllowances = { ...allowances, [key]: value };
     setAllowances(newAllowances);
 
@@ -237,6 +264,36 @@ const EmployeeSalaryStructure = () => {
   }, [allowances, grossAmount]);
 
   const handleDeductionChange = (key, value) => {
+     if (value.endsWith('%')) {
+    const numericValue = value.slice(0, -1); // Remove '%' symbol to check numeric value
+    if (numericValue && parseFloat(numericValue) > 100) {
+      setErrorMessage("Percentage value cannot exceed 100%.");
+      return; // Prevent the change if the value exceeds 100%
+    }
+    if (value.length > 4) {
+      setErrorMessage("Percentage value cannot exceed 4 characters (including '%').");
+      return; // Prevent the change if the length exceeds 4 characters (like 100%)
+    }
+    // Check for negative percentage values
+    if (numericValue.startsWith('-')) {
+      setErrorMessage("Percentage value cannot be negative.");
+      return; // Prevent the change if the value is negative
+    }
+  }
+    // Validation for number-related fields (maximum 10 digits)
+    if (!value.endsWith('%')) {
+      const numericValue = value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+      if (numericValue.length > 10) {
+        setErrorMessage("Numeric value cannot exceed 10 digits.");
+        return; // Prevent further input if the length exceeds 10 digits
+      }
+      if (parseFloat(value) < 0) {
+        setErrorMessage("Deduction value cannot be negative.");
+        return; // Prevent deduction if value is negative
+      }
+    }
+    setErrorMessage("");
+  
     const newDeductions = { ...deductions, [key]: value };
     setDeductions(newDeductions);
   };
@@ -559,7 +616,7 @@ const EmployeeSalaryStructure = () => {
                 ) : (
                   showCards && (
                     <>
-                  <div className="row d-flex">
+                  <div className="row col-lg-12 d-flex">
                         <div className="col-6 mb-4">
                           <div className="card">
                             <div className="card-header">
@@ -585,19 +642,23 @@ const EmployeeSalaryStructure = () => {
                                   <input
                                     className="form-control"
                                     type="text"
+                                    maxLength={10} // Max length set for the input field
                                     value={allowances[key]}
                                     onChange={(e) => {
-                                      // Allow only numbers and '%' characters
+                                      // Allow only numbers and '%' characters, and apply the length restrictions
                                       const newValue = e.target.value.replace(/[^0-9%]/g, '');
+
+                                      // Check if the value exceeds the character limit or length for percentage or number
                                       handleAllowanceChange(key, newValue);
-                                    }} />
+                                    }} 
+                                  />
                                 </div>
                               ))}
                               <div className="mb-3">
                                 <label>Total Allowances:</label>
                                 <input
                                   className="form-control"
-                                  type="number"
+                                  type="text"
                                   name="totalAllowance"
                                   value={totalAllowances}
                                   readOnly
@@ -675,6 +736,7 @@ const EmployeeSalaryStructure = () => {
                                   <input
                                     className="form-control"
                                     type="text"
+                                    maxLength={10}
                                     value={deductions[key]}
                                     onChange={(e) => {
                                       // Allow only numbers and '%' characters

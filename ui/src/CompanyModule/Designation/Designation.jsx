@@ -193,12 +193,14 @@ const Designation = () => {
 
   const columns = [
     {
-      name: <h5><b>S No</b></h5>,
+      name: <h5><b>#</b></h5>,
       selector: (row, index) => getSerialNumber(index),
+       width:"400px"
     },
     {
       name: <h5><b>Designation</b></h5>,
       selector: (row) => row.name,
+       width:"500px"
     },
     {
       name: <h5><b>Actions</b></h5>,

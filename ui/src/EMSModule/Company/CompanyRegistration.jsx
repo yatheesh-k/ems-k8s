@@ -254,6 +254,8 @@ const CompanyRegistration = () => {
     input.value = value;
   };
 
+
+
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
     let newValue = "";
@@ -315,6 +317,7 @@ const CompanyRegistration = () => {
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
+
 
   const validateREGISTER = (value) => {
     const spaceError = "Spaces are not allowed in the Register Number.";
@@ -968,7 +971,7 @@ const CompanyRegistration = () => {
                           required: "Name is Required",
                           minLength: {
                             value: 3,
-                            message: "Minimum 3 characters Required",
+                            message: "Minimun 3 characters Required",
                           },
                           maxLength: {
                             value: 100,
