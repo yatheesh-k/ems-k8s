@@ -50,93 +50,93 @@ const CompanyRegistration = () => {
 
   const onSubmit = async (data) => {
     try {
-        const updateData = {
-            companyAddress: data.companyAddress,
-            mobileNo: data.mobileNo,
-            alternateNo: data.alternateNo,
-            name: data.name,
-            personalMailId: data.personalMailId,
-            personalMobileNo: data.personalMobileNo,
-            companyBranch:data.address,
-            address: data.address,
-            companyType: data.companyType,
-        };
+      const updateData = {
+        companyAddress: data.companyAddress,
+        mobileNo: data.mobileNo,
+        alternateNo: data.alternateNo,
+        name: data.name,
+        personalMailId: data.personalMailId,
+        personalMobileNo: data.personalMobileNo,
+        companyBranch: data.address,
+        address: data.address,
+        companyType: data.companyType,
+      };
 
-       // Conditionally add CIN number or Company Registration Number
-        if (data.companyType === "Private Limited") {
-            updateData.cinNumber = data.cinNumber;
-        } else if (data.companyType === "Firm") {
-            updateData.companyRegistrationNumber = data.companyRegistrationNumber;
-        }
-        if (location.state && location.state.id) {
-            // Update existing company
-            await companyUpdateByIdApi(location.state.id, updateData);
-            toast.success("Company Updated Successfully");
-        } else {
-            // Create new company
-            await CompanyRegistrationApi(data);
-            toast.success("Company Created Successfully");
-        }
+      // Conditionally add CIN number or Company Registration Number
+      if (data.companyType === "Private Limited") {
+        updateData.cinNumber = data.cinNumber;
+      } else if (data.companyType === "Firm") {
+        updateData.companyRegistrationNumber = data.companyRegistrationNumber;
+      }
+      if (location.state && location.state.id) {
+        // Update existing company
+        await companyUpdateByIdApi(location.state.id, updateData);
+        toast.success("Company Updated Successfully");
+      } else {
+        // Create new company
+        await CompanyRegistrationApi(data);
+        toast.success("Company Created Successfully");
+      }
 
-        navigate("/companyView");
-        reset();
+      navigate("/companyView");
+      reset();
     } catch (error) {
       console.log("Entered catch block");  // Add this line
-        console.log("Full error object:", error);
-        let errorList = [];
+      console.log("Full error object:", error);
+      let errorList = [];
 
-        // Check if error response exists
-        if (error.response) {
-          console.log("Axios response error:", error.response.data.error); // Log Axios error response
-    
-          // Case 1: General error message
-          if (error.response.data.error && error.response.data.error.message) {
-            const generalErrorMessage = error.response.data.error.message;
-            toast.error("Invalid Format");  // Display general error message
-            errorList.push(generalErrorMessage);
-          }
-    
-          // Case 2: Specific error messages (multiple messages, such as form validation errors)
-          if (error.response.data.error && error.response.data.error.messages) {
-            const specificErrorMessages = error.response.data.error.messages;
-            toast.error("Invalid Format Fields"); 
-            specificErrorMessages.forEach((message) => {
-             // Display each error message individually
-              errorList.push(message);
-            });
-          }
-    
-          // Case 3: Specific error data (duplicate value conflicts)
-          if (error.response.data.data) {
-            const conflictData = error.response.data.data;
-            let conflictMessage = "Error Details:\n";
-            toast.error(error.response.data.message);
-            // Check if data contains specific conflict details (e.g., duplicate values)
-            Object.keys(conflictData).forEach((key) => {
-              const value = conflictData[key];
-              conflictMessage += `${key}: ${value}\n`;
-            });
-    
-            // Display detailed conflict message in toast and add to error list
-            errorList.push(conflictMessage);
-          }
-    
-          // Handle HTTP 409 Conflict Error (duplicate or other conflicts)
-          if (error.response.status === 409) {
-            const conflictMessage = error.response.data.message || "A conflict occurred.";
-            toast.error(conflictMessage);  // Show conflict error in toast
-          }
-    
-        } else {
-          // General error (non-Axios)
-          console.log('Error without response:', error);
-          toast.error('An unexpected error occurred. Please try again later.');
+      // Check if error response exists
+      if (error.response) {
+        console.log("Axios response error:", error.response.data.error); // Log Axios error response
+
+        // Case 1: General error message
+        if (error.response.data.error && error.response.data.error.message) {
+          const generalErrorMessage = error.response.data.error.message;
+          toast.error("Invalid Format");  // Display general error message
+          errorList.push(generalErrorMessage);
         }
-    
-        // Update the error messages in the state
-        setErrorMessage(errorList);
+
+        // Case 2: Specific error messages (multiple messages, such as form validation errors)
+        if (error.response.data.error && error.response.data.error.messages) {
+          const specificErrorMessages = error.response.data.error.messages;
+          toast.error("Invalid Format Fields");
+          specificErrorMessages.forEach((message) => {
+            // Display each error message individually
+            errorList.push(message);
+          });
+        }
+
+        // Case 3: Specific error data (duplicate value conflicts)
+        if (error.response.data.data) {
+          const conflictData = error.response.data.data;
+          let conflictMessage = "Error Details:\n";
+          toast.error(error.response.data.message);
+          // Check if data contains specific conflict details (e.g., duplicate values)
+          Object.keys(conflictData).forEach((key) => {
+            const value = conflictData[key];
+            conflictMessage += `${key}: ${value}\n`;
+          });
+
+          // Display detailed conflict message in toast and add to error list
+          errorList.push(conflictMessage);
+        }
+
+        // Handle HTTP 409 Conflict Error (duplicate or other conflicts)
+        if (error.response.status === 409) {
+          const conflictMessage = error.response.data.message || "A conflict occurred.";
+          toast.error(conflictMessage);  // Show conflict error in toast
+        }
+
+      } else {
+        // General error (non-Axios)
+        console.log('Error without response:', error);
+        toast.error('An unexpected error occurred. Please try again later.');
       }
-};
+
+      // Update the error messages in the state
+      setErrorMessage(errorList);
+    }
+  };
 
   useEffect(() => {
     if (location && location.state && location.state.id) {
@@ -168,6 +168,7 @@ const CompanyRegistration = () => {
 
   const clearForm = () => {
     reset();
+    setErrorMessage('');
   };
 
   const toInputTitleCase = (e) => {
@@ -237,6 +238,21 @@ const CompanyRegistration = () => {
     input.value = value;
   };
 
+  const toInputEmailCase = (e) => {
+    const input = e.target;
+    let value = input.value;
+
+    // Remove all spaces from the input
+    value = value.replace(/\s+/g, '');
+
+    // If the first character is not lowercase, make it lowercase
+    if (value.length > 0 && value[0] !== value[0].toLowerCase()) {
+      value = value.charAt(0).toLowerCase() + value.slice(1);
+    }
+
+    // Update the input value
+    input.value = value;
+  };
 
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
@@ -272,9 +288,9 @@ const CompanyRegistration = () => {
     // Remove leading spaces
     value = value.replace(/^\s+/g, '');
     // Ensure only alphabets (upper and lower case), numbers, and allowed special characters
-    const allowedCharsRegex = /^[a-zA-Z0-9\s!@#&()*/,.\\-{}]+$/
+    const allowedCharsRegex = /^[a-zA-Z0-9\s!-_@#&()*/,.\\-{}]+$/
     value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
-    
+
     // Capitalize the first letter of each word, but allow uppercase letters in the middle of the word
     const words = value.split(' ');
     const capitalizedWords = words.map(word => {
@@ -284,23 +300,22 @@ const CompanyRegistration = () => {
       }
       return '';
     });
-    
+
     // Join the words back into a string
     let formattedValue = capitalizedWords.join(' ');
-  
+
     // Remove spaces not allowed (before the first two characters)
     if (formattedValue.length > 2) {
       formattedValue = formattedValue.slice(0, 2) + formattedValue.slice(2).replace(/\s+/g, ' ');
     }
-  
+
     // Update input value
     input.value = formattedValue;
-  
+
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
-  
-  
+
   const validateREGISTER = (value) => {
     const spaceError = "Spaces are not allowed in the Register Number.";
     const patternError = "Invalid Register Number format";
@@ -373,8 +388,8 @@ const CompanyRegistration = () => {
     }
     // Update the value in the input
     event.target.value = value;
-    }
-  
+  }
+
   // Function to handle keydown for specific actions (e.g., prevent multiple spaces)
   function handlePhoneNumberKeyDown(event) {
     let value = event.target.value;
@@ -387,7 +402,7 @@ const CompanyRegistration = () => {
       event.preventDefault();
     }
   }
-  
+
 
   return (
     <LayOut>
@@ -556,7 +571,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Company Email Id"
                         autoComplete="off"
-                        onInput={toInputLowerCase}
+                        onInput={toInputEmailCase}
                         onKeyDown={handleEmailChange}
                         {...register("emailId", {
                           required: "Company Email Id is Required",
@@ -625,12 +640,11 @@ const CompanyRegistration = () => {
                           <label className="form-label">
                             Password <span style={{ color: "red" }}>*</span>
                           </label>
-                          <div className="col-sm-12 input-group">
+                          <div className="col-sm-12 password-input-container">
                             <input
                               className="form-control"
                               placeholder="Enter Password"
                               onChange={handlePasswordChange}
-                              //onInput={toInputTitleCase}
                               autoComplete="off"
                               onKeyDown={handleEmailChange}
                               type={passwordShown ? "text" : "password"}
@@ -647,9 +661,12 @@ const CompanyRegistration = () => {
                                 },
                               })}
                             />
-                            <i onClick={togglePasswordVisiblity} style={{ margin: "5px" }}>
-                              {passwordShown ? <Eye size={17} /> : <EyeSlash size={17} />}
-                            </i>
+                            {/* Eye Icon to toggle password visibility */}
+                            <span
+                              className={`bi bi-eye-fill field-icon pb-1 toggle-password ${passwordShown ? 'text-primary' : ''}`} onClick={togglePasswordVisiblity}
+                              style={{ background: "transparent", borderLeft: "none" }}
+                            >
+                            </span>
                           </div>
                           {errors.password && (
                             <p className="errorMsg">{errors.password.message}</p>
@@ -766,7 +783,7 @@ const CompanyRegistration = () => {
                         {...register("companyAddress", {
                           required: "Company Address is Required",
                           pattern: {
-                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*.()^\-/]*$/,
+                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
                             message:
                               "Please enter valid Address",
                           },
@@ -803,66 +820,66 @@ const CompanyRegistration = () => {
                 </div>
                 <div className="card-body">
                   <div className="row">
-                  {companyType === "Private Limited" && (
-                    <>
-                    <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Company CIN Number<span style={{ color: "red" }}>*</span></label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Enter Company CIN Number"
-                        onKeyDown={handleEmailChange}
-                        onInput={toInputSpaceCase}
-                        autoComplete="off"
-                        maxLength={21}
-                        {...register("cinNo", {
-                          required: "Company CIN Number is Required",
-                          maxLength: {
-                            value: 21,
-                            message: "CIN Number must not exceed 21 characters",
-                          },
+                    {companyType === "Private Limited" && (
+                      <>
+                        <div className="col-12 col-md-6 col-lg-5 mb-3">
+                          <label className="form-label">Company CIN Number<span style={{ color: "red" }}>*</span></label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Enter Company CIN Number"
+                            onKeyDown={handleEmailChange}
+                            onInput={toInputSpaceCase}
+                            autoComplete="off"
+                            maxLength={21}
+                            {...register("cinNo", {
+                              required: "Company CIN Number is Required",
+                              maxLength: {
+                                value: 21,
+                                message: "CIN Number must not exceed 21 characters",
+                              },
 
-                          validate: validateCIN,
+                              validate: validateCIN,
 
-                        })}
-                        disabled={editMode}
-                      />
-                      {errors.cinNo && (
-                        <p className="errorMsg">{errors.cinNo.message}</p>
-                      )}
+                            })}
+                            disabled={editMode}
+                          />
+                          {errors.cinNo && (
+                            <p className="errorMsg">{errors.cinNo.message}</p>
+                          )}
 
-                    </div>
-                    <div className="col-lg-1"></div>
+                        </div>
+                        <div className="col-lg-1"></div>
 
-                     </>
-                  )}
+                      </>
+                    )}
                     {companyType === "Firm" && (
                       <>
-                     
-                      <div className="col-12 col-md-6 col-lg-5 mb-3">
-                        <label className="form-label">
-                          Company Registration Number <span style={{ color: "red" }}>*</span>
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Enter Company Registration Number"
-                          autoComplete="off"
-                          maxLength={21}
-                          {...register("companyRegNo", {
-                            required: "Company Registration Number is Required",
-                            maxLength: {
-                              value: 21,
-                              message: "Registration Number must not exceed 21 characters",
-                            },
-                            validate: validateREGISTER
-                          })}
-                          disabled={editMode}
-                        />
-                        {errors.companyRegNo && <p className="errorMsg">{errors.companyRegNo.message}</p>}
-                      </div>
-                      <div className="col-lg-1"></div>
-                       </>
+
+                        <div className="col-12 col-md-6 col-lg-5 mb-3">
+                          <label className="form-label">
+                            Company Registration Number <span style={{ color: "red" }}>*</span>
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Enter Company Registration Number"
+                            autoComplete="off"
+                            maxLength={21}
+                            {...register("companyRegNo", {
+                              required: "Company Registration Number is Required",
+                              maxLength: {
+                                value: 21,
+                                message: "Registration Number must not exceed 21 characters",
+                              },
+                              validate: validateREGISTER
+                            })}
+                            disabled={editMode}
+                          />
+                          {errors.companyRegNo && <p className="errorMsg">{errors.companyRegNo.message}</p>}
+                        </div>
+                        <div className="col-lg-1"></div>
+                      </>
                     )}
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
@@ -951,7 +968,7 @@ const CompanyRegistration = () => {
                           required: "Name is Required",
                           minLength: {
                             value: 3,
-                            message: "Minimun 3 characters Required",
+                            message: "Minimum 3 characters Required",
                           },
                           maxLength: {
                             value: 100,
@@ -978,7 +995,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Personal Email Id"
                         autoComplete="off"
-                        onInput={toInputLowerCase}
+                        onInput={toInputEmailCase}
                         onKeyDown={handleEmailChange}
                         {...register("personalMailId", {
                           required: "Personal Email Id is Required",
@@ -1000,44 +1017,44 @@ const CompanyRegistration = () => {
                         <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
-                          type="tel"
-                          className="form-control"
-                          placeholder="Enter Personal Mobile Number"
-                          autoComplete="off"
-                          defaultValue="+91 " // Set the initial value to +91 with a space
-                          onInput={handlePhoneNumberChange} // Handle input changes
-                          onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
-                          {...register("personalMobileNo", {
-                            required: "Personal Mobile Number is Required",
-                            validate: {
-                              startsWithPlus91: (value) => {
-                                if (!value.startsWith("+91 ")) {
-                                  return "Contact Number must start with +91 and a space.";
-                                }
-                                return true;
-                              },
-                              correctLength: (value) => {
-                                if (value.length !== 14) {
-                                  return "Contact Number must be exactly 10 digits (including +91).";
-                                }
-                                return true;
-                              },
-                              notRepeatingDigits: (value) => {
-                                const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                                return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
-                              },
+                        type="tel"
+                        className="form-control"
+                        placeholder="Enter Personal Mobile Number"
+                        autoComplete="off"
+                        defaultValue="+91 " // Set the initial value to +91 with a space
+                        onInput={handlePhoneNumberChange} // Handle input changes
+                        onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
+                        {...register("personalMobileNo", {
+                          required: "Personal Mobile Number is Required",
+                          validate: {
+                            startsWithPlus91: (value) => {
+                              if (!value.startsWith("+91 ")) {
+                                return "Contact Number must start with +91 and a space.";
+                              }
+                              return true;
                             },
-                            pattern: {
-                              value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                              message: "Contact Number must start with +91 followed by 10 digits.",
+                            correctLength: (value) => {
+                              if (value.length !== 14) {
+                                return "Contact Number must be exactly 10 digits (including +91).";
+                              }
+                              return true;
                             },
-                          })}
-                        />
-                        {errors.personalMobileNo && (
-                          <p className="errorMsg">
-                            {errors.personalMobileNo.message}
-                          </p>
-                        )}
+                            notRepeatingDigits: (value) => {
+                              const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
+                              return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
+                            },
+                          },
+                          pattern: {
+                            value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
+                            message: "Contact Number must start with +91 followed by 10 digits.",
+                          },
+                        })}
+                      />
+                      {errors.personalMobileNo && (
+                        <p className="errorMsg">
+                          {errors.personalMobileNo.message}
+                        </p>
+                      )}
                     </div>
 
                     <div className="col-lg-1"></div>
@@ -1056,7 +1073,7 @@ const CompanyRegistration = () => {
                         {...register("address", {
                           required: "Address is Required",
                           pattern: {
-                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*.()^\-/]*$/,
+                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
                             message:
                               "Please enter valid Address",
                           },
@@ -1081,24 +1098,24 @@ const CompanyRegistration = () => {
           </div>
           <div className="col-lg-1"></div>
           <div className="col-12 d-flex align-items-start mt-1">
-          {errorMessage.length > 0 && (
-                <div className="acol-9 alert alert-danger text-center mt-1">
-                    {errorMessage.map((msg, index) => (
-                        <p key={index}>{msg}</p>  // Display each message in a <p> tag
-                    ))}
-                </div>
+            {errorMessage.length > 0 && (
+              <div className="col-9 alert alert-danger text-center mt-1">
+                {errorMessage.map((msg, index) => (
+                  <p key={index}>{msg}</p>  // Display each message in a <p> tag
+                ))}
+              </div>
             )}
             <div className={`col-${errorMessage ? '3' : '12'} d-flex justify-content-end mt-1`}>
-                          <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
-                            Close
-                          </button>
-                          <button
-                            className={editMode ? "btn btn-danger btn-lg" : "btn btn-primary btn-lg"}
-                            type="submit"
-                          >
-                            {editMode ? 'Update Company' : 'Submit'}
-                          </button>
-                        </div>
+              <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
+                Clear
+              </button>
+              <button
+                className={editMode ? "btn btn-danger btn-lg" : "btn btn-primary btn-lg"}
+                type="submit"
+              >
+                {editMode ? 'Update Company' : 'Submit'}
+              </button>
+            </div>
           </div>
         </form>
       </div >

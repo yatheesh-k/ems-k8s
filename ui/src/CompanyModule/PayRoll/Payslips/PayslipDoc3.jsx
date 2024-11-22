@@ -163,13 +163,13 @@ const PayslipDoc3 = () => {
                                         </tr>
                                         <tr>
                                             <th style={{ padding: "4px", width: "150px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black" }}>Department</th>
-                                            <td style={{ padding: "4px", textAlign: "left", border: "1px solid black" }}>{employeeDetails.departmentName}</td>
+                                            <td style={{ padding: "4px", textAlign: "left", border: "1px solid black" }}>{payslipData.department}</td>
                                             <th style={{ padding: "4px", width: "150px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black" }}>UAN</th>
                                             <td style={{ padding: "4px", textAlign: "left", border: "1px solid black" }}>{maskPanNumber(employeeDetails.uanNo)}</td>
                                         </tr>
                                         <tr>
                                             <th style={{ padding: "4px", width: "150px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black" }}>Designation</th>
-                                            <td style={{ padding: "4px", textAlign: "left", border: "1px solid black" }}>{employeeDetails.designationName}</td>
+                                            <td style={{ padding: "4px", textAlign: "left", border: "1px solid black" }}>{payslipData.designation}</td>
                                             <th style={{ padding: "4px", width: "150px", textAlign: "left", background: "#ffcc80", color: 'black', border: "1px solid black" }}></th>
                                             <td style={{ padding: "4px", textAlign: "left", border: "1px solid black" }}>
                                                 {/* {employeeDetails.location && typeof employeeDetails.location === 'string' ?

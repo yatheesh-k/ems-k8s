@@ -23,6 +23,9 @@ const Reset = ({ companyName, onClose, show }) => {
 
   const toggleNewPasswordVisibility = () => {
     setNewPasswordShown(!newPasswordShown);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
     setConfirmPasswordShown(!confirmPasswordShown);
   };
 
@@ -172,7 +175,7 @@ const Reset = ({ companyName, onClose, show }) => {
             <div className="form-group mt-3">
               <label className="form-label">Confirm Password</label>
               <div className="input-group">
-                <span className="input-group-text" onClick={toggleNewPasswordVisibility}>
+                <span className="input-group-text" onClick={toggleConfirmPasswordVisibility}>
                   {confirmPasswordShown ? <UnlockFill size={20} color="#4C489D" /> : <LockFill size={20} color="#4C489D" />}
                 </span>
                 <input
@@ -194,7 +197,7 @@ const Reset = ({ companyName, onClose, show }) => {
               )}
             </div>
 
-            <div className="text-center mt-4 ">
+            <div className="mt-4" style={{marginLeft:"63%"}}>
             <button className="btn btn-secondary me-2" type="button" onClick={handleReset}>
                 Reset
               </button>

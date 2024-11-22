@@ -538,7 +538,7 @@ function handlePhoneNumberKeyDown(event) {
                   <a href="/main">Home</a>
                 </li>
                 <li className="breadcrumb-item">
-                  <a href="/employeeView">Employee</a>
+                  <a href="/employeeView">Employees</a>
                 </li>
                 <li className="breadcrumb-item active">
                   Registration
