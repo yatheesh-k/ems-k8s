@@ -105,6 +105,23 @@ const EmsLogin = () => {
     return true; // Return true if all conditions are satisfied
   };
 
+  const toInputLowerCase = (e) => {
+    const input = e.target;
+    let value = input.value;
+  
+    // Remove all spaces from the input
+    value = value.replace(/\s+/g, '');
+  
+    // If the first character is not lowercase, make it lowercase
+    if (value.length > 0 && value[0] !== value[0].toLowerCase()) {
+      value = value.charAt(0).toLowerCase() + value.slice(1);
+    }
+  
+    // Update the input value
+    input.value = value;
+  };
+  
+
   return (
     <div>
       <main className="newLoginMainWrapper">
@@ -136,11 +153,12 @@ const EmsLogin = () => {
                       placeholder="Email Id"
                       autoComplete="off"
                       onKeyDown={handleEmailChange}
+                      onInput={toInputLowerCase}
                       {...register("username", {
                         required: "Email Id is Required.",
                         pattern: {
                           value:
-                            /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                          /^[a-z][a-zA-Z0-9._%+\-!#$&'*+/=?^_`{|}~]*@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                           message:
                             "Invalid email Id format. Only .com, .in, .org, .net, .edu, .gov are allowed.",
                         },

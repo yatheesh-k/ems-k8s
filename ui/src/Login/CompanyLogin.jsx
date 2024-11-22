@@ -186,26 +186,19 @@ const CompanyLogin = () => {
   const toInputLowerCase = (e) => {
     const input = e.target;
     let value = input.value;
-    // Remove leading spaces
-    value = value.replace(/^\s+/g, '');
-
-    // Initially disallow spaces if there are no non-space characters
-    if (!/\S/.test(value)) {
-      // If no non-space characters are present, prevent spaces
-      value = value.replace(/\s+/g, '');
-    } else {
-      // Allow spaces if there are non-space characters
-      value = value.toLowerCase();
-      value = value.replace(/^\s+/g, ''); // Remove leading spaces
-      const words = value.split(' ');
-      const capitalizedWords = words.map(word => {
-        return word.charAt(0).toLowerCase() + word.slice(1);
-      });
-      value = capitalizedWords.join(' ');
+  
+    // Remove all spaces from the input
+    value = value.replace(/\s+/g, '');
+  
+    // If the first character is not lowercase, make it lowercase
+    if (value.length > 0 && value[0] !== value[0].toLowerCase()) {
+      value = value.charAt(0).toLowerCase() + value.slice(1);
     }
-    // Update input value
+  
+    // Update the input value
     input.value = value;
   };
+  
 
   return (
     <div>
@@ -216,7 +209,7 @@ const CompanyLogin = () => {
         <div className="newLoginWrapper">
             <div className="newLoginContainer">
                 <div className="newLoginLeftSectionOuter">
-                    <div className="newLoginLeftTitle">Welcome to <br/> Employee Management System</div>
+                    <div className="newLoginLeftTitle">Welcome To <br/> Employee Management System</div>
                     <div className="newLoginLeftImgHolder"><img src="..\assets\img\left-img.png" alt='#' /></div>
                 </div>
                 <div className='newLoginRightSectionOuter'>
@@ -224,7 +217,7 @@ const CompanyLogin = () => {
                         <div className="newLoginRightSecTitle">Login</div>
                         <div className="newLoginRightSecSelectLogin">
 
-                            <div className="loginBtn"><span>Continue with Company login</span></div>
+                            <div className="loginBtn"><span>Continue With Company Login</span></div>
 
                         </div>
                         <form onSubmit={handleSubmit(onSubmit)}>
@@ -241,7 +234,7 @@ const CompanyLogin = () => {
                                   {...register("username", {
                                     required: "Email Id is Required.",
                                     pattern: {
-                                      value: /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                                      value:/^[a-z][a-zA-Z0-9._%+\-!#$&'*+/=?^_`{|}~]*@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                                       message: "Invalid Email Id Format",
                                     },
                                     })}

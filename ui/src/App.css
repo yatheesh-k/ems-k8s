@@ -2319,6 +2319,31 @@ progress {
 	width: 100%;
 }
 
+.password-input-container {
+    position: relative;
+    width: 100%;
+  }
+  
+  .password-input-container .form-control {
+    padding-right: 40px; /* Add some padding to the right for the icon */
+  }
+  
+  .field-icon {
+    position: absolute;
+    right: 10px; /* Adjust this value for fine-tuning the icon's position */
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1.2rem; /* Adjust the size of the eye icon */
+    color: #4a5870; /* Change this color to match your design */
+    z-index: 2; /* Ensure the icon appears above the input field */
+  }
+  
+  .field-icon:hover {
+    color: #007bff; /* Optional: change icon color on hover */
+  }
+  
+
 @media (prefers-reduced-motion: reduce) {
 	.form-control {
 		transition: none;
@@ -5851,7 +5876,7 @@ fieldset:disabled .btn {
 
 .fixed-sideNav {
 	width: 250px;
-	transition: width 0.3s ease;
+	transition: width 1.3s ease;
 }
 
 .fixed-sideNav.hidden {

@@ -311,6 +311,23 @@ const clearForm =()=>{
     }
   };
 
+  const handleKeyDown = async (e) => {
+    // Check if the key pressed is "Enter"
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent default form submission
+  
+      // Trigger validation for the field
+      const isValid = await trigger("fieldName");
+  
+      // If validation passes, save the data
+      if (isValid) {
+        const fieldName = getValues("fieldName");
+        addField(fieldName);  // Call your function to save the data
+      }
+    }
+  };
+  
+
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
     let newValue = "";
@@ -617,7 +634,7 @@ const clearForm =()=>{
                             className="form-control"
                             placeholder={`Enter New ${modalType === 'allowances' ? 'Allowance' : 'Deduction'} Name`}
                             onInput={toInputTitleCase}
-                            onKeyDown={handleEmailChange}
+                            onKeyDown={handleKeyDown}
                             autoComplete='off'
                             {...register("fieldName", {
                               required: "Field name is required",
