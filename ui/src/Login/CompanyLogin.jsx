@@ -273,7 +273,7 @@ const CompanyLogin = () => {
                                       })}
                                     />
                                     <span
-                                      className={`bi bi-eye-fill field-icon mb-1 toggle-password ${passwordShown ? 'text-primary' : ''}`}
+                                      className={`bi bi-eye-fill field-icon pb-1 toggle-password ${passwordShown ? 'text-primary' : ''}`}
                                       onClick={togglePasswordVisibility}
                                     ></span>
                                   </div>

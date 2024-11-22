@@ -60,29 +60,28 @@
 
 <body>
 
-    <!-- Company Logo -->
-    <img src="${company.imageFile}" alt="Company Logo" class="company-logo">
-    <!-- ${company.imageFile} -->
-
     <!-- Watermark Background Image -->
-    <div class="watermark" style="background-image: url('${company.imageFile}');"></div>
+    <div class="watermark" style="background-image: url('${company[0].imageFile}');"></div>
+
+    <!-- Company Logo -->
+    <img src="${company[0].imageFile}" alt="Company Logo" class="company-logo">
 
     <!-- Letter Content -->
     <div class="container">
-        <p><strong>Date: ${relieving.date}</strong></p>
+        <p><strong>Date: ${relieving.relievingDate}</strong></p>
         <h4 class="title">Relieving Letter</h4>
 
         <p>To,</p>
-        <p><strong>Employee Name: ${employee.employeeName}</strong></p>
+        <p><strong>Employee Name: ${employee.firstName} ${employee.lastName}</strong></p>
         <p><strong>[Employee ID: ${employee.employeeId}]</strong></p>
 
         <p>
             I am writing to acknowledge the resignation letter you submitted, dated <strong>${relieving.resignationDate}</strong>,
             in which you specified that <strong>${relieving.relievingDate}</strong> would be your last working day with
-            <strong>${company.companyName}</strong>.
+            <strong>${company[0].companyName}</strong>.
             I want to inform you that your resignation has been accepted, and you will be relieved from your position as
             <strong>${employee.designationName}</strong>
-            with <strong>${company.companyName}</strong> on <strong>${relieving.noticePeriod}</strong>.
+            with <strong>${company[0].companyName}</strong> on <strong>${relieving.noticePeriod}</strong>.
         </p>
 
         <p>We kindly request you to return your company ID and any other company-owned items that you have been using

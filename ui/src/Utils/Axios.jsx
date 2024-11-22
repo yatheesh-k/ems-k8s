@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useAuth } from "../Context/AuthContext";
 import { employeeId } from "./Auth";
+import { json } from "react-router-dom";
 
 const protocol = window.location.protocol;
 const hostname = window.location.hostname;
@@ -310,12 +311,11 @@ export const AllEmployeePayslipsGet = (month, year) => {
   });
 }
 
-export const EmployeePaySlipDownloadById = async (employeeId, payslipId, templateNumber) => {
+export const EmployeePaySlipDownloadById = async (employeeId, payslipId) => {
   const company = localStorage.getItem("companyName");
-
   try {
     // Make the API request with specific headers for this request
-    const response = await axiosInstance.get(`/${company}/employee/${employeeId}/template/${templateNumber}/download/${payslipId}`, {
+    const response = await axiosInstance.get(`/${company}/employee/${employeeId}/download/${payslipId}`, {
       responseType: 'blob', // Handle the response as a binary blob
       headers: {
         'Accept': 'application/pdf', // Accept PDF format
@@ -392,31 +392,6 @@ export const CompanySalaryStructureGetApi = () => {
   return axiosInstance.get(`${company}/salary`);
 }
 
-export const OfferLetterDownload = async (payload) => {
-  try {
-    const response = await axiosInstance.post(`/offerletter/upload`,payload, {
-      responseType: 'blob', 
-      headers: {
-        'Accept': 'application/pdf', 
-      }
-    });
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `offer_letter.pdf`; 
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
-
-    return true; 
-
-  } catch (error) {
-    console.error('Download error:', error);
-    throw error; 
-  }
-};
-
 export const PayslipTemplate = (data) => {
   return axiosInstance.patch(`/template`, data);
 };
@@ -430,59 +405,9 @@ export const TemplateGetAPI = (data) => {
   return axiosInstance.get(`/${companyName}/template`, data);
 };
 
-export const InternshipCertificateDownload = async (id,payload) => {
-  try {
-    const response = await axiosInstance.post(`/internship/${id}/upload`,payload, {
-      responseType: 'blob', 
-      headers: {
-        'Accept': 'application/pdf', 
-      }
-    });
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `internship.pdf`; 
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
-
-    return true; 
-
-  } catch (error) {
-    console.error('Download error:', error);
-    throw error; 
-  }
-};
-
-export const AppraisalLetterDownload = async (id,payload) => {
-  try {
-    const response = await axiosInstance.post(`/appraisal/template/${id}/upload`,payload, {
-      responseType: 'blob', 
-      headers: {
-        'Accept': 'application/pdf', 
-      }
-    });
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Appraisal.pdf`; 
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
-
-    return true; 
-
-  } catch (error) {
-    console.error('Download error:', error);
-    throw error; 
-  }
-};
-
-export const RelievingDownloadPostApi = (employeeId,templateNo, data) => {
+export const RelievingDownloadPostApi = (employeeId,data) => {
   const company = localStorage.getItem("companyName")
-  return axiosInstance.post(`/${company}/employee/${employeeId}/template/${templateNo}/download`, data);
+  return axiosInstance.post(`/${company}/employee/${employeeId}/download`, data);
 }
 export const RelievingFormPostApi = (employeeId, data) => {
   const company = localStorage.getItem("companyName")
@@ -539,15 +464,20 @@ export const RelievingLetterDownload = async (employeeId,payload) => {
     throw error;
   }
 };
-export const ExperienceFormPostApi = async (templateNo,payload) => {
-  const company = localStorage.getItem("companyName")
+
+export const ExperienceFormPostApi = async (payload) => {
   try {
-    const response = await axiosInstance.post(`/${company}/template/${templateNo}/upload`,payload, {
-      responseType: 'blob',
-      headers: {
-        'Accept': 'application/pdf',
+    const response = await axiosInstance.post(
+      `/experienceletter/upload`,
+      JSON.stringify(payload), // Ensure JSON format
+      {
+        responseType: 'blob', // Handle binary response for file download
+        headers: {
+          'Content-Type': 'application/json', // Correct content type
+          'Accept': 'application/pdf',        // Expected response format
+        },
       }
-    });
+    );
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const a = document.createElement('a');
     a.href = url;
@@ -560,5 +490,82 @@ export const ExperienceFormPostApi = async (templateNo,payload) => {
   } catch (error) {
     console.error('Download error:', error);
     throw error;
+  }
+};
+
+export const OfferLetterDownload = async (payload) => {
+  try {
+    const response = await axiosInstance.post(`/offerletter/upload`,payload, {
+      responseType: 'blob', 
+      headers: {
+        'Accept': 'application/pdf', 
+      }
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `offer_letter.pdf`; 
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+
+    return true; 
+
+  } catch (error) {
+    console.error('Download error:', error);
+    throw error; 
+  }
+};
+
+export const InternshipCertificateDownload= async (payload) => {
+  try {
+    const response = await axiosInstance.post(`/internship/upload`,payload, {
+      responseType: 'blob', // Handle binary response for file download
+      headers: {
+        'Content-Type': 'application/json', // Correct content type
+        'Accept': 'application/pdf',        // Expected response format
+      },
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `internship_letter.pdf`; 
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+    return true; 
+  } catch (error) {
+    console.error('Download error:', error);
+    throw error; 
+  }
+};
+
+export const AppraisalLetterDownload = async (payload) => {
+  try {
+    const response = await axiosInstance.post(
+      `/appraisal/upload`,
+      JSON.stringify(payload), // Ensure JSON format
+      {
+        responseType: 'blob', // Handle binary response for file download
+        headers: {
+          'Content-Type': 'application/json', // Correct content type
+          'Accept': 'application/pdf',        // Expected response format
+        },
+      }
+    );
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Appraisal.pdf';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+    return true;
+  } catch (error) {
+    console.error('Download error:', error.response || error.message);
+    throw error; // Re-throw for handling by calling code
   }
 };
