@@ -116,7 +116,7 @@ const CompanyView = () => {
           {row.shortName.length > 20 ? `${row.shortName.slice(0, 20)}...` : row.shortName}
           </div>
       ),
-      width: "150px",
+      width: "200px",
       wrap: true,
     },
     {
@@ -207,7 +207,7 @@ const CompanyView = () => {
           <div className="col-12 col-lg-12 col-xxl-12 d-flex">
             <div className="card flex-fill">
               <div className="card-header">
-                <div className='row mb-2'>
+                <div className='row'>
                   <div className='col-12 col-md-6 col-lg-4'>
                   </div>
                   <div className='col-12 col-md-6 col-lg-4'></div>

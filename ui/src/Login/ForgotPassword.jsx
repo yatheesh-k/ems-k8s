@@ -1,22 +1,41 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { forgotPasswordStep1, forgotPasswordStep2, ValidateOtp } from '../Utils/Axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BriefcaseFill, EnvelopeFill, LockFill, UnlockFill } from 'react-bootstrap-icons';
 import Loader from '../Utils/Loader';
+import { Modal, ModalBody, ModalHeader, ModalTitle } from 'react-bootstrap';
 
 const ForgotPassword = () => {
-  const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm({ mode: "onChange" });
+  const { register, handleSubmit, watch,reset, formState: { errors, isSubmitting } } = useForm({ mode: "onChange" });
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
   const [passwordShown, setPasswordShown] = useState(false);
   const [confirmPasswordShown, setConfirmPasswordShown] = useState(false);
   const [otpShown, setOtpShown] = useState(false); // Separate state for OTP visibility
+  const [otpTimeLimit, setOtpTimeLimit] = useState(56); 
+  const [otpExpired, setOtpExpired] = useState(false); 
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showErrorModal, setShowErrorModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const watchPassword = watch('password', '');
   const navigate = useNavigate();
   const company = localStorage.getItem("company");
+
+  useEffect(() => {
+    if (otpTimeLimit > 0) {
+      const timer = setTimeout(() => {
+        setOtpTimeLimit((prevTime) => prevTime - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setOtpExpired(true);  // OTP expired
+      setOtpShown(false);  // Hide OTP input
+      setStep(1); // Move to Step 1 (Email Step) if OTP expired
+    }
+  }, [otpTimeLimit]);
+
 
   const onSubmitEmail = async (data) => {
     setLoading(true);
@@ -30,6 +49,7 @@ const ForgotPassword = () => {
       toast.success("OTP Sent Successfully"); // Handle API response as needed
       setEmail(data.email); // Update email state here
       setStep(2); // Move to Step 2 if successful
+      
     } catch (error) {
       console.error("Failed to send OTP:", error);
       handleApiErrors(error);
@@ -40,22 +60,50 @@ const ForgotPassword = () => {
 
   const onSubmitOtp = async (data) => {
     setLoading(true);
+  
+    // // Check if OTP has expired before making the API call
+    // if (otpExpired) {
+    //   toast.error("OTP has expired. Please request a new one.");
+    //   setStep(1);  // Move back to Step 1 if OTP is expired
+    //   setOtpTimeLimit(40);  // Reset OTP timer
+    //   setOtpExpired(false); // Reset OTP expired flag
+    //   //setErrorMessage("");  // Clear any residual error messages
+    //   setLoading(false);
+    //   return;
+    // }
+  
     const formData = {
       username: data.email,
       otp: data.otp,
-      company: company
+      company: company,
     };
+  
     try {
       const response = await ValidateOtp(formData);
-      toast.success("Verification Successfull");
+      toast.success("Verification Successful");
       console.log(response.data); // Handle API response as needed
-      setStep(3); // Move to Step 3 if OTP validation successful
+      setStep(3); // Move to Step 3 if OTP validation is successful
+      setOtpExpired(false); // Reset OTP expiration state
+      setOtpTimeLimit(40); // Reset timer when OTP is valid
+      setErrorMessage(""); // Clear any error messages after successful validation
     } catch (error) {
       handleApiErrors(error);
+      if (otpExpired) {
+        toast.error("OTP Has Expired. Please Request A New One.");
+        setStep(1);  // Move back to Step 1 if OTP is expired
+        setOtpTimeLimit(40);  // Reset OTP timer
+        setOtpExpired(true); // Reset the OTP expired flag
+        setLoading(false);
+        setErrorMessage("OTP Has Expired. Please Request A New One."); // Error message for expired OTP
+        return;
+      } else {
+        toast.error("Invalid OTP. Please try again."); // Error message for invalid OTP
+      }
     } finally {
       setLoading(false);
     }
   };
+  
 
   const onSubmitNewPassword = async (data) => {
     setLoading(true);
@@ -68,6 +116,7 @@ const ForgotPassword = () => {
       };
       const response = await forgotPasswordStep2(formData);
       toast.success("Password Updated Successfully");
+      setOtpExpired(false);
       console.log(response.data); // Handle API response as needed
       navigate(`/${company}/login`);
     } catch (error) {
@@ -96,6 +145,16 @@ const ForgotPassword = () => {
 
   const toggleOtpVisibility = () => {
     setOtpShown(!otpShown);
+  };
+
+  const closeButton=()=>{
+    reset();
+    navigate(`/${company}/login`);
+  }
+
+  const closeModal = () => {
+    setShowErrorModal(false);
+    setErrorMessage("");
   };
 
   const validatePassword = (value) => {
@@ -128,7 +187,7 @@ const ForgotPassword = () => {
         return (
           <form onSubmit={handleSubmit(onSubmitEmail)}>
       
-            <div className="form-group">
+            <div className="form-group mb-1">
               <label>Email Id</label>
               <div className="input-group">
                 <span className="input-group-text">
@@ -163,7 +222,7 @@ const ForgotPassword = () => {
       case 2:
         return (
           <form onSubmit={handleSubmit(onSubmitOtp)}>
-            <div className="form-group">
+            <div className="form-group mb-1">
               <label>Email Id:</label>
               <div className="input-group">
                 <span className="input-group-text">
@@ -211,7 +270,7 @@ const ForgotPassword = () => {
       case 3:
         return (
           <form onSubmit={handleSubmit(onSubmitNewPassword)}>
-            <div className="form-group">
+            <div className="form-group mb-1">
               <label>Email:</label>
               <div className="input-group">
                 <span className="input-group-text">
@@ -220,7 +279,7 @@ const ForgotPassword = () => {
                 <input type="email" className="form-control" value={email} disabled />
               </div>
             </div>
-            <div className="form-group">
+            {/* <div className="form-group">
               <label>OTP:</label>
               <div className="input-group">
               <span className="input-group-text" onClick={toggleOtpVisibility} style={{ cursor: 'pointer' }}>
@@ -246,7 +305,7 @@ const ForgotPassword = () => {
           />
               </div>
               {errors.otp && <span className="text-danger" style={{ marginLeft: "60px" }}>{errors.otp.message}</span>}
-            </div>
+            </div> */}
             <div className="form-group">
               <label>New Password:</label>
               <div className="input-group">
@@ -266,6 +325,10 @@ const ForgotPassword = () => {
                     minLength: {
                       value: 6,
                       message: "Password must be at least 6 characters long",
+                    },
+                    maxLength: {
+                      value: 16,
+                      message: "Password must be at least 16 characters long",
                     },
                    validate:validatePassword,
                   })}
@@ -293,7 +356,15 @@ const ForgotPassword = () => {
                   className="form-control"
                   {...register('confirmPassword', {
                     required: 'Confirm Password is required',
-                    validate: value => value === watchPassword || "Passwords do not match"
+                    validate: value => value === watchPassword || "Passwords do not match",
+                    minLength: {
+                      value: 6,
+                      message: "Password must be at least 6 characters long",
+                    },
+                    maxLength: {
+                      value: 16,
+                      message: "Password must be at least 16 characters long",
+                    },
                   })}
                 />
               </div>
@@ -326,11 +397,13 @@ const ForgotPassword = () => {
           <div className="col-sm-10 col-md-7 col-lg-6 mx-auto d-table h-100">
             <div className="d-table-cell align-middle">
               <div className="card">
-                <div className="card-header" style={{paddingBottom:'0px'}}>
-                  <div className="text-center mt-2">
+              <div className="card-header d-flex justify-content-between align-items-center pb-0">
+                  <div className="text-center">
                     <p className="lead">Forgot Password</p>
                   </div>
+                  <button className='btn text-white' style={{marginBottom:"6px"}} onClick={closeButton}>X</button>
                 </div>
+
                 <div className="card-body" style={{ marginRight: '60px',paddingTop:'0px' }}>
                   <div className="mt-2 m-sm-2 ">
                     {renderStep()}
@@ -341,6 +414,20 @@ const ForgotPassword = () => {
           </div>
         </div>
       </div>
+      <Modal
+        show={showErrorModal}
+        onHide={closeModal}
+        centered
+        style={{ zIndex: "1050"}}
+        className="custom-modal"
+      >
+        <ModalHeader closeButton>
+          <ModalTitle className="text-center">Error</ModalTitle>
+        </ModalHeader>
+        <ModalBody className="text-center fs-bold">
+          {errorMessage}
+        </ModalBody>
+      </Modal>
     </main>
   );
 };

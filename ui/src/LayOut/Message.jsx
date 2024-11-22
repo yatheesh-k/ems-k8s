@@ -94,9 +94,18 @@ function Message() {
                 <div className="modal" style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)', position: 'fixed', top: 0, bottom: 0, left: 0, right: 0, zIndex: 9999 }}>
                     <div className="modal-dialog modal-dialog-centered">
                         <div className="modal-content">
-                            <div className="modal-header">
-                                <ModalTitle className="modal-title">Company Service Name</ModalTitle>
-                            </div>
+                        <div className="modal-header d-flex justify-content-between w-100">
+                            <ModalTitle className="modal-title">Company Service Name</ModalTitle>
+                            <button
+                                type="button"
+                                className="close"
+                                style={{ border: "0px", background: "none" , fontSize: "1.5rem" }}
+                                onClick={closeModal}
+                                aria-label="Close"
+                            >
+                                <span aria-hidden="true">&times;</span> {/* "X" symbol */}
+                            </button>
+                        </div>
                             <div className="modal-body">
                                 <form onSubmit={handleSubmit(onSubmit)}>
                                     <input
