@@ -139,8 +139,7 @@ const EmployeeView = () => {
       name: <h6><b>Email Id</b></h6>,
       selector: row => (
         <div title={row.emailId}>
-          {/* {row.emailId.length > 10 ? `${row.emailId.slice(0, 10)}...` : row.emailId} */}
-          {row.emailId}
+          {row.emailId.length > 20 ? `${row.emailId.slice(0, 20)}...` : row.emailId}
         </div>
       ),
       width: "210px",

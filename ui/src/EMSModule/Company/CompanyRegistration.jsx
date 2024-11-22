@@ -168,6 +168,7 @@ const CompanyRegistration = () => {
 
   const clearForm = () => {
     reset();
+    setErrorMessage('');
   };
 
   const toInputTitleCase = (e) => {
@@ -237,6 +238,23 @@ const CompanyRegistration = () => {
     input.value = value;
   };
 
+  const toInputEmailCase = (e) => {
+    const input = e.target;
+    let value = input.value;
+  
+    // Remove all spaces from the input
+    value = value.replace(/\s+/g, '');
+  
+    // If the first character is not lowercase, make it lowercase
+    if (value.length > 0 && value[0] !== value[0].toLowerCase()) {
+      value = value.charAt(0).toLowerCase() + value.slice(1);
+    }
+  
+    // Update the input value
+    input.value = value;
+  };
+  
+
 
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
@@ -272,7 +290,7 @@ const CompanyRegistration = () => {
     // Remove leading spaces
     value = value.replace(/^\s+/g, '');
     // Ensure only alphabets (upper and lower case), numbers, and allowed special characters
-    const allowedCharsRegex = /^[a-zA-Z0-9\s!@#&()*/,.\\-{}]+$/
+    const allowedCharsRegex = /^[a-zA-Z0-9\s!-_@#&()*/,.\\-{}]+$/
     value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
     
     // Capitalize the first letter of each word, but allow uppercase letters in the middle of the word
@@ -299,8 +317,7 @@ const CompanyRegistration = () => {
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
-  
-  
+ 
   const validateREGISTER = (value) => {
     const spaceError = "Spaces are not allowed in the Register Number.";
     const patternError = "Invalid Register Number format";
@@ -556,7 +573,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Company Email Id"
                         autoComplete="off"
-                        onInput={toInputLowerCase}
+                        onInput={toInputEmailCase}
                         onKeyDown={handleEmailChange}
                         {...register("emailId", {
                           required: "Company Email Id is Required",
@@ -625,12 +642,11 @@ const CompanyRegistration = () => {
                           <label className="form-label">
                             Password <span style={{ color: "red" }}>*</span>
                           </label>
-                          <div className="col-sm-12 input-group">
+                          <div className="col-sm-12 password-input-container">
                             <input
                               className="form-control"
                               placeholder="Enter Password"
                               onChange={handlePasswordChange}
-                              //onInput={toInputTitleCase}
                               autoComplete="off"
                               onKeyDown={handleEmailChange}
                               type={passwordShown ? "text" : "password"}
@@ -647,9 +663,12 @@ const CompanyRegistration = () => {
                                 },
                               })}
                             />
-                            <i onClick={togglePasswordVisiblity} style={{ margin: "5px" }}>
-                              {passwordShown ? <Eye size={17} /> : <EyeSlash size={17} />}
-                            </i>
+                            {/* Eye Icon to toggle password visibility */}
+                            <span
+                              className={`bi bi-eye-fill field-icon pb-1 toggle-password ${passwordShown ? 'text-primary' : ''}`}                              onClick={togglePasswordVisiblity}
+                              style={{background: "transparent",borderLeft:"none"}}
+                            >
+                            </span>
                           </div>
                           {errors.password && (
                             <p className="errorMsg">{errors.password.message}</p>
@@ -766,7 +785,7 @@ const CompanyRegistration = () => {
                         {...register("companyAddress", {
                           required: "Company Address is Required",
                           pattern: {
-                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*.()^\-/]*$/,
+                            value:/^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
                             message:
                               "Please enter valid Address",
                           },
@@ -978,7 +997,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Personal Email Id"
                         autoComplete="off"
-                        onInput={toInputLowerCase}
+                        onInput={toInputEmailCase}
                         onKeyDown={handleEmailChange}
                         {...register("personalMailId", {
                           required: "Personal Email Id is Required",
@@ -1056,7 +1075,7 @@ const CompanyRegistration = () => {
                         {...register("address", {
                           required: "Address is Required",
                           pattern: {
-                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*.()^\-/]*$/,
+                            value:/^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
                             message:
                               "Please enter valid Address",
                           },
@@ -1082,7 +1101,7 @@ const CompanyRegistration = () => {
           <div className="col-lg-1"></div>
           <div className="col-12 d-flex align-items-start mt-1">
           {errorMessage.length > 0 && (
-                <div className="acol-9 alert alert-danger text-center mt-1">
+                <div className="col-9 alert alert-danger text-center mt-1">
                     {errorMessage.map((msg, index) => (
                         <p key={index}>{msg}</p>  // Display each message in a <p> tag
                     ))}
@@ -1090,7 +1109,7 @@ const CompanyRegistration = () => {
             )}
             <div className={`col-${errorMessage ? '3' : '12'} d-flex justify-content-end mt-1`}>
                           <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
-                            Close
+                            Clear
                           </button>
                           <button
                             className={editMode ? "btn btn-danger btn-lg" : "btn btn-primary btn-lg"}
