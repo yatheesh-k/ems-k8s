@@ -10,6 +10,15 @@
             size: A4;
             margin: 6mm;
           }
+          @media print {
+              body {
+                  margin: 0;
+                  padding: 0;
+              }
+              .salary-table {
+                  page-break-before: always;
+              }
+          }
         .employee-details {
             text-align: left;
             font-size: 20px;
