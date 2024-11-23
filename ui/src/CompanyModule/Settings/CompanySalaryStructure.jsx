@@ -11,8 +11,8 @@ import { Navigate, useNavigate } from 'react-router-dom';
 const CompanySalaryStructure = () => {
   const { register, handleSubmit, control, getValues, trigger, reset, formState: { errors } } = useForm({ mode: "onChange" });
   const [activeTab, setActiveTab] = useState('nav-home');
-  const [allowanceFields, setAllowanceFields] = useState([{ label: '', type: 'number', value: '' }]);
-  const [deductionFields, setDeductionFields] = useState([{ label: '', type: 'number', value: '' }]);
+  const [allowanceFields, setAllowanceFields] = useState([{ label: '', type: 'text', value: '' }]);
+  const [deductionFields, setDeductionFields] = useState([{ label: '', type: 'text', value: '' }]);
   const [isEditing, setIsEditing] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [allowanceError, setAllowanceError] = useState("");
@@ -28,10 +28,13 @@ const CompanySalaryStructure = () => {
   const navigate = useNavigate();
 
   const addField = (fieldName) => {
-    const newField = { label: fieldName, type: 'number', value: '' };
+    const newField = { label: fieldName, type: 'text', value: '' };
+
+    // Determine which fields to check based on the active tab
     const fieldsToCheck = activeTab === 'nav-home' ? allowanceFields : deductionFields;
     const fieldExists = fieldsToCheck.some(field => field.label === fieldName);
 
+    // If the field doesn't exist, add it
     if (!fieldExists) {
       if (activeTab === 'nav-home') {
         setAllowanceFields((prev) => [...prev, newField]);
@@ -46,16 +49,55 @@ const CompanySalaryStructure = () => {
           deductions: { ...prev.deductions, [fieldName]: true },
         }));
       }
+
+      // Clear modal, error messages, and reset form
       setNewFieldName('');
       setShowModal(false);
       reset();
       setErrorMessage('');
+
+      // Validation for the new field
+      const validationErrorsCopy = { ...validationErrors };
+      if (!newField.value || newField.value === '') {
+        validationErrorsCopy[fieldName] = 'Value is required';
+      } else if (!/^\d+$/.test(newField.value)) {
+        validationErrorsCopy[fieldName] = 'This field accepts only Integers';
+      } else {
+        delete validationErrorsCopy[fieldName];
+      }
+
+      setValidationErrors(validationErrorsCopy);
     } else {
+      // If the field already exists, show an error
       setErrorMessage(`Field "${fieldName}" already exists.`);
     }
   };
 
-  /**Tab Navigation */
+  const handleDeleteField = (fieldLabel) => {
+    // Remove from allowance or deduction fields based on the active tab
+    if (activeTab === 'nav-home') {
+      // Filter out the deleted field from the allowanceFields
+      setAllowanceFields((prev) => prev.filter(field => field.label !== fieldLabel));
+      // Update fieldCheckboxes for allowances
+      setFieldCheckboxes((prev) => {
+        const { [fieldLabel]: deleted, ...rest } = prev.allowances;
+        return { ...prev, allowances: rest };
+      });
+    } else {
+      // Filter out the deleted field from the deductionFields
+      setDeductionFields((prev) => prev.filter(field => field.label !== fieldLabel));
+      // Update fieldCheckboxes for deductions
+      setFieldCheckboxes((prev) => {
+        const { [fieldLabel]: deleted, ...rest } = prev.deductions;
+        return { ...prev, deductions: rest };
+      });
+    }
+    setValidationErrors((prev) => {
+      const { [fieldLabel]: deleted, ...rest } = prev;
+      return rest;
+    });
+  };
+
   const handleLabelChange = (index, value) => {
     const fields = activeTab === 'nav-home' ? allowanceFields : deductionFields;
     const newFields = [...fields];
@@ -67,7 +109,6 @@ const CompanySalaryStructure = () => {
     }
   };
 
-  /**OnChange event for tab navigation */
   const handleTypeChange = (index, value) => {
     const fields = activeTab === 'nav-home' ? allowanceFields : deductionFields;
     const newFields = [...fields];
@@ -115,7 +156,6 @@ const CompanySalaryStructure = () => {
     }
   };
 
-
   const validateField = (field) => {
     const errors = { ...validationErrors };
 
@@ -135,7 +175,7 @@ const CompanySalaryStructure = () => {
       const response = await AllowancesGetApi();
       const allowancesData = response.data;
       setAllowances(allowancesData);
-      setAllowanceFields(allowancesData.map(allowance => ({ label: allowance, type: 'number', value: '' })));
+      setAllowanceFields(allowancesData.map(allowance => ({ label: allowance, type: 'text', value: '' })));
       setFieldCheckboxes(prev => ({
         ...prev,
         allowances: allowancesData.reduce((acc, allowance) => {
@@ -157,7 +197,7 @@ const CompanySalaryStructure = () => {
       const response = await DeductionsGetApi();
       const deductionsData = response.data;
       setDeductions(deductionsData);
-      setDeductionFields(deductionsData.map(deduction => ({ label: deduction, type: 'number', value: '' })));
+      setDeductionFields(deductionsData.map(deduction => ({ label: deduction, type: 'text', value: '' })));
       setFieldCheckboxes(prev => ({
         ...prev,
         deductions: deductionsData.reduce((dcc, deduction) => {
@@ -184,11 +224,12 @@ const CompanySalaryStructure = () => {
       setDeductionFields(newFields);
     }
   };
+  
 
-  const onSubmit = async (data) => {
+  const onSubmit = async () => {
     const jsonData = {
       companyName: user.company,
-      status: data.status,
+      status: "Active",
       allowances: {},
       deductions: {},
     };
@@ -248,10 +289,10 @@ const CompanySalaryStructure = () => {
     }
   };
 
-const clearForm =()=>{
-  reset();
-  navigate('/companySalaryView');
-}
+  const clearForm = () => {
+    reset();
+    navigate('/companySalaryView');
+  }
   const formatFieldName = (fieldName) => {
     return fieldName
       .replace(/([A-Z])/g, ' $1')
@@ -371,7 +412,7 @@ const clearForm =()=>{
     setAllowanceError('');
     setActiveTab(tab);
   };
-  
+
 
   return (
     <LayOut>
@@ -413,8 +454,8 @@ const clearForm =()=>{
                   </div>
                 </nav>
                 <div className="tab-content companyTabContent" id="nav-tabContent">
+                  {/* Allowance Tab */}
                   <div className={`tab-pane fade ${activeTab === 'nav-home' ? 'show active' : ''}`} id="nav-home" role="tabpanel">
-                    {allowanceError && <div className="text-danger">{allowanceError}</div>}
                     {allowanceFields.map((field, index) => (
                       <div className="row bbl ptb25" key={index}>
                         <div className="col-auto mt-2">
@@ -426,8 +467,8 @@ const clearForm =()=>{
                         </div>
                         <div className="col-sm-3">
                           <input
-                            type='text'
-                            className='form-control'
+                            type="text"
+                            className="form-control"
                             readOnly
                             value={formatFieldName(field.label)}
                             onChange={(e) => handleLabelChange(index, e.target.value)}
@@ -437,19 +478,19 @@ const clearForm =()=>{
                         </div>
                         <div className="col-sm-3">
                           <select
-                            className='form-select'
+                            className="form-select"
                             value={field.type}
                             onChange={(e) => handleTypeChange(index, e.target.value)}
                             disabled={!isEditing}
                           >
-                            <option value="number">₹</option>
+                            <option value="text">₹</option>
                             <option value="percentage">%</option>
                           </select>
                         </div>
                         <div className="col-sm-3">
                           <input
-                            type={field.type === 'percentage' ? 'number' : 'text'}
-                            className='form-control'
+                            type={field.type === 'percentage' ? 'text' : 'text'}
+                            className="form-control"
                             value={field.value}
                             onInput={toInputSpaceCase}
                             onChange={(e) => {
@@ -457,41 +498,27 @@ const clearForm =()=>{
                               validateField({ ...field, value: e.target.value });
                             }}
                             placeholder="Enter Value"
-                            disabled={!isEditing}
+                            disabled={!fieldCheckboxes.allowances[field.label] || !isEditing}
                             maxLength={7}
+                            data-bs-toggle="tooltip"
+                            title={!fieldCheckboxes.allowances[field.label] ? 'Please select checkbox' : ''}
                           />
-                          {validationErrors[field.label] && <div className="text-danger">{validationErrors[field.label]}</div>}
+                          {validationErrors[field.label] && (
+                            <div className="text-danger">{validationErrors[field.label]}</div>
+                          )}
                         </div>
                       </div>
                     ))}
-
-                    {/* Other Allowance Field
-                     <div className="row bbl ptb25">
-                      <div className="col-auto mt-2">
-                        <input
-                          type="checkbox"
-                          checked={true}
-                          disabled={true}
-                        />
-                      </div>
-                      <div className="col-sm-3">
-                        <input
-                          type='text'
-                          className='form-control'
-                          readOnly
-                          value="Other Allowance"
-                        />
-                      </div>
-                    </div> */}
-                    <div className="row">
-                      <div className="col-sm-12">
-                        <button type="button" onClick={() => {
-                          setModalType('allowances');
-                          setShowModal(true);
-                        }} className="btn btn-primary mt-4">Add Field</button>
-                      </div>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowModal(true)}
+                      className="btn btn-primary mt-4"
+                    >
+                      Add Field
+                    </button>
                   </div>
+
+                  {/* Deduction Tab */}
                   <div className={`tab-pane fade ${activeTab === 'nav-profile' ? 'show active' : ''}`} id="nav-profile" role="tabpanel">
                     {deductionFields.map((field, index) => (
                       <div className="row bbl ptb25" key={index}>
@@ -504,8 +531,8 @@ const clearForm =()=>{
                         </div>
                         <div className="col-sm-3">
                           <input
-                            type='text'
-                            className='form-control'
+                            type="text"
+                            className="form-control"
                             readOnly
                             value={formatFieldName(field.label)}
                             onChange={(e) => handleLabelChange(index, e.target.value)}
@@ -515,19 +542,19 @@ const clearForm =()=>{
                         </div>
                         <div className="col-sm-3">
                           <select
-                            className='form-select'
+                            className="form-select"
                             value={field.type}
                             onChange={(e) => handleTypeChange(index, e.target.value)}
                             disabled={!isEditing}
                           >
-                            <option value="number">₹</option>
+                            <option value="text">₹</option>
                             <option value="percentage">%</option>
                           </select>
                         </div>
                         <div className="col-sm-3">
                           <input
-                            type={field.type === 'percentage' ? 'number' : 'text'}
-                            className='form-control'
+                            type={field.type === 'percentage' ? 'text' : 'text'}
+                            className="form-control"
                             value={field.value}
                             onInput={toInputSpaceCase}
                             onChange={(e) => {
@@ -535,30 +562,29 @@ const clearForm =()=>{
                               validateField({ ...field, value: e.target.value });
                             }}
                             placeholder="Enter Value"
-                            disabled={!isEditing}
+                            disabled={!fieldCheckboxes.deductions[field.label] || !isEditing}
                             maxLength={7}
+                            data-bs-toggle="tooltip"
+                            title={!fieldCheckboxes.allowances[field.label] ? 'Please select checkbox' : ''}
                           />
-                          {validationErrors[field.label] && <div className="text-danger">{validationErrors[field.label]}</div>}
+                          {validationErrors[field.label] && (
+                            <div className="text-danger">{validationErrors[field.label]}</div>
+                          )}
                         </div>
                       </div>
                     ))}
-                    <div className="mt-4">
-                      <div className="alert alert-info" role="alert">
-                        <strong>Note:</strong> LOP is calculated based on your Attendance.
-                      </div>
-                    </div>
-                    <div className="row">
-                      <div className="col-sm-12">
-                        <button type="button" onClick={() => {
-                          setModalType('deductions');
-                          setShowModal(true);
-                        }} className="btn btn-primary mt-4">Add Field</button>
-                      </div>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowModal(true)}
+                      className="btn btn-primary mt-4"
+                    >
+                      Add Field
+                    </button>
                   </div>
                 </div>
-                <div className="row col-12 mt-3 align-items-center">
-                  <div className="col-6">
+
+                <div className="row col-12 mt-3 align-items-center" style={{ marginLeft: "65%" }}>
+                  {/* <div className="col-6">
                     <div className="row d-flex flex-column">
                       <label className="form-label mb-0">Status: {errors.status && <p className="errorMsg text-danger">Status is required</p>}
                       </label>
@@ -578,32 +604,32 @@ const clearForm =()=>{
                               field.value
                                 ? { value: field.value, label: field.value }
                                 : null
-                        }
-                        onChange={(val) => field.onChange(val.value)}
-                        isDisabled={!isSubmitEnabled()}
-                        placeholder="Select Status"
-                    />
-                )}
-            />
-        </div>
-    </div>
-    <div className="col-4 text-end">
-    <button
-            type="button"
-            onClick={clearForm}
-            className="btn btn-secondary me-2"
-        >
-          Cancel
-        </button>
-        <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={!isSubmitEnabled()}
-        >
-            Submit All
-        </button>
-    </div>
-</div>
+                            }
+                            onChange={(val) => field.onChange(val.value)}
+                            isDisabled={!isSubmitEnabled()}
+                            placeholder="Select Status"
+                          />
+                        )}
+                      />
+                    </div>
+                  </div> */}
+                  <div className="col-4 text-end">
+                    <button
+                      type="button"
+                      onClick={clearForm}
+                      className="btn btn-secondary me-2"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={!isSubmitEnabled()}
+                    >
+                      Submit All
+                    </button>
+                  </div>
+                </div>
 
               </div>
             </div>
@@ -623,6 +649,12 @@ const clearForm =()=>{
                   <ModalTitle className="modal-title">
                     Add New {modalType === 'allowances' ? 'Allowance' : 'Deduction'} Field
                   </ModalTitle>
+                  <button
+                    type="button"
+                    className="btn-close" // Bootstrap's close button class
+                    aria-label="Close"
+                    onClick={handleCloseNewFieldModal} // Function to close the modal
+                  ></button>
                 </ModalHeader>
                 <ModalBody>
                   <form>
