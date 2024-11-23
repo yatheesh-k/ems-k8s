@@ -221,7 +221,6 @@
 
 <body>
     <img src="${blurredImage}" alt="Company Logo" class="watermark" />
-    <div class="salary-table" style="page-break-after: always;">
         <div class="logo">
             <img src="${company.imageFile}" alt="Company Logo" />
         </div>
@@ -279,7 +278,7 @@
                 appraisal process.
             </p>
         </div>
-        <h5 style="text-align: center; margin-top: 30px;">
+        <h5 style="text-align: center; margin-top: 40px;">
             <#if company.cinNo?has_content>
                 CIN: ${company.cinNo}
                 <#elseif company.companyRegNo?has_content>
@@ -297,7 +296,6 @@
                 PH: ${company.mobileNo}, Email: ${company.emailId} | Web: https://${company.shortName}.com
             </p>
         </div>
-    </div>
 
     <div class="logo">
         <img src="${company.imageFile}" alt="Company Logo" />
