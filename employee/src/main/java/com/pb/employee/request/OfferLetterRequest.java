@@ -28,14 +28,14 @@ public class OfferLetterRequest {
     private String referenceNo;
 
     @Schema(example = "employeeName")
-    @Pattern(regexp = "^[A-Za-z][a-zA-Z]*(\\s[A-Za-z][a-zA-Z]*)*$", message = "{firstname.format}")
+    @Pattern(regexp = "^[A-Za-z][a-zA-Z]*(\\s[A-Za-z][a-zA-Z]*){1,4}$", message = "{firstname.format}")
     @Size(min = 3, max = 100, message = "{firstName.size.message}")
     private String employeeName;
 
     @Schema(example = "employeeFatherName")
-    @Pattern(regexp = "^[A-Za-z][a-zA-Z]*(\\s[A-Za-z][a-zA-Z]*)*$",
+    @Pattern(regexp = "^[A-Za-z][a-zA-Z]*(\\s[A-Za-z][a-zA-Z]*){1,4}$",
             message = "{fathername.format}")
-    @Size(min = 3, max = 20, message = "{firstName.size.message}")
+    @Size(min = 3, max = 100, message = "{firstName.size.message}")
     private String employeeFatherName;
 
     @Schema(example = "address")
