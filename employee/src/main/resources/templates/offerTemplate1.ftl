@@ -6,10 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Offer Letter</title>
     <style>
-          @page {
-            size: A4;
-            margin: 6mm;
-          }
         .employee-details {
             text-align: left;
             font-size: 20px;
@@ -278,7 +274,7 @@
                 appraisal process.
             </p>
         </div>
-        <h5 style="text-align: center; margin-top: 40px;">
+        <h5 style="text-align: center; margin-top: 43px;">
             <#if company.cinNo?has_content>
                 CIN: ${company.cinNo}
                 <#elseif company.companyRegNo?has_content>
