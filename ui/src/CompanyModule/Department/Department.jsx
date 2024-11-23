@@ -310,7 +310,7 @@ const Department = () => {
           <div className="col-12 col-lg-12 col-xxl-12 d-flex">
             <div className="card flex-fill">
               <div className="card-header">
-                <div className='row mb-2'>
+                <div className='row'>
                   <div className='col-12 col-md-6 col-lg-4'>
                     <button
                       onClick={() => setAddDeparment(true)}

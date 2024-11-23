@@ -94,21 +94,21 @@ const Template = () => {
 
     const calculateValues = () => {
         console.log("Gross Amount: ", grossAmount); // Log the grossAmount
-    
+
         if (salaryStructures.length === 0) {
             toast.error("No salary structure available for calculation.");
             return;
         }
-    
+
         const activeStructure = salaryStructures.find(structure => structure.status === "Active");
         if (!activeStructure) {
             toast.error("No active salary structure available.");
             return;
         }
-    
+
         const deductions = activeStructure.deductions;
         console.log("Deductions: ", deductions); // Log deductions to check the structure
-    
+
         const totalDeductions = Object.entries(deductions).reduce((acc, [key, value]) => {
             let deductionAmount = 0;
             if (typeof value === 'string' && value.includes('%')) {
@@ -119,19 +119,19 @@ const Template = () => {
             }
             return acc + deductionAmount;
         }, 0);
-    
+
         console.log("Calculated Total Deductions: ", totalDeductions); // Log totalDeductions
-    
+
         const netSalary = grossAmount - totalDeductions;
         console.log("Net Salary: ", netSalary); // Log netSalary
-    
+
         setCalculatedValues({
             totalDeductions,
             netSalary,
         });
     };
-    
-console.log("calculateValues",calculatedValues)
+
+    console.log("calculateValues", calculatedValues)
     const handleDownload = async () => {
         const payload = {
             offerDate: date,
@@ -519,7 +519,7 @@ console.log("calculateValues",calculatedValues)
                                                 </tr>
                                             );
                                         })}
-                                       <tr>
+                                        <tr>
                                             <td><strong>Total Deductions</strong></td>
                                             <td>{calculatedValues.totalDeductions ? Math.floor(calculatedValues.totalDeductions / 12) : 0}</td>
                                             <td>{calculatedValues.totalDeductions ? Math.floor(calculatedValues.totalDeductions) : 0}</td>

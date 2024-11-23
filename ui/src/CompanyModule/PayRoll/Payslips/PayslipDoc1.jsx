@@ -145,11 +145,11 @@ const PayslipDoc1 = () => {
                                         </li>
                                         <li style={{ display: "flex", padding: "4px 8px", alignItems: "center" }}>
                                             <span style={{ flex: 1, color: "black", paddingTop: "10px", paddingRight: "35%" }}><b>Department</b></span>
-                                            <span style={{ flex: 1, color: "black", paddingTop: "10px", marginRight: "15px" }}>{employeeDetails.departmentName}</span>
+                                            <span style={{ flex: 1, color: "black", paddingTop: "10px", marginRight: "15px" }}>{payslipData.department}</span>
                                         </li>
                                         <li style={{ display: "flex", padding: "4px 8px", alignItems: "center" }}>
                                             <span style={{ flex: 1, color: "black", paddingTop: "10px", paddingRight: "35%" }}><b>Designation</b></span>
-                                            <span style={{ flex: 1, color: "black", paddingTop: "10px", marginRight: "15px" }}>{employeeDetails.designationName}</span>
+                                            <span style={{ flex: 1, color: "black", paddingTop: "10px", marginRight: "15px" }}>{payslipData.designation}</span>
                                         </li>
                                         <li style={{ display: "flex", padding: "4px 8px", alignItems: "center" }}>
                                             <span style={{ flex: 1, color: "black", paddingTop: "10px", paddingRight: "35%" }}><b>Bank ACC No</b></span>
