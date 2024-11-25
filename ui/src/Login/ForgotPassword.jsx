@@ -8,14 +8,14 @@ import Loader from '../Utils/Loader';
 import { Modal, ModalBody, ModalHeader, ModalTitle } from 'react-bootstrap';
 
 const ForgotPassword = () => {
-  const { register, handleSubmit, watch,reset, formState: { errors, isSubmitting } } = useForm({ mode: "onChange" });
+  const { register, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm({ mode: "onChange" });
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
   const [passwordShown, setPasswordShown] = useState(false);
   const [confirmPasswordShown, setConfirmPasswordShown] = useState(false);
   const [otpShown, setOtpShown] = useState(false); // Separate state for OTP visibility
-  const [otpTimeLimit, setOtpTimeLimit] = useState(56); 
-  const [otpExpired, setOtpExpired] = useState(false); 
+  const [otpTimeLimit, setOtpTimeLimit] = useState(56);
+  const [otpExpired, setOtpExpired] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -49,7 +49,7 @@ const ForgotPassword = () => {
       toast.success("OTP Sent Successfully"); // Handle API response as needed
       setEmail(data.email); // Update email state here
       setStep(2); // Move to Step 2 if successful
-      
+
     } catch (error) {
       console.error("Failed to send OTP:", error);
       handleApiErrors(error);
@@ -60,7 +60,7 @@ const ForgotPassword = () => {
 
   const onSubmitOtp = async (data) => {
     setLoading(true);
-  
+
     // // Check if OTP has expired before making the API call
     // if (otpExpired) {
     //   toast.error("OTP has expired. Please request a new one.");
@@ -71,13 +71,13 @@ const ForgotPassword = () => {
     //   setLoading(false);
     //   return;
     // }
-  
+
     const formData = {
       username: data.email,
       otp: data.otp,
       company: company,
     };
-  
+
     try {
       const response = await ValidateOtp(formData);
       toast.success("Verification Successful");
@@ -103,7 +103,7 @@ const ForgotPassword = () => {
       setLoading(false);
     }
   };
-  
+
 
   const onSubmitNewPassword = async (data) => {
     setLoading(true);
@@ -147,7 +147,7 @@ const ForgotPassword = () => {
     setOtpShown(!otpShown);
   };
 
-  const closeButton=()=>{
+  const closeButton = () => {
     reset();
     navigate(`/${company}/login`);
   }
@@ -174,7 +174,7 @@ const ForgotPassword = () => {
     if (value.includes(" ")) {
       errors.push("no spaces");
     }
-    
+
     if (errors.length > 0) {
       return `Password must contain ${errors.join(", ")}.`;
     }
@@ -186,7 +186,7 @@ const ForgotPassword = () => {
       case 1:
         return (
           <form onSubmit={handleSubmit(onSubmitEmail)}>
-      
+
             <div className="form-group mb-1">
               <label>Email Id</label>
               <div className="input-group">
@@ -279,33 +279,33 @@ const ForgotPassword = () => {
                 <input type="email" className="form-control" value={email} disabled />
               </div>
             </div>
-            {/* <div className="form-group">
+            <div className="form-group">
               <label>OTP:</label>
               <div className="input-group">
-              <span className="input-group-text" onClick={toggleOtpVisibility} style={{ cursor: 'pointer' }}>
+                <span className="input-group-text" onClick={toggleOtpVisibility} style={{ cursor: 'pointer' }}>
                   {otpShown ? (
                     <UnlockFill size={20} color="#4C489D" />
                   ) : (
                     <LockFill size={20} color="#4C489D" />
                   )}
                 </span>
-              <input
-            placeholder='Enter OTP'
-            type={otpShown ? "text" : "password"}
-            name='otp'
-            className="form-control"
-            {...register('otp', {
-              required: 'OTP is required',
-              pattern: {
-                value: /^[0-9]{6}$/,
-                message: 'Invalid OTP'
-              }
-            })}
-            disabled // Disable the OTP input here
-          />
+                <input
+                  placeholder='Enter OTP'
+                  type={otpShown ? "text" : "password"}
+                  name='otp'
+                  className="form-control"
+                  {...register('otp', {
+                    required: 'OTP is required',
+                    pattern: {
+                      value: /^[0-9]{6}$/,
+                      message: 'Invalid OTP'
+                    }
+                  })}
+                  disabled // Disable the OTP input here
+                />
               </div>
               {errors.otp && <span className="text-danger" style={{ marginLeft: "60px" }}>{errors.otp.message}</span>}
-            </div> */}
+            </div>
             <div className="form-group">
               <label>New Password:</label>
               <div className="input-group">
@@ -330,7 +330,7 @@ const ForgotPassword = () => {
                       value: 16,
                       message: "Password must be at least 16 characters long",
                     },
-                   validate:validatePassword,
+                    validate: validatePassword,
                   })}
                 />
               </div>
@@ -374,7 +374,7 @@ const ForgotPassword = () => {
                 </p>
               )}
             </div>
-        
+
             <div className="text-center mt-4">
               <button type="submit" className="btn btn-primary" disabled={loading || isSubmitting}>
                 {loading ? "Loading..." : "Update Password"}
@@ -389,22 +389,22 @@ const ForgotPassword = () => {
 
   return (
     <main className="d-flex w-100 ">
-       {loading &&(
-             <Loader/>
-          )}
+      {loading && (
+        <Loader />
+      )}
       <div className="container d-flex flex-column">
         <div className="row vh-100">
           <div className="col-sm-10 col-md-7 col-lg-6 mx-auto d-table h-100">
             <div className="d-table-cell align-middle">
               <div className="card">
-              <div className="card-header d-flex justify-content-between align-items-center pb-0">
+                <div className="card-header d-flex justify-content-between align-items-center pb-0">
                   <div className="text-center">
                     <p className="lead">Forgot Password</p>
                   </div>
-                  <button className='btn text-white' style={{marginBottom:"6px"}} onClick={closeButton}>X</button>
+                  <button className='btn text-white' style={{ marginBottom: "6px" }} onClick={closeButton}>X</button>
                 </div>
 
-                <div className="card-body" style={{ marginRight: '60px',paddingTop:'0px' }}>
+                <div className="card-body" style={{ marginRight: '60px', paddingTop: '0px' }}>
                   <div className="mt-2 m-sm-2 ">
                     {renderStep()}
                   </div>
@@ -418,7 +418,7 @@ const ForgotPassword = () => {
         show={showErrorModal}
         onHide={closeModal}
         centered
-        style={{ zIndex: "1050"}}
+        style={{ zIndex: "1050" }}
         className="custom-modal"
       >
         <ModalHeader closeButton>

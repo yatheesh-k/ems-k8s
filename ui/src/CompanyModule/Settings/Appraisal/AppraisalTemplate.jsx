@@ -193,7 +193,7 @@ const AppraisalTemplate = () => {
       const errorMessage = error.response.data.error.message;
       toast.error(errorMessage);
     } else {
-      toast.error("Network Error !");
+      // toast.error("Network Error !");
     }
     console.error(error.response);
   };
@@ -256,7 +256,7 @@ const AppraisalTemplate = () => {
                         Close
                       </button>
                       <button className="btn btn-primary mt-3" type="button" onClick={handleSubmitTemplate}>
-                        Submit Template
+                        Select Template
                       </button>
                     </>
                   )}
