@@ -310,7 +310,7 @@ const EmployeeRegistration = () => {
         // Handle HTTP 409 Conflict Error (duplicate or other conflicts)
         if (error.response.status === 409) {
           const conflictMessage = error.response.data.message || "A conflict occurred.";
-          toast.error(conflictMessage);  // Show conflict error in toast
+          // toast.error(conflictMessage);  // Show conflict error in toast
         }
   
       } else {
@@ -1004,7 +1004,7 @@ const toInputEmailCase = (e) => {
                               })}
                             />
                            <span
-                              className={`bi bi-eye-fill field-icon pb-1 toggle-password ${passwordShown ? 'text-primary' : ''}`}                              onClick={togglePasswordVisiblity}
+                              className={`bi bi-eye field-icon pb-1 toggle-password ${passwordShown ? 'text-primary' : ''}`}                              onClick={togglePasswordVisiblity}
                               style={{background: "transparent",borderLeft:"none"}}
                             >
                             </span>
@@ -1091,7 +1091,7 @@ const toInputEmailCase = (e) => {
                           className="form-control"
                           placeholder="Enter Personal Mobile Number"
                           autoComplete="off"
-                          maxLength={15} // Limit input to 15 characters
+                          maxLength={14} // Limit input to 15 characters
                           defaultValue="+91 " // Set the initial value to +91 with a space
                           onInput={handlePhoneNumberChange} // Handle input changes
                           onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions

@@ -80,7 +80,7 @@ const RelievingLetter = () => {
       name: "1",
       content: (data) => (
         <RelievingTemplate1
-          companyLogo={logo}
+          companyLogo={logoFileName}
           companyData={companyData}
           date="October 28, 2024"
           employeeName="John Doe"
@@ -98,7 +98,7 @@ const RelievingLetter = () => {
       name: "2",
       content: (data) => (
         <RelievingTemplate2
-          companyLogo={logo}
+          companyLogo={logoFileName}
           companyData={companyData}
           date="October 28, 2024"
           employeeName="John Doe"
@@ -116,7 +116,7 @@ const RelievingLetter = () => {
       name: "3",
       content: (data) => (
         <RelievingTemplate3
-          companyLogo={logo}
+          companyLogo={logoFileName}
           companyData={companyData}
           date="October 28, 2024"
           employeeName="John Doe"
@@ -180,7 +180,7 @@ const RelievingLetter = () => {
       const errorMessage = error.response.data.error.message;
       toast.error(errorMessage);
     } else {
-      toast.error("Network Error !");
+      // toast.error("Network Error !");
     }
     console.error(error.response);
   };
@@ -243,7 +243,7 @@ const RelievingLetter = () => {
                         Close
                       </button>
                       <button className="btn btn-primary mt-3" type="button" onClick={handleSubmitTemplate}>
-                        Submit Template
+                        Select Template
                       </button>
                     </>
                   )}

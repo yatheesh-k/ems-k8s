@@ -601,12 +601,11 @@ const CompanyRegistration = () => {
                             className="form-control"
                             placeholder="Enter Contact Number"
                             autoComplete="off"
-                            maxLength={15} // Limit input to 15 characters
+                            maxLength={14}
                             defaultValue="+91 " // Set the initial value to +91 with a space
                             onInput={handlePhoneNumberChange} // Handle input changes
                             onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                             {...register("mobileNo", {
-                              required: "Contact Number is Required",
                               validate: {
                                 startsWithPlus91: (value) => {
                                   if (!value.startsWith("+91 ")) {
@@ -666,7 +665,7 @@ const CompanyRegistration = () => {
                             />
                             {/* Eye Icon to toggle password visibility */}
                             <span
-                              className={`bi bi-eye-fill field-icon pb-1 toggle-password ${passwordShown ? 'text-primary' : ''}`} onClick={togglePasswordVisiblity}
+                              className={`bi bi-eye field-icon pb-1 toggle-password ${passwordShown ? 'text-primary' : ''}`} onClick={togglePasswordVisiblity}
                               style={{ background: "transparent", borderLeft: "none" }}
                             >
                             </span>
@@ -688,7 +687,7 @@ const CompanyRegistration = () => {
                             className="form-control"
                             placeholder="Enter Contact Number"
                             autoComplete="off"
-                            maxLength={15} // Limit input to 15 characters
+                            maxLength={14} // Limit input to 15 characters
                             defaultValue="+91 " // Set the initial value to +91 with a space
                             onInput={handlePhoneNumberChange} // Handle input changes
                             onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
@@ -735,7 +734,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Alternate Number"
                         autoComplete="off"
-                        maxLength={15}
+                        maxLength={14}
                         defaultValue="+91 " // Set the initial value to +91 with a space
                         onInput={handlePhoneNumberChange} // Handle input changes
                         onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
@@ -743,24 +742,24 @@ const CompanyRegistration = () => {
                           validate: {
                             startsWithPlus91: (value) => {
                               if (!value.startsWith("+91 ")) {
-                                return "Contact Number must start with +91 and a space.";
+                                return "Alternate Number must start with +91 and a space.";
                               }
                               return true;
                             },
                             correctLength: (value) => {
                               if (value.length !== 14) {
-                                return "Contact Number must be exactly 10 digits (including +91).";
+                                return "Alternate Number must be exactly 10 digits (including +91).";
                               }
                               return true;
                             },
                             notRepeatingDigits: (value) => {
                               const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                              return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
+                              return !isRepeating || "Alternate Number cannot consist of the same digit repeated.";
                             },
                           },
                           pattern: {
                             value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                            message: "Contact Number must start with +91 followed by 10 digits.",
+                            message: "Alternate Number must start with +91 followed by 10 digits.",
                           },
                         })}
                       />
@@ -1024,6 +1023,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Personal Mobile Number"
                         autoComplete="off"
+                        maxLength={14}
                         defaultValue="+91 " // Set the initial value to +91 with a space
                         onInput={handlePhoneNumberChange} // Handle input changes
                         onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
@@ -1032,24 +1032,24 @@ const CompanyRegistration = () => {
                           validate: {
                             startsWithPlus91: (value) => {
                               if (!value.startsWith("+91 ")) {
-                                return "Contact Number must start with +91 and a space.";
+                                return "Personal Mobile Number must start with +91 and a space.";
                               }
                               return true;
                             },
                             correctLength: (value) => {
                               if (value.length !== 14) {
-                                return "Contact Number must be exactly 10 digits (including +91).";
+                                return "Personal MObile Number must be exactly 10 digits (including +91).";
                               }
                               return true;
                             },
                             notRepeatingDigits: (value) => {
                               const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                              return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
+                              return !isRepeating || "Personal Mobile Number cannot consist of the same digit repeated.";
                             },
                           },
                           pattern: {
                             value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                            message: "Contact Number must start with +91 followed by 10 digits.",
+                            message: "Personal Mobile Number must start with +91 followed by 10 digits.",
                           },
                         })}
                       />

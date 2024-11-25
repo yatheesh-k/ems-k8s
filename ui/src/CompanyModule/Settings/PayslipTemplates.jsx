@@ -69,7 +69,7 @@ const PayslipTemplates = () => {
                 }
             } else {
                 setPayslipTemplateNo(null);
-                toast.error("Template does not exist for the company.");
+                // toast.error("Template does not exist for the company.");
             }
         } catch (error) {
             console.error("API fetch error:", error);

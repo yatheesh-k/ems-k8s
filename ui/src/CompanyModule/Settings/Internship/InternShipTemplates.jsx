@@ -227,7 +227,7 @@ const InternShipTemplates = () => {
                         Close
                       </button>
                       <button className="btn btn-primary mt-3" type="button" onClick={handleSubmitTemplate}>
-                        Submit Template
+                        Select Template
                       </button>
                     </>
                   )}

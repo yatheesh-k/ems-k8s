@@ -257,35 +257,41 @@ const SideNav = () => {
   return (
     <nav id="sidebar" className="sidebar js-sidebar">
       <div className="sidebar-content js-simplebar">
-        <a className="sidebar-brand" href="/main">
-        {loading ? (
-       <span>Loading...</span>
-) : (
-  <span>
-    {logoFileName ? (
-      // If logoFileName exists, display the company logo
-      <img
-        className="align-middle text-center"
-        src={`${logoFileName}`}
-        alt="Company Logo"
-        style={{ height: "55px", width: "160px" }}
-      />
-    ) : (
-      // If logoFileName doesn't exist, display "Add Logo"
-      <a href="/profile"><span className="text-warning fs-6" style={{marginLeft:"40px"}}><Image/> Add Logo</span></a>
-    )}
-    {user && user.userRole && user.userRole.includes("ems_admin") && !logoFileName && (
-      // Display the EMS Admin Logo if the user is an EMS admin and logoFileName is not present
-      <img
-        className="align-middle"
-        src="assets/img/pathbreaker_logo.png"
-        alt="EMS Admin Logo"
-        style={{ height: "55px", width: "160px" }}
-      />
-    )}
-  </span>
-)}
-
+      <a className="sidebar-brand" href="/main">
+          {loading ? (
+            <span>Loading...</span>
+          ) : (
+            <span>
+              {logoFileName ? (
+                // If logoFileName exists, display the company logo
+                <img
+                  className="align-middle text-center"
+                  src={`${logoFileName}`}
+                  alt="Company Logo"
+                  style={{ height: "55px", width: "160px" }}
+                />
+              ) : (
+                // If logoFileName doesn't exist, display "Add Logo"
+                user && user.userRole && user.userRole.includes("company_admin") ? (
+                  // Only show "Add Logo" if the user is a company admin
+                  <a href="/profile">
+                    <span className="text-warning fs-6" style={{ marginLeft: "40px" }}>
+                      <Image /> Add Logo
+                    </span>
+                  </a>
+                ) : null
+              )}
+              {user && user.userRole && user.userRole.includes("ems_admin") && !logoFileName && (
+                // Display the EMS Admin Logo if the user is an EMS admin and logoFileName is not present
+                <img
+                  className="align-middle"
+                  src="assets/img/pathbreaker_logo.png"
+                  alt="EMS Admin Logo"
+                  style={{ height: "55px", width: "160px" }}
+                />
+              )}
+            </span>
+          )}
         </a>
         <ul className="sidebar-nav mt-2">
           {user && user.userRole && user.userRole.includes("ems_admin") && (

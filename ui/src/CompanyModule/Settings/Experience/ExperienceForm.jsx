@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Select from "react-select";
 import { Bounce, toast } from "react-toastify";
 import LayOut from "../../../LayOut/LayOut";
-import { EmployeeGetApi, EmployeeGetApiById,ExperienceFormPostApi, TemplateGetAPI } from "../../../Utils/Axios";
+import { EmployeeGetApi, EmployeeGetApiById, ExperienceFormPostApi, TemplateGetAPI } from "../../../Utils/Axios";
 import { useAuth } from "../../../Context/AuthContext";
 import ExperiencePreview from "./ExperiencePreview";
 
@@ -17,7 +17,7 @@ const ExperienceForm = () => {
     watch,
     formState: { errors },
     reset,
-  } = useForm();
+  } = useForm({ mode: 'onChange' });
   const { user } = useAuth();
   const [emp, setEmp] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -26,30 +26,30 @@ const ExperienceForm = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [submissionData, setSubmissionData] = useState(null);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
-  const [error,setError]=useState(null);
+  const [error, setError] = useState(null);
   const [selectedEmployee, setSelectedEmployee] = useState(null); // New state to store the selected employee
   const [templateAvailable, setTemplateAvailable] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
 
-  const calculateNoticePeriod = (resignationDate, lastWorkingDate,dateOfHiring) => {
+  const calculateNoticePeriod = (resignationDate, lastWorkingDate, dateOfHiring) => {
     if (resignationDate && lastWorkingDate) {
       const resignation = new Date(resignationDate);
       const lastWorking = new Date(lastWorkingDate);
       const hiringDate = new Date(dateOfHiring);
-  
+
       // Check if last working date is after resignation date
       if (lastWorking <= resignation) {
         setError("Last working date must be after the resignation date.");
         setNoticePeriod(0);
         return;
       }
-      else if  (resignation <= hiringDate) {
+      else if (resignation <= hiringDate) {
         setError("Resignation date must be after the date of hiring.");
         setNoticePeriod(0);
         return;
       }
-  
+
       const monthDiff = (lastWorking.getFullYear() - resignation.getFullYear()) * 12 + (lastWorking.getMonth() - resignation.getMonth());
       setNoticePeriod(monthDiff);
     } else {
@@ -73,8 +73,8 @@ const ExperienceForm = () => {
         filteredData.map((employee) => ({
           label: `${employee.firstName} ${employee.lastName} (${employee.employeeId})`,
           value: employee.id,
-          employeeName:`${employee.firstName} ${employee.lastName}`,
-          employeeId:employee.employeeId,
+          employeeName: `${employee.firstName} ${employee.lastName}`,
+          employeeId: employee.employeeId,
           designationName: employee.designationName,
           departmentName: employee.departmentName,
           dateOfHiring: employee.dateOfHiring,
@@ -87,36 +87,36 @@ const ExperienceForm = () => {
     try {
       const res = await TemplateGetAPI(companyId);
       const templateNumber = res.data.data.experienceTemplateNo;
-         setSelectedTemplate(templateNumber)
-         setTemplateAvailable(!!templateNumber); 
+      setSelectedTemplate(templateNumber)
+      setTemplateAvailable(!!templateNumber);
     } catch (error) {
       handleApiErrors(error);
-      setTemplateAvailable(false); 
+      setTemplateAvailable(false);
     }
   };
   useEffect(() => {
     fetchTemplate()
-}, []);
+  }, []);
 
-// Helper function to format date as dd-mm-yyyy
-const formatDate = (date) => {
-  if (!date) return ""; // If the date is falsy, return an empty string
-  
-  const d = new Date(date);
-  const day = String(d.getDate()).padStart(2, "0"); // Get the day, ensuring two digits
-  const month = String(d.getMonth() + 1).padStart(2, "0"); // Get the month (0-indexed)
-  const year = d.getFullYear(); // Get the full year
-  
-  return `${day}-${month}-${year}`;
-};
+  // Helper function to format date as dd-mm-yyyy
+  const formatDate = (date) => {
+    if (!date) return ""; // If the date is falsy, return an empty string
+
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0"); // Get the day, ensuring two digits
+    const month = String(d.getMonth() + 1).padStart(2, "0"); // Get the month (0-indexed)
+    const year = d.getFullYear(); // Get the full year
+
+    return `${day}-${month}-${year}`;
+  };
 
   const onSubmit = (data) => {
     const submissionData = {
-      employeeId: data.employeeId, 
+      employeeId: data.employeeId,
       companyName: user.company,
-      date:data.lastWorkingDate 
-    }; 
-     // Format the date fields to dd-mm-yyyy format
+      date: data.lastWorkingDate
+    };
+    // Format the date fields to dd-mm-yyyy format
     const formattedLastWorkingDate = formatDate(data.lastWorkingDate);
     const formattedResignationDate = formatDate(data.resignationDate);
     const formattedHiringDate = formatDate(data.dateOfHiring);
@@ -125,13 +125,13 @@ const formatDate = (date) => {
       employeeId: selectedEmployee ? selectedEmployee.employeeId : data.employeeId,
       designationName: data.designationName || "",
       departmentName: data.departmentName || "",
-      joiningDate:formattedHiringDate||"",
+      joiningDate: formattedHiringDate || "",
       experienceDate: formattedResignationDate || "", // Resignation date formatted
       date: formattedLastWorkingDate || "",
       noticePeriod,
       companyName: user.company,
     };
-    
+
     setPreviewData(preview);
     setShowPreview(true);
     setSubmissionData(submissionData);
@@ -139,17 +139,17 @@ const formatDate = (date) => {
 
   const handleConfirmSubmission = async () => {
     try {
-        const success = await ExperienceFormPostApi(submissionData);
-        if (success) {
-          setShowPreview(true);
-          reset();
-        }
-      } catch (error) {
-        console.error('Error downloading the PDF:', error);
-        handleError(error)
+      const success = await ExperienceFormPostApi(submissionData);
+      if (success) {
+        setShowPreview(true);
+        reset();
       }
+    } catch (error) {
+      console.error('Error downloading the PDF:', error);
+      handleError(error)
+    }
   };
-   
+
   const handleError = (errors) => {
     if (errors.response) {
       const status = errors.response.status;
@@ -182,18 +182,26 @@ const formatDate = (date) => {
         autoClose: 3000,
       });
     } else {
-      toast.error("Network Error!", {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
+      // toast.error("Network Error!", {
+      //   position: "top-right",
+      //   transition: Bounce,
+      //   hideProgressBar: true,
+      //   theme: "colored",
+      //   autoClose: 3000,
+      // });
     }
   };
 
   const clearForm = () => {
-    reset();
+    // Reset the entire form, including the employeeId (react-select) to null
+    reset({
+      employeeId: null,   // Reset the Select field to null
+      employeeName: '',
+      designationName: '',
+      departmentName: '',
+      dateOfHiring: '',
+      lastWorkingDate: ''
+    });
   };
 
   useEffect(() => {
@@ -245,33 +253,33 @@ const formatDate = (date) => {
         autoClose: 3000,
       });
     } else {
-      toast.error("Network Error!", {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
+      // toast.error("Network Error!", {
+      //   position: "top-right",
+      //   transition: Bounce,
+      //   hideProgressBar: true,
+      //   theme: "colored",
+      //   autoClose: 3000,
+      // });
     }
   };
 
 
-    // Render loading message or template not available message
-    if (!templateAvailable) {
-        return (
-          <LayOut>
-            <div className="container-fluid p-0">
-              <div className="row justify-content-center">
-                <div className="col-8 text-center mt-5">
-                  <h2>No Experience Template Available</h2>
-                  <p>To set up the experience templates before proceeding, Please select the Template from Settings <a href="/experienceLetter">Expereince Templates </a></p>
-                  <p>Please contact the administrator to set up the experience templates before proceeding.</p>
-                </div>
-              </div>
+  // Render loading message or template not available message
+  if (!templateAvailable) {
+    return (
+      <LayOut>
+        <div className="container-fluid p-0">
+          <div className="row justify-content-center">
+            <div className="col-8 text-center mt-5">
+              <h2>No Experience Template Available</h2>
+              <p>To set up the experience templates before proceeding, Please select the Template from Settings <a href="/experienceLetter">Expereince Templates </a></p>
+              <p>Please contact the administrator to set up the experience templates before proceeding.</p>
             </div>
-          </LayOut>
-        );
-      }
+          </div>
+        </div>
+      </LayOut>
+    );
+  }
 
   return (
     <LayOut>
@@ -329,16 +337,21 @@ const formatDate = (date) => {
                             <Select
                               {...field}
                               options={emp}
-                              value={emp.find((option) => option.value === field.value)}
+                              value={emp.find(option => option.value === field.value) || null} // Handle clearing
                               onChange={(selectedOption) => {
-                                field.onChange(selectedOption.value);
-                                const selectedEmp = emp.find(emp => emp.value === selectedOption.value);
+                                field.onChange(selectedOption?.value || null); // Make sure to reset to null when unselected
+                                const selectedEmp = emp.find(emp => emp.value === selectedOption?.value);
                                 if (selectedEmp) {
                                   setSelectedEmployee(selectedEmp);
-                                  // Use selectedEmp instead of selectedEmployee here
+                                  // Update other form fields with selected employee data
                                   setValue("designationName", selectedEmp.designationName);
                                   setValue("departmentName", selectedEmp.departmentName);
                                   setValue("dateOfHiring", selectedEmp.dateOfHiring);
+                                } else {
+                                  // If no employee is selected, reset other fields
+                                  setValue("designationName", '');
+                                  setValue("departmentName", '');
+                                  setValue("dateOfHiring", '');
                                 }
                               }}
                               placeholder="Select Employee Name"
@@ -351,23 +364,23 @@ const formatDate = (date) => {
                       </div>
                     )}
 
-                      <input
-                        type="hidden"
-                        className="form-control"
-                        placeholder="Designation"
-                        name="employeeName"
-                        readOnly
-                        {...register("employeeName")}
-                      />
+                    <input
+                      type="hidden"
+                      className="form-control"
+                      placeholder="Designation"
+                      name="employeeName"
+                      readOnly
+                      {...register("employeeName")}
+                    />
 
-                      <input
-                        type="hidden"
-                        className="form-control"
-                        placeholder="Designation"
-                        name="employeeId"
-                        readOnly
-                        {...register("employeeId")}
-                      />
+                    <input
+                      type="hidden"
+                      className="form-control"
+                      placeholder="Designation"
+                      name="employeeId"
+                      readOnly
+                      {...register("employeeId")}
+                    />
 
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Designation</label>
@@ -379,9 +392,9 @@ const formatDate = (date) => {
                         readOnly
                         {...register("designationName", { required: true })}
                       />
-                      {errors.designationName && (
+                      {/* {errors.designationName && (
                         <p className="errorMsg">Designation Required</p>
-                      )}
+                      )} */}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Department</label>
@@ -393,9 +406,9 @@ const formatDate = (date) => {
                         readOnly
                         {...register("departmentName", { required: true })}
                       />
-                      {errors.departmentName && (
+                      {/* {errors.departmentName && (
                         <p className="errorMsg">Department Required</p>
-                      )}
+                      )} */}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Date of Hired</label>
@@ -407,9 +420,9 @@ const formatDate = (date) => {
                         readOnly
                         {...register("dateOfHiring", { required: true })}
                       />
-                      {errors.dateOfHiring && (
+                      {/* {errors.dateOfHiring && (
                         <p className="errorMsg">Date of Hiring Required</p>
-                      )}
+                      )} */}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Date of Experience</label>
@@ -427,46 +440,46 @@ const formatDate = (date) => {
                     </div>
 
                     <div className="col-12 d-flex align-items-start mt-5">
-                        {error && (
-                          <div className="col-9 alert alert-danger text-center mt-4">
-                            {error}
-                          </div>
-                        )}
-                        <div className={`col-${error ? '3' : '12'} d-flex justify-content-end mt-4`}>
-                          <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
-                            Close
-                          </button>
-                          <button
-                            className={isUpdating ? "btn btn-danger btn-lg" : "btn btn-primary btn-lg"}
-                            type="submit"
-                          >
-                            {isUpdating ? "Update" : "Submit"}
-                          </button>
+                      {error && (
+                        <div className="col-9 alert alert-danger text-center mt-4">
+                          {error}
                         </div>
+                      )}
+                      <div className={`col-${error ? '3' : '12'} d-flex justify-content-end mt-4`}>
+                        <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
+                          Close
+                        </button>
+                        <button
+                          className={isUpdating ? "btn btn-danger btn-lg" : "btn btn-primary btn-lg"}
+                          type="submit"
+                        >
+                          {isUpdating ? "Update" : "Submit"}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </form>
               {showPreview && (
-            <div className={`modal fade ${showPreview ? 'show' : ''}`} style={{ display: showPreview ? 'block' : 'none' }} tabIndex="-1" role="dialog" aria-hidden={!showPreview}>
-                <div className="modal-dialog modal-lg" role="document">
-                  <div className="modal-content mt-2 mb-3">
-                    <div className="modal-header">
-                      <h5 className="modal-title">Preview Experience Letter</h5>
-                      <button type="button" className="close" onClick={() => setShowPreview(false)} aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div className="modal-body">
-                      <ExperiencePreview previewData={previewData} selectedTemplate={selectedTemplate} />
-                    </div>
-                    <div className="modal-footer">
-                      <button type="button" className="btn btn-secondary" onClick={() => setShowPreview(false)}>Close</button>
-                      <button type="button" className="btn btn-primary" onClick={handleConfirmSubmission}>Confirm Submission</button>
+                <div className={`modal fade ${showPreview ? 'show' : ''}`} style={{ display: showPreview ? 'block' : 'none' }} tabIndex="-1" role="dialog" aria-hidden={!showPreview}>
+                  <div className="modal-dialog modal-lg" role="document">
+                    <div className="modal-content mt-2 mb-3">
+                      <div className="modal-header">
+                        <h5 className="modal-title">Preview Experience Letter</h5>
+                        <button type="button" className="close" onClick={() => setShowPreview(false)} aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div className="modal-body">
+                        <ExperiencePreview previewData={previewData} selectedTemplate={selectedTemplate} />
+                      </div>
+                      <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" onClick={() => setShowPreview(false)}>Close</button>
+                        <button type="button" className="btn btn-primary" onClick={handleConfirmSubmission}>Confirm Submission</button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
               )}
             </div>
           </div>

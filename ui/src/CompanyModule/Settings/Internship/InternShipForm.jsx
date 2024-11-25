@@ -177,13 +177,13 @@ const InternShipForm = () => {
         autoClose: 3000,
       });
     } else {
-      toast.error("Network Error!", {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
+      // toast.error("Network Error!", {
+      //   position: "top-right",
+      //   transition: Bounce,
+      //   hideProgressBar: true,
+      //   theme: "colored",
+      //   autoClose: 3000,
+      // });
     }
   };
 
@@ -224,13 +224,13 @@ const InternShipForm = () => {
         autoClose: 3000,
       });
     } else {
-      toast.error("Network Error!", {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
+      // toast.error("Network Error!", {
+      //   position: "top-right",
+      //   transition: Bounce,
+      //   hideProgressBar: true,
+      //   theme: "colored",
+      //   autoClose: 3000,
+      // });
     }
   };
   const toInputTitleCase = (e) => {

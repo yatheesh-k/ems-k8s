@@ -86,10 +86,10 @@ const InternshipTemplate1 = ({
       <p className="mb-5">With Best Wishes,</p>
       <div className="mt-5 pt-5">
         <p>Authorized Signature</p>
-        <h4>{companyName},</h4>
+        {/* <h4>{companyName},</h4>
         <p>{mailId},</p>
         <p>{contactNumber},</p>
-        <p>{companyAddress}.</p>
+        <p>{companyAddress}.</p> */}
       </div>
     </div>
   </div>
