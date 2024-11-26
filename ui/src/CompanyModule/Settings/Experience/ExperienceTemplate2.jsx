@@ -67,14 +67,11 @@ const ExperienceTemplate2 = ({
             }}
           >
             <p>
-              This letter certifies that <strong>{employeeName}</strong>with and ID <strong>{employeeId}</strong> was a
-              valued member of our team at {companyData.companyName} as a{" "}
-              <strong>{designation}</strong> in the <strong>{department} </strong>
-              Department from {joiningDate} to {experienceDate}.
+              This letter certifies that <strong>{employeeName}</strong>with and ID <strong>{employeeId}</strong> was a valued member of our team at <strong>{companyData.companyName}</strong> as a <strong>{designation}</strong> in the <strong>{department} </strong> Department from {joiningDate} to {experienceDate}.
             </p>
             <p>
-              During <strong>{employeeName}</strong>’s employment, he exhibited exceptional
-              proficiency in coding and software development. He actively
+              During <strong>{employeeName}</strong>’s employment, he/she exhibited exceptional
+              proficiency in coding and software development. He/She actively
               participated in multiple projects, demonstrating strong
               problem-solving abilities and meticulous attention to detail.{" "}
               <strong>{employeeName}</strong> consistently met project deadlines and
@@ -83,16 +80,16 @@ const ExperienceTemplate2 = ({
             </p>
             <p>
               <strong>{employeeName}</strong>’s dedication and hard work significantly
-              contributed to the success of our projects. His innovative ideas
+              contributed to the success of our projects. His/Her innovative ideas
               and proactive approach were instrumental in overcoming challenges
               and achieving project objectives.
             </p>
             <p>
               We commend <strong>{employeeName}</strong> for his outstanding performance and
-              professionalism throughout his tenure with{" "}
-              {companyData.companyName}. His contributions have been invaluable
-              to our team, and we have no doubt that he will continue to excel
-              in his future endeavors.
+              professionalism throughout his/her tenure with{" "}
+              {companyData.companyName}. His/Her contributions have been invaluable
+              to our team, and we have no doubt that he/she will continue to excel
+              in his/her future endeavors.
             </p>
 
             <div className="mt-5 pt-3">

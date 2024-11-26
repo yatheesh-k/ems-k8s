@@ -153,7 +153,7 @@ const EmsLogin = () => {
                       placeholder="Email Id"
                       autoComplete="off"
                       onKeyDown={handleEmailChange}
-                      onInput={toInputLowerCase}
+                     // onInput={toInputLowerCase}
                       {...register("username", {
                         required: "Email Id is Required.",
                         pattern: {

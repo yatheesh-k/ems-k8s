@@ -101,8 +101,7 @@ const AppraisalTemplate2 = ({
         </p>
 
         <p>
-          We would like to congratulate you on completion of One year period with us. We are pleased to inform you of your salary increase effective from{" "}
-          <strong>{effectiveDate}</strong>. The amount of your salary increase is <strong>Rs. {salaryIncrease} pa</strong>. We understand this is a sustainable increase in your pay and we appreciate your hard work and dedication to the company. All other T&C are the same as per the original offer letter.
+        We are pleased to inform you that based on your performance and contribution to the company, our management has revised your compensation to Rs.<strong>{salaryIncrease}</strong> pa which is cost to company with effect from <strong>{effectiveDate}</strong>.All other T&C are same as per the original offer letter.
         </p>
         <table className="table border-collapse mb-5">
           <thead>
@@ -147,7 +146,7 @@ const AppraisalTemplate2 = ({
         </table>
 
         <p>
-          We appreciate your initiative and expect you to take many more such responsibilities in future assignments to ensure company’s growth.
+         <i>We appreciate your initiative and expect you to take many more such responsibilities in future assignments to ensure company’s growth.</i>
         </p>
 
         <div className="mt-5 pt-3">

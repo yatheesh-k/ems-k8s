@@ -16,7 +16,7 @@ import {
 import { useAuth } from '../../Context/AuthContext';
 
 const Designation = () => {
-  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm({ mode: "onChange" });
+  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm({mode:"onChange"});
   const [designations, setDesignations] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [search, setSearch] = useState('');
@@ -27,15 +27,15 @@ const Designation = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedItemId, setSelectedItemId] = useState(null); // State to store the ID of the item to be deleted
-  const { user } = useAuth();
-
+  const { user} = useAuth();
+  
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
-    setSelectedItemId(null);
+    setSelectedItemId(null); 
   };
 
   const handleShowDeleteModal = (id) => {
-    setSelectedItemId(id);
+    setSelectedItemId(id); 
     setShowDeleteModal(true);
   };
 
@@ -44,7 +44,7 @@ const Designation = () => {
     reset();
   };
 
-  const fetchDesignation = async () => {
+   const fetchDesignation = async () => {
     try {
       const designations = await DesignationGetApi();
       const sortedDesignations = designations.sort((a, b) => a.name.localeCompare(b.name));
@@ -53,7 +53,7 @@ const Designation = () => {
       // handleApiErrors(error);
     }
   };
-
+  
   useEffect(() => {
     fetchDesignation();
   }, []);
@@ -69,18 +69,18 @@ const Designation = () => {
         await DesignationPutApiById(editingUserId, formData);
         setTimeout(() => {
           toast.success('Designation Updated Successfully');
-          fetchDesignation(); // Fetch updated list of departments after delay
-          setAddDesignation(false);
-        }, 1500);
-
+            fetchDesignation(); // Fetch updated list of departments after delay
+            setAddDesignation(false);
+          }, 1500);
+      
       } else {
         await DesignationPostApi(formData);
-
+       
         setTimeout(() => {
           toast.success('Designation Created Successfully');
           fetchDesignation(); // Fetch updated list of departments after delay
           setAddDesignation(false);
-        }, 1500);
+          }, 1500);
       }
       reset();
       setEditingUserId(null);
@@ -117,7 +117,7 @@ const Designation = () => {
       }
     }
   };
-
+  
 
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
@@ -128,47 +128,36 @@ const Designation = () => {
     }
     console.error(error.response);
   };
-
+  
   const validateName = (value) => {
-    // Trim leading and trailing spaces before further validation
-    const trimmedValue = value.trim();
-
-    // Check if value is empty after trimming (meaning it only had spaces)
-    if (trimmedValue.length === 0) {
-      return "Department Name is Required.";
-    }
-
-    // Allow alphabetic characters, numbers, spaces, and the / character
-    else if (!/^[A-Za-z0-9\s/!@#&()*,.-]+$/.test(trimmedValue)) {
-      return "Only Alphabetic Characters, Numbers, Spaces, and '/' are Allowed.";
+    if (!value || value.trim().length === 0) {
+      return "Deparment Name is Required.";
+    } else if (!/^[A-Za-z ]+$/.test(value)) {
+      return "Only Alphabetic Characters are Allowed.";
     } else {
-      const words = trimmedValue.split(" ");
-
-      // Check for minimum and maximum word length
-      for (const word of words) {
-        if (word.length < 2) {
-          return "Minimum Length 2 Character Required.";  // If any word is shorter than 1 character
-        } else if (word.length > 40) {
-          return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters
+      const words = value.split(" ");
+      
+        for (const word of words) {
+          if (word.length < 1) {
+            return "Minimum Length 1 Characters Required.";  // If any word is shorter than 2 characters, return this message
+          } else if (word.length > 40) {
+            return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters, return this message
+          }
         }
-      }
-
-      // Check if there are leading or trailing spaces (after trimming)
-      if (/\s$/.test(value)) {
-        return "Spaces at the end are not allowed.";  // Trailing space error
-      } else if (/^\s/.test(value)) {
-        return "No Leading Space Allowed.";  // Leading space error
-      }
-
-      // Check if there are multiple spaces between words
-      else if (/\s{2,}/.test(trimmedValue)) {
+      
+      if (/^\s|\s$/.test(value)) {
+        return "No Leading or Trailing Spaces Allowed.";
+      } else if (/\s{2,}/.test(value)) {
         return "No Multiple Spaces Between Words Allowed.";
       }
+      // Check if there's a space after the last character in the input string
+    if (/\s$/.test(value)) {
+      return "No Trailing Space Allowed.";  // Space after the last character is not allowed
     }
-
+    }
+  
     return true; // Return true if all conditions are satisfied
   };
-
   useEffect(() => {
     setFilteredData(designations);
   }, [designations]);
@@ -208,12 +197,12 @@ const Designation = () => {
     {
       name: <h5><b>#</b></h5>,
       selector: (row, index) => getSerialNumber(index),
-      width: "400px"
+       width:"400px"
     },
     {
       name: <h5><b>Designation</b></h5>,
       selector: (row) => row.name,
-      width: "500px"
+       width:"500px"
     },
     {
       name: <h5><b>Actions</b></h5>,
@@ -253,48 +242,45 @@ const Designation = () => {
     const input = e.target;
     let value = input.value;
     const cursorPosition = input.selectionStart; // Save the cursor position
-
     // Remove leading spaces
     value = value.replace(/^\s+/g, '');
-
-    // Ensure only alphabets, numbers, spaces, and allowed special characters like /, -, ., etc.
+    // Ensure only alphabets and spaces are allowed
     const allowedCharsRegex = /^[a-zA-Z0-9\s!@#&()*/,.\\-]+$/;
     value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
-
-    // Capitalize the first letter of each word but leave the rest as-is (case-sensitive) and allow special characters
+    // Capitalize the first letter of each word
     const words = value.split(' ');
+    // Capitalize the first letter of each word and lowercase the rest
     const capitalizedWords = words.map(word => {
       if (word.length > 0) {
-        // Capitalize first letter of each word, leave the rest as-is
-        return word.charAt(0).toUpperCase() + word.slice(1);
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
       }
-      return word;
+      return '';
     });
-
     // Join the words back into a string
     let formattedValue = capitalizedWords.join(' ');
-
+    // Remove spaces not allowed (before the first two characters)
+    if (formattedValue.length > 3) {
+      formattedValue = formattedValue.slice(0, 3) + formattedValue.slice(3).replace(/\s+/g, ' ');
+    }
     // Update input value
     input.value = formattedValue;
-
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
-
   const handleEmailChange = (e) => {
     // Get the current value of the input field
     const value = e.target.value;
-
+    
     // Check if the value is empty
     if (value.trim() !== '') {
-      return; // Allow space button
+        return; // Allow space button
     }
 
     // Prevent space character entry if the value is empty
     if (e.keyCode === 32) {
-      e.preventDefault();
+        e.preventDefault();
     }
-  };
+};
 
   return (
     <LayOut>
@@ -321,7 +307,7 @@ const Designation = () => {
           <div className="col-12 col-lg-12 col-xxl-12 d-flex">
             <div className="card flex-fill">
               <div className="card-header">
-                <div className='row'>
+                <div className='row mb-2'>
                   <div className='col-12 col-md-6 col-lg-4'>
                     <button
                       onClick={() => setAddDesignation(true)}
@@ -329,7 +315,7 @@ const Designation = () => {
                       type='submit'
                     >
                       Add Designation
-
+                   
                     </button>
                   </div>
                   <div className='col-12 col-md-6 col-lg-4'></div>
@@ -364,8 +350,8 @@ const Designation = () => {
               show={showDeleteModal}
               handleClose={handleCloseDeleteModal}
               handleConfirm={() => handleConfirmDelete(selectedItemId)}
-              id={selectedItemId}
-              pageName="Designation"
+              id={selectedItemId} 
+               pageName="Designation"
             />
 
             {addDesignation && (
@@ -392,7 +378,7 @@ const Designation = () => {
                         <div className="card-body" style={{ width: "1060px", paddingBottom: "0px" }}>
                           <div className='row'>
                             <div className='col-12 col-md-6 col-lg-4 mb-2'>
-                              <input
+                              <input 
                                 type="text"
                                 className="form-control"
                                 placeholder="Enter Designation"
@@ -403,9 +389,9 @@ const Designation = () => {
                                 autoComplete='off'
                                 {...register("name", {
                                   required: "Designation is Required",
-                                  validate: {
-                                    validateName,
-                                  },
+                                 validate:{
+                                  validateName,
+                                 },
                                 })}
                               />
                               {errors.name && (<p className='errorMsg'>{errors.name.message}</p>)}

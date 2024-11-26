@@ -80,8 +80,9 @@ const EmployeeView = () => {
           style={{
             borderRadius: "5px",
             padding: "3px",
+            color:"white",
+            backgroundColor:"green"
           }}
-          className="bg-primary"
         >
           Active
         </b>

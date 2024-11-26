@@ -15,8 +15,7 @@ const ExperienceLetter = () => {
   const [loading, setLoading] = useState(false);
   const [isFetched, setIsFetched] = useState(false);
 
-  const { user,logoFileName } = useAuth();
-  const logo = "/assets/img/adapt_adapt_logo.png";
+  const { user,logoFileName} = useAuth();
 
   const fetchCompanyData = async (companyId) => {
     try {
@@ -87,6 +86,8 @@ const ExperienceLetter = () => {
           jobTitle="Software Engineer"
           joiningDate="January 1, 2020"
           lastWorkingDate="October 27, 2024"
+          department="Department"
+          designation="Designation"
         />
       ),
     },
@@ -107,7 +108,7 @@ const ExperienceLetter = () => {
       ),
     },
 
-  ], [companyData, logo]);
+  ], [companyData, logoFileName]);
 
   useEffect(() => {
     // Set default template as Template 1
@@ -161,7 +162,7 @@ const ExperienceLetter = () => {
       const errorMessage = error.response.data.error.message;
       toast.error(errorMessage);
     } else {
-      // toast.error("Network Error !");
+      toast.error("Network Error !");
     }
     console.error(error.response);
   };
@@ -224,7 +225,7 @@ const ExperienceLetter = () => {
                         Close
                       </button>
                       <button className="btn btn-primary mt-3" type="button" onClick={handleSubmitTemplate}>
-                        Select Template
+                        Submit Template
                       </button>
                     </>
                   )}
