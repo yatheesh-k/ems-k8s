@@ -230,8 +230,8 @@
 
         <div class="employee-details">
             <h6>To</h6>
-            <h6>Ms. ${offerLetter.employeeName}</h6>
-            <h6>D/o: ${offerLetter.employeeFatherName}</h6>
+            <h6>Name: ${offerLetter.employeeName}</h6>
+            <h6>S/o,D/o: ${offerLetter.employeeFatherName}</h6>
             <h6>Address: ${offerLetter.employeeAddress}</h6>
             <h6>Contact No: ${offerLetter.employeeContactNo}</h6>
         </div>
@@ -244,7 +244,7 @@
                 member of the ${company.companyName} family and wish you a long, rewarding, and satisfying career with
                 us.
             </p>
-            <p>On behalf of ${company.companyName}., hereinafter referred to as ‘the Company’, we are pleased to
+            <p>On behalf of ${company.companyName}., here in after referred to as ‘the Company’, we are pleased to
                 extend
                 an offer for the position of ‘${offerLetter.employeePosition}’ in our organization with the following
                 mentioned details:

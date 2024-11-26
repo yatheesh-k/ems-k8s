@@ -323,6 +323,12 @@ public class CompanyServiceImpl implements CompanyService {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_PASSWORD),
                         HttpStatus.NOT_FOUND);
             }
+            // Check if the old password and new password are the same to throw exception
+            if (employeePasswordReset.getPassword().equals(employeePasswordReset.getNewPassword())) {
+                log.error("you can't update with the previous password");
+                return new ResponseEntity<>(ResponseBuilder.builder().build().createFailureResponse(new Exception(Constants.USED_PASSWORD)),
+                        HttpStatus.BAD_REQUEST);
+            }
             String newPassword = Base64.getEncoder().encodeToString(employeePasswordReset.getNewPassword().toString().getBytes());
             employee.setPassword(newPassword);
             if (employee.getCompanyId() != null) {

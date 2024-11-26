@@ -39,7 +39,7 @@ public class PayslipServiceImpl implements PayslipService {
     @Override
     public ResponseEntity<?> generatePaySlip(PayslipRequest payslipRequest, String salaryId, String employeeId) throws EmployeeException, IOException {
         String paySlipId = ResourceIdUtils.generatePayslipId(payslipRequest.getMonth(), payslipRequest.getYear(), employeeId);
-            EmployeeSalaryEntity entity = null;
+        EmployeeSalaryEntity entity = null;
         Object payslipEntity = null;
         EmployeeEntity employee = null;
         AttendanceEntity attendance = null;
@@ -722,7 +722,7 @@ public class PayslipServiceImpl implements PayslipService {
                 ResponseBuilder.builder().build().createSuccessResponse(responseBody), HttpStatus.CREATED);
     }
 
-    public ResponseEntity<?> savePayslip(PayslipUpdateRequest payslipsRequest, String payslipId, String employeeId) throws EmployeeException {
+    public ResponseEntity<?> savePayslip(PayslipUpdateRequest payslipsRequest, String payslipId, String employeeId) throws EmployeeException,IOException {
         PayslipEntity payslipEntity = null;
         String index = ResourceIdUtils.generateCompanyIndex(payslipsRequest.getCompanyName());
         try{
@@ -744,6 +744,22 @@ public class PayslipServiceImpl implements PayslipService {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_PAYSLIP_ALREADY_EXISTS),
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
+            // Check if the employee exists
+            EmployeeEntity employee = openSearchOperations.getEmployeeById(employeeId,null, index);
+            if (employee == null) {
+                log.error("Employee with ID {} not found", employeeId);
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_NOT_FOUND),
+                        HttpStatus.NOT_FOUND);
+            }
+            DepartmentEntity departmentEntity =null;
+            DesignationEntity designationEntity = null;
+            if (employee.getDepartment() !=null && employee.getDesignation() !=null) {
+                departmentEntity = openSearchOperations.getDepartmentById(employee.getDepartment(), null, index);
+                designationEntity = openSearchOperations.getDesignationById(employee.getDesignation(), null, index);
+            }
+            assert designationEntity != null;
+            payslipsRequest.setDesignation(designationEntity.getName());
+            payslipsRequest.setDepartment(departmentEntity.getName());
 
             PayslipEntity payslipProperties = PayslipUtils.maskEmployeePayslipUpdateProperties(payslipsRequest, payslipId, employeeId);
             openSearchOperations.saveEntity(payslipProperties, payslipId, index);

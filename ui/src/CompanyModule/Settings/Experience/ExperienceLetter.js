@@ -79,7 +79,7 @@ const ExperienceLetter = () => {
       name: "1",
       content: (data) => (
         <ExperienceTemplate1
-          companyLogo={logo}
+          companyLogo={logoFileName}
           companyData={companyData}
           date="October 28, 2024"
           employeeName="John Doe"
@@ -95,7 +95,7 @@ const ExperienceLetter = () => {
       name: "2",
       content: (data) => (
         <ExperienceTemplate2
-          companyLogo={logo}
+          companyLogo={logoFileName}
           companyData={companyData}
           date="October 28, 2024"
           employeeName="John Doe"
@@ -161,7 +161,7 @@ const ExperienceLetter = () => {
       const errorMessage = error.response.data.error.message;
       toast.error(errorMessage);
     } else {
-      toast.error("Network Error !");
+      // toast.error("Network Error !");
     }
     console.error(error.response);
   };
@@ -224,7 +224,7 @@ const ExperienceLetter = () => {
                         Close
                       </button>
                       <button className="btn btn-primary mt-3" type="button" onClick={handleSubmitTemplate}>
-                        Submit Template
+                        Select Template
                       </button>
                     </>
                   )}

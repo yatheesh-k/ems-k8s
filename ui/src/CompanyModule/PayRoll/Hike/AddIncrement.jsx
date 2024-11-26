@@ -328,7 +328,7 @@ const AddIncrement = () => {
       const errorMessage = error.response.data.error.message;
       toast.error(errorMessage);
     } else {
-      toast.error("Network Error !");
+      // toast.error("Network Error !");
     }
     console.error(error.response);
   };
@@ -535,9 +535,9 @@ const AddIncrement = () => {
         <div className="container-fluid p-0">
           <div className="row justify-content-center">
             <div className="col-8 text-center mt-5">
-              <h2>No Interns Template Available</h2>
-              <p>To set up the Interns templates before proceeding, Please select the Template from Settings <a href="/internsTemplates">Interns Templates </a></p>
-              <p>Please contact the administrator to set up the Interns templates before proceeding.</p>
+              <h2>No Appraisal Template Available</h2>
+              <p>To set up the Appraisal templates before proceeding, Please select the Template from Settings <a href="/appraisalTemplates">Appraisal Templates </a></p>
+              <p>Please contact the administrator to set up the Appraisal templates before proceeding.</p>
             </div>
           </div>
         </div>

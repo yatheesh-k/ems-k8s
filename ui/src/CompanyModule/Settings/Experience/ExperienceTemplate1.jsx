@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAuth } from '../../../Context/AuthContext';
 
 const ExperienceTemplate1 = ({
     companyLogo,
@@ -11,6 +12,7 @@ const ExperienceTemplate1 = ({
     department,
     experienceDate
 }) => {
+  const {logoFileName} = useAuth();
 
 
     return (
@@ -50,7 +52,7 @@ const ExperienceTemplate1 = ({
                 right: '30%',
                 width: '50%',
                 height: '50%',
-                backgroundImage: `url(${companyLogo})`, // Use the logo or another image
+                backgroundImage: `url(${logoFileName})`, // Use the logo or another image
                 transform: 'rotate(340deg)',
                 backgroundSize: 'contain',
                 backgroundRepeat: 'no-repeat',

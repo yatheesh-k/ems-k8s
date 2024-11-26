@@ -58,14 +58,15 @@
            <div class="watermark">
                <img src="${blurredImage}" alt="Blurred Company Logo" />
            </div>
-        <p>This is to certify that <b>${employee.firstName} ${employee.lastName}</b> was employed with our company ${company[0].companyName} from ${employee.dateOfHiring} to ${request.date}
+        <p>This is to certify that <b>${employee.firstName} ${employee.lastName}</b> with an ID <b>${employee.employeeId}</b> was employed with our Company <b>${company[0].companyName}</b> from <b>${employee.dateOfHiring}</b> to <b>${request.date} </b>
         <#if employee.designationName?has_content>
             as a <b>${employee.designationName}</b>.
         </#if>
         </p>
-        <p>We found ${employee.firstName} ${employee.lastName} to be very dedicated to the work assigned. He was result-oriented, professional, and sincere. He carries excellent interpersonal skills and knowledge which helped in completing many valuable business assignments. He is a true team player and a fun-loving individual who mixed well with both his seniors and juniors.</p>
-        <p>We wish him all the best for future ventures. Please feel free to contact us for any other information required.</p>
-
+        <p>We found ${employee.firstName} ${employee.lastName} to be very dedicated to the work assigned. He/She were results-oriented, professional, and sincere. He/She possess excellent interpersonal skills and knowledge, which helped in completing many valuable business assignments. He/She are a true team player and a fun-loving individual who mixes well with both  seniors and juniors.</p>
+        <p>We are sure that his/her passion and dedication will help him/her excel in whatever they choose to do next in their life. He/She have shown a high level of commitment throughout his/her time with our company.</p>
+        <p>We wish him/her all the best for future ventures. Please feel free to contact us for any further information required.</p>
+            <p>Sincerely,</p>
         <div>For company ${company[0].companyName}</div>
 
          <div style="margin-top:100px">Authorized Signature</div>

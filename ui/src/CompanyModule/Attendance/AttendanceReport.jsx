@@ -842,7 +842,7 @@ const AttendanceReport = () => {
                                         <div className='col-12 col-md-6 col-lg-4 mb-2'>
                                             <label>Total Working Days</label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 name='totalWorkingDays'
                                                 readOnly
                                                 className="form-control"
@@ -853,8 +853,9 @@ const AttendanceReport = () => {
                                         <div className='col-12 col-md-6 col-lg-4 mb-2'>
                                             <label>No. Of Working Days</label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 name='noOfWorkingDays'
+                                                maxLength={2}
                                                 className="form-control"
                                                 {...register("noOfWorkingDays", {
                                                     required: "No. of working days is required",

@@ -844,8 +844,8 @@ const EmployeeSalaryStructure = () => {
             ) : (
               <div className="col-12">
                 <div className="card">
-                  <div className="card-header" style={{ paddingBottom: "0" }}>
-                    <h5 className="card-title">Employee Details</h5>
+                  <div className="card-header">
+                    <h5 className="card-title" style={{marginBottom:"0px"}}>Employee Details</h5>
                     <div
                       className="dropdown-divider"
                       style={{ borderTopColor: "#d7d9dd" }}
