@@ -176,7 +176,8 @@
             border-collapse: collapse;
         }
 
-        .employee-table th, td {
+        .employee-table th,
+        td {
             border: 1px solid black;
             padding: 3px;
             text-align: left;
@@ -211,87 +212,89 @@
             height: auto;
             opacity: 0.05;
         }
-
-
     </style>
 </head>
 
 <body>
-    <img src= "${blurredImage}" alt="Company Logo" class="watermark" />
-    <div class="logo">
-        <img src= "${company.imageFile}" alt="Company Logo"/>
-    </div>
-
-    <h5 class="confidential-text">Private & Confidential</h5>
-    <div class="date-info">
-        <h6 class="date">Date: ${offerLetter.offerDate}</h6>
-        <h6 class="ref-no">Ref No: ${offerLetter.referenceNo}</h6>
-    </div>
-
-
-    <div class="employee-details">
-        <h6>To</h6>
-        <h6>Ms. ${offerLetter.employeeName}</h6>
-        <h6>D/o: ${offerLetter.employeeFatherName}</h6>
-        <h6>Address: ${offerLetter.employeeAddress}</h6>
-        <h6>Contact No: ${offerLetter.employeeContactNo}</h6>
-    </div>
-    <div class="subject-offer">
-        <h6>Subject: Offer Of Employment</h6>
-    </div>
-    <div class="company-about">
-        <h6>Dear ${offerLetter.employeeName}</h6>
-        <p>We welcome you to our pursuit of excellence and we feel proud to have a professional of your stature as a
-            member of the ${company.companyName} family and wish you a long, rewarding, and satisfying career with
-            us.
-        </p>
-        <p>On behalf of ${company.companyName}., hereinafter referred to as ‘the Company’, we are pleased to
-            extend
-            an offer for the position of ‘${offerLetter.employeePosition}’ in our organization with the following
-            mentioned details:
-        </p>
-        <div class="top-navbar">
-            <p class="with-arrow">You would join us on or before ‘${offerLetter.joiningDate}’ or else this offer
-                would be null and
-                void.</p>
-            <p class="with-arrow">You will be deployed at our office site and your job location would be at
-                ‘${offerLetter.jobLocation}’.
-            </p>
-            <p class="with-arrow">Your gross compensation per annum is ‘${offerLetter.grossCompensation}’</p>
-            <p class="with-dot"><b>The proposed compensation details are attached as Annexure '1' , And details of
-                    required
-                    documents at the time of joining are attached as Annexure '2'.</b></p>
+    <img src="${blurredImage}" alt="Company Logo" class="watermark" />
+        <div class="logo">
+            <img src="${company.imageFile}" alt="Company Logo" />
         </div>
-        <p>You will also be governed by all other instructions/rules/policies of the company, which are not specifically
-            mentioned in this letter. For clarification, if any, regarding these instructions/rules/policies please get
-            in touch with HR Department.</p>
-        <p>
-            <b>Probation Period:</b> Probation period will be six months. Your service will get
-            confirmed/extended/terminated
-            depending upon your performance shown in the probation period and feedback received through the confirmation
-            appraisal process.
-        </p>
-    </div>
-    <h5 style="text-align: center; margin-top: 55px;">
-    <#if company.cinNo?has_content>
+
+        <h5 class="confidential-text">Private & Confidential</h5>
+        <div class="date-info">
+            <h6 class="date">Date: ${offerLetter.offerDate}</h6>
+            <h6 class="ref-no">Ref No: ${offerLetter.referenceNo}</h6>
+        </div>
+
+
+        <div class="employee-details">
+            <h6>To</h6>
+            <h6>Name: ${offerLetter.employeeName}</h6>
+            <h6>S/o,D/o: ${offerLetter.employeeFatherName}</h6>
+            <h6>Address: ${offerLetter.employeeAddress}</h6>
+            <h6>Contact No: ${offerLetter.employeeContactNo}</h6>
+        </div>
+        <div class="subject-offer">
+            <h6>Subject: Offer Of Employment</h6>
+        </div>
+        <div class="company-about">
+            <h6>Dear ${offerLetter.employeeName}</h6>
+            <p>We welcome you to our pursuit of excellence and we feel proud to have a professional of your stature as a
+                member of the ${company.companyName} family and wish you a long, rewarding, and satisfying career with
+                us.
+            </p>
+            <p>On behalf of ${company.companyName}., here in after referred to as ‘the Company’, we are pleased to
+                extend
+                an offer for the position of ‘${offerLetter.employeePosition}’ in our organization with the following
+                mentioned details:
+            </p>
+            <div class="top-navbar">
+                <p class="with-arrow">You would join us on or before ‘${offerLetter.joiningDate}’ or else this offer
+                    would be null and
+                    void.</p>
+                <p class="with-arrow">You will be deployed at our office site and your job location would be at
+                    ‘${offerLetter.jobLocation}’.
+                </p>
+                <p class="with-arrow">Your gross compensation per annum is ‘${offerLetter.grossCompensation}’</p>
+                <p class="with-dot"><b>The proposed compensation details are attached as Annexure '1' , And details of
+                        required
+                        documents at the time of joining are attached as Annexure '2'.</b></p>
+            </div>
+            <p>You will also be governed by all other instructions/rules/policies of the company, which are not
+                specifically
+                mentioned in this letter. For clarification, if any, regarding these instructions/rules/policies please
+                get
+                in touch with HR Department.</p>
+            <p>
+                <b>Probation Period:</b> Probation period will be six months. Your service will get
+                confirmed/extended/terminated
+                depending upon your performance shown in the probation period and feedback received through the
+                confirmation
+                appraisal process.
+            </p>
+        </div>
+        <h5 style="text-align: center; margin-top: 43px;">
+            <#if company.cinNo?has_content>
                 CIN: ${company.cinNo}
-            <#elseif company.companyRegNo?has_content>
-                Registration No: ${company.companyRegNo}
-            <#else>
-                <!-- Optionally, you can add a default text if both are null -->
-                Company Information Not Available
-    </#if>
-    </h5>
-    <hr style="color: rgb(10, 53, 248);" />
-    <div style="text-align: center; font-size: 14px;">
-        <p>
-            ${company.companyName}<br />
-            ${company.companyAddress}<br />
-            PH: ${company.mobileNo}, Email: ${company.emailId} | Web: https://${company.shortName}.com
-        </p>
-    </div>
+                <#elseif company.companyRegNo?has_content>
+                    Registration No: ${company.companyRegNo}
+                    <#else>
+                        <!-- Optionally, you can add a default text if both are null -->
+                        Company Information Not Available
+            </#if>
+        </h5>
+        <hr style="color: rgb(10, 53, 248);" />
+        <div style="text-align: center; font-size: 14px;">
+            <p>
+                ${company.companyName}<br />
+                ${company.companyAddress}<br />
+                PH: ${company.mobileNo}, Email: ${company.emailId} | Web: https://${company.shortName}.com
+            </p>
+        </div>
+
     <div class="logo">
-        <img src= "${company.imageFile}" alt="Company Logo" />
+        <img src="${company.imageFile}" alt="Company Logo" />
     </div>
     <div style="margin-top: -27px;">
         <p>
@@ -362,11 +365,11 @@
     <h5 style="text-align: center; margin-top: 40px;">
         <#if company.cinNo?has_content>
             CIN: ${company.cinNo}
-        <#elseif company.companyRegNo?has_content>
-            Registration No: ${company.companyRegNo}
-        <#else>
-            <!-- Optionally, you can add a default text if both are null -->
-            Company Information Not Available
+            <#elseif company.companyRegNo?has_content>
+                Registration No: ${company.companyRegNo}
+                <#else>
+                    <!-- Optionally, you can add a default text if both are null -->
+                    Company Information Not Available
         </#if>
     </h5>
     <hr style="color: rgb(10, 53, 248);" />
@@ -406,16 +409,17 @@
                 by a written mail and signed copy within the next 24 hours.</b>
         </p>
         <p>Please do not hesitate to contact us in case you have any queries.</p>
-      <h5 style="text-align: center; margin-top: 440px;">
-        <#if company.cinNo?has_content>
-            CIN: ${company.cinNo}
-        <#elseif company.companyRegNo?has_content>
-            Registration No: ${company.companyRegNo}
-        <#else>
-            <!-- Optionally, you can add a default text if both are null -->
-            Company Information Not Available
-        </#if>
-     </h5>        <hr style="color: rgb(10, 53, 248);" />
+        <h5 style="text-align: center; margin-top: 440px;">
+            <#if company.cinNo?has_content>
+                CIN: ${company.cinNo}
+                <#elseif company.companyRegNo?has_content>
+                    Registration No: ${company.companyRegNo}
+                    <#else>
+                        <!-- Optionally, you can add a default text if both are null -->
+                        Company Information Not Available
+            </#if>
+        </h5>
+        <hr style="color: rgb(10, 53, 248);" />
         <div style="text-align: center; font-size: 14px;">
             <p>
                 ${company.companyName}<br />
@@ -427,7 +431,7 @@
     <div class="logo">
         <img src="${company.imageFile}" alt="Company Logo" />
     </div>
-    <div class="salary-table" style= "page-break-after: always;">
+    <div class="salary-table" style="page-break-after: always;">
         <h5 class="annexure-text">Annexure -1 </h5>
         <p style="text-align: left; font-size: 15px; ">Fixed Salary breakup</p>
         <table>
@@ -451,28 +455,28 @@
         <p>*Income Tax deduction is subjected to timely submission of the investment details.</p>
         <p>*Pan Card submission is mandatory for the disbursement of the salary.</p>
 
-       <div style="margin-top: 90px;">
-           <h5 style="text-align: center;">
-               <#if company.cinNo?has_content>
-                   CIN: ${company.cinNo}
-               <#elseif company.companyRegNo?has_content>
-                   Registration No: ${company.companyRegNo}
-               <#else>
-                   <!-- Optionally, you can add a default text if both are null -->
-                   Company Information Not Available
-               </#if>
-           </h5>
-           <hr style="color: rgb(10, 53, 248);" />
-           <div style="text-align: center; font-size: 14px;">
-               <p>
-                   ${company.companyName}<br />
-                   ${company.companyAddress}<br />
-                   PH: ${company.mobileNo}, Email: ${company.emailId} | Web: https://${company.shortName}.com
-               </p>
-           </div>
-       </div>
+        <div style="margin-top: 90px;">
+            <h5 style="text-align: center;">
+                <#if company.cinNo?has_content>
+                    CIN: ${company.cinNo}
+                    <#elseif company.companyRegNo?has_content>
+                        Registration No: ${company.companyRegNo}
+                        <#else>
+                            <!-- Optionally, you can add a default text if both are null -->
+                            Company Information Not Available
+                </#if>
+            </h5>
+            <hr style="color: rgb(10, 53, 248);" />
+            <div style="text-align: center; font-size: 14px;">
+                <p>
+                    ${company.companyName}<br />
+                    ${company.companyAddress}<br />
+                    PH: ${company.mobileNo}, Email: ${company.emailId} | Web: https://${company.shortName}.com
+                </p>
+            </div>
+        </div>
 
-   </div>
+    </div>
 
     <div class="logo">
         <img src="${company.imageFile}" alt="Company Logo" />
@@ -560,16 +564,16 @@
             </tr>
         </table>
     </div>
-     <h5 style="text-align: center; margin-top: 100px;">
-            <#if company.cinNo?has_content>
-                CIN: ${company.cinNo}
+    <h5 style="text-align: center; margin-top: 100px;">
+        <#if company.cinNo?has_content>
+            CIN: ${company.cinNo}
             <#elseif company.companyRegNo?has_content>
                 Registration No: ${company.companyRegNo}
-            <#else>
-                <!-- Optionally, you can add a default text if both are null -->
-                Company Information Not Available
-            </#if>
-        </h5>
+                <#else>
+                    <!-- Optionally, you can add a default text if both are null -->
+                    Company Information Not Available
+        </#if>
+    </h5>
     <hr style="color: rgb(10, 53, 248);" />
     <div style="text-align: center; font-size: 14px;">
         <p>
@@ -597,16 +601,17 @@
             numbers.
         </p>
     </div>
-     <h5 style="text-align: center; margin-top: 549px;">
+    <h5 style="text-align: center; margin-top: 549px;">
         <#if company.cinNo?has_content>
             CIN: ${company.cinNo}
-        <#elseif company.companyRegNo?has_content>
-            Registration No: ${company.companyRegNo}
-        <#else>
-            <!-- Optionally, you can add a default text if both are null -->
-            Company Information Not Available
+            <#elseif company.companyRegNo?has_content>
+                Registration No: ${company.companyRegNo}
+                <#else>
+                    <!-- Optionally, you can add a default text if both are null -->
+                    Company Information Not Available
         </#if>
-    </h5>    <hr style="color: rgb(10, 53, 248);" />
+    </h5>
+    <hr style="color: rgb(10, 53, 248);" />
     <div style="text-align: center; font-size: 14px;">
         <p>
             ${company.companyName}<br />

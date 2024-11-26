@@ -153,7 +153,7 @@ const EmsLogin = () => {
                       placeholder="Email Id"
                       autoComplete="off"
                       onKeyDown={handleEmailChange}
-                      onInput={toInputLowerCase}
+                     // onInput={toInputLowerCase}
                       {...register("username", {
                         required: "Email Id is Required.",
                         pattern: {
@@ -176,6 +176,7 @@ const EmsLogin = () => {
                         name="password"
                         placeholder="Password"
                         onChange={handleEmailChange}
+                        maxLength={16}
                         type={passwordShown ? "text" : "password"}
                         {...register("password", {
                           required: "Password is Required",

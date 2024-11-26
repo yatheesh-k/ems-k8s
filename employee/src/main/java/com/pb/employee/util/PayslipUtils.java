@@ -537,7 +537,8 @@ public class PayslipUtils {
 
         String var = null, fix = null, bas = null, gross = null;
         String hra = null, trav = null, pfc = null, other = null, spa = null;
-        String te = null, pfE = null, pfEmployer = null, lop = null, tax = null, itax = null, ttax = null, tded = null, net = null;
+        String te = null, pfE = null, pfEmployer = null, lop = null, tax = null,
+                itax = null, ttax = null, tded = null, net = null,department=null,designation=null;
         Map<String, String> allowances = new HashMap<>();
         Map<String, String> deductions = new HashMap<>();
 
@@ -583,6 +584,15 @@ public class PayslipUtils {
                 deductions.put(entry.getKey(), maskValue(entry.getValue()));
             }
         }
+        if (payslipRequest.getDepartment() != null) {
+            department  = Base64.getEncoder().encodeToString((payslipRequest.getDepartment()).getBytes());
+            payslipRequest.setDepartment(department);
+
+        }
+        if (payslipRequest.getDesignation() != null) {
+            designation  = Base64.getEncoder().encodeToString((payslipRequest.getDesignation()).getBytes());
+            payslipRequest.setDesignation(designation);
+        }
 
         ObjectMapper objectMapper = new ObjectMapper();
         AttendanceEntity attendanceEntity = objectMapper.convertValue(payslipRequest.getAttendance(),AttendanceEntity.class);
@@ -625,17 +635,6 @@ public class PayslipUtils {
         // Convert annual gross salary to monthly salary for Basic Salary
         Double grossMonthlySalary = grossAmount / 12;
 
-        // Store Basic Salary breakdown without adding to total initially
-        Map<String, String> basicSalaryData = new HashMap<>();
-        basicSalaryData.put(Constants.MONTH, formatValue(String.valueOf(grossMonthlySalary)));
-        basicSalaryData.put(Constants.ANNUAL, formatValue(String.valueOf(grossAmount)));
-        components.put(Constants.BASIC_SALARY, basicSalaryData); // Add Basic Salary first but don’t yet add to total
-
-        double totalMonthlySalary = 0.0;
-        double totalAnnualSalary = 0.0;
-
-        double totalDedMonthlySalary = 0.0;
-        double totalDedAnnualSalary = 0.0;
         // Calculate allowances and accumulate totals
         Map<String, String> allowances = salaryConfiguration.getAllowances();
         if (allowances != null) {
@@ -644,22 +643,22 @@ public class PayslipUtils {
                 double allowanceAnnualValue = Double.parseDouble(persentageOrValueForYearly(entry.getValue(), grossAmount));
                 double allowanceMonthlyValue = allowanceAnnualValue / 12;
 
-                // Accumulate allowance totals for later addition to Gross Salary
-                totalMonthlySalary += allowanceMonthlyValue;
-                totalAnnualSalary += allowanceAnnualValue;
-
                 // Add the formatted allowance to components
                 Map<String, String> allowanceData = new HashMap<>();
                 allowanceData.put(Constants.MONTH, formatValue(String.valueOf(allowanceMonthlyValue)));
                 allowanceData.put(Constants.ANNUAL, formatValue(String.valueOf(allowanceAnnualValue)));
                 components.put(formatComponentName(entry.getKey()), allowanceData);
-
             }
         }
+
+        // **Gross CTC** (directly using the provided grossAnnualSalary)
         Map<String, String> grossSalaryData = new HashMap<>();
-        grossSalaryData.put(Constants.MONTH, "<b>"+formatValue(String.valueOf(totalMonthlySalary))+"</b>");
-        grossSalaryData.put(Constants.ANNUAL,  "<b>"+ formatValue(String.valueOf(totalAnnualSalary))+"</b>");
-        components.put("<b>"+Constants.GROSS_CTC+"</b>", grossSalaryData);
+        grossSalaryData.put(Constants.MONTH, "<b>" + formatValue(String.valueOf(grossMonthlySalary)) + "</b>");
+        grossSalaryData.put(Constants.ANNUAL, "<b>" + formatValue(String.valueOf(grossAmount)) + "</b>");
+        components.put("<b>" + Constants.GROSS_CTC + "</b>", grossSalaryData);
+
+        double totalDedMonthlySalary = 0.0;
+        double totalDedAnnualSalary = 0.0;
         // Calculate deductions without affecting Gross Salary
         Map<String, String> deductions = salaryConfiguration.getDeductions();
         if (deductions != null) {
@@ -667,27 +666,34 @@ public class PayslipUtils {
                 double deductionAnnualValue = Double.parseDouble(persentageOrValueForYearly(entry.getValue(), grossAmount));
                 double deductionMonthlyValue = deductionAnnualValue / 12;
 
-                totalDedMonthlySalary +=deductionMonthlyValue;
-                totalDedAnnualSalary +=deductionAnnualValue;
                 // Add formatted deduction to components only
                 Map<String, String> deductionData = new HashMap<>();
-                deductionData.put(Constants.MONTH, formatValue(String.valueOf(deductionMonthlyValue)));
-                deductionData.put(Constants.ANNUAL, formatValue(String.valueOf(deductionAnnualValue)));
+                String formatMonthlyValue =  formatValue(String.valueOf(deductionMonthlyValue));
+                String formatYearlyValue =  formatValue(String.valueOf(deductionAnnualValue));
+                deductionData.put(Constants.MONTH, formatMonthlyValue);
+                deductionData.put(Constants.ANNUAL, formatYearlyValue);
                 components.put(formatComponentName(entry.getKey()), deductionData);
+
+                totalDedMonthlySalary += Double.parseDouble(formatMonthlyValue);
+                totalDedAnnualSalary += Double.parseDouble(formatYearlyValue);
+
             }
         }
-        // Add Gross Salary to components
-
+        // **Total Deductions** (from monthly and annual totals)
         Map<String, String> grossSalaryCtcData = new HashMap<>();
-        grossSalaryCtcData.put(Constants.MONTH,  "<b>"+formatValue(String.valueOf(totalDedMonthlySalary))+"</b>");
-        grossSalaryCtcData.put(Constants.ANNUAL, "<b>"+ formatValue(String.valueOf(totalDedAnnualSalary))+"</b>");
-        components.put("<b>"+Constants.TOTAL_DEDUCTIONS+"</b>", grossSalaryCtcData);
+        grossSalaryCtcData.put(Constants.MONTH, "<b>" + formatValue(String.valueOf(totalDedMonthlySalary)) + "</b>");
+        grossSalaryCtcData.put(Constants.ANNUAL, "<b>" + formatValue(String.valueOf(totalDedAnnualSalary)) + "</b>");
+        components.put("<b>" + Constants.TOTAL_DEDUCTIONS + "</b>", grossSalaryCtcData);
+
+        // **Net Salary** after deductions
         Map<String, String> netSalary = new HashMap<>();
-        netSalary.put(Constants.MONTH,  "<b>"+formatValue(String.valueOf(totalMonthlySalary-totalDedMonthlySalary))+"</b>");
-        netSalary.put(Constants.ANNUAL,  "<b>"+formatValue(String.valueOf(totalAnnualSalary-totalDedAnnualSalary))+"</b>");
-        components.put("<b>"+Constants.NET_SALARY+"</b>", netSalary);
+        netSalary.put(Constants.MONTH, "<b>" + formatValue(String.valueOf(grossMonthlySalary - totalDedMonthlySalary)) + "</b>");
+        netSalary.put(Constants.ANNUAL, "<b>" + formatValue(String.valueOf(grossAmount - totalDedAnnualSalary)) + "</b>");
+        components.put("<b>" + Constants.NET_SALARY + "</b>", netSalary);
+
         return components;
     }
+
 
     public static Map<String, Map<String, String>> calculateSalaryYearlyComponents(SalaryConfigurationEntity salaryConfiguration, String grossAnnualSalary) {
         Map<String, Map<String, String>> components = new LinkedHashMap<>(); // Use LinkedHashMap to maintain order

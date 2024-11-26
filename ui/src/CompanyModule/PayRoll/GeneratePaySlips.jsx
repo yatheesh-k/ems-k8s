@@ -22,6 +22,7 @@ const GeneratePaySlip = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
+  const [templateAvailable, setTemplateAvailable] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentTemplate, setCurrentTemplate] = useState(null);
   const { user } = useAuth();
@@ -148,12 +149,15 @@ const GeneratePaySlip = () => {
   const fetchTemplate = async () => {
     try {
       const response = await TemplateGetAPI();
+      const templateNumber = response.data.data.payslipTemplateNo;
       const templateData = response.data.data;
       setCurrentTemplate(templateData);
+      setTemplateAvailable(!!templateNumber);
       if (!templateData.payslipTemplateNo) {
         toast.error("Invalid payslip template number.");
       }
     } catch (error) {
+      setTemplateAvailable(false);
       console.error("API fetch error:", error);
       toast.error("Failed to fetch payslip templates. Please try again.");
     }
@@ -211,6 +215,22 @@ const GeneratePaySlip = () => {
     }
   };
 
+  if (!templateAvailable) {
+    return (
+      <LayOut>
+        <div className="container-fluid p-0">
+          <div className="row justify-content-center">
+            <div className="col-8 text-center mt-5">
+              <h2>No Payslip Template Available</h2>
+              <p>To set up the Payslip templates before proceeding, Please select the Template from Settings <a href="/payslipTemplates">Payslip Templates </a></p>
+              <p>Please contact the administrator to set up the Payslip templates before proceeding.</p>
+            </div>
+          </div>
+        </div>
+      </LayOut>
+    );
+  }
+
   return (
     <LayOut>
       <div className="container-fluid p-0">
@@ -232,7 +252,7 @@ const GeneratePaySlip = () => {
           <div className="col-12">
             <div className="card">
               <div className="card-header">
-                <h5 className="card-title">Generate PaySlips</h5>
+                <h5 className="card-title" style={{marginBottom:"0px"}}>Generate PaySlips</h5>
                 <div className="dropdown-divider" style={{ borderTopColor: "#D7D9DD" }} />
               </div>
               <form onSubmit={handleSubmit(onSubmit)}>

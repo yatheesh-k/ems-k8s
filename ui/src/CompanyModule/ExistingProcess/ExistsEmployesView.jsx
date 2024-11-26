@@ -106,7 +106,7 @@ const ExistsEmployesView = () => {
   const fetchTemplate = async (companyId) => {
     try {
       const res = await TemplateGetAPI(companyId);
-      const templateNumber = res.data.data.experienceTemplateNo;
+      const templateNumber = res.data.data.relievingTemplateNo;
          setSelectedTemplate(templateNumber)
          setTemplateAvailable(true)
     } catch (error) {
@@ -205,7 +205,7 @@ const ExistsEmployesView = () => {
         }
       }
     } else {
-      errorMessage = "Network Error!";
+      // errorMessage = "Network Error!";
     }
     toast.error(errorMessage, {
       position: "top-right",

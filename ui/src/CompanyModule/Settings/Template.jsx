@@ -94,21 +94,33 @@ const Template = () => {
 
     const calculateValues = () => {
         console.log("Gross Amount: ", grossAmount); // Log the grossAmount
-    
+
         if (salaryStructures.length === 0) {
             toast.error("No salary structure available for calculation.");
             return;
         }
-    
+
         const activeStructure = salaryStructures.find(structure => structure.status === "Active");
         if (!activeStructure) {
             toast.error("No active salary structure available.");
             return;
         }
-    
+
+        const allowances = activeStructure.allowances;
         const deductions = activeStructure.deductions;
         console.log("Deductions: ", deductions); // Log deductions to check the structure
-    
+
+        const totalAllowances = Object.entries(allowances).reduce((dcc, [key, value]) => {
+            let allowanceAmount = 0;
+            if (typeof value === 'string' && value.includes('%')) {
+                const percentageValue = parseFloat(value.slice(0, -1));
+                allowanceAmount = grossAmount * (percentageValue / 100);
+            } else {
+                allowanceAmount = parseFloat(value);
+            }
+            return dcc + allowanceAmount;
+        }, 0);
+
         const totalDeductions = Object.entries(deductions).reduce((acc, [key, value]) => {
             let deductionAmount = 0;
             if (typeof value === 'string' && value.includes('%')) {
@@ -119,19 +131,20 @@ const Template = () => {
             }
             return acc + deductionAmount;
         }, 0);
-    
+
         console.log("Calculated Total Deductions: ", totalDeductions); // Log totalDeductions
-    
+
         const netSalary = grossAmount - totalDeductions;
         console.log("Net Salary: ", netSalary); // Log netSalary
-    
+
         setCalculatedValues({
+            totalAllowances,
             totalDeductions,
             netSalary,
         });
     };
-    
-console.log("calculateValues",calculatedValues)
+
+    console.log("calculateValues", calculatedValues)
     const handleDownload = async () => {
         const payload = {
             offerDate: date,
@@ -494,6 +507,11 @@ console.log("calculateValues",calculatedValues)
                                                 </tr>
                                             );
                                         })}
+                                         <tr>
+                                            <td><strong>Other Allowance</strong></td>
+                                            <td>{Math.round((grossAmount - calculatedValues.totalAllowances) / 12)}</td>
+                                            <td>{Math.floor(grossAmount-calculatedValues.totalAllowances)}</td>
+                                        </tr>
                                         <tr>
                                             <td><strong>Gross (CTC)</strong></td>
                                             <td>{Math.floor(grossAmount / 12)}</td>
@@ -514,19 +532,24 @@ console.log("calculateValues",calculatedValues)
                                                             .replace(/^./, str => str.toUpperCase())
                                                         }
                                                     </td>
-                                                    <td>{Math.floor(deductionAmount.toFixed(2) / 12)}</td>
+                                                    <td>{Math.round(deductionAmount.toFixed(2) / 12)}</td>
                                                     <td>{Math.floor(deductionAmount.toFixed(2))}</td>
                                                 </tr>
                                             );
                                         })}
-                                       <tr>
+                                        <tr>
                                             <td><strong>Total Deductions</strong></td>
-                                            <td>{calculatedValues.totalDeductions ? Math.floor(calculatedValues.totalDeductions / 12) : 0}</td>
+                                            <td>{calculatedValues.totalDeductions ? Math.round(calculatedValues.totalDeductions / 12) : 0}</td>
                                             <td>{calculatedValues.totalDeductions ? Math.floor(calculatedValues.totalDeductions) : 0}</td>
                                         </tr>
+                                        {/* <tr>
+                                            <td><strong>Total Allowances</strong></td>
+                                            <td>{calculatedValues.totalAllowances ? Math.round(calculatedValues.totalAllowances / 12) : 0}</td>
+                                            <td>{calculatedValues.totalAllowances ? Math.floor(calculatedValues.totalAllowances) : 0}</td>
+                                        </tr> */}
                                         <tr>
                                             <td><strong>Net Salary</strong></td>
-                                            <td>{calculatedValues.netSalary ? Math.floor(calculatedValues.netSalary / 12) : 0}</td>
+                                            <td>{calculatedValues.netSalary ? Math.round(calculatedValues.netSalary / 12) : 0}</td>
                                             <td>{calculatedValues.netSalary ? Math.floor(calculatedValues.netSalary) : 0}</td>
                                         </tr>
                                     </React.Fragment>

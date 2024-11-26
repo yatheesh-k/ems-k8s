@@ -13,7 +13,7 @@ const AddIncrement = () => {
   const {
     register,
     handleSubmit,
-    setValue,
+    setValue,watch,
     control, reset, getValues,
     formState: { errors },
   } = useForm({ mode: 'onChange',
@@ -126,6 +126,18 @@ const AddIncrement = () => {
       setShowCards(false);
     }
   }, [id, salaryId, setValue]);
+
+  const validateAppraisalDate = (value) => {
+    const dateOfHiring = new Date(watch('dateOfHiring')); // Access the dateOfHiring value
+    const appraisalDate = new Date(value);
+
+    // If the Appraisal Date is before the Date of Hiring, return an error message
+    if (appraisalDate < dateOfHiring) {
+      return "Appraisal Date must be after the Date of Hiring.";
+    }
+
+    return true; // If valid, return true
+  };
 
 
   const monthOptions = Array.from({ length: 12 }, (_, i) => ({
@@ -328,7 +340,7 @@ const AddIncrement = () => {
       const errorMessage = error.response.data.error.message;
       toast.error(errorMessage);
     } else {
-      toast.error("Network Error !");
+      // toast.error("Network Error !");
     }
     console.error(error.response);
   };
@@ -535,9 +547,9 @@ const AddIncrement = () => {
         <div className="container-fluid p-0">
           <div className="row justify-content-center">
             <div className="col-8 text-center mt-5">
-              <h2>No Interns Template Available</h2>
-              <p>To set up the Interns templates before proceeding, Please select the Template from Settings <a href="/internsTemplates">Interns Templates </a></p>
-              <p>Please contact the administrator to set up the Interns templates before proceeding.</p>
+              <h2>No Appraisal Template Available</h2>
+              <p>To set up the Appraisal templates before proceeding, Please select the Template from Settings <a href="/appraisalTemplates">Appraisal Templates </a></p>
+              <p>Please contact the administrator to set up the Appraisal templates before proceeding.</p>
             </div>
           </div>
         </div>
@@ -1017,7 +1029,7 @@ const AddIncrement = () => {
                                   <p className="errorMsg">Department Required</p>
                                 )}
                               </div>
-
+{/* 
                               <div className="col-md-5 mb-3">
                                 <label className="form-label">Time Period</label>
                                 <div className="row d-flex">
@@ -1058,7 +1070,7 @@ const AddIncrement = () => {
                                   </p>
                                 )}
                               </div>
-                              <div className="col-lg-1"></div>
+                              <div className="col-lg-1"></div> */}
                               <div className="col-md-5 mb-3">
                                 <label className="form-label">Appraisal Date (Hike Start Date)</label>
                                 <input
@@ -1066,6 +1078,7 @@ const AddIncrement = () => {
                                   className="form-control"
                                   {...register("dateOfSalaryIncrement", {
                                     required: "Appraisal Date is required",
+                                    validate: validateAppraisalDate, // Apply custom validation
                                   })}
                                 />
                                 {errors.dateOfSalaryIncrement && (

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAuth } from '../../../Context/AuthContext';
 
 const RelievingTemplate2 = ({
   companyLogo,
@@ -12,6 +13,8 @@ const RelievingTemplate2 = ({
   resignationDate,
   lastWorkingDate,
 }) => {
+  const {logoFileName} = useAuth();
+
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', position: 'relative' }}>
         {/* Company Logo positioned at the top right */}
@@ -31,7 +34,7 @@ const RelievingTemplate2 = ({
           right: '30%',
           width: '50%',
           height: '40%',
-          backgroundImage: `url(${companyLogo})`, // Use the logo or another image
+          backgroundImage: `url(${logoFileName})`, // Use the logo or another image
           transform: 'rotate(340deg)',
           backgroundSize: 'contain',
           backgroundRepeat: 'no-repeat',
@@ -51,7 +54,7 @@ const RelievingTemplate2 = ({
         <p><strong>{employeeName}</strong></p>
         <p>Employee Id: <strong>{employeeId}</strong></p>
         <p>
-          I am writing to acknowledge the resignation letter you submitted, dated <strong>{resignationDate}</strong>. I want to inform you that your resignation has been accepted, and you will be relieved from your position as an  <strong> {designation}</strong> with <strong>{companyData.companyName}</strong> on <strong>{lastWorkingDate}</strong>  with Serving the Notice Period <strong>{noticePeriod}</strong> months.
+          I am writing to acknowledge the resignation letter you submitted, dated <strong>{resignationDate}</strong>. I want to inform you that your resignation has been accepted, and you will be relieved from your position as an  <strong> {designation}</strong> with <strong>{companyData.companyName}</strong> on <strong>{lastWorkingDate}</strong>  with Serving the Notice Period <strong>{noticePeriod}</strong>.
         </p>
          <p>We kindly request you to return your company ID and any other company-owned items that you have been using during your tenure with our firm.</p>
         <p>

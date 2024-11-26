@@ -23,6 +23,9 @@ const Reset = ({ companyName, onClose, show }) => {
 
   const toggleNewPasswordVisibility = () => {
     setNewPasswordShown(!newPasswordShown);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
     setConfirmPasswordShown(!confirmPasswordShown);
   };
 
@@ -89,6 +92,19 @@ const Reset = ({ companyName, onClose, show }) => {
     setConfirmPasswordShown(false);
     setError(null);
   };
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+
+    // Prevent space key (keyCode 32) from being entered
+    if (e.keyCode === 32) {
+      e.preventDefault();
+    }
+
+    // If there is any space already entered, prevent re-render with spaces
+    if (value.includes(" ")) {
+      e.preventDefault();
+    }
+  };
 
   return (
 
@@ -118,6 +134,7 @@ const Reset = ({ companyName, onClose, show }) => {
                   id="password"
                   placeholder="Enter your old password"
                   type={oldPasswordShown ? "text" : "password"}
+                  onKeyDown={handleEmailChange}
                   {...register("password", {
                     required: "Old Password is Required",
                     minLength: {
@@ -150,6 +167,7 @@ const Reset = ({ companyName, onClose, show }) => {
                   id="newPassword"
                   placeholder="Enter your new password"
                   type={newPasswordShown ? "text" : "password"}
+                  onKeyDown={handleEmailChange}
                   {...register("newPassword", {
                     required: "New Password is Required",
                     minLength: {
@@ -172,7 +190,7 @@ const Reset = ({ companyName, onClose, show }) => {
             <div className="form-group mt-3">
               <label className="form-label">Confirm Password</label>
               <div className="input-group">
-                <span className="input-group-text" onClick={toggleNewPasswordVisibility}>
+                <span className="input-group-text" onClick={toggleConfirmPasswordVisibility}>
                   {confirmPasswordShown ? <UnlockFill size={20} color="#4C489D" /> : <LockFill size={20} color="#4C489D" />}
                 </span>
                 <input
@@ -181,6 +199,7 @@ const Reset = ({ companyName, onClose, show }) => {
                   id="confirmPassword"
                   placeholder="Confirm your new password"
                   type={confirmPasswordShown ? "text" : "password"}
+                  onKeyDown={handleEmailChange}
                   {...register("confirmPassword", {
                     required: "Please confirm your password",
                     validate: (value) => value === getValues("newPassword") || "The passwords do not match",
@@ -194,7 +213,7 @@ const Reset = ({ companyName, onClose, show }) => {
               )}
             </div>
 
-            <div className="text-center mt-4 ">
+            <div className="mt-4" style={{marginLeft:"55%"}}>
             <button className="btn btn-secondary me-2" type="button" onClick={handleReset}>
                 Reset
               </button>

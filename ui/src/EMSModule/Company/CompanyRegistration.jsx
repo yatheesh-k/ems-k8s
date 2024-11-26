@@ -8,13 +8,13 @@ import {
 } from "../../Utils/Axios";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Eye, EyeSlash } from "react-bootstrap-icons";
 
 const CompanyRegistration = () => {
   const {
     register,
     watch,
     handleSubmit,
+    setValue,
     formState: { errors },
     reset,
   } = useForm({ mode: 'onChange' });
@@ -36,10 +36,14 @@ const CompanyRegistration = () => {
   };
   const handleEmailChange = (e) => {
     const value = e.target.value;
-    if (value.trim() !== "") {
-      return;
-    }
+
+    // Prevent space key (keyCode 32) from being entered
     if (e.keyCode === 32) {
+      e.preventDefault();
+    }
+
+    // If there is any space already entered, prevent re-render with spaces
+    if (value.includes(" ")) {
       e.preventDefault();
     }
   };
@@ -50,93 +54,93 @@ const CompanyRegistration = () => {
 
   const onSubmit = async (data) => {
     try {
-        const updateData = {
-            companyAddress: data.companyAddress,
-            mobileNo: data.mobileNo,
-            alternateNo: data.alternateNo,
-            name: data.name,
-            personalMailId: data.personalMailId,
-            personalMobileNo: data.personalMobileNo,
-            companyBranch:data.address,
-            address: data.address,
-            companyType: data.companyType,
-        };
+      const updateData = {
+        companyAddress: data.companyAddress,
+        mobileNo: data.mobileNo,
+        alternateNo: data.alternateNo,
+        name: data.name,
+        personalMailId: data.personalMailId,
+        personalMobileNo: data.personalMobileNo,
+        companyBranch: data.address,
+        address: data.address,
+        companyType: data.companyType,
+      };
 
-       // Conditionally add CIN number or Company Registration Number
-        if (data.companyType === "Private Limited") {
-            updateData.cinNumber = data.cinNumber;
-        } else if (data.companyType === "Firm") {
-            updateData.companyRegistrationNumber = data.companyRegistrationNumber;
-        }
-        if (location.state && location.state.id) {
-            // Update existing company
-            await companyUpdateByIdApi(location.state.id, updateData);
-            toast.success("Company Updated Successfully");
-        } else {
-            // Create new company
-            await CompanyRegistrationApi(data);
-            toast.success("Company Created Successfully");
-        }
+      // Conditionally add CIN number or Company Registration Number
+      if (data.companyType === "Private Limited") {
+        updateData.cinNumber = data.cinNumber;
+      } else if (data.companyType === "Firm") {
+        updateData.companyRegistrationNumber = data.companyRegistrationNumber;
+      }
+      if (location.state && location.state.id) {
+        // Update existing company
+        await companyUpdateByIdApi(location.state.id, updateData);
+        toast.success("Company Updated Successfully");
+      } else {
+        // Create new company
+        await CompanyRegistrationApi(data);
+        toast.success("Company Created Successfully");
+      }
 
-        navigate("/companyView");
-        reset();
+      navigate("/companyView");
+      reset();
     } catch (error) {
       console.log("Entered catch block");  // Add this line
-        console.log("Full error object:", error);
-        let errorList = [];
+      console.log("Full error object:", error);
+      let errorList = [];
 
-        // Check if error response exists
-        if (error.response) {
-          console.log("Axios response error:", error.response.data.error); // Log Axios error response
-    
-          // Case 1: General error message
-          if (error.response.data.error && error.response.data.error.message) {
-            const generalErrorMessage = error.response.data.error.message;
-            toast.error("Invalid Format");  // Display general error message
-            errorList.push(generalErrorMessage);
-          }
-    
-          // Case 2: Specific error messages (multiple messages, such as form validation errors)
-          if (error.response.data.error && error.response.data.error.messages) {
-            const specificErrorMessages = error.response.data.error.messages;
-            toast.error("Invalid Format Fields"); 
-            specificErrorMessages.forEach((message) => {
-             // Display each error message individually
-              errorList.push(message);
-            });
-          }
-    
-          // Case 3: Specific error data (duplicate value conflicts)
-          if (error.response.data.data) {
-            const conflictData = error.response.data.data;
-            let conflictMessage = "Error Details:\n";
-            toast.error(error.response.data.message);
-            // Check if data contains specific conflict details (e.g., duplicate values)
-            Object.keys(conflictData).forEach((key) => {
-              const value = conflictData[key];
-              conflictMessage += `${key}: ${value}\n`;
-            });
-    
-            // Display detailed conflict message in toast and add to error list
-            errorList.push(conflictMessage);
-          }
-    
-          // Handle HTTP 409 Conflict Error (duplicate or other conflicts)
-          if (error.response.status === 409) {
-            const conflictMessage = error.response.data.message || "A conflict occurred.";
-            toast.error(conflictMessage);  // Show conflict error in toast
-          }
-    
-        } else {
-          // General error (non-Axios)
-          console.log('Error without response:', error);
-          toast.error('An unexpected error occurred. Please try again later.');
+      // Check if error response exists
+      if (error.response) {
+        console.log("Axios response error:", error.response.data.error); // Log Axios error response
+
+        // Case 1: General error message
+        if (error.response.data.error && error.response.data.error.message) {
+          const generalErrorMessage = error.response.data.error.message;
+          // toast.error("Invalid Format");  // Display general error message
+          errorList.push(generalErrorMessage);
         }
-    
-        // Update the error messages in the state
-        setErrorMessage(errorList);
+
+        // Case 2: Specific error messages (multiple messages, such as form validation errors)
+        if (error.response.data.error && error.response.data.error.messages) {
+          const specificErrorMessages = error.response.data.error.messages;
+          // toast.error("Invalid Format Fields");
+          specificErrorMessages.forEach((message) => {
+            // Display each error message individually
+            errorList.push(message);
+          });
+        }
+
+        // Case 3: Specific error data (duplicate value conflicts)
+        if (error.response.data.data) {
+          const conflictData = error.response.data.data;
+          let conflictMessage = "Error Details:\n";
+          toast.error(error.response.data.message);
+          // Check if data contains specific conflict details (e.g., duplicate values)
+          Object.keys(conflictData).forEach((key) => {
+            const value = conflictData[key];
+            conflictMessage += `${key}: ${value}\n`;
+          });
+
+          // Display detailed conflict message in toast and add to error list
+          errorList.push(conflictMessage);
+        }
+
+        // Handle HTTP 409 Conflict Error (duplicate or other conflicts)
+        if (error.response.status === 409) {
+          const conflictMessage = error.response.data.message || "A conflict occurred.";
+          toast.error(conflictMessage);  // Show conflict error in toast
+        }
+
+      } else {
+        // General error (non-Axios)
+        console.log('Error without response:', error);
+        toast.error('An unexpected error occurred. Please try again later.');
       }
-};
+
+      // Update the error messages in the state
+      setErrorMessage(errorList);
+    }
+  };
 
   useEffect(() => {
     if (location && location.state && location.state.id) {
@@ -167,39 +171,48 @@ const CompanyRegistration = () => {
   };
 
   const clearForm = () => {
+    setCompanyType("");  
     reset();
-    setErrorMessage('');
   };
-
   const toInputTitleCase = (e) => {
     const input = e.target;
     let value = input.value;
     const cursorPosition = input.selectionStart; // Save the cursor position
+  
     // Remove leading spaces
     value = value.replace(/^\s+/g, '');
-    // Ensure only alphabets and spaces are allowed
+  
+    // Ensure only allowed characters (alphabets, numbers, and some special chars)
     const allowedCharsRegex = /^[a-zA-Z0-9\s!@#&()*/,.\\-]+$/;
     value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
+  
     // Capitalize the first letter of each word
     const words = value.split(' ');
-    // Capitalize the first letter of each word and lowercase the rest
+  
+    // Capitalize the first letter of each word and leave the rest of the characters as they are
     const capitalizedWords = words.map(word => {
       if (word.length > 0) {
-        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        // Capitalize the first letter, keep the rest as is
+        return word.charAt(0).toUpperCase() + word.slice(1);
       }
       return '';
     });
+  
     // Join the words back into a string
     let formattedValue = capitalizedWords.join(' ');
+  
     // Remove spaces not allowed (before the first two characters)
-    if (formattedValue.length > 2) {
-      formattedValue = formattedValue.slice(0, 2) + formattedValue.slice(2).replace(/\s+/g, ' ');
+    if (formattedValue.length > 3) {
+      formattedValue = formattedValue.slice(0, 3) + formattedValue.slice(3).replace(/\s+/g, ' ');
     }
+  
     // Update input value
     input.value = formattedValue;
+  
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
+  
   const validatePassword = (value) => {
     const errors = [];
     if (!/(?=.*[0-9])/.test(value)) {
@@ -241,21 +254,20 @@ const CompanyRegistration = () => {
   const toInputEmailCase = (e) => {
     const input = e.target;
     let value = input.value;
-  
+
     // Remove all spaces from the input
     value = value.replace(/\s+/g, '');
-  
+
     // If the first character is not lowercase, make it lowercase
     if (value.length > 0 && value[0] !== value[0].toLowerCase()) {
       value = value.charAt(0).toLowerCase() + value.slice(1);
     }
-  
-    // Update the input value
-    input.value = value;
+
+    // Only update the value if it was changed
+    if (input.value !== value) {
+      input.value = value;
+    }
   };
-  
-
-
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
     let newValue = "";
@@ -292,7 +304,7 @@ const CompanyRegistration = () => {
     // Ensure only alphabets (upper and lower case), numbers, and allowed special characters
     const allowedCharsRegex = /^[a-zA-Z0-9\s!-_@#&()*/,.\\-{}]+$/
     value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
-    
+
     // Capitalize the first letter of each word, but allow uppercase letters in the middle of the word
     const words = value.split(' ');
     const capitalizedWords = words.map(word => {
@@ -302,22 +314,23 @@ const CompanyRegistration = () => {
       }
       return '';
     });
-    
+
     // Join the words back into a string
     let formattedValue = capitalizedWords.join(' ');
-  
+
     // Remove spaces not allowed (before the first two characters)
     if (formattedValue.length > 2) {
       formattedValue = formattedValue.slice(0, 2) + formattedValue.slice(2).replace(/\s+/g, ' ');
     }
-  
+
     // Update input value
     input.value = formattedValue;
-  
+
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
- 
+
+
   const validateREGISTER = (value) => {
     const spaceError = "Spaces are not allowed in the Register Number.";
     const patternError = "Invalid Register Number format";
@@ -365,7 +378,35 @@ const CompanyRegistration = () => {
 
     return true; // Return true if all checks pass
   };
-
+  
+  const validateName = (value) => {
+    if (!value || value.trim().length === 0) {
+      return "Company Name is Required.";
+    } else if (!/^[A-Za-z\s,.'\-/]*$/.test(value)) {
+      return "Field accepts only alphabets and special characters:( , ' -  . /)";
+    } else {
+      const words = value.split(" "); 
+        for (const word of words) {
+          if (word.length < 1) {
+            return "Minimum Length 1 Characters Required.";  // If any word is shorter than 2 characters, return this message
+          } else if (word.length > 100) {
+            return "Max Length 100 Characters Exceed.";  // If any word is longer than 40 characters, return this message
+          }
+        }
+      
+      if (/^\s|\s$/.test(value)) {
+        return "No Leading or Trailing Spaces Allowed.";
+      } else if (/\s{2,}/.test(value)) {
+        return "No Multiple Spaces Between Words Allowed.";
+      }
+      // Check if there's a space after the last character in the input string
+    if (/\s$/.test(value)) {
+      return "No Trailing Space Allowed.";  // Space after the last character is not allowed
+    }
+    }
+  
+    return true; // Return true if all conditions are satisfied
+  };
   const validatePAN = (value) => {
     const spaceError = "Spaces are not allowed in the PAN Number.";
     const patternError = "Invalid PAN Number format";
@@ -384,27 +425,26 @@ const CompanyRegistration = () => {
 
   function handlePhoneNumberChange(event) {
     let value = event.target.value;
-    // Ensure only one space is allowed after +91
-    if (value.startsWith("+91 ") && value.charAt(3) !== " ") {
+
+    // Ensure the value starts with +91 and one space
+    if (value.startsWith("+91") && value.charAt(3) !== " ") {
       value = "+91 " + value.slice(3); // Ensure one space after +91
     }
-    // Update the value in the input
+
+    // Allow only numeric characters after +91 and the space
+    const numericValue = value.slice(4).replace(/[^0-9]/g, ''); // Remove any non-numeric characters after +91 
+    if (numericValue.length <= 10) {
+      value = "+91 " + numericValue; // Keep the +91 with a space
+    }
+
+    // Limit the total length to 14 characters (including +91 space)
+    if (value.length > 14) {
+      value = value.slice(0, 14); // Truncate if the length exceeds 14 characters
+    }
+
+    // Update the input field's value
     event.target.value = value;
-    }
-  
-  // Function to handle keydown for specific actions (e.g., prevent multiple spaces)
-  function handlePhoneNumberKeyDown(event) {
-    let value = event.target.value;
-    // Prevent backspace if the cursor is before the "+91 "
-    if (event.key === "Backspace" && value.startsWith("+91 ") && event.target.selectionStart <= 4) {
-      event.preventDefault(); // Prevent the backspace if it's before the "+91 "
-    }
-    // Prevent multiple spaces after +91
-    if (event.key === " " && value.charAt(3) === " ") {
-      event.preventDefault();
-    }
   }
-  
 
   return (
     <LayOut>
@@ -432,7 +472,7 @@ const CompanyRegistration = () => {
               <div className="card">
                 <div className="card-header ">
                   <div className="d-flex justify-content-start align-items-start">
-                    <h5 className="card-title me-2">Company Type</h5>
+                    <h5 className="card-title" style={{marginBottom:"0px"}}>Company Type</h5>
                     <span className="text-danger">
                       {errors.companyType && (
                         <p className="mb-0">{errors.companyType.message}</p>
@@ -491,7 +531,7 @@ const CompanyRegistration = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title">Company Details</h5>
+                  <h5 className="card-title" style={{marginBottom:"0px"}}>Company Details</h5>
                   <div
                     className="dropdown-divider"
                     style={{ borderTopColor: "#d7d9dd" }}
@@ -511,18 +551,9 @@ const CompanyRegistration = () => {
                         autoComplete="off"
                         {...register("companyName", {
                           required: "Company Name is Required",
-                          pattern: {
-                            value: /^[a-zA-Z\s,.'\-/]*$/,
-                            message: "Field accepts only alphabets and special characters:( , ' -  . /)",
-                          },
-                          minLength: {
-                            value: 2,
-                            message: "Minimum 2 Characters Required",
-                          },
-                          maxLength: {
-                            value: 100,
-                            message: "Maximum 100 Characters allowed",
-                          },
+                          validate:{
+                            validateName,
+                           },
                         })}
                         disabled={editMode}
                       />
@@ -530,7 +561,7 @@ const CompanyRegistration = () => {
                         <p className="errorMsg">{errors.companyName.message}</p>
                       )}
                     </div>
-                    <div className="col-lg-1"></div>
+                    <div className="col-lg-1"></div> 
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Service Name <span style={{ color: "red" }}>*</span>
@@ -573,7 +604,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Company Email Id"
                         autoComplete="off"
-                        onInput={toInputEmailCase}
+                        //onInput={toInputEmailCase}
                         onKeyDown={handleEmailChange}
                         {...register("emailId", {
                           required: "Company Email Id is Required",
@@ -598,24 +629,23 @@ const CompanyRegistration = () => {
                           <input
                             type="tel"
                             className="form-control"
-                            placeholder="Enter Contact Number"
+                            placeholder="Enter Personal Mobile Number"
                             autoComplete="off"
-                            maxLength={15} // Limit input to 15 characters
+                            maxLength={14} // Limit input to 14 characters (3 for +91, 1 for space, 10 for digits)
                             defaultValue="+91 " // Set the initial value to +91 with a space
                             onInput={handlePhoneNumberChange} // Handle input changes
-                            onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                             {...register("mobileNo", {
                               required: "Contact Number is Required",
                               validate: {
                                 startsWithPlus91: (value) => {
                                   if (!value.startsWith("+91 ")) {
-                                    return "Contact Number must start with +91 and a space.";
+                                    return "Contact Number must start with +91.";
                                   }
                                   return true;
                                 },
                                 correctLength: (value) => {
                                   if (value.length !== 14) {
-                                    return "Contact Number must be exactly 10 digits (including +91).";
+                                    return "Contact Number must be exactly 10 digits.";
                                   }
                                   return true;
                                 },
@@ -623,10 +653,6 @@ const CompanyRegistration = () => {
                                   const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
                                   return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
                                 },
-                              },
-                              pattern: {
-                                value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                                message: "Contact Number must start with +91 followed by 10 digits.",
                               },
                             })}
                           />
@@ -665,8 +691,8 @@ const CompanyRegistration = () => {
                             />
                             {/* Eye Icon to toggle password visibility */}
                             <span
-                              className={`bi bi-eye-fill field-icon pb-1 toggle-password ${passwordShown ? 'text-primary' : ''}`}                              onClick={togglePasswordVisiblity}
-                              style={{background: "transparent",borderLeft:"none"}}
+                              className={`bi bi-eye field-icon pb-1 toggle-password ${passwordShown ? 'text-primary' : ''}`} onClick={togglePasswordVisiblity}
+                              style={{ background: "transparent", borderLeft: "none" }}
                             >
                             </span>
                           </div>
@@ -687,10 +713,10 @@ const CompanyRegistration = () => {
                             className="form-control"
                             placeholder="Enter Contact Number"
                             autoComplete="off"
-                            maxLength={15} // Limit input to 15 characters
+                            maxLength={14} // Limit input to 15 characters
                             defaultValue="+91 " // Set the initial value to +91 with a space
                             onInput={handlePhoneNumberChange} // Handle input changes
-                            onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
+                            // onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                             {...register("mobileNo", {
                               required: "Contact Number is Required",
                               validate: {
@@ -713,7 +739,7 @@ const CompanyRegistration = () => {
                               },
                               pattern: {
                                 value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                                message: "Contact Number must start with +91 followed by 10 digits.",
+                                message: "Contact Number is Required.",
                               },
                             })}
                           />
@@ -734,32 +760,32 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Alternate Number"
                         autoComplete="off"
-                        maxLength={15}
+                        maxLength={14}
                         defaultValue="+91 " // Set the initial value to +91 with a space
                         onInput={handlePhoneNumberChange} // Handle input changes
-                        onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
+                        // onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                         {...register("alternateNo", {
                           validate: {
                             startsWithPlus91: (value) => {
                               if (!value.startsWith("+91 ")) {
-                                return "Contact Number must start with +91 and a space.";
+                                return "Alternate Number must start with +91 and a space.";
                               }
                               return true;
                             },
                             correctLength: (value) => {
                               if (value.length !== 14) {
-                                return "Contact Number must be exactly 10 digits (including +91).";
+                                return "Alternate Number must be exactly 10 digits (including +91).";
                               }
                               return true;
                             },
                             notRepeatingDigits: (value) => {
                               const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                              return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
+                              return !isRepeating || "Alternate Number cannot consist of the same digit repeated.";
                             },
                           },
                           pattern: {
                             value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                            message: "Contact Number must start with +91 followed by 10 digits.",
+                            message: "Alternate Number is Required.",
                           },
                         })}
                       />
@@ -785,7 +811,7 @@ const CompanyRegistration = () => {
                         {...register("companyAddress", {
                           required: "Company Address is Required",
                           pattern: {
-                            value:/^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
+                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
                             message:
                               "Please enter valid Address",
                           },
@@ -814,7 +840,7 @@ const CompanyRegistration = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title">Company Registration Details</h5>
+                  <h5 className="card-title" style={{marginBottom:"0px"}}>Company Registration Details</h5>
                   <div
                     className="dropdown-divider"
                     style={{ borderTopColor: "#d7d9dd" }}
@@ -822,66 +848,66 @@ const CompanyRegistration = () => {
                 </div>
                 <div className="card-body">
                   <div className="row">
-                  {companyType === "Private Limited" && (
-                    <>
-                    <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Company CIN Number<span style={{ color: "red" }}>*</span></label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Enter Company CIN Number"
-                        onKeyDown={handleEmailChange}
-                        onInput={toInputSpaceCase}
-                        autoComplete="off"
-                        maxLength={21}
-                        {...register("cinNo", {
-                          required: "Company CIN Number is Required",
-                          maxLength: {
-                            value: 21,
-                            message: "CIN Number must not exceed 21 characters",
-                          },
+                    {companyType === "Private Limited" && (
+                      <>
+                        <div className="col-12 col-md-6 col-lg-5 mb-3">
+                          <label className="form-label">Company CIN Number<span style={{ color: "red" }}>*</span></label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Enter Company CIN Number"
+                            onKeyDown={handleEmailChange}
+                            onInput={toInputSpaceCase}
+                            autoComplete="off"
+                            maxLength={21}
+                            {...register("cinNo", {
+                              required: "Company CIN Number is Required",
+                              maxLength: {
+                                value: 21,
+                                message: "CIN Number must not exceed 21 characters",
+                              },
 
-                          validate: validateCIN,
+                              validate: validateCIN,
 
-                        })}
-                        disabled={editMode}
-                      />
-                      {errors.cinNo && (
-                        <p className="errorMsg">{errors.cinNo.message}</p>
-                      )}
+                            })}
+                            disabled={editMode}
+                          />
+                          {errors.cinNo && (
+                            <p className="errorMsg">{errors.cinNo.message}</p>
+                          )}
 
-                    </div>
-                    <div className="col-lg-1"></div>
+                        </div>
+                        <div className="col-lg-1"></div>
 
-                     </>
-                  )}
+                      </>
+                    )}
                     {companyType === "Firm" && (
                       <>
-                     
-                      <div className="col-12 col-md-6 col-lg-5 mb-3">
-                        <label className="form-label">
-                          Company Registration Number <span style={{ color: "red" }}>*</span>
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Enter Company Registration Number"
-                          autoComplete="off"
-                          maxLength={21}
-                          {...register("companyRegNo", {
-                            required: "Company Registration Number is Required",
-                            maxLength: {
-                              value: 21,
-                              message: "Registration Number must not exceed 21 characters",
-                            },
-                            validate: validateREGISTER
-                          })}
-                          disabled={editMode}
-                        />
-                        {errors.companyRegNo && <p className="errorMsg">{errors.companyRegNo.message}</p>}
-                      </div>
-                      <div className="col-lg-1"></div>
-                       </>
+
+                        <div className="col-12 col-md-6 col-lg-5 mb-3">
+                          <label className="form-label">
+                            Company Registration Number <span style={{ color: "red" }}>*</span>
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Enter Company Registration Number"
+                            autoComplete="off"
+                            maxLength={21}
+                            {...register("companyRegNo", {
+                              required: "Company Registration Number is Required",
+                              maxLength: {
+                                value: 21,
+                                message: "Registration Number must not exceed 21 characters",
+                              },
+                              validate: validateREGISTER
+                            })}
+                            disabled={editMode}
+                          />
+                          {errors.companyRegNo && <p className="errorMsg">{errors.companyRegNo.message}</p>}
+                        </div>
+                        <div className="col-lg-1"></div>
+                      </>
                     )}
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
@@ -946,7 +972,7 @@ const CompanyRegistration = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title">Authorized Details</h5>
+                  <h5 className="card-title" style={{marginBottom:"20px"}}>Authorized Details</h5>
                   <div
                     className="dropdown-divider"
                     style={{ borderTopColor: "#d7d9dd" }}
@@ -962,9 +988,8 @@ const CompanyRegistration = () => {
                         type="text"
                         className="form-control"
                         placeholder="Enter Name"
-                        onKeyDown={handleEmailChange}
+                       // onKeyDown={handleEmailChange}
                         onInput={toInputTitleCase}
-
                         autoComplete="off"
                         {...register("name", {
                           required: "Name is Required",
@@ -997,7 +1022,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Personal Email Id"
                         autoComplete="off"
-                        onInput={toInputEmailCase}
+                       // onInput={toInputEmailCase}
                         onKeyDown={handleEmailChange}
                         {...register("personalMailId", {
                           required: "Personal Email Id is Required",
@@ -1019,44 +1044,45 @@ const CompanyRegistration = () => {
                         <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
-                          type="tel"
-                          className="form-control"
-                          placeholder="Enter Personal Mobile Number"
-                          autoComplete="off"
-                          defaultValue="+91 " // Set the initial value to +91 with a space
-                          onInput={handlePhoneNumberChange} // Handle input changes
-                          onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
-                          {...register("personalMobileNo", {
-                            required: "Personal Mobile Number is Required",
-                            validate: {
-                              startsWithPlus91: (value) => {
-                                if (!value.startsWith("+91 ")) {
-                                  return "Contact Number must start with +91 and a space.";
-                                }
-                                return true;
-                              },
-                              correctLength: (value) => {
-                                if (value.length !== 14) {
-                                  return "Contact Number must be exactly 10 digits (including +91).";
-                                }
-                                return true;
-                              },
-                              notRepeatingDigits: (value) => {
-                                const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                                return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
-                              },
+                        type="tel"
+                        className="form-control"
+                        placeholder="Enter Personal Mobile Number"
+                        autoComplete="off"
+                        maxLength={14}
+                        defaultValue="+91 " // Set the initial value to +91 with a space
+                        onInput={handlePhoneNumberChange} // Handle input changes
+                        // onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
+                        {...register("personalMobileNo", {
+                          required: "Personal Mobile Number is Required",
+                          validate: {
+                            startsWithPlus91: (value) => {
+                              if (!value.startsWith("+91 ")) {
+                                return "Personal Mobile Number must start with +91 and a space.";
+                              }
+                              return true;
                             },
-                            pattern: {
-                              value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                              message: "Contact Number must start with +91 followed by 10 digits.",
+                            correctLength: (value) => {
+                              if (value.length !== 14) {
+                                return "Personal Mobile Number must be exactly 10 digits (including +91).";
+                              }
+                              return true;
                             },
-                          })}
-                        />
-                        {errors.personalMobileNo && (
-                          <p className="errorMsg">
-                            {errors.personalMobileNo.message}
-                          </p>
-                        )}
+                            notRepeatingDigits: (value) => {
+                              const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
+                              return !isRepeating || "Personal Mobile Number cannot consist of the same digit repeated.";
+                            },
+                          },
+                          pattern: {
+                            value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
+                            message: "Personal Mobile Number is Required.",
+                          },
+                        })}
+                      />
+                      {errors.personalMobileNo && (
+                        <p className="errorMsg">
+                          {errors.personalMobileNo.message}
+                        </p>
+                      )}
                     </div>
 
                     <div className="col-lg-1"></div>
@@ -1075,7 +1101,7 @@ const CompanyRegistration = () => {
                         {...register("address", {
                           required: "Address is Required",
                           pattern: {
-                            value:/^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
+                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
                             message:
                               "Please enter valid Address",
                           },
@@ -1100,24 +1126,24 @@ const CompanyRegistration = () => {
           </div>
           <div className="col-lg-1"></div>
           <div className="col-12 d-flex align-items-start mt-1">
-          {errorMessage.length > 0 && (
-                <div className="col-9 alert alert-danger text-center mt-1">
-                    {errorMessage.map((msg, index) => (
-                        <p key={index}>{msg}</p>  // Display each message in a <p> tag
-                    ))}
-                </div>
+            {errorMessage.length > 0 && (
+              <div className="col-9 alert alert-danger text-center mt-1">
+                {errorMessage.map((msg, index) => (
+                  <p key={index}>{msg}</p>  // Display each message in a <p> tag
+                ))}
+              </div>
             )}
             <div className={`col-${errorMessage ? '3' : '12'} d-flex justify-content-end mt-1`}>
-                          <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
-                            Clear
-                          </button>
-                          <button
-                            className={editMode ? "btn btn-danger btn-lg" : "btn btn-primary btn-lg"}
-                            type="submit"
-                          >
-                            {editMode ? 'Update Company' : 'Submit'}
-                          </button>
-                        </div>
+              <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
+                Clear
+              </button>
+              <button
+                className={editMode ? "btn btn-danger btn-lg" : "btn btn-primary btn-lg"}
+                type="submit"
+              >
+                {editMode ? 'Update Company' : 'Submit'}
+              </button>
+            </div>
           </div>
         </form>
       </div >

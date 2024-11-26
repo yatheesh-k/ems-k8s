@@ -131,31 +131,33 @@ const Designation = () => {
   
   const validateName = (value) => {
     if (!value || value.trim().length === 0) {
-      return "Designation Name is Required.";
+      return "Deparment Name is Required.";
     } else if (!/^[A-Za-z ]+$/.test(value)) {
       return "Only Alphabetic Characters are Allowed.";
     } else {
       const words = value.split(" ");
       
-      for (const word of words) {
-        if (word.length < 2) {
-          return "Minimum Length 2 characters.";  // If any word is shorter than 2 characters, return this message
-        } else if (word.length > 40) {
-          return "Maximum Length 40 characters.";  // If any word is longer than 40 characters, return this message
+        for (const word of words) {
+          if (word.length < 1) {
+            return "Minimum Length 1 Characters Required.";  // If any word is shorter than 2 characters, return this message
+          } else if (word.length > 40) {
+            return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters, return this message
+          }
         }
-      }
       
       if (/^\s|\s$/.test(value)) {
         return "No Leading or Trailing Spaces Allowed.";
       } else if (/\s{2,}/.test(value)) {
         return "No Multiple Spaces Between Words Allowed.";
       }
+      // Check if there's a space after the last character in the input string
+    if (/\s$/.test(value)) {
+      return "No Trailing Space Allowed.";  // Space after the last character is not allowed
+    }
     }
   
     return true; // Return true if all conditions are satisfied
   };
-
-  
   useEffect(() => {
     setFilteredData(designations);
   }, [designations]);

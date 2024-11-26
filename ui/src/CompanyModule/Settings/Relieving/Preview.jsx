@@ -9,7 +9,7 @@ import RelievingTemplate3 from "./RelievingTemplate3";
 const Preview = ({ previewData,selectedTemplate }) => { // Accept previewData as a prop
   const [companyData, setCompanyData] = useState({});
   const [loading, setLoading] = useState(false);
-  const { user } = useAuth();
+  const { user, logoFileName } = useAuth();
   const logo = "/assets/img/adapt_adapt_logo.png";
 
   const fetchCompanyData = async (companyId) => {
@@ -84,7 +84,7 @@ const Preview = ({ previewData,selectedTemplate }) => { // Accept previewData as
       name: "3",
       content: () => (
         <RelievingTemplate3
-          companyLogo={logo}
+          companyLogo={logoFileName}
           companyData={companyData}
           employeeName={previewData.employeeName}
           employeeId={previewData.employeeId}
@@ -96,7 +96,7 @@ const Preview = ({ previewData,selectedTemplate }) => { // Accept previewData as
         />
       ),
     },
-  ], [companyData, logo, previewData]);
+  ], [companyData, logoFileName, previewData]);
 
   const selectedTemplateContent = useMemo(() => {
     const template = templates.find(t => t.name === selectedTemplate);

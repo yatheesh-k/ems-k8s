@@ -47,10 +47,14 @@ const CompanyLogin = () => {
       }, 1000);
       return () => clearTimeout(timer);
     } else {
+      // OTP expired logic
       setOtpExpired(true);
       setOtpSent(false);
+      setOtpTimeLimit(56); // Reset OTP timer
+      reset({ otp: "" });
     }
   }, [otpTimeLimit]);
+  
 
   const sendOtp = (data) => {
     const payload = {
@@ -77,6 +81,8 @@ const CompanyLogin = () => {
           console.error('Token not found in response');
           setErrorMessage("Unexpected response format. Token not found.");
           setShowErrorModal(true);
+          setOtpSent(false);
+          reset('')
         }
         setLoading(false);
       })
@@ -228,7 +234,7 @@ const CompanyLogin = () => {
                                   name="email"
                                   placeholder="Email Id"
                                   autoComplete="off"
-                                  onInput={toInputLowerCase}
+                                 // onInput={toInputLowerCase}
                                   onKeyDown={handleEmailChange}
                                   readOnly={otpSent}
                                   {...register("username", {
@@ -256,6 +262,7 @@ const CompanyLogin = () => {
                                       placeholder="Password"
                                       onChange={handleEmailChange}
                                       type={passwordShown ? "text" : "password"}
+                                      maxLength={16}
                                       {...register("password", {
                                         required: "Password is Required",
                                         minLength: {

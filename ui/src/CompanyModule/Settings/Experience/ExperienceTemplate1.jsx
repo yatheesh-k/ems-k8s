@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAuth } from '../../../Context/AuthContext';
 
 const ExperienceTemplate1 = ({
     companyLogo,
@@ -11,6 +12,7 @@ const ExperienceTemplate1 = ({
     department,
     experienceDate
 }) => {
+  const {logoFileName} = useAuth();
 
 
     return (
@@ -50,7 +52,7 @@ const ExperienceTemplate1 = ({
                 right: '30%',
                 width: '50%',
                 height: '50%',
-                backgroundImage: `url(${companyLogo})`, // Use the logo or another image
+                backgroundImage: `url(${logoFileName})`, // Use the logo or another image
                 transform: 'rotate(340deg)',
                 backgroundSize: 'contain',
                 backgroundRepeat: 'no-repeat',
@@ -70,24 +72,19 @@ const ExperienceTemplate1 = ({
             }}
           >
             <p>
-              This is to certify that <strong>{employeeName}</strong> with an ID <strong>{employeeId}</strong> was
-              employed as <strong>{designation}</strong> in the {" "}
-              <strong>{department}</strong> of {" "}
-              <strong>{companyData.companyName}</strong> from {" "}
-              <strong>{joiningDate}</strong> to {" "}
-              <strong>{experienceDate}</strong>.
+              This is to certify that <strong>{employeeName}</strong> with an ID <strong>{employeeId}</strong> was employed with our Company <strong>{companyData.companyName}</strong> from <strong>{joiningDate}</strong> to <strong>{experienceDate}</strong> as a <strong>{designation}</strong>.
             </p>
             <p>
               We found <strong>{employeeName}</strong> to be very dedicated to
-              the work assigned. They were results-oriented, professional, and
-              sincere. They possess excellent interpersonal skills and
+              the work assigned. He/She were results-oriented, professional, and
+              sincere. He/She possess excellent interpersonal skills and
               knowledge, which helped in completing many valuable business
-              assignments. They are a true team player and a fun-loving
+              assignments. He/She are a true team player and a fun-loving
               individual who mixes well with both seniors and juniors.
             </p>
             <p>
               We are sure that their passion and dedication will help them excel
-              in whatever they choose to do next in their life. They have shown
+              in whatever they choose to do next in their life. He/She have shown
               a high level of commitment throughout their time with our company.
             </p>
             <p>

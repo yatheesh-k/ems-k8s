@@ -54,7 +54,7 @@ function Profile() {
     const updateData = {
       companyAddress: data.companyAddress,
       mobileNo: data.mobileNo,
-      landNo: data.landNo,
+      alternateNo: data.alternateNo,
       name: data.name,
       personalMailId: data.personalMailId,
       personalMobileNo: data.personalMobileNo,
@@ -138,21 +138,21 @@ function Profile() {
         setImgError("File size must be less than 200KB.");
         return;
       }
-  
+
       // Check file type
       const validTypes = ["image/png", "image/jpeg", "image/svg+xml", "application/pdf"];
       if (!validTypes.includes(file.type)) {
         setImgError("Only .png, .jpg, .jpeg, .svg, and .pdf files are allowed.");
         return;
       }
-  
+
       // Clear errors if all checks pass
       setImgError('');
       setPostImage(file); // Set the valid image file
       console.log("File is valid and ready for upload:", file);
     }
   };
-  
+
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
 
@@ -220,6 +220,45 @@ function Profile() {
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
 
+  function handlePhoneNumberChange(event) {
+    let value = event.target.value;
+    // Ensure only one space is allowed after +91
+    if (value.startsWith("+91 ") && value.charAt(3) !== " ") {
+      value = "+91 " + value.slice(3); // Ensure one space after +91
+    }
+    // Update the value in the input
+    event.target.value = value;
+  }
+
+  // Function to handle keydown for specific actions (e.g., prevent multiple spaces)
+  function handlePhoneNumberKeyDown(event) {
+    let value = event.target.value;
+    // Prevent backspace if the cursor is before the "+91 "
+    if (event.key === "Backspace" && value.startsWith("+91 ") && event.target.selectionStart <= 4) {
+      event.preventDefault(); // Prevent the backspace if it's before the "+91 "
+    }
+    // Prevent multiple spaces after +91
+    if (event.key === " " && value.charAt(3) === " ") {
+      event.preventDefault();
+    }
+  }
+
+  const toInputEmailCase = (e) => {
+    const input = e.target;
+    let value = input.value;
+
+    // Remove all spaces from the input
+    value = value.replace(/\s+/g, '');
+
+    // If the first character is not lowercase, make it lowercase
+    if (value.length > 0 && value[0] !== value[0].toLowerCase()) {
+      value = value.charAt(0).toLowerCase() + value.slice(1);
+    }
+
+    // Update the input value
+    input.value = value;
+  };
+
   const toInputLowerCase = (e) => {
     const input = e.target;
     let value = input.value;
@@ -251,6 +290,41 @@ function Profile() {
     input.value = value;
   };
 
+  const toInputAddressCase = (e) => {
+    const input = e.target;
+    let value = input.value;
+    const cursorPosition = input.selectionStart; // Save the cursor position
+    // Remove leading spaces
+    value = value.replace(/^\s+/g, '');
+    // Ensure only alphabets (upper and lower case), numbers, and allowed special characters
+    const allowedCharsRegex = /^[a-zA-Z0-9\s!-_@#&()*/,.\\-{}]+$/
+    value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
+
+    // Capitalize the first letter of each word, but allow uppercase letters in the middle of the word
+    const words = value.split(' ');
+    const capitalizedWords = words.map(word => {
+      if (word.length > 0) {
+        // Capitalize the first letter, but leave the middle of the word intact
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      }
+      return '';
+    });
+
+    // Join the words back into a string
+    let formattedValue = capitalizedWords.join(' ');
+
+    // Remove spaces not allowed (before the first two characters)
+    if (formattedValue.length > 2) {
+      formattedValue = formattedValue.slice(0, 2) + formattedValue.slice(2).replace(/\s+/g, ' ');
+    }
+
+    // Update input value
+    input.value = formattedValue;
+
+    // Restore the cursor position
+    input.setSelectionRange(cursorPosition, cursorPosition);
+  };
+
   return (
     <LayOut>
       <div className="container-fluid p-0">
@@ -261,8 +335,7 @@ function Profile() {
           <div className="col-12">
             <div className="card">
               <div className="card-header">
-                <h5 className="card-title">Add Company Logo</h5>
-                <hr />
+                <h5 className="card-title" style={{ marginBottom: "0px" }}>Add Company Logo</h5>
               </div>
               <div className="card-body">
                 <div className="row">
@@ -311,7 +384,7 @@ function Profile() {
             <div className="col-12">
               <div className="card">
                 <div className="card-header ">
-                  <h5 className="card-title">Company Details</h5>
+                  <h5 className="card-title" style={{ marginBottom: "0px" }}>Company Details</h5>
                   <div className="dropdown-divider" style={{ borderTopColor: "#d7d9dd" }} />
                 </div>
                 <div className="card-body">
@@ -348,41 +421,76 @@ function Profile() {
                         className="form-control"
                         placeholder="Enter Alternate Number"
                         autoComplete="off"
-                        maxLength={10}
-                        onInput={toInputSpaceCase}
-                        onKeyDown={handleEmailChange}
+                        maxLength={14}
+                        defaultValue="+91 " // Set the initial value to +91 with a space
+                        onInput={handlePhoneNumberChange} // Handle input changes
+                        onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                         {...register("alternateNo", {
-                          required: "Alternate Number is Required",
+                          validate: {
+                            startsWithPlus91: (value) => {
+                              if (!value.startsWith("+91 ")) {
+                                return "Contact Number must start with +91 and a space.";
+                              }
+                              return true;
+                            },
+                            correctLength: (value) => {
+                              if (value.length !== 14) {
+                                return "Contact Number must be exactly 10 digits (including +91).";
+                              }
+                              return true;
+                            },
+                            notRepeatingDigits: (value) => {
+                              const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
+                              return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
+                            },
+                          },
                           pattern: {
-                            value: /^[0-9]{10}$/,
-                            message:
-                              "Alternate Number should contain only 10 numbers",
+                            value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
+                            message: "Contact Number is Required",
                           },
                         })}
                       />
-                      {errors.mobileNo && (
-                        <p className="errorMsg">{errors.mobileNo.message}</p>
+                      {errors.alternateNo && (
+                        <p className="errorMsg">{errors.alternateNo.message}</p>
                       )}
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
-                        Mobile Number <span style={{ color: "red" }}>*</span>
+                        Contact Number <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
                         type="tel"
                         className="form-control"
-                        placeholder="Enter Mobile Number"
+                        placeholder="Enter Contact Number"
                         autoComplete="off"
-                        maxLength={10}
-                        onInput={toInputSpaceCase}
-                        onKeyDown={handleEmailChange}
+                        maxLength={14} // Limit input to 14 characters
+                        defaultValue="+91 " // Set the initial value to +91 with a space
+                        onInput={handlePhoneNumberChange} // Handle input changes
+                        onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                         {...register("mobileNo", {
-                          required: "Mobile Number is Required",
+                          required: "Contact Number is Required",
+                          validate: {
+                            startsWithPlus91: (value) => {
+                              if (!value.startsWith("+91 ")) {
+                                return "Contact Number must start with +91 and a space.";
+                              }
+                              return true;
+                            },
+                            correctLength: (value) => {
+                              if (value.length !== 14) {
+                                return "Contact Number must be exactly 10 digits (including +91).";
+                              }
+                              return true;
+                            },
+                            notRepeatingDigits: (value) => {
+                              const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
+                              return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
+                            },
+                          },
                           pattern: {
-                            value: /^[0-9]{10}$/,
-                            message:
-                              "Mobile Number should contain only 10 numbers. ",
+                            value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
+                            message: "Contact Number is Required",
                           },
                         })}
                       />
@@ -391,14 +499,25 @@ function Profile() {
                       )}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label htmlFor="emailId" className="form-label">Company MailId</label>
+                      <label htmlFor="emailId" className="form-label"> Company Email Id</label>
                       <input
-                        type="text"
-                        id="emailId"
+                        type="email"
                         className="form-control"
-                        {...register("emailId")}
+                        placeholder="Enter Company Email Id"
+                        autoComplete="off"
+                        onKeyDown={handleEmailChange}
+                        {...register("emailId", {
+                          required: "Company Email Id is Required",
+                          pattern: {
+                            value: /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                            message: "Invalid email format",
+                          },
+                        })}
                         readOnly
                       />
+                      {errors.emailId && (
+                        <p className="errorMsg">{errors.emailId.message}</p>
+                      )}
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
@@ -409,23 +528,23 @@ function Profile() {
                         type="text"
                         className="form-control"
                         placeholder="Enter Company Address"
-                        onKeyDown={handleEmailChange}
-                        onInput={toInputTitleCase}
+                        //onKeyDown={handleEmailChange}
+                        onInput={toInputAddressCase}
                         autoComplete="off"
                         {...register("companyAddress", {
                           required: "Company Address is Required",
                           pattern: {
-                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*()^\-/]*$/,
+                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
                             message:
                               "Please enter valid Address",
                           },
                           minLength: {
                             value: 3,
-                            message: "minimum 3 characters allowed",
+                            message: "Minimum 3 Characters allowed",
                           },
                           maxLength: {
-                            value: 100,
-                            message: "maximum 100 characters allowed",
+                            value: 200,
+                            message: "Maximum 200 Characters allowed",
                           },
                         })}
                       />
@@ -443,7 +562,7 @@ function Profile() {
               <div className="col-12">
                 <div className="card">
                   <div className="card-header">
-                    <h5 className="card-title">Company Registration Details</h5>
+                    <h5 className="card-title" style={{ marginBottom: "0px" }}>Company Registration Details</h5>
                     <div className="dropdown-divider" style={{ borderTopColor: "#d7d9dd" }} />
                   </div>
                   <div className="card-body">
@@ -506,7 +625,7 @@ function Profile() {
               <div className="col-12">
                 <div className="card">
                   <div className="card-header">
-                    <h5 className="card-title">Authorized Details</h5>
+                    <h5 className="card-title" style={{ marginBottom: "0px" }}>Authorized Details</h5>
                     <div className="dropdown-divider" style={{ borderTopColor: "#d7d9dd" }} />
                   </div>
                   <div className="card-body">
@@ -521,7 +640,7 @@ function Profile() {
                           placeholder="Enter Name"
                           onKeyDown={handleEmailChange}
                           onInput={toInputTitleCase}
-                          maxLength={20}
+                          maxLength={100}
                           autoComplete="off"
                           {...register("name", {
                             required: "Name is Required",
@@ -530,8 +649,8 @@ function Profile() {
                               message: "Minimun 3 characters Required",
                             },
                             maxLength: {
-                              value: 20,
-                              message: "Name must not exceed 20 characters",
+                              value: 100,
+                              message: "Name must not exceed 100 characters",
                             },
                             pattern: {
                               value: /^[a-zA-Z\s]*$/,
@@ -553,13 +672,13 @@ function Profile() {
                           className="form-control"
                           placeholder="Enter Personal Email Id"
                           autoComplete="off"
-                          onInput={toInputLowerCase}
+                          onInput={toInputEmailCase}
                           onKeyDown={handleEmailChange}
                           {...register("personalMailId", {
                             required: "Personal Email Id is Required",
                             pattern: {
-                              value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
-                              message: "Invalid Email Format",
+                              value: /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                              message: "Invalid Email Format ",
                             },
                           })}
                         />
@@ -578,15 +697,33 @@ function Profile() {
                           className="form-control"
                           placeholder="Enter Personal Mobile Number"
                           autoComplete="off"
-                          onKeyDown={handleEmailChange}
-                          maxLength={10}
-                          onInput={toInputSpaceCase}
+                          maxLength={14}
+                          defaultValue="+91 " // Set the initial value to +91 with a space
+                          onInput={handlePhoneNumberChange} // Handle input changes
+                          onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                           {...register("personalMobileNo", {
                             required: "Personal Mobile Number is Required",
+                            validate: {
+                              startsWithPlus91: (value) => {
+                                if (!value.startsWith("+91 ")) {
+                                  return "Contact Number must start with +91 and a space.";
+                                }
+                                return true;
+                              },
+                              correctLength: (value) => {
+                                if (value.length !== 14) {
+                                  return "Contact Number must be exactly 10 digits (including +91).";
+                                }
+                                return true;
+                              },
+                              notRepeatingDigits: (value) => {
+                                const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
+                                return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
+                              },
+                            },
                             pattern: {
-                              value: /^[0-9]{10}$/,
-                              message:
-                                "Mobile Number should be exactly 10 digits long and should contain only numbers",
+                              value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
+                              message: "Contact Number is Required",
                             },
                           })}
                         />
@@ -602,39 +739,40 @@ function Profile() {
                           Address <span style={{ color: "red" }}>*</span>
                         </label>
                         <textarea
-                          type="text"
-                          className="form-control"
-                          placeholder="Enter Address"
-                          autoComplete="off"
-                          onInput={toInputTitleCase}
-                          onKeyDown={handleEmailChange}
-                          maxLength={100}
-                          {...register("address", {
-                            required: "Address is Required",
-                            maxLength: {
-                              value: 100,
-                              message: "Name must not exceed 100 characters",
-                            },
-                            minLength: {
-                              value: 3,
-                              message: "Mimium 3 characters Required",
-                            },
-                            pattern: {
-                              value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,&*()^\-/]*$/,
-                              message: "Please enter valid Address",
-                            },
-                          })}
-                        />
-                        {errors.address && (
-                          <p className="errorMsg">{errors.address.message}</p>
-                        )}
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter Address"
+                        autoComplete="off"
+                        onInput={toInputAddressCase}
+                        onKeyDown={handleEmailChange}
+                        maxLength={200}
+                        {...register("address", {
+                          required: "Address is Required",
+                          pattern: {
+                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
+                            message:
+                              "Please enter valid Address",
+                          },
+                          minLength: {
+                            value: 3,
+                            message: "Minimum 3 Characters allowed",
+                          },
+                          maxLength: {
+                            value: 200,
+                            message: "Maximum 200 Characters allowed",
+                          },
+                        })}
+                      />
+                      {errors.address && (
+                        <p className="errorMsg">{errors.address.message}</p>
+                      )}
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
               <div className="col-lg-1"></div>
-              <div className="col-12 d-flex justify-content-end mt-5">
+              <div className="col-12 d-flex justify-content-end">
                 <button type="submit" className="btn btn-primary">
                   Save
                 </button>

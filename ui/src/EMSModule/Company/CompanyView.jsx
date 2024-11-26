@@ -175,8 +175,8 @@ const CompanyView = () => {
     const filtered = view.filter((item) => {
       const lowerCasedSearchTerm = searchTerm.toLowerCase();
       return (
-        item.companyName.toLowerCase().includes(lowerCasedSearchTerm) ||
-        item.name.toLowerCase().includes(lowerCasedSearchTerm)
+        item.companyName.toLowerCase().includes(lowerCasedSearchTerm) 
+        // item.name.toLowerCase().includes(lowerCasedSearchTerm)
       );
     });
     setFilteredData(filtered);

@@ -347,7 +347,7 @@ const EmployeeSalaryUpdate = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title"> Salary Details </h5>
+                  <h5 className="card-title" style={{marginBottom:"0px"}}> Salary Details </h5>
                   
                 </div>
                 <div className=" card-body row">

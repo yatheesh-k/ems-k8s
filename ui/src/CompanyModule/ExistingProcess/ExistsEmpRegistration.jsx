@@ -18,7 +18,7 @@ const ExistsEmpRegistration = () => {
     watch,
     formState: { errors },
     reset,
-  } = useForm();
+  } = useForm({mode: "onChange"});
   const { user } = useAuth();
   const [emp, setEmp] = useState([]);
   const [noticePeriod, setNoticePeriod] = useState(0);
@@ -32,38 +32,75 @@ const ExistsEmpRegistration = () => {
   const [loading,setLoading]=useState(false);
   const navigate = useNavigate();
 
-
-  const calculateNoticePeriod = (resignationDate, relievingDate,dateOfHiring) => {
+  const calculateNoticePeriod = (resignationDate, relievingDate, dateOfHiring) => {
     if (resignationDate && relievingDate) {
       const resignation = new Date(resignationDate);
       const lastWorking = new Date(relievingDate);
       const hiringDate = new Date(dateOfHiring);
   
-      // Check if last working date is after resignation date
-      if (lastWorking <= resignation) {
-        setError("Last working date must be after the resignation date.");
-        setNoticePeriod(0);
-        return;
-      }
-      else if  (resignation <= hiringDate) {
-        setError("Resignation date must be after the date of hiring.");
-        setNoticePeriod(0);
-        return;
-      }
+      // Check if last working date is after resignation date and resignation date is after hiring date
+      if (lastWorking > resignation && resignation > hiringDate) {
+        // Calculate full months between resignation and last working date
+        const monthDiff = (lastWorking.getFullYear() - resignation.getFullYear()) * 12 + (lastWorking.getMonth() - resignation.getMonth());
   
-      const monthDiff = (lastWorking.getFullYear() - resignation.getFullYear()) * 12 + (lastWorking.getMonth() - resignation.getMonth());
-      setNoticePeriod(monthDiff);
+        // Calculate the total number of days between resignation and relieving date
+        const totalDaysDiff = Math.floor((lastWorking - resignation) / (1000 * 3600 * 24));
+  
+        // Calculate the number of days remaining after accounting for full months
+        const daysDiff = totalDaysDiff - (monthDiff * 30); // Estimate that 1 month has 30 days
+  
+        // Singular/plural handling for months
+        const monthText = monthDiff === 1 ? 'month' : 'months';
+        // Singular/plural handling for days
+        const dayText = daysDiff === 1 ? 'day' : 'days';
+  
+        // If the difference is less than a month, show only the days
+        if (monthDiff === 0) {
+          setNoticePeriod(`${daysDiff} ${dayText}`);
+        } else {
+          // If it's 1 month or more, show both months and days
+          setNoticePeriod(`${monthDiff} ${monthText} ${daysDiff} ${dayText}`);
+        }
+      } else {
+        // If the conditions are not met, set notice period to 0
+        setNoticePeriod(0);
+      }
     } else {
       setNoticePeriod(0);
     }
   };
-
+  
+  
   useEffect(() => {
     const subscription = watch((value) => {
       calculateNoticePeriod(value.resignationDate, value.relievingDate, value.dateOfHiring);
     });
     return () => subscription.unsubscribe();
   }, [watch]);
+
+// Custom validation for resignationDate and relievingDate
+const validateResignationDate = (value) => {
+  const dateOfHiring = new Date(watch('dateOfHiring'));
+  const resignationDate = new Date(value);
+
+  // Check if the resignation date is after the date of hiring
+  if (resignationDate < dateOfHiring) {
+    return "Resignation Date must be after the Date of Hiring.";
+  }
+  return true;
+};
+
+const validateRelievingDate = (value) => {
+  const resignationDate = new Date(watch('resignationDate'));
+  const relievingDate = new Date(value);
+
+  // Check if the relieving date is after the resignation date
+  if (relievingDate < resignationDate) {
+    return "Last Working Day (Relieving Date) must be after the Resignation Date.";
+  }
+  return true;
+};
+
 
   useEffect(() => {
     EmployeeGetApi().then((data) => {
@@ -194,7 +231,6 @@ const ExistsEmpRegistration = () => {
     });
   };
   
-
   const clearForm = () => {
     reset();
     navigate("/relievingSummary");
@@ -229,7 +265,7 @@ const ExistsEmpRegistration = () => {
         <div className="row d-flex align-items-center justify-content-between mt-1">
           <div className="col">
             <h1 className="h3">
-              <strong>Employee Exist Form</strong>
+              <strong>Employee Relieving Form</strong>
             </h1>
           </div>
           <div className="col-auto">
@@ -239,9 +275,9 @@ const ExistsEmpRegistration = () => {
                   <a href="/main">Home</a>
                 </li>
                 <li className="breadcrumb-item">
-                  <a href="/existingSummary">Exists Summary</a>
+                  <a href="/existingSummary">Relieving Summary</a>
                 </li>
-                <li className="breadcrumb-item active">Exist Employee</li>
+                <li className="breadcrumb-item active">Employee Relieving Form</li>
               </ol>
             </nav>
           </div>
@@ -252,7 +288,7 @@ const ExistsEmpRegistration = () => {
             <div className="card">
               <div className="card-header">
                 <h5 className="card-title">
-                   Existing Form
+                   Relieving Form
                 </h5>
               </div>
               <form onSubmit={handleSubmit(onSubmit)}>
@@ -263,18 +299,22 @@ const ExistsEmpRegistration = () => {
                         <Controller
                           name="employeeId"
                           control={control}
-                          rules={{ required: true }}
+                          rules={{ required: "Employee Name is required" }}
+                          defaultValue={selectedEmployee ? selectedEmployee.value : ""} // Ensure default value is set
                           render={({ field }) => (
                             <Select
                               {...field}
                               options={emp}
-                              value={emp.find((option) => option.value === field.value)}
+                              value={emp.find((option) => option.value === field.value)} // Show the selected employee correctly
                               onChange={(selectedOption) => {
-                                field.onChange(selectedOption.value);
-                                const selectedEmp = emp.find(emp => emp.value === selectedOption.value);
+                                // Update the form state when the selection changes
+                                field.onChange(selectedOption ? selectedOption.value : ""); // Update react-hook-form value
+
+                                // If an employee is selected, set their details
+                                const selectedEmp = emp.find(emp => emp.value === selectedOption?.value);
                                 if (selectedEmp) {
-                                  setSelectedEmployee(selectedEmp);
-                                  // Use selectedEmp instead of selectedEmployee here
+                                  setSelectedEmployee(selectedEmp); // Store the selected employee
+                                  setValue("employeeName", selectedEmp.employeeName); // Update other form fields
                                   setValue("designationName", selectedEmp.designationName);
                                   setValue("departmentName", selectedEmp.departmentName);
                                   setValue("dateOfHiring", selectedEmp.dateOfHiring);
@@ -349,29 +389,46 @@ const ExistsEmpRegistration = () => {
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Date of Resignation</label>
-                      <input
-                        type="date"
-                        className="form-control"
-                        placeholder="Resignation Date"
-                        name="resignationDate"
-                        {...register("resignationDate", { required: true })}
-                      />
+                      <Controller
+                          name="resignationDate"
+                          control={control}
+                          rules={{
+                            required: "Resignation Date is required",
+                            validate: validateResignationDate
+                          }}
+                          render={({ field }) => (
+                            <input
+                              {...field}
+                              type="date"
+                              className="form-control"
+                              placeholder="Resignation Date"
+                            />
+                          )}
+                        />
                       {errors.resignationDate && (
-                        <p className="errorMsg">Resignation Date Required</p>
+                        <p className="errorMsg">{errors.resignationDate.message}</p>
                       )}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Date of Last Working Day</label>
-                      <input
-                        type="date"
-                        className="form-control"
-                        placeholder="Last Working Date"
-                        name="relievingData"
-                        max={sixMonthsFromNow}
-                        {...register("relievingDate", { required: true })}
-                      />
-                      {errors.relievingData && (
-                        <p className="errorMsg">Last Working Date Required</p>
+                      <Controller
+                          name="relievingDate"
+                          control={control}
+                          rules={{
+                            required: "Relieving Date is required",
+                            validate: validateRelievingDate
+                          }}
+                          render={({ field }) => (
+                            <input
+                              {...field}
+                              type="date"
+                              className="form-control"
+                              placeholder="Last Working Date"
+                            />
+                          )}
+                        />
+                      {errors.relievingDate && (
+                        <p className="errorMsg">{errors.relievingDate.message}</p>
                       )}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
