@@ -537,7 +537,8 @@ public class PayslipUtils {
 
         String var = null, fix = null, bas = null, gross = null;
         String hra = null, trav = null, pfc = null, other = null, spa = null;
-        String te = null, pfE = null, pfEmployer = null, lop = null, tax = null, itax = null, ttax = null, tded = null, net = null;
+        String te = null, pfE = null, pfEmployer = null, lop = null, tax = null,
+                itax = null, ttax = null, tded = null, net = null,department=null,designation=null;
         Map<String, String> allowances = new HashMap<>();
         Map<String, String> deductions = new HashMap<>();
 
@@ -582,6 +583,15 @@ public class PayslipUtils {
             for (Map.Entry<String, String> entry : payslipRequest.getSalary().getSalaryConfigurationEntity().getDeductions().entrySet()) {
                 deductions.put(entry.getKey(), maskValue(entry.getValue()));
             }
+        }
+        if (payslipRequest.getDepartment() != null) {
+            department  = Base64.getEncoder().encodeToString((payslipRequest.getDepartment()).getBytes());
+            payslipRequest.setDepartment(department);
+
+        }
+        if (payslipRequest.getDesignation() != null) {
+            designation  = Base64.getEncoder().encodeToString((payslipRequest.getDesignation()).getBytes());
+            payslipRequest.setDesignation(designation);
         }
 
         ObjectMapper objectMapper = new ObjectMapper();

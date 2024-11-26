@@ -41,7 +41,7 @@
      margin: 20px 0;
      }
      .address {
-     margin-top:150px;
+     margin-top: 120px;
      text-align: center;
     }
     .allowance-fields, .allowance-values {

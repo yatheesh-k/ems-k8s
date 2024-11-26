@@ -105,26 +105,26 @@ public class ResourceIdUtils {
             prefix = Constants.TEMPLATE +"-";
 
         }
-           
-            StringBuilder md5Input = new StringBuilder();
-            for (Object arg : args) {
-                if (arg != null) {
-                    if (md5Input.length() == 0) {
-                        md5Input.append(arg.toString());
-                    } else {
-                        md5Input.append(":").append(arg.toString());
-                    }
+
+        StringBuilder md5Input = new StringBuilder();
+        for (Object arg : args) {
+            if (arg != null) {
+                if (md5Input.length() == 0) {
+                    md5Input.append(arg.toString());
+                } else {
+                    md5Input.append(":").append(arg.toString());
                 }
             }
-            String md5Hash;
-            if (isCaseSensitive) {
-                md5Hash = org.springframework.util.DigestUtils.md5DigestAsHex(md5Input.toString().getBytes()).toLowerCase();
-
-            } else {
-                md5Hash = org.springframework.util.DigestUtils.md5DigestAsHex(md5Input.toString().toLowerCase().getBytes()).toLowerCase();
-
-            }
-            return prefix + md5Hash;
         }
+        String md5Hash;
+        if (isCaseSensitive) {
+            md5Hash = org.springframework.util.DigestUtils.md5DigestAsHex(md5Input.toString().getBytes()).toLowerCase();
+
+        } else {
+            md5Hash = org.springframework.util.DigestUtils.md5DigestAsHex(md5Input.toString().toLowerCase().getBytes()).toLowerCase();
+
+        }
+        return prefix + md5Hash;
+    }
 
 }
