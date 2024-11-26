@@ -45,7 +45,7 @@ public class CompanyUpdateRequest {
     @Schema(example = "address")
     @Pattern(regexp = "^(?!\\s)(.*?)(?<!\\s)$",
             message = "{address.pattern.message}")
-    @Size(min = 10, max = 300, message = "{address.notnull.message}")
+    @Size(min = 1, max = 300, message = "{address.notnull.message}")
     private String address;
 
 

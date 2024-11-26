@@ -102,15 +102,16 @@
     </div>
 
     <div class ="increment-details">
-    <h6 style="font-size: 14px;">Sub: Increament on Salary</h6>
+    <h6 style="font-size: 14px;">Sub: Increment on Salary</h6>
     <h6 style="font-size: 14px;">Dear ${employee.firstName},</h6>
     <p>
-    We would like to congratulate you on completion of One year period with us.
-    We are pleased to inform you of your salary increase effective from <b>${appraisal.dateOfSalaryIncrement}. </b>
+    We are pleased to inform you that your salary increase effective from <b>${appraisal.dateOfSalaryIncrement}. </b>
     The amount of your salary increase is <b>Rs. ${appraisal.grossCompensation} pa.</b>
     We understand this is a sustainable increase in your pay and we appreciate
     your hard work and dedication to the company.
-    All other T&C are the same as per the original offer letter.
+    <br />
+    <br />
+    All other T&C are the same as per the original offer letter. We extend our good wishes and trust that you will maintain your remarkable enthusiasm and dedication moving forward.
     </p>
     </div>
     <div class="salary-table">
