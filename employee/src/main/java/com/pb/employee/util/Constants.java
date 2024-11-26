@@ -36,6 +36,7 @@ public class Constants {
     public static final String EMPLOYEE_NAME = "EmployeeName";
     public static final String EMPLOYEE = "employee";
     public static final String SUCCESS = "success";
+    public static final String USED_PASSWORD = "Used Password";
 
     public static final String EMPLOYEE_ID = "employeeId";
     public static final String EMAIL_ID = "emailId";

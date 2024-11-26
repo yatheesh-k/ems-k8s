@@ -139,7 +139,7 @@ public class PayslipController {
                                          @RequestHeader(Constants.AUTH_KEY) String authToken,
                                          @RequestBody @Valid PayslipUpdateRequest payslipsRequest,
                                          @PathVariable String payslipId,
-                                         @PathVariable String employeeId) throws EmployeeException{
+                                         @PathVariable String employeeId) throws EmployeeException, IOException{
         return payslipService.savePayslip(payslipsRequest, payslipId, employeeId);
     }
 }
