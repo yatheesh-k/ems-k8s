@@ -13,7 +13,7 @@ const AddIncrement = () => {
   const {
     register,
     handleSubmit,
-    setValue,
+    setValue,watch,
     control, reset, getValues,
     formState: { errors },
   } = useForm({ mode: 'onChange',
@@ -126,6 +126,18 @@ const AddIncrement = () => {
       setShowCards(false);
     }
   }, [id, salaryId, setValue]);
+
+  const validateAppraisalDate = (value) => {
+    const dateOfHiring = new Date(watch('dateOfHiring')); // Access the dateOfHiring value
+    const appraisalDate = new Date(value);
+
+    // If the Appraisal Date is before the Date of Hiring, return an error message
+    if (appraisalDate < dateOfHiring) {
+      return "Appraisal Date must be after the Date of Hiring.";
+    }
+
+    return true; // If valid, return true
+  };
 
 
   const monthOptions = Array.from({ length: 12 }, (_, i) => ({
@@ -1017,7 +1029,7 @@ const AddIncrement = () => {
                                   <p className="errorMsg">Department Required</p>
                                 )}
                               </div>
-
+{/* 
                               <div className="col-md-5 mb-3">
                                 <label className="form-label">Time Period</label>
                                 <div className="row d-flex">
@@ -1058,7 +1070,7 @@ const AddIncrement = () => {
                                   </p>
                                 )}
                               </div>
-                              <div className="col-lg-1"></div>
+                              <div className="col-lg-1"></div> */}
                               <div className="col-md-5 mb-3">
                                 <label className="form-label">Appraisal Date (Hike Start Date)</label>
                                 <input
@@ -1066,6 +1078,7 @@ const AddIncrement = () => {
                                   className="form-control"
                                   {...register("dateOfSalaryIncrement", {
                                     required: "Appraisal Date is required",
+                                    validate: validateAppraisalDate, // Apply custom validation
                                   })}
                                 />
                                 {errors.dateOfSalaryIncrement && (

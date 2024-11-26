@@ -421,7 +421,7 @@ function Profile() {
                         className="form-control"
                         placeholder="Enter Alternate Number"
                         autoComplete="off"
-                        maxLength={15}
+                        maxLength={14}
                         defaultValue="+91 " // Set the initial value to +91 with a space
                         onInput={handlePhoneNumberChange} // Handle input changes
                         onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
@@ -446,7 +446,7 @@ function Profile() {
                           },
                           pattern: {
                             value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                            message: "Contact Number must start with +91 followed by 10 digits.",
+                            message: "Contact Number is Required",
                           },
                         })}
                       />
@@ -464,7 +464,7 @@ function Profile() {
                         className="form-control"
                         placeholder="Enter Contact Number"
                         autoComplete="off"
-                        maxLength={15} // Limit input to 15 characters
+                        maxLength={14} // Limit input to 14 characters
                         defaultValue="+91 " // Set the initial value to +91 with a space
                         onInput={handlePhoneNumberChange} // Handle input changes
                         onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
@@ -490,7 +490,7 @@ function Profile() {
                           },
                           pattern: {
                             value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                            message: "Contact Number must start with +91 followed by 10 digits.",
+                            message: "Contact Number is Required",
                           },
                         })}
                       />
@@ -640,7 +640,7 @@ function Profile() {
                           placeholder="Enter Name"
                           onKeyDown={handleEmailChange}
                           onInput={toInputTitleCase}
-                          maxLength={20}
+                          maxLength={100}
                           autoComplete="off"
                           {...register("name", {
                             required: "Name is Required",
@@ -649,8 +649,8 @@ function Profile() {
                               message: "Minimun 3 characters Required",
                             },
                             maxLength: {
-                              value: 20,
-                              message: "Name must not exceed 20 characters",
+                              value: 100,
+                              message: "Name must not exceed 100 characters",
                             },
                             pattern: {
                               value: /^[a-zA-Z\s]*$/,
@@ -697,6 +697,7 @@ function Profile() {
                           className="form-control"
                           placeholder="Enter Personal Mobile Number"
                           autoComplete="off"
+                          maxLength={14}
                           defaultValue="+91 " // Set the initial value to +91 with a space
                           onInput={handlePhoneNumberChange} // Handle input changes
                           onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
@@ -722,7 +723,7 @@ function Profile() {
                             },
                             pattern: {
                               value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                              message: "Contact Number must start with +91 followed by 10 digits.",
+                              message: "Contact Number is Required",
                             },
                           })}
                         />

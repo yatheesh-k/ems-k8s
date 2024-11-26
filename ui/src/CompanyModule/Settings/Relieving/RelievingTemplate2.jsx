@@ -54,7 +54,7 @@ const RelievingTemplate2 = ({
         <p><strong>{employeeName}</strong></p>
         <p>Employee Id: <strong>{employeeId}</strong></p>
         <p>
-          I am writing to acknowledge the resignation letter you submitted, dated <strong>{resignationDate}</strong>. I want to inform you that your resignation has been accepted, and you will be relieved from your position as an  <strong> {designation}</strong> with <strong>{companyData.companyName}</strong> on <strong>{lastWorkingDate}</strong>  with Serving the Notice Period <strong>{noticePeriod}</strong> months.
+          I am writing to acknowledge the resignation letter you submitted, dated <strong>{resignationDate}</strong>. I want to inform you that your resignation has been accepted, and you will be relieved from your position as an  <strong> {designation}</strong> with <strong>{companyData.companyName}</strong> on <strong>{lastWorkingDate}</strong>  with Serving the Notice Period <strong>{noticePeriod}</strong>.
         </p>
          <p>We kindly request you to return your company ID and any other company-owned items that you have been using during your tenure with our firm.</p>
         <p>

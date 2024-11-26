@@ -8,7 +8,6 @@ import {
 } from "../../Utils/Axios";
 import { toast } from "react-toastify";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Eye, EyeSlash } from "react-bootstrap-icons";
 
 const CompanyRegistration = () => {
   const {
@@ -172,47 +171,48 @@ const CompanyRegistration = () => {
   };
 
   const clearForm = () => {
-    // Reset only the CIN and Registration Number fields
-    setValue("cinNo", '');        // Clear CIN Number field
-    setValue("companyRegNo", ''); // Clear Company Registration Number field
-
-    // Optionally, clear the errors as well (if needed)
-    // clearErrors(); // Uncomment if you want to clear all errors
-
-    // Optionally, reset error message or other states here
-    // setErrorMessage('');
+    setCompanyType("");  
+    reset();
   };
-
-
   const toInputTitleCase = (e) => {
     const input = e.target;
     let value = input.value;
     const cursorPosition = input.selectionStart; // Save the cursor position
+  
     // Remove leading spaces
     value = value.replace(/^\s+/g, '');
-    // Ensure only alphabets and spaces are allowed
+  
+    // Ensure only allowed characters (alphabets, numbers, and some special chars)
     const allowedCharsRegex = /^[a-zA-Z0-9\s!@#&()*/,.\\-]+$/;
     value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
+  
     // Capitalize the first letter of each word
     const words = value.split(' ');
-    // Capitalize the first letter of each word and lowercase the rest
+  
+    // Capitalize the first letter of each word and leave the rest of the characters as they are
     const capitalizedWords = words.map(word => {
       if (word.length > 0) {
-        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        // Capitalize the first letter, keep the rest as is
+        return word.charAt(0).toUpperCase() + word.slice(1);
       }
       return '';
     });
+  
     // Join the words back into a string
     let formattedValue = capitalizedWords.join(' ');
+  
     // Remove spaces not allowed (before the first two characters)
-    if (formattedValue.length > 2) {
-      formattedValue = formattedValue.slice(0, 2) + formattedValue.slice(2).replace(/\s+/g, ' ');
+    if (formattedValue.length > 3) {
+      formattedValue = formattedValue.slice(0, 3) + formattedValue.slice(3).replace(/\s+/g, ' ');
     }
+  
     // Update input value
     input.value = formattedValue;
+  
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
+  
   const validatePassword = (value) => {
     const errors = [];
     if (!/(?=.*[0-9])/.test(value)) {
@@ -378,7 +378,35 @@ const CompanyRegistration = () => {
 
     return true; // Return true if all checks pass
   };
-
+  
+  const validateName = (value) => {
+    if (!value || value.trim().length === 0) {
+      return "Company Name is Required.";
+    } else if (!/^[A-Za-z\s,.'\-/]*$/.test(value)) {
+      return "Field accepts only alphabets and special characters:( , ' -  . /)";
+    } else {
+      const words = value.split(" "); 
+        for (const word of words) {
+          if (word.length < 1) {
+            return "Minimum Length 1 Characters Required.";  // If any word is shorter than 2 characters, return this message
+          } else if (word.length > 100) {
+            return "Max Length 100 Characters Exceed.";  // If any word is longer than 40 characters, return this message
+          }
+        }
+      
+      if (/^\s|\s$/.test(value)) {
+        return "No Leading or Trailing Spaces Allowed.";
+      } else if (/\s{2,}/.test(value)) {
+        return "No Multiple Spaces Between Words Allowed.";
+      }
+      // Check if there's a space after the last character in the input string
+    if (/\s$/.test(value)) {
+      return "No Trailing Space Allowed.";  // Space after the last character is not allowed
+    }
+    }
+  
+    return true; // Return true if all conditions are satisfied
+  };
   const validatePAN = (value) => {
     const spaceError = "Spaces are not allowed in the PAN Number.";
     const patternError = "Invalid PAN Number format";
@@ -417,20 +445,6 @@ const CompanyRegistration = () => {
     // Update the input field's value
     event.target.value = value;
   }
-
-
-  // Function to handle keydown for specific actions (e.g., prevent multiple spaces)
-  // function handlePhoneNumberKeyDown(event) {
-  //   let value = event.target.value;
-  //   // Prevent backspace if the cursor is before the "+91 "
-  //   if (event.key === "Backspace" && value.startsWith("+91 ") && event.target.selectionStart <= 4) {
-  //     event.preventDefault(); // Prevent the backspace if it's before the "+91 "
-  //   }
-  //   // Prevent multiple spaces after +91
-  //   if (event.key === " " && value.charAt(3) === " ") {
-  //     event.preventDefault();
-  //   }
-  // }
 
   return (
     <LayOut>
@@ -537,18 +551,9 @@ const CompanyRegistration = () => {
                         autoComplete="off"
                         {...register("companyName", {
                           required: "Company Name is Required",
-                          pattern: {
-                            value: /^[a-zA-Z\s,.'\-/]*$/,
-                            message: "Field accepts only alphabets and special characters:( , ' -  . /)",
-                          },
-                          minLength: {
-                            value: 2,
-                            message: "Minimum 2 Characters Required",
-                          },
-                          maxLength: {
-                            value: 100,
-                            message: "Maximum 100 Characters allowed",
-                          },
+                          validate:{
+                            validateName,
+                           },
                         })}
                         disabled={editMode}
                       />
@@ -556,7 +561,7 @@ const CompanyRegistration = () => {
                         <p className="errorMsg">{errors.companyName.message}</p>
                       )}
                     </div>
-                    <div className="col-lg-1"></div>
+                    <div className="col-lg-1"></div> 
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Service Name <span style={{ color: "red" }}>*</span>
@@ -599,7 +604,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Company Email Id"
                         autoComplete="off"
-                        onInput={toInputEmailCase}
+                        //onInput={toInputEmailCase}
                         onKeyDown={handleEmailChange}
                         {...register("emailId", {
                           required: "Company Email Id is Required",
@@ -640,7 +645,7 @@ const CompanyRegistration = () => {
                                 },
                                 correctLength: (value) => {
                                   if (value.length !== 14) {
-                                    return "Contact Number must be exactly 14 characters.";
+                                    return "Contact Number must be exactly 10 digits.";
                                   }
                                   return true;
                                 },
@@ -734,7 +739,7 @@ const CompanyRegistration = () => {
                               },
                               pattern: {
                                 value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                                message: "Contact Number must be exactly 10 Numbers.",
+                                message: "Contact Number is Required.",
                               },
                             })}
                           />
@@ -780,7 +785,7 @@ const CompanyRegistration = () => {
                           },
                           pattern: {
                             value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                            message: "Alternate Number must be exactly 10 Numbers.",
+                            message: "Alternate Number is Required.",
                           },
                         })}
                       />
@@ -983,9 +988,8 @@ const CompanyRegistration = () => {
                         type="text"
                         className="form-control"
                         placeholder="Enter Name"
-                        onKeyDown={handleEmailChange}
+                       // onKeyDown={handleEmailChange}
                         onInput={toInputTitleCase}
-
                         autoComplete="off"
                         {...register("name", {
                           required: "Name is Required",
@@ -1018,7 +1022,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Personal Email Id"
                         autoComplete="off"
-                        onInput={toInputEmailCase}
+                       // onInput={toInputEmailCase}
                         onKeyDown={handleEmailChange}
                         {...register("personalMailId", {
                           required: "Personal Email Id is Required",
@@ -1070,7 +1074,7 @@ const CompanyRegistration = () => {
                           },
                           pattern: {
                             value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                            message: "Personal Mobile Number must be exactly 10 Numbers.",
+                            message: "Personal Mobile Number is Required.",
                           },
                         })}
                       />

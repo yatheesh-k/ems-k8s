@@ -33,8 +33,10 @@ const ForgotPassword = () => {
       setOtpExpired(true);  // OTP expired
       setOtpShown(false);  // Hide OTP input
       setStep(1); // Move to Step 1 (Email Step) if OTP expired
+      reset({ otp: '' });
     }
   }, [otpTimeLimit]);
+  
 
 
   const onSubmitEmail = async (data) => {
@@ -60,51 +62,35 @@ const ForgotPassword = () => {
 
   const onSubmitOtp = async (data) => {
     setLoading(true);
-
-    // // Check if OTP has expired before making the API call
-    // if (otpExpired) {
-    //   toast.error("OTP has expired. Please request a new one.");
-    //   setStep(1);  // Move back to Step 1 if OTP is expired
-    //   setOtpTimeLimit(40);  // Reset OTP timer
-    //   setOtpExpired(false); // Reset OTP expired flag
-    //   //setErrorMessage("");  // Clear any residual error messages
-    //   setLoading(false);
-    //   return;
-    // }
-
+  
     const formData = {
       username: data.email,
       otp: data.otp,
       company: company,
     };
-
+  
     try {
       const response = await ValidateOtp(formData);
       toast.success("Verification Successful");
-      console.log(response.data); // Handle API response as needed
       setStep(3); // Move to Step 3 if OTP validation is successful
       setOtpExpired(false); // Reset OTP expiration state
       setOtpTimeLimit(40); // Reset timer when OTP is valid
+      reset({ otp: '' });
       setErrorMessage(""); // Clear any error messages after successful validation
     } catch (error) {
       handleApiErrors(error);
-      if (otpExpired) {
-        // toast.error("OTP Has Expired. Please Request A New One.");
-        setStep(1);  // Move back to Step 1 if OTP is expired
-        setOtpTimeLimit(40);  // Reset OTP timer
-        setOtpExpired(true); // Reset the OTP expired flag
-        setLoading(false);
-        setErrorMessage("OTP Has Expired. Please Request A New One."); // Error message for expired OTP
-        return;
-      } else {
-        toast.error("Invalid OTP. Please try again."); // Error message for invalid OTP
-      }
+      // On error or invalid OTP, reset the OTP and directly go to Step 1
+      reset({ otp: '' });
+      setStep(1);  // Move back to Step 1 if OTP is expired or invalid
+      setOtpTimeLimit(40);  // Reset OTP timer
+      setOtpExpired(false); // Reset OTP expired flag
+      setLoading(false);
+      setErrorMessage("Invalid OTP. Please try again."); // Error message for invalid OTP
     } finally {
       setLoading(false);
     }
   };
-
-
+  
   const onSubmitNewPassword = async (data) => {
     setLoading(true);
     try {
@@ -112,19 +98,17 @@ const ForgotPassword = () => {
         username: email,
         password: data.password,
         company: company,
-        companyFullName: data.companyName
+        companyFullName: data.companyName,
       };
-      const response = await forgotPasswordStep2(formData);
+      await forgotPasswordStep2(formData);
       toast.success("Password Updated Successfully");
-      setOtpExpired(false);
-      console.log(response.data); // Handle API response as needed
-      navigate(`/${company}/login`);
+      reset(); // Reset the form data
     } catch (error) {
       handleApiErrors(error);
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
@@ -148,9 +132,13 @@ const ForgotPassword = () => {
   };
 
   const closeButton = () => {
+    // Reset the OTP and other states
     reset();
+    setOtpTimeLimit(40); // Reset the OTP timer
+    setStep(1);  // Go back to Step 1
     navigate(`/${company}/login`);
-  }
+  };
+  
 
   const closeModal = () => {
     setShowErrorModal(false);
@@ -180,6 +168,19 @@ const ForgotPassword = () => {
     }
     return true; // Return true if all conditions are satisfied
   };
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+
+    // Prevent space key (keyCode 32) from being entered
+    if (e.keyCode === 32) {
+      e.preventDefault();
+    }
+
+    // If there is any space already entered, prevent re-render with spaces
+    if (value.includes(" ")) {
+      e.preventDefault();
+    }
+  };
 
   const renderStep = () => {
     switch (step) {
@@ -197,12 +198,13 @@ const ForgotPassword = () => {
                   type="email"
                   placeholder='Enter Your Email Id'
                   className="form-control"
+                  onKeyDown={handleEmailChange}
                   {...register('email', {
                     required: 'Email is required',
                     pattern: {
-                      value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                      message: 'Invalid email address'
-                    }
+                      value: /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                      message: "Invalid email format",
+                    },
                   })}
                 />
               </div>
@@ -245,6 +247,7 @@ const ForgotPassword = () => {
                   type={otpShown ? "text" : "password"}
                   placeholder='Enter OTP'
                   className="form-control"
+                  onKeyDown={handleEmailChange}
                   {...register('otp', {
                     required: 'OTP is required',
                     pattern: {
@@ -280,33 +283,6 @@ const ForgotPassword = () => {
               </div>
             </div>
             <div className="form-group">
-              <label>OTP:</label>
-              <div className="input-group">
-                <span className="input-group-text" onClick={toggleOtpVisibility} style={{ cursor: 'pointer' }}>
-                  {otpShown ? (
-                    <UnlockFill size={20} color="#4C489D" />
-                  ) : (
-                    <LockFill size={20} color="#4C489D" />
-                  )}
-                </span>
-                <input
-                  placeholder='Enter OTP'
-                  type={otpShown ? "text" : "password"}
-                  name='otp'
-                  className="form-control"
-                  {...register('otp', {
-                    required: 'OTP is required',
-                    pattern: {
-                      value: /^[0-9]{6}$/,
-                      message: 'Invalid OTP'
-                    }
-                  })}
-                  disabled // Disable the OTP input here
-                />
-              </div>
-              {errors.otp && <span className="text-danger" style={{ marginLeft: "60px" }}>{errors.otp.message}</span>}
-            </div>
-            <div className="form-group">
               <label>New Password:</label>
               <div className="input-group">
                 <span className="input-group-text" onClick={togglePasswordVisibility}>
@@ -320,6 +296,7 @@ const ForgotPassword = () => {
                   placeholder='Enter Your New Password'
                   type={passwordShown ? "text" : "password"}
                   className="form-control"
+                  onKeyDown={handleEmailChange}
                   {...register("password", {
                     required: "Password is Required",
                     minLength: {
@@ -354,6 +331,7 @@ const ForgotPassword = () => {
                   placeholder='Confirm Password'
                   type={confirmPasswordShown ? "text" : "password"}
                   className="form-control"
+                  onKeyDown={handleEmailChange}
                   {...register('confirmPassword', {
                     required: 'Confirm Password is required',
                     validate: value => value === watchPassword || "Passwords do not match",

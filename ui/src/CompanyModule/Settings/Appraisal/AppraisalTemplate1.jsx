@@ -120,8 +120,13 @@ const AppraisalTemplate1 = ({
           Dear <strong>{employeeDetails?.firstName || "Employee"}</strong>,
         </p>
         <p>
-          We would like to congratulate you on completing a {period} year period with us. We are pleased to inform you of your salary increase effective from{" "}
-          <strong>{effectiveDate}</strong>. The amount of your salary increase is <strong>Rs. {salaryIncrease} pa</strong>. We understand this is a sustainable increase in your pay and we appreciate your hard work and dedication to the company. All other T&C are the same as per the original offer letter.
+        We are pleased to inform you that based on your performance and contribution to the company, our management has revised your compensation to Rs.<strong>{salaryIncrease}</strong> pa which is cost to company with effect from <strong>{effectiveDate}</strong>.
+        </p>
+        <p>
+        We recognize your continued contributions and dedication to the company, and we are happy to reward your hard work. Please note that all other terms and conditions of your employment remain unchanged as per your original offer letter.
+        </p>
+        <p>
+        If you have any questions or need further clarification, feel free to reach out.
         </p>
         <table className="table border-collapse mb-5">
           <thead>
@@ -133,9 +138,7 @@ const AppraisalTemplate1 = ({
           <tbody>
             {allowances && Object.keys(allowances).map((key, index) => {
               const value = allowances[key];
-
               let allowanceAmount = 0;
-
               // Check if the value contains a '%' (percentage)
               if (typeof value === 'string' && value.includes('%')) {
                 // Extract the numeric part and calculate the allowance as a percentage of salaryIncrease
@@ -145,7 +148,6 @@ const AppraisalTemplate1 = ({
                 // Otherwise, treat the value as a fixed amount
                 allowanceAmount = parseFloat(value); // Convert to number directly
               }
-
               return (
                 <tr key={index}>
                   <td>{key}</td>
@@ -154,7 +156,6 @@ const AppraisalTemplate1 = ({
                 </tr>
               );
             })}
-            
             {/* Add a row for Gross Salary after the allowances */}
             {salaryIncrease && (
               <tr>
@@ -163,13 +164,10 @@ const AppraisalTemplate1 = ({
               </tr>
             )}
           </tbody>
-
         </table>
-
         <p>
-          We appreciate your initiative and expect you to take many more such responsibilities in future assignments to ensure company’s growth.
+         <i> We appreciate your initiative and expect you to take many more such responsibilities in future assignments to ensure company’s growth.</i>
         </p>
-
         <div className="mt-5 pt-3">
           <p className="mb-5">With Best Wishes,</p>
           <div className="mt-5 pt-5">
