@@ -124,7 +124,8 @@ const CompanySalaryStructure = () => {
   const handleCheckboxChange = (index) => {
     const fields = activeTab === 'nav-home' ? allowanceFields : deductionFields;
     const fieldLabel = fields[index].label;
-
+  
+    // Update the checkbox selection state
     setFieldCheckboxes((prev) => {
       const newCheckboxes = {
         ...prev,
@@ -133,21 +134,66 @@ const CompanySalaryStructure = () => {
           [fieldLabel]: !prev[activeTab === 'nav-home' ? 'allowances' : 'deductions'][fieldLabel],
         }
       };
-
-      const selected = Object.values(newCheckboxes[activeTab === 'nav-home' ? 'allowances' : 'deductions']).filter(Boolean);
-
-      if (activeTab === 'nav-home' && selected.length > 0) {
-        setAllowanceError('');
+  
+      // Get selected allowances and selected deductions
+      const selectedAllowances = Object.entries(newCheckboxes.allowances).filter(([key, value]) => value);
+      const selectedDeductions = Object.entries(newCheckboxes.deductions).filter(([key, value]) => value);
+  
+      // Calculate total percentage for selected allowances
+      const totalAllowancePercentage = selectedAllowances
+        .map(([key]) => allowanceFields.find(f => f.label === key))
+        .filter(field => field.type === 'percentage' && field.value)
+        .reduce((total, field) => total + parseFloat(field.value), 0);
+  
+      // Calculate total percentage for selected deductions
+      const totalDeductionPercentage = selectedDeductions
+        .map(([key]) => deductionFields.find(f => f.label === key))
+        .filter(field => field.type === 'percentage' && field.value)
+        .reduce((total, field) => total + parseFloat(field.value), 0);
+  
+      // Initialize error object
+      let updatedErrors = { ...prev };
+  
+      // Check if total percentage for allowances exceeds 100%
+      if (totalAllowancePercentage > 100) {
+        updatedErrors = {
+          ...updatedErrors,
+          totalAllowancePercentage: 'The total percentage for allowances cannot exceed 100%',
+        };
+      } else {
+        // Clear the error message for allowances if the total is valid
+        delete updatedErrors.totalAllowancePercentage;
       }
-
+  
+      // Check if total percentage for deductions exceeds 100%
+      if (totalDeductionPercentage > 100) {
+        updatedErrors = {
+          ...updatedErrors,
+          totalDeductionPercentage: 'The total percentage for deductions cannot exceed 100%',
+        };
+      } else {
+        // Clear the error message for deductions if the total is valid
+        delete updatedErrors.totalDeductionPercentage;
+      }
+  
+      // If there are any errors, return the previous state to prevent changing the checkbox state
+      if (updatedErrors.totalAllowancePercentage || updatedErrors.totalDeductionPercentage) {
+        setValidationErrors(updatedErrors);
+        return prev; // Prevent state change if there's an error
+      }
+  
+      // Clear the errors if everything is valid
+      setValidationErrors(updatedErrors);
+  
+      // Return the updated state
       return newCheckboxes;
     });
-
+  
+    // Handle validation for the current field
     const isChecked = !fieldCheckboxes[activeTab === 'nav-home' ? 'allowances' : 'deductions'][fieldLabel];
     if (isChecked) {
       validateField(fields[index]);
     } else {
-
       setValidationErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[fieldLabel];
@@ -224,7 +270,7 @@ const CompanySalaryStructure = () => {
       setDeductionFields(newFields);
     }
   };
-  
+
 
   const onSubmit = async () => {
     const jsonData = {
@@ -356,10 +402,10 @@ const CompanySalaryStructure = () => {
     // Check if the key pressed is "Enter"
     if (e.key === 'Enter') {
       e.preventDefault(); // Prevent default form submission
-  
+
       // Trigger validation for the field
       const isValid = await trigger("fieldName");
-  
+
       // If validation passes, save the data
       if (isValid) {
         const fieldName = getValues("fieldName");
@@ -367,7 +413,7 @@ const CompanySalaryStructure = () => {
       }
     }
   };
-  
+
 
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
@@ -403,16 +449,60 @@ const CompanySalaryStructure = () => {
   };
 
   const handleTabChange = (tab) => {
+    // Check for the allowances errors
     if (tab === 'nav-profile') {
+      // Ensure at least one allowance is selected
       if (Object.values(fieldCheckboxes.allowances).every(checkbox => !checkbox)) {
         setAllowanceError('Please select at least one allowance.');
-        return;
+        return; // Prevent changing the tab if no allowances are selected
+      }
+  
+      // Check if the total percentage for allowances exceeds 100%
+      const selectedAllowances = Object.entries(fieldCheckboxes.allowances).filter(([key, value]) => value);
+      const totalAllowancePercentage = selectedAllowances
+        .map(([key]) => allowanceFields.find(f => f.label === key))
+        .filter(field => field.type === 'percentage' && field.value)
+        .reduce((total, field) => total + parseFloat(field.value), 0);
+  
+      if (totalAllowancePercentage > 100) {
+        setValidationErrors({
+          totalAllowancePercentage: 'The total percentage for allowances cannot exceed 100%',
+        });
+        return; // Prevent changing the tab if allowance percentage exceeds 100%
+      }
+  
+      // Clear the allowance error if everything is valid
+      setAllowanceError('');
+    }
+  
+    // Check for the deductions errors if navigating to the deductions tab
+    if (tab === 'nav-home') {
+      // Check if the total percentage for deductions exceeds 100%
+      const selectedDeductions = Object.entries(fieldCheckboxes.deductions).filter(([key, value]) => value);
+      const totalDeductionPercentage = selectedDeductions
+        .map(([key]) => deductionFields.find(f => f.label === key))
+        .filter(field => field.type === 'percentage' && field.value)
+        .reduce((total, field) => total + parseFloat(field.value), 0);
+  
+      if (totalDeductionPercentage > 100) {
+        setValidationErrors({
+          totalDeductionPercentage: 'The total percentage for deductions cannot exceed 100%',
+        });
+        return; // Prevent changing the tab if deduction percentage exceeds 100%
       }
     }
-    setAllowanceError('');
+  
+    // Clear the validation errors if everything is valid
+    setValidationErrors(prevErrors => {
+      const newErrors = { ...prevErrors };
+      delete newErrors.totalAllowancePercentage;
+      delete newErrors.totalDeductionPercentage;
+      return newErrors;
+    });
+  
+    // Allow tab change if there are no errors
     setActiveTab(tab);
-  };
-
+  };  
 
   return (
     <LayOut>
@@ -434,7 +524,7 @@ const CompanySalaryStructure = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="card">
               <div className="card-header">
-                <div className="card-title">Company Salary Structure</div>
+                <div className="card-title" style={{marginBottom:"0px"}}>Company Salary Structure</div>
               </div>
               <div className="card-body">
                 <nav className="companyNavOuter">
@@ -489,17 +579,30 @@ const CompanySalaryStructure = () => {
                         </div>
                         <div className="col-sm-3">
                           <input
-                            type={field.type === 'percentage' ? 'text' : 'text'}
+                            type="text" // Keep the type as text, but we will restrict the value
                             className="form-control"
                             value={field.value}
                             onInput={toInputSpaceCase}
                             onChange={(e) => {
-                              handleValueChange(index, e.target.value);
-                              validateField({ ...field, value: e.target.value });
+                              const newValue = e.target.value;
+
+                              // Check if the field type is 'percentage'
+                              if (field.type === 'percentage') {
+                                // Restrict input to a maximum of 2 digits for percentage
+                                if (/^\d{0,2}$/.test(newValue)) {
+                                  handleValueChange(index, newValue);
+                                }
+                              } else {
+                                // Otherwise allow the regular input handling
+                                handleValueChange(index, newValue);
+                              }
+
+                              // Validate the field value
+                              validateField({ ...field, value: newValue });
                             }}
                             placeholder="Enter Value"
                             disabled={!fieldCheckboxes.allowances[field.label] || !isEditing}
-                            maxLength={7}
+                            maxLength={7}  // You can adjust this to a larger number if needed
                             data-bs-toggle="tooltip"
                             title={!fieldCheckboxes.allowances[field.label] ? 'Please select checkbox' : ''}
                           />
@@ -507,8 +610,18 @@ const CompanySalaryStructure = () => {
                             <div className="text-danger">{validationErrors[field.label]}</div>
                           )}
                         </div>
+
                       </div>
                     ))}
+                    <div className="row">
+                      {validationErrors.totalAllowancePercentage && (
+                        <div className="col-12 mt-2">
+                          <div className="alert alert-danger">
+                            {validationErrors.totalAllowancePercentage}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     <button
                       type="button"
                       onClick={() => setShowModal(true)}
@@ -553,26 +666,49 @@ const CompanySalaryStructure = () => {
                         </div>
                         <div className="col-sm-3">
                           <input
-                            type={field.type === 'percentage' ? 'text' : 'text'}
+                            type="text" // Keep the type as text, but we will restrict the value
                             className="form-control"
                             value={field.value}
                             onInput={toInputSpaceCase}
                             onChange={(e) => {
-                              handleValueChange(index, e.target.value);
-                              validateField({ ...field, value: e.target.value });
+                              const newValue = e.target.value;
+
+                              // Check if the field type is 'percentage'
+                              if (field.type === 'percentage') {
+                                // Restrict input to a maximum of 2 digits for percentage
+                                if (/^\d{0,2}$/.test(newValue)) {
+                                  handleValueChange(index, newValue);
+                                }
+                              } else {
+                                // Otherwise allow the regular input handling
+                                handleValueChange(index, newValue);
+                              }
+
+                              // Validate the field value
+                              validateField({ ...field, value: newValue });
                             }}
                             placeholder="Enter Value"
                             disabled={!fieldCheckboxes.deductions[field.label] || !isEditing}
-                            maxLength={7}
+                            maxLength={7}  // You can adjust this to a larger number if needed
                             data-bs-toggle="tooltip"
-                            title={!fieldCheckboxes.allowances[field.label] ? 'Please select checkbox' : ''}
+                            title={!fieldCheckboxes.deductions[field.label] ? 'Please select checkbox' : ''}
                           />
                           {validationErrors[field.label] && (
                             <div className="text-danger">{validationErrors[field.label]}</div>
                           )}
                         </div>
+
                       </div>
                     ))}
+                    <div className="row">
+                      {validationErrors.totalDeductionPercentage && (
+                        <div className="col-12 mt-2">
+                          <div className="alert alert-danger">
+                            {validationErrors.totalDeductionPercentage}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     <button
                       type="button"
                       onClick={() => setShowModal(true)}
@@ -582,7 +718,6 @@ const CompanySalaryStructure = () => {
                     </button>
                   </div>
                 </div>
-
                 <div className="row col-12 mt-3 align-items-center" style={{ marginLeft: "65%" }}>
                   {/* <div className="col-6">
                     <div className="row d-flex flex-column">

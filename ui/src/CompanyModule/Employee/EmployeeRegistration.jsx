@@ -274,24 +274,24 @@ const EmployeeRegistration = () => {
       // Check if error response exists
       if (error.response) {
         console.log("Axios response error:", error.response.data.error); // Log Axios error response
-  
+
         // Case 1: General error message
         if (error.response.data.error && error.response.data.error.message) {
           const generalErrorMessage = error.response.data.error.message;
           errorList.push(generalErrorMessage);
           toast.error(generalErrorMessage);
         }
-  
+
         // Case 2: Specific error messages (multiple messages, such as form validation errors)
         if (error.response.data.error && error.response.data.error.messages) {
           const specificErrorMessages = error.response.data.error.messages;
-          toast.error("Invalid Format Fields"); 
+          toast.error("Invalid Format Fields");
           specificErrorMessages.forEach((message) => {
-           // Display each error message individually
+            // Display each error message individually
             errorList.push(message);
           });
         }
-  
+
         // Case 3: Specific error data (duplicate value conflicts)
         if (error.response.data.data) {
           const conflictData = error.response.data.data;
@@ -302,23 +302,23 @@ const EmployeeRegistration = () => {
             const value = conflictData[key];
             conflictMessage += `${key}: ${value}\n`;
           });
-  
+
           // Display detailed conflict message in toast and add to error list
           errorList.push(conflictMessage);
         }
-  
+
         // Handle HTTP 409 Conflict Error (duplicate or other conflicts)
         if (error.response.status === 409) {
           const conflictMessage = error.response.data.message || "A conflict occurred.";
           // toast.error(conflictMessage);  // Show conflict error in toast
         }
-  
+
       } else {
         // General error (non-Axios)
         console.log('Error without response:', error);
         toast.error('An unexpected error occurred. Please try again later.');
       }
-  
+
       // Update the error messages in the state
       setErrorMessage(errorList);
     }
@@ -442,64 +442,74 @@ const EmployeeRegistration = () => {
   };
 
   const validateName = (value) => {
-    if (!value || value.trim().length === 0) {
-      return "Manager Name is Required.";
-    } else if (!/^[A-Za-z ]+$/.test(value)) {
+    // Trim leading and trailing spaces before further validation
+    const trimmedValue = value.trim();
+
+    // Check if value is empty after trimming (meaning it only had spaces)
+    if (trimmedValue.length === 0) {
+      return "Manager is Required.";
+    }
+
+    // Allow alphabetic characters, numbers, spaces, and the / character
+    else if (!/^[A-Za-z\s]+$/.test(trimmedValue)) {
       return "Only Alphabetic Characters are Allowed.";
     } else {
-      const words = value.split(" ");
+      const words = trimmedValue.split(" ");
 
+      // Check for minimum and maximum word length
       for (const word of words) {
-        if (word.length < 1) {
-          return "Minimum Length 1 Character Required .";  // If any word is shorter than 1 characters, return this message
+        if (word.length < 2) {
+          return "Minimum Length 2 Character Required.";  // If any word is shorter than 1 character
         } else if (word.length > 40) {
-          return "Maximum Length 40 Characters Required.";  // If any word is longer than 40 characters, return this message
+          return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters
         }
       }
 
-      if (/^\s|\s$/.test(value)) {
-        return "No Leading or Trailing Spaces Allowed.";
-      } else if (/\s{2,}/.test(value)) {
+      if (/\s$/.test(value)) {
+        return "Spaces at the end are not allowed.";  // Trailing space error
+      } else if (/^\s/.test(value)) {
+        return "No Leading Space Allowed.";  // Leading space error
+      }
+
+      // Check if there are multiple spaces between words
+      else if (/\s{2,}/.test(trimmedValue)) {
         return "No Multiple Spaces Between Words Allowed.";
       }
-      // Check if there's a space after the last character in the input string
-    if (/\s$/.test(value)) {
-      return "No Trailing Space Allowed.";  // Space after the last character is not allowed
-    }
     }
 
     return true; // Return true if all conditions are satisfied
   };
+
   const validateNumber = (value) => {
     // Check if the input is empty
     if (!value || value.trim().length === 0) {
       return "Number is Required.";
     }
-  
+
     // Check if the value contains only digits
     if (!/^\d+$/.test(value)) {
       return "Only Numeric Characters Are Allowed.";
     }
-  
+
     // Check if there are any leading or trailing spaces
     if (/^\s|\s$/.test(value)) {
       return "No Leading or Trailing Spaces Are Allowed.";
     }
-  
+
     // Check for multiple spaces in between numbers
     if (/\s{2,}/.test(value)) {
       return "No Multiple Spaces Between Numbers Allowed.";
     }
-  
+
     // Optionally: Check if the number is composed of repeating digits
     const isRepeating = /^(\d)\1{11}$/.test(value);  // Check if all digits are the same (e.g., "111111111111")
     if (isRepeating) {
       return "The Number Cannot Consist Of The Same Digit Repeated.";
     }
-  
+
     return true; // Return true if all validations pass
   };
-  
+
 
   const validateLocation = (value) => {
     if (!value || value.trim().length === 0) {
@@ -538,7 +548,7 @@ const EmployeeRegistration = () => {
     // Ensure only alphabets (upper and lower case), numbers, and allowed special characters
     const allowedCharsRegex = /^[a-zA-Z0-9\s!-_@#&()*/,.\\-{}]+$/
     value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
-    
+
     // Capitalize the first letter of each word, but allow uppercase letters in the middle of the word
     const words = value.split(' ');
     const capitalizedWords = words.map(word => {
@@ -548,61 +558,70 @@ const EmployeeRegistration = () => {
       }
       return '';
     });
-    
+
     // Join the words back into a string
     let formattedValue = capitalizedWords.join(' ');
-  
+
     // Remove spaces not allowed (before the first two characters)
     if (formattedValue.length > 2) {
       formattedValue = formattedValue.slice(0, 2) + formattedValue.slice(2).replace(/\s+/g, ' ');
     }
-  
+
     // Update input value
     input.value = formattedValue;
-  
+
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
 
   // Function to handle input formatting
-function handlePhoneNumberChange(event) {
-  let value = event.target.value;
+  function handlePhoneNumberChange(event) {
+    let value = event.target.value;
 
-  // Ensure only one space is allowed after +91
-  if (value.startsWith("+91 ") && value.charAt(3) !== " ") {
-    value = "+91 " + value.slice(3); // Ensure one space after +91
+    // Ensure the value starts with +91 and one space
+    if (value.startsWith("+91") && value.charAt(3) !== " ") {
+      value = "+91 " + value.slice(3); // Ensure one space after +91
+    }
+
+    // Allow only numeric characters after +91 and the space
+    const numericValue = value.slice(4).replace(/[^0-9]/g, ''); // Remove any non-numeric characters after +91 
+    if (numericValue.length <= 10) {
+      value = "+91 " + numericValue; // Keep the +91 with a space
+    }
+
+    // Limit the total length to 14 characters (including +91 space)
+    if (value.length > 14) {
+      value = value.slice(0, 14); // Truncate if the length exceeds 14 characters
+    }
+
+    // Update the input field's value
+    event.target.value = value;
   }
 
-  // Update the value in the input
-  event.target.value = value;
+  // Function to handle keydown for specific actions (e.g., prevent multiple spaces)
+  function handlePhoneNumberKeyDown(event) {
+    let value = event.target.value;
 
-  // You can do any other formatting logic here if needed (e.g., auto-formatting on every keystroke)
-}
-
-// Function to handle keydown for specific actions (e.g., prevent multiple spaces)
-function handlePhoneNumberKeyDown(event) {
-  let value = event.target.value;
-
-  // Prevent multiple spaces after +91
-  if (event.key === " " && value.charAt(3) === " ") {
-    event.preventDefault();
+    // Prevent multiple spaces after +91
+    if (event.key === " " && value.charAt(3) === " ") {
+      event.preventDefault();
+    }
   }
-}
-const toInputEmailCase = (e) => {
-  const input = e.target;
-  let value = input.value;
+  const toInputEmailCase = (e) => {
+    const input = e.target;
+    let value = input.value;
 
-  // Remove all spaces from the input
-  value = value.replace(/\s+/g, '');
+    // Remove all spaces from the input
+    value = value.replace(/\s+/g, '');
 
-  // If the first character is not lowercase, make it lowercase
-  if (value.length > 0 && value[0] !== value[0].toLowerCase()) {
-    value = value.charAt(0).toLowerCase() + value.slice(1);
-  }
+    // If the first character is not lowercase, make it lowercase
+    if (value.length > 0 && value[0] !== value[0].toLowerCase()) {
+      value = value.charAt(0).toLowerCase() + value.slice(1);
+    }
 
-  // Update the input value
-  input.value = value;
-};
+    // Update the input value
+    input.value = value;
+  };
 
   // In your component
   const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
@@ -634,7 +653,7 @@ const toInputEmailCase = (e) => {
           <div className="col-12">
             <div className="card">
               <div className="card-header">
-                <h5 className="card-title ">
+                <h5 className="card-title" style={{marginBottom:"0px"}}>
                   {isUpdating ? "Employee Data" : "Employee Registration"}
                 </h5>
                 <div
@@ -955,7 +974,7 @@ const toInputEmailCase = (e) => {
                         {...register("location", {
                           required: "Location is Required",
                           pattern: {
-                            value:/^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
+                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
                             message:
                               "Please enter valid Address",
                           },
@@ -1003,9 +1022,9 @@ const toInputEmailCase = (e) => {
                                 },
                               })}
                             />
-                           <span
-                              className={`bi bi-eye field-icon pb-1 toggle-password ${passwordShown ? 'text-primary' : ''}`}                              onClick={togglePasswordVisiblity}
-                              style={{background: "transparent",borderLeft:"none"}}
+                            <span
+                              className={`bi bi-eye field-icon pb-1 toggle-password ${passwordShown ? 'text-primary' : ''}`} onClick={togglePasswordVisiblity}
+                              style={{ background: "transparent", borderLeft: "none" }}
                             >
                             </span>
                           </div>
@@ -1052,31 +1071,31 @@ const toInputEmailCase = (e) => {
                       <Controller
                         name="status"
                         control={control}
-                        defaultValue="Active" 
+                        defaultValue="Active"
                         rules={{ required: true }}
                         render={({ field }) => (
                           <Select
-                          {...field}
-                          options={
-                            showNoticePeriodOption
-                              ? [
+                            {...field}
+                            options={
+                              showNoticePeriodOption
+                                ? [
                                   { value: "Active", label: "Active" },
                                   { value: "InActive", label: "InActive" },
                                   { value: "NoticePeriod", label: "Notice Period" }, // Show Notice Period
                                 ]
-                              : [
+                                : [
                                   { value: "Active", label: "Active" },
                                   { value: "InActive", label: "InActive" }, // Show only Active and InActive
                                 ]
-                          }
-                          value={
-                            field.value
-                              ? { value: field.value, label: field.value }
-                              : { value: "Active", label: "Active" }
-                          }
-                          onChange={(val) => field.onChange(val.value)}
-                          placeholder="Select Status"
-                        />
+                            }
+                            value={
+                              field.value
+                                ? { value: field.value, label: field.value }
+                                : { value: "Active", label: "Active" }
+                            }
+                            onChange={(val) => field.onChange(val.value)}
+                            placeholder="Select Status"
+                          />
                         )}
                       />
                       {errors.status && <p className="errorMsg">Status is Required</p>}
@@ -1087,40 +1106,40 @@ const toInputEmailCase = (e) => {
                         Mobile Number <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
-                          type="tel"
-                          className="form-control"
-                          placeholder="Enter Personal Mobile Number"
-                          autoComplete="off"
-                          maxLength={14} // Limit input to 15 characters
-                          defaultValue="+91 " // Set the initial value to +91 with a space
-                          onInput={handlePhoneNumberChange} // Handle input changes
-                          onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
-                          {...register("mobileNo", {
-                            required: "Personal Mobile Number is Required",
-                            validate: {
-                              startsWithPlus91: (value) => {
-                                if (!value.startsWith("+91 ")) {
-                                  return "Personal Mobile Number must start with +91.";
-                                }
-                                return true;
-                              },
-                              correctLength: (value) => {
-                                if (value.length !== 14) {
-                                  return "Personal Mobile Number must be exactly 14 characters.";
-                                }
-                                return true;
-                              },
-                              notRepeatingDigits: (value) => {
-                                const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                                return !isRepeating || "Personal Mobile Number cannot consist of the same digit repeated.";
-                              },
+                        type="tel"
+                        className="form-control"
+                        placeholder="Enter Personal Mobile Number"
+                        autoComplete="off"
+                        maxLength={14} // Limit input to 14 characters (3 for +91, 1 for space, 10 for digits)
+                        defaultValue="+91 " // Set the initial value to +91 with a space
+                        onInput={handlePhoneNumberChange} // Handle input changes
+                        {...register("mobileNo", {
+                          required: "Mobile Number is Required",
+                          validate: {
+                            startsWithPlus91: (value) => {
+                              if (!value.startsWith("+91 ")) {
+                                return "Mobile Number must start with +91.";
+                              }
+                              return true;
                             },
-                          })}
+                            correctLength: (value) => {
+                              if (value.length !== 14) {
+                                return "Mobile Number must be exactly 10 Numbers.";
+                              }
+                              return true;
+                            },
+                            notRepeatingDigits: (value) => {
+                              const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
+                              return !isRepeating || "Mobile Number cannot consist of the same digit repeated.";
+                            },
+                          },
+                        })}
                       />
                       {errors.mobileNo && (
                         <p className="errorMsg">{errors.mobileNo.message}</p>
                       )}
                     </div>
+
                     {/* {isUpdating ? (
                       <div className="col-12 col-md-6 col-lg-5 mb-3">
                         <label className="form-label">Role <span style={{ color: "red" }}>*</span></label>
@@ -1287,7 +1306,7 @@ const toInputEmailCase = (e) => {
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         {...register("uanNo", {
-                          validate:validateNumber ,
+                          validate: validateNumber,
                           pattern: {
                             value: /^\d{12}$/,
                             message:
@@ -1301,7 +1320,7 @@ const toInputEmailCase = (e) => {
                             value: 12,
                             message: "UAN Number Must Not Exceed 12 Digits",
                           },
-                         
+
                         })}
                       />
                       {errors.uanNo && (

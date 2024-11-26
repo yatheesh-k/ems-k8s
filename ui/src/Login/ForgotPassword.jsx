@@ -89,7 +89,7 @@ const ForgotPassword = () => {
     } catch (error) {
       handleApiErrors(error);
       if (otpExpired) {
-        toast.error("OTP Has Expired. Please Request A New One.");
+        // toast.error("OTP Has Expired. Please Request A New One.");
         setStep(1);  // Move back to Step 1 if OTP is expired
         setOtpTimeLimit(40);  // Reset OTP timer
         setOtpExpired(true); // Reset the OTP expired flag

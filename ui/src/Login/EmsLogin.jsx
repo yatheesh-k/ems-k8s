@@ -176,6 +176,7 @@ const EmsLogin = () => {
                         name="password"
                         placeholder="Password"
                         onChange={handleEmailChange}
+                        maxLength={16}
                         type={passwordShown ? "text" : "password"}
                         {...register("password", {
                           required: "Password is Required",

@@ -96,10 +96,10 @@ const Department = () => {
           theme: "colored",
           autoClose: 1000,
         });
-        
+
         // Fetch departments after deletion
         const updatedDepartments = departments.filter(department => department.id !== selectedItemId);
-        setDepartments(updatedDepartments) 
+        setDepartments(updatedDepartments)
         setTimeout(() => {
           // Only if you want to refetch after a delay
           fetchDepartments();
@@ -110,7 +110,7 @@ const Department = () => {
       }
     }
   };
-  
+
 
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
@@ -144,61 +144,74 @@ const Department = () => {
     const input = e.target;
     let value = input.value;
     const cursorPosition = input.selectionStart; // Save the cursor position
+
     // Remove leading spaces
     value = value.replace(/^\s+/g, '');
-    // Ensure only alphabets and spaces are allowed
+
+    // Ensure only alphabets, numbers, spaces, and allowed special characters like /, -, ., etc.
     const allowedCharsRegex = /^[a-zA-Z0-9\s!@#&()*/,.\\-]+$/;
     value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
-    // Capitalize the first letter of each word
+
+    // Capitalize the first letter of each word but leave the rest as-is (case-sensitive) and allow special characters
     const words = value.split(' ');
-    // Capitalize the first letter of each word and lowercase the rest
     const capitalizedWords = words.map(word => {
       if (word.length > 0) {
-        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        // Capitalize first letter of each word, leave the rest as-is
+        return word.charAt(0).toUpperCase() + word.slice(1);
       }
-      return '';
+      return word;
     });
+
     // Join the words back into a string
     let formattedValue = capitalizedWords.join(' ');
-    // Remove spaces not allowed (before the first two characters)
-    if (formattedValue.length > 3) {
-      formattedValue = formattedValue.slice(0, 3) + formattedValue.slice(3).replace(/\s+/g, ' ');
-    }
+
     // Update input value
     input.value = formattedValue;
+
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
-
+  
   const validateName = (value) => {
-    if (!value || value.trim().length === 0) {
-      return "Deparment Name is Required.";
-    } else if (!/^[A-Za-z ]+$/.test(value)) {
-      return "Only Alphabetic Characters are Allowed.";
+    // Trim leading and trailing spaces before further validation
+    const trimmedValue = value.trim();
+
+    // Check if value is empty after trimming (meaning it only had spaces)
+    if (trimmedValue.length === 0) {
+      return "Department Name is Required.";
+    }
+
+    // Allow alphabetic characters, numbers, spaces, and the / character
+    else if (!/^[A-Za-z0-9\s/!@#&()*,.-]+$/.test(trimmedValue)) {
+      return "Only Alphabetic Characters, Numbers, Spaces, and '/' are Allowed.";
     } else {
-      const words = value.split(" ");
-      
-        for (const word of words) {
-          if (word.length < 1) {
-            return "Minimum Length 1 Characters Required.";  // If any word is shorter than 2 characters, return this message
-          } else if (word.length > 40) {
-            return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters, return this message
-          }
+      const words = trimmedValue.split(" ");
+
+      // Check for minimum and maximum word length
+      for (const word of words) {
+        if (word.length < 2) {
+          return "Minimum Length 2 Character Required.";  // If any word is shorter than 1 character
+        } else if (word.length > 40) {
+          return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters
         }
-      
-      if (/^\s|\s$/.test(value)) {
-        return "No Leading or Trailing Spaces Allowed.";
-      } else if (/\s{2,}/.test(value)) {
+      }
+
+      // Check if there are leading or trailing spaces (after trimming)
+      if (/\s$/.test(value)) {
+        return "Spaces at the end are not allowed.";  // Trailing space error
+      } else if (/^\s/.test(value)) {
+        return "No Leading Space Allowed.";  // Leading space error
+      }
+
+      // Check if there are multiple spaces between words
+      else if (/\s{2,}/.test(trimmedValue)) {
         return "No Multiple Spaces Between Words Allowed.";
       }
-      // Check if there's a space after the last character in the input string
-    if (/\s$/.test(value)) {
-      return "No Trailing Space Allowed.";  // Space after the last character is not allowed
     }
-    }
-  
+
     return true; // Return true if all conditions are satisfied
   };
+
   const getFilteredList = (searchTerm) => {
     setSearch(searchTerm);
     if (searchTerm === '') {
@@ -234,7 +247,7 @@ const Department = () => {
     {
       name: <h5><b>#</b></h5>,
       selector: (row, index) => getSerialNumber(index),
-      width:"400px"
+      width: "400px"
     },
     {
       name: <h5><b>Department Name</b></h5>,
@@ -265,7 +278,7 @@ const Department = () => {
         </div>
 
       )
-      
+
     }
   ];
 
@@ -314,10 +327,10 @@ const Department = () => {
                   <div className='col-12 col-md-6 col-lg-4'>
                     <button
                       onClick={() => setAddDeparment(true)}
-                      className= "btn btn-primary"
+                      className="btn btn-primary"
                       type='submit'
                     >
-                    Add Department
+                      Add Department
 
                     </button>
                   </div>
@@ -391,8 +404,8 @@ const Department = () => {
                                 autoComplete='off'
                                 {...register("name", {
                                   required: "Department is Required",
-                                  validate:{
-                                       validateName,
+                                  validate: {
+                                    validateName,
                                   },
                                 })}
                               />
