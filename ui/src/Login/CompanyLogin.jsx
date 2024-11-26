@@ -256,6 +256,7 @@ const CompanyLogin = () => {
                                       placeholder="Password"
                                       onChange={handleEmailChange}
                                       type={passwordShown ? "text" : "password"}
+                                      maxLength={16}
                                       {...register("password", {
                                         required: "Password is Required",
                                         minLength: {

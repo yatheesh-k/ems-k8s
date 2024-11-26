@@ -252,7 +252,7 @@ const GeneratePaySlip = () => {
           <div className="col-12">
             <div className="card">
               <div className="card-header">
-                <h5 className="card-title">Generate PaySlips</h5>
+                <h5 className="card-title" style={{marginBottom:"0px"}}>Generate PaySlips</h5>
                 <div className="dropdown-divider" style={{ borderTopColor: "#D7D9DD" }} />
               </div>
               <form onSubmit={handleSubmit(onSubmit)}>

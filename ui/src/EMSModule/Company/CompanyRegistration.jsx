@@ -15,6 +15,7 @@ const CompanyRegistration = () => {
     register,
     watch,
     handleSubmit,
+    setValue,
     formState: { errors },
     reset,
   } = useForm({ mode: 'onChange' });
@@ -36,10 +37,14 @@ const CompanyRegistration = () => {
   };
   const handleEmailChange = (e) => {
     const value = e.target.value;
-    if (value.trim() !== "") {
-      return;
-    }
+
+    // Prevent space key (keyCode 32) from being entered
     if (e.keyCode === 32) {
+      e.preventDefault();
+    }
+
+    // If there is any space already entered, prevent re-render with spaces
+    if (value.includes(" ")) {
       e.preventDefault();
     }
   };
@@ -92,14 +97,14 @@ const CompanyRegistration = () => {
         // Case 1: General error message
         if (error.response.data.error && error.response.data.error.message) {
           const generalErrorMessage = error.response.data.error.message;
-          toast.error("Invalid Format");  // Display general error message
+          // toast.error("Invalid Format");  // Display general error message
           errorList.push(generalErrorMessage);
         }
 
         // Case 2: Specific error messages (multiple messages, such as form validation errors)
         if (error.response.data.error && error.response.data.error.messages) {
           const specificErrorMessages = error.response.data.error.messages;
-          toast.error("Invalid Format Fields");
+          // toast.error("Invalid Format Fields");
           specificErrorMessages.forEach((message) => {
             // Display each error message individually
             errorList.push(message);
@@ -167,9 +172,17 @@ const CompanyRegistration = () => {
   };
 
   const clearForm = () => {
-    reset();
-    setErrorMessage('');
+    // Reset only the CIN and Registration Number fields
+    setValue("cinNo", '');        // Clear CIN Number field
+    setValue("companyRegNo", ''); // Clear Company Registration Number field
+
+    // Optionally, clear the errors as well (if needed)
+    // clearErrors(); // Uncomment if you want to clear all errors
+
+    // Optionally, reset error message or other states here
+    // setErrorMessage('');
   };
+
 
   const toInputTitleCase = (e) => {
     const input = e.target;
@@ -250,12 +263,11 @@ const CompanyRegistration = () => {
       value = value.charAt(0).toLowerCase() + value.slice(1);
     }
 
-    // Update the input value
-    input.value = value;
+    // Only update the value if it was changed
+    if (input.value !== value) {
+      input.value = value;
+    }
   };
-
-
-
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
     let newValue = "";
@@ -385,27 +397,40 @@ const CompanyRegistration = () => {
 
   function handlePhoneNumberChange(event) {
     let value = event.target.value;
-    // Ensure only one space is allowed after +91
-    if (value.startsWith("+91 ") && value.charAt(3) !== " ") {
+
+    // Ensure the value starts with +91 and one space
+    if (value.startsWith("+91") && value.charAt(3) !== " ") {
       value = "+91 " + value.slice(3); // Ensure one space after +91
     }
-    // Update the value in the input
+
+    // Allow only numeric characters after +91 and the space
+    const numericValue = value.slice(4).replace(/[^0-9]/g, ''); // Remove any non-numeric characters after +91 
+    if (numericValue.length <= 10) {
+      value = "+91 " + numericValue; // Keep the +91 with a space
+    }
+
+    // Limit the total length to 14 characters (including +91 space)
+    if (value.length > 14) {
+      value = value.slice(0, 14); // Truncate if the length exceeds 14 characters
+    }
+
+    // Update the input field's value
     event.target.value = value;
   }
 
-  // Function to handle keydown for specific actions (e.g., prevent multiple spaces)
-  function handlePhoneNumberKeyDown(event) {
-    let value = event.target.value;
-    // Prevent backspace if the cursor is before the "+91 "
-    if (event.key === "Backspace" && value.startsWith("+91 ") && event.target.selectionStart <= 4) {
-      event.preventDefault(); // Prevent the backspace if it's before the "+91 "
-    }
-    // Prevent multiple spaces after +91
-    if (event.key === " " && value.charAt(3) === " ") {
-      event.preventDefault();
-    }
-  }
 
+  // Function to handle keydown for specific actions (e.g., prevent multiple spaces)
+  // function handlePhoneNumberKeyDown(event) {
+  //   let value = event.target.value;
+  //   // Prevent backspace if the cursor is before the "+91 "
+  //   if (event.key === "Backspace" && value.startsWith("+91 ") && event.target.selectionStart <= 4) {
+  //     event.preventDefault(); // Prevent the backspace if it's before the "+91 "
+  //   }
+  //   // Prevent multiple spaces after +91
+  //   if (event.key === " " && value.charAt(3) === " ") {
+  //     event.preventDefault();
+  //   }
+  // }
 
   return (
     <LayOut>
@@ -433,7 +458,7 @@ const CompanyRegistration = () => {
               <div className="card">
                 <div className="card-header ">
                   <div className="d-flex justify-content-start align-items-start">
-                    <h5 className="card-title me-2">Company Type</h5>
+                    <h5 className="card-title" style={{marginBottom:"0px"}}>Company Type</h5>
                     <span className="text-danger">
                       {errors.companyType && (
                         <p className="mb-0">{errors.companyType.message}</p>
@@ -492,7 +517,7 @@ const CompanyRegistration = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title">Company Details</h5>
+                  <h5 className="card-title" style={{marginBottom:"0px"}}>Company Details</h5>
                   <div
                     className="dropdown-divider"
                     style={{ borderTopColor: "#d7d9dd" }}
@@ -599,23 +624,23 @@ const CompanyRegistration = () => {
                           <input
                             type="tel"
                             className="form-control"
-                            placeholder="Enter Contact Number"
+                            placeholder="Enter Personal Mobile Number"
                             autoComplete="off"
-                            maxLength={14}
+                            maxLength={14} // Limit input to 14 characters (3 for +91, 1 for space, 10 for digits)
                             defaultValue="+91 " // Set the initial value to +91 with a space
                             onInput={handlePhoneNumberChange} // Handle input changes
-                            onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                             {...register("mobileNo", {
+                              required: "Contact Number is Required",
                               validate: {
                                 startsWithPlus91: (value) => {
                                   if (!value.startsWith("+91 ")) {
-                                    return "Contact Number must start with +91 and a space.";
+                                    return "Contact Number must start with +91.";
                                   }
                                   return true;
                                 },
                                 correctLength: (value) => {
                                   if (value.length !== 14) {
-                                    return "Contact Number must be exactly 10 digits (including +91).";
+                                    return "Contact Number must be exactly 14 characters.";
                                   }
                                   return true;
                                 },
@@ -623,10 +648,6 @@ const CompanyRegistration = () => {
                                   const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
                                   return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
                                 },
-                              },
-                              pattern: {
-                                value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                                message: "Contact Number must start with +91 followed by 10 digits.",
                               },
                             })}
                           />
@@ -690,7 +711,7 @@ const CompanyRegistration = () => {
                             maxLength={14} // Limit input to 15 characters
                             defaultValue="+91 " // Set the initial value to +91 with a space
                             onInput={handlePhoneNumberChange} // Handle input changes
-                            onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
+                            // onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                             {...register("mobileNo", {
                               required: "Contact Number is Required",
                               validate: {
@@ -713,7 +734,7 @@ const CompanyRegistration = () => {
                               },
                               pattern: {
                                 value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                                message: "Contact Number must start with +91 followed by 10 digits.",
+                                message: "Contact Number must be exactly 10 Numbers.",
                               },
                             })}
                           />
@@ -737,7 +758,7 @@ const CompanyRegistration = () => {
                         maxLength={14}
                         defaultValue="+91 " // Set the initial value to +91 with a space
                         onInput={handlePhoneNumberChange} // Handle input changes
-                        onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
+                        // onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                         {...register("alternateNo", {
                           validate: {
                             startsWithPlus91: (value) => {
@@ -759,7 +780,7 @@ const CompanyRegistration = () => {
                           },
                           pattern: {
                             value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                            message: "Alternate Number must start with +91 followed by 10 digits.",
+                            message: "Alternate Number must be exactly 10 Numbers.",
                           },
                         })}
                       />
@@ -814,7 +835,7 @@ const CompanyRegistration = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title">Company Registration Details</h5>
+                  <h5 className="card-title" style={{marginBottom:"0px"}}>Company Registration Details</h5>
                   <div
                     className="dropdown-divider"
                     style={{ borderTopColor: "#d7d9dd" }}
@@ -946,7 +967,7 @@ const CompanyRegistration = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title">Authorized Details</h5>
+                  <h5 className="card-title" style={{marginBottom:"20px"}}>Authorized Details</h5>
                   <div
                     className="dropdown-divider"
                     style={{ borderTopColor: "#d7d9dd" }}
@@ -1026,7 +1047,7 @@ const CompanyRegistration = () => {
                         maxLength={14}
                         defaultValue="+91 " // Set the initial value to +91 with a space
                         onInput={handlePhoneNumberChange} // Handle input changes
-                        onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
+                        // onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                         {...register("personalMobileNo", {
                           required: "Personal Mobile Number is Required",
                           validate: {
@@ -1038,7 +1059,7 @@ const CompanyRegistration = () => {
                             },
                             correctLength: (value) => {
                               if (value.length !== 14) {
-                                return "Personal MObile Number must be exactly 10 digits (including +91).";
+                                return "Personal Mobile Number must be exactly 10 digits (including +91).";
                               }
                               return true;
                             },
@@ -1049,7 +1070,7 @@ const CompanyRegistration = () => {
                           },
                           pattern: {
                             value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                            message: "Personal Mobile Number must start with +91 followed by 10 digits.",
+                            message: "Personal Mobile Number must be exactly 10 Numbers.",
                           },
                         })}
                       />

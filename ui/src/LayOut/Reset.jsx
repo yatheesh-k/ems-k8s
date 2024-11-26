@@ -197,7 +197,7 @@ const Reset = ({ companyName, onClose, show }) => {
               )}
             </div>
 
-            <div className="mt-4" style={{marginLeft:"63%"}}>
+            <div className="mt-4" style={{marginLeft:"55%"}}>
             <button className="btn btn-secondary me-2" type="button" onClick={handleReset}>
                 Reset
               </button>
