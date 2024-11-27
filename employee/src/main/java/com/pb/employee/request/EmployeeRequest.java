@@ -34,12 +34,11 @@ public class EmployeeRequest {
     private String employeeId;
 
     @Schema(example = "firstName")
-    @Pattern(regexp ="^(?!.*\\b([A-Z])\\s\\1\\s\\1)(?:[A-Z][a-z]+(?: [A-Z][a-z]+)*|[A-Z](?:\\.? ?[A-Z])? ?[A-Z][a-z]+|[A-Z][a-z]+(?: [A-Z](?:\\.? ?[A-Z])?)+)$", message = "{firstname.format}")
-    @Size(min = 3, max = 20, message = "{firstName.size.message}")
+    @Pattern(regexp ="^(?:[A-Z]{2,}(?:\\s[A-Z][a-z]+)*|[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*|[A-Z]+(?:\\s[A-Z]+)*)$", message = "{firstname.format}")
     private String firstName;
 
     @Schema(example = "lastName")
-    @Pattern(regexp = "^([A-Z]|[A-Z][a-z]*|[a-z]|)$", message = "{lastname.format}")
+    @Pattern(regexp = "^(?:[A-Z]{2,}(?:\\s[A-Z][a-z]+)*|[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*|[A-Z]+(?:\\s[A-Z]+)*)$", message = "{lastname.format}")
     private String lastName;
 
     @Schema(example = "emailId")
@@ -115,8 +114,8 @@ public class EmployeeRequest {
     private String ifscCode;
 
     @Schema(example = "bankName")
-    @Pattern(regexp = "^(?:[A-Z]{2,}(?:\\s[A-Z][a-z]+)*|(?:[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*))$", message = "{bankName.format}")
-    @Size(min = 3, max = 100, message = "{bankName.size.message}")
+    @Pattern(regexp =  "^(?:[A-Z]{2,}(?:\\s[A-Z][a-z]+)*|[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*|[A-Z]+(?:\\s[A-Z]+)*)$", message = "{bankName.format}")
+    @Size(min = 2, max = 100, message = "{bankName.size.message}")
     private String bankName;
 
     private String pfNo;
