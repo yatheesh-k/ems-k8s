@@ -869,28 +869,58 @@ const AttendanceReport = () => {
                                                     },
                                                     validate: {
                                                         maxTotal: (value) => {
-                                                            const totalWorkingDays = watch("totalWorkingDays"); // Use watch to get the value of totalWorkingDays
-                                                            return value <= totalWorkingDays || "Cannot exceed total working days.";
+                                                            const totalWorkingDays = watch("totalWorkingDays"); // Get total working days
+
+                                                            // Check if value contains "to" (i.e., a range like "4 to 9")
+                                                            if (value.includes("to")) {
+                                                                // Split the value by "to", then trim and convert to numbers
+                                                                const [start, end] = value.split("to").map(val => parseInt(val.trim(), 10));
+
+                                                                // Check if the range is valid
+                                                                if (isNaN(start) || isNaN(end)) {
+                                                                    return "Invalid range format.";
+                                                                }
+
+                                                                // Ensure that the range is within totalWorkingDays
+                                                                if (start > end) {
+                                                                    return "Start value cannot be greater than end value."; // Invalid range
+                                                                }
+
+                                                                if (start <= totalWorkingDays && end <= totalWorkingDays) {
+                                                                    return true; // Valid range
+                                                                } else {
+                                                                    return "The range cannot exceed total working days.";
+                                                                }
+                                                            } else {
+                                                                // If it's a single value, check if it's within the working days
+                                                                const numberValue = parseInt(value, 10);
+
+                                                                if (isNaN(numberValue)) {
+                                                                    return "Invalid number.";
+                                                                }
+
+                                                                return numberValue <= totalWorkingDays || "Value cannot exceed total working days.";
+                                                            }
                                                         },
-                                                    },
+                                                    }
                                                 })}
                                             />
                                             {errors.noOfWorkingDays && <p className='errorMsg'>{errors.noOfWorkingDays.message}</p>}
                                         </div>
                                     </div>
-                                    <div className='modal-footer'>
-                                        <button
-                                            className="btn btn-primary"
-                                            type='submit'
-                                        >
-                                            Save changes
-                                        </button>
+                                    <div className='modal-footer' style={{marginRight:"15px"}}>
                                         <button
                                             type='button'
                                             className="btn btn-secondary"
                                             onClick={handleCloseEditModal}
                                         >
                                             Cancel
+                                        </button>
+                                        <button
+                                            className="btn btn-primary"
+                                            type='submit'
+                                        >
+                                            Save changes
                                         </button>
                                     </div>
                                 </form>

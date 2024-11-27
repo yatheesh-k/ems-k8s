@@ -35,8 +35,6 @@ import ForgotPassword from '../Login/ForgotPassword'
 import EmployeeProfile from '../EmployeeModule/EmployeeProfile';
 import EmployeeSalaryUpdate from '../CompanyModule/PayRoll/EmployeeSalaryUpdate';
 import CompanySalaryView from '../CompanyModule/Settings/CompanySalaryView';
-import OfferLetters from '../CompanyModule/Settings/OfferLetters';
-import Template from '../CompanyModule/Settings/Template';
 import ExperienceLetter from '../CompanyModule/Settings/Experience/ExperienceLetter';
 import ExperienceForm from '../CompanyModule/Settings/Experience/ExperienceForm';
 import ExperienceView from '../CompanyModule/Settings/Experience/ExperienceView';
@@ -54,6 +52,10 @@ import PayslipDoc1 from '../CompanyModule/PayRoll/Payslips/PayslipDoc1';
 import PayslipDoc3 from '../CompanyModule/PayRoll/Payslips/PayslipDoc3';
 import PayslipDoc2 from '../CompanyModule/PayRoll/Payslips/PayslipDoc2';
 import PayslipDoc4 from '../CompanyModule/PayRoll/Payslips/PayslipDoc4';
+import OfferLetters from '../CompanyModule/Settings/OfferLetter/OfferLetters';
+import Template from '../CompanyModule/Settings/OfferLetter/Template';
+import OfferLetterForm from '../CompanyModule/Settings/OfferLetter/OfferLetterForm';
+import OfferLetterPreview from '../CompanyModule/Settings/OfferLetter/OfferLetterPreview';
 
 const Rout = () => {
   const location = useLocation();
@@ -150,6 +152,8 @@ const Rout = () => {
       <Route path='/existingEmployee' element={<ExistingLetter />}></Route>
       <Route path='/experienceSummary' element={<ExperienceView/>}></Route>
       <Route path='/experienceForm' element={<ExperienceForm/>}></Route>
+      <Route path='/offerLetterForm' element={<OfferLetterForm/>}></Route>
+      <Route path='/offerLetterPreview' element={<OfferLetterPreview/>}></Route>
       <Route path='/forgotPassword' element={<ForgotPassword />}></Route>
       <Route path='/relievingTemplates' element={<RelievingLetter/>}></Route>
       <Route path='/relivingReview' element={<Preview/>}></Route>

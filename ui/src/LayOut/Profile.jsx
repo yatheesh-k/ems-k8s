@@ -54,7 +54,7 @@ function Profile() {
     const updateData = {
       companyAddress: data.companyAddress,
       mobileNo: data.mobileNo,
-      alternateNo: data.alternateNo,
+      landNo: data.landNo,
       name: data.name,
       personalMailId: data.personalMailId,
       personalMobileNo: data.personalMobileNo,
@@ -131,27 +131,33 @@ function Profile() {
   };
 
   const onChangePicture = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Check file size (200KB)
-      if (file.size > 200 * 1024) {
-        setImgError("File size must be less than 200KB.");
-        return;
-      }
-
-      // Check file type
-      const validTypes = ["image/png", "image/jpeg", "image/svg+xml", "application/pdf"];
-      if (!validTypes.includes(file.type)) {
-        setImgError("Only .png, .jpg, .jpeg, .svg, and .pdf files are allowed.");
-        return;
-      }
-
-      // Clear errors if all checks pass
-      setImgError('');
-      setPostImage(file); // Set the valid image file
-      console.log("File is valid and ready for upload:", file);
+    const file = e.target.files[0]; // Get the selected file
+  
+    // Check if no file is selected
+    if (!file) {
+      setImgError("No file selected.");
+      return; // Stop processing if no file is selected
     }
+  
+    // Check file size (limit to 200KB)
+    if (file.size > 200 * 1024) {
+      setImgError("File size must be less than 200KB.");
+      return; // Stop further processing if size exceeds limit
+    }
+  
+    // Check file type (valid image types and PDF)
+    const validTypes = ["image/png", "image/jpeg", "image/svg+xml", "application/pdf"];
+    if (!validTypes.includes(file.type)) {
+      setImgError("Only .png, .jpg, .jpeg, .svg, and .pdf files are allowed.");
+      return; // Stop further processing if the type is invalid
+    }
+  
+    // If the file is valid, clear previous errors and update the state
+    setImgError(''); // Clear error messages
+    setPostImage(file); // Store the selected file
+    console.log("File is valid and ready for upload:", file);
   };
+  
 
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
@@ -791,11 +797,10 @@ function Profile() {
               type="file"
               className="form-control"
               accept=".png, .jpg, .svg, .jpeg, .pdf"
-
               onChange={onChangePicture}
             />
             {errorMessage && (
-              <p className="text-danger" style={{ marginLeft: "2%" }}>{imgError}</p>
+              <p className="text-danger" style={{ marginLeft: "2%", color:"red" }}>{imgError}</p>
             )}
           </ModalBody>
           <ModalFooter>

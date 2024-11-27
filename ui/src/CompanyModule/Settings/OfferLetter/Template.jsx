@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import LayOut from '../../LayOut/LayOut';
 import { Download } from 'react-bootstrap-icons';
-import { CompanySalaryStructureGetApi, companyViewByIdApi, OfferLetterDownload } from '../../Utils/Axios';
 import { toast } from 'react-toastify';
-import { useAuth } from '../../Context/AuthContext';
 import { useForm } from 'react-hook-form';
+import { useAuth } from '../../../Context/AuthContext';
+import { CompanySalaryStructureGetApi, companyViewByIdApi, OfferLetterDownload } from '../../../Utils/Axios';
+import LayOut from '../../../LayOut/LayOut';
 
 const Template = () => {
     const formatDate = (date) => {
@@ -715,7 +715,7 @@ const Template = () => {
                     </div>
                 </div>
             </div>
-            <div className="col-12 mt-4 d-flex justify-content-between" style={{ background: "none" }}>
+            {/* <div className="col-12 mt-4 d-flex justify-content-between" style={{ background: "none" }}>
                 <button
                     onClick={handleEditToggle}
                     className={isEditing ? "btn btn-secondary" : "btn btn-danger"}
@@ -732,7 +732,7 @@ const Template = () => {
                     <span className="m-2">{isEditing ? "Save" : "Download"}</span>
                     {!isEditing && <Download size={18} className="ml-1" />}
                 </button>
-            </div>
+            </div> */}
 
         </LayOut >
     );

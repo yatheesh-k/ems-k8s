@@ -128,7 +128,7 @@ const CompanyRegistration = () => {
         // Handle HTTP 409 Conflict Error (duplicate or other conflicts)
         if (error.response.status === 409) {
           const conflictMessage = error.response.data.message || "A conflict occurred.";
-          toast.error(conflictMessage);  // Show conflict error in toast
+          // toast.error(conflictMessage);  // Show conflict error in toast
         }
 
       } else {
@@ -163,7 +163,7 @@ const CompanyRegistration = () => {
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
       const errorMessage = error.response.data.error.message;
-      toast.error(errorMessage);
+      // toast.error(errorMessage);
     } else {
       // toast.error("Network Error !");
     }
@@ -472,8 +472,8 @@ const CompanyRegistration = () => {
               <div className="card">
                 <div className="card-header ">
                   <div className="d-flex justify-content-start align-items-start">
-                    <h5 className="card-title" style={{marginBottom:"0px"}}>Company Type</h5>
-                    <span className="text-danger">
+                    <h5 className="card-title" style={{ marginBottom: "0px" }}>Company Type</h5>
+                    <span className="text-danger" style={{marginLeft:"10px"}}>
                       {errors.companyType && (
                         <p className="mb-0">{errors.companyType.message}</p>
                       )}
@@ -531,7 +531,7 @@ const CompanyRegistration = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title" style={{marginBottom:"0px"}}>Company Details</h5>
+                  <h5 className="card-title" style={{ marginBottom: "0px" }}>Company Details</h5>
                   <div
                     className="dropdown-divider"
                     style={{ borderTopColor: "#d7d9dd" }}
@@ -624,7 +624,7 @@ const CompanyRegistration = () => {
                         <div className="col-lg-1"></div>
                         <div className="col-12 col-md-6 col-lg-5 mb-3">
                           <label className="form-label">
-                            Contact Number <span style={{ color: "red" }}>*</span>
+                            Mobile Number <span style={{ color: "red" }}>*</span>
                           </label>
                           <input
                             type="tel"
@@ -635,23 +635,23 @@ const CompanyRegistration = () => {
                             defaultValue="+91 " // Set the initial value to +91 with a space
                             onInput={handlePhoneNumberChange} // Handle input changes
                             {...register("mobileNo", {
-                              required: "Contact Number is Required",
+                              required: "Mobile Number is Required",
                               validate: {
                                 startsWithPlus91: (value) => {
                                   if (!value.startsWith("+91 ")) {
-                                    return "Contact Number must start with +91.";
+                                    return "Mobile Number must start with +91.";
                                   }
                                   return true;
                                 },
                                 correctLength: (value) => {
                                   if (value.length !== 14) {
-                                    return "Contact Number must be exactly 10 digits.";
+                                    return "Mobile Number must be exactly 14 characters.";
                                   }
                                   return true;
                                 },
                                 notRepeatingDigits: (value) => {
                                   const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                                  return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
+                                  return !isRepeating || "Mobile Number cannot consist of the same digit repeated.";
                                 },
                               },
                             })}
@@ -706,40 +706,40 @@ const CompanyRegistration = () => {
                       <>
                         <div className="col-12 col-md-6 col-lg-5 mb-3">
                           <label className="form-label">
-                            Contact Number <span style={{ color: "red" }}>*</span>
+                            Mobile Number <span style={{ color: "red" }}>*</span>
                           </label>
                           <input
                             type="tel"
                             className="form-control"
-                            placeholder="Enter Contact Number"
+                            placeholder="Enter Mobile Number"
                             autoComplete="off"
                             maxLength={14} // Limit input to 15 characters
                             defaultValue="+91 " // Set the initial value to +91 with a space
                             onInput={handlePhoneNumberChange} // Handle input changes
                             // onKeyDown={handlePhoneNumberKeyDown} // Handle keydown for specific actions
                             {...register("mobileNo", {
-                              required: "Contact Number is Required",
+                              required: "Mobile Number is Required",
                               validate: {
                                 startsWithPlus91: (value) => {
                                   if (!value.startsWith("+91 ")) {
-                                    return "Contact Number must start with +91 and a space.";
+                                    return "Mobile Number must start with +91 and a space.";
                                   }
                                   return true;
                                 },
                                 correctLength: (value) => {
                                   if (value.length !== 14) {
-                                    return "Contact Number must be exactly 10 digits (including +91).";
+                                    return "Mobile Number must be exactly 10 digits (including +91).";
                                   }
                                   return true;
                                 },
                                 notRepeatingDigits: (value) => {
                                   const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                                  return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
+                                  return !isRepeating || "Mobile Number cannot consist of the same digit repeated.";
                                 },
                               },
                               pattern: {
                                 value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                                message: "Contact Number is Required.",
+                                message: "Mobile Number must be exactly 10 Numbers.",
                               },
                             })}
                           />
@@ -840,7 +840,7 @@ const CompanyRegistration = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title" style={{marginBottom:"0px"}}>Company Registration Details</h5>
+                  <h5 className="card-title" style={{ marginBottom: "0px" }}>Company Registration Details</h5>
                   <div
                     className="dropdown-divider"
                     style={{ borderTopColor: "#d7d9dd" }}
@@ -972,7 +972,7 @@ const CompanyRegistration = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title" style={{marginBottom:"20px"}}>Authorized Details</h5>
+                  <h5 className="card-title" style={{ marginBottom: "0px" }}>Authorized Details</h5>
                   <div
                     className="dropdown-divider"
                     style={{ borderTopColor: "#d7d9dd" }}
@@ -1093,11 +1093,10 @@ const CompanyRegistration = () => {
                       <textarea
                         type="text"
                         className="form-control"
-                        placeholder="Enter Address"
-                        autoComplete="off"
+                        placeholder="Enter Company Address"
+                        //onKeyDown={handleEmailChange}
                         onInput={toInputAddressCase}
-                        onKeyDown={handleEmailChange}
-                        maxLength={200}
+                        autoComplete="off"
                         {...register("address", {
                           required: "Address is Required",
                           pattern: {

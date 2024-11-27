@@ -171,7 +171,7 @@ const Department = () => {
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
-  
+
   const validateName = (value) => {
     // Trim leading and trailing spaces before further validation
     const trimmedValue = value.trim();
@@ -181,31 +181,32 @@ const Department = () => {
       return "Department Name is Required.";
     }
 
-    // Allow alphabetic characters, numbers, spaces, and the / character
-    else if (!/^[A-Za-z0-9\s/!@#&()*,.-]+$/.test(trimmedValue)) {
-      return "Only Alphabetic Characters, Numbers, Spaces, and '/' are Allowed.";
+    // Allow alphabetic characters, numbers, spaces, and some special characters like /, !, @, #, &...
+    else if (!/^[A-Za-z/]+$/.test(trimmedValue)) {
+      return "Only Alphabetic Characters and '/' are Allowed.";
     } else {
       const words = trimmedValue.split(" ");
 
       // Check for minimum and maximum word length
       for (const word of words) {
-        if (word.length < 2) {
-          return "Minimum Length 2 Character Required.";  // If any word is shorter than 1 character
+        // If the word is a single character and it's not the only word in the string, skip this rule
+        if (word.length < 2 && words.length === 1) {
+          return "Minimum Length 2 Characters Required.";  // If any word is shorter than 2 characters and it's a single word
         } else if (word.length > 40) {
           return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters
         }
       }
 
-      // Check if there are leading or trailing spaces (after trimming)
-      if (/\s$/.test(value)) {
-        return "Spaces at the end are not allowed.";  // Trailing space error
-      } else if (/^\s/.test(value)) {
-        return "No Leading Space Allowed.";  // Leading space error
+      // Check for multiple spaces between words
+      if (/\s{2,}/.test(trimmedValue)) {
+        return "No Multiple Spaces Between Words Allowed.";
       }
 
-      // Check if there are multiple spaces between words
-      else if (/\s{2,}/.test(trimmedValue)) {
-        return "No Multiple Spaces Between Words Allowed.";
+      // Check if the value has leading or trailing spaces (shouldn't happen due to trimming)
+      if (/^\s/.test(value)) {
+        return "Leading space not allowed.";  // Leading space error
+      } else if (/\s$/.test(value)) {
+        return "Spaces at the end are not allowed.";  // Trailing space error
       }
     }
 
@@ -380,7 +381,8 @@ const Department = () => {
               >
                 <div className="modal-dialog modal-dialog-centered">
                   <div className="modal-content">
-                    <ModalHeader>
+                    {/* <ModalHeader> */}
+                    <div className="modal-header d-flex justify-content-between w-100">
                       <ModalTitle>{editingId ? "Update Department" : "Add Department"}</ModalTitle>
                       <button
                         type="button"
@@ -388,7 +390,8 @@ const Department = () => {
                         aria-label="Close"
                         onClick={handleCloseAddDepartmentModal} // Function to close the modal
                       ></button>
-                    </ModalHeader>
+                      {/* </ModalHeader> */}
+                    </div>
                     <ModalBody>
                       <form onSubmit={handleSubmit(onSubmit)} id='designationForm'>
                         <div className="card-body" style={{ width: "1060px", paddingBottom: "0px" }}>
@@ -415,18 +418,18 @@ const Department = () => {
                         </div>
                         <div className='modal-footer'>
                           <button
-                            className={editingId ? "btn btn-danger" : "btn btn-primary"}
-                            type='submit'
-                            disabled={loading}
-                          >
-                            {loading ? "Loading..." : (editingId ? "Update Department" : "Add Department")}
-                          </button>
-                          <button
                             type='button'
                             className="btn btn-secondary"
                             onClick={handleCloseAddDepartmentModal}
                           >
                             Cancel
+                          </button>
+                          <button
+                            className={editingId ? "btn btn-danger" : "btn btn-primary"}
+                            type='submit'
+                            disabled={loading}
+                          >
+                            {loading ? "Loading..." : (editingId ? "Update Department" : "Add Department")}
                           </button>
                         </div>
                       </form>

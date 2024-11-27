@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import LayOut from '../../LayOut/LayOut';
+import LayOut from '../../../LayOut/LayOut';
 
 const OfferLetters = () => {
   const navigate = useNavigate(); // Initialize useNavigate
