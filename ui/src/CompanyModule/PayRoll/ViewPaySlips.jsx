@@ -22,8 +22,8 @@ const ViewPaySlips = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [showSpinner, setShowSpinner] = useState(false);
   const [noRecords, setNoRecords] = useState(false);
-  const [payslipTemplates, setPayslipTemplates] = useState([]); 
-  const [selectedTemplate, setSelectedTemplate] = useState(null); 
+  const [payslipTemplates, setPayslipTemplates] = useState([]);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [currentTemplate, setCurrentTemplate] = useState(null);
   const navigate = useNavigate();
 
@@ -118,13 +118,13 @@ const ViewPaySlips = () => {
       toast.error("Failed to fetch payslip templates. Please try again.");
     }
   };
-  
+
   useEffect(() => {
     fetchTemplate();
   }, []);
 
   const handleViewSalary = (employeeId, payslipId) => {
-    const payslipTemplateNo = currentTemplate?.payslipTemplateNo || "default"; 
+    const payslipTemplateNo = currentTemplate?.payslipTemplateNo || "default";
     let url;
     switch (payslipTemplateNo) {
       case "1":
@@ -143,15 +143,15 @@ const ViewPaySlips = () => {
         console.error("Invalid payslip template number:", payslipTemplateNo);
         return;
     }
-  
+
     navigate(url, {
       state: {
         employeeDetails: selectedEmployeeDetails,
       },
     });
   };
-  
-  
+
+
   const getMonthAndYear = () => {
     if (employeeSalaryView.length > 0) {
       const firstRecord = employeeSalaryView[0];
@@ -199,7 +199,7 @@ const ViewPaySlips = () => {
       error.response.data.error.message
     ) {
       const errorMessage = error.response.data.error.message;
-      toast.error(errorMessage);
+      // toast.error(errorMessage);
     } else {
       toast.error("Network Error!");
     }
@@ -282,120 +282,128 @@ const ViewPaySlips = () => {
             </nav>
           </div>
         </div>
-        <div className="card mb-3">
-          <div className="card-body justify-content-around">
-            <div className="row d-flex justify-content-around">
-              <div className="col-12 col-md-3">
-                <div className="form-group">
-                  <label className="form-label" style={{ paddingTop: "10px" }}>Select Employee</label>
-                  <Controller
-                    name="employeeId"
-                    control={control}
-                    defaultValue=""
-                    rules={{ required: true }}
-                    render={({ field }) => (
-                      <Select
-                        {...field}
-                        options={employees}
-                        value={employees.find((option) => option.value === field.value) || ""}
-                        onChange={(val) => {
-                          field.onChange(val.value);
-                          setSelectedEmployeeId(val.value);
-                          setShowFields(true);
-                        }}
-                        placeholder="Select Employee"
-                      />
-                    )}
-                  />
-                  {errors.employeeId && (
-                    <p className="errorMsg">Employee Name is required</p>
+        <div className="row">
+          <div className="col-12">
+            <div className="card">
+              <div className="card-header">
+                <h5 className="card-title" style={{ marginBottom: "0px" }}>PaySlips</h5>
+                <div className="dropdown-divider" style={{ borderTopColor: "#D7D9DD" }} />
+              </div>
+                <div className="card-body justify-content-around">
+                  <div className="row d-flex justify-content-around">
+                    <div className="col-12 col-md-3">
+                      <div className="form-group">
+                        <label className="form-label" style={{ paddingTop: "10px" }}>Select Employee</label>
+                        <Controller
+                          name="employeeId"
+                          control={control}
+                          defaultValue=""
+                          rules={{ required: true }}
+                          render={({ field }) => (
+                            <Select
+                              {...field}
+                              options={employees}
+                              value={employees.find((option) => option.value === field.value) || ""}
+                              onChange={(val) => {
+                                field.onChange(val.value);
+                                setSelectedEmployeeId(val.value);
+                                setShowFields(true);
+                              }}
+                              placeholder="Select Employee"
+                            />
+                          )}
+                        />
+                        {errors.employeeId && (
+                          <p className="errorMsg">Employee Name is required</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="col-12 col-md-3">
+                      <div className="form-group">
+                        <label className="form-label" style={{ paddingTop: "10px" }}>Select Year</label>
+                        <Select
+                          options={years}
+                          value={years.find((option) => option.value === selectedYear) || ""}
+                          onChange={(selectedOption) => setSelectedYear(selectedOption.value)}
+                          placeholder="Select Year"
+                        />
+                      </div>
+                    </div>
+                    <div className="col-12 col-md-3">
+                      <div className="form-group">
+                        <label className="form-label" style={{ paddingTop: "10px" }}>Select Month</label>
+                        <Select
+                          options={months}
+                          value={months.find((month) => month.value === selectedMonth) || ""}
+                          onChange={(selectedOption) => setSelectedMonth(selectedOption.value)}
+                          placeholder="Select Month"
+                        />
+                      </div>
+                    </div>
+                    <div className="col-12 col-md-3 mt-4">
+                      <div className="form-group">
+                        <button
+                          type="button"
+                          style={{ marginTop: "8px", paddingBottom: "8px" }}
+                          className="btn btn-primary btn-block"
+                          onClick={handleGoClick}
+                          disabled={!isGoButtonEnabled}
+                        >
+                          Go
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  {showFields ? (
+                    <div>
+                      <h5 className="card-title mt-4 text-secondary" >
+                        PaySlip Details for {selectedEmployeeDetails.firstName ? `${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})` : 'All Employees'}
+                        {selectedYear && ` - ${selectedYear}`}
+                        {selectedMonth && ` - ${getMonthNames()[selectedMonth - 1]}`}
+                      </h5>
+                      <hr />
+                      {noRecords ? (
+                        <p style={{ textAlign: "center" }}>There are no records to display.</p>
+                      ) : (
+                        <DataTable
+                          columns={columns}
+                          data={employeeSalaryView}
+                          pagination
+                          highlightOnHover
+                          pointerOnHover
+                          dense
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    <div>
+                      <h5 className="card-title mt-4">
+                        PaySlip Details for {getMonthAndYear()}
+                      </h5>
+                      <hr />
+                      {noRecords ? (
+                        <p style={{ textAlign: "center" }}>There are no records to display.</p>
+                      ) : (
+                        <DataTable
+                          columns={columns}
+                          data={employeeSalaryView}
+                          pagination
+                          highlightOnHover
+                          pointerOnHover
+                          dense
+                          onChangePage={page => setCurrentPage(page)}
+                          onChangeRowsPerPage={perPage => setRowsPerPage(perPage)}
+                        />
+                      )}
+                    </div>
+                  )}
+                  {showSpinner && (
+                    <div className="spinner-container" style={{ margin: "15% 0 0 45%" }}>
+                      <div className="spinner-border text-primary" role="status"></div>
+                    </div>
                   )}
                 </div>
-              </div>
-              <div className="col-12 col-md-3">
-                <div className="form-group">
-                  <label className="form-label" style={{ paddingTop: "10px" }}>Select Year</label>
-                  <Select
-                    options={years}
-                    value={years.find((option) => option.value === selectedYear) || ""}
-                    onChange={(selectedOption) => setSelectedYear(selectedOption.value)}
-                    placeholder="Select Year"
-                  />
-                </div>
-              </div>
-              <div className="col-12 col-md-3">
-                <div className="form-group">
-                  <label className="form-label" style={{ paddingTop: "10px" }}>Select Month</label>
-                  <Select
-                    options={months}
-                    value={months.find((month) => month.value === selectedMonth) || ""}
-                    onChange={(selectedOption) => setSelectedMonth(selectedOption.value)}
-                    placeholder="Select Month"
-                  />
-                </div>
-              </div>
-              <div className="col-12 col-md-3 mt-4">
-                <div className="form-group">
-                  <button
-                    type="button"
-                    style={{ marginTop: "8px", paddingBottom: "8px" }}
-                    className="btn btn-primary btn-block"
-                    onClick={handleGoClick}
-                    disabled={!isGoButtonEnabled}
-                  >
-                    Go
-                  </button>
-                </div>
-              </div>
             </div>
-            {showFields ? (
-              <div>
-                <h5 className="card-title mt-4 text-secondary" >
-                  PaySlip Details for {selectedEmployeeDetails.firstName ? `${selectedEmployeeDetails.firstName} ${selectedEmployeeDetails.lastName} (${selectedEmployeeDetails.employeeId})` : 'All Employees'}
-                  {selectedYear && ` - ${selectedYear}`}
-                  {selectedMonth && ` - ${getMonthNames()[selectedMonth - 1]}`}
-                </h5>
-                <hr />
-                {noRecords ? (
-                  <p style={{ textAlign: "center" }}>There are no records to display.</p>
-                ) : (
-                  <DataTable
-                    columns={columns}
-                    data={employeeSalaryView}
-                    pagination
-                    highlightOnHover
-                    pointerOnHover
-                    dense
-                  />
-                )}
-              </div>
-            ) : (
-              <div>
-                <h5 className="card-title mt-4">
-                  PaySlip Details for {getMonthAndYear()}
-                </h5>
-                <hr />
-                {noRecords ? (
-                  <p style={{ textAlign: "center" }}>There are no records to display.</p>
-                ) : (
-                  <DataTable
-                    columns={columns}
-                    data={employeeSalaryView}
-                    pagination
-                    highlightOnHover
-                    pointerOnHover
-                    dense
-                    onChangePage={page => setCurrentPage(page)}
-                    onChangeRowsPerPage={perPage => setRowsPerPage(perPage)}
-                  />
-                )}
-              </div>
-            )}
-            {showSpinner && (
-              <div className="spinner-container" style={{ margin: "15% 0 0 45%" }}>
-                <div className="spinner-border text-primary" role="status"></div>
-              </div>
-            )}
           </div>
         </div>
       </div>

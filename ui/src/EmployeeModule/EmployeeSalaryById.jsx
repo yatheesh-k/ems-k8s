@@ -46,8 +46,8 @@ const EmployeeSalaryById = () => {
           employeeSalaryView.map((item, index) => (
             <div key={index} className="card mb-3">
               <div className="card-header d-flex justify-content-between align-items-center" onClick={() => toggleExpand(index)} style={{ cursor: 'pointer' }}>
-                <h5 className="mb-0"> {index + 1}. Net Salary: {item.netSalary}</h5>
-                <ChevronRight size={18} />
+                <h5 style={{color:"#fff"}} className="mb-0"> {index + 1}. Net Salary: {item.netSalary}</h5>
+                <ChevronRight size={18} color='#fff' />
               </div>
               {expanded[index] && (
                 <div className="card-body">

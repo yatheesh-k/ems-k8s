@@ -124,7 +124,7 @@ const CompanySalaryStructure = () => {
   const handleCheckboxChange = (index) => {
     const fields = activeTab === 'nav-home' ? allowanceFields : deductionFields;
     const fieldLabel = fields[index].label;
-  
+
     // Update the checkbox selection state
     setFieldCheckboxes((prev) => {
       const newCheckboxes = {
@@ -134,26 +134,26 @@ const CompanySalaryStructure = () => {
           [fieldLabel]: !prev[activeTab === 'nav-home' ? 'allowances' : 'deductions'][fieldLabel],
         }
       };
-  
+
       // Get selected allowances and selected deductions
       const selectedAllowances = Object.entries(newCheckboxes.allowances).filter(([key, value]) => value);
       const selectedDeductions = Object.entries(newCheckboxes.deductions).filter(([key, value]) => value);
-  
+
       // Calculate total percentage for selected allowances
       const totalAllowancePercentage = selectedAllowances
         .map(([key]) => allowanceFields.find(f => f.label === key))
         .filter(field => field.type === 'percentage' && field.value)
         .reduce((total, field) => total + parseFloat(field.value), 0);
-  
+
       // Calculate total percentage for selected deductions
       const totalDeductionPercentage = selectedDeductions
         .map(([key]) => deductionFields.find(f => f.label === key))
         .filter(field => field.type === 'percentage' && field.value)
         .reduce((total, field) => total + parseFloat(field.value), 0);
-  
+
       // Initialize error object
       let updatedErrors = { ...prev };
-  
+
       // Check if total percentage for allowances exceeds 100%
       if (totalAllowancePercentage > 100) {
         updatedErrors = {
@@ -164,7 +164,7 @@ const CompanySalaryStructure = () => {
         // Clear the error message for allowances if the total is valid
         delete updatedErrors.totalAllowancePercentage;
       }
-  
+
       // Check if total percentage for deductions exceeds 100%
       if (totalDeductionPercentage > 100) {
         updatedErrors = {
@@ -175,20 +175,20 @@ const CompanySalaryStructure = () => {
         // Clear the error message for deductions if the total is valid
         delete updatedErrors.totalDeductionPercentage;
       }
-  
+
       // If there are any errors, return the previous state to prevent changing the checkbox state
       if (updatedErrors.totalAllowancePercentage || updatedErrors.totalDeductionPercentage) {
         setValidationErrors(updatedErrors);
         return prev; // Prevent state change if there's an error
       }
-  
+
       // Clear the errors if everything is valid
       setValidationErrors(updatedErrors);
-  
+
       // Return the updated state
       return newCheckboxes;
     });
-  
+
     // Handle validation for the current field
     const isChecked = !fieldCheckboxes[activeTab === 'nav-home' ? 'allowances' : 'deductions'][fieldLabel];
     if (isChecked) {
@@ -212,7 +212,6 @@ const CompanySalaryStructure = () => {
     } else {
       delete errors[field.label];
     }
-
     setValidationErrors(errors);
   };
 
@@ -271,69 +270,104 @@ const CompanySalaryStructure = () => {
     }
   };
 
-
   const onSubmit = async () => {
     const jsonData = {
-      companyName: user.company,
-      status: "Active",
-      allowances: {},
-      deductions: {},
+        companyName: user.company,
+        status: "Active",
+        allowances: {},
+        deductions: {},
     };
 
+    // Get selected allowances and deductions
     const selectedAllowances = allowanceFields.filter((field) => fieldCheckboxes.allowances[field.label]);
     const selectedDeductions = deductionFields.filter((field) => fieldCheckboxes.deductions[field.label]);
 
     // Validation: Check if any selected allowance or deduction has an empty value
     const errors = {};
+
     selectedAllowances.forEach((field) => {
-      if (!field.value) {
-        errors[field.label] = "Value is required for selected allowance.";
-      }
+        if (!field.value) {
+            errors[field.label] = "Value is required for selected allowance.";
+        }
     });
 
     selectedDeductions.forEach((field) => {
-      if (!field.value) {
-        errors[field.label] = "Value is required for selected deduction.";
-      }
+        if (!field.value) {
+            errors[field.label] = "Value is required for selected deduction.";
+        }
     });
 
-    // If there are errors, show alert and return early
-    if (Object.keys(errors).length > 0) {
-      alert("Please fill in the required values for the selected allowances and deductions.");
-      setValidationErrors(errors);
-      return; // Prevent submission
+    // Validation: Check if the total percentage for allowances exceeds 100%
+    const totalAllowancePercentage = selectedAllowances
+        .map((field) => {
+            // Ensure the field exists before trying to access its properties
+            const foundField = allowanceFields.find(f => f.label === field.label);
+            return foundField ? foundField : null; // If field is found, return it, otherwise return null
+        })
+        .filter(field => field && field.type === 'percentage' && field.value)
+        .reduce((total, field) => total + parseFloat(field.value), 0);
+
+    if (totalAllowancePercentage > 100) {
+        errors.totalAllowancePercentage = 'The total percentage for allowances cannot exceed 100%. Please Adjust';
     }
 
+    // Validation: Check if the total percentage for deductions exceeds 100%
+    const totalDeductionPercentage = selectedDeductions
+        .map((field) => {
+            // Ensure the field exists before trying to access its properties
+            const foundField = deductionFields.find(f => f.label === field.label);
+            return foundField ? foundField : null; // If field is found, return it, otherwise return null
+        })
+        .filter(field => field && field.type === 'percentage' && field.value)
+        .reduce((total, field) => total + parseFloat(field.value), 0);
+
+    if (totalDeductionPercentage > 100) {
+        errors.totalDeductionPercentage = 'The total percentage for deductions cannot exceed 100%. Please Adjust';
+    }
+
+    // If there are validation errors, show them and prevent submission
+    if (Object.keys(errors).length > 0) {
+        setValidationErrors(errors); // Set validation errors to state
+          // alert("Please fill in the required values for the selected allowances and deductions, and make sure percentages do not exceed 100.");
+        return; // Prevent form submission
+    }
+
+    // Populate the allowances and deductions data for submission
     selectedAllowances.forEach((field) => {
-      if (field.label && field.value) {
-        jsonData.allowances[field.label] = field.type === "percentage" ? `${field.value}%` : field.value;
-      }
+        if (field.label && field.value) {
+            jsonData.allowances[field.label] = field.type === "percentage" ? `${field.value}%` : field.value;
+        }
     });
 
     selectedDeductions.forEach((field) => {
-      if (field.label && field.value) {
-        jsonData.deductions[field.label] = field.type === "percentage" ? `${field.value}%` : field.value;
-      }
+        if (field.label && field.value) {
+            jsonData.deductions[field.label] = field.type === "percentage" ? `${field.value}%` : field.value;
+        }
     });
 
     console.log("Submitting data:", jsonData);
 
     try {
-      const response = await CompanySalaryStructurePostApi(jsonData);
-      toast.success("Salary structure submitted successfully!");
-      reset();
-      navigate('/companySalaryView');
-      window.location.reload();
+        // Submit the data to the backend
+        const response = await CompanySalaryStructurePostApi(jsonData);
+        
+        // If submission is successful, show a success message
+        toast.success("Salary structure submitted successfully");
+        
+        // Reset the form, navigate, or reload as needed
+        reset();
+        navigate('/companySalaryView');
+        window.location.reload();
     } catch (error) {
-      if (error.response) {
-        console.error("Error response from backend:", error.response.data);
-        toast.error(`Error: ${error.response.data.message || 'An error occurred'}`);
-      } else {
-        console.error("Fetch error:", error);
-        toast.error("An unexpected error occurred. Please try again.");
-      }
+        if (error.response) {
+            console.error("Error response from backend:", error.response.data);
+            toast.error(`Error: ${error.response.data.message || 'An error occurred'}`);
+        } else {
+            console.error("Fetch error:", error);
+            toast.error("An unexpected error occurred. Please try again.");
+        }
     }
-  };
+};
 
   const clearForm = () => {
     reset();
@@ -456,25 +490,25 @@ const CompanySalaryStructure = () => {
         setAllowanceError('Please select at least one allowance.');
         return; // Prevent changing the tab if no allowances are selected
       }
-  
+
       // Check if the total percentage for allowances exceeds 100%
-      const selectedAllowances = Object.entries(fieldCheckboxes.allowances).filter(([key, value]) => value);
-      const totalAllowancePercentage = selectedAllowances
-        .map(([key]) => allowanceFields.find(f => f.label === key))
-        .filter(field => field.type === 'percentage' && field.value)
-        .reduce((total, field) => total + parseFloat(field.value), 0);
-  
-      if (totalAllowancePercentage > 100) {
-        setValidationErrors({
-          totalAllowancePercentage: 'The total percentage for allowances cannot exceed 100%',
-        });
-        return; // Prevent changing the tab if allowance percentage exceeds 100%
-      }
-  
+      // const selectedAllowances = Object.entries(fieldCheckboxes.allowances).filter(([key, value]) => value);
+      // const totalAllowancePercentage = selectedAllowances
+      //   .map(([key]) => allowanceFields.find(f => f.label === key))
+      //   .filter(field => field.type === 'percentage' && field.value)
+      //   .reduce((total, field) => total + parseFloat(field.value), 0);
+
+      // if (totalAllowancePercentage > 100) {
+      //   setValidationErrors({
+      //     totalAllowancePercentage: 'The total percentage for allowances cannot exceed 100%. Please Adjust',
+      //   });
+      //   return; // Prevent changing the tab if allowance percentage exceeds 100%
+      // }
+
       // Clear the allowance error if everything is valid
       setAllowanceError('');
     }
-  
+
     // Check for the deductions errors if navigating to the deductions tab
     if (tab === 'nav-home') {
       // Check if the total percentage for deductions exceeds 100%
@@ -483,15 +517,15 @@ const CompanySalaryStructure = () => {
         .map(([key]) => deductionFields.find(f => f.label === key))
         .filter(field => field.type === 'percentage' && field.value)
         .reduce((total, field) => total + parseFloat(field.value), 0);
-  
+
       if (totalDeductionPercentage > 100) {
         setValidationErrors({
-          totalDeductionPercentage: 'The total percentage for deductions cannot exceed 100%',
+          totalDeductionPercentage: 'The total percentage for deductions cannot exceed 100%. Please Adjust',
         });
         return; // Prevent changing the tab if deduction percentage exceeds 100%
       }
     }
-  
+
     // Clear the validation errors if everything is valid
     setValidationErrors(prevErrors => {
       const newErrors = { ...prevErrors };
@@ -499,10 +533,10 @@ const CompanySalaryStructure = () => {
       delete newErrors.totalDeductionPercentage;
       return newErrors;
     });
-  
+
     // Allow tab change if there are no errors
     setActiveTab(tab);
-  };  
+  };
 
   return (
     <LayOut>
@@ -524,8 +558,22 @@ const CompanySalaryStructure = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="card">
               <div className="card-header">
-                <div className="card-title" style={{marginBottom:"0px"}}>Company Salary Structure</div>
+                <div className="card-title" style={{ marginBottom: "0px" }}>Company Salary Structure</div>
               </div>
+              {validationErrors.totalAllowancePercentage && (
+                <div className="col-12 mt-2" style={{ marginLeft: "60px", marginRight: "16px" }}>
+                  <div className="alert alert-danger" style={{marginRight:"75px"}}>
+                    {validationErrors.totalAllowancePercentage}
+                  </div>
+                </div>
+              )}
+              {validationErrors.totalDeductionPercentage && (
+                <div className="col-12 mt-2" style={{marginLeft:"60px", marginRight:"16px"}}>
+                  <div className="alert alert-danger" style={{marginRight:"75px"}}>
+                    {validationErrors.totalDeductionPercentage}
+                  </div>
+                </div>
+              )}
               <div className="card-body">
                 <nav className="companyNavOuter">
                   <div className="nav nav-tabs" id="nav-tab" role="tablist">
@@ -610,18 +658,8 @@ const CompanySalaryStructure = () => {
                             <div className="text-danger">{validationErrors[field.label]}</div>
                           )}
                         </div>
-
                       </div>
                     ))}
-                    <div className="row">
-                      {validationErrors.totalAllowancePercentage && (
-                        <div className="col-12 mt-2">
-                          <div className="alert alert-danger">
-                            {validationErrors.totalAllowancePercentage}
-                          </div>
-                        </div>
-                      )}
-                    </div>
                     <button
                       type="button"
                       onClick={() => setShowModal(true)}
@@ -700,15 +738,6 @@ const CompanySalaryStructure = () => {
 
                       </div>
                     ))}
-                    <div className="row">
-                      {validationErrors.totalDeductionPercentage && (
-                        <div className="col-12 mt-2">
-                          <div className="alert alert-danger">
-                            {validationErrors.totalDeductionPercentage}
-                          </div>
-                        </div>
-                      )}
-                    </div>
                     <button
                       type="button"
                       onClick={() => setShowModal(true)}

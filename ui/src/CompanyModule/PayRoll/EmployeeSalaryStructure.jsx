@@ -56,7 +56,7 @@ const EmployeeSalaryStructure = () => {
   useEffect(() => {
     if (id && salaryId) {
       setShowFields(true);
-      
+
     } else {
       setShowFields(false);
     }
@@ -189,31 +189,31 @@ const EmployeeSalaryStructure = () => {
 
   const handleAllowanceChange = (key, value) => {
     // Validation for percentage-related fields (maximum 4 characters, including '%')
-  if (value.endsWith('%')) {
-    if (value.length > 4) {
-      setErrorMessage("Percentage value cannot exceed 4 characters (including '%').");
-      return; // If the value exceeds 4 characters (e.g., 100%, 150%), prevent change
+    if (value.endsWith('%')) {
+      if (value.length > 4) {
+        setErrorMessage("Percentage value cannot exceed 4 characters (including '%').");
+        return; // If the value exceeds 4 characters (e.g., 100%, 150%), prevent change
+      }
+      // Check for negative percentage values
+      if (value.startsWith('-')) {
+        setErrorMessage("Percentage value cannot be negative.");
+        return; // Prevent the change if the value is negative
+      }
     }
-    // Check for negative percentage values
-    if (value.startsWith('-')) {
-      setErrorMessage("Percentage value cannot be negative.");
-      return; // Prevent the change if the value is negative
-    }
-  }
 
-  // Validation for number-related fields (maximum 10 digits)
-  if (!value.endsWith('%')) {
-    const numericValue = value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
-    if (numericValue.length > 10) {
-      setErrorMessage("Numeric value cannot exceed 10 digits.");
-      return; // Prevent further input if the length exceeds 10 digits
+    // Validation for number-related fields (maximum 10 digits)
+    if (!value.endsWith('%')) {
+      const numericValue = value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+      if (numericValue.length > 10) {
+        setErrorMessage("Numeric value cannot exceed 10 digits.");
+        return; // Prevent further input if the length exceeds 10 digits
+      }
+      if (parseFloat(value) < 0) {
+        setErrorMessage("Allowance value cannot be negative.");
+        return; // Prevent deduction if value is negative
+      }
     }
-    if (parseFloat(value) < 0) {
-      setErrorMessage("Allowance value cannot be negative.");
-      return; // Prevent deduction if value is negative
-    }
-  }
-  setErrorMessage("");
+    setErrorMessage("");
 
     const newAllowances = { ...allowances, [key]: value };
     setAllowances(newAllowances);
@@ -264,22 +264,22 @@ const EmployeeSalaryStructure = () => {
   }, [allowances, grossAmount]);
 
   const handleDeductionChange = (key, value) => {
-     if (value.endsWith('%')) {
-    const numericValue = value.slice(0, -1); // Remove '%' symbol to check numeric value
-    if (numericValue && parseFloat(numericValue) > 100) {
-      setErrorMessage("Percentage value cannot exceed 100%.");
-      return; // Prevent the change if the value exceeds 100%
+    if (value.endsWith('%')) {
+      const numericValue = value.slice(0, -1); // Remove '%' symbol to check numeric value
+      if (numericValue && parseFloat(numericValue) > 100) {
+        setErrorMessage("Percentage value cannot exceed 100%.");
+        return; // Prevent the change if the value exceeds 100%
+      }
+      if (value.length > 4) {
+        setErrorMessage("Percentage value cannot exceed 4 characters (including '%').");
+        return; // Prevent the change if the length exceeds 4 characters (like 100%)
+      }
+      // Check for negative percentage values
+      if (numericValue.startsWith('-')) {
+        setErrorMessage("Percentage value cannot be negative.");
+        return; // Prevent the change if the value is negative
+      }
     }
-    if (value.length > 4) {
-      setErrorMessage("Percentage value cannot exceed 4 characters (including '%').");
-      return; // Prevent the change if the length exceeds 4 characters (like 100%)
-    }
-    // Check for negative percentage values
-    if (numericValue.startsWith('-')) {
-      setErrorMessage("Percentage value cannot be negative.");
-      return; // Prevent the change if the value is negative
-    }
-  }
     // Validation for number-related fields (maximum 10 digits)
     if (!value.endsWith('%')) {
       const numericValue = value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
@@ -293,7 +293,7 @@ const EmployeeSalaryStructure = () => {
       }
     }
     setErrorMessage("");
-  
+
     const newDeductions = { ...deductions, [key]: value };
     setDeductions(newDeductions);
   };
@@ -471,17 +471,17 @@ const EmployeeSalaryStructure = () => {
       });
   };
 
-  
-    error && (
-      <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>
-        {error}
-      </div>
-    )
-  
 
-  const clearForm=()=>{
-      reset();
-      setShowFields(false);
+  error && (
+    <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>
+      {error}
+    </div>
+  )
+
+
+  const clearForm = () => {
+    reset();
+    setShowFields(false);
   }
 
   return (
@@ -512,9 +512,9 @@ const EmployeeSalaryStructure = () => {
                 <div className="col-12">
                   <div className="card">
                     <div className="card-header">
-                      <h5 className="card-title"> Salary Details </h5>
+                      <h5 className="card-title" style={{ marginBottom: "0px" }}> Salary Details </h5>
                     </div>
-                    <div className="card-body">
+                    <div className="card-body" style={{ marginLeft: "20px" }}>
                       <div className="row">
                         <div className="col-md-5 mb-3">
                           <label className="form-label">Variable Amount</label>
@@ -602,7 +602,7 @@ const EmployeeSalaryStructure = () => {
                             readOnly
                           />
                         </div>
-                        <div className="col-12 text-end mt-2">
+                        <div className="col-12 text-center mt-2" style={{ marginLeft: "37%" }}>
                           <button type="button" className="btn btn-primary" onClick={calculateAllowances}>
                             Submit
                           </button>
@@ -616,13 +616,13 @@ const EmployeeSalaryStructure = () => {
                 ) : (
                   showCards && (
                     <>
-                  <div className="row col-lg-12 d-flex">
+                      <div className="row col-lg-12 d-flex">
                         <div className="col-6 mb-4">
                           <div className="card">
                             <div className="card-header">
-                              <h5 className="card-title">Allowances</h5>
+                              <h5 className="card-title" style={{ marginBottom: "0px" }}>Allowances</h5>
                             </div>
-                            <div className="card-body">
+                            <div className="card-body" style={{ paddingLeft: "20px" }}>
                               {errorMessage && <span className="text-danger m-2 text-center">{errorMessage}</span>}
                               {Object.keys(allowances).map((key) => (
                                 <div key={key} className="mb-3">
@@ -630,14 +630,14 @@ const EmployeeSalaryStructure = () => {
                                     {key}:
                                     <span className="text-danger me-1">({allowances[key]})</span>
                                     {allowances[key].endsWith('%') && (
-                                    <span
-                                      className="m-1"
-                                      data-toggle="tooltip"
-                                      title="Percentage values are calculated based on Gross Amount."
-                                    >
-                                      <span className="text-primary"><i className="bi bi-info-circle"></i></span>
-                                    </span>
-                                  )}
+                                      <span
+                                        className="m-1"
+                                        data-toggle="tooltip"
+                                        title="Percentage values are calculated based on Gross Amount."
+                                      >
+                                        <span className="text-primary"><i className="bi bi-info-circle"></i></span>
+                                      </span>
+                                    )}
                                   </label>
                                   <input
                                     className="form-control"
@@ -650,7 +650,7 @@ const EmployeeSalaryStructure = () => {
 
                                       // Check if the value exceeds the character limit or length for percentage or number
                                       handleAllowanceChange(key, newValue);
-                                    }} 
+                                    }}
                                   />
                                 </div>
                               ))}
@@ -672,7 +672,7 @@ const EmployeeSalaryStructure = () => {
                           <div className="card">
                             <div className="card-header">
                               <div className="d-flex justify-content-start align-items-start">
-                                <h5 className="card-title me-2">Status</h5>
+                                <h5 className="card-title me-2" style={{ marginBottom: "0px" }}>Status</h5>
                                 <span className="text-danger">
                                   {errors.status && <p className="mb-0">{errors.status.message}</p>}
                                 </span>
@@ -715,23 +715,23 @@ const EmployeeSalaryStructure = () => {
                         <div className="col-6 mb-4">
                           <div className="card">
                             <div className="card-header">
-                              <h5 className="card-title">Deductions</h5>
+                              <h5 className="card-title" style={{ marginBottom: "0px" }}>Deductions</h5>
                             </div>
-                            <div className="card-body">
+                            <div className="card-body" style={{ paddingLeft: "20px" }}>
                               {Object.entries(deductions).map(([key, value]) => (
                                 <div key={key} className="mb-3">
                                   <label>
-                                    {key}: 
+                                    {key}:
                                     <span className="text-danger">({deductions[key]})</span>
                                     {deductions[key].endsWith('%') && (
-                                    <span
-                                      className="m-1"
-                                      data-toggle="tooltip"
-                                      title="Percentage values are calculated based on Gross Amount."
-                                    >
-                                      <span className="text-primary"><i className="bi bi-info-circle"></i></span>
-                                    </span>
-                                  )}
+                                      <span
+                                        className="m-1"
+                                        data-toggle="tooltip"
+                                        title="Percentage values are calculated based on Gross Amount."
+                                      >
+                                        <span className="text-primary"><i className="bi bi-info-circle"></i></span>
+                                      </span>
+                                    )}
                                   </label>
                                   <input
                                     className="form-control"
@@ -753,7 +753,7 @@ const EmployeeSalaryStructure = () => {
                                   type="number"
                                   value={totalDeductions.toFixed(2)}
                                   readOnly
-                                  data-toggle="tooltip" 
+                                  data-toggle="tooltip"
                                   title="This is the total of all deductions."
                                 />
                               </div>
@@ -762,7 +762,7 @@ const EmployeeSalaryStructure = () => {
                           <div className="card">
                             <div className="card-header ">
                               <div className="d-flex justify-content-start align-items-start">
-                                <h5 className="card-title me-2">TDS</h5>
+                                <h5 className="card-title me-2" style={{ marginBottom: "0px" }}>TDS</h5>
                                 <span className="text-danger">
                                   {errors.incomeTax && <p className="mb-0">{errors.incomeTax.message}</p>}
                                 </span>
@@ -802,9 +802,9 @@ const EmployeeSalaryStructure = () => {
 
                           <div className="card">
                             <div className="card-header">
-                              <h5 className="card-title">Net Salary</h5>
+                              <h5 className="card-title" style={{ marginBottom: "0px" }}>Net Salary</h5>
                             </div>
-                            <div className="card-body">
+                            <div className="card-body" style={{ paddingLeft: "20px" }}>
                               <div className="mb-3">
                                 <label>Net Salary</label>
                                 <input
@@ -813,7 +813,7 @@ const EmployeeSalaryStructure = () => {
                                   name="netSalary"
                                   value={netSalary.toFixed(2)}
                                   readOnly
-                                  data-toggle="tooltip" 
+                                  data-toggle="tooltip"
                                   title="This is the final salary after all deductions and allowances."
                                 />
                               </div>
@@ -845,7 +845,7 @@ const EmployeeSalaryStructure = () => {
               <div className="col-12">
                 <div className="card">
                   <div className="card-header">
-                    <h5 className="card-title" style={{marginBottom:"0px"}}>Employee Details</h5>
+                    <h5 className="card-title" style={{ marginBottom: "0px" }}>Employee Details</h5>
                     <div
                       className="dropdown-divider"
                       style={{ borderTopColor: "#d7d9dd" }}

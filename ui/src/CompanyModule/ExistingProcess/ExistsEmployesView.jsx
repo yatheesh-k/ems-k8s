@@ -207,13 +207,13 @@ const ExistsEmployesView = () => {
     } else {
       // errorMessage = "Network Error!";
     }
-    toast.error(errorMessage, {
-      position: "top-right",
-      transition: Bounce,
-      hideProgressBar: true,
-      theme: "colored",
-      autoClose: 3000,
-    });
+    // toast.error(errorMessage, {
+    //   position: "top-right",
+    //   transition: Bounce,
+    //   hideProgressBar: true,
+    //   theme: "colored",
+    //   autoClose: 3000,
+    // });
   };
   
 

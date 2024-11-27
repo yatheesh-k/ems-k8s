@@ -292,7 +292,7 @@ const GeneratePaySlip = () => {
                       />
                       {errors.month && <p className="errorMsg">Month is Required</p>}
                     </div>
-                    <div className="col-12 d-flex justify-content-end mt-5">
+                    <div className="col-12 col-md-6 col-lg-2 mt-4">
                       <button className="btn btn-primary btn-lg" type="submit" style={{ marginRight: "65px" }}>
                         Submit
                       </button>

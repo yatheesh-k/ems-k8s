@@ -79,10 +79,11 @@ const EmployeeView = () => {
         <b
           style={{
             borderRadius: "5px",
-            padding: "3px",
-            color:"white",
-            backgroundColor:"green"
+            padding: "3px 6px",
+            color: "#fff",
+            background: "green"
           }}
+          // className="bg-primary"
         >
           Active
         </b>
@@ -93,7 +94,8 @@ const EmployeeView = () => {
         <b
           style={{
             borderRadius: "5px",
-            padding: "2px",
+            padding: "3px 6px",
+            color: "#fff",
           }}
           className="bg-warning"
         >
@@ -106,9 +108,11 @@ const EmployeeView = () => {
         <b
           style={{
             borderRadius: "5px",
-            padding: "2px",
+            padding: "3px 6px",
+            color: "#fff",
+            background:"red",
           }}
-          className="bg-danger"
+          // className="bg-danger"
         >
           InActive
         </b>
@@ -164,14 +168,14 @@ const EmployeeView = () => {
         const year = date.getFullYear();
         return `${day}-${month}-${year}`;
       },
-      width: '130px'
+      width: '150px'
     },
 
     {
       name: <h6><b>Status</b></h6>,
       selector: row => row.status,
       cell: (row) => statusMappings[row.status]?.label || "Unknown",
-      width: "130px"
+      width: "110px"
     },
     {
       name: <h5><b>Actions</b></h5>,

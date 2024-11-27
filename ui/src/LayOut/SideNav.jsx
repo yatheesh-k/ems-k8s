@@ -405,9 +405,9 @@ const SideNav = () => {
                 >
                   <li
                     style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${location.pathname === "/offerLetters" ? "active" : ""}`}
+                    className={`sidebar-item ${location.pathname === "/offerLetterForm" ? "active" : ""}`}
                   >
-                    <Link className="sidebar-link" to="/offerLetters">
+                    <Link className="sidebar-link" to="/offerLetterForm">
                       Offer Letter
                     </Link>
                   </li>

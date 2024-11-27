@@ -6,7 +6,7 @@ import { Eye, XSquareFill } from "react-bootstrap-icons";
 import { toast, Bounce } from "react-toastify";
 import DataTable from "react-data-table-component";
 import DeletePopup from "../Utils/DeletePopup";
-import { EmployeePayslipGetById, EmployeePayslipDeleteById, EmployeePayslipsGet, EmployeeGetApiById } from "../Utils/Axios";
+import { EmployeePayslipGetById, EmployeePayslipDeleteById, EmployeePayslipsGet, EmployeeGetApiById, TemplateGetAPI } from "../Utils/Axios";
 import { userId } from "../Utils/Auth";
 
 const EmployeePayslips = () => {
@@ -14,6 +14,8 @@ const EmployeePayslips = () => {
   const [employeeDetails, setEmployeeDetails] = useState({});
   const [showFields, setShowFields] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
+  const [currentTemplate, setCurrentTemplate] = useState(null);
+  const [selectedEmployeeDetails, setSelectedEmployeeDetails] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPayslipId, setSelectedPayslipId] = useState("");
   const [refreshData, setRefreshData] = useState(false);
@@ -24,6 +26,22 @@ const EmployeePayslips = () => {
   console.log("userId:", userId);
   const id = userId;
   console.log(id);
+
+  const fetchTemplate = async () => {
+    try {
+      const response = await TemplateGetAPI();
+      const templateData = response.data.data; // Assuming this is where your template details are
+      setCurrentTemplate(templateData); // Set the template data correctly
+      console.log("Fetched Payslip Template:", templateData); // Log for debugging
+    } catch (error) {
+      console.error("API fetch error:", error);
+      toast.error("Failed to fetch payslip templates. Please try again.");
+    }
+  };
+
+  useEffect(() => {
+    fetchTemplate();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,12 +97,31 @@ const EmployeePayslips = () => {
 
 
   const handleViewSalary = (employeeId, payslipId) => {
-    navigate(`/payslip?employeeId=${employeeId}&payslipId=${payslipId}`, {
+    const payslipTemplateNo = currentTemplate?.payslipTemplateNo || "default";
+    let url;
+    switch (payslipTemplateNo) {
+      case "1":
+        url = `/payslipDoc1?employeeId=${employeeId}&payslipId=${payslipId}`;
+        break;
+      case "2":
+        url = `/payslipDoc2?employeeId=${employeeId}&payslipId=${payslipId}`;
+        break;
+      case "3":
+        url = `/payslipDoc3?employeeId=${employeeId}&payslipId=${payslipId}`;
+        break;
+      case "4":
+        url = `/payslipDoc4?employeeId=${employeeId}&payslipId=${payslipId}`;
+        break;
+      default:
+        console.error("Invalid payslip template number:", payslipTemplateNo);
+        return;
+    }
+
+    navigate(url, {
       state: {
-        employeeDetails: employeeDetails, // Pass selected employee details
+        employeeDetails: selectedEmployeeDetails,
       },
     });
-
   };
 
   const handleCloseDeleteModal = () => {
@@ -248,7 +285,7 @@ const EmployeePayslips = () => {
                       placeholder="Select Month"
                     />
                   </div>
-                  <div className="col-12 d-flex justify-content-end mt-5">
+                  <div className="col-12 col-md-6 col-lg-2 mt-4">
                     <button
                       className="btn btn-primary btn-lg"
                       type="submit"

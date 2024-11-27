@@ -671,6 +671,10 @@ const EmployeeRegistration = () => {
   // In your component
   const dateOfHiring = watch("dateOfHiring"); // Use `watch` from react-hook-form
 
+  const clearForm = () => {
+    reset();
+  };
+
   return (
     <LayOut>
       <div className="container-fluid p-0">
@@ -698,7 +702,7 @@ const EmployeeRegistration = () => {
           <div className="col-12">
             <div className="card">
               <div className="card-header">
-                <h5 className="card-title" style={{marginBottom:"0px"}}>
+                <h5 className="card-title" style={{ marginBottom: "0px" }}>
                   {isUpdating ? "Employee Data" : "Employee Registration"}
                 </h5>
                 <div
@@ -1356,13 +1360,16 @@ const EmployeeRegistration = () => {
                       className="col-12 mt-4  d-flex justify-content-end"
                       style={{ background: "none" }}
                     >
+                      <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
+                        Clear
+                      </button>
                       <button
                         className={
                           isUpdating
                             ? "btn btn-danger bt-lg"
                             : "btn btn-primary btn-lg"
                         }
-                        style={{ marginRight: "65px" }}
+                        style={{ marginRight: "85px" }}
                         type="submit"
                       >
                         {isUpdating ? "Update Employee" : "Add Employee"}{" "}

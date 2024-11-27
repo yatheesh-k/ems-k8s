@@ -130,34 +130,48 @@ const Designation = () => {
   };
   
   const validateName = (value) => {
-    if (!value || value.trim().length === 0) {
-      return "Deparment Name is Required.";
-    } else if (!/^[A-Za-z ]+$/.test(value)) {
-      return "Only Alphabetic Characters are Allowed.";
+    // Trim leading and trailing spaces before further validation
+    const trimmedValue = value.trim();
+  
+    // Check if value is empty after trimming (meaning it only had spaces)
+    if (trimmedValue.length === 0) {
+      return "Department Name is Required.";
+    }
+  
+    // Allow alphabetic characters, numbers, spaces, and the / character
+    else if (!/^[A-Za-z/]+$/.test(trimmedValue)) {
+      return "Only Alphabetic Characters and '/' are Allowed.";
     } else {
-      const words = value.split(" ");
-      
-        for (const word of words) {
-          if (word.length < 1) {
-            return "Minimum Length 1 Characters Required.";  // If any word is shorter than 2 characters, return this message
-          } else if (word.length > 40) {
-            return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters, return this message
-          }
+      const words = trimmedValue.split(" ");
+  
+      // Check for minimum and maximum word length
+      for (const word of words) {
+        // If there is only one word, enforce the minimum length check
+        if (words.length === 1 && word.length < 2) {
+          return "Minimum Length 2 Characters Required.";  // Single word with less than 2 characters
         }
-      
-      if (/^\s|\s$/.test(value)) {
-        return "No Leading or Trailing Spaces Allowed.";
-      } else if (/\s{2,}/.test(value)) {
+        // Check for words longer than 40 characters
+        else if (word.length > 40) {
+          return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters
+        }
+      }
+  
+      // Check for multiple spaces between words
+      if (/\s{2,}/.test(trimmedValue)) {
         return "No Multiple Spaces Between Words Allowed.";
       }
-      // Check if there's a space after the last character in the input string
-    if (/\s$/.test(value)) {
-      return "No Trailing Space Allowed.";  // Space after the last character is not allowed
-    }
+  
+      // Check if there are leading or trailing spaces (after trimming)
+      if (/^\s/.test(value)) {
+        return "No Leading Space Allowed.";  // Leading space error
+      } else if (/\s$/.test(value)) {
+        return "Spaces at the end are not allowed.";  // Trailing space error
+      }
     }
   
     return true; // Return true if all conditions are satisfied
-  };
+  };  
+
   useEffect(() => {
     setFilteredData(designations);
   }, [designations]);
@@ -400,17 +414,17 @@ const Designation = () => {
                         </div>
                         <div className='modal-footer'>
                           <button
-                            className={editingUserId ? "btn btn-danger" : "btn btn-primary"}
-                            type='submit'
-                          >
-                            {editingUserId ? "Update Designation" : "Add Designation"}
-                          </button>
-                          <button
                             type='button'
                             className="btn btn-secondary"
                             onClick={handleCloseAddDesignationModal}
                           >
                             Cancel
+                          </button>
+                          <button
+                            className={editingUserId ? "btn btn-danger" : "btn btn-primary"}
+                            type='submit'
+                          >
+                            {editingUserId ? "Update Designation" : "Add Designation"}
                           </button>
                         </div>
                       </form>

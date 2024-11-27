@@ -133,8 +133,8 @@ const AppraisalTemplate2 = ({
           </thead>
           <tbody>
             {allowances && Object.keys(allowances).map((key, index) => {
-              const value = allowances[key]; 
-              const allowanceAmount = (salaryIncrease * (parseFloat(value) / 100)); 
+              const value = allowances[key];
+              const allowanceAmount = (salaryIncrease * (parseFloat(value) / 100));
               return (
                 <tr key={index}>
                   <td>{key}</td>
@@ -142,7 +142,10 @@ const AppraisalTemplate2 = ({
                 </tr>
               );
             })}
-
+            <tr>
+              <td><strong>Other Allowance</strong></td>
+              <td>{Math.floor(grossAmount - calculatedValues.totalAllowances)}</td>
+            </tr>
             {/* Add a row for Gross Salary after the allowances */}
             {salaryIncrease && (
               <tr>
