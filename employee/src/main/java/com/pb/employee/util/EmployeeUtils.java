@@ -306,10 +306,6 @@ public class EmployeeUtils {
         if(!user.getAddress().equals(companyUpdateRequest.getAddress())){
             noOfChanges +=1;
         }
-        if(!user.getCompanyType().equals(companyUpdateRequest.getCompanyType())){
-            noOfChanges +=1;
-        }
-
     return noOfChanges;
     }
 
