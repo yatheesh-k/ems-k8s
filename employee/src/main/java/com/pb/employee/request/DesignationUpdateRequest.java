@@ -18,7 +18,7 @@ public class DesignationUpdateRequest {
     private String companyName;
 
     @Schema(example = "designation")
-    @Pattern(regexp = "^(?!.*\\b([A-Z])\\s\\1\\s\\1)(?:[A-Z][a-z]+(?: [A-Z][a-z]+)*|[A-Z]{2,} [A-Z][a-z]+)$", message = "{designation.format}")
+    @Pattern(regexp = "^(?:[A-Z][a-z]+(?: [A-Z][a-z]+)*|[A-Z]{2,} [A-Z][a-z]+|[A-Z]+(?: [A-Z]+)*|[A-Z]+(?:/[A-Z]+)*)$", message = "{designation.format}")
     @Size(min = 2, max = 40, message = "{designation.size.message}")
     private String name;
 }

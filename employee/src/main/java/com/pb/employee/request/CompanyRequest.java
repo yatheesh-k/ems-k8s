@@ -14,7 +14,7 @@ public class CompanyRequest {
 
     @Schema(example = "companyName")
     @Size(min = 2, max = 100, message = "{size.message}")
-    @Pattern(regexp ="^(?!.*\\b([A-Z])\\s\\1\\s\\1)(?:[A-Z][a-z]+(?: [A-Z][a-z]+)*|[A-Z](?:\\.? ?[A-Z])? ?[A-Z][a-z]+)$", message = "{companyname.message}")
+    @Pattern(regexp ="^(?:[A-Z]{2,}(?:\\s[A-Z][a-z]+)*|[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*|[A-Z]+(?:\\s[A-Z]+)*)$", message = "{companyname.message}")
     private String companyName;
 
     @Schema(example = "emailId")
@@ -58,7 +58,7 @@ public class CompanyRequest {
 
     @Schema(example = "name")
     @Size(min = 3, max = 35, message = "{name.notnull.message}")
-    @Pattern(regexp = "^(?!.*\\b([A-Z])\\s\\1\\s\\1)(?:[A-Z][a-z]+(?: [A-Z][a-z]+)*|[A-Z](?:\\.? ?[A-Z])? ?[A-Z][a-z]+|[A-Z][a-z]+(?: [A-Z](?:\\.? ?[A-Z])?)+)$", message = "{name.message}")
+    @Pattern(regexp = "^(?:[A-Z]{2,}(?:\\s[A-Z][a-z]+)*|[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*|[A-Z]+(?:\\s[A-Z]+)*)$", message = "{name.message}")
     private String name;
 
     @Schema(example = "personalMailId")
