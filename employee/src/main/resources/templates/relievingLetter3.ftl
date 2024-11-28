@@ -2,8 +2,8 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Relieving Letter</title>
     <style>
         body {
@@ -33,19 +33,20 @@
             text-align: center;
             margin-top: 2rem;
         }
-
         .watermark {
-            position: absolute;
-            top: 30%;
-            left: 20%;
-            width: 50%;
-            height: 50%;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            transform: rotate(340deg);
-            z-index: 1;
-            opacity: 0.1;
+           position: fixed;
+           left: 20%;
+           transform: translate(-50%, -50%) rotate(30deg);
+           z-index: -1;
+           width: 400px;
+           height: auto;
+           text-align: center;
+        }
+
+        .watermark img {
+           width: 100%;
+           height: auto;
+           opacity: 0.05;
         }
 
         .footer {
@@ -60,11 +61,8 @@
 
 <body>
 
-    <!-- Watermark Background Image -->
-    <div class="watermark" style="background-image: url('${company[0].imageFile}');"></div>
-
     <!-- Company Logo -->
-    <img src="${company[0].imageFile}" alt="Company Logo" class="company-logo">
+    <img src="${company[0].imageFile}" alt="Company Logo" class="company-logo" />
 
     <!-- Letter Content -->
     <div class="container">
@@ -73,7 +71,12 @@
 
         <p>To,</p>
         <p><strong>Employee Name: ${employee.firstName} ${employee.lastName}</strong></p>
-        <p><strong>[Employee ID: ${employee.employeeId}]</strong></p>
+        <p><strong>Employee ID: ${employee.employeeId}</strong></p>
+
+         <!-- Watermark Background Image -->
+         <div class="watermark">
+                 <img src="${blurredImage}" alt="Blurred Company Logo" />
+          </div>
 
         <p>
             I am writing to acknowledge the resignation letter you submitted, dated <strong>${relieving.resignationDate}</strong>,

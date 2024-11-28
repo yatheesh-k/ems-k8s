@@ -428,7 +428,9 @@ public class CompanyUtils {
 
     public static Map<String, Object> duplicateValues(CompanyRequest companyRequest, List<CompanyEntity> companyEntities) {
         Map<String, Object> responseBody = new HashMap<>();
-           String cinNo = null, regNo = null, mobileNo = null, landNo =  null, gstNo = null, panNo= null, personalMail = null, personalMobile = null, emailId=null;
+           String cinNo = null, regNo = null, mobileNo = null, landNo =  null,
+                   gstNo = null, panNo= null, personalMail = null, personalMobile = null,
+                   emailId=null,mailId=null;
         for (CompanyEntity companyEntity :companyEntities) {
 
             if (companyRequest.getEmailId() != null && companyEntity.getEmailId() != null) {
@@ -487,6 +489,14 @@ public class CompanyUtils {
                 }
 
             }
+            if (companyRequest.getPersonalMailId() != null && companyEntity.getEmailId() != null) {
+                personalMail = new String(Base64.getDecoder().decode(companyEntity.getPersonalMailId()));
+                mailId = companyEntity.getEmailId();
+                if (personalMail.equals(mailId)){
+                    responseBody.put(Constants.DUPLICATE_AS_EMAIL_NO, companyRequest.getPersonalMailId());
+                }
+            }
+
             if (companyRequest.getPersonalMobileNo() != null && companyEntity.getPersonalMobileNo() != null) {
                 personalMobile = new String(Base64.getDecoder().decode(companyEntity.getPersonalMobileNo()));
                 if (personalMobile.equals(companyRequest.getPersonalMobileNo())){
