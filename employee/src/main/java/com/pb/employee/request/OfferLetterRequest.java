@@ -23,8 +23,8 @@ public class OfferLetterRequest {
     private String offerDate;
 
     @Schema(example = "referenceNo")
-    @Pattern(regexp ="^[A-Z0-9/-]+$", message = "{referenceNo.format}")
-    @Size(min = 3, max = 20, message = "{referenceNo.size.message}")
+/*    @Pattern(regexp ="^[A-Z0-9/-]+$", message = "{referenceNo.format}")
+    @Size(min = 3, max = 20, message = "{referenceNo.size.message}")*/
     private String referenceNo;
 
     @Schema(example = "employeeName")

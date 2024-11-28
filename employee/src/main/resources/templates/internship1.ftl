@@ -67,7 +67,7 @@
     </div>
 
     <div class = "details">
-       <p> This is to certify that<strong>${internship.employeeName}</strong>has successfully completed an
+       <p> This is to certify that <strong>${internship.employeeName}</strong> has successfully completed an
        internship program with <strong>${company.companyName}</strong> as a <strong>${internship.designation}</strong>
        in the <strong>${internship.department}</strong> department from <strong>${internship.startDate}</strong>
        to <strong>${internship.endDate}</strong>.</p>

@@ -32,6 +32,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 
@@ -53,7 +55,6 @@ public class ExperienceLetterServiceImpl implements ExperienceLetterService {
         String index = ResourceIdUtils.generateCompanyIndex(experienceLetterFieldsRequest.getCompanyName());
 
         try {
-
             templateNo=openSearchOperations.getCompanyTemplates(experienceLetterFieldsRequest.getCompanyName());
             if (templateNo ==null){
                 log.error("company templates are not exist ");
@@ -66,6 +67,20 @@ public class ExperienceLetterServiceImpl implements ExperienceLetterService {
             if (employee == null) {
                 log.error("Employee does not exist with this Id: {}", experienceLetterFieldsRequest.getEmployeeId());
                 throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_NOT_FOUND), experienceLetterFieldsRequest.getEmployeeId()), HttpStatus.NOT_FOUND);
+            }
+
+            // Normalize both dates to ignore time components
+            String experienceDate = experienceLetterFieldsRequest.getDate();
+            String hiringDate = employee.getDateOfHiring();
+
+            // Parse the strings to LocalDate (assuming the format is "yyyy-MM-dd")
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // Adjust format if necessary
+            LocalDate experienceLocalDate = LocalDate.parse(experienceDate, formatter);
+            LocalDate hiringLocalDate = LocalDate.parse(hiringDate, formatter);
+
+            if (experienceLocalDate.isBefore(hiringLocalDate)) {
+                log.error("Cannot give the experience before the hiring date for employeeId {}", experienceLetterFieldsRequest.getEmployeeId());
+                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EXPERIENCE_DATE_NOT_VALID), experienceLetterFieldsRequest.getEmployeeId()), HttpStatus.NOT_FOUND);
             }
 
             DepartmentEntity departmentEntity =null;
