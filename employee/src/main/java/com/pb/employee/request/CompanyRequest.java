@@ -57,8 +57,8 @@ public class CompanyRequest {
     private String panNo;
 
     @Schema(example = "name")
-    @Size(min = 3, max = 35, message = "{name.notnull.message}")
-    @Pattern(regexp = "^(?:[A-Z]{2,}(?:\\s[A-Z][a-z]+)*|[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*|[A-Z]+(?:\\s[A-Z]+)*)$", message = "{name.message}")
+    @Size(min = 1, max = 35, message = "{name.notnull.message}")
+    @Pattern(regexp = "^(?:[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*|[A-Z][a-z]*\\s[A-Z])$", message = "{name.message}")
     private String name;
 
     @Schema(example = "personalMailId")
