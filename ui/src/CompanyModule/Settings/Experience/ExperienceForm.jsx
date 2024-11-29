@@ -89,13 +89,14 @@ const ExperienceForm = () => {
   };
 
   const onSubmit = (data) => {
+    console.log(data);
     const submissionData = {
       employeeId: data.employeeId,
       companyName: user.company,
-      date: data.lastWorkingDate
+      date: data.relievingDate
     };
     // Format the date fields to dd-mm-yyyy format
-    const formattedLastWorkingDate = formatDate(data.lastWorkingDate);
+    const formattedLastWorkingDate = formatDate(data.relievingDate);
     const formattedResignationDate = formatDate(data.resignationDate);
     const formattedHiringDate = formatDate(data.dateOfHiring);
     const preview = {

@@ -751,9 +751,6 @@ const EmployeeSalaryStructure = () => {
               onChange={(e) => handleAllowanceChange(key, e.target.value)}
               maxLength={isPercentage ? 4 : 10}
             />
-            {errorMessage && (
-              <p className="text-danger">{errorMessage}</p>
-            )}
           </div>
         );
       })}
@@ -768,6 +765,9 @@ const EmployeeSalaryStructure = () => {
                                   data-toggle="tooltip"
                                   title="This is the total of all allowances."
                                 />
+                                 {errorMessage && (
+              <p className="text-danger">{errorMessage}</p>
+            )}
                               </div>
                             </div>
                           </div>

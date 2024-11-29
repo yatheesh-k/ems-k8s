@@ -467,9 +467,7 @@ export const RelievingLetterDownload = async (employeeId,payload) => {
 
 export const ExperienceFormPostApi = async (payload) => {
   try {
-    const response = await axiosInstance.post(
-      `/experienceletter/upload`,
-      JSON.stringify(payload), // Ensure JSON format
+    const response = await axiosInstance.post(`/experienceletter/upload`, JSON.stringify(payload), // Ensure JSON format
       {
         responseType: 'blob', // Handle binary response for file download
         headers: {
