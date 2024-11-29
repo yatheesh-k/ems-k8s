@@ -54,7 +54,7 @@ function Profile() {
     const updateData = {
       companyAddress: data.companyAddress,
       mobileNo: data.mobileNo,
-      landNo: data.landNo,
+      alternateNo: data.alternateNo,
       name: data.name,
       personalMailId: data.personalMailId,
       personalMobileNo: data.personalMobileNo,
@@ -146,9 +146,9 @@ function Profile() {
     }
   
     // Check file type (valid image types and PDF)
-    const validTypes = ["image/png", "image/jpeg", "image/svg+xml", "application/pdf"];
+    const validTypes = ["image/png", "image/jpeg", "image/svg+xml"];
     if (!validTypes.includes(file.type)) {
-      setImgError("Only .png, .jpg, .jpeg, .svg, and .pdf files are allowed.");
+      setImgError("Only .png, .jpg, .jpeg, .svg files are allowed.");
       return; // Stop further processing if the type is invalid
     }
   
@@ -373,7 +373,7 @@ function Profile() {
                       <img
                         className="align-middle"
                         src={`${logoFileName}`}
-                        accept=".png, .jpg. ,svg ,.jpeg, .pdf"
+                        accept=".png, .jpg. ,svg ,.jpeg,"
                         alt="Company Logo"
                         style={{ height: "80px", width: "200px" }}
                       />
@@ -435,24 +435,24 @@ function Profile() {
                           validate: {
                             startsWithPlus91: (value) => {
                               if (!value.startsWith("+91 ")) {
-                                return "Contact Number must start with +91 and a space.";
+                                return "Alternate Number must start with +91 and a space.";
                               }
                               return true;
                             },
                             correctLength: (value) => {
                               if (value.length !== 14) {
-                                return "Contact Number must be exactly 10 digits (including +91).";
+                                return "Alternate Number must be exactly 10 digits (including +91).";
                               }
                               return true;
                             },
                             notRepeatingDigits: (value) => {
                               const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                              return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
+                              return !isRepeating || "Alternate Number cannot consist of the same digit repeated.";
                             },
                           },
                           pattern: {
                             value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                            message: "Contact Number is Required",
+                            message: "Alternate Number is Required",
                           },
                         })}
                       />
@@ -712,24 +712,24 @@ function Profile() {
                             validate: {
                               startsWithPlus91: (value) => {
                                 if (!value.startsWith("+91 ")) {
-                                  return "Contact Number must start with +91 and a space.";
+                                  return "Personal Mobile Number must start with +91 and a space.";
                                 }
                                 return true;
                               },
                               correctLength: (value) => {
                                 if (value.length !== 14) {
-                                  return "Contact Number must be exactly 10 digits (including +91).";
+                                  return "Personal Mobile Number must be exactly 10 digits (including +91).";
                                 }
                                 return true;
                               },
                               notRepeatingDigits: (value) => {
                                 const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                                return !isRepeating || "Contact Number cannot consist of the same digit repeated.";
+                                return !isRepeating || "Personal Mobile Number cannot consist of the same digit repeated.";
                               },
                             },
                             pattern: {
                               value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                              message: "Contact Number is Required",
+                              message: "Personal Mobile Number is Required",
                             },
                           })}
                         />

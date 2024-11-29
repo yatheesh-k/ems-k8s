@@ -128,49 +128,7 @@ const Designation = () => {
     }
     console.error(error.response);
   };
-  
-  const validateName = (value) => {
-    // Trim leading and trailing spaces before further validation
-    const trimmedValue = value.trim();
-  
-    // Check if value is empty after trimming (meaning it only had spaces)
-    if (trimmedValue.length === 0) {
-      return "Department Name is Required.";
-    }
-  
-    // Allow alphabetic characters, numbers, spaces, and the / character
-    else if (!/^[A-Za-z/]+$/.test(trimmedValue)) {
-      return "Only Alphabetic Characters and '/' are Allowed.";
-    } else {
-      const words = trimmedValue.split(" ");
-  
-      // Check for minimum and maximum word length
-      for (const word of words) {
-        // If there is only one word, enforce the minimum length check
-        if (words.length === 1 && word.length < 2) {
-          return "Minimum Length 2 Characters Required.";  // Single word with less than 2 characters
-        }
-        // Check for words longer than 40 characters
-        else if (word.length > 40) {
-          return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters
-        }
-      }
-  
-      // Check for multiple spaces between words
-      if (/\s{2,}/.test(trimmedValue)) {
-        return "No Multiple Spaces Between Words Allowed.";
-      }
-  
-      // Check if there are leading or trailing spaces (after trimming)
-      if (/^\s/.test(value)) {
-        return "No Leading Space Allowed.";  // Leading space error
-      } else if (/\s$/.test(value)) {
-        return "Spaces at the end are not allowed.";  // Trailing space error
-      }
-    }
-  
-    return true; // Return true if all conditions are satisfied
-  };  
+
 
   useEffect(() => {
     setFilteredData(designations);
@@ -283,6 +241,47 @@ const Designation = () => {
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
+  const validateName = (value) => {
+    // Trim leading and trailing spaces before further validation
+    const trimmedValue = value.trim();
+  
+    // Check if value is empty after trimming (meaning it only had spaces)
+    if (trimmedValue.length === 0) {
+      return "Designation Name is Required.";
+    }
+  
+    // Allow alphabetic characters, spaces, slashes, and a few other special characters
+    // Modify the regex to allow "UI/UX", "QA testing", etc.
+    else if (!/^[A-Za-z\s/!-]+$/.test(trimmedValue)) {
+      return "Only Alphabetic Characters, Spaces, and '/', - are Allowed.";
+    } else {
+      const words = trimmedValue.split(" ");
+  
+      // Check for minimum and maximum word length
+      for (const word of words) {
+        // If the word is a single character and it's not the only word in the string, skip this rule
+        if (word.length < 2 && words.length === 1) {
+          return "Minimum Length 2 Characters Required.";  // If any word is shorter than 2 characters and it's a single word
+        } else if (word.length > 40) {
+          return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters
+        }
+      }
+  
+      // Check for multiple spaces between words
+      if (/\s{2,}/.test(trimmedValue)) {
+        return "No Multiple Spaces Between Words Allowed.";
+      }
+  
+      // Check if the value has leading or trailing spaces (shouldn't happen due to trimming)
+      if (/^\s/.test(value)) {
+        return "Leading space not allowed.";  // Leading space error
+      } else if (/\s$/.test(value)) {
+        return "Spaces at the end are not allowed.";  // Trailing space error
+      }
+    }
+  
+    return true; // Return true if all conditions are satisfied
+  };  
 
   const handleEmailChange = (e) => {
     // Get the current value of the input field

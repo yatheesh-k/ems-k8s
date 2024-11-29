@@ -161,7 +161,6 @@ const CompanyRegistration = () => {
 
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
-      const errorMessage = error.response.data.error.message;
       // toast.error(errorMessage);
     } else {
       // toast.error("Network Error !");
@@ -170,8 +169,9 @@ const CompanyRegistration = () => {
   };
 
   const clearForm = () => {
-    setCompanyType("");  
+    //setCompanyType("");  
     reset();
+   // setEditMode(true);  // Optionally, if you want to reset edit mode
   };
   const toInputTitleCase = (e) => {
     const input = e.target;
@@ -250,23 +250,23 @@ const CompanyRegistration = () => {
     input.value = value;
   };
 
-  const toInputEmailCase = (e) => {
-    const input = e.target;
-    let value = input.value;
+  // const toInputEmailCase = (e) => {
+  //   const input = e.target;
+  //   let value = input.value;
 
-    // Remove all spaces from the input
-    value = value.replace(/\s+/g, '');
+  //   // Remove all spaces from the input
+  //   value = value.replace(/\s+/g, '');
 
-    // If the first character is not lowercase, make it lowercase
-    if (value.length > 0 && value[0] !== value[0].toLowerCase()) {
-      value = value.charAt(0).toLowerCase() + value.slice(1);
-    }
+  //   // If the first character is not lowercase, make it lowercase
+  //   if (value.length > 0 && value[0] !== value[0].toLowerCase()) {
+  //     value = value.charAt(0).toLowerCase() + value.slice(1);
+  //   }
 
-    // Only update the value if it was changed
-    if (input.value !== value) {
-      input.value = value;
-    }
-  };
+  //   // Only update the value if it was changed
+  //   if (input.value !== value) {
+  //     input.value = value;
+  //   }
+  // };
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
     let newValue = "";
@@ -378,34 +378,75 @@ const CompanyRegistration = () => {
     return true; // Return true if all checks pass
   };
   
-  const validateName = (value) => {
-    if (!value || value.trim().length === 0) {
-      return "Company Name is Required.";
-    } else if (!/^[A-Za-z\s,.'\-/]*$/.test(value)) {
-      return "Field accepts only alphabets and special characters:( , ' -  . /)";
-    } else {
-      const words = value.split(" "); 
-        for (const word of words) {
-          if (word.length < 1) {
-            return "Minimum Length 1 Characters Required.";  // If any word is shorter than 2 characters, return this message
-          } else if (word.length > 100) {
-            return "Max Length 100 Characters Exceed.";  // If any word is longer than 40 characters, return this message
-          }
-        }
+  // const validateName = (value) => {
+  //   if (!value || value.trim().length === 0) {
+  //     return "Company Name is Required.";
+  //   } else if (!/^[A-Za-z\s,.'\-/]*$/.test(value)) {
+  //     return "Field accepts only alphabets and special characters:( , ' -  . /)";
+  //   } else {
+  //     const words = value.split(" "); 
+  //       for (const word of words) {
+  //         if (word.length < 1) {
+  //           return "Minimum Length 1 Characters Required.";  // If any word is shorter than 2 characters, return this message
+  //         } else if (word.length > 100) {
+  //           return "Max Length 100 Characters Exceed.";  // If any word is longer than 40 characters, return this message
+  //         }
+  //       }
       
-      if (/^\s|\s$/.test(value)) {
-        return "No Leading or Trailing Spaces Allowed.";
-      } else if (/\s{2,}/.test(value)) {
+  //     if (/^\s|\s$/.test(value)) {
+  //       return "No Leading or Trailing Spaces Allowed.";
+  //     } else if (/\s{2,}/.test(value)) {
+  //       return "No Multiple Spaces Between Words Allowed.";
+  //     }
+  //     // Check if there's a space after the last character in the input string
+  //   if (/\s$/.test(value)) {
+  //     return "No Trailing Space Allowed.";  // Space after the last character is not allowed
+  //   }
+  //   }
+  
+  //   return true; // Return true if all conditions are satisfied
+  // };
+  const validateName = (value) => {
+    // Trim leading and trailing spaces before further validation
+    const trimmedValue = value.trim();
+  
+    // Check if value is empty after trimming (meaning it only had spaces)
+    if (trimmedValue.length === 0) {
+      return "Company Name is Required.";
+    
+  
+    // Allow alphabetic characters, spaces, slashes, and a few other special characters
+    // Modify the regex to allow "UI/UX", "QA testing", etc.
+  } else if (!/^[A-Za-z\s,.'\-/]*$/.test(value)) {
+    return "Field accepts only alphabets and special characters:( , ' -  . /)";
+    } else {
+      const words = trimmedValue.split(" ");
+  
+      // Check for minimum and maximum word length
+      for (const word of words) {
+        // If the word is a single character and it's not the only word in the string, skip this rule
+        if (word.length < 2 && words.length === 1) {
+          return "Minimum Length 2 Characters Required.";  // If any word is shorter than 2 characters and it's a single word
+        } else if (word.length > 40) {
+          return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters
+        }
+      }
+  
+      // Check for multiple spaces between words
+      if (/\s{2,}/.test(trimmedValue)) {
         return "No Multiple Spaces Between Words Allowed.";
       }
-      // Check if there's a space after the last character in the input string
-    if (/\s$/.test(value)) {
-      return "No Trailing Space Allowed.";  // Space after the last character is not allowed
-    }
+  
+      // Check if the value has leading or trailing spaces (shouldn't happen due to trimming)
+      if (/^\s/.test(value)) {
+        return "Leading space not allowed.";  // Leading space error
+      } else if (/\s$/.test(value)) {
+        return "Spaces at the end are not allowed.";  // Trailing space error
+      }
     }
   
     return true; // Return true if all conditions are satisfied
-  };
+  };  
   const validatePAN = (value) => {
     const spaceError = "Spaces are not allowed in the PAN Number.";
     const patternError = "Invalid PAN Number format";
@@ -644,7 +685,7 @@ const CompanyRegistration = () => {
                                 },
                                 correctLength: (value) => {
                                   if (value.length !== 14) {
-                                    return "Mobile Number must be exactly 14 characters.";
+                                    return "Mobile Number is Required";
                                   }
                                   return true;
                                 },
@@ -727,7 +768,7 @@ const CompanyRegistration = () => {
                                 },
                                 correctLength: (value) => {
                                   if (value.length !== 14) {
-                                    return "Mobile Number must be exactly 10 digits (including +91).";
+                                    return "Mobile Number is Required";
                                   }
                                   return true;
                                 },
@@ -773,7 +814,7 @@ const CompanyRegistration = () => {
                             },
                             correctLength: (value) => {
                               if (value.length !== 14) {
-                                return "Alternate Number must be exactly 10 digits (including +91).";
+                                return "Alternate Number is Required";
                               }
                               return true;
                             },
@@ -1062,7 +1103,7 @@ const CompanyRegistration = () => {
                             },
                             correctLength: (value) => {
                               if (value.length !== 14) {
-                                return "Personal Mobile Number must be exactly 10 digits (including +91).";
+                                return "Personal Mobile Number is Required";
                               }
                               return true;
                             },
