@@ -2,10 +2,7 @@ import React from "react";
 
 const InternShipTemplate2 = ({
   companyLogo,
-  companyName,
-  companyAddress,
-  contactNumber,
-  mailId,
+  companyData,
   employeeName,
   designation,
   department,
@@ -26,9 +23,9 @@ const InternShipTemplate2 = ({
         {/* Left side: Company Information */}
         <div className="text-start">
             <div style={{ textAlign: "left" }}>
-            <h4>{companyName}</h4>
-            <p>{companyAddress}</p>
-            <p> {contactNumber} | {mailId}</p>
+            <h4>{companyData.companyName}</h4>
+            <p>{companyData.companyAddress}</p>
+            <p> {companyData.mobileNo} | {companyData.emailId}</p>
             </div>
         </div>
 
@@ -79,7 +76,7 @@ const InternShipTemplate2 = ({
         <p>
           We are pleased to inform that <strong>{employeeName}</strong>&nbsp;
            has successfully completed an internship program with{" "}
-          <strong>{companyName}</strong> as a <strong>{designation}</strong> in
+          <strong>{companyData.companyName}</strong> as a <strong>{designation}</strong> in
           the <strong>{department}</strong> department from{" "}
           <strong>{startDate}</strong> to <strong>{endDate}</strong>.
         </p>

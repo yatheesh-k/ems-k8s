@@ -15,7 +15,7 @@ const ExistsEmpRegistration = () => {
     handleSubmit,
     control,
     setValue,
-    watch,
+    watch,trigger,clearErrors,
     formState: { errors },
     reset,
   } = useForm({mode: "onChange"});
@@ -183,6 +183,7 @@ const validateRelievingDate = (value) => {
       setShowPreview(true);
       // Optionally, reset submissionData or navigate to another page
       // resetSubmissionData();
+      reset();
        navigate('/relievingSummary');
   
     } catch (error) {
@@ -234,6 +235,39 @@ const validateRelievingDate = (value) => {
   const clearForm = () => {
     reset();
     navigate("/relievingSummary");
+  };
+
+  const handleEmployeeChange = (selectedOption) => {
+    // Update the selected employee in the state
+    const selectedEmp = emp.find(emp => emp.value === selectedOption?.value);
+    
+    if (selectedEmp) {
+      setSelectedEmployee(selectedEmp);
+
+      // Update form fields with selected employee data
+      setValue("employeeId", selectedEmp.value); // set employeeId correctly
+      setValue("designationName", selectedEmp.designationName);
+      setValue("departmentName", selectedEmp.departmentName);
+      setValue("dateOfHiring", selectedEmp.dateOfHiring);
+
+      // Clear any previous errors
+      clearErrors("employeeId");
+
+      // Trigger validation for the employeeId field
+      trigger("employeeId");
+    } else {
+      // If no employee is selected, reset other fields
+      setValue("employeeId", "");
+      setValue("designationName", "");
+      setValue("departmentName", "");
+      setValue("dateOfHiring", "");
+      
+      // Set error if needed, but it's likely you just want to reset
+      // setError("employeeId", { message: "Employee selection is required" });
+
+      // Clear any previous errors
+      clearErrors("employeeId");
+    }
   };
 
    if (loading) return  <Loader/>;
@@ -300,26 +334,12 @@ const validateRelievingDate = (value) => {
                           name="employeeId"
                           control={control}
                           rules={{ required: "Employee Name is required" }}
-                          defaultValue={selectedEmployee ? selectedEmployee.value : ""} // Ensure default value is set
                           render={({ field }) => (
                             <Select
                               {...field}
                               options={emp}
-                              value={emp.find((option) => option.value === field.value)} // Show the selected employee correctly
-                              onChange={(selectedOption) => {
-                                // Update the form state when the selection changes
-                                field.onChange(selectedOption ? selectedOption.value : ""); // Update react-hook-form value
-
-                                // If an employee is selected, set their details
-                                const selectedEmp = emp.find(emp => emp.value === selectedOption?.value);
-                                if (selectedEmp) {
-                                  setSelectedEmployee(selectedEmp); // Store the selected employee
-                                  setValue("employeeName", selectedEmp.employeeName); // Update other form fields
-                                  setValue("designationName", selectedEmp.designationName);
-                                  setValue("departmentName", selectedEmp.departmentName);
-                                  setValue("dateOfHiring", selectedEmp.dateOfHiring);
-                                }
-                              }}
+                              value={emp.find(option => option.value === field.value) || null} // Handle clearing
+                              onChange={handleEmployeeChange}
                               placeholder="Select Employee Name"
                             />
                           )}

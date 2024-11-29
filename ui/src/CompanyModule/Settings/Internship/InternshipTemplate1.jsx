@@ -2,10 +2,7 @@ import React from 'react';
 
 const InternshipTemplate1 = ({
         companyLogo,
-        companyName,
-        companyAddress,
-        contactNumber,
-        mailId,
+        companyData,
         employeeName,
         designation,
         department,
@@ -79,17 +76,17 @@ const InternshipTemplate1 = ({
       backgroundColor: "rgba(255, 255, 255, 0.8)", 
       backdropFilter: "blur(2px)",     }}
   >
-  <p> This is to certify that <strong>{employeeName}</strong> has successfully completed an internship program with <strong>{companyName}</strong> as a <strong>{designation}</strong> in the <strong>{department}</strong> department from <strong>{startDate}</strong> to <strong>{endDate}</strong>.</p>
+  <p> This is to certify that <strong>{employeeName}</strong> has successfully completed an internship program with <strong>{companyData.companyName}</strong> as a <strong>{designation}</strong> in the <strong>{department}</strong> department from <strong>{startDate}</strong> to <strong>{endDate}</strong>.</p>
   <p>Throughout the internship, {employeeName} demonstrated professionalism and dedication. We believe that {employeeName} has gained valuable experience that will aid in future professional endeavors.</p>
    <p>We wish {employeeName} the best of luck in all future endeavors and are confident that {employeeName} will continue to excel in their career path.</p>
     <div className="mt-5 pt-3">
       <p className="mb-5">With Best Wishes,</p>
       <div className="mt-5 pt-5">
         <p>Authorized Signature</p>
-        {/* <h4>{companyName},</h4>
-        <p>{mailId},</p>
-        <p>{contactNumber},</p>
-        <p>{companyAddress}.</p> */}
+        <h4>{companyData.companyName},</h4>
+        <p>{companyData.emailId},</p>
+        <p>{companyData.mobileNo},</p>
+        <p>{companyData.companyAddress}.</p>
       </div>
     </div>
   </div>

@@ -97,6 +97,7 @@ const ExperienceTemplate2 = ({
               <div className='mt-5 pt-5'>
               <p>Authorized Signature</p>
               <p>{companyData.companyName}</p>
+              <p>{companyData.mobileNo},{companyData.emailId}</p>
               <p>{companyData.companyAddress}</p>
               </div>
             </div>

@@ -16,7 +16,6 @@ const InternShipTemplates = () => {
   const [isFetched, setIsFetched] = useState(false);
 
   const { user,logoFileName } = useAuth();
-  const logo = "/assets/img/adapt_adapt_logo.png";
 
   const fetchCompanyData = async (companyId) => {
     try {
@@ -80,10 +79,7 @@ const InternShipTemplates = () => {
       content: (data) => (
         <InternshipTemplate1
           companyLogo={logoFileName}
-          companyName={companyData.companyName}
-          companyAddress={companyData.companyAddress}
-          contactNumber={companyData.mobileNo}
-          mailId={companyData.emailId}
+          companyData={companyData}
           date="October 28, 2024"
           employeeName="John Doe"
           employeeId="E123456"
@@ -99,10 +95,7 @@ const InternShipTemplates = () => {
       content: (data) => (
         <InternShipTemplate2
           companyLogo={logoFileName}
-          companyName={companyData.companyName}
-          companyAddress={companyData.companyAddress}
-          contactNumber={companyData.mobileNo}
-          mailId={companyData.emailId}
+          companyData={companyData}
           date="October 28, 2024"
           employeeName="John Doe"
           employeeId="E123456"
@@ -113,7 +106,7 @@ const InternShipTemplates = () => {
       ),
     },
 
-  ], [user, logoFileName]);
+  ], [user,companyData,logoFileName]);
 
   useEffect(() => {
     // Set default template as Template 1

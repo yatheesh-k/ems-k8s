@@ -9,9 +9,8 @@ import { companyViewByIdApi, EmployeeGetApiById} from "../../../Utils/Axios";
 const ExperiencePreview = ({ previewData, selectedTemplate }) => { // Accept previewData as a prop
   const [companyData, setCompanyData] = useState({});
   const [loading, setLoading] = useState(false);
-  const { user,companyLogo } = useAuth();
+  const { user,logoFileName } = useAuth();
   const navigate=useNavigate();
-  const logo = "/assets/img/adapt_adapt_logo.png";
 
   const fetchCompanyData = async (companyId) => {
     try {
@@ -44,56 +43,14 @@ const ExperiencePreview = ({ previewData, selectedTemplate }) => { // Accept pre
     setLoading(false);
   }, [user.userId]);
 
-  const handleApiErrors = (errors) => {
-    if (errors.response) {
-      const status = errors.response.status;
-      let errorMessage = "";
-
-      switch (status) {
-        case 403:
-          errorMessage = "Session Timeout!";
-          navigate("/");
-          break;
-        case 404:
-          errorMessage = "Resource Not Found!";
-          break;
-        case 406:
-          errorMessage = "Invalid Details!";
-          break;
-        case 500:
-          errorMessage = "Server Error!";
-          break;
-        default:
-          errorMessage = "An Error Occurred!";
-          break;
-      }
-
-      toast.error(errorMessage, {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
-    } else {
-      toast.error("Network Error!", {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
-    }
-  };
-
   const templates = useMemo(() => [
     {
       title: "Template 1",
       name: "1",
       content: () => (
         <ExperienceTemplate1
-          companyLogo={companyLogo}
-          companyData={companyData}
+          companyLogo={logoFileName}
+          companyData={previewData.companyData}
           employeeName={previewData.employeeName}
           employeeId={previewData.employeeId}
           designation={previewData.designationName}
@@ -109,8 +66,8 @@ const ExperiencePreview = ({ previewData, selectedTemplate }) => { // Accept pre
       name: "2",
       content: () => (
         <ExperienceTemplate2
-          companyLogo={companyLogo}
-          companyData={companyData}
+          companyLogo={logoFileName}
+          companyData={previewData.companyData}
           employeeName={previewData.employeeName}
           employeeId={previewData.employeeId}
           designation={previewData.designationName}
@@ -121,7 +78,7 @@ const ExperiencePreview = ({ previewData, selectedTemplate }) => { // Accept pre
         />
       ),
     },
-  ], [companyData, companyLogo, previewData]);
+  ], [companyData, logoFileName, previewData]);
 
   const selectedTemplateContent = useMemo(() => {
     const template = templates.find(t => t.name === selectedTemplate);

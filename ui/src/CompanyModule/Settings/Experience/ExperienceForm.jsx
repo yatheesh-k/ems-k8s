@@ -14,11 +14,11 @@ const ExperienceForm = () => {
     handleSubmit,
     control,
     setValue,
-    watch,
+    watch,trigger,clearErrors,
     formState: { errors },
     reset,
   } = useForm({ mode: 'onChange' });
-  const { user } = useAuth();
+  const { user,companyData } = useAuth();
   const [emp, setEmp] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [noticePeriod, setNoticePeriod] = useState(0);
@@ -32,37 +32,15 @@ const ExperienceForm = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const calculateNoticePeriod = (resignationDate, lastWorkingDate, dateOfHiring) => {
-    if (resignationDate && lastWorkingDate) {
-      const resignation = new Date(resignationDate);
-      const lastWorking = new Date(lastWorkingDate);
-      const hiringDate = new Date(dateOfHiring);
-
-      // Check if last working date is after resignation date
-      if (lastWorking <= resignation) {
-        setError("Last working date must be after the resignation date.");
-        setNoticePeriod(0);
-        return;
-      }
-      else if (resignation <= hiringDate) {
-        setError("Resignation date must be after the date of hiring.");
-        setNoticePeriod(0);
-        return;
-      }
-
-      const monthDiff = (lastWorking.getFullYear() - resignation.getFullYear()) * 12 + (lastWorking.getMonth() - resignation.getMonth());
-      setNoticePeriod(monthDiff);
-    } else {
-      setNoticePeriod(0);
+  const validateExperienceDate = (value) => {
+    const dateOfHiring = new Date(watch('dateOfHiring'));
+    const relievingDate = new Date(value);
+    if (relievingDate < dateOfHiring) {
+      return "Experience Date must be after Date of Hired.";
     }
+    return true;
   };
-
-  useEffect(() => {
-    const subscription = watch((value) => {
-      calculateNoticePeriod(value.resignationDate, value.lastWorkingDate, value.dateOfHiring);
-    });
-    return () => subscription.unsubscribe();
-  }, [watch]);
+  
 
   useEffect(() => {
     EmployeeGetApi().then((data) => {
@@ -90,7 +68,7 @@ const ExperienceForm = () => {
       setSelectedTemplate(templateNumber)
       setTemplateAvailable(!!templateNumber);
     } catch (error) {
-      handleApiErrors(error);
+      handleError(error);
       setTemplateAvailable(false);
     }
   };
@@ -130,6 +108,7 @@ const ExperienceForm = () => {
       date: formattedLastWorkingDate || "",
       noticePeriod,
       companyName: user.company,
+      companyData:companyData
     };
 
     setPreviewData(preview);
@@ -192,6 +171,39 @@ const ExperienceForm = () => {
     }
   };
 
+  const handleEmployeeChange = (selectedOption) => {
+    // Update the selected employee in the state
+    const selectedEmp = emp.find(emp => emp.value === selectedOption?.value);
+    
+    if (selectedEmp) {
+      setSelectedEmployee(selectedEmp);
+
+      // Update form fields with selected employee data
+      setValue("employeeId", selectedEmp.value); // set employeeId correctly
+      setValue("designationName", selectedEmp.designationName);
+      setValue("departmentName", selectedEmp.departmentName);
+      setValue("dateOfHiring", selectedEmp.dateOfHiring);
+
+      // Clear any previous errors
+      clearErrors("employeeId");
+
+      // Trigger validation for the employeeId field
+      trigger("employeeId");
+    } else {
+      // If no employee is selected, reset other fields
+      setValue("employeeId", "");
+      setValue("designationName", "");
+      setValue("departmentName", "");
+      setValue("dateOfHiring", "");
+      
+      // Set error if needed, but it's likely you just want to reset
+      // setError("employeeId", { message: "Employee selection is required" });
+
+      // Clear any previous errors
+      clearErrors("employeeId");
+    }
+  };
+
   const clearForm = () => {
     // Reset the entire form, including the employeeId (react-select) to null
     reset({
@@ -220,49 +232,6 @@ const ExperienceForm = () => {
   const nextSixMonths = new Date();
   nextSixMonths.setMonth(nextSixMonths.getMonth() + 6);
   const sixMonthsFromNow = nextSixMonths.toISOString().split("T")[0];
-
-  const handleApiErrors = (errors) => {
-    if (errors.response) {
-      const status = errors.response.status;
-      let errorMessage = "";
-
-      switch (status) {
-        case 403:
-          errorMessage = "Session Timeout!";
-          navigate("/");
-          break;
-        case 404:
-          errorMessage = "Resource Not Found!";
-          break;
-        case 406:
-          errorMessage = "Invalid Details!";
-          break;
-        case 500:
-          errorMessage = "Server Error!";
-          break;
-        default:
-          errorMessage = "An Error Occurred!";
-          break;
-      }
-
-      toast.error(errorMessage, {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
-    } else {
-      // toast.error("Network Error!", {
-      //   position: "top-right",
-      //   transition: Bounce,
-      //   hideProgressBar: true,
-      //   theme: "colored",
-      //   autoClose: 3000,
-      // });
-    }
-  };
-
 
   // Render loading message or template not available message
   if (!templateAvailable) {
@@ -312,58 +281,26 @@ const ExperienceForm = () => {
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="card-body">
                   <div className="row">
-                    {isUpdating ? (
-                      <div className="col-12 col-md-6 col-lg-5 mb-3">
-                        <label className="form-label">Employee Name</label>
-                        <input
-                          type="text"
-                          readOnly
-                          className="form-control"
-                          name="employeeName"
-                          {...register("employeeName", { required: true })}
-                        />
-                        {errors.employeeName && (
-                          <p className="errorMsg">Employee Name Required</p>
-                        )}
-                      </div>
-                    ) : (
                       <div className="col-12 col-md-6 col-lg-5 mb-2">
                         <label className="form-label">Select Employee Name</label>
                         <Controller
                           name="employeeId"
                           control={control}
-                          rules={{ required: true }}
+                          rules={{ required: "Employee Name is required" }}
                           render={({ field }) => (
                             <Select
                               {...field}
                               options={emp}
                               value={emp.find(option => option.value === field.value) || null} // Handle clearing
-                              onChange={(selectedOption) => {
-                                field.onChange(selectedOption?.value || null); // Make sure to reset to null when unselected
-                                const selectedEmp = emp.find(emp => emp.value === selectedOption?.value);
-                                if (selectedEmp) {
-                                  setSelectedEmployee(selectedEmp);
-                                  // Update other form fields with selected employee data
-                                  setValue("designationName", selectedEmp.designationName);
-                                  setValue("departmentName", selectedEmp.departmentName);
-                                  setValue("dateOfHiring", selectedEmp.dateOfHiring);
-                                } else {
-                                  // If no employee is selected, reset other fields
-                                  setValue("designationName", '');
-                                  setValue("departmentName", '');
-                                  setValue("dateOfHiring", '');
-                                }
-                              }}
+                              onChange={handleEmployeeChange}
                               placeholder="Select Employee Name"
                             />
                           )}
                         />
                         {errors.employeeId && (
-                          <p className="errorMsg">Employee Name Required</p>
+                          <p className="errorMsg">{errors.employeeId.message}</p>
                         )}
                       </div>
-                    )}
-
                     <input
                       type="hidden"
                       className="form-control"
@@ -426,17 +363,26 @@ const ExperienceForm = () => {
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Date of Experience</label>
-                      <input
-                        type="date"
-                        className="form-control"
-                        placeholder="Last Working Date"
-                        name="lastWorkingDate"
-                        max={sixMonthsFromNow}
-                        {...register("lastWorkingDate", { required: true })}
-                      />
-                      {errors.lastWorkingDate && (
-                        <p className="errorMsg">Last Working Date Required</p>
-                      )}
+                      <Controller
+                          name="relievingDate"
+                          control={control}
+                          max={sixMonthsFromNow}
+                          rules={{
+                            required: "Relieving Date is required",
+                            validate: validateExperienceDate,  // Make sure this function is correctly passed
+                          }}
+                          render={({ field }) => (
+                            <input
+                              {...field}
+                              type="date"
+                              className="form-control"
+                              placeholder="Last Working Date"
+                            />
+                          )}
+                        />
+                        {errors.relievingDate && (
+                          <p className="errorMsg">{errors.relievingDate.message}</p>
+                        )}
                     </div>
 
                     <div className="col-12 d-flex align-items-start mt-5">

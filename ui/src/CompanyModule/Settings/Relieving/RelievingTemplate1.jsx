@@ -1,5 +1,4 @@
 import React from 'react';
-import { useAuth } from '../../../Context/AuthContext';
 
 const RelievingTemplate1 = ({
   companyLogo,
@@ -8,12 +7,9 @@ const RelievingTemplate1 = ({
   employeeName,
   employeeId,
   designation,
-  joiningDate,
   resignationDate,
   lastWorkingDate,
 }) => {
-const {logoFileName} = useAuth();
-
   return (
     <div
       className="watermarked"
@@ -42,7 +38,7 @@ const {logoFileName} = useAuth();
             right: '30%',
             width: '50%',
             height: '50%',
-            backgroundImage: `url(${logoFileName})`, // Use the logo or another image
+            backgroundImage: `url(${companyLogo})`, // Use the logo or another image
             transform: 'rotate(340deg)',
             backgroundSize: 'contain',
             backgroundRepeat: 'no-repeat',
