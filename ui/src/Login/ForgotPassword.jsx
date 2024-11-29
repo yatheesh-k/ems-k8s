@@ -8,7 +8,12 @@ import Loader from '../Utils/Loader';
 import { Modal, ModalBody, ModalHeader, ModalTitle } from 'react-bootstrap';
 
 const ForgotPassword = () => {
-  const { register, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm({ mode: "onChange" });
+  const { register, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm({ mode: "onChange", defaultValues: {
+    email: '',
+    otp: '',
+    password: '',
+    confirmPassword: '',
+  }, });
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
   const [passwordShown, setPasswordShown] = useState(false);
@@ -51,7 +56,6 @@ const ForgotPassword = () => {
       toast.success("OTP Sent Successfully"); // Handle API response as needed
       setEmail(data.email); // Update email state here
       setStep(2); // Move to Step 2 if successful
-
     } catch (error) {
       console.error("Failed to send OTP:", error);
       handleApiErrors(error);
@@ -72,17 +76,25 @@ const ForgotPassword = () => {
     try {
       const response = await ValidateOtp(formData);
       toast.success("Verification Successful");
-      setStep(3); // Move to Step 3 if OTP validation is successful
+      
+      // Move to Step 3 if OTP is valid
+      setStep(3);
+
+      // Reset form, clearing OTP and password fields
+      reset({
+        otp: '',  // Clear OTP field
+        password: '',  // Clear password field to avoid OTP being passed to password
+        confirmPassword: '',  // Clear confirm password field
+      });
+
       setOtpExpired(false); // Reset OTP expiration state
       setOtpTimeLimit(40); // Reset timer when OTP is valid
-      reset({ otp: '' });
       setErrorMessage(""); // Clear any error messages after successful validation
     } catch (error) {
       handleApiErrors(error);
-      // On error or invalid OTP, reset the OTP and directly go to Step 1
-      reset({ otp: '' });
-      setStep(1);  // Move back to Step 1 if OTP is expired or invalid
-      setOtpTimeLimit(40);  // Reset OTP timer
+      reset({ otp: '' }); // Reset OTP if error occurs
+      setStep(1); // Move back to Step 1 if OTP is invalid
+      setOtpTimeLimit(40); // Reset OTP timer
       setOtpExpired(false); // Reset OTP expired flag
       setLoading(false);
       setErrorMessage("Invalid OTP. Please try again."); // Error message for invalid OTP
@@ -103,7 +115,7 @@ const ForgotPassword = () => {
       await forgotPasswordStep2(formData);
       toast.success("Password Updated Successfully");
       reset(); // Reset the form data
-    } catch (error) {
+      navigate(`/${company}/login`);    } catch (error) {
       handleApiErrors(error);
     } finally {
       setLoading(false);
@@ -296,6 +308,7 @@ const ForgotPassword = () => {
                   placeholder='Enter Your New Password'
                   type={passwordShown ? "text" : "password"}
                   className="form-control"
+                  name='password'
                   onKeyDown={handleEmailChange}
                   {...register("password", {
                     required: "Password is Required",
@@ -332,6 +345,7 @@ const ForgotPassword = () => {
                   type={confirmPasswordShown ? "text" : "password"}
                   className="form-control"
                   onKeyDown={handleEmailChange}
+                  name='confirmPassword'
                   {...register('confirmPassword', {
                     required: 'Confirm Password is required',
                     validate: value => value === watchPassword || "Passwords do not match",

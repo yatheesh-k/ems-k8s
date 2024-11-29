@@ -21,7 +21,7 @@ const AddIncrement = () => {
       incomeTax: "new", 
       status: "Active" 
   } });
-  const { user } = useAuth();
+  const { user,companyData } = useAuth();
   const date = new Date().toLocaleDateString();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -347,13 +347,12 @@ const AddIncrement = () => {
 
   const handleGoClick = () => {
     const { employeeId, designationName, departmentName, dateOfHiring, months, years } = getValues(); // Get current form values
-
     // Check if any required field is missing
     if (!employeeId || !designationName || !departmentName || !dateOfHiring || !months || !years) {
       setMessage("Please fill all the required fields.");
-      setShowFields(false); // Optionally hide or show some fields based on conditions
+      setShowFields(true); // Optionally hide or show some fields based on conditions
     } else {
-      setShowFields(true); // Show fields or proceed with form submission
+      setShowFields(false); // Show fields or proceed with form submission
       setErrorMessage(""); // Clear any existing error messages
     }
   };
@@ -523,6 +522,7 @@ const AddIncrement = () => {
       departmentName: data.departmentName || "",
       dateOfSalaryIncrement: data.dateOfSalaryIncrement || "",
       companyId: user.companyId,
+      companyData:companyData,
       timePeriod: `${selectedMonth} ${selectedYear}`,
       grossCompensation: grossAmount || "",
       allowances: allowances,

@@ -13,7 +13,6 @@ const RelievingTemplate3 = ({
   resignationDate,
   lastWorkingDate,
 }) => {
-const {logoFileName} = useAuth();
 
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', position: 'relative' }}>
@@ -34,7 +33,7 @@ const {logoFileName} = useAuth();
           right: '30%',
           width: '50%',
           height: '50%',
-          backgroundImage: `url(${logoFileName})`, // Use the logo or another image
+          backgroundImage: `url(${companyLogo})`, // Use the logo or another image
           transform: 'rotate(340deg)',
           backgroundSize: 'contain',
           backgroundRepeat: 'no-repeat',

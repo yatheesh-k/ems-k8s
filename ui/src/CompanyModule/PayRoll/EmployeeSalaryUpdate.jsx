@@ -94,8 +94,6 @@ const EmployeeSalaryUpdate = () => {
 
       setAllowances(data.salaryConfigurationEntity.allowances || {});
       setDeductions(data.salaryConfigurationEntity.deductions || {});
-
-      console.log("Fetched salary structures:", data);
     } catch (error) {
       console.error("API fetch error:", error);
     }
@@ -119,74 +117,115 @@ const EmployeeSalaryUpdate = () => {
   };
 
   const handleAllowanceChange = (allowance, value) => {
-    // Check if the value ends with '%' (percentage value)
+    // Track if any field has changed
+    let fieldChanged = false;
+  
+    // Validate percentage values
     if (value.endsWith('%')) {
       const numericValue = value.slice(0, -1); // Remove '%' symbol to check numeric value
-      
+  
       // Check for negative percentage values
       if (numericValue.startsWith('-')) {
         setErrorMessage("Percentage value cannot be negative.");
-        return; // Prevent the change if the value is negative
+        return;
       }
   
-      // Check if the percentage value exceeds 100%
+      // Check if the percentage exceeds 100%
       if (numericValue && parseFloat(numericValue) > 100) {
         setErrorMessage("Percentage value cannot exceed 100%.");
-        return; // Prevent the change if the value exceeds 100%
+        return;
       }
   
       // Check if the length exceeds 4 characters (e.g., "100%" is 4 characters)
       if (value.length > 4) {
         setErrorMessage("Percentage value cannot exceed 4 characters (including '%').");
-        return; // Prevent the change if the length exceeds 4 characters (like "100%")
+        return;
       }
     }
   
-    // Validation for number-related fields (maximum 10 digits)
+    // Handle validation for numeric fields (maximum 10 digits)
     if (!value.endsWith('%')) {
-      const numericValue = value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
-      // Check if the numeric value exceeds 10 digits
+      const numericValue = value.replace(/[^0-9]/g, '');
       if (numericValue.length > 10) {
         setErrorMessage("Numeric value cannot exceed 10 digits.");
-        return; // Prevent further input if the length exceeds 10 digits
+        return;
       }
-  
-      // Check if the value is negative
       if (parseFloat(value) < 0) {
         setErrorMessage("Allowance value cannot be negative.");
-        return; // Prevent the change if the value is negative
+        return;
       }
     }
   
-    // Clear error message if validation passes
+    // Clear error message if no errors
     setErrorMessage("");
   
-    // Update the allowance value in form state
+    // Mark field as modified
+    fieldChanged = true;
+  
+    // Update the allowance value
     setValue(`allowances.${allowance}`, value);
   
-    // Recalculate total earnings based on new allowances
+    // Recalculate total earnings based on new allowance values
     const currentAllowances = getValues("allowances");
-    let newTotalEarnings = 0;
   
-    // Iterate through allowances and sum up
-    Object.keys(currentAllowances).forEach((key) => {
-      const allowanceValue = currentAllowances[key];
-      if (typeof allowanceValue === "string" && allowanceValue.includes("%")) {
-        const percentageValue = parseFloat(allowanceValue) / 100;
-        newTotalEarnings += percentageValue * grossAmount; // Adjust based on gross or other basis
-      } else {
-        newTotalEarnings += parseFloat(allowanceValue) || 0;
-      }
-    });
+    // Get the total earnings and total percentage from the current allowances
+    const { total, totalPercentage } = calculateTotal(currentAllowances, grossAmount);
   
-    // Validate if total earnings exceed gross amount
-    if (newTotalEarnings > grossAmount) {
-      setErrorMessage("Total earnings cannot exceed the gross salary.");
-      return; // Prevent update if total earnings exceed gross salary
+    // Ensure total and totalPercentage are valid numbers
+    if (isNaN(total) || isNaN(totalPercentage)) {
+      setErrorMessage("Invalid total or total percentage calculation.");
+      return;
     }
   
-    // Update state with new total earnings
-    setTotalEarnings(newTotalEarnings);
+    // Logic for handling excess allowance percentage
+    if (totalPercentage > 100) {
+      // Calculate the excess percentage and amount
+      const excessAmount = total - grossAmount;
+      const excessPercentage = totalPercentage - 100;
+  
+      // Set the value of otherAllowance with excess values
+      if (!isNaN(excessAmount) && !isNaN(excessPercentage)) {
+        setValue("otherAllowance", `${excessAmount.toFixed(2)} (Excess: ${excessPercentage.toFixed(2)}% of Gross)`);
+      } else {
+        setErrorMessage("Invalid excess amount or percentage.");
+        return;
+      }
+    } else {
+      // Otherwise, just set the value of otherAllowance with total and percentage
+      if (!isNaN(total) && !isNaN(totalPercentage)) {
+        setValue("otherAllowance", `${total.toFixed(2)} (Total: ${totalPercentage.toFixed(2)}% of Gross)`);
+      } else {
+        setErrorMessage("Invalid total or total percentage.");
+        return;
+      }
+    }
+  
+    // Check if total earnings exceed gross amount
+    if (total > grossAmount) {
+      setErrorMessage("Total earnings cannot exceed the gross salary.");
+      return;
+    }
+  
+    // Update the total earnings state
+    setTotalEarnings(total);
+  
+    // Display error message if totalEarnings is not equal to grossAmount
+    if (totalEarnings !== grossAmount) {
+      setErrorMessage("Total earnings must match the gross salary.");
+      return;
+    }
+  
+    // Optionally, if any field was changed, set a flag for the UI or further processing
+    if (fieldChanged) {
+      // Show a "Saving..." indicator or any UI update
+      console.log("Changes have been made, saving...");
+  
+      // You can also enable the submit button here
+      // setIsSubmitDisabled(false); // Enable submit button
+  
+      // If needed, trigger an API call or other operations
+      // saveChangesToServer(); // Call an API or perform other operations
+    }
   };
   
 

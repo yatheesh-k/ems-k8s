@@ -6,10 +6,8 @@ import { companyViewByIdApi, EmployeeGetApiById } from '../../../Utils/Axios';
 
 const AppraisalTemplate1 = ({
   companyLogo,
-  companyAddress,
+  companyData,
   companyName,
-  contactNumber,
-  mailId,
   employeeName,
   designation,
   employeeId, // Ensure employeeId is passed as a prop
@@ -20,54 +18,17 @@ const AppraisalTemplate1 = ({
 }) => {
   const [employeeDetails, setEmployeeDetails] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [companyDetails, setCompanyDetails] = useState(null);
   const { user, logoFileName } = useAuth();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const idFromQuery = queryParams.get('employeeId'); // Extract employeeId from URL query params if needed
 
-  // Function to fetch company data
-  const fetchCompanyData = async (companyId) => {
-    try {
-      const response = await companyViewByIdApi(companyId);
-      const data = response.data;
-      setCompanyDetails(data);
-    } catch (err) {
-      console.error("Error fetching company data:", err);
-      toast.error("Failed to fetch company data");
-    }
-  };
-
-  // Function to fetch employee details using employeeId
-  const fetchEmployeeDetails = async (id) => {
-    try {
-      console.log("Fetching details for employeeId:", id);
-      const response = await EmployeeGetApiById(id);
-      console.log(response.data); // Inspect the structure of the response
-      setEmployeeDetails(response.data);
-      if (response.data.companyId) {
-        fetchCompanyData(response.data.companyId);
-      }
-    } catch (err) {
-      console.error("Error fetching employee details:", err);
-      // toast.error("Failed to fetch employee details");
-    }
-  };
-
-  useEffect(() => {
-    const idToUse = employeeId || idFromQuery || user.userId; // Fallback to employeeId, query param, or userId
-    setLoading(true);
-    if (idToUse) {
-      fetchEmployeeDetails(idToUse); // Fetch employee details using employeeId
-    }
-    setLoading(false);
-  }, [employeeId, idFromQuery, user.userId]);
 
   return (
     <div className="watermarked" style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
       <div style={{ textAlign: "right" }}>
         {logoFileName ? (
-          <img className="align-middle" src={logoFileName} alt="Logo" style={{ height: "80px", width: "180px" }} />
+          <img className="align-middle" src={companyLogo} alt="Logo" style={{ height: "80px", width: "180px" }} />
         ) : (
           <p>Logo</p>
         )}
@@ -81,7 +42,7 @@ const AppraisalTemplate1 = ({
           right: "30%",
           width: "50%",
           height: "50%",
-          backgroundImage: `url(${logoFileName})`,
+          backgroundImage: `url(${companyLogo})`,
           transform: "rotate(340deg)",
           backgroundSize: "contain",
           backgroundRepeat: "no-repeat",
@@ -92,15 +53,12 @@ const AppraisalTemplate1 = ({
 
       <h4 className="text-center p-3">APPRAISAL LETTER</h4>
 
-      {loading ? (
-        <p>Loading employee details...</p>
-      ) : employeeDetails ? (
         <div className="row d-flex justify-content-between p-1">
           <div className="col-6">
             <p className="mb-0"><h6>To</h6></p>
-            <p><strong>{employeeDetails?.firstName || "N/A"}</strong></p>
-            <p><strong>Designation: {designation || "N/A"}</strong></p>
-            <p><strong>Emp Id: {employeeDetails?.employeeId || "N/A"}</strong></p>
+            <p><strong>{employeeName || "EmployeeName"}</strong></p>
+            <p><strong>Designation: {designation || "Designation"}</strong></p>
+            <p><strong>Emp Id: {employeeId || "EmployeeId"}</strong></p>
           </div>
           <div className="col-6">
             <p className="mb-0 text-end">
@@ -108,16 +66,13 @@ const AppraisalTemplate1 = ({
             </p>
           </div>
         </div>
-      ) : (
-        <p>No employee details available</p>
-      )}
 
       <div style={{ position: "relative", zIndex: 2, backgroundColor: "rgba(255, 255, 255, 0.8)", backdropFilter: "blur(2px)" }}>
         <p className="p-2">
           Sub: <strong>Increment of Salary</strong>
         </p>
         <p className="p-2">
-          Dear <strong>{employeeDetails?.firstName || "Employee"}</strong>,
+          Dear <strong>{employeeName || "Employee Name"}</strong>,
         </p>
         <p>
         We are pleased to inform you that based on your performance and contribution to the company, our management has revised your compensation to Rs.<strong>{salaryIncrease}</strong> pa which is cost to company with effect from <strong>{effectiveDate}</strong>.
@@ -172,9 +127,9 @@ const AppraisalTemplate1 = ({
           <p className="mb-5">With Best Wishes,</p>
           <div className="mt-5 pt-5">
             <p>Authorized Signature</p>
-            <h6>{companyDetails?.companyName}</h6>
-            <h6>PH: {companyDetails?.mobileNo}, Email: {companyDetails?.emailId} </h6>
-            <h6>{companyDetails?.companyAddress}</h6>
+            <h6>{companyName}</h6>
+            <h6>PH: {companyData.mobileNo}, Email: {companyData.emailId} </h6>
+            <h6>{companyData.companyAddress}</h6>
           </div>
         </div>
       </div>

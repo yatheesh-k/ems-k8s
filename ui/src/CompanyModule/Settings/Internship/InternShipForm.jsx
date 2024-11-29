@@ -16,7 +16,7 @@ const InternShipForm = () => {
     formState: { errors },
     reset,
   } = useForm();
-  const { user,companyData } = useAuth();
+  const { user,companyData,logoFileName } = useAuth();
   const [emp, setEmp] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [departments, setDepartments] = useState([]);
@@ -84,7 +84,7 @@ const InternShipForm = () => {
          setSelectedTemplate(templateNumber)
          setTemplateAvailable(!!templateNumber); 
     } catch (error) {
-      handleApiErrors(error);
+      handleError(error);
       setTemplateAvailable(false); 
     }
   };
@@ -117,6 +117,7 @@ const InternShipForm = () => {
     }; 
     console.log("submissionData",submissionData)
     const preview = {
+      companyLogo:logoFileName,
       employeeName: selectedEmployee ? selectedEmployee.employeeName : data.employeeName,
       employeeId: selectedEmployee ? selectedEmployee.employeeId : data.employeeId,
       designationName: data.designationName || "",
@@ -124,6 +125,7 @@ const InternShipForm = () => {
       startDate:data.dateOfHiring||"",
       lastWorkingDate: data.lastWorkingDate || "",
       companyName: user.company,
+      companyData:companyData
     };
       setPreviewData(preview);
       setShowPreview(true);
@@ -191,48 +193,6 @@ const InternShipForm = () => {
     reset();
   };
 
-
-  const handleApiErrors = (errors) => {
-    if (errors.response) {
-      const status = errors.response.status;
-      let errorMessage = "";
-
-      switch (status) {
-        case 403:
-          errorMessage = "Session Timeout!";
-          navigate("/");
-          break;
-        case 404:
-          errorMessage = "Resource Not Found!";
-          break;
-        case 406:
-          errorMessage = "Invalid Details!";
-          break;
-        case 500:
-          errorMessage = "Server Error!";
-          break;
-        default:
-          errorMessage = "An Error Occurred!";
-          break;
-      }
-
-      toast.error(errorMessage, {
-        position: "top-right",
-        transition: Bounce,
-        hideProgressBar: true,
-        theme: "colored",
-        autoClose: 3000,
-      });
-    } else {
-      // toast.error("Network Error!", {
-      //   position: "top-right",
-      //   transition: Bounce,
-      //   hideProgressBar: true,
-      //   theme: "colored",
-      //   autoClose: 3000,
-      // });
-    }
-  };
   const toInputTitleCase = (e) => {
     const input = e.target;
     let value = input.value;
@@ -272,7 +232,7 @@ const InternShipForm = () => {
   
       // Check if last working date is before date of hiring
       if (lastWorking < hiringDate) {
-        setError("Last working date cannot be before the date of hiring.");
+        setError("Internship date cannot be before the date of Joining.");
         return false; // Return false if validation fails
       }
   
@@ -292,7 +252,7 @@ const InternShipForm = () => {
               <div className="row justify-content-center">
                 <div className="col-8 text-center mt-5">
                   <h2>No Intenrship Template Available</h2>
-                  <p>To set up the Intenrship templates before proceeding, Please select the Template from Settings <a href="/internsTemplates">Intenrship Templates </a></p>
+                  <p>To set up the Intenrship templates before proceeding, Please select the Template from Settings <a href="/internsTemplates">Intenship Templates </a></p>
                   <p>Please contact the administrator to set up the Intenrship templates before proceeding.</p>
                 </div>
               </div>

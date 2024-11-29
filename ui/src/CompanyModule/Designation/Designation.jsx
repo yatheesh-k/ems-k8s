@@ -256,31 +256,34 @@ const Designation = () => {
     const input = e.target;
     let value = input.value;
     const cursorPosition = input.selectionStart; // Save the cursor position
+
     // Remove leading spaces
     value = value.replace(/^\s+/g, '');
-    // Ensure only alphabets and spaces are allowed
+
+    // Ensure only alphabets, numbers, spaces, and allowed special characters like /, -, ., etc.
     const allowedCharsRegex = /^[a-zA-Z0-9\s!@#&()*/,.\\-]+$/;
     value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
-    // Capitalize the first letter of each word
+
+    // Capitalize the first letter of each word but leave the rest as-is (case-sensitive) and allow special characters
     const words = value.split(' ');
-    // Capitalize the first letter of each word and lowercase the rest
     const capitalizedWords = words.map(word => {
       if (word.length > 0) {
-        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        // Capitalize first letter of each word, leave the rest as-is
+        return word.charAt(0).toUpperCase() + word.slice(1);
       }
-      return '';
+      return word;
     });
+
     // Join the words back into a string
     let formattedValue = capitalizedWords.join(' ');
-    // Remove spaces not allowed (before the first two characters)
-    if (formattedValue.length > 3) {
-      formattedValue = formattedValue.slice(0, 3) + formattedValue.slice(3).replace(/\s+/g, ' ');
-    }
+
     // Update input value
     input.value = formattedValue;
+
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
+
   const handleEmailChange = (e) => {
     // Get the current value of the input field
     const value = e.target.value;

@@ -91,7 +91,6 @@ const CompanyRegistration = () => {
 
       // Check if error response exists
       if (error.response) {
-        console.log("Axios response error:", error.response.data.error); // Log Axios error response
 
         // Case 1: General error message
         if (error.response.data.error && error.response.data.error.message) {

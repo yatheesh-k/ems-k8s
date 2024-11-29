@@ -95,7 +95,7 @@ const ExperienceTemplate1 = ({
               <p className='mb-5'>Sincerely,</p>
               <div className='mt-5 pt-5'>
               <h4>{companyData.companyName},</h4>
-              <p>[Contact Details],</p>
+              <p>{companyData.mobileNo},{companyData.emailId}</p>
               <p>{companyData.companyAddress}.</p>
               </div>
             </div>
