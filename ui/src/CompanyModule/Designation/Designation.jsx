@@ -16,7 +16,7 @@ import {
 import { useAuth } from '../../Context/AuthContext';
 
 const Designation = () => {
-  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm({mode:"onChange"});
+  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm({ mode: "onChange" });
   const [designations, setDesignations] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [search, setSearch] = useState('');
@@ -26,16 +26,16 @@ const Designation = () => {
   const [addDesignation, setAddDesignation] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [selectedItemId, setSelectedItemId] = useState(null); // State to store the ID of the item to be deleted
-  const { user} = useAuth();
-  
+  const [selectedItemId, setSelectedItemId] = useState(null); 
+  const { user } = useAuth();
+
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
-    setSelectedItemId(null); 
+    setSelectedItemId(null);
   };
 
   const handleShowDeleteModal = (id) => {
-    setSelectedItemId(id); 
+    setSelectedItemId(id);
     setShowDeleteModal(true);
   };
 
@@ -44,7 +44,7 @@ const Designation = () => {
     reset();
   };
 
-   const fetchDesignation = async () => {
+  const fetchDesignation = async () => {
     try {
       const designations = await DesignationGetApi();
       const sortedDesignations = designations.sort((a, b) => a.name.localeCompare(b.name));
@@ -53,7 +53,7 @@ const Designation = () => {
       // handleApiErrors(error);
     }
   };
-  
+
   useEffect(() => {
     fetchDesignation();
   }, []);
@@ -69,18 +69,18 @@ const Designation = () => {
         await DesignationPutApiById(editingUserId, formData);
         setTimeout(() => {
           toast.success('Designation Updated Successfully');
-            fetchDesignation(); // Fetch updated list of departments after delay
-            setAddDesignation(false);
-          }, 1500);
-      
+          fetchDesignation(); // Fetch updated list of departments after delay
+          setAddDesignation(false);
+        }, 1500);
+
       } else {
         await DesignationPostApi(formData);
-       
+
         setTimeout(() => {
           toast.success('Designation Created Successfully');
           fetchDesignation(); // Fetch updated list of departments after delay
           setAddDesignation(false);
-          }, 1500);
+        }, 1500);
       }
       reset();
       setEditingUserId(null);
@@ -117,7 +117,7 @@ const Designation = () => {
       }
     }
   };
-  
+
 
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
@@ -129,6 +129,46 @@ const Designation = () => {
     console.error(error.response);
   };
 
+  const validateName = (value) => {
+    // Trim leading and trailing spaces before further validation
+    const trimmedValue = value.trim();
+
+    // Check if value is empty after trimming (meaning it only had spaces)
+    if (trimmedValue.length === 0) {
+      return "Department Name is Required.";
+    }
+
+    // Allow alphabetic characters, numbers, spaces, and some special characters like /, !, @, #, &...
+    else if (!/^[A-Za-z\s/]+$/.test(trimmedValue)) {
+      return "Only Alphabetic Characters, Spaces, and '/' are Allowed.";
+    } else {
+      const words = trimmedValue.split(" ");
+
+      // Check for minimum and maximum word length
+      for (const word of words) {
+        // If the word is a single character and it's not the only word in the string, skip this rule
+        if (word.length < 2 && words.length === 1) {
+          return "Minimum Length 2 Characters Required.";  // If any word is shorter than 2 characters and it's a single word
+        } else if (word.length > 40) {
+          return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters
+        }
+      }
+
+      // Check for multiple spaces between words
+      if (/\s{2,}/.test(trimmedValue)) {
+        return "No Multiple Spaces Between Words Allowed.";
+      }
+
+      // Check if the value has leading or trailing spaces (shouldn't happen due to trimming)
+      if (/^\s/.test(value)) {
+        return "Leading space not allowed.";  // Leading space error
+      } else if (/\s$/.test(value)) {
+        return "Spaces at the end are not allowed.";  // Trailing space error
+      }
+    }
+
+    return true; // Return true if all conditions are satisfied
+  };
 
   useEffect(() => {
     setFilteredData(designations);
@@ -169,12 +209,12 @@ const Designation = () => {
     {
       name: <h5><b>#</b></h5>,
       selector: (row, index) => getSerialNumber(index),
-       width:"400px"
+      width: "400px"
     },
     {
       name: <h5><b>Designation</b></h5>,
       selector: (row) => row.name,
-       width:"500px"
+      width: "500px"
     },
     {
       name: <h5><b>Actions</b></h5>,
@@ -209,7 +249,6 @@ const Designation = () => {
       setAddDesignation(true);
     }
   };
-
   const toInputTitleCase = (e) => {
     const input = e.target;
     let value = input.value;
@@ -241,62 +280,21 @@ const Designation = () => {
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
-  const validateName = (value) => {
-    // Trim leading and trailing spaces before further validation
-    const trimmedValue = value.trim();
-  
-    // Check if value is empty after trimming (meaning it only had spaces)
-    if (trimmedValue.length === 0) {
-      return "Designation Name is Required.";
-    }
-  
-    // Allow alphabetic characters, spaces, slashes, and a few other special characters
-    // Modify the regex to allow "UI/UX", "QA testing", etc.
-    else if (!/^[A-Za-z\s/!-]+$/.test(trimmedValue)) {
-      return "Only Alphabetic Characters, Spaces, and '/', - are Allowed.";
-    } else {
-      const words = trimmedValue.split(" ");
-  
-      // Check for minimum and maximum word length
-      for (const word of words) {
-        // If the word is a single character and it's not the only word in the string, skip this rule
-        if (word.length < 2 && words.length === 1) {
-          return "Minimum Length 2 Characters Required.";  // If any word is shorter than 2 characters and it's a single word
-        } else if (word.length > 40) {
-          return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters
-        }
-      }
-  
-      // Check for multiple spaces between words
-      if (/\s{2,}/.test(trimmedValue)) {
-        return "No Multiple Spaces Between Words Allowed.";
-      }
-  
-      // Check if the value has leading or trailing spaces (shouldn't happen due to trimming)
-      if (/^\s/.test(value)) {
-        return "Leading space not allowed.";  // Leading space error
-      } else if (/\s$/.test(value)) {
-        return "Spaces at the end are not allowed.";  // Trailing space error
-      }
-    }
-  
-    return true; // Return true if all conditions are satisfied
-  };  
 
   const handleEmailChange = (e) => {
     // Get the current value of the input field
     const value = e.target.value;
-    
+
     // Check if the value is empty
     if (value.trim() !== '') {
-        return; // Allow space button
+      return; // Allow space button
     }
 
     // Prevent space character entry if the value is empty
     if (e.keyCode === 32) {
-        e.preventDefault();
+      e.preventDefault();
     }
-};
+  };
 
   return (
     <LayOut>
@@ -318,7 +316,6 @@ const Designation = () => {
             </nav>
           </div>
         </div>
-
         <div className="row">
           <div className="col-12 col-lg-12 col-xxl-12 d-flex">
             <div className="card flex-fill">
@@ -331,7 +328,7 @@ const Designation = () => {
                       type='submit'
                     >
                       Add Designation
-                   
+
                     </button>
                   </div>
                   <div className='col-12 col-md-6 col-lg-4'></div>
@@ -366,8 +363,8 @@ const Designation = () => {
               show={showDeleteModal}
               handleClose={handleCloseDeleteModal}
               handleConfirm={() => handleConfirmDelete(selectedItemId)}
-              id={selectedItemId} 
-               pageName="Designation"
+              id={selectedItemId}
+              pageName="Designation"
             />
 
             {addDesignation && (
@@ -394,7 +391,7 @@ const Designation = () => {
                         <div className="card-body" style={{ width: "1060px", paddingBottom: "0px" }}>
                           <div className='row'>
                             <div className='col-12 col-md-6 col-lg-4 mb-2'>
-                              <input 
+                              <input
                                 type="text"
                                 className="form-control"
                                 placeholder="Enter Designation"
@@ -405,9 +402,9 @@ const Designation = () => {
                                 autoComplete='off'
                                 {...register("name", {
                                   required: "Designation is Required",
-                                 validate:{
-                                  validateName,
-                                 },
+                                  validate: {
+                                    validateName,
+                                  },
                                 })}
                               />
                               {errors.name && (<p className='errorMsg'>{errors.name.message}</p>)}
