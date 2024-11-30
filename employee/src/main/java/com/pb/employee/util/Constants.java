@@ -137,4 +137,7 @@ public class Constants {
     public static final String PF_EMPLOYEE = "pfEmployee";
     public static final String PF_EMPLOYER = "pfEmployer";
     public static final String RELIEVING_LETTER3 = "relievingLetter3.ftl";
+    public static final String IMAGE_JPG = "image/jpeg";
+    public static final String IMAGE_PNG = "image/png";
+    public static final String IMAGE_SVG = "image/svg+xml";
 }
