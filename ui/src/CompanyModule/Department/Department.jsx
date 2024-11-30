@@ -180,11 +180,10 @@ const Department = () => {
     if (trimmedValue.length === 0) {
       return "Department Name is Required.";
     }
-  
-    // Allow alphabetic characters, spaces, slashes, and a few other special characters
-    // Modify the regex to allow "UI/UX", "QA testing", etc.
-    else if (!/^[A-Za-z\s/!-]+$/.test(trimmedValue)) {
-      return "Only Alphabetic Characters, Spaces, and '/', - are Allowed.";
+
+    // Allow alphabetic characters, numbers, spaces, and some special characters like /, !, @, #, &...
+    else if (!/^[A-Za-z\s/]+$/.test(trimmedValue)) {
+      return "Only Alphabetic Characters, Spaces, and '/' are Allowed.";
     } else {
       const words = trimmedValue.split(" ");
   

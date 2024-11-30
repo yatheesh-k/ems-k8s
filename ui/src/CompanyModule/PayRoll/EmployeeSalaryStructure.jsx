@@ -19,7 +19,7 @@ const EmployeeSalaryStructure = () => {
     register,
     handleSubmit,
     setValue,
-    reset,
+    reset,getValues,
     formState: { errors },
   } = useForm({ mode: "onChange" });
   const { user } = useAuth();
@@ -49,6 +49,7 @@ const EmployeeSalaryStructure = () => {
   const [pfEmployer, setPfEmployer] = useState(0);
   const [travelAllowance, setTravelAllowance] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
+  const [totalEarnings, setTotalEarnings] = useState(0);  // Define state for total earnings
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("Active");
   const [isReadOnly, setIsReadOnly] = useState(false);
@@ -323,41 +324,67 @@ const EmployeeSalaryStructure = () => {
     }));
   }, [allowances, grossAmount]);
 
-  const handleDeductionChange = (key, value) => {
-    if (value.endsWith("%")) {
-      const numericValue = value.slice(0, -1); // Remove '%' symbol to check numeric value
-      if (numericValue && parseFloat(numericValue) > 100) {
+  const handleDeductionChange = (key, newValue) => {
+    let validValue = newValue;
+
+    // Check if the value is a percentage
+    const isPercentage = newValue.includes("%");
+
+    // Handle percentage-specific validation
+    if (isPercentage) {
+      // Remove any non-numeric characters except for '%'
+      validValue = newValue.replace(/[^0-9%]/g, '');
+
+      // Limit to 1-2 digits before the '%' symbol
+      if (validValue.includes('%')) {
+        const digitsBeforePercentage = validValue.split('%')[0].slice(0, 2);
+        validValue = digitsBeforePercentage + '%';
+      }
+
+      // If more than 3 characters (e.g., "100%"), show an error message
+      if (validValue.length > 4) {
+        setErrorMessage("Percentage value should have up to 2 digits before '%'.");
+        return;
+      }
+
+      // Ensure that the percentage does not exceed 100%
+      const numericValue = parseFloat(validValue.slice(0, -1)); // Remove '%' and parse the number
+      if (numericValue > 100) {
         setErrorMessage("Percentage value cannot exceed 100%.");
-        return; // Prevent the change if the value exceeds 100%
+        return;
       }
-      if (value.length > 4) {
-        setErrorMessage(
-          "Percentage value cannot exceed 4 characters (including '%')."
-        );
-        return; // Prevent the change if the length exceeds 4 characters (like 100%)
-      }
-      // Check for negative percentage values
-      if (numericValue.startsWith("-")) {
-        setErrorMessage("Percentage value cannot be negative.");
-        return; // Prevent the change if the value is negative
-      }
-    }
-    // Validation for number-related fields (maximum 10 digits)
-    if (!value.endsWith("%")) {
-      const numericValue = value.replace(/[^0-9]/g, ""); // Remove non-numeric characters
-      if (numericValue.length > 10) {
+    } else {
+      // For numeric fields, allow only digits and check for validity
+      // Remove any non-numeric characters (except for the minus sign if negative)
+      validValue = validValue.replace(/[^0-9.-]/g, '');
+
+      // Ensure that the numeric value does not exceed 10 digits
+      if (validValue.length > 10) {
         setErrorMessage("Numeric value cannot exceed 10 digits.");
-        return; // Prevent further input if the length exceeds 10 digits
+        return;
       }
-      if (parseFloat(value) < 0) {
+
+      // Check for negative values if they are not allowed
+      if (parseFloat(validValue) < 0) {
         setErrorMessage("Deduction value cannot be negative.");
-        return; // Prevent deduction if value is negative
+        return;
+      }
+
+      // Ensure it's a valid number
+      if (isNaN(parseFloat(validValue))) {
+        setErrorMessage("Invalid numeric value.");
+        return;
       }
     }
+
+    // Clear any existing error message if the input is valid
     setErrorMessage("");
 
-    const newDeductions = { ...deductions, [key]: value };
-    setDeductions(newDeductions);
+    // Update the deductions state with the validated value
+    setDeductions((prevDeductions) => ({
+      ...prevDeductions,
+      [key]: validValue,
+    }));
   };
 
   useEffect(() => {
@@ -871,7 +898,7 @@ const EmployeeSalaryStructure = () => {
                                 <input
                                   className="form-control"
                                   type="number"
-                                  value={totalDeductions.toFixed(2)}
+                                  value={Math.round(totalDeductions.toFixed(2))}
                                   readOnly
                                   data-toggle="tooltip"
                                   title="This is the total of all deductions."
@@ -939,7 +966,7 @@ const EmployeeSalaryStructure = () => {
                                   className="form-control"
                                   type="text"
                                   name="netSalary"
-                                  value={netSalary.toFixed(2)}
+                                  value={Math.round(netSalary.toFixed(2))}
                                   readOnly
                                   data-toggle="tooltip"
                                   title="This is the final salary after all deductions and allowances."
