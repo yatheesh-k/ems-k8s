@@ -284,6 +284,7 @@ public class RelievingServiceImpl implements RelievingService {
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDisposition(ContentDisposition.builder(Constants.ATTACHMENT).filename(Constants.RELIEVING_LETTER_PDF).build());
 
+            log.info("Relieving download successfully...");
             // Return response with PDF content
             return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
 
