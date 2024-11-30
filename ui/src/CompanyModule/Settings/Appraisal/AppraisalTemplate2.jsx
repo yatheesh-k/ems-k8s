@@ -2,10 +2,8 @@ import React from 'react';
 
 const AppraisalTemplate2 = ({
   companyLogo,
-  companyAddress,
+  companyData,
   companyName,
-  contactNumber,
-  mailId,
   employeeName,
   designation,
   employeeId,
@@ -153,9 +151,9 @@ const AppraisalTemplate2 = ({
           <p className="mb-5">With Best Wishes,</p>
           <div className="mt-5 pt-5">
             <p>Authorized Signature</p>
-            <h4>{companyName},</h4>
-            <p>{contactNumber} | {mailId},</p>
-            <p>{companyAddress}.</p>
+            <h4>{companyData.companyName},</h4>
+            <p>{companyData.mobileNo} | {companyData.emailId},</p>
+            <p>{companyData.companyAddress}.</p>
           </div>
         </div>
       </div>

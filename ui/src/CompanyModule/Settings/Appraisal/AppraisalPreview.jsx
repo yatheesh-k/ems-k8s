@@ -48,10 +48,7 @@ const AppraisalPreview = ({ previewData, selectedTemplate }) => { // Accept prev
       content: () => (
         <AppraisalTemplate1
         companyLogo={logoFileName}
-        companyAddress={companyData.companyAddress}
-        companyName={companyData.companyName}
-        contactNumber={companyData.mobileNo}
-        mailId={companyData.emailId}
+        companyData={companyData}
         allowances={previewData.allowances}   
         date={previewData.date}
         employeeName={previewData.employeeName}
@@ -69,10 +66,7 @@ const AppraisalPreview = ({ previewData, selectedTemplate }) => { // Accept prev
       content: () => (
         <AppraisalTemplate2
           companyLogo={logoFileName}
-          companyAddress={companyData.companyAddress}
-          companyName={companyData.companyName}
-          contactNumber={companyData.mobileNo}
-          mailId={companyData.emailId}
+          companyData={companyData}
           allowances={previewData.allowances}   // Passing allowances dynamically
           date={previewData.date}
           employeeName={previewData.employeeName}

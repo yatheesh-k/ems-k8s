@@ -618,7 +618,7 @@ const EmployeeSalaryUpdate = () => {
                       const allowanceValue = allowances[key];
                       const isPercentage = allowanceValue.includes("%");
                       let displayValue = allowanceValue;
-
+                      const isOtherAllowanceReadOnly = key === "otherAllowances";
                       // Folr numeric fields, we display them as whole numbers
                       if (!isPercentage) {
                         displayValue = Math.floor(allowanceValue);
@@ -646,14 +646,14 @@ const EmployeeSalaryUpdate = () => {
                           <input
                             type="text"
                             className="form-control"
-                            // readOnly={isOtherAllowanceReadOnly}
+                            readOnly={isOtherAllowanceReadOnly}
                             value={allowanceValue}
                             onChange={(e) => handleAllowanceChange(key, e.target.value)}
                             maxLength={isPercentage ? 4 : 10}
                           />
-                          {errorMessage && (
+                          {/* {errorMessage && (
                             <p className="text-danger">{errorMessage}</p>
-                          )}
+                          )} */}
                         </div>
                       );
                     })}
@@ -758,7 +758,7 @@ const EmployeeSalaryUpdate = () => {
                             onChange={(e) => handleDeductionChange(key, e.target.value)}
                             maxLength={isPercentage ? 4 : 10}
                           />
-                          {errorMessage && <p className="text-danger">{errorMessage}</p>}
+                          {/* {errorMessage && <p className="text-danger">{errorMessage}</p>} */}
                         </div>
                       );
                     })}

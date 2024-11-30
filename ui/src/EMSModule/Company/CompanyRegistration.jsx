@@ -91,7 +91,6 @@ const CompanyRegistration = () => {
 
       // Check if error response exists
       if (error.response) {
-        console.log("Axios response error:", error.response.data.error); // Log Axios error response
 
         // Case 1: General error message
         if (error.response.data.error && error.response.data.error.message) {
@@ -162,7 +161,6 @@ const CompanyRegistration = () => {
 
   const handleApiErrors = (error) => {
     if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
-      const errorMessage = error.response.data.error.message;
       // toast.error(errorMessage);
     } else {
       // toast.error("Network Error !");
@@ -171,8 +169,9 @@ const CompanyRegistration = () => {
   };
 
   const clearForm = () => {
-    setCompanyType("");  
+    //setCompanyType("");  
     reset();
+   // setEditMode(true);  // Optionally, if you want to reset edit mode
   };
   const toInputTitleCase = (e) => {
     const input = e.target;
@@ -251,23 +250,23 @@ const CompanyRegistration = () => {
     input.value = value;
   };
 
-  const toInputEmailCase = (e) => {
-    const input = e.target;
-    let value = input.value;
+  // const toInputEmailCase = (e) => {
+  //   const input = e.target;
+  //   let value = input.value;
 
-    // Remove all spaces from the input
-    value = value.replace(/\s+/g, '');
+  //   // Remove all spaces from the input
+  //   value = value.replace(/\s+/g, '');
 
-    // If the first character is not lowercase, make it lowercase
-    if (value.length > 0 && value[0] !== value[0].toLowerCase()) {
-      value = value.charAt(0).toLowerCase() + value.slice(1);
-    }
+  //   // If the first character is not lowercase, make it lowercase
+  //   if (value.length > 0 && value[0] !== value[0].toLowerCase()) {
+  //     value = value.charAt(0).toLowerCase() + value.slice(1);
+  //   }
 
-    // Only update the value if it was changed
-    if (input.value !== value) {
-      input.value = value;
-    }
-  };
+  //   // Only update the value if it was changed
+  //   if (input.value !== value) {
+  //     input.value = value;
+  //   }
+  // };
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
     let newValue = "";
@@ -659,7 +658,7 @@ const CompanyRegistration = () => {
                                 },
                                 correctLength: (value) => {
                                   if (value.length !== 14) {
-                                    return "Mobile Number must be exactly 14 characters.";
+                                    return "Mobile Number is Required";
                                   }
                                   return true;
                                 },
@@ -742,7 +741,7 @@ const CompanyRegistration = () => {
                                 },
                                 correctLength: (value) => {
                                   if (value.length !== 14) {
-                                    return "Mobile Number must be exactly 10 digits (including +91).";
+                                    return "Mobile Number is Required";
                                   }
                                   return true;
                                 },
@@ -788,7 +787,7 @@ const CompanyRegistration = () => {
                             },
                             correctLength: (value) => {
                               if (value.length !== 14) {
-                                return "Alternate Number must be exactly 10 digits (including +91).";
+                                return "Alternate Number is Required";
                               }
                               return true;
                             },
@@ -1077,7 +1076,7 @@ const CompanyRegistration = () => {
                             },
                             correctLength: (value) => {
                               if (value.length !== 14) {
-                                return "Personal Mobile Number must be exactly 10 digits (including +91).";
+                                return "Personal Mobile Number is Required";
                               }
                               return true;
                             },

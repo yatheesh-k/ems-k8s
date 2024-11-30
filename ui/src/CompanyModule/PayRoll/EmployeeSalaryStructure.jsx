@@ -1,8 +1,13 @@
-
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import LayOut from "../../LayOut/LayOut";
-import { EmployeeGetApi, EmployeeSalaryPostApi, EmployeeSalaryGetApiById, EmployeeSalaryPatchApiById, CompanySalaryStructureGetApi } from "../../Utils/Axios";
+import {
+  EmployeeGetApi,
+  EmployeeSalaryPostApi,
+  EmployeeSalaryGetApiById,
+  EmployeeSalaryPatchApiById,
+  CompanySalaryStructureGetApi,
+} from "../../Utils/Axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
@@ -16,12 +21,12 @@ const EmployeeSalaryStructure = () => {
     setValue,
     reset,getValues,
     formState: { errors },
-  } = useForm({ mode: 'onChange' });
+  } = useForm({ mode: "onChange" });
   const { user } = useAuth();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const salaryId = queryParams.get('salaryId');
-  const id = queryParams.get('employeeId')
+  const salaryId = queryParams.get("salaryId");
+  const id = queryParams.get("employeeId");
 
   const [employes, setEmployes] = useState([]);
   const [salaryStructure, setSalaryStructure] = useState(0);
@@ -49,7 +54,7 @@ const EmployeeSalaryStructure = () => {
   const [status, setStatus] = useState("Active");
   const [isReadOnly, setIsReadOnly] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [showCards, setShowCards] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -57,7 +62,6 @@ const EmployeeSalaryStructure = () => {
   useEffect(() => {
     if (id && salaryId) {
       setShowFields(true);
-
     } else {
       setShowFields(false);
     }
@@ -87,12 +91,12 @@ const EmployeeSalaryStructure = () => {
             setFixedAmount(parseFloat(data.fixedAmount));
             setVariableAmount(parseFloat(data.variableAmount));
             setGrossAmount(parseFloat(data.grossAmount));
-            setStatus(data.status || '');
-            setValue('status', data.status || '');
+            setStatus(data.status || "");
+            setValue("status", data.status || "");
             setShowFields(true);
             setShowCards(true);
             setIsUpdating(true);
-            setIsReadOnly(data.status === 'InActive');
+            setIsReadOnly(data.status === "InActive");
             calculateAllowances();
           }
         })
@@ -135,22 +139,24 @@ const EmployeeSalaryStructure = () => {
         const allSalaryStructures = response.data.data;
 
         if (allSalaryStructures.length === 0) {
-          setError('Company Salary Structure is not defined');
+          setError("Company Salary Structure is not defined");
           setSalaryStructure([]);
         } else {
-          const activeSalaryStructures = allSalaryStructures.filter(structure => structure.status === "Active");
+          const activeSalaryStructures = allSalaryStructures.filter(
+            (structure) => structure.status === "Active"
+          );
 
           if (activeSalaryStructures.length > 0) {
             setSalaryStructure(activeSalaryStructures);
             setAllowances(activeSalaryStructures[0].allowances);
             setDeductions(activeSalaryStructures[0].deductions);
-            setError(''); // Clear error if salary structures are found
+            setError(""); // Clear error if salary structures are found
           } else {
-            setError('No active salary structure found');
+            setError("No active salary structure found");
           }
         }
       } catch (error) {
-        setError('Error fetching salary structures.');
+        setError("Error fetching salary structures.");
         console.error("API fetch error:", error);
       }
     };
@@ -161,7 +167,7 @@ const EmployeeSalaryStructure = () => {
   const calculateTotalDeductions = () => {
     let total = 0;
     Object.entries(deductions).forEach(([key, value]) => {
-      if (value.endsWith('%')) {
+      if (value.endsWith("%")) {
         const parsedValue = parseFloat(value.slice(0, -1));
         const percentageValue = (parsedValue / 100) * (grossAmount || 0);
         total += percentageValue;
@@ -175,8 +181,8 @@ const EmployeeSalaryStructure = () => {
   const calculateTotalAllowances = () => {
     let total = 0;
     Object.entries(allowances).forEach(([key, value]) => {
-      if (key !== 'otherAllowances') {
-        if (value.endsWith('%')) {
+      if (key !== "otherAllowances") {
+        if (value.endsWith("%")) {
           const parsedValue = parseFloat(value.slice(0, -1));
           const percentageValue = (parsedValue / 100) * (grossAmount || 0);
           total += percentageValue;
@@ -188,121 +194,120 @@ const EmployeeSalaryStructure = () => {
     return total;
   };
 
-  const handleAllowanceChange = (allowance, value) => {
-    // Validation for percentage or numeric values
-    if (value.endsWith('%')) {
-      const numericValue = value.slice(0, -1); // Remove the '%' symbol
-      if (numericValue.startsWith('-')) {
-        setErrorMessage("Percentage value cannot be negative.");
+  const handleAllowanceChange = (key, newValue) => {
+    let validValue = newValue;
+
+    // Check if the value is a percentage
+    const isPercentage = newValue.includes("%");
+
+    // Handle percentage-specific validation
+    if (isPercentage) {
+      // Remove any non-numeric characters except for '%'
+      validValue = newValue.replace(/[^0-9%]/g, '');
+
+      // Limit to 1-2 digits before the '%' symbol
+      if (validValue.includes('%')) {
+        const digitsBeforePercentage = validValue.split('%')[0].slice(0, 2);
+        validValue = digitsBeforePercentage + '%';
+      }
+
+      // If more than 3 characters (e.g., "100%"), show an error message
+      if (validValue.length > 4) {
+        setErrorMessage("Percentage value should have up to 2 digits before '%'.");
         return;
       }
-      if (numericValue && parseFloat(numericValue) > 100) {
-        setErrorMessage("Percentage value cannot exceed 100%.");
-        return;
-      }
-      if (value.length > 4) {
-        setErrorMessage("Percentage value cannot exceed 4 characters (including '%').");
-        return;
-      }
-    }
-  
-    if (!value.endsWith('%')) {
-      const numericValue = value.replace(/[^0-9]/g, ''); // Allow only numbers
-      if (numericValue.length > 10) {
+    } else {
+      // For numeric fields, allow only digits and check for validity
+      if (validValue.length > 10) {
         setErrorMessage("Numeric value cannot exceed 10 digits.");
         return;
       }
-      if (parseFloat(value) < 0) {
+
+      // Allow negative values and zero (if needed)
+      if (parseFloat(validValue) < 0) {
         setErrorMessage("Allowance value cannot be negative.");
         return;
       }
+
+      setErrorMessage(""); // Clear error if valid
     }
-  
-    setErrorMessage("");  // Reset any previous error message
-  
-    // Update the specific allowance value in the form state
-    const oldAllowanceValue = getValues(`allowances.${allowance}`);
-    setValue(`allowances.${allowance}`, value);
-  
-    // Recalculate total earnings based on the new allowances
-    const currentAllowances = getValues("allowances");  // Get current allowances from form state
-    const newTotalEarnings = calculateTotalEarningsFromAllowances(currentAllowances, grossAmount);
-    console.log("New Total Earnings:", newTotalEarnings);
-  
-    // Check if total earnings exceed gross amount
-    if (newTotalEarnings > grossAmount) {
-      setErrorMessage("Total earnings cannot exceed the gross salary.");
-      return;
-    }
-  
-    // Set the total earnings after validation
-    setTotalEarnings(newTotalEarnings);
-  
-    // Calculate the total sum of all allowances (excluding 'otherAllowances')
-    let totalAllowancesExcludingOther = 0;
-  
-    Object.keys(currentAllowances).forEach((key) => {
-      if (key !== 'otherAllowances') {
-        const allowanceValue = currentAllowances[key];
-        // If it's a percentage, convert to numeric value
-        if (typeof allowanceValue === "string" && allowanceValue.includes("%")) {
-          totalAllowancesExcludingOther += (parseFloat(allowanceValue) / 100) * grossAmount;
-        } else {
-          totalAllowancesExcludingOther += parseFloat(allowanceValue) || 0;
-        }
-      }
-    });
-  
-    // Calculate the remaining amount for "Other Allowance"
-    let remainingOtherAllowance = grossAmount - totalAllowancesExcludingOther;
-  
-    // If the total is less than zero (which shouldn't happen), set it to 0
-    remainingOtherAllowance = remainingOtherAllowance < 0 ? 0 : remainingOtherAllowance;
-  
-    // Calculate the difference between old and new allowance value
-    let difference = parseFloat(value) - parseFloat(oldAllowanceValue);
-  
-    // If the allowance is increased, subtract from `otherAllowances`
-    if (difference > 0) {
-      remainingOtherAllowance = Math.max(0, remainingOtherAllowance - difference);
-    } 
-  
-    // If the allowance is decreased, add the difference to `otherAllowances`
-    if (difference < 0) {
-      remainingOtherAllowance += Math.abs(difference);  // Add the difference (positive value)
-    }
-  
-    // Ensure `otherAllowances` doesn't go negative
-    const adjustedOtherAllowance = Math.max(0, remainingOtherAllowance);
-  
-    // Debugging: log the remaining other allowance
-    console.log("Adjusted Other Allowance: ", adjustedOtherAllowance);
-  
-    // Update the "otherAllowances" field with the adjusted value
-    setValue("allowances.otherAllowances", adjustedOtherAllowance.toFixed(2));  // Ensure it's in the correct format
+
+    // Update the allowances state with the validated value
+    setAllowances((prevAllowances) => ({
+      ...prevAllowances,
+      [key]: validValue,
+    }));
   };
 
-  const calculateTotalEarningsFromAllowances = (allowances, grossAmount) => {
-    let total = 0;
-    Object.keys(allowances).forEach((key) => {
-      const allowanceValue = allowances[key];
 
-      if (typeof allowanceValue === "string" && allowanceValue.includes("%")) {
-        total += (parseFloat(allowanceValue) / 100) * grossAmount;
-      } else {
-        total += parseFloat(allowanceValue) || 0;
+  const handleInputChange = (key, e) => {
+    let newValue = e.target.value;
+
+    // If the value contains '%' (percentage), we ensure no extra characters after it
+    if (newValue.includes("%")) {
+      // If length exceeds 4 (e.g., "100%"), truncate to the first 4 characters
+      if (newValue.length > 4) {
+        newValue = newValue.slice(0, 4); // Limit to 3 digits + '%'
       }
-    });
-    return total;
+
+      // Ensure only digits before the '%' symbol
+      const validPercentageValue =
+        newValue.slice(0, -1).replace(/[^0-9]/g, "") + "%";
+      newValue = validPercentageValue; // Update with the valid percentage format
+    } else {
+      // If it's a number (no '%'), restrict to a maximum of 10 digits
+      if (newValue.length > 10) {
+        newValue = newValue.slice(0, 10); // Limit to 10 digits
+      }
+
+      // Allow only numeric values (remove any non-numeric characters)
+      newValue = newValue.replace(/[^0-9]/g, "");
+    }
+
+    // Clear the error message if the input is valid
+    setErrorMessage("");
+
+    // Call the validation and update logic
+    handleAllowanceChange(key, newValue);
   };
-  
+
+  // const handleKeyDown = (e, key) => {
+  //   if (e.key === 'Backspace') {
+  //     let newValue = allowances[key];
+
+  //     // If value contains '%' and we're deleting a digit before it
+  //     if (newValue.includes('%')) {
+  //       const valueBeforePercent = newValue.slice(0, -1); // Remove '%'
+  //       if (valueBeforePercent.length > 0) {
+  //         // Allow the deletion of one character at a time before '%'
+  //         newValue = valueBeforePercent.slice(0, -1) + '%';
+  //       }
+  //     }
+
+  //     // If we're trying to clear everything before '%'
+  //     if (newValue.slice(0, -1) === '') {
+  //       newValue = '';
+  //     }
+
+  //     // Update the allowances with the new value
+  //     setAllowances((prev) => ({
+  //       ...prev,
+  //       [key]: newValue,
+  //     }));
+
+  //     // Prevent default behavior to avoid unwanted deletion
+  //     e.preventDefault();
+  //   }
+  // };
+
   useEffect(() => {
     const totalAllow = calculateTotalAllowances();
     const newOtherAllowances = grossAmount - totalAllow;
-
     // Check for errors
     if (newOtherAllowances < 0) {
-      setErrorMessage("Total allowances exceed gross amount. Please adjust allowances.");
+      setErrorMessage(
+        "Total allowances exceed gross amount. Please adjust allowances."
+      );
       setIsSubmitDisabled(true); // Disable the button
     } else {
       setErrorMessage(""); // Clear error message if valid
@@ -319,39 +324,67 @@ const EmployeeSalaryStructure = () => {
     }));
   }, [allowances, grossAmount]);
 
-  const handleDeductionChange = (key, value) => {
-    if (value.endsWith('%')) {
-      const numericValue = value.slice(0, -1); // Remove '%' symbol to check numeric value
-      if (numericValue && parseFloat(numericValue) > 100) {
+  const handleDeductionChange = (key, newValue) => {
+    let validValue = newValue;
+
+    // Check if the value is a percentage
+    const isPercentage = newValue.includes("%");
+
+    // Handle percentage-specific validation
+    if (isPercentage) {
+      // Remove any non-numeric characters except for '%'
+      validValue = newValue.replace(/[^0-9%]/g, '');
+
+      // Limit to 1-2 digits before the '%' symbol
+      if (validValue.includes('%')) {
+        const digitsBeforePercentage = validValue.split('%')[0].slice(0, 2);
+        validValue = digitsBeforePercentage + '%';
+      }
+
+      // If more than 3 characters (e.g., "100%"), show an error message
+      if (validValue.length > 4) {
+        setErrorMessage("Percentage value should have up to 2 digits before '%'.");
+        return;
+      }
+
+      // Ensure that the percentage does not exceed 100%
+      const numericValue = parseFloat(validValue.slice(0, -1)); // Remove '%' and parse the number
+      if (numericValue > 100) {
         setErrorMessage("Percentage value cannot exceed 100%.");
-        return; // Prevent the change if the value exceeds 100%
+        return;
       }
-      if (value.length > 4) {
-        setErrorMessage("Percentage value cannot exceed 4 characters (including '%').");
-        return; // Prevent the change if the length exceeds 4 characters (like 100%)
-      }
-      // Check for negative percentage values
-      if (numericValue.startsWith('-')) {
-        setErrorMessage("Percentage value cannot be negative.");
-        return; // Prevent the change if the value is negative
-      }
-    }
-    // Validation for number-related fields (maximum 10 digits)
-    if (!value.endsWith('%')) {
-      const numericValue = value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
-      if (numericValue.length > 10) {
+    } else {
+      // For numeric fields, allow only digits and check for validity
+      // Remove any non-numeric characters (except for the minus sign if negative)
+      validValue = validValue.replace(/[^0-9.-]/g, '');
+
+      // Ensure that the numeric value does not exceed 10 digits
+      if (validValue.length > 10) {
         setErrorMessage("Numeric value cannot exceed 10 digits.");
-        return; // Prevent further input if the length exceeds 10 digits
+        return;
       }
-      if (parseFloat(value) < 0) {
+
+      // Check for negative values if they are not allowed
+      if (parseFloat(validValue) < 0) {
         setErrorMessage("Deduction value cannot be negative.");
-        return; // Prevent deduction if value is negative
+        return;
+      }
+
+      // Ensure it's a valid number
+      if (isNaN(parseFloat(validValue))) {
+        setErrorMessage("Invalid numeric value.");
+        return;
       }
     }
+
+    // Clear any existing error message if the input is valid
     setErrorMessage("");
 
-    const newDeductions = { ...deductions, [key]: value };
-    setDeductions(newDeductions);
+    // Update the deductions state with the validated value
+    setDeductions((prevDeductions) => ({
+      ...prevDeductions,
+      [key]: validValue,
+    }));
   };
 
   useEffect(() => {
@@ -366,7 +399,9 @@ const EmployeeSalaryStructure = () => {
 
     // Check for errors and set the error message accordingly
     if (newOtherAllowances < 0) {
-      setErrorMessage("Total allowances exceed gross amount. Please adjust allowances.");
+      setErrorMessage(
+        "Total allowances exceed gross amount. Please adjust allowances."
+      );
     } else {
       setErrorMessage(""); // Clear error message if valid
     }
@@ -380,13 +415,12 @@ const EmployeeSalaryStructure = () => {
       ...prevAllowances,
       otherAllowances: validOtherAllowances.toFixed(2),
     }));
-
   }, [allowances, grossAmount]);
 
   const calculateAllowances = () => {
     calculateTotalAllowances();
     calculateTotalDeductions();
-    setShowCards(true)
+    setShowCards(true);
   };
 
   const calculateNetSalary = () => {
@@ -398,21 +432,35 @@ const EmployeeSalaryStructure = () => {
     calculateNetSalary();
   }, [totalAllowances, totalDeductions]);
 
-
   useEffect(() => {
     if (salaryId && id) {
-      setValue('variableAmount', variableAmount);
-      setValue('fixedAmount', fixedAmount);
-      setValue('hra', hra);
-      setValue('travelAllowance', travelAllowance);
-      setValue('pfEmployee', pfEmployee);
-      setValue('pfEmployer', pfEmployer);
+      setValue("variableAmount", variableAmount);
+      setValue("fixedAmount", fixedAmount);
+      setValue("hra", hra);
+      setValue("travelAllowance", travelAllowance);
+      setValue("pfEmployee", pfEmployee);
+      setValue("pfEmployer", pfEmployer);
       // Update other values as necessary
     }
-  }, [variableAmount, fixedAmount, hra, travelAllowance, pfEmployee, pfEmployer, salaryId, id, setValue]);
+  }, [
+    variableAmount,
+    fixedAmount,
+    hra,
+    travelAllowance,
+    pfEmployee,
+    pfEmployer,
+    salaryId,
+    id,
+    setValue,
+  ]);
 
   const handleApiErrors = (error) => {
-    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+    if (
+      error.response &&
+      error.response.data &&
+      error.response.data.error &&
+      error.response.data.error.message
+    ) {
       const errorMessage = error.response.data.error.message;
       toast.error(errorMessage);
     } else {
@@ -517,28 +565,24 @@ const EmployeeSalaryStructure = () => {
 
     apiCall()
       .then((response) => {
-        toast.success(salaryId ? "Employee Salary Updated Successfully" : "Employee Salary Added Successfully");
-        setError(''); // Clear error message on success
+        toast.success(
+          salaryId
+            ? "Employee Salary Updated Successfully"
+            : "Employee Salary Added Successfully"
+        );
+        setError(""); // Clear error message on success
         setShowFields(false);
-        navigate('/employeeview');
+        navigate("/employeeview");
       })
       .catch((error) => {
         handleApiErrors(error);
       });
   };
 
-
-  error && (
-    <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>
-      {error}
-    </div>
-  )
-
-
   const clearForm = () => {
     reset();
     setShowFields(false);
-  }
+  };
 
   return (
     <LayOut>
@@ -550,7 +594,7 @@ const EmployeeSalaryStructure = () => {
                 <strong>Manage Salary</strong>
               </h1>
             </div>
-            <div className="col-auto" style={{ paddingBottom: '20px' }}>
+            <div className="col-auto" style={{ paddingBottom: "20px" }}>
               <nav aria-label="breadcrumb">
                 <ol className="breadcrumb mb-0">
                   <li className="breadcrumb-item">
@@ -588,7 +632,7 @@ const EmployeeSalaryStructure = () => {
                               },
                               maxLength: {
                                 value: 10,
-                                message: "Maximum 10 Numbers Allowed"
+                                message: "Maximum 10 Numbers Allowed",
                               },
                             })}
                             readOnly={isReadOnly}
@@ -603,7 +647,9 @@ const EmployeeSalaryStructure = () => {
                         </div>
                         <div className="col-md-1 mb-3"></div>
                         <div className="col-md-5 mb-3">
-                          <label className="form-label">Fixed Amount<span style={{ color: "red" }}>*</span></label>
+                          <label className="form-label">
+                            Fixed Amount<span style={{ color: "red" }}>*</span>
+                          </label>
                           <input
                             type="text"
                             className="form-control"
@@ -617,15 +663,16 @@ const EmployeeSalaryStructure = () => {
                               },
                               minLength: {
                                 value: 5,
-                                message: "Minimum 5 Numbers Required"
+                                message: "Minimum 5 Numbers Required",
                               },
                               maxLength: {
                                 value: 10,
-                                message: "Maximum 10 Numbers Allowed"
+                                message: "Maximum 10 Numbers Allowed",
                               },
                               validate: {
-                                notZero: value => value !== "0" || "Value cannot be 0"
-                              }
+                                notZero: (value) =>
+                                  value !== "0" || "Value cannot be 0",
+                              },
                             })}
                             readOnly={isReadOnly}
                             value={fixedAmount}
@@ -638,19 +685,26 @@ const EmployeeSalaryStructure = () => {
                           )}
                         </div>
                         <div className="col-md-5 mb-3">
-                          <label className="form-label">Gross Amount<span style={{ color: "red" }}>*</span></label>
+                          <label className="form-label">
+                            Gross Amount<span style={{ color: "red" }}>*</span>
+                          </label>
                           <input
                             type="text"
                             className="form-control"
                             autoComplete="off"
                             value={grossAmount}
-                            onChange={(e) => setGrossAmount(parseFloat(e.target.value))}
+                            onChange={(e) =>
+                              setGrossAmount(parseFloat(e.target.value))
+                            }
                             readOnly
                           />
                         </div>
                         <div className="col-md-1 mb-3"></div>
                         <div className="col-md-5 mb-3">
-                          <label className="form-label">Monthly Salary<span style={{ color: "red" }}>*</span></label>
+                          <label className="form-label">
+                            Monthly Salary
+                            <span style={{ color: "red" }}>*</span>
+                          </label>
                           <input
                             type="text"
                             className="form-control"
@@ -658,8 +712,12 @@ const EmployeeSalaryStructure = () => {
                             readOnly
                           />
                         </div>
-                        <div className="col-12 text-center mt-2" style={{ marginLeft: "37%" }}>
-                          <button type="button" className="btn btn-primary" onClick={calculateAllowances}>
+                        <div className="col-12 text-end mt-2">
+                          <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={calculateAllowances}
+                          >
                             Submit
                           </button>
                         </div>
@@ -678,38 +736,51 @@ const EmployeeSalaryStructure = () => {
                             <div className="card-header">
                               <h5 className="card-title" style={{ marginBottom: "0px" }}>Allowances</h5>
                             </div>
-                            <div className="card-body" style={{ paddingLeft: "20px" }}>
-                              {errorMessage && <span className="text-danger m-2 text-center">{errorMessage}</span>}
-                              {Object.keys(allowances).map((key) => (
-                                <div key={key} className="mb-3">
-                                  <label>
-                                    {key}:
-                                    <span className="text-danger me-1">({allowances[key]})</span>
-                                    {allowances[key].endsWith('%') && (
-                                      <span
-                                        className="m-1"
-                                        data-toggle="tooltip"
-                                        title="Percentage values are calculated based on Gross Amount."
-                                      >
-                                        <span className="text-primary"><i className="bi bi-info-circle"></i></span>
-                                      </span>
-                                    )}
-                                  </label>
-                                  <input
-                                    className="form-control"
-                                    type="text"
-                                    maxLength={10} // Max length set for the input field
-                                    value={allowances[key]}
-                                    onChange={(e) => {
-                                      // Allow only numbers and '%' characters, and apply the length restrictions
-                                      const newValue = e.target.value.replace(/[^0-9%]/g, '');
+                            <div className="card-body">
+                              {errorMessage && (
+                                <span className="text-danger m-2 text-center">
+                                  {errorMessage}
+                                </span>
+                              )}
+                            {Object.keys(allowances).map((key) => {
+        const allowanceValue = allowances[key];
+        const isPercentage = allowanceValue.includes("%");
+        let displayValue = allowanceValue;
 
-                                      // Check if the value exceeds the character limit or length for percentage or number
-                                      handleAllowanceChange(key, newValue);
-                                    }}
-                                  />
-                                </div>
-                              ))}
+        // For numeric fields, we display them as whole numbers
+        if (!isPercentage) {
+          displayValue = Math.floor(allowanceValue);
+        }
+
+        return (
+          <div key={key} className="mb-2">
+            <label className="form-label">
+              {key}:
+              <span className="text-danger me-1">
+                ({allowanceValue})
+              </span>
+              {isPercentage && (
+                <span
+                  className="m-1"
+                  data-toggle="tooltip"
+                  title="Percentage values are calculated based on Gross Amount."
+                >
+                  <span className="text-primary">
+                    <i className="bi bi-info-circle"></i>
+                  </span>
+                </span>
+              )}
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              value={allowanceValue}
+              onChange={(e) => handleAllowanceChange(key, e.target.value)}
+              maxLength={isPercentage ? 4 : 10}
+            />
+          </div>
+        );
+      })}
                               <div className="mb-3">
                                 <label>Total Allowances:</label>
                                 <input
@@ -721,6 +792,9 @@ const EmployeeSalaryStructure = () => {
                                   data-toggle="tooltip"
                                   title="This is the total of all allowances."
                                 />
+                                 {errorMessage && (
+              <p className="text-danger">{errorMessage}</p>
+            )}
                               </div>
                             </div>
                           </div>
@@ -730,7 +804,11 @@ const EmployeeSalaryStructure = () => {
                               <div className="d-flex justify-content-start align-items-start">
                                 <h5 className="card-title me-2" style={{ marginBottom: "0px" }}>Status</h5>
                                 <span className="text-danger">
-                                  {errors.status && <p className="mb-0">{errors.status.message}</p>}
+                                  {errors.status && (
+                                    <p className="mb-0">
+                                      {errors.status.message}
+                                    </p>
+                                  )}
                                 </span>
                               </div>
                             </div>
@@ -744,7 +822,9 @@ const EmployeeSalaryStructure = () => {
                                       defaultChecked
                                       value="Active"
                                       style={{ marginRight: "10px" }}
-                                      {...register("status", { required: "Please Select Status" })}
+                                      {...register("status", {
+                                        required: "Please Select Status",
+                                      })}
                                     />
                                     Active
                                   </label>
@@ -757,7 +837,9 @@ const EmployeeSalaryStructure = () => {
                                       name="status"
                                       value="InActive"
                                       style={{ marginRight: "10px" }}
-                                      {...register("status", { required: "Please Select Status" })}
+                                      {...register("status", {
+                                        required: "Please Select Status",
+                                      })}
                                     />
                                     InActive
                                   </label>
@@ -773,41 +855,50 @@ const EmployeeSalaryStructure = () => {
                             <div className="card-header">
                               <h5 className="card-title" style={{ marginBottom: "0px" }}>Deductions</h5>
                             </div>
-                            <div className="card-body" style={{ paddingLeft: "20px" }}>
-                              {Object.entries(deductions).map(([key, value]) => (
-                                <div key={key} className="mb-3">
-                                  <label>
-                                    {key}:
-                                    <span className="text-danger">({deductions[key]})</span>
-                                    {deductions[key].endsWith('%') && (
-                                      <span
-                                        className="m-1"
-                                        data-toggle="tooltip"
-                                        title="Percentage values are calculated based on Gross Amount."
-                                      >
-                                        <span className="text-primary"><i className="bi bi-info-circle"></i></span>
+                            <div className="card-body">
+                              {Object.entries(deductions).map(
+                                ([key, value]) => (
+                                  <div key={key} className="mb-3">
+                                    <label>
+                                      {key}:
+                                      <span className="text-danger">
+                                        ({deductions[key]})
                                       </span>
-                                    )}
-                                  </label>
-                                  <input
-                                    className="form-control"
-                                    type="text"
-                                    maxLength={10}
-                                    value={deductions[key]}
-                                    onChange={(e) => {
-                                      // Allow only numbers and '%' characters
-                                      const newValue = e.target.value.replace(/[^0-9%]/g, '');
-                                      handleDeductionChange(key, newValue);
-                                    }}
-                                  />
-                                </div>
-                              ))}
+                                      {deductions[key].endsWith("%") && (
+                                        <span
+                                          className="m-1"
+                                          data-toggle="tooltip"
+                                          title="Percentage values are calculated based on Gross Amount."
+                                        >
+                                          <span className="text-primary">
+                                            <i className="bi bi-info-circle"></i>
+                                          </span>
+                                        </span>
+                                      )}
+                                    </label>
+                                    <input
+                                      className="form-control"
+                                      type="text"
+                                      maxLength={10}
+                                      value={deductions[key]}
+                                      onChange={(e) => {
+                                        // Allow only numbers and '%' characters
+                                        const newValue = e.target.value.replace(
+                                          /[^0-9%]/g,
+                                          ""
+                                        );
+                                        handleDeductionChange(key, newValue);
+                                      }}
+                                    />
+                                  </div>
+                                )
+                              )}
                               <div className="mb-3">
                                 <label>Total Deductions</label>
                                 <input
                                   className="form-control"
                                   type="number"
-                                  value={totalDeductions.toFixed(2)}
+                                  value={Math.round(totalDeductions.toFixed(2))}
                                   readOnly
                                   data-toggle="tooltip"
                                   title="This is the total of all deductions."
@@ -820,7 +911,11 @@ const EmployeeSalaryStructure = () => {
                               <div className="d-flex justify-content-start align-items-start">
                                 <h5 className="card-title me-2" style={{ marginBottom: "0px" }}>TDS</h5>
                                 <span className="text-danger">
-                                  {errors.incomeTax && <p className="mb-0">{errors.incomeTax.message}</p>}
+                                  {errors.incomeTax && (
+                                    <p className="mb-0">
+                                      {errors.incomeTax.message}
+                                    </p>
+                                  )}
                                 </span>
                               </div>
                             </div>
@@ -833,7 +928,9 @@ const EmployeeSalaryStructure = () => {
                                       name="incomeTax"
                                       value="old"
                                       style={{ marginRight: "10px" }}
-                                      {...register("incomeTax", { required: "Please Select Tax" })}
+                                      {...register("incomeTax", {
+                                        required: "Please Select Tax",
+                                      })}
                                     />
                                     Old Regime
                                   </label>
@@ -847,7 +944,9 @@ const EmployeeSalaryStructure = () => {
                                       value="new"
                                       defaultChecked
                                       style={{ marginRight: "10px" }}
-                                      {...register("incomeTax", { required: "Please Select Tax" })}
+                                      {...register("incomeTax", {
+                                        required: "Please Select Tax",
+                                      })}
                                     />
                                     New Regime
                                   </label>
@@ -867,7 +966,7 @@ const EmployeeSalaryStructure = () => {
                                   className="form-control"
                                   type="text"
                                   name="netSalary"
-                                  value={netSalary.toFixed(2)}
+                                  value={Math.round(netSalary.toFixed(2))}
                                   readOnly
                                   data-toggle="tooltip"
                                   title="This is the final salary after all deductions and allowances."
@@ -877,7 +976,12 @@ const EmployeeSalaryStructure = () => {
                           </div>
 
                           <div className="text-end">
-                            <button className="btn btn-secondary me-2" onClick={clearForm}>Close</button>
+                            <button
+                              className="btn btn-secondary me-2"
+                              onClick={clearForm}
+                            >
+                              Close
+                            </button>
                             <button
                               type="submit"
                               className="btn btn-primary"
@@ -889,7 +993,14 @@ const EmployeeSalaryStructure = () => {
                         </div>
                       </div>
                       {error && (
-                        <div className="error-message" style={{ color: 'red', marginBottom: '10px', textAlign: "center" }}>
+                        <div
+                          className="error-message"
+                          style={{
+                            color: "red",
+                            marginBottom: "10px",
+                            textAlign: "center",
+                          }}
+                        >
                           <b>{error}</b>
                         </div>
                       )}
@@ -901,7 +1012,9 @@ const EmployeeSalaryStructure = () => {
               <div className="col-12">
                 <div className="card">
                   <div className="card-header">
-                    <h5 className="card-title" style={{ marginBottom: "0px" }}>Employee Details</h5>
+                    <h5 className="card-title" style={{ marginBottom: "0px" }}>
+                      Employee Details
+                    </h5>
                     <div
                       className="dropdown-divider"
                       style={{ borderTopColor: "#d7d9dd" }}
@@ -915,7 +1028,9 @@ const EmployeeSalaryStructure = () => {
                             className="mt-3"
                             style={{ flex: "1 1 auto", maxWidth: "400px" }}
                           >
-                            <label className="form-label">Select Employee Name</label>
+                            <label className="form-label">
+                              Select Employee Name
+                            </label>
                             <Select
                               options={employes}
                               onChange={handleEmployeeChange}
@@ -923,7 +1038,10 @@ const EmployeeSalaryStructure = () => {
                             />
                           </div>
                           <div style={{ marginTop: "27px" }}>
-                            <div className="mt-3 ml-3" style={{ marginLeft: "20px" }}>
+                            <div
+                              className="mt-3 ml-3"
+                              style={{ marginLeft: "20px" }}
+                            >
                               <button
                                 type="button"
                                 className="btn btn-primary"
@@ -934,7 +1052,14 @@ const EmployeeSalaryStructure = () => {
                             </div>
                           </div>
                         </div>
-                        {message && <div className="errorMsg mt-2" style={{ marginLeft: '10px' }}>{message}</div>}
+                        {message && (
+                          <div
+                            className="errorMsg mt-2"
+                            style={{ marginLeft: "10px" }}
+                          >
+                            {message}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -948,4 +1073,4 @@ const EmployeeSalaryStructure = () => {
   );
 };
 
-export default EmployeeSalaryStructure; 
+export default EmployeeSalaryStructure;

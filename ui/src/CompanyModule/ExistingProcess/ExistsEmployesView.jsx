@@ -5,7 +5,7 @@ import Select from "react-select";
 import { Bounce, toast } from "react-toastify";
 import LayOut from "../../LayOut/LayOut";
 import Loader from "../../Utils/Loader";
-import { EmployeeGetApi, RelievingGetApiById, RelievingLetterDownload, RelievingPatchApiById, TemplateGetAPI } from "../../Utils/Axios";
+import { EmployeeGetApi, RelievingFormPostApi, RelievingGetApiById, RelievingLetterDownload, RelievingPatchApiById, TemplateGetAPI } from "../../Utils/Axios";
 import { useAuth } from "../../Context/AuthContext";
 import Preview from "../Settings/Relieving/Preview";
 
@@ -68,15 +68,16 @@ const ExistsEmployesView = () => {
   useEffect(() => {
     EmployeeGetApi().then((data) => {
       const filteredData = data
-        .filter((employee) => employee.firstName !== null && employee.status === "InActive")
+        .filter((employee) => employee.firstName !== null && employee.status !== "Active")  // Filter for non-active employees
         .map(({ referenceId, ...rest }) => rest);
+  
       setEmp(
         filteredData.map((employee) => ({
           label: `${employee.firstName} ${employee.lastName} (${employee.employeeId})`,
           value: employee.id,
-          id:employee.id,
-          employeeName:`${employee.firstName} ${employee.lastName}`,
-          employeeId:employee.employeeId,
+          id: employee.id,
+          employeeName: `${employee.firstName} ${employee.lastName}`,
+          employeeId: employee.employeeId,
           designationName: employee.designationName,
           departmentName: employee.departmentName,
           dateOfHiring: employee.dateOfHiring,
@@ -84,6 +85,7 @@ const ExistsEmployesView = () => {
       );
     });
   }, []);
+  
 
   const fetchRelievingData = async (employeeId) => {
     try {
@@ -118,63 +120,60 @@ const ExistsEmployesView = () => {
     fetchTemplate()
 }, []);
 
-  const onSubmit = (data) => {
-    const submissionData = {
-      resignationDate: data.resignationDate,
-      relievingDate: data.relievingDate,
-      noticePeriod: noticePeriod,
-    };
-    
-    const preview = {
-      employeeName: selectedEmployee ? selectedEmployee.employeeName : data.employeeName,
-      id: selectedEmployee ? selectedEmployee.id : data.id,
-      employeeId: selectedEmployee ? selectedEmployee.employeeId : data.employeeId,
-      designationName: data.designationName || "",
-      departmentName: data.departmentName || "",
-      resignationDate: data.resignationDate || "",
-      relievingDate: data.relievingDate || "",
-      noticePeriod,
-      relievingId:data.relievingId,
-      companyName: user.company,
-    };
-    setPreviewData(preview);
+const onSubmit = (data) => {
+  const submissionData = {
+    resignationDate: data.resignationDate,
+    relievingDate: data.relievingDate,
+    noticePeriod: noticePeriod,
+  };    
+  const preview = {
+    employeeName: selectedEmployee ? selectedEmployee.employeeName : data.employeeName,
+    id: data.employeeId,
+    employeeId: selectedEmployee ? selectedEmployee.employeeId : data.employeeId,
+    designationName: data.designationName || "",
+    departmentName: data.departmentName || "",
+    resignationDate: data.resignationDate || "",
+    lastWorkingDate: data.relievingDate || "",
+    noticePeriod,
+    companyName: user.company,
+  };
+  setPreviewData(preview);
+  setShowPreview(true);
+  console.log("preview" ,true)
+  setSubmissionData(submissionData);
+};
+
+const handleConfirmSubmission = async () => {
+  const employeeId =previewData.id;
+  try {
+    // Assuming submissionData contains the necessary data to be posted
+    const response = await RelievingFormPostApi(employeeId,submissionData);
+
+    const TIMEOUT_DURATION = 10000; // 2 seconds timeout
+
+  // Create a timeout promise that rejects after the timeout duration
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('Relieving letter download timed out')), TIMEOUT_DURATION)
+  );
+
+  // Race between the download API call and the timeout
+  const downloadResponse = await Promise.race([
+    RelievingLetterDownload(employeeId),
+    timeoutPromise
+  ]);      // Handle the response (you can adjust this based on your needs)
+
+    toast.success(response.data.message);
+    toast.success(downloadResponse.data.message);
     setShowPreview(true);
-    setSubmissionData(submissionData);
-  };
+    // Optionally, reset submissionData or navigate to another page
+    // resetSubmissionData();
+     navigate('/relievingSummary');
 
-  const handleConfirmSubmission = async () => {
-    const relievingId =previewData.relievingId; // This will retrieve the relievingId set by fetchRelievingData
-    const employeeId = getValues("employeeId");
-    
-    console.log(relievingId,employeeId)
-     try {
-      // Assuming submissionData contains the necessary data to be posted
-      const response = await RelievingPatchApiById(employeeId,relievingId,submissionData);
-
-      const TIMEOUT_DURATION = 10000; // 2 seconds timeout
-
-    // Create a timeout promise that rejects after the timeout duration
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Relieving letter download timed out')), TIMEOUT_DURATION)
-    );
-
-    // Race between the download API call and the timeout
-    const downloadResponse = await Promise.race([
-      RelievingLetterDownload(employeeId),
-      timeoutPromise
-    ]);      // Handle the response (you can adjust this based on your needs)
-      toast.success(response.data.message);
-     toast.success(downloadResponse.data.message);
-  
-      // Optionally, reset submissionData or navigate to another page
-      // resetSubmissionData();
-       navigate('/existingSummary');
-  
-    } catch (error) {
-      console.error('Error submitting experience letter:', error);
-      handleError(error);
-    }
-  };
+  } catch (error) {
+    console.error('Error submitting experience letter:', error);
+    handleError(error);
+  }
+};
 
   const handleError = (errors) => {
     let errorMessage = "An Error Occurred!"; // Default error message
@@ -395,6 +394,7 @@ const ExistsEmployesView = () => {
                         className="form-control"
                         placeholder="Resignation Date"
                         name="resignationDate"
+                        readOnly
                         {...register("resignationDate", { required: true })}
                       />
                       {errors.resignationDate && (
@@ -409,6 +409,7 @@ const ExistsEmployesView = () => {
                         placeholder="Last Working Date"
                         name="relievingData"
                         max={sixMonthsFromNow}
+                        readOnly
                         {...register("relievingDate", { required: true })}
                       />
                       {errors.relievingData && (
@@ -430,7 +431,7 @@ const ExistsEmployesView = () => {
                             {error}
                           </div>
                         )}
-                        <div className={`col-${error ? '3' : '12'} d-flex justify-content-end mt-4`}>
+                        {/* <div className={`col-${error ? '3' : '12'} d-flex justify-content-end mt-4`}>
                           <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
                             Close
                           </button>
@@ -440,7 +441,7 @@ const ExistsEmployesView = () => {
                           >
                           Submit
                           </button>
-                        </div>
+                        </div> */}
                     </div>
                   </div>
                 </div>

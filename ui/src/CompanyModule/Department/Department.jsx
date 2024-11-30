@@ -175,7 +175,7 @@ const Department = () => {
   const validateName = (value) => {
     // Trim leading and trailing spaces before further validation
     const trimmedValue = value.trim();
-
+  
     // Check if value is empty after trimming (meaning it only had spaces)
     if (trimmedValue.length === 0) {
       return "Department Name is Required.";
@@ -186,7 +186,7 @@ const Department = () => {
       return "Only Alphabetic Characters, Spaces, and '/' are Allowed.";
     } else {
       const words = trimmedValue.split(" ");
-
+  
       // Check for minimum and maximum word length
       for (const word of words) {
         // If the word is a single character and it's not the only word in the string, skip this rule
@@ -196,12 +196,12 @@ const Department = () => {
           return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters
         }
       }
-
+  
       // Check for multiple spaces between words
       if (/\s{2,}/.test(trimmedValue)) {
         return "No Multiple Spaces Between Words Allowed.";
       }
-
+  
       // Check if the value has leading or trailing spaces (shouldn't happen due to trimming)
       if (/^\s/.test(value)) {
         return "Leading space not allowed.";  // Leading space error
@@ -209,9 +209,9 @@ const Department = () => {
         return "Spaces at the end are not allowed.";  // Trailing space error
       }
     }
-
+  
     return true; // Return true if all conditions are satisfied
-  };
+  };  
 
   const getFilteredList = (searchTerm) => {
     setSearch(searchTerm);

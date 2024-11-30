@@ -5876,7 +5876,7 @@ fieldset:disabled .btn {
 
 .fixed-sideNav {
 	width: 250px;
-	transition: width 1.3s ease;
+	transition: width 0.3s ease;
 }
 
 .fixed-sideNav.hidden {

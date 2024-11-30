@@ -15,7 +15,7 @@ const ExistsEmpRegistration = () => {
     handleSubmit,
     control,
     setValue,
-    watch,
+    watch,trigger,clearErrors,
     formState: { errors },
     reset,
   } = useForm({mode: "onChange"});
@@ -160,34 +160,65 @@ const validateRelievingDate = (value) => {
   };
 
   const handleConfirmSubmission = async () => {
-    const employeeId =previewData.id;
+    const employeeId = previewData.id;
     try {
       // Assuming submissionData contains the necessary data to be posted
-      const response = await RelievingFormPostApi(employeeId,submissionData);
-
-      const TIMEOUT_DURATION = 10000; // 2 seconds timeout
-
-    // Create a timeout promise that rejects after the timeout duration
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Relieving letter download timed out')), TIMEOUT_DURATION)
-    );
-
-    // Race between the download API call and the timeout
-    const downloadResponse = await Promise.race([
-      RelievingLetterDownload(employeeId),
-      timeoutPromise
-    ]);      // Handle the response (you can adjust this based on your needs)
-
-      toast.success(response.data.message);
-      toast.success(downloadResponse.data.message);
-      setShowPreview(true);
-      // Optionally, reset submissionData or navigate to another page
-      // resetSubmissionData();
-       navigate('/relievingSummary');
+      const response = await RelievingFormPostApi(employeeId, submissionData);
+  
+      const TIMEOUT_DURATION = 5000; // 5 seconds timeout for download
+  
+      // Create a timeout promise that rejects after the timeout duration
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Relieving letter download timed out')), TIMEOUT_DURATION)
+      );
+  
+      // Create a flag to prevent further execution if the download completes successfully
+      let downloadCompleted = false;
+  
+      // Function to ensure the timeout promise doesn't trigger after download finishes
+      const wrappedRelievingDownload = async () => {
+        try {
+          const downloadResponse = await RelievingLetterDownload(employeeId);
+          downloadCompleted = true;  // Mark download as completed
+          return downloadResponse;   // Return the download response if successful
+        } catch (error) {
+          throw error;  // Pass any download errors to be caught in the main try-catch
+        }
+      };
+  
+      // Race between the download API call and the timeout
+      const downloadResponse = await Promise.race([
+        wrappedRelievingDownload(),  // This wraps the download call to handle success/failure
+        timeoutPromise               // Timeout after the specified duration
+      ]);
+  
+      // If download completed successfully, proceed
+      if (downloadCompleted) {
+        // Handle success responses
+        toast.success(response.data.message);
+        if (downloadResponse && downloadResponse.data) {
+          toast.success(downloadResponse.data.message);
+        }
+        
+        // Reset and navigate after success
+        setShowPreview(true);
+        reset();
+        navigate('/relievingSummary');
+      }
   
     } catch (error) {
-      console.error('Error submitting experience letter:', error);
-      handleError(error);
+      console.error('Error submitting relieving letter:', error);
+  
+      // Add more specific error handling for the download
+      if (error.message && error.message.includes('timed out')) {
+        toast.error('The download took too long, please try again later.');
+      } else if (error.response) {
+        // Handle known error responses
+        handleError(error);
+      } else {
+        // Handle generic network errors
+        toast.error('Network Error, please check your internet connection.');
+      }
     }
   };
 
@@ -234,6 +265,39 @@ const validateRelievingDate = (value) => {
   const clearForm = () => {
     reset();
     navigate("/relievingSummary");
+  };
+
+  const handleEmployeeChange = (selectedOption) => {
+    // Update the selected employee in the state
+    const selectedEmp = emp.find(emp => emp.value === selectedOption?.value);
+    
+    if (selectedEmp) {
+      setSelectedEmployee(selectedEmp);
+
+      // Update form fields with selected employee data
+      setValue("employeeId", selectedEmp.value); // set employeeId correctly
+      setValue("designationName", selectedEmp.designationName);
+      setValue("departmentName", selectedEmp.departmentName);
+      setValue("dateOfHiring", selectedEmp.dateOfHiring);
+
+      // Clear any previous errors
+      clearErrors("employeeId");
+
+      // Trigger validation for the employeeId field
+      trigger("employeeId");
+    } else {
+      // If no employee is selected, reset other fields
+      setValue("employeeId", "");
+      setValue("designationName", "");
+      setValue("departmentName", "");
+      setValue("dateOfHiring", "");
+      
+      // Set error if needed, but it's likely you just want to reset
+      // setError("employeeId", { message: "Employee selection is required" });
+
+      // Clear any previous errors
+      clearErrors("employeeId");
+    }
   };
 
    if (loading) return  <Loader/>;
@@ -300,26 +364,12 @@ const validateRelievingDate = (value) => {
                           name="employeeId"
                           control={control}
                           rules={{ required: "Employee Name is required" }}
-                          defaultValue={selectedEmployee ? selectedEmployee.value : ""} // Ensure default value is set
                           render={({ field }) => (
                             <Select
                               {...field}
                               options={emp}
-                              value={emp.find((option) => option.value === field.value)} // Show the selected employee correctly
-                              onChange={(selectedOption) => {
-                                // Update the form state when the selection changes
-                                field.onChange(selectedOption ? selectedOption.value : ""); // Update react-hook-form value
-
-                                // If an employee is selected, set their details
-                                const selectedEmp = emp.find(emp => emp.value === selectedOption?.value);
-                                if (selectedEmp) {
-                                  setSelectedEmployee(selectedEmp); // Store the selected employee
-                                  setValue("employeeName", selectedEmp.employeeName); // Update other form fields
-                                  setValue("designationName", selectedEmp.designationName);
-                                  setValue("departmentName", selectedEmp.departmentName);
-                                  setValue("dateOfHiring", selectedEmp.dateOfHiring);
-                                }
-                              }}
+                              value={emp.find(option => option.value === field.value) || null} // Handle clearing
+                              onChange={handleEmployeeChange}
                               placeholder="Select Employee Name"
                             />
                           )}

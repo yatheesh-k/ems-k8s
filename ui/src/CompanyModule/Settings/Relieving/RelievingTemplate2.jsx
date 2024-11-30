@@ -34,7 +34,7 @@ const RelievingTemplate2 = ({
           right: '30%',
           width: '50%',
           height: '40%',
-          backgroundImage: `url(${logoFileName})`, // Use the logo or another image
+          backgroundImage: `url(${companyLogo})`, // Use the logo or another image
           transform: 'rotate(340deg)',
           backgroundSize: 'contain',
           backgroundRepeat: 'no-repeat',
