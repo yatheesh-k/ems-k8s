@@ -198,6 +198,7 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public ResponseEntity<?> updateCompanyImageById(String companyId,  CompanyImageUpdate companyImageUpdate, MultipartFile multipartFile) throws EmployeeException, IOException {
         CompanyEntity user;
+        List<String> allowedFileTypes = Arrays.asList(Constants.IMAGE_JPG, Constants.IMAGE_PNG, Constants.IMAGE_SVG);
         try {
             user = openSearchOperations.getCompanyById(companyId, null, Constants.INDEX_EMS);
             if (user == null) {
@@ -212,6 +213,13 @@ public class CompanyServiceImpl implements CompanyService {
 
         CompanyEntity entity = CompanyUtils.maskCompanyImageUpdateProperties(user, companyImageUpdate, companyId);
         if (!multipartFile.isEmpty()){
+            // Validate file type
+            String contentType = multipartFile.getContentType();
+
+            if (!allowedFileTypes.contains(contentType)) {
+                // Return an error response if file type is invalid
+                throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_IMAGE), HttpStatus.BAD_REQUEST);
+            }
             multiPartFileStore(multipartFile, entity);
         }
         openSearchOperations.saveEntity(entity, companyId, Constants.INDEX_EMS);
