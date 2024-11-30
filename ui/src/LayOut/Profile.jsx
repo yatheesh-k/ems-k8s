@@ -50,48 +50,39 @@ function Profile() {
 
   const handleDetailsSubmit = async (data) => {
     if (!user.companyId) return;
-
     const updateData = {
       companyAddress: data.companyAddress,
       mobileNo: data.mobileNo,
-      landNo: data.landNo,
+      alternateNo: data.alternateNo,
       name: data.name,
       personalMailId: data.personalMailId,
       personalMobileNo: data.personalMobileNo,
       address: data.address
     };
-
     try {
       // Attempt to update company details
       await companyUpdateByIdApi(user.companyId, updateData);
-
       // Clear any previous error message
       setErrorMessage("");
       setError(null);
-
       // If the update is successful, show success message
       setSuccessMessage("Profile Updated Successfully.");
       toast.success("Company Details Updated Successfully");
-
       // Redirect to main page
       navigate("/main");
     } catch (err) {
       // Log the error to the console
       console.error("Details update error:", err);
-
       // Clear any previous success message
       setSuccessMessage("");
-
       // Set the error message and display error notification
       setErrorMessage("Failed To Update Profile Details.");
       setError(err);
-
-      // Show error notification
-      toast.error("Failed To Update Company Details");
+      const errorMessage = err?.response?.data?.message || "An error occurred";
+      // Show error notification with the error message from the API
+      toast.error(errorMessage);
     }
   };
-
-
 
   const handleLogoSubmit = async () => {
     if (!user.companyId) return;

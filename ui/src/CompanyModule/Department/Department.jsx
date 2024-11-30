@@ -182,8 +182,8 @@ const Department = () => {
     }
 
     // Allow alphabetic characters, numbers, spaces, and some special characters like /, !, @, #, &...
-    else if (!/^[A-Za-z/]+$/.test(trimmedValue)) {
-      return "Only Alphabetic Characters and '/' are Allowed.";
+    else if (!/^[A-Za-z\s/]+$/.test(trimmedValue)) {
+      return "Only Alphabetic Characters, Spaces, and '/' are Allowed.";
     } else {
       const words = trimmedValue.split(" ");
 

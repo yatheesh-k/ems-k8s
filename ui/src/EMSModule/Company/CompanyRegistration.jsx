@@ -382,31 +382,45 @@ const CompanyRegistration = () => {
   const validateName = (value) => {
     if (!value || value.trim().length === 0) {
       return "Company Name is Required.";
-    } else if (!/^[A-Za-z\s,.'\-/]*$/.test(value)) {
-      return "Field accepts only alphabets and special characters:( , ' -  . /)";
-    } else {
-      const words = value.split(" "); 
-        for (const word of words) {
-          if (word.length < 1) {
-            return "Minimum Length 1 Characters Required.";  // If any word is shorter than 2 characters, return this message
-          } else if (word.length > 100) {
-            return "Max Length 100 Characters Exceed.";  // If any word is longer than 40 characters, return this message
-          }
-        }
-      
-      if (/^\s|\s$/.test(value)) {
-        return "No Leading or Trailing Spaces Allowed.";
-      } else if (/\s{2,}/.test(value)) {
-        return "No Multiple Spaces Between Words Allowed.";
-      }
-      // Check if there's a space after the last character in the input string
-    if (/\s$/.test(value)) {
-      return "No Trailing Space Allowed.";  // Space after the last character is not allowed
     }
+  
+    // Check for leading or trailing spaces first
+    if (/^\s/.test(value)) {
+      return "Leading space not allowed.";  // Leading space error
+    } else if (/\s$/.test(value)) {
+      return "Spaces at the end are not allowed.";  // Trailing space error
+    }
+  
+    // Check for multiple spaces between words
+    if (/\s{2,}/.test(value)) {
+      return "No Multiple Spaces Between Words Allowed.";
+    }
+  
+    // Validate special characters and alphabets
+    if (!/^[A-Za-z\s,.'\-/]*$/.test(value)) {
+      return "Field accepts only alphabets and special characters: ( , ' - . /)";
+    }
+  
+    // Check word lengths (min 2 and max 100 characters)
+    const words = value.split(" ");
+    for (const word of words) {
+      // Allow single character word if it's a valid word
+      if (word.length === 1 && /^[A-Za-z]$/.test(word)) {
+        continue; // Skip the length check for valid single-character words
+      }
+  
+      // Check minimum word length
+      if (word.length < 2) {
+        return "Minimum Length 2 Characters Required.";  // If any word is shorter than 2 characters
+      } else if (word.length > 100) {
+        return "Max Length 100 Characters Exceed.";  // If any word is longer than 100 characters
+      }
     }
   
     return true; // Return true if all conditions are satisfied
   };
+  
+  
   const validatePAN = (value) => {
     const spaceError = "Spaces are not allowed in the PAN Number.";
     const patternError = "Invalid PAN Number format";
@@ -609,7 +623,7 @@ const CompanyRegistration = () => {
                         {...register("emailId", {
                           required: "Company Email Id is Required",
                           pattern: {
-                            value: /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                            value: /^(?![0-9]+@)[a-z0-9._%+-]+@[a-z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid email format",
                           },
                         })}
@@ -739,7 +753,7 @@ const CompanyRegistration = () => {
                               },
                               pattern: {
                                 value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                                message: "Mobile Number must be exactly 10 Numbers.",
+                                message: "Mobile Number is Required.",
                               },
                             })}
                           />
@@ -1027,7 +1041,7 @@ const CompanyRegistration = () => {
                         {...register("personalMailId", {
                           required: "Personal Email Id is Required",
                           pattern: {
-                            value: /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                            value: /^(?![0-9]+@)[a-z0-9._%+-]+@[a-z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid Email Format ",
                           },
                         })}

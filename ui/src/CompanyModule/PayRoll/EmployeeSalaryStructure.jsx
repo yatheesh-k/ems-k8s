@@ -14,7 +14,7 @@ const EmployeeSalaryStructure = () => {
     register,
     handleSubmit,
     setValue,
-    reset,
+    reset,getValues,
     formState: { errors },
   } = useForm({ mode: 'onChange' });
   const { user } = useAuth();
@@ -44,6 +44,7 @@ const EmployeeSalaryStructure = () => {
   const [pfEmployer, setPfEmployer] = useState(0);
   const [travelAllowance, setTravelAllowance] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
+  const [totalEarnings, setTotalEarnings] = useState(0);  // Define state for total earnings
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("Active");
   const [isReadOnly, setIsReadOnly] = useState(false);
@@ -187,59 +188,114 @@ const EmployeeSalaryStructure = () => {
     return total;
   };
 
-  const handleAllowanceChange = (key, value) => {
-    // Validation for percentage-related fields (maximum 4 characters, including '%')
+  const handleAllowanceChange = (allowance, value) => {
+    // Validation for percentage or numeric values
     if (value.endsWith('%')) {
+      const numericValue = value.slice(0, -1); // Remove the '%' symbol
+      if (numericValue.startsWith('-')) {
+        setErrorMessage("Percentage value cannot be negative.");
+        return;
+      }
+      if (numericValue && parseFloat(numericValue) > 100) {
+        setErrorMessage("Percentage value cannot exceed 100%.");
+        return;
+      }
       if (value.length > 4) {
         setErrorMessage("Percentage value cannot exceed 4 characters (including '%').");
-        return; // If the value exceeds 4 characters (e.g., 100%, 150%), prevent change
-      }
-      // Check for negative percentage values
-      if (value.startsWith('-')) {
-        setErrorMessage("Percentage value cannot be negative.");
-        return; // Prevent the change if the value is negative
+        return;
       }
     }
-
-    // Validation for number-related fields (maximum 10 digits)
+  
     if (!value.endsWith('%')) {
-      const numericValue = value.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+      const numericValue = value.replace(/[^0-9]/g, ''); // Allow only numbers
       if (numericValue.length > 10) {
         setErrorMessage("Numeric value cannot exceed 10 digits.");
-        return; // Prevent further input if the length exceeds 10 digits
+        return;
       }
       if (parseFloat(value) < 0) {
         setErrorMessage("Allowance value cannot be negative.");
-        return; // Prevent deduction if value is negative
+        return;
       }
     }
-    setErrorMessage("");
-
-    const newAllowances = { ...allowances, [key]: value };
-    setAllowances(newAllowances);
-
-    const totalAllow = calculateTotalAllowances(newAllowances);
-    const newOtherAllowances = grossAmount - totalAllow;
-
-    // Check for errors
-    if (newOtherAllowances < 0) {
-      setErrorMessage("Total allowances exceed gross amount. Please adjust allowances.");
-      setIsSubmitDisabled(true); // Disable the button
-    } else {
-      setErrorMessage(""); // Clear error message if valid
-      setIsSubmitDisabled(false); // Enable the button
+  
+    setErrorMessage("");  // Reset any previous error message
+  
+    // Update the specific allowance value in the form state
+    const oldAllowanceValue = getValues(`allowances.${allowance}`);
+    setValue(`allowances.${allowance}`, value);
+  
+    // Recalculate total earnings based on the new allowances
+    const currentAllowances = getValues("allowances");  // Get current allowances from form state
+    const newTotalEarnings = calculateTotalEarningsFromAllowances(currentAllowances, grossAmount);
+    console.log("New Total Earnings:", newTotalEarnings);
+  
+    // Check if total earnings exceed gross amount
+    if (newTotalEarnings > grossAmount) {
+      setErrorMessage("Total earnings cannot exceed the gross salary.");
+      return;
     }
-
-    // Update total allowances
-    const validOtherAllowances = Math.max(0, newOtherAllowances);
-    setTotalAllowances(totalAllow + validOtherAllowances);
-
-    setAllowances((prevAllowances) => ({
-      ...prevAllowances,
-      otherAllowances: validOtherAllowances.toFixed(2),
-    }));
+  
+    // Set the total earnings after validation
+    setTotalEarnings(newTotalEarnings);
+  
+    // Calculate the total sum of all allowances (excluding 'otherAllowances')
+    let totalAllowancesExcludingOther = 0;
+  
+    Object.keys(currentAllowances).forEach((key) => {
+      if (key !== 'otherAllowances') {
+        const allowanceValue = currentAllowances[key];
+        // If it's a percentage, convert to numeric value
+        if (typeof allowanceValue === "string" && allowanceValue.includes("%")) {
+          totalAllowancesExcludingOther += (parseFloat(allowanceValue) / 100) * grossAmount;
+        } else {
+          totalAllowancesExcludingOther += parseFloat(allowanceValue) || 0;
+        }
+      }
+    });
+  
+    // Calculate the remaining amount for "Other Allowance"
+    let remainingOtherAllowance = grossAmount - totalAllowancesExcludingOther;
+  
+    // If the total is less than zero (which shouldn't happen), set it to 0
+    remainingOtherAllowance = remainingOtherAllowance < 0 ? 0 : remainingOtherAllowance;
+  
+    // Calculate the difference between old and new allowance value
+    let difference = parseFloat(value) - parseFloat(oldAllowanceValue);
+  
+    // If the allowance is increased, subtract from `otherAllowances`
+    if (difference > 0) {
+      remainingOtherAllowance = Math.max(0, remainingOtherAllowance - difference);
+    } 
+  
+    // If the allowance is decreased, add the difference to `otherAllowances`
+    if (difference < 0) {
+      remainingOtherAllowance += Math.abs(difference);  // Add the difference (positive value)
+    }
+  
+    // Ensure `otherAllowances` doesn't go negative
+    const adjustedOtherAllowance = Math.max(0, remainingOtherAllowance);
+  
+    // Debugging: log the remaining other allowance
+    console.log("Adjusted Other Allowance: ", adjustedOtherAllowance);
+  
+    // Update the "otherAllowances" field with the adjusted value
+    setValue("allowances.otherAllowances", adjustedOtherAllowance.toFixed(2));  // Ensure it's in the correct format
   };
 
+  const calculateTotalEarningsFromAllowances = (allowances, grossAmount) => {
+    let total = 0;
+    Object.keys(allowances).forEach((key) => {
+      const allowanceValue = allowances[key];
+
+      if (typeof allowanceValue === "string" && allowanceValue.includes("%")) {
+        total += (parseFloat(allowanceValue) / 100) * grossAmount;
+      } else {
+        total += parseFloat(allowanceValue) || 0;
+      }
+    });
+    return total;
+  };
+  
   useEffect(() => {
     const totalAllow = calculateTotalAllowances();
     const newOtherAllowances = grossAmount - totalAllow;

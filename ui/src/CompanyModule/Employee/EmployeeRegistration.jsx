@@ -855,7 +855,7 @@ const EmployeeRegistration = () => {
                         {...register("emailId", {
                           required: "Email Id is Required",
                           pattern: {
-                            value: /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                            value: /^(?![0-9]+@)[a-z0-9._%+-]+@[a-z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid Email Format",
                           },
                         })}
@@ -1121,7 +1121,7 @@ const EmployeeRegistration = () => {
                             },
                             correctLength: (value) => {
                               if (value.length !== 14) {
-                                return "Mobile Number must be exactly 10 Numbers.";
+                                return "Mobile Number is Required.";
                               }
                               return true;
                             },
