@@ -1,16 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import Select from "react-select";
-import LayOut from "../../LayOut/LayOut";
-import {
-  EmployeeSalaryGetApiById,
-  EmployeeSalaryPatchApiById,
-} from "../../Utils/Axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Controller, useForm } from "react-hook-form";
-import { useAuth } from "../../Context/AuthContext";
+import { EmployeeSalaryGetApiById, EmployeeSalaryPatchApiById } from "../Utils/Axios";
+import LayOut from "../LayOut/LayOut";
+import { useAuth } from "../Context/AuthContext";
+import { userId } from "../Utils/Auth";
 
-const EmployeeSalaryUpdate = () => {
+const EmployeeSalaryView = () => {
   const {
     register,
     control,
@@ -23,7 +21,7 @@ const EmployeeSalaryUpdate = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const salaryId = queryParams.get("salaryId");
-  const id = queryParams.get("employeeId");
+  const userId = queryParams.get("employeeId");
   const [totalTax, setTotalTax] = useState("");
   const [employes, setEmployes] = useState([]);
   const [salaryStructure, setSalaryStructure] = useState(0);
@@ -58,17 +56,17 @@ const EmployeeSalaryUpdate = () => {
   const debounceTimerRef = useRef(null);
 
   useEffect(() => {
-    if (id && salaryId) {
+    if (userId && salaryId) {
       setShowFields(true);
     } else {
       setShowFields(false);
     }
-  }, [id, salaryId]);
+  }, [userId, salaryId]);
 
   useEffect(() => {
-    if (id && salaryId) {
+    if (userId && salaryId) {
       // Fetch employee salary data first
-      EmployeeSalaryGetApiById(id, salaryId)
+      EmployeeSalaryGetApiById(userId, salaryId)
         .then((response) => {
           const data = response.data.data;
 
@@ -90,7 +88,7 @@ const EmployeeSalaryUpdate = () => {
           }
 
           // Now, fetch salary structures using the salaryId
-          return EmployeeSalaryGetApiById(id, salaryId); // Reuse the same API or make a new call as needed
+          return EmployeeSalaryGetApiById(userId, salaryId); // Reuse the same API or make a new call as needed
         })
         .then((response) => {
           const salaryData = response?.data?.data;
@@ -133,7 +131,7 @@ const EmployeeSalaryUpdate = () => {
     } else {
       setShowCards(false); // If id or salaryId is not present, hide the cards
     }
-  }, [id, salaryId, setValue]); // Dependencies: re-run effect when `id` or `salaryId` changes
+  }, [userId, salaryId, setValue]); // Dependencies: re-run effect when `id` or `salaryId` changes
 
   const calculateTotalDeductions = () => {
     let total = 0;
@@ -344,7 +342,7 @@ const EmployeeSalaryUpdate = () => {
   }, [totalAllowances, totalDeductions, totalTax]);
 
   useEffect(() => {
-    if (salaryId && id) {
+    if (salaryId && userId) {
       setValue("variableAmount", variableAmount);
       setValue("fixedAmount", fixedAmount);
       setValue("hra", hra);
@@ -361,7 +359,7 @@ const EmployeeSalaryUpdate = () => {
     pfEmployee,
     pfEmployer,
     salaryId,
-    id,
+    userId,
     setValue,
   ]);
 
@@ -659,7 +657,7 @@ const EmployeeSalaryUpdate = () => {
                           <input
                             type="text"
                             className="form-control"
-                            readOnly={isOtherAllowanceReadOnly}
+                            readOnly
                             value={allowanceValue}
                             onChange={(e) => {
                               // Allow only numbers and '%' characters
@@ -727,6 +725,7 @@ const EmployeeSalaryUpdate = () => {
                           }
                           onChange={(val) => field.onChange(val.value)}
                           placeholder="Select Status"
+                          isDisabled={true}
                         />
                       )}
                     />
@@ -779,6 +778,7 @@ const EmployeeSalaryUpdate = () => {
                             type="text"
                             className="form-control"
                             value={deductions[key]}
+                            readOnly
                             onChange={(e) => {
                               // Allow only numbers and '%' characters
                               const newValue = e.target.value.replace(
@@ -814,6 +814,7 @@ const EmployeeSalaryUpdate = () => {
                         type="text"
                         className="form-control"
                         value={pfTax}
+                        readOnly
                         maxLength={10}
                         onChange={handlePfTaxChange}
                       />
@@ -826,6 +827,7 @@ const EmployeeSalaryUpdate = () => {
                         type="text"
                         className="form-control"
                         value={incomeTax}
+                        readOnly
                         maxLength={10}
                         onChange={handleIncomeTaxChange}
                       />
@@ -867,30 +869,8 @@ const EmployeeSalaryUpdate = () => {
                     </div>
                   </div>
                 </div>
-
-                <div className="text-end">
-                  <button
-                    type="submit"
-                    className="btn btn-danger"
-                    disabled={!!errorMessage}
-                  >
-                    Update
-                  </button>
-                </div>
               </div>
             </div>
-            {error && (
-              <div
-                className="error-message"
-                style={{
-                  color: "red",
-                  marginBottom: "10px",
-                  textAlign: "center",
-                }}
-              >
-                <b>{error}</b>
-              </div>
-            )}
           </div>
         </form>
       </div>
@@ -898,4 +878,4 @@ const EmployeeSalaryUpdate = () => {
   );
 };
 
-export default EmployeeSalaryUpdate;
+export default EmployeeSalaryView;

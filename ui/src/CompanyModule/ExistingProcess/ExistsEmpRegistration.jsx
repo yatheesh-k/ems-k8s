@@ -161,13 +161,19 @@ const validateRelievingDate = (value) => {
 
   const handleConfirmSubmission = async () => {
     const employeeId = previewData.id;
+  
     try {
-      // Assuming submissionData contains the necessary data to be posted
+      // Step 1: First, make the API call to submit the form data (RelievingFormPostApi)
       const response = await RelievingFormPostApi(employeeId, submissionData);
   
-      const TIMEOUT_DURATION = 5000; // 5 seconds timeout for download
+      // Display success message for form submission
+      toast.success(response.data.message);
   
-      // Create a timeout promise that rejects after the timeout duration
+      // Step 2: After a 30-second delay, trigger the download API call
+      const TIMEOUT_DURATION = 1000; // 5 seconds timeout for download
+      const DOWNLOAD_DELAY = 1000; // 5 seconds delay before downloading the relieving letter
+  
+      // Create a timeout promise that rejects after the timeout duration for download
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Relieving letter download timed out')), TIMEOUT_DURATION)
       );
@@ -178,6 +184,10 @@ const validateRelievingDate = (value) => {
       // Function to ensure the timeout promise doesn't trigger after download finishes
       const wrappedRelievingDownload = async () => {
         try {
+          // Delay the execution of the download API call by 30 seconds
+          await new Promise((resolve) => setTimeout(resolve, DOWNLOAD_DELAY));  // 30 second delay
+  
+          // Now, call the download API after the delay
           const downloadResponse = await RelievingLetterDownload(employeeId);
           downloadCompleted = true;  // Mark download as completed
           return downloadResponse;   // Return the download response if successful
@@ -186,7 +196,7 @@ const validateRelievingDate = (value) => {
         }
       };
   
-      // Race between the download API call and the timeout
+      // Step 3: Race between the download API call and the timeout
       const downloadResponse = await Promise.race([
         wrappedRelievingDownload(),  // This wraps the download call to handle success/failure
         timeoutPromise               // Timeout after the specified duration
@@ -195,11 +205,10 @@ const validateRelievingDate = (value) => {
       // If download completed successfully, proceed
       if (downloadCompleted) {
         // Handle success responses
-        toast.success(response.data.message);
         if (downloadResponse && downloadResponse.data) {
           toast.success(downloadResponse.data.message);
         }
-        
+  
         // Reset and navigate after success
         setShowPreview(true);
         reset();
@@ -211,7 +220,7 @@ const validateRelievingDate = (value) => {
   
       // Add more specific error handling for the download
       if (error.message && error.message.includes('timed out')) {
-        toast.error('The download took too long, please try again later.');
+        // toast.error('The download took too long, please try again later.');
       } else if (error.response) {
         // Handle known error responses
         handleError(error);
@@ -221,6 +230,7 @@ const validateRelievingDate = (value) => {
       }
     }
   };
+  
 
   const handleError = (errors) => {
     let errorMessage = "An Error Occurred!"; // Default error message

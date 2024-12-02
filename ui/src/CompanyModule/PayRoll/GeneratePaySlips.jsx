@@ -159,7 +159,7 @@ const GeneratePaySlip = () => {
     } catch (error) {
       setTemplateAvailable(false);
       console.error("API fetch error:", error);
-      toast.error("Failed to fetch payslip templates. Please try again.");
+      // toast.error("Failed to fetch payslip templates. Please try again.");
     }
   };
   const handleEditClick = (employeeId, payslipId, month, year) => {
