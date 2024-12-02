@@ -55,8 +55,8 @@ public class ResourceIdUtils {
     public static String generateSalaryConfigurationResourceId(String companyName, String timestamp) {
         return generateGlobalResourceId(ResourceType.SALARY_STRUCTURE, companyName, timestamp);
     }
-    public static String generateRelievingId(String companyName, String relievingDate) {
-        return generateGlobalResourceId(ResourceType.RELIEVING, companyName, relievingDate);
+    public static String generateRelievingId(String companyName, String relievingDate, String resignationDate) {
+        return generateGlobalResourceId(ResourceType.RELIEVING, companyName, relievingDate,resignationDate);
     }
 
     /**
