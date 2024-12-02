@@ -126,17 +126,17 @@ const EmployeeRegistration = () => {
     const input = e.target;
     let value = input.value;
     const cursorPosition = input.selectionStart; // Save the cursor position
-  
+
     // Remove leading spaces
     value = value.replace(/^\s+/g, '');
-  
+
     // Ensure only allowed characters (alphabets, numbers, and some special chars)
     const allowedCharsRegex = /^[a-zA-Z\s]+$/;
     value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
-  
+
     // Capitalize the first letter of each word
     const words = value.split(' ');
-  
+
     // Capitalize the first letter of each word and leave the rest of the characters as they are
     const capitalizedWords = words.map(word => {
       if (word.length > 0) {
@@ -145,18 +145,18 @@ const EmployeeRegistration = () => {
       }
       return '';
     });
-  
+
     // Join the words back into a string
     let formattedValue = capitalizedWords.join(' ');
-  
+
     // Remove spaces not allowed (before the first two characters)
     if (formattedValue.length > 1) {
       formattedValue = formattedValue.slice(0, 1) + formattedValue.slice(1).replace(/\s+/g, ' ');
     }
-  
+
     // Update input value
     input.value = formattedValue;
-  
+
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
@@ -495,21 +495,28 @@ const EmployeeRegistration = () => {
       return "Field is Required.";
     }
 
-    // Allow alphabetic characters, numbers, spaces, and the / character
+    // Allow alphabetic characters, spaces, and numbers
     else if (!/^[A-Za-z\s]+$/.test(trimmedValue)) {
       return "Only Alphabetic Characters are Allowed.";
     } else {
       const words = trimmedValue.split(" ");
 
-      // Check for minimum and maximum word length
-      for (const word of words) {
-        if (word.length < 3) {
-          return "Minimum Length 3 Character Required.";  // If any word is shorter than 1 character
-        } else if (word.length > 100) {
-          return "Max Length 100 Characters Required.";  // If any word is longer than 40 characters
+      // Check for minimum and maximum word length, allowing one-character words at the end
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+
+        // If the word length is less than 3 and it's not the last word, show error
+        if (word.length < 3 && i !== words.length - 1) {
+          return "Minimum Length 3 Characters Required.";
+        }
+
+        // Check maximum word length
+        if (word.length > 100) {
+          return "Max Length 100 Characters Exceeded.";
         }
       }
 
+      // Check for trailing and leading spaces
       if (/\s$/.test(value)) {
         return "Spaces at the end are not allowed.";  // Trailing space error
       } else if (/^\s/.test(value)) {
@@ -810,9 +817,9 @@ const EmployeeRegistration = () => {
                         onKeyDown={handleEmailChange}
                         {...register("firstName", {
                           required: "First Name is Required",
-                         validate:{
-                          validateFirstName
-                         }
+                          validate: {
+                            validateFirstName
+                          }
                         })}
                       />
                       {errors.firstName && (
@@ -834,7 +841,7 @@ const EmployeeRegistration = () => {
                         onKeyDown={handleEmailChange}
                         {...register("lastName", {
                           required: "Last Name is Required",
-                          validate:{validateName}
+                          validate: { validateName }
                         })}
                       />
                       {errors.lastName && (
@@ -850,7 +857,7 @@ const EmployeeRegistration = () => {
                         placeholder="Enter Email Id"
                         name="emailId"
                         autoComplete="off"
-                       // onInput={toInputEmailCase}
+                        // onInput={toInputEmailCase}
                         onKeyDown={handleEmailChange}
                         {...register("emailId", {
                           required: "Email Id is Required",
@@ -1130,6 +1137,10 @@ const EmployeeRegistration = () => {
                               return !isRepeating || "Mobile Number cannot consist of the same digit repeated.";
                             },
                           },
+                          pattern: {
+                            value: /^\+91\s[6-9]\d{9}$/, // Ensure it starts with +91, followed by a space, and then 6-9 and 9 more digits
+                            message: "Mobile Number is Required.",
+                          },
                         })}
                       />
                       {errors.mobileNo && (
@@ -1360,9 +1371,11 @@ const EmployeeRegistration = () => {
                       className="col-12 mt-4  d-flex justify-content-end"
                       style={{ background: "none" }}
                     >
-                      <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
-                        Clear
-                      </button>
+                      {!isUpdating && (
+                        <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
+                          Clear
+                        </button>
+                      )}
                       <button
                         className={
                           isUpdating

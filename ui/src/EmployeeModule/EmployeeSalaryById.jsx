@@ -9,6 +9,7 @@ const EmployeeSalaryById = () => {
   const [employeeSalaryView, setEmployeeSalaryView] = useState([]);
   const [expanded, setExpanded] = useState({});
   const location = useLocation();
+  const navigate = useNavigate();
  
   const toggleExpand = (index) => {
     setExpanded(prevState => ({ ...prevState, [index]: !prevState[index] }));
@@ -21,6 +22,11 @@ const EmployeeSalaryById = () => {
       });
     }
   }, [userId]);
+
+  const handleEditClick = (salaryId, event) => {
+    event.stopPropagation(); // Prevent the card from toggling when editing
+    navigate(`/employeeSalaryView?salaryId=${salaryId}&employeeId=${userId}`); // Navigate with both parameters
+  };
 
   return (
     <LayOut>
@@ -45,7 +51,7 @@ const EmployeeSalaryById = () => {
         {employeeSalaryView.length > 0 ? (
           employeeSalaryView.map((item, index) => (
             <div key={index} className="card mb-3">
-              <div className="card-header d-flex justify-content-between align-items-center" onClick={() => toggleExpand(index)} style={{ cursor: 'pointer' }}>
+              <div className="card-header d-flex justify-content-between align-items-center"onClick={(e) => handleEditClick(item.salaryId, e)}>
                 <h5 style={{color:"#fff"}} className="mb-0"> {index + 1}. Net Salary: {item.netSalary}</h5>
                 <ChevronRight size={18} color='#fff' />
               </div>

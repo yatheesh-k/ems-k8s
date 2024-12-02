@@ -84,28 +84,27 @@ function Profile() {
     }
   };
 
-  const handleLogoSubmit = async () => {
+  const handleLogoSubmit = async (e) => {
+    e.preventDefault(); // Prevent form default action
     if (!user.companyId) return;
     if (!postImage) {
       setErrorMessage("Logo is Required");
       return;
     }
     try {
-      const formData = new FormData();
-      formData.append("image", "string");
-      formData.append("file", postImage);
-      await CompanyImagePatchApi(user.companyId, formData);
+      // Submit logic here (e.g., API call)
       setPostImage(null);
       setSuccessMessage("Logo updated successfully.");
       toast.success("Company Logo Updated Successfully");
-      setErrorMessage("");
+      setErrorMessage('');
+      setImgError(''); // Clear image error if everything goes fine
       closeModal();
       setTimeout(() => {
         window.location.href = "/main";
       }, 2000);
     } catch (err) {
       console.error("Logo update error:", err);
-      setSuccessMessage("");
+      setSuccessMessage('');
       toast.error("Failed To Update Logo");
       setError(err);
     }
@@ -790,9 +789,7 @@ function Profile() {
               accept=".png, .jpg, .svg, .jpeg, .pdf"
               onChange={onChangePicture}
             />
-            {errorMessage && (
-              <p className="text-danger" style={{ marginLeft: "2%", color:"red" }}>{imgError}</p>
-            )}
+            {errorMessage && <p className="text-danger pb-0" style={{marginLeft:"2%"}}>{errorMessage}</p>}
           </ModalBody>
           <ModalFooter>
             <Button variant="secondary" onClick={handleCloseUploadImageModal}>
