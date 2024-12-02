@@ -22,13 +22,6 @@
             z-index: 2;
         }
 
-        .company-logo {
-            max-width: 150px;
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-
         .title {
             text-align: center;
             margin-top: 2rem;
@@ -62,8 +55,11 @@
 <body>
 
     <!-- Company Logo -->
-    <img src="${company[0].imageFile}" alt="Company Logo" class="company-logo" />
-
+        <div class="logo">
+                 <#if company[0].imageFile?has_content>
+                 <img style="height: 70px; width: 160px;" src="${company[0].imageFile}" alt="Company Logo" />
+                 </#if>
+             </div>
     <!-- Letter Content -->
     <div class="container">
         <p><strong>Date: ${relieving.relievingDate}</strong></p>
