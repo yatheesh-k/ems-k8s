@@ -58,7 +58,7 @@ public class RelievingServiceImpl implements RelievingService {
                                         .getMessage(EmployeeErrorMessageKey.EMPLOYEE_NOT_FOUND)))),
                         HttpStatus.NOT_FOUND);
             }
-            String relievingId = ResourceIdUtils.generateRelievingId(employeeId, request.getRelievingDate());
+            String relievingId = ResourceIdUtils.generateRelievingId(employeeId, request.getRelievingDate(),request.getResignationDate());
             relievingEntity = openSearchOperations.getRelievingById(relievingId, null, index);
             if (relievingEntity != null) {
                 log.error("The Relieving for the employee is already exist {}", employeeId);
