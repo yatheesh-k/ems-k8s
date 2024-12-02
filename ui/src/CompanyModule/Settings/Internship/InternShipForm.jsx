@@ -251,9 +251,9 @@ const InternShipForm = () => {
             <div className="container-fluid p-0">
               <div className="row justify-content-center">
                 <div className="col-8 text-center mt-5">
-                  <h2>No Intenrship Template Available</h2>
-                  <p>To set up the Intenrship templates before proceeding, Please select the Template from Settings <a href="/internsTemplates">Intenship Templates </a></p>
-                  <p>Please contact the administrator to set up the Intenrship templates before proceeding.</p>
+                  <h2>No Internship Template Available</h2>
+                  <p>To set up the Internship templates before proceeding, Please select the Template from Settings <a href="/internsTemplates">Internship Templates </a></p>
+                  <p>Please contact the administrator to set up the Internship templates before proceeding.</p>
                 </div>
               </div>
             </div>
@@ -266,7 +266,7 @@ const InternShipForm = () => {
         <div className="row d-flex align-items-center justify-content-between mt-1">
           <div className="col">
             <h1 className="h3">
-              <strong>Intenrship Form</strong>
+              <strong>Internship Form</strong>
             </h1>
           </div>
           <div className="col-auto">
@@ -275,7 +275,7 @@ const InternShipForm = () => {
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
-                <li className="breadcrumb-item active">Intenrship Experience</li>
+                <li className="breadcrumb-item active">Internship Experience</li>
               </ol>
             </nav>
           </div>
@@ -285,7 +285,7 @@ const InternShipForm = () => {
             <div className="card">
               <div className="card-header">
                 <h5 className="card-title">
-                  {isUpdating ? "Employee Intenrship Data" : "Employee Intenrship Form"}
+                  {isUpdating ? "Employee Internship Data" : "Employee Internship Form"}
                 </h5>
               </div>
               <form onSubmit={handleSubmit(onSubmit)}>

@@ -169,25 +169,25 @@ const CompanyRegistration = () => {
   };
 
   const clearForm = () => {
-    //setCompanyType("");  
+    setCompanyType("");
     reset();
-   // setEditMode(true);  // Optionally, if you want to reset edit mode
+    // setEditMode(true);  // Optionally, if you want to reset edit mode
   };
   const toInputTitleCase = (e) => {
     const input = e.target;
     let value = input.value;
     const cursorPosition = input.selectionStart; // Save the cursor position
-  
+
     // Remove leading spaces
     value = value.replace(/^\s+/g, '');
-  
+
     // Ensure only allowed characters (alphabets, numbers, and some special chars)
     const allowedCharsRegex = /^[a-zA-Z0-9\s!@#&()*/,.\\-]+$/;
     value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
-  
+
     // Capitalize the first letter of each word
     const words = value.split(' ');
-  
+
     // Capitalize the first letter of each word and leave the rest of the characters as they are
     const capitalizedWords = words.map(word => {
       if (word.length > 0) {
@@ -196,22 +196,22 @@ const CompanyRegistration = () => {
       }
       return '';
     });
-  
+
     // Join the words back into a string
     let formattedValue = capitalizedWords.join(' ');
-  
+
     // Remove spaces not allowed (before the first two characters)
     if (formattedValue.length > 3) {
       formattedValue = formattedValue.slice(0, 3) + formattedValue.slice(3).replace(/\s+/g, ' ');
     }
-  
+
     // Update input value
     input.value = formattedValue;
-  
+
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
-  
+
   const validatePassword = (value) => {
     const errors = [];
     if (!/(?=.*[0-9])/.test(value)) {
@@ -377,49 +377,63 @@ const CompanyRegistration = () => {
 
     return true; // Return true if all checks pass
   };
-  
+
   const validateName = (value) => {
-    if (!value || value.trim().length === 0) {
+    // Trim leading and trailing spaces
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue || trimmedValue.length === 0) {
       return "Company Name is Required.";
     }
-  
-    // Check for leading or trailing spaces first
+
+    // Check for leading or trailing spaces
     if (/^\s/.test(value)) {
-      return "Leading space not allowed.";  // Leading space error
+      return "Leading space not allowed."; // Leading space error
     } else if (/\s$/.test(value)) {
-      return "Spaces at the end are not allowed.";  // Trailing space error
+      return "Spaces at the end are not allowed."; // Trailing space error
     }
-  
+
     // Check for multiple spaces between words
     if (/\s{2,}/.test(value)) {
       return "No Multiple Spaces Between Words Allowed.";
     }
-  
-    // Validate special characters and alphabets
-    if (!/^[A-Za-z\s,.'\-/]*$/.test(value)) {
-      return "Field accepts only alphabets and special characters: ( , ' - . /)";
+
+    // Validate special characters and alphabets (including @, $, &, ())
+    const validCharsRegex = /^[A-Za-z\s,.'\-/&@$()]*$/;
+    if (!validCharsRegex.test(value)) {
+      return "Field accepts only alphabets and special characters: ( , ' - . / & @ $ ( ) )";
     }
-  
-    // Check word lengths (min 2 and max 100 characters)
-    const words = value.split(" ");
+
+    // Check word lengths (min 2 characters for alphabetic words)
+    const words = trimmedValue.split(" ");
+
     for (const word of words) {
-      // Allow single character word if it's a valid word
-      if (word.length === 1 && /^[A-Za-z]$/.test(word)) {
-        continue; // Skip the length check for valid single-character words
+      // Allow words that are only special characters (e.g., "-")
+      if (/^[\W]+$/.test(word)) {
+        continue; // Skip special characters only words
       }
-  
-      // Check minimum word length
-      if (word.length < 2) {
-        return "Minimum Length 2 Characters Required.";  // If any word is shorter than 2 characters
-      } else if (word.length > 100) {
-        return "Max Length 100 Characters Exceed.";  // If any word is longer than 100 characters
+
+      // If the word contains special characters (e.g., "dsad-@dsad"), it is valid
+      // Ensure at least 2 alphabetic characters before any special characters in a word
+      if (/^[A-Za-z]+[\W]*[A-Za-z]*$/.test(word)) {
+        continue; // Word contains at least 2 alphabetic characters with or without special characters
+      }
+
+      // If the word is alphabetic and has less than 2 characters, show error
+      if (/^[A-Za-z]+$/.test(word) && word.length < 2) {
+        return "Minimum Length 2 Characters Required."; // If any alphabetic word is shorter than 2 characters
+      }
+
+      // If the word exceeds 100 characters, show error
+      if (word.length > 100) {
+        return "Max Length 100 Characters Exceed."; // If any word is longer than 100 characters
       }
     }
-  
+
     return true; // Return true if all conditions are satisfied
   };
-  
-  
+
+
   const validatePAN = (value) => {
     const spaceError = "Spaces are not allowed in the PAN Number.";
     const patternError = "Invalid PAN Number format";
@@ -486,7 +500,7 @@ const CompanyRegistration = () => {
                 <div className="card-header ">
                   <div className="d-flex justify-content-start align-items-start">
                     <h5 className="card-title" style={{ marginBottom: "0px" }}>Company Type</h5>
-                    <span className="text-danger" style={{marginLeft:"10px"}}>
+                    <span className="text-danger" style={{ marginLeft: "10px" }}>
                       {errors.companyType && (
                         <p className="mb-0">{errors.companyType.message}</p>
                       )}
@@ -564,9 +578,14 @@ const CompanyRegistration = () => {
                         autoComplete="off"
                         {...register("companyName", {
                           required: "Company Name is Required",
-                          validate:{
+                          validate: {
                             validateName,
-                           },
+                          },
+                          minLength: {
+                            value: 2,
+                            message: "Minimum 2 Characters Required",
+
+                          },
                         })}
                         disabled={editMode}
                       />
@@ -574,7 +593,7 @@ const CompanyRegistration = () => {
                         <p className="errorMsg">{errors.companyName.message}</p>
                       )}
                     </div>
-                    <div className="col-lg-1"></div> 
+                    <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Service Name <span style={{ color: "red" }}>*</span>
@@ -667,6 +686,10 @@ const CompanyRegistration = () => {
                                   return !isRepeating || "Mobile Number cannot consist of the same digit repeated.";
                                 },
                               },
+                              pattern: {
+                                value: /^\+91\s[6-9]\d{9}$/, // Ensure it starts with +91, followed by a space, and then 6-9 and 9 more digits
+                                message: "Mobile Number must be a valid 10-digit number starting with 6, 7, 8, or 9.",
+                              },
                             })}
                           />
                           {errors.mobileNo && (
@@ -751,8 +774,8 @@ const CompanyRegistration = () => {
                                 },
                               },
                               pattern: {
-                                value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                                message: "Mobile Number is Required.",
+                                value: /^\+91\s[6-9]\d{9}$/, // Ensure it starts with +91, followed by a space, and then 6-9 and 9 more digits
+                                message: "Mobile Number must be a valid 10-digit number starting with 6, 7, 8, or 9.",
                               },
                             })}
                           />
@@ -797,8 +820,8 @@ const CompanyRegistration = () => {
                             },
                           },
                           pattern: {
-                            value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                            message: "Alternate Number is Required.",
+                            value: /^\+91\s[6-9]\d{9}$/, // Ensure it starts with +91, followed by a space, and then 6-9 and 9 more digits
+                            message: "Alternate Number must be a valid 10-digit number starting with 6, 7, 8, or 9.",
                           },
                         })}
                       />
@@ -1001,7 +1024,7 @@ const CompanyRegistration = () => {
                         type="text"
                         className="form-control"
                         placeholder="Enter Name"
-                       // onKeyDown={handleEmailChange}
+                        // onKeyDown={handleEmailChange}
                         onInput={toInputTitleCase}
                         autoComplete="off"
                         {...register("name", {
@@ -1035,7 +1058,7 @@ const CompanyRegistration = () => {
                         className="form-control"
                         placeholder="Enter Personal Email Id"
                         autoComplete="off"
-                       // onInput={toInputEmailCase}
+                        // onInput={toInputEmailCase}
                         onKeyDown={handleEmailChange}
                         {...register("personalMailId", {
                           required: "Personal Email Id is Required",
@@ -1086,8 +1109,8 @@ const CompanyRegistration = () => {
                             },
                           },
                           pattern: {
-                            value: /^\+91\s\d{10}$/, // Ensure it starts with +91, followed by a space and exactly 10 digits
-                            message: "Personal Mobile Number is Required.",
+                            value: /^\+91\s[6-9]\d{9}$/, // Ensure it starts with +91, followed by a space, and then 6-9 and 9 more digits
+                            message: "Personal Mobile Number must be a valid 10-digit number starting with 6, 7, 8, or 9.",
                           },
                         })}
                       />
@@ -1146,14 +1169,23 @@ const CompanyRegistration = () => {
               </div>
             )}
             <div className={`col-${errorMessage ? '3' : '12'} d-flex justify-content-end mt-1`}>
-              <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
-                Clear
-              </button>
+              {/* Conditionally render the "Clear" button only when not in editMode */}
+              {!editMode && (
+                <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
+                  Clear
+                </button>
+              )}
+
               <button
-                className={editMode ? "btn btn-danger btn-lg" : "btn btn-primary btn-lg"}
+                className={
+                  editMode
+                    ? "btn btn-danger bt-lg"
+                    : "btn btn-primary btn-lg"
+                }
+                style={{ marginRight: "85px" }}
                 type="submit"
               >
-                {editMode ? 'Update Company' : 'Submit'}
+                {editMode ? "Update Company" : "Add Company"}{" "}
               </button>
             </div>
           </div>

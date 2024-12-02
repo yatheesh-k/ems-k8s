@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Select from "react-select";
 import LayOut from "../../LayOut/LayOut";
 import {
@@ -55,6 +55,7 @@ const EmployeeSalaryUpdate = () => {
   const [showCards, setShowCards] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const debounceTimerRef = useRef(null);
 
   useEffect(() => {
     if (id && salaryId) {
@@ -98,7 +99,11 @@ const EmployeeSalaryUpdate = () => {
           console.log("API Response for Salary Structure:", response);
 
           // Ensure that the salary data exists and has the necessary structure
-          if (!salaryData || typeof salaryData !== "object" || Object.keys(salaryData).length === 0) {
+          if (
+            !salaryData ||
+            typeof salaryData !== "object" ||
+            Object.keys(salaryData).length === 0
+          ) {
             setError("Employee Salary Structure is not defined");
             setSalaryStructure([]); // Clear salary structure if data is invalid
             return; // Exit early to avoid further errors
@@ -111,9 +116,9 @@ const EmployeeSalaryUpdate = () => {
           // Ensure that the status is "Active" before processing
           if (status === "Active") {
             setSalaryStructure([salaryData]); // Set the salary structure
-            setAllowances(allowances);         // Set the allowances
-            setDeductions(deductions);         // Set the deductions
-            setError("");                      // Clear error if everything is valid
+            setAllowances(allowances); // Set the allowances
+            setDeductions(deductions); // Set the deductions
+            setError(""); // Clear error if everything is valid
           } else {
             setError("Employee Salary Structure is not active");
           }
@@ -161,49 +166,61 @@ const EmployeeSalaryUpdate = () => {
   };
 
   const handleAllowanceChange = (key, newValue) => {
-    let validValue = newValue;
-
-    // Check if the value is a percentage
-    const isPercentage = newValue.includes("%");
-
-    // Handle percentage-specific validation
-    if (isPercentage) {
-      // Remove any non-numeric characters except for '%'
-      validValue = newValue.replace(/[^0-9%]/g, '');
-
-      // Limit to 1-2 digits before the '%' symbol
-      if (validValue.includes('%')) {
-        const digitsBeforePercentage = validValue.split('%')[0].slice(0, 2);
-        validValue = digitsBeforePercentage + '%';
+      let validValue = newValue;
+      const isPercentage = newValue.includes("%");
+      let errorMessage = "";
+      
+      // Check for non-numeric characters (excluding the '%' symbol)
+      if (!isPercentage && /[^0-9.-]/.test(newValue)) {
+          errorMessage = "Only numeric values are allowed.";
       }
-
-      // If more than 3 characters (e.g., "100%"), show an error message
-      if (validValue.length > 4) {
-        setErrorMessage("Percentage value should have up to 2 digits before '%'.");
-        return;
+  
+      // Handle percentage-specific validation
+      if (isPercentage) {
+          validValue = newValue.replace(/[^0-9%]/g, "");
+          if (validValue.includes("%")) {
+              const digitsBeforePercentage = validValue.split("%")[0].slice(0, 2);
+              validValue = digitsBeforePercentage + "%";
+          }
+          if (validValue.length > 4) {
+              errorMessage = "Percentage value should have up to 2 digits before '%'.";
+          }
+      } else {
+          if (validValue.length > 10) {
+              errorMessage = "Numeric value cannot exceed 10 digits.";
+          }
+          if (parseFloat(validValue) < 0) {
+              errorMessage = "Allowance value cannot be negative.";
+          }
       }
-    } else {
-      // For numeric fields, allow only digits and check for validity
-      if (validValue.length > 10) {
-        setErrorMessage("Numeric value cannot exceed 10 digits.");
-        return;
+  
+      // Update the allowances state only if there's no error
+      if (!errorMessage) {
+          setAllowances((prevAllowances) => ({
+              ...prevAllowances,
+              [key]: validValue,
+          }));
       }
-
-      // Allow negative values and zero (if needed)
-      if (parseFloat(validValue) < 0) {
-        setErrorMessage("Allowance value cannot be negative.");
-        return;
-      }
-
-      setErrorMessage(""); // Clear error if valid
+  
+      // Only update the error message if there's an error
+      setErrorMessage(errorMessage);
+  };
+  
+  // For useRef debouncing and preventing the blinking:
+  const inputValueRef = useRef("");
+  
+  const handleChangeWithDebounce = (key, newValue) => {
+    // Cancel the previous debounce timer
+    if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
     }
 
-    // Update the allowances state with the validated value
-    setAllowances((prevAllowances) => ({
-      ...prevAllowances,
-      [key]: validValue,
-    }));
-  };
+    // Set a new debounce timer
+    debounceTimerRef.current = setTimeout(() => {
+        handleAllowanceChange(key, newValue);
+    }, 500); // Debounce delay in milliseconds
+};
+  
 
   useEffect(() => {
     const totalAllow = calculateTotalAllowances();
@@ -229,67 +246,56 @@ const EmployeeSalaryUpdate = () => {
     }));
   }, [allowances, grossAmount]);
 
-  const handleDeductionChange = (key, newValue) => {
-    let validValue = newValue;
-
-    // Check if the value is a percentage
-    const isPercentage = newValue.includes("%");
-
-    // Handle percentage-specific validation
-    if (isPercentage) {
-      // Remove any non-numeric characters except for '%'
-      validValue = newValue.replace(/[^0-9%]/g, '');
-
-      // Limit to 1-2 digits before the '%' symbol
-      if (validValue.includes('%')) {
-        const digitsBeforePercentage = validValue.split('%')[0].slice(0, 2);
-        validValue = digitsBeforePercentage + '%';
-      }
-
-      // If more than 3 characters (e.g., "100%"), show an error message
-      if (validValue.length > 4) {
-        setErrorMessage("Percentage value should have up to 2 digits before '%'.");
-        return;
-      }
-
-      // Ensure that the percentage does not exceed 100%
-      const numericValue = parseFloat(validValue.slice(0, -1)); // Remove '%' and parse the number
-      if (numericValue > 100) {
-        setErrorMessage("Percentage value cannot exceed 100%.");
-        return;
-      }
-    } else {
-      // For numeric fields, allow only digits and check for validity
-      // Remove any non-numeric characters (except for the minus sign if negative)
-      validValue = validValue.replace(/[^0-9.-]/g, '');
-
-      // Ensure that the numeric value does not exceed 10 digits
-      if (validValue.length > 10) {
-        setErrorMessage("Numeric value cannot exceed 10 digits.");
-        return;
-      }
-
-      // Check for negative values if they are not allowed
-      if (parseFloat(validValue) < 0) {
-        setErrorMessage("Deduction value cannot be negative.");
-        return;
-      }
-
-      // Ensure it's a valid number
-      if (isNaN(parseFloat(validValue))) {
-        setErrorMessage("Invalid numeric value.");
-        return;
+  const handleDeductionChange = (key, value) => {
+    // Block alphabetic characters
+    if (/[a-zA-Z]/.test(value)) {
+      setErrorMessage("Alphabetic characters are not allowed.");
+      return; // Prevent the change if any alphabet is detected
+    }
+    // Ensure '%' is only allowed at the end and no characters are added after it
+    if (value.includes("%")) {
+      // Check if there are any characters after the '%' symbol
+      if (value.indexOf("%") !== value.length - 1) {
+        setErrorMessage("No values are allowed after '%'.");
+        return; // Prevent input if there's anything after '%'
       }
     }
-
-    // Clear any existing error message if the input is valid
+    // If there's a percentage symbol at the end, validate the percentage logic
+    if (value.endsWith("%")) {
+      const numericValue = value.slice(0, -1); // Remove '%' symbol to check the number part
+      if (numericValue && parseFloat(numericValue) > 100) {
+        setErrorMessage("Percentage value cannot exceed 100%.");
+        return; // Prevent the change if the value exceeds 100%
+      }
+      if (value.length > 4) {
+        setErrorMessage(
+          "Percentage value cannot exceed 4 characters (including '%')."
+        );
+        return; // Prevent the change if the length exceeds 4 characters (like 100%)
+      }
+      // Check for negative percentage values
+      if (numericValue.startsWith("-")) {
+        setErrorMessage("Percentage value cannot be negative.");
+        return; // Prevent the change if the value is negative
+      }
+    }
+    // Validation for numeric values (without '%')
+    if (!value.endsWith("%")) {
+      const numericValue = value.replace(/[^0-9]/g, ""); // Remove non-numeric characters
+      if (numericValue.length > 10) {
+        setErrorMessage("Numeric value cannot exceed 10 digits.");
+        return; // Prevent further input if the length exceeds 10 digits
+      }
+      if (parseFloat(value) < 0) {
+        setErrorMessage("Deduction value cannot be negative.");
+        return; // Prevent deduction if value is negative
+      }
+    }
+    // Clear error message if no issues
     setErrorMessage("");
-
-    // Update the deductions state with the validated value
-    setDeductions((prevDeductions) => ({
-      ...prevDeductions,
-      [key]: validValue,
-    }));
+    // Update the deductions state
+    const newDeductions = { ...deductions, [key]: value };
+    setDeductions(newDeductions);
   };
 
   useEffect(() => {
@@ -440,7 +446,8 @@ const EmployeeSalaryUpdate = () => {
       incomeTax: incomeTax,
       status: statusValue,
     };
-    const apiCall = () => EmployeeSalaryPatchApiById(employeeId, salaryId, dataToSubmit);
+    const apiCall = () =>
+      EmployeeSalaryPatchApiById(employeeId, salaryId, dataToSubmit);
 
     apiCall()
       .then((response) => {
@@ -500,7 +507,10 @@ const EmployeeSalaryUpdate = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title" style={{ marginBottom: "0px" }}> Salary Details </h5>
+                  <h5 className="card-title" style={{ marginBottom: "0px" }}>
+                    {" "}
+                    Salary Details{" "}
+                  </h5>
                 </div>
                 <div className="card-body" style={{ marginLeft: "20px" }}>
                   <div className="row">
@@ -606,7 +616,9 @@ const EmployeeSalaryUpdate = () => {
               <div className="col-6 mb-4">
                 <div className="card">
                   <div className="card-header">
-                    <h5 className="card-title" style={{ marginBottom: "0px" }}>Allowances</h5>
+                    <h5 className="card-title" style={{ marginBottom: "0px" }}>
+                      Allowances
+                    </h5>
                   </div>
                   <div className="card-body" style={{ paddingLeft: "20px" }}>
                     {errorMessage && (
@@ -618,7 +630,8 @@ const EmployeeSalaryUpdate = () => {
                       const allowanceValue = allowances[key];
                       const isPercentage = allowanceValue.includes("%");
                       let displayValue = allowanceValue;
-                      const isOtherAllowanceReadOnly = key === "otherAllowances";
+                      const isOtherAllowanceReadOnly =
+                        key === "otherAllowances";
                       // Folr numeric fields, we display them as whole numbers
                       if (!isPercentage) {
                         displayValue = Math.floor(allowanceValue);
@@ -648,7 +661,14 @@ const EmployeeSalaryUpdate = () => {
                             className="form-control"
                             readOnly={isOtherAllowanceReadOnly}
                             value={allowanceValue}
-                            onChange={(e) => handleAllowanceChange(key, e.target.value)}
+                            onChange={(e) => {
+                              // Allow only numbers and '%' characters
+                              const newValue = e.target.value.replace(
+                                /[^0-9%]/g,
+                                ""
+                              );
+                              handleAllowanceChange(key, newValue);
+                            }}
                             maxLength={isPercentage ? 4 : 10}
                           />
                           {/* {errorMessage && (
@@ -674,9 +694,11 @@ const EmployeeSalaryUpdate = () => {
                 <div className="card">
                   <div className="card-header">
                     <h5 className="card-title">Status</h5>
-
                   </div>
-                  <div className="card-body col-12" style={{ paddingLeft: "20px" }}>
+                  <div
+                    className="card-body col-12"
+                    style={{ paddingLeft: "20px" }}
+                  >
                     <label className="form-label">
                       Status<span style={{ color: "red" }}>*</span>
                     </label>
@@ -696,11 +718,11 @@ const EmployeeSalaryUpdate = () => {
                           value={
                             field.value
                               ? {
-                                value: field.value,
-                                label: ["Active", "InActive"].find(
-                                  (option) => option === field.value
-                                ),
-                              }
+                                  value: field.value,
+                                  label: ["Active", "InActive"].find(
+                                    (option) => option === field.value
+                                  ),
+                                }
                               : null
                           }
                           onChange={(val) => field.onChange(val.value)}
@@ -719,7 +741,9 @@ const EmployeeSalaryUpdate = () => {
               <div className="col-6 mb-4">
                 <div className="card">
                   <div className="card-header">
-                    <h5 className="card-title" style={{ marginBottom: "0px" }}>Deductions</h5>
+                    <h5 className="card-title" style={{ marginBottom: "0px" }}>
+                      Deductions
+                    </h5>
                   </div>
                   <div className="card-body" style={{ paddingLeft: "20px" }}>
                     {Object.keys(deductions).map((key) => {
@@ -755,7 +779,14 @@ const EmployeeSalaryUpdate = () => {
                             type="text"
                             className="form-control"
                             value={deductions[key]}
-                            onChange={(e) => handleDeductionChange(key, e.target.value)}
+                            onChange={(e) => {
+                              // Allow only numbers and '%' characters
+                              const newValue = e.target.value.replace(
+                                /[^0-9%]/g,
+                                ""
+                              );
+                              handleDeductionChange(key, newValue);
+                            }}
                             maxLength={isPercentage ? 4 : 10}
                           />
                           {/* {errorMessage && <p className="text-danger">{errorMessage}</p>} */}
@@ -817,7 +848,9 @@ const EmployeeSalaryUpdate = () => {
                 </div>
                 <div className="card">
                   <div className="card-header">
-                    <h5 className="card-title" style={{ marginBottom: "0px" }}>Net Salary</h5>
+                    <h5 className="card-title" style={{ marginBottom: "0px" }}>
+                      Net Salary
+                    </h5>
                   </div>
                   <div className="card-body" style={{ paddingLeft: "20px" }}>
                     <div className="mb-3">
@@ -860,8 +893,8 @@ const EmployeeSalaryUpdate = () => {
             )}
           </div>
         </form>
-      </div >
-    </LayOut >
+      </div>
+    </LayOut>
   );
 };
 
