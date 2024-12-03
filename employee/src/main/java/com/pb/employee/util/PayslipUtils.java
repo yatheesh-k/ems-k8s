@@ -635,6 +635,9 @@ public class PayslipUtils {
         // Convert annual gross salary to monthly salary for Basic Salary
         Double grossMonthlySalary = grossAmount / 12;
 
+        double totalAllowanceAnnual = 0.0;
+        double totalAllowanceMonthly = 0.0;
+
         // Calculate allowances and accumulate totals
         Map<String, String> allowances = salaryConfiguration.getAllowances();
         if (allowances != null) {
@@ -648,7 +651,21 @@ public class PayslipUtils {
                 allowanceData.put(Constants.MONTH, formatValue(String.valueOf(allowanceMonthlyValue)));
                 allowanceData.put(Constants.ANNUAL, formatValue(String.valueOf(allowanceAnnualValue)));
                 components.put(formatComponentName(entry.getKey()), allowanceData);
+
+                // Accumulate total allowances
+                totalAllowanceAnnual += allowanceAnnualValue;
+                totalAllowanceMonthly += allowanceMonthlyValue;
             }
+        }
+        // **Other Allowance** (Gross CTC - Total Allowances - Deductions)
+        double otherAllowanceAnnual = grossAmount - totalAllowanceAnnual;
+        double otherAllowanceMonthly = otherAllowanceAnnual / 12;
+
+        if (otherAllowanceAnnual > 0) {
+            Map<String, String> otherAllowanceData = new HashMap<>();
+            otherAllowanceData.put(Constants.MONTH, formatValue(String.valueOf(otherAllowanceMonthly)));
+            otherAllowanceData.put(Constants.ANNUAL, formatValue(String.valueOf(otherAllowanceAnnual)));
+            components.put(Constants.OTHER_ALLOWANCES, otherAllowanceData);
         }
 
         // **Gross CTC** (directly using the provided grossAnnualSalary)
@@ -691,6 +708,7 @@ public class PayslipUtils {
         netSalary.put(Constants.ANNUAL, "<b>" + formatValue(String.valueOf(grossAmount - totalDedAnnualSalary)) + "</b>");
         components.put("<b>" + Constants.NET_SALARY + "</b>", netSalary);
 
+
         return components;
     }
 
@@ -721,13 +739,22 @@ public class PayslipUtils {
                 components.put(formatComponentName(entry.getKey()), allowanceData);
             }
         }
+        // **Other Allowance** (Gross CTC - Total Allowances - Deductions)
+        double otherAllowanceAnnual = grossAnnual - totalAllowances;
+        double otherAllowanceMonthly = otherAllowanceAnnual / 12;
+
+        if (otherAllowanceAnnual > 0) {
+            Map<String, String> otherAllowanceData = new HashMap<>();
+            otherAllowanceData.put(Constants.MONTH, formatValue(String.valueOf(otherAllowanceMonthly)));
+            otherAllowanceData.put(Constants.ANNUAL, formatValue(String.valueOf(otherAllowanceAnnual)));
+            components.put(Constants.OTHER_ALLOWANCES, otherAllowanceData);
+        }
         // Calculate Total Deductions as the difference between gross annual and total allowances
         double totalDeductions = grossAnnual - totalAllowances;
 
         // Add Total Deductions to components
         Map<String, String> deductionsData = new HashMap<>();
         deductionsData.put(Constants.ANNUAL, formatValue(String.valueOf(totalDeductions)));
-        components.put(Constants.OTHER_ALLOWANCES, deductionsData);
 
         return components;
     }
