@@ -83,7 +83,6 @@ const EmployeeSalaryView = () => {
             setShowFields(true);
             setShowCards(true);
             setIsUpdating(true);
-            setIsReadOnly(data.status === "InActive"); // Disable fields if salary status is InActive
             calculateAllowances(); // Custom function to calculate allowances, if needed
           }
 
@@ -111,8 +110,8 @@ const EmployeeSalaryView = () => {
           const { salaryConfigurationEntity, status } = salaryData;
           const { allowances, deductions } = salaryConfigurationEntity;
 
-          // Ensure that the status is "Active" before processing
-          if (status === "Active") {
+          // // Ensure that the status is "Active" before processing
+          if (status === "Active" || status === "InActive") {
             setSalaryStructure([salaryData]); // Set the salary structure
             setAllowances(allowances); // Set the allowances
             setDeductions(deductions); // Set the deductions
@@ -704,7 +703,7 @@ const EmployeeSalaryView = () => {
                       name="status"
                       control={control}
                       defaultValue={status}
-                      disabled={status === "InActive"}
+                      isDisabled={true}
                       rules={{ required: true }}
                       render={({ field }) => (
                         <Select
