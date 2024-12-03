@@ -128,7 +128,7 @@ const PayslipDoc1 = () => {
                         </div>
                     </div>
                     <div style={{ textAlign: "center", margin: "0px 25px" }}>
-                        <h3 style={{ marginBottom: "0px", borderLeft: "1px solid black", backgroundColor: "#ccc", color: "#ccc" }}>SALARY SLIP</h3>
+                        <h3 style={{ marginBottom: "0px", borderLeft: "1px solid black", backgroundColor: "#ccc", color: "#ccc", height:"30px" }}></h3>
                     </div>
                     <div className="card-body" style={{ padding: "0px 25px" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", textAlign: "center", backgroundColor: "#9fc7df", paddingTop: "10px", borderLeft: "1px solid black", borderRight: "1px solid black" }}>
