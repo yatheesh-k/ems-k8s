@@ -80,8 +80,9 @@ const AttendanceReport = () => {
   const fetchAttendanceData = async (empId, month = "", year = "") => {
     try {
       if (!month) {
-        month = getLastMonth(); // Set default to last month if not provided
+        month = ""; // Set to empty string if month is "Select Month" or null/empty
       }
+
       if (!year) {
         year = new Date().getFullYear(); // Set default to current year if not provided
       }
@@ -98,6 +99,15 @@ const AttendanceReport = () => {
       setNoDataFound(true); // Set to true in case of an error
     }
   };
+
+  useEffect(() => {
+    const lastMonth = getLastMonth(); // Get the last month
+    const currentYear = new Date().getFullYear(); // Get the current year
+    setSelectedMonth(lastMonth); // Default to last month
+    setSelectedYear(currentYear); // Default to current year
+    fetchAttendanceData(employeeId, lastMonth, currentYear);
+    
+  }, [employeeId]);
   const handleEmployeeChange = (selectedOption) => {
     setEmployeeId(selectedOption.value);
     setSelectedEmployee(selectedOption); // Set the selected employee details
@@ -105,12 +115,16 @@ const AttendanceReport = () => {
 
   const filterByMonthYear = () => {
     if (!selectedYear || !employeeId) {
-      console.log("Please select Employee, Year");
+      console.log("Please select Employee and Year");
       return;
     }
+
     setIsFilterClicked(true); // Mark that the "Go" button has been clicked
-    // Fetch the attendance data based on selectedMonth and selectedYear
-    fetchAttendanceData(employeeId, selectedMonth, selectedYear);
+
+    // Check if selectedMonth is valid, if not, pass null or empty string
+    let monthToSend = selectedMonth === "Select Month" ? "" : selectedMonth;
+
+    fetchAttendanceData(employeeId, monthToSend, selectedYear);
   };
 
   // Get the months for dropdown
@@ -323,9 +337,10 @@ const AttendanceReport = () => {
                     <select
                       className="form-select"
                       value={selectedMonth}
-                      onChange={(e) => setSelectedMonth(e.target.value)}
+                      onChange={(e) => setSelectedMonth(e.target.value)} // Update the selectedMonth state
                     >
-                      <option>Select Month</option>
+                      <option value="">Select Month</option>{" "}
+                      {/* Default option */}
                       {Array.from({ length: 12 }, (_, i) =>
                         new Date(0, i).toLocaleString("en-US", {
                           month: "long",
