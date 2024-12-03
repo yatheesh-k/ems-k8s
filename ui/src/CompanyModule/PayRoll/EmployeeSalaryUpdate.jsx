@@ -114,7 +114,7 @@ const EmployeeSalaryUpdate = () => {
           const { allowances, deductions } = salaryConfigurationEntity;
 
           // Ensure that the status is "Active" before processing
-          if (status === "Active") {
+          if (status === "Active" || status === "InActive") { 
             setSalaryStructure([salaryData]); // Set the salary structure
             setAllowances(allowances); // Set the allowances
             setDeductions(deductions); // Set the deductions

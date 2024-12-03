@@ -789,7 +789,7 @@ function Profile() {
             <input
               type="file"
               className="form-control"
-              accept=".png, .jpg, .svg, .jpeg, .pdf"
+              accept=".png, .jpg, .svg, .jpeg,"
               onChange={onChangePicture}
             />
             {errorMessage && <p className="text-danger pb-0" style={{marginLeft:"2%"}}>{errorMessage}</p>}
