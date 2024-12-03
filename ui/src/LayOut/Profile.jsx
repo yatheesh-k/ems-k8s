@@ -92,7 +92,10 @@ function Profile() {
       return;
     }
     try {
-      // Submit logic here (e.g., API call)
+      const formData = new FormData();
+      formData.append("image", "string");
+      formData.append("file", postImage);
+      await CompanyImagePatchApi(user.companyId, formData);
       setPostImage(null);
       setSuccessMessage("Logo updated successfully.");
       toast.success("Company Logo Updated Successfully");

@@ -241,8 +241,8 @@ const CompanyLogin = () => {
                                   {...register("username", {
                                     required: "Email Id is Required.",
                                     pattern: {
-                                      value:/^[a-z][a-zA-Z0-9._%+\-!#$&'*+/=?^_`{|}~]*@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
-                                      message: "Invalid Email Id Format",
+                                      value:
+                                      /^[a-z][a-zA-Z0-9._+-]*@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,                                      message: "Invalid Email Id Format",
                                     },
                                     })}
                                   />

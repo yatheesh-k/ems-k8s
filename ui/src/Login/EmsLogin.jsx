@@ -158,7 +158,7 @@ const EmsLogin = () => {
                         required: "Email Id is Required.",
                         pattern: {
                           value:
-                          /^[a-z][a-zA-Z0-9._%+\-!#$&'*+/=?^_`{|}~]*@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                          /^[a-z][a-zA-Z0-9._+-]*@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                           message:
                             "Invalid email Id format. Only .com, .in, .org, .net, .edu, .gov are allowed.",
                         },
@@ -189,7 +189,7 @@ const EmsLogin = () => {
                         })}
                       />
                       <span
-                        className={`bi bi-eye field-icon pb-1 toggle-password ${
+                        className={`bi bi-eye-fill field-icon pb-1 toggle-password ${
                           passwordShown ? "text-primary" : ""
                         }`}
                         onClick={togglePasswordVisibility}
