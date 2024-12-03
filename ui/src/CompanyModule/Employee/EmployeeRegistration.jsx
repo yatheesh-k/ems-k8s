@@ -862,7 +862,8 @@ const EmployeeRegistration = () => {
                         {...register("emailId", {
                           required: "Email Id is Required",
                           pattern: {
-                            value: /^(?![0-9]+@)[a-z0-9._%+-]+@[a-z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                            value:
+                            /^[a-z][a-zA-Z0-9._+-]*@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid Email Format",
                           },
                         })}

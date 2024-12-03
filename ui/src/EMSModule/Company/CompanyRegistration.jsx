@@ -17,13 +17,13 @@ const CompanyRegistration = () => {
     setValue,
     formState: { errors },
     reset,
-  } = useForm({ mode: 'onChange' });
+  } = useForm({ mode: "onChange" });
   const [postImage, setPostImage] = useState("");
   const [companyType, setCompanyType] = useState("");
   const [passwordShown, setPasswordShown] = useState("");
   const [editMode, setEditMode] = useState(false); // State to track edit mode
-  const [errorMessage, setErrorMessage] = useState('');
-  const watchRegistrationNumber = watch('cinNo', '');
+  const [errorMessage, setErrorMessage] = useState("");
+  const watchRegistrationNumber = watch("cinNo", "");
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -85,13 +85,12 @@ const CompanyRegistration = () => {
       navigate("/companyView");
       reset();
     } catch (error) {
-      console.log("Entered catch block");  // Add this line
+      console.log("Entered catch block"); // Add this line
       console.log("Full error object:", error);
       let errorList = [];
 
       // Check if error response exists
       if (error.response) {
-
         // Case 1: General error message
         if (error.response.data.error && error.response.data.error.message) {
           const generalErrorMessage = error.response.data.error.message;
@@ -126,14 +125,14 @@ const CompanyRegistration = () => {
 
         // Handle HTTP 409 Conflict Error (duplicate or other conflicts)
         if (error.response.status === 409) {
-          const conflictMessage = error.response.data.message || "A conflict occurred.";
+          const conflictMessage =
+            error.response.data.message || "A conflict occurred.";
           // toast.error(conflictMessage);  // Show conflict error in toast
         }
-
       } else {
         // General error (non-Axios)
-        console.log('Error without response:', error);
-        toast.error('An unexpected error occurred. Please try again later.');
+        console.log("Error without response:", error);
+        toast.error("An unexpected error occurred. Please try again later.");
       }
 
       // Update the error messages in the state
@@ -160,7 +159,12 @@ const CompanyRegistration = () => {
   }, [location.state]);
 
   const handleApiErrors = (error) => {
-    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+    if (
+      error.response &&
+      error.response.data &&
+      error.response.data.error &&
+      error.response.data.error.message
+    ) {
       // toast.error(errorMessage);
     } else {
       // toast.error("Network Error !");
@@ -179,30 +183,35 @@ const CompanyRegistration = () => {
     const cursorPosition = input.selectionStart; // Save the cursor position
 
     // Remove leading spaces
-    value = value.replace(/^\s+/g, '');
+    value = value.replace(/^\s+/g, "");
 
     // Ensure only allowed characters (alphabets, numbers, and some special chars)
     const allowedCharsRegex = /^[a-zA-Z0-9\s!@#&()*/,.\\-]+$/;
-    value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
+    value = value
+      .split("")
+      .filter((char) => allowedCharsRegex.test(char))
+      .join("");
 
     // Capitalize the first letter of each word
-    const words = value.split(' ');
+    const words = value.split(" ");
 
     // Capitalize the first letter of each word and leave the rest of the characters as they are
-    const capitalizedWords = words.map(word => {
+    const capitalizedWords = words.map((word) => {
       if (word.length > 0) {
         // Capitalize the first letter, keep the rest as is
         return word.charAt(0).toUpperCase() + word.slice(1);
       }
-      return '';
+      return "";
     });
 
     // Join the words back into a string
-    let formattedValue = capitalizedWords.join(' ');
+    let formattedValue = capitalizedWords.join(" ");
 
     // Remove spaces not allowed (before the first two characters)
     if (formattedValue.length > 3) {
-      formattedValue = formattedValue.slice(0, 3) + formattedValue.slice(3).replace(/\s+/g, ' ');
+      formattedValue =
+        formattedValue.slice(0, 3) +
+        formattedValue.slice(3).replace(/\s+/g, " ");
     }
 
     // Update input value
@@ -241,7 +250,7 @@ const CompanyRegistration = () => {
     let value = input.value;
 
     // Remove all spaces
-    value = value.replace(/\s+/g, '');
+    value = value.replace(/\s+/g, "");
 
     // Convert the entire string to lowercase
     value = value.toLowerCase();
@@ -299,27 +308,32 @@ const CompanyRegistration = () => {
     let value = input.value;
     const cursorPosition = input.selectionStart; // Save the cursor position
     // Remove leading spaces
-    value = value.replace(/^\s+/g, '');
+    value = value.replace(/^\s+/g, "");
     // Ensure only alphabets (upper and lower case), numbers, and allowed special characters
-    const allowedCharsRegex = /^[a-zA-Z0-9\s!-_@#&()*/,.\\-{}]+$/
-    value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
+    const allowedCharsRegex = /^[a-zA-Z0-9\s!-_@#&()*/,.\\-{}]+$/;
+    value = value
+      .split("")
+      .filter((char) => allowedCharsRegex.test(char))
+      .join("");
 
     // Capitalize the first letter of each word, but allow uppercase letters in the middle of the word
-    const words = value.split(' ');
-    const capitalizedWords = words.map(word => {
+    const words = value.split(" ");
+    const capitalizedWords = words.map((word) => {
       if (word.length > 0) {
         // Capitalize the first letter, but leave the middle of the word intact
         return word.charAt(0).toUpperCase() + word.slice(1);
       }
-      return '';
+      return "";
     });
 
     // Join the words back into a string
-    let formattedValue = capitalizedWords.join(' ');
+    let formattedValue = capitalizedWords.join(" ");
 
     // Remove spaces not allowed (before the first two characters)
     if (formattedValue.length > 2) {
-      formattedValue = formattedValue.slice(0, 2) + formattedValue.slice(2).replace(/\s+/g, ' ');
+      formattedValue =
+        formattedValue.slice(0, 2) +
+        formattedValue.slice(2).replace(/\s+/g, " ");
     }
 
     // Update input value
@@ -328,7 +342,6 @@ const CompanyRegistration = () => {
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
-
 
   const validateREGISTER = (value) => {
     const spaceError = "Spaces are not allowed in the Register Number.";
@@ -339,7 +352,11 @@ const CompanyRegistration = () => {
     }
 
     // Check the pattern for the CIN Number
-    if (!/^([LU]{1})([0-9]{5})([A-Z]{2})([0-9]{4})([A-Z]{3})([0-9]{6})$/.test(value)) {
+    if (
+      !/^([LU]{1})([0-9]{5})([A-Z]{2})([0-9]{4})([A-Z]{3})([0-9]{6})$/.test(
+        value
+      )
+    ) {
       return patternError; // Return pattern error if it doesn't match
     }
 
@@ -355,7 +372,11 @@ const CompanyRegistration = () => {
     }
 
     // Check the pattern for the CIN Number
-    if (!/^([LU]{1})([0-9]{5})([A-Z]{2})([0-9]{4})([A-Z]{3})([0-9]{6})$/.test(value)) {
+    if (
+      !/^([LU]{1})([0-9]{5})([A-Z]{2})([0-9]{4})([A-Z]{3})([0-9]{6})$/.test(
+        value
+      )
+    ) {
       return patternError; // Return pattern error if it doesn't match
     }
 
@@ -433,7 +454,6 @@ const CompanyRegistration = () => {
     return true; // Return true if all conditions are satisfied
   };
 
-
   const validatePAN = (value) => {
     const spaceError = "Spaces are not allowed in the PAN Number.";
     const patternError = "Invalid PAN Number format";
@@ -459,7 +479,7 @@ const CompanyRegistration = () => {
     }
 
     // Allow only numeric characters after +91 and the space
-    const numericValue = value.slice(4).replace(/[^0-9]/g, ''); // Remove any non-numeric characters after +91 
+    const numericValue = value.slice(4).replace(/[^0-9]/g, ""); // Remove any non-numeric characters after +91
     if (numericValue.length <= 10) {
       value = "+91 " + numericValue; // Keep the +91 with a space
     }
@@ -499,8 +519,13 @@ const CompanyRegistration = () => {
               <div className="card">
                 <div className="card-header ">
                   <div className="d-flex justify-content-start align-items-start">
-                    <h5 className="card-title" style={{ marginBottom: "0px" }}>Company Type</h5>
-                    <span className="text-danger" style={{ marginLeft: "10px" }}>
+                    <h5 className="card-title" style={{ marginBottom: "0px" }}>
+                      Company Type
+                    </h5>
+                    <span
+                      className="text-danger"
+                      style={{ marginLeft: "10px" }}
+                    >
                       {errors.companyType && (
                         <p className="mb-0">{errors.companyType.message}</p>
                       )}
@@ -523,7 +548,9 @@ const CompanyRegistration = () => {
                             value="Private Limited"
                             style={{ marginRight: "10px" }}
                             {...register("companyType", {
-                              required: !editMode ? "Please Select Your Company Type" : false,
+                              required: !editMode
+                                ? "Please Select Your Company Type"
+                                : false,
                             })}
                             disabled={editMode}
                             onChange={handleCompanyTypeChange}
@@ -541,7 +568,9 @@ const CompanyRegistration = () => {
                           value="Firm"
                           style={{ marginRight: "10px" }}
                           {...register("companyType", {
-                            required: !editMode ? "Please Select Your Company Type" : false,
+                            required: !editMode
+                              ? "Please Select Your Company Type"
+                              : false,
                           })}
                           disabled={editMode}
                           onChange={handleCompanyTypeChange}
@@ -558,7 +587,9 @@ const CompanyRegistration = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title" style={{ marginBottom: "0px" }}>Company Details</h5>
+                  <h5 className="card-title" style={{ marginBottom: "0px" }}>
+                    Company Details
+                  </h5>
                   <div
                     className="dropdown-divider"
                     style={{ borderTopColor: "#d7d9dd" }}
@@ -584,7 +615,6 @@ const CompanyRegistration = () => {
                           minLength: {
                             value: 2,
                             message: "Minimum 2 Characters Required",
-
                           },
                         })}
                         disabled={editMode}
@@ -614,11 +644,11 @@ const CompanyRegistration = () => {
                           minLength: {
                             value: 2,
                             message: "Minimum 2 Characters Required",
-
                           },
                           maxLength: {
                             value: 30,
-                            message: "Minimum 2 and Maximum 30 Characters allowed",
+                            message:
+                              "Minimum 2 and Maximum 30 Characters allowed",
                           },
                         })}
                         disabled={editMode}
@@ -641,7 +671,8 @@ const CompanyRegistration = () => {
                         {...register("emailId", {
                           required: "Company Email Id is Required",
                           pattern: {
-                            value: /^(?![0-9]+@)[a-z0-9._%+-]+@[a-z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                            value:
+                          /^[a-z][a-zA-Z0-9._+-]*@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid email format",
                           },
                         })}
@@ -656,7 +687,8 @@ const CompanyRegistration = () => {
                         <div className="col-lg-1"></div>
                         <div className="col-12 col-md-6 col-lg-5 mb-3">
                           <label className="form-label">
-                            Mobile Number <span style={{ color: "red" }}>*</span>
+                            Mobile Number{" "}
+                            <span style={{ color: "red" }}>*</span>
                           </label>
                           <input
                             type="tel"
@@ -682,18 +714,25 @@ const CompanyRegistration = () => {
                                   return true;
                                 },
                                 notRepeatingDigits: (value) => {
-                                  const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                                  return !isRepeating || "Mobile Number cannot consist of the same digit repeated.";
+                                  const isRepeating = /^(\d)\1{12}$/.test(
+                                    value
+                                  ); // Check for repeating digits
+                                  return (
+                                    !isRepeating ||
+                                    "Mobile Number cannot consist of the same digit repeated."
+                                  );
                                 },
                               },
                               pattern: {
                                 value: /^\+91\s[6-9]\d{9}$/, // Ensure it starts with +91, followed by a space, and then 6-9 and 9 more digits
-                                message: "Mobile Number must be a valid 10-digit number starting with 6, 7, 8, or 9.",
+                                message: "Mobile Number is Required",
                               },
                             })}
                           />
                           {errors.mobileNo && (
-                            <p className="errorMsg">{errors.mobileNo.message}</p>
+                            <p className="errorMsg">
+                              {errors.mobileNo.message}
+                            </p>
                           )}
                         </div>
                       </>
@@ -721,19 +760,27 @@ const CompanyRegistration = () => {
                                 },
                                 maxLength: {
                                   value: 16,
-                                  message: "Minimum 6 & Maximum 16 Characters allowed",
+                                  message:
+                                    "Minimum 6 & Maximum 16 Characters allowed",
                                 },
                               })}
                             />
                             {/* Eye Icon to toggle password visibility */}
                             <span
-                              className={`bi bi-eye field-icon pb-1 toggle-password ${passwordShown ? 'text-primary' : ''}`} onClick={togglePasswordVisiblity}
-                              style={{ background: "transparent", borderLeft: "none" }}
-                            >
-                            </span>
+                              className={`bi bi-eye field-icon pb-1 toggle-password ${
+                                passwordShown ? "text-primary" : ""
+                              }`}
+                              onClick={togglePasswordVisiblity}
+                              style={{
+                                background: "transparent",
+                                borderLeft: "none",
+                              }}
+                            ></span>
                           </div>
                           {errors.password && (
-                            <p className="errorMsg">{errors.password.message}</p>
+                            <p className="errorMsg">
+                              {errors.password.message}
+                            </p>
                           )}
                         </div>
                       </>
@@ -742,7 +789,8 @@ const CompanyRegistration = () => {
                       <>
                         <div className="col-12 col-md-6 col-lg-5 mb-3">
                           <label className="form-label">
-                            Mobile Number <span style={{ color: "red" }}>*</span>
+                            Mobile Number{" "}
+                            <span style={{ color: "red" }}>*</span>
                           </label>
                           <input
                             type="tel"
@@ -769,18 +817,25 @@ const CompanyRegistration = () => {
                                   return true;
                                 },
                                 notRepeatingDigits: (value) => {
-                                  const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                                  return !isRepeating || "Mobile Number cannot consist of the same digit repeated.";
+                                  const isRepeating = /^(\d)\1{12}$/.test(
+                                    value
+                                  ); // Check for repeating digits
+                                  return (
+                                    !isRepeating ||
+                                    "Mobile Number cannot consist of the same digit repeated."
+                                  );
                                 },
                               },
                               pattern: {
                                 value: /^\+91\s[6-9]\d{9}$/, // Ensure it starts with +91, followed by a space, and then 6-9 and 9 more digits
-                                message: "Mobile Number must be a valid 10-digit number starting with 6, 7, 8, or 9.",
+                                message: "Mobile Number is Required",
                               },
                             })}
                           />
                           {errors.mobileNo && (
-                            <p className="errorMsg">{errors.mobileNo.message}</p>
+                            <p className="errorMsg">
+                              {errors.mobileNo.message}
+                            </p>
                           )}
                         </div>
 
@@ -816,12 +871,15 @@ const CompanyRegistration = () => {
                             },
                             notRepeatingDigits: (value) => {
                               const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                              return !isRepeating || "Alternate Number cannot consist of the same digit repeated.";
+                              return (
+                                !isRepeating ||
+                                "Alternate Number cannot consist of the same digit repeated."
+                              );
                             },
                           },
                           pattern: {
                             value: /^\+91\s[6-9]\d{9}$/, // Ensure it starts with +91, followed by a space, and then 6-9 and 9 more digits
-                            message: "Alternate Number must be a valid 10-digit number starting with 6, 7, 8, or 9.",
+                            message: "Alternate Number is Required",
                           },
                         })}
                       />
@@ -829,10 +887,7 @@ const CompanyRegistration = () => {
                         <p className="errorMsg">{errors.alternateNo.message}</p>
                       )}
                     </div>
-                    {editMode && (
-                      <div className="col-lg-1"></div>
-
-                    )}
+                    {editMode && <div className="col-lg-1"></div>}
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Company Address <span style={{ color: "red" }}>*</span>
@@ -847,9 +902,9 @@ const CompanyRegistration = () => {
                         {...register("companyAddress", {
                           required: "Company Address is Required",
                           pattern: {
-                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
-                            message:
-                              "Please enter valid Address",
+                            value:
+                              /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
+                            message: "Please enter valid Address",
                           },
                           minLength: {
                             value: 3,
@@ -876,7 +931,9 @@ const CompanyRegistration = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title" style={{ marginBottom: "0px" }}>Company Registration Details</h5>
+                  <h5 className="card-title" style={{ marginBottom: "0px" }}>
+                    Company Registration Details
+                  </h5>
                   <div
                     className="dropdown-divider"
                     style={{ borderTopColor: "#d7d9dd" }}
@@ -887,7 +944,10 @@ const CompanyRegistration = () => {
                     {companyType === "Private Limited" && (
                       <>
                         <div className="col-12 col-md-6 col-lg-5 mb-3">
-                          <label className="form-label">Company CIN Number<span style={{ color: "red" }}>*</span></label>
+                          <label className="form-label">
+                            Company CIN Number
+                            <span style={{ color: "red" }}>*</span>
+                          </label>
                           <input
                             type="text"
                             className="form-control"
@@ -900,29 +960,27 @@ const CompanyRegistration = () => {
                               required: "Company CIN Number is Required",
                               maxLength: {
                                 value: 21,
-                                message: "CIN Number must not exceed 21 characters",
+                                message:
+                                  "CIN Number must not exceed 21 characters",
                               },
 
                               validate: validateCIN,
-
                             })}
                             disabled={editMode}
                           />
                           {errors.cinNo && (
                             <p className="errorMsg">{errors.cinNo.message}</p>
                           )}
-
                         </div>
                         <div className="col-lg-1"></div>
-
                       </>
                     )}
                     {companyType === "Firm" && (
                       <>
-
                         <div className="col-12 col-md-6 col-lg-5 mb-3">
                           <label className="form-label">
-                            Company Registration Number <span style={{ color: "red" }}>*</span>
+                            Company Registration Number{" "}
+                            <span style={{ color: "red" }}>*</span>
                           </label>
                           <input
                             type="text"
@@ -931,16 +989,22 @@ const CompanyRegistration = () => {
                             autoComplete="off"
                             maxLength={21}
                             {...register("companyRegNo", {
-                              required: "Company Registration Number is Required",
+                              required:
+                                "Company Registration Number is Required",
                               maxLength: {
                                 value: 21,
-                                message: "Registration Number must not exceed 21 characters",
+                                message:
+                                  "Registration Number must not exceed 21 characters",
                               },
-                              validate: validateREGISTER
+                              validate: validateREGISTER,
                             })}
                             disabled={editMode}
                           />
-                          {errors.companyRegNo && <p className="errorMsg">{errors.companyRegNo.message}</p>}
+                          {errors.companyRegNo && (
+                            <p className="errorMsg">
+                              {errors.companyRegNo.message}
+                            </p>
+                          )}
                         </div>
                         <div className="col-lg-1"></div>
                       </>
@@ -964,11 +1028,13 @@ const CompanyRegistration = () => {
                             value: 15,
                             message: "GST Number must not exceed 15 characters",
                           },
-                          validate: validateGST
+                          validate: validateGST,
                         })}
                         disabled={editMode}
                       />
-                      {errors.gstNo && <p className="errorMsg">{errors.gstNo.message}</p>}
+                      {errors.gstNo && (
+                        <p className="errorMsg">{errors.gstNo.message}</p>
+                      )}
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
@@ -990,8 +1056,7 @@ const CompanyRegistration = () => {
                             value: 10,
                             message: "PAN Number must not exceed 10 characters",
                           },
-                          validate: validatePAN
-
+                          validate: validatePAN,
                         })}
                         disabled={editMode}
                       />
@@ -1008,7 +1073,9 @@ const CompanyRegistration = () => {
             <div className="col-12">
               <div className="card">
                 <div className="card-header">
-                  <h5 className="card-title" style={{ marginBottom: "0px" }}>Authorized Details</h5>
+                  <h5 className="card-title" style={{ marginBottom: "0px" }}>
+                    Authorized Details
+                  </h5>
                   <div
                     className="dropdown-divider"
                     style={{ borderTopColor: "#d7d9dd" }}
@@ -1051,7 +1118,8 @@ const CompanyRegistration = () => {
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
-                        Personal Email Id <span style={{ color: "red" }}>*</span>
+                        Personal Email Id{" "}
+                        <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
                         type="email"
@@ -1063,7 +1131,8 @@ const CompanyRegistration = () => {
                         {...register("personalMailId", {
                           required: "Personal Email Id is Required",
                           pattern: {
-                            value: /^(?![0-9]+@)[a-z0-9._%+-]+@[a-z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                            value:
+                          /^[a-z][a-zA-Z0-9._+-]*@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid Email Format ",
                           },
                         })}
@@ -1105,12 +1174,15 @@ const CompanyRegistration = () => {
                             },
                             notRepeatingDigits: (value) => {
                               const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                              return !isRepeating || "Personal Mobile Number cannot consist of the same digit repeated.";
+                              return (
+                                !isRepeating ||
+                                "Personal Mobile Number cannot consist of the same digit repeated."
+                              );
                             },
                           },
                           pattern: {
                             value: /^\+91\s[6-9]\d{9}$/, // Ensure it starts with +91, followed by a space, and then 6-9 and 9 more digits
-                            message: "Personal Mobile Number must be a valid 10-digit number starting with 6, 7, 8, or 9.",
+                            message: "Personal Mobile Number is Required",
                           },
                         })}
                       />
@@ -1136,9 +1208,9 @@ const CompanyRegistration = () => {
                         {...register("address", {
                           required: "Address is Required",
                           pattern: {
-                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
-                            message:
-                              "Please enter valid Address",
+                            value:
+                              /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
+                            message: "Please enter valid Address",
                           },
                           minLength: {
                             value: 3,
@@ -1160,38 +1232,42 @@ const CompanyRegistration = () => {
             </div>
           </div>
           <div className="col-lg-1"></div>
-          <div className="col-12 d-flex align-items-start mt-1">
+          <div className="col-12 mt-1">
+            {/* Display error message above the button if there are any error messages */}
             {errorMessage.length > 0 && (
-              <div className="col-9 alert alert-danger text-center mt-1">
+              <div className="alert alert-danger text-center mt-1">
                 {errorMessage.map((msg, index) => (
-                  <p key={index}>{msg}</p>  // Display each message in a <p> tag
+                  <p key={index}>{msg}</p> // Display each message in a <p> tag
                 ))}
               </div>
             )}
-            <div className={`col-${errorMessage ? '3' : '12'} d-flex justify-content-end mt-1`}>
+
+            <div className="d-flex justify-content-end mt-1">
               {/* Conditionally render the "Clear" button only when not in editMode */}
               {!editMode && (
-                <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
+                <button
+                  className="btn btn-secondary me-2"
+                  type="button"
+                  onClick={clearForm}
+                >
                   Clear
                 </button>
               )}
 
               <button
                 className={
-                  editMode
-                    ? "btn btn-danger bt-lg"
-                    : "btn btn-primary btn-lg"
+                  editMode ? "btn btn-danger btn-lg" : "btn btn-primary btn-lg"
                 }
                 style={{ marginRight: "85px" }}
                 type="submit"
               >
-                {editMode ? "Update Company" : "Add Company"}{" "}
+                {editMode ? "Update Company" : "Add Company"}
               </button>
             </div>
           </div>
         </form>
-      </div >
-    </LayOut >
+      </div>
+    </LayOut>
   );
 };
 
