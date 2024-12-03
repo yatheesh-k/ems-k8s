@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const AppraisalTemplate2 = ({
   companyLogo,
@@ -9,11 +9,9 @@ const AppraisalTemplate2 = ({
   employeeId,
   effectiveDate,
   salaryIncrease,
-  allowances, date
-
+  allowances,
+  date,
 }) => {
-
-
   return (
     <div
       className="watermarked"
@@ -99,52 +97,68 @@ const AppraisalTemplate2 = ({
         </p>
 
         <p>
-        We are pleased to inform you that based on your performance and contribution to the company, our management has revised your compensation to Rs.<strong>{salaryIncrease}</strong> pa which is cost to company with effect from <strong>{effectiveDate}</strong>.All other T&C are same as per the original offer letter.
+          We are pleased to inform you that based on your performance and
+          contribution to the company, our management has revised your
+          compensation to Rs.<strong>{salaryIncrease}</strong> pa which is cost
+          to company with effect from <strong>{effectiveDate}</strong>.All other
+          T&C are same as per the original offer letter.
         </p>
         <table className="table border-collapse mb-5">
           <thead>
-            <tr className='text-center'>
+            <tr className="text-center">
               <th>Particulars</th>
               <th>Amount (INR)</th>
             </tr>
           </thead>
           <tbody>
-            {allowances && Object.keys(allowances).map((key, index) => {
-              const value = allowances[key];
+            {allowances &&
+              Object.keys(allowances).map((key, index) => {
+                const value = allowances[key];
 
-              let allowanceAmount = 0;
+                let allowanceAmount = 0;
 
-              // Check if the value contains a '%' (percentage)
-              if (typeof value === 'string' && value.includes('%')) {
-                // Extract the numeric part and calculate the allowance as a percentage of salaryIncrease
-                const percentageValue = parseFloat(value.slice(0, -1)); // Remove '%' and convert to a number
-                allowanceAmount = salaryIncrease * (percentageValue / 100);
-              } else {
-                // Otherwise, treat the value as a fixed amount
-                allowanceAmount = parseFloat(value); // Convert to number directly
-              }
+                // Check if the value contains a '%' (percentage)
+                if (typeof value === "string" && value.includes("%")) {
+                  // Extract the numeric part and calculate the allowance as a percentage of salaryIncrease
+                  const percentageValue = parseFloat(value.slice(0, -1)); // Remove '%' and convert to a number
+                  allowanceAmount = salaryIncrease * (percentageValue / 100);
+                } else {
+                  // Otherwise, treat the value as a fixed amount
+                  allowanceAmount = parseFloat(value); // Convert to number directly
+                }
 
-              return (
-                <tr key={index}>
-                  <td>{key}</td>
-                  {/* Show the allowance amount (rounded to nearest integer) */}
-                  <td>{Math.floor(allowanceAmount.toFixed(2))}</td>
-                </tr>
-              );
-            })}
+                return (
+                  <tr key={index}>
+                    <td>
+                      {key
+                        .replace(/([A-Z])/g, " $1")
+                        .replace(/^./, (str) => str.toUpperCase())}
+                    </td>
+                    {/* Show the allowance amount (rounded to nearest integer) */}
+                    <td>{Math.floor(allowanceAmount.toFixed(2))}</td>
+                  </tr>
+                );
+              })}
 
             {/* Add a row for Gross Salary after the allowances */}
             {salaryIncrease && (
               <tr>
-                <td><strong>Gross Salary</strong></td>
-                <td><strong>{salaryIncrease}</strong></td>
+                <td>
+                  <strong>Gross Salary</strong>
+                </td>
+                <td>
+                  <strong>{salaryIncrease}</strong>
+                </td>
               </tr>
             )}
           </tbody>
         </table>
 
         <p>
-         <i>We appreciate your initiative and expect you to take many more such responsibilities in future assignments to ensure company’s growth.</i>
+          <i>
+            We appreciate your initiative and expect you to take many more such
+            responsibilities in future assignments to ensure company’s growth.
+          </i>
         </p>
 
         <div className="mt-5 pt-3">
@@ -152,14 +166,15 @@ const AppraisalTemplate2 = ({
           <div className="mt-5 pt-5">
             <p>Authorized Signature</p>
             <h4>{companyData.companyName},</h4>
-            <p>{companyData.mobileNo} | {companyData.emailId},</p>
+            <p>
+              {companyData.mobileNo} | {companyData.emailId},
+            </p>
             <p>{companyData.companyAddress}.</p>
           </div>
         </div>
       </div>
     </div>
-
   );
-}
+};
 
 export default AppraisalTemplate2;
