@@ -4,7 +4,12 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Select from "react-select";
 import { Bounce, toast } from "react-toastify";
 import LayOut from "../../../LayOut/LayOut";
-import { EmployeeGetApi, EmployeeGetApiById, ExperienceFormPostApi, TemplateGetAPI } from "../../../Utils/Axios";
+import {
+  EmployeeGetApi,
+  EmployeeGetApiById,
+  ExperienceFormPostApi,
+  TemplateGetAPI,
+} from "../../../Utils/Axios";
 import { useAuth } from "../../../Context/AuthContext";
 import ExperiencePreview from "./ExperiencePreview";
 
@@ -14,11 +19,13 @@ const ExperienceForm = () => {
     handleSubmit,
     control,
     setValue,
-    watch,trigger,clearErrors,
+    watch,
+    trigger,
+    clearErrors,
     formState: { errors },
     reset,
-  } = useForm({ mode: 'onChange' });
-  const { user,companyData } = useAuth();
+  } = useForm({ mode: "onChange" });
+  const { user, companyData } = useAuth();
   const [emp, setEmp] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [noticePeriod, setNoticePeriod] = useState(0);
@@ -33,14 +40,13 @@ const ExperienceForm = () => {
   const navigate = useNavigate();
 
   const validateExperienceDate = (value) => {
-    const dateOfHiring = new Date(watch('dateOfHiring'));
+    const dateOfHiring = new Date(watch("dateOfHiring"));
     const relievingDate = new Date(value);
     if (relievingDate < dateOfHiring) {
       return "Experience Date must be after Date of Hired.";
     }
     return true;
   };
-  
 
   useEffect(() => {
     EmployeeGetApi().then((data) => {
@@ -65,7 +71,7 @@ const ExperienceForm = () => {
     try {
       const res = await TemplateGetAPI(companyId);
       const templateNumber = res.data.data.experienceTemplateNo;
-      setSelectedTemplate(templateNumber)
+      setSelectedTemplate(templateNumber);
       setTemplateAvailable(!!templateNumber);
     } catch (error) {
       handleError(error);
@@ -73,7 +79,7 @@ const ExperienceForm = () => {
     }
   };
   useEffect(() => {
-    fetchTemplate()
+    fetchTemplate();
   }, []);
 
   // Helper function to format date as dd-mm-yyyy
@@ -93,15 +99,19 @@ const ExperienceForm = () => {
     const submissionData = {
       employeeId: data.employeeId,
       companyName: user.company,
-      date: data.relievingDate
+      date: data.relievingDate,
     };
     // Format the date fields to dd-mm-yyyy format
     const formattedLastWorkingDate = formatDate(data.relievingDate);
     const formattedResignationDate = formatDate(data.resignationDate);
     const formattedHiringDate = formatDate(data.dateOfHiring);
     const preview = {
-      employeeName: selectedEmployee ? selectedEmployee.employeeName : data.employeeName,
-      employeeId: selectedEmployee ? selectedEmployee.employeeId : data.employeeId,
+      employeeName: selectedEmployee
+        ? selectedEmployee.employeeName
+        : data.employeeName,
+      employeeId: selectedEmployee
+        ? selectedEmployee.employeeId
+        : data.employeeId,
       designationName: data.designationName || "",
       departmentName: data.departmentName || "",
       joiningDate: formattedHiringDate || "",
@@ -109,7 +119,7 @@ const ExperienceForm = () => {
       date: formattedLastWorkingDate || "",
       noticePeriod,
       companyName: user.company,
-      companyData:companyData
+      companyData: companyData,
     };
 
     setPreviewData(preview);
@@ -125,8 +135,8 @@ const ExperienceForm = () => {
         reset();
       }
     } catch (error) {
-      console.error('Error downloading the PDF:', error);
-      handleError(error)
+      console.error("Error downloading the PDF:", error);
+      handleError(error);
     }
   };
 
@@ -174,8 +184,8 @@ const ExperienceForm = () => {
 
   const handleEmployeeChange = (selectedOption) => {
     // Update the selected employee in the state
-    const selectedEmp = emp.find(emp => emp.value === selectedOption?.value);
-    
+    const selectedEmp = emp.find((emp) => emp.value === selectedOption?.value);
+
     if (selectedEmp) {
       setSelectedEmployee(selectedEmp);
 
@@ -196,7 +206,7 @@ const ExperienceForm = () => {
       setValue("designationName", "");
       setValue("departmentName", "");
       setValue("dateOfHiring", "");
-      
+
       // Set error if needed, but it's likely you just want to reset
       // setError("employeeId", { message: "Employee selection is required" });
 
@@ -208,12 +218,12 @@ const ExperienceForm = () => {
   const clearForm = () => {
     // Reset the entire form, including the employeeId (react-select) to null
     reset({
-      employeeId: null,   // Reset the Select field to null
-      employeeName: '',
-      designationName: '',
-      departmentName: '',
-      dateOfHiring: '',
-      lastWorkingDate: ''
+      employeeId: null, // Reset the Select field to null
+      employeeName: "",
+      designationName: "",
+      departmentName: "",
+      dateOfHiring: "",
+      lastWorkingDate: "",
     });
   };
 
@@ -242,8 +252,15 @@ const ExperienceForm = () => {
           <div className="row justify-content-center">
             <div className="col-8 text-center mt-5">
               <h2>No Experience Template Available</h2>
-              <p>To set up the experience templates before proceeding, Please select the Template from Settings <a href="/experienceLetter">Expereince Templates </a></p>
-              <p>Please contact the administrator to set up the experience templates before proceeding.</p>
+              <p>
+                To set up the experience templates before proceeding, Please
+                select the Template from Settings{" "}
+                <a href="/experienceLetter">Expereince Templates </a>
+              </p>
+              <p>
+                Please contact the administrator to set up the experience
+                templates before proceeding.
+              </p>
             </div>
           </div>
         </div>
@@ -276,32 +293,38 @@ const ExperienceForm = () => {
             <div className="card">
               <div className="card-header">
                 <h5 className="card-title">
-                  {isUpdating ? "Employee Experience Data" : "Employee Experience Form"}
+                  {isUpdating
+                    ? "Employee Experience Data"
+                    : "Employee Experience Form"}
                 </h5>
               </div>
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="card-body">
                   <div className="row">
-                      <div className="col-12 col-md-6 col-lg-5 mb-2">
-                        <label className="form-label">Select Employee Name</label>
-                        <Controller
-                          name="employeeId"
-                          control={control}
-                          rules={{ required: "Employee Name is required" }}
-                          render={({ field }) => (
-                            <Select
-                              {...field}
-                              options={emp}
-                              value={emp.find(option => option.value === field.value) || null} // Handle clearing
-                              onChange={handleEmployeeChange}
-                              placeholder="Select Employee Name"
-                            />
-                          )}
-                        />
-                        {errors.employeeId && (
-                          <p className="errorMsg">{errors.employeeId.message}</p>
+                    <div className="col-12 col-md-6 col-lg-5 mb-2">
+                      <label className="form-label">Select Employee Name</label>
+                      <Controller
+                        name="employeeId"
+                        control={control}
+                        rules={{ required: "Employee Name is required" }}
+                        render={({ field }) => (
+                          <Select
+                            {...field}
+                            options={emp}
+                            value={
+                              emp.find(
+                                (option) => option.value === field.value
+                              ) || null
+                            } // Handle clearing
+                            onChange={handleEmployeeChange}
+                            placeholder="Select Employee Name"
+                          />
                         )}
-                      </div>
+                      />
+                      {errors.employeeId && (
+                        <p className="errorMsg">{errors.employeeId.message}</p>
+                      )}
+                    </div>
                     <input
                       type="hidden"
                       className="form-control"
@@ -365,25 +388,34 @@ const ExperienceForm = () => {
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Date of Experience</label>
                       <Controller
-                          name="relievingDate"
-                          control={control}
-                          max={sixMonthsFromNow}
-                          rules={{
-                            required: "Relieving Date is required",
-                            validate: validateExperienceDate,  // Make sure this function is correctly passed
-                          }}
-                          render={({ field }) => (
-                            <input
-                              {...field}
-                              type="date"
-                              className="form-control"
-                              placeholder="Last Working Date"
-                            />
-                          )}
-                        />
-                        {errors.relievingDate && (
-                          <p className="errorMsg">{errors.relievingDate.message}</p>
+                        name="relievingDate"
+                        control={control}
+                        max={sixMonthsFromNow}
+                        rules={{
+                          required: "Relieving Date is required",
+                          validate: (value) => {
+                            const today = new Date();
+                            const selectedDate = new Date(value);
+                            if (selectedDate < today) {
+                              return "Relieving Date cannot be in the past"; // Custom validation message
+                            }
+                            return true; // No error, validation passed
+                          },
+                        }}
+                        render={({ field }) => (
+                          <input
+                            {...field}
+                            type="date"
+                            className="form-control"
+                            placeholder="Last Working Date"
+                          />
                         )}
+                      />
+                      {errors.relievingDate && (
+                        <p className="errorMsg">
+                          {errors.relievingDate.message}
+                        </p>
+                      )}
                     </div>
 
                     <div className="col-12 d-flex align-items-start mt-5">
@@ -392,12 +424,24 @@ const ExperienceForm = () => {
                           {error}
                         </div>
                       )}
-                      <div className={`col-${error ? '3' : '12'} d-flex justify-content-end mt-4`}>
-                        <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
+                      <div
+                        className={`col-${
+                          error ? "3" : "12"
+                        } d-flex justify-content-end mt-4`}
+                      >
+                        <button
+                          className="btn btn-secondary me-2"
+                          type="button"
+                          onClick={clearForm}
+                        >
                           Close
                         </button>
                         <button
-                          className={isUpdating ? "btn btn-danger btn-lg" : "btn btn-primary btn-lg"}
+                          className={
+                            isUpdating
+                              ? "btn btn-danger btn-lg"
+                              : "btn btn-primary btn-lg"
+                          }
                           type="submit"
                         >
                           {isUpdating ? "Update" : "Submit"}
@@ -408,21 +452,49 @@ const ExperienceForm = () => {
                 </div>
               </form>
               {showPreview && (
-                <div className={`modal fade ${showPreview ? 'show' : ''}`} style={{ display: showPreview ? 'block' : 'none' }} tabIndex="-1" role="dialog" aria-hidden={!showPreview}>
+                <div
+                  className={`modal fade ${showPreview ? "show" : ""}`}
+                  style={{ display: showPreview ? "block" : "none" }}
+                  tabIndex="-1"
+                  role="dialog"
+                  aria-hidden={!showPreview}
+                >
                   <div className="modal-dialog modal-lg" role="document">
                     <div className="modal-content mt-2 mb-3">
                       <div className="modal-header">
-                        <h5 className="modal-title">Preview Experience Letter</h5>
-                        <button type="button" className="close" onClick={() => setShowPreview(false)} aria-label="Close">
+                        <h5 className="modal-title">
+                          Preview Experience Letter
+                        </h5>
+                        <button
+                          type="button"
+                          className="close"
+                          onClick={() => setShowPreview(false)}
+                          aria-label="Close"
+                        >
                           <span aria-hidden="true">&times;</span>
                         </button>
                       </div>
                       <div className="modal-body">
-                        <ExperiencePreview previewData={previewData} selectedTemplate={selectedTemplate} />
+                        <ExperiencePreview
+                          previewData={previewData}
+                          selectedTemplate={selectedTemplate}
+                        />
                       </div>
                       <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" onClick={() => setShowPreview(false)}>Close</button>
-                        <button type="button" className="btn btn-primary" onClick={handleConfirmSubmission}>Confirm Submission</button>
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          onClick={() => setShowPreview(false)}
+                        >
+                          Close
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          onClick={handleConfirmSubmission}
+                        >
+                          Confirm Submission
+                        </button>
                       </div>
                     </div>
                   </div>
