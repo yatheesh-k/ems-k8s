@@ -36,6 +36,21 @@ public class SalaryConfigurationServiceImpl implements SalaryConfigurationServic
     @Autowired
     private OpenSearchOperations openSearchOperations;
 
+    // Helper method to format field names from camelCase to "Human Readable Format"
+    private String formatFieldName(String fieldName) {
+
+        if (fieldName.equalsIgnoreCase(Constants.HRA_SMALL)) {
+            return Constants.HRA; // Ensure it's always uppercase
+        }
+        // Split the camelCase field name into separate words
+        String[] words = fieldName.split("(?=[A-Z])");
+
+        // Capitalize the first letter of each word and join them with spaces
+        return Arrays.stream(words)
+                .map(word -> word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
+                .collect(Collectors.joining(" "));
+    }
+
 
     @Override
     public List<String> getAllowanceColumnNames() {
@@ -45,9 +60,9 @@ public class SalaryConfigurationServiceImpl implements SalaryConfigurationServic
         // Retrieve all fields from the class
         Field[] fields = clazz.getDeclaredFields();
 
-        // Extract the names of the fields
+        // Extract the names of the fields and format them
         return Arrays.stream(fields)
-                .map(Field::getName)
+                .map(field -> formatFieldName(field.getName())) // Format each field name
                 .collect(Collectors.toList());
     }
     @Override
@@ -60,7 +75,7 @@ public class SalaryConfigurationServiceImpl implements SalaryConfigurationServic
 
         // Extract the names of the fields
         return Arrays.stream(fields)
-                .map(Field::getName)
+                .map(field -> formatFieldName(field.getName())) // Format each field name
                 .collect(Collectors.toList());
     }
 
