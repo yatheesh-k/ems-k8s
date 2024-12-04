@@ -7,11 +7,12 @@ import com.pb.employee.request.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.sql.Struct;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.lang.reflect.Field;
+import java.util.Base64;
 
 @Slf4j
 @Component
@@ -310,6 +311,91 @@ public class EmployeeUtils {
     }
 
 
+    public static int duplicateSalaryProperties(EmployeeSalaryEntity employee, SalaryUpdateRequest salaryUpdateRequest) {
+        int noOfChanges = 0;
+        if (!employee.getNetSalary().equals(salaryUpdateRequest.getNetSalary())){
+            String netSalary = new String((Base64.getDecoder().decode(employee.getNetSalary().toString().getBytes())));
 
+            if (!netSalary.equals(salaryUpdateRequest.getNetSalary())) {
+                noOfChanges += 1;
+            }
+        }
+        if (!employee.getFixedAmount().equals(salaryUpdateRequest.getFixedAmount())){
+            String fixedAmount = new String((Base64.getDecoder().decode(employee.getFixedAmount().toString().getBytes())));
 
+            if (!fixedAmount.equals(salaryUpdateRequest.getFixedAmount())) {
+                noOfChanges += 1;
+            }
+        }
+        if (!employee.getTotalDeductions().equals(salaryUpdateRequest.getTotalDeductions())){
+            String totalDeductions= new String((Base64.getDecoder().decode(employee.getTotalDeductions().toString().getBytes())));
+
+            if (!totalDeductions.equals(salaryUpdateRequest.getTotalDeductions())) {
+                noOfChanges += 1;
+            }
+        }
+        if (!employee.getStatus().equals(salaryUpdateRequest.getStatus())){
+            noOfChanges +=1;
+        }
+        if (!employee.getTotalEarnings().isEmpty()) {
+            String totalEarnings = new String((Base64.getDecoder().decode(employee.getTotalEarnings().toString().getBytes())));
+
+            if (!totalEarnings.equals(salaryUpdateRequest.getTotalEarnings())) {
+                noOfChanges += 1;
+            }
+        }if (!employee.getTotalDeductions().isEmpty()) {
+            String deductions = new String(Base64.getDecoder().decode(employee.getTotalDeductions().toString().getBytes()));
+            if (!deductions.equals(salaryUpdateRequest.getTotalDeductions())) {
+                noOfChanges += 1;
+            }
+        }
+        if (!employee.getVariableAmount().isEmpty()) {
+            String variable = new String(Base64.getDecoder().decode(employee.getVariableAmount().toString().getBytes()));
+            if (!variable.equals(salaryUpdateRequest.getVariableAmount())) {
+                noOfChanges += 1;
+            }
+        }
+        if (!employee.getGrossAmount().isEmpty()) {
+           String grossAmount = new String(Base64.getDecoder().decode(employee.getGrossAmount().toString().getBytes()));
+           if (!grossAmount.equals(salaryUpdateRequest.getGrossAmount())) {
+           noOfChanges += 1;
+           }
+        }
+        // Compare allowance values with Base64 decoding
+        if (employee.getSalaryConfigurationEntity().getAllowances() != null && salaryUpdateRequest.getSalaryConfigurationRequest().getAllowances() != null) {
+            Map<String, String> employeeAllowances = employee.getSalaryConfigurationEntity().getAllowances();
+            Map<String, String> requestAllowances = salaryUpdateRequest.getSalaryConfigurationRequest().getAllowances();
+
+            for (Map.Entry<String, String> entry : employeeAllowances.entrySet()) {
+                String employeeAllowanceValue = entry.getValue();
+                String requestAllowanceValue = requestAllowances.get(entry.getKey());
+
+                if (employeeAllowanceValue != null && requestAllowanceValue != null) {
+                    String decodedEmployeeAllowance = new String(Base64.getDecoder().decode(employeeAllowanceValue.getBytes()));
+                    if (!decodedEmployeeAllowance.equals(requestAllowanceValue)) {
+                        noOfChanges++;
+                    }
+                }
+            }
+        }
+
+        // Compare deduction values with Base64 decoding
+        if (employee.getSalaryConfigurationEntity().getDeductions() != null && salaryUpdateRequest.getSalaryConfigurationRequest().getDeductions() != null) {
+            Map<String, String> employeeDeductions = employee.getSalaryConfigurationEntity().getDeductions();
+            Map<String, String> requestDeductions = salaryUpdateRequest.getSalaryConfigurationRequest().getDeductions();
+
+            for (Map.Entry<String, String> entry : employeeDeductions.entrySet()) {
+                String employeeDeductionValue = entry.getValue();
+                String requestDeductionValue = requestDeductions.get(entry.getKey());
+
+                if (employeeDeductionValue != null && requestDeductionValue != null) {
+                    String decodedEmployeeDeduction = new String(Base64.getDecoder().decode(employeeDeductionValue.getBytes()));
+                    if (!decodedEmployeeDeduction.equals(requestDeductionValue)) {
+                        noOfChanges++;
+                    }
+                }
+            }
+        }
+        return noOfChanges;
+    }
 }
