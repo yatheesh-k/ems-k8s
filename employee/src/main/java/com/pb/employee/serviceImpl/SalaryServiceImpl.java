@@ -225,6 +225,12 @@ public class SalaryServiceImpl implements SalaryService {
                                         .getMessage(EmployeeErrorMessageKey.EMPLOYEE_INACTIVE)))),
                         HttpStatus.CONFLICT);
             }
+            int noOfChanges = EmployeeUtils.duplicateSalaryProperties(entity, salaryUpdateRequest);
+            if (noOfChanges==0){
+                return new ResponseEntity<>(
+                        ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.SALARY_ALREADY_EXIST)))),
+                        HttpStatus.CONFLICT);
+            }
             if (!entity.getEmployeeId().equals(employeeId)) {
                 log.error("Employee ID mismatch for salary {}: expected {}, found", salaryId, employeeId);
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
