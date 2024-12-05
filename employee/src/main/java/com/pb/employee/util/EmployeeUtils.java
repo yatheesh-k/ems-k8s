@@ -235,14 +235,21 @@ public class EmployeeUtils {
             itax = new String((Base64.getDecoder().decode(salaryEntity.getIncomeTax().toString().getBytes())));
             salaryEntity.setIncomeTax(itax);
         }
-
-        if(salaryEntity.getNetSalary() != null) {
-            net = new String((Base64.getDecoder().decode(salaryEntity.getNetSalary().toString().getBytes())));
-            salaryEntity.setNetSalary(net);
-        }
         if(salaryEntity.getTotalTax() != null) {
             ttax = new String((Base64.getDecoder().decode(salaryEntity.getTotalTax().toString().getBytes())));
             salaryEntity.setTotalTax(ttax);
+        }
+        if (salaryEntity.getNetSalary() != null) {
+            // Convert tded and ttax from String to double
+            double tdedValue = Double.parseDouble(tded); // Parse tded to double
+            double ttaxValue = Double.parseDouble(ttax);  // Parse ttax to double
+            double tEarValue = Double.parseDouble(te);  // Parse te to double
+
+            double totalAmount = tdedValue+ttaxValue;
+            double netAmount = tEarValue -totalAmount;
+            // Convert the result to String
+            net = String.valueOf(netAmount);
+            salaryEntity.setNetSalary(net);
         }
 
         if (salaryEntity.getSalaryConfigurationEntity().getAllowances() != null) {

@@ -274,7 +274,7 @@
                 appraisal process.
             </p>
         </div>
-        <h5 style="text-align: center; margin-top: 43px;">
+        <h5 style="text-align: center; margin-top: 30px;">
             <#if company.cinNo?has_content>
                 CIN: ${company.cinNo}
                 <#elseif company.companyRegNo?has_content>

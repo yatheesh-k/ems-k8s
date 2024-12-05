@@ -159,7 +159,7 @@ public class PayslipUtils {
             int noOfLeaves = totalWorkingDays - noOfWorkingDays;
             if (noOfLeaves > 1) {
                 double monthlySalary = (gross / 12);
-                double perDaySalary = (monthlySalary / totalWorkingDays);
+                double perDaySalary = Math.round(monthlySalary / totalWorkingDays);
                 lop = (noOfLeaves - 1) * perDaySalary;
                 lop = (double) Math.round(lop);
                 totalDeduction += lop;
