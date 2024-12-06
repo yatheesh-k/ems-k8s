@@ -323,6 +323,27 @@ function Profile() {
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
+  const validateAddress = (value) => {
+    // Check for leading or trailing spaces
+    if (/^\s/.test(value)) {
+      return "Leading space not allowed."; // Leading space error
+    } else if (/\s$/.test(value)) {
+      return "Spaces at the end are not allowed."; // Trailing space error
+    }
+  
+    // Check for multiple spaces between words
+    if (/\s{2,}/.test(value)) {
+      return "No multiple spaces between words allowed."; // Multiple spaces error
+    }
+  
+    // Validate special characters and alphanumeric characters
+    const validCharsRegex = /^[A-Za-z0-9\s,.'\-/&@#$()*+!]*$/;
+    if (!validCharsRegex.test(value)) {
+      return "Invalid characters used. Only alphabets, numbers, and special characters (, . ' - / & @ # $ ( ) *) are allowed.";
+    }
+  
+    return true; // Return true if all conditions are satisfied
+  };
 
   return (
     <LayOut>
@@ -545,6 +566,7 @@ function Profile() {
                             value: 200,
                             message: "Maximum 200 Characters allowed",
                           },
+                          validate:validateAddress
                         })}
                       />
                       {errors.companyAddress && (
@@ -760,6 +782,7 @@ function Profile() {
                             value: 200,
                             message: "Maximum 200 Characters allowed",
                           },
+                          validate:validateAddress
                         })}
                       />
                       {errors.address && (

@@ -306,7 +306,7 @@ const EmployeeRegistration = () => {
           // Check if data contains specific conflict details (e.g., duplicate values)
           Object.keys(conflictData).forEach((key) => {
             const value = conflictData[key];
-            conflictMessage += `${key}: ${value}\n`;
+            conflictMessage += `${key}: ${value}\n,`;
           });
 
           // Display detailed conflict message in toast and add to error list
@@ -315,8 +315,8 @@ const EmployeeRegistration = () => {
 
         // Handle HTTP 409 Conflict Error (duplicate or other conflicts)
         if (error.response.status === 409) {
-          const conflictMessage = error.response.data.message || "A conflict occurred.";
-          // toast.error(conflictMessage);  // Show conflict error in toast
+          const conflictMessage ="A conflict occurred.";
+           toast.error(conflictMessage);  // Show conflict error in toast
         }
 
       } else {
@@ -447,7 +447,7 @@ const EmployeeRegistration = () => {
     return true; // Return true if all conditions are satisfied
   };
 
-  const validateName = (value) => {
+  const validateLastName = (value) => {
     // Trim leading and trailing spaces before further validation
     const trimmedValue = value.trim();
 
@@ -561,7 +561,21 @@ const EmployeeRegistration = () => {
 
     return true; // Return true if all validations pass
   };
+  const validatePAN = (value) => {
+    const spaceError = "Spaces are not allowed in the PAN Number.";
+    const patternError = "Invalid PAN Number format";
 
+    if (/\s/.test(value)) {
+      return spaceError; // Return space error if spaces are found
+    }
+
+    // Check the pattern for the CIN Number
+    if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(value)) {
+      return patternError; // Return pattern error if it doesn't match
+    }
+
+    return true; // Return true if all checks pass
+  };
 
   const validateLocation = (value) => {
     if (!value || value.trim().length === 0) {
@@ -571,11 +585,18 @@ const EmployeeRegistration = () => {
     } else {
       const words = value.split(" ");
 
-      for (const word of words) {
-        if (word.length < 1) {
-          return "Minimum Length 1 Character Required.";  // If any word is shorter than 2 characters, return this message
-        } else if (word.length > 200) {
-          return "Maximum Length 200 Characters Required.";  // If any word is longer than 40 characters, return this message
+      // Check for minimum and maximum word length, allowing one-character words at the end
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+
+        // If the word length is less than 3 and it's not the last word, show error
+        if (word.length < 3 && i !== words.length - 1) {
+          return "Minimum Length 3 Characters Required.";
+        }
+
+        // Check maximum word length
+        if (word.length > 100) {
+          return "Max Length 100 Characters Exceeded.";
         }
       }
 
@@ -591,6 +612,7 @@ const EmployeeRegistration = () => {
 
     return true; // Return true if all conditions are satisfied
   };
+
   const toInputAddressCase = (e) => {
     const input = e.target;
     let value = input.value;
@@ -681,6 +703,10 @@ const EmployeeRegistration = () => {
   const clearForm = () => {
     reset();
   };
+  const backForm=()=>{
+    reset();
+    navigate("/employeeView")
+  }
 
   return (
     <LayOut>
@@ -787,7 +813,7 @@ const EmployeeRegistration = () => {
                           required: "Employee Id is Required",
                           pattern: {
                             value: /^(?=.*\d)[A-Z0-9]+$/,
-                            message: "These fields accepts only Integers and Alphanumerical Characters",
+                            message: "These fields accepts only Integers and UpperCase Alphabets Characters",
                           },
                           minLength: {
                             value: 2,
@@ -819,7 +845,11 @@ const EmployeeRegistration = () => {
                           required: "First Name is Required",
                           validate: {
                             validateFirstName
-                          }
+                          },
+                          minLength: {
+                            value: 3,
+                            message: "Minimum 3 Characters Required",
+                          },
                         })}
                       />
                       {errors.firstName && (
@@ -841,7 +871,7 @@ const EmployeeRegistration = () => {
                         onKeyDown={handleEmailChange}
                         {...register("lastName", {
                           required: "Last Name is Required",
-                          validate: { validateName }
+                          validate: { validateLastName }
                         })}
                       />
                       {errors.lastName && (
@@ -957,7 +987,7 @@ const EmployeeRegistration = () => {
                           required: "Manager is Required",
 
                           validate: {
-                            validateName,
+                            validateFirstName,
                           }
                         })}
                       />
@@ -978,11 +1008,7 @@ const EmployeeRegistration = () => {
                         onInput={toInputAddressCase}
                         {...register("location", {
                           required: "Location is Required",
-                          pattern: {
-                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
-                            message:
-                              "Please enter valid Address",
-                          },
+                         validate:validateLocation,
                           minLength: {
                             value: 3,
                             message: "Minimum 3 Characters allowed",
@@ -1236,11 +1262,7 @@ const EmployeeRegistration = () => {
                         onKeyDown={handleEmailChange}
                         {...register("bankName", {
                           required: "Bank Name is Required",
-                          pattern: {
-                            value: /^[A-Za-z&'(),./\- ]{1,100}$/,
-                            message:
-                              "Invalid Bank Name format",
-                          },
+                          validate:validateFirstName,
                           minLength: {
                             value: 3,
                             message: "Minimum 3 Characters Required",
@@ -1372,11 +1394,16 @@ const EmployeeRegistration = () => {
                       className="col-12 mt-4  d-flex justify-content-end"
                       style={{ background: "none" }}
                     >
-                      {!isUpdating && (
+                      {!isUpdating ? (
                         <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
                           Clear
                         </button>
+                      ):(
+                        <button className="btn btn-secondary me-2" type="button" onClick={backForm}>
+                        Back
+                      </button>
                       )}
+
                       <button
                         className={
                           isUpdating

@@ -172,7 +172,11 @@ const Reset = ({ companyName, onClose, show }) => {
                     required: "New Password is Required",
                     minLength: {
                       value: 6,
-                      message: "New Password must be at least 6 characters long",
+                      message: "Minimum 6 Characters allowed",
+                    },
+                    maxLength:{
+                      value: 16,
+                      message: "Minimum 6 & Maximum 16 Characters allowed",
                     },
                     pattern: {
                       value: /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{6,16}$/,

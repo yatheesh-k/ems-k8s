@@ -349,7 +349,7 @@ const CompanySalaryStructure = () => {
 
     try {
         // Submit the data to the backend
-        const response = await CompanySalaryStructurePostApi(jsonData);
+        await CompanySalaryStructurePostApi(jsonData);
         
         // If submission is successful, show a success message
         toast.success("Salary structure submitted successfully");
@@ -608,7 +608,7 @@ const CompanySalaryStructure = () => {
                             type="text"
                             className="form-control"
                             readOnly
-                            value={formatFieldName(field.label)}
+                            value={field.label}
                             onChange={(e) => handleLabelChange(index, e.target.value)}
                             placeholder="Label Name"
                             disabled={!isEditing}
@@ -685,7 +685,7 @@ const CompanySalaryStructure = () => {
                             type="text"
                             className="form-control"
                             readOnly
-                            value={formatFieldName(field.label)}
+                            value={field.label}
                             onChange={(e) => handleLabelChange(index, e.target.value)}
                             placeholder="Label Name"
                             disabled={!isEditing}

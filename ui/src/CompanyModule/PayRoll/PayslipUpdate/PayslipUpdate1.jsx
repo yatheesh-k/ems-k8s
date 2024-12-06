@@ -372,6 +372,11 @@ const PayslipUpdate1 = () => {
 
     const otherAllowanceKey = 'otherAllowances';
 
+    const backForm=()=>{
+        reset();
+        navigate("/payslipGeneration");
+      }
+
     return (
         <LayOut>
             <div className="container mt-4">
@@ -743,6 +748,9 @@ const PayslipUpdate1 = () => {
                 )}
             </div>
             <div className="d-flex justify-content-end align-items-center me-4">
+                <button className="btn btn-secondary me-2" type="button" onClick={backForm}>
+                   Back
+                 </button>
                 <button type="button" className="btn btn-primary" onClick={handleUpdate}>
                     <span className="m-2">Generate Payslip</span>
                 </button>

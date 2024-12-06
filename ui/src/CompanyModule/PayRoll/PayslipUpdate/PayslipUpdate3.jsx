@@ -213,13 +213,16 @@ const PayslipUpdate3 = () => {
         }
     }, [payslipData, allowanceFields, deductionFields, taxFields]);
 
-    {
+    
         validationError && (
             <div style={{ color: 'red', margin: '10px 0' }}>
                 {validationError}
             </div>
         )
-    }
+        const backForm=()=>{
+            reset();
+            navigate("/payslipGeneration");
+          }
 
     if (loading) {
         return <div>Loading...</div>;
@@ -738,6 +741,9 @@ const PayslipUpdate3 = () => {
 
             </div>
             <div className="d-flex justify-content-end align-items-center me-4">
+            <button className="btn btn-secondary me-2" type="button" onClick={backForm}>
+                   Back
+                 </button>
                 <button type="button" className="btn btn-primary" onClick={handleUpdate}>
                     <span className="m-2">Generate Payslip</span>
                 </button>
