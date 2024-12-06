@@ -25,7 +25,6 @@ const EmployeeSalaryUpdate = () => {
   const salaryId = queryParams.get("salaryId");
   const id = queryParams.get("employeeId");
   const [totalTax, setTotalTax] = useState("");
-  const [employes, setEmployes] = useState([]);
   const [salaryStructure, setSalaryStructure] = useState(0);
   const [allowances, setAllowances] = useState({});
   const [incomeTax, setIncomeTax] = useState(0);
@@ -56,6 +55,11 @@ const EmployeeSalaryUpdate = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const debounceTimerRef = useRef(null);
+
+  const backForm=()=>{
+    reset();
+    navigate(`/employeeSalaryList?id=${id}`);
+  }
 
   useEffect(() => {
     if (id && salaryId) {
@@ -867,11 +871,17 @@ const EmployeeSalaryUpdate = () => {
                     </div>
                   </div>
                 </div>
+               
 
                 <div className="text-end">
+                {showFields && (
+                   <button className="btn btn-secondary me-2" type="button" onClick={backForm}>
+                   Back
+                 </button>
+                )}
                   <button
                     type="submit"
-                    className="btn btn-danger"
+                    className="btn btn-danger ms-2"
                     disabled={!!errorMessage}
                   >
                     Update
