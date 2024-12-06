@@ -13,7 +13,7 @@ const GeneratePaySlip = () => {
   const {
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors },reset
   } = useForm();
 
   const [view, setView] = useState([]);
