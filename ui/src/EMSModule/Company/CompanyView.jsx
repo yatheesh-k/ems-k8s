@@ -110,16 +110,6 @@ const CompanyView = () => {
       wrap: true,
     },
     {
-      name: <h6><b>Service Name</b></h6>,
-      selector: row => (
-        <div title={row.shortName}>
-          {row.shortName.length > 20 ? `${row.shortName.slice(0, 20)}...` : row.shortName}
-          </div>
-      ),
-      width: "200px",
-      wrap: true,
-    },
-    {
       name: <h6><b>Email Id</b></h6>,
       selector: row => (
         <div title={row.emailId}>
@@ -127,6 +117,16 @@ const CompanyView = () => {
           </div>
       ),
       width: "250px",
+    },
+    {
+      name: <h6><b>Mobile Number</b></h6>,
+      selector: row => (
+        <div title={row.mobileNo}>
+          {row.mobileNo.length > 20 ? `${row.mobileNo.slice(0, 20)}...` : row.mobileNo}
+          </div>
+      ),
+      width: "200px",
+      wrap: true, 
     },
     {
       name: <h6><b>Type</b></h6>,
