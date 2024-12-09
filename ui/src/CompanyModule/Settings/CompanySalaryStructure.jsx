@@ -767,7 +767,6 @@ const CompanySalaryStructure = () => {
                             <option value="text">₹</option>
                           </select>
                         </div>
-
                         <div className="col-sm-3">
                           <input
                             type="text"
@@ -820,7 +819,6 @@ const CompanySalaryStructure = () => {
                       Add Field
                     </button>
                   </div>
-
                   {/* Deduction Tab */}
                   <div
                     className={`tab-pane fade ${
