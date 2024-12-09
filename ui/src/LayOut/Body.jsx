@@ -88,11 +88,7 @@ const Body = () => {
            
                 <div className='card'>
                   <iframe
-<<<<<<< HEAD
-                    src="https://122.175.43.71:5701/kibana/s/ems/app/dashboards#/view/28814343-cc4e-4b7c-aa1b-c1f5b2271aa0?embed=true&fullscreen=true"  height="1000" width="800"
-=======
-                    src="https://122.175.43.71:2800/kibana/s/ems/app/dashboards#/view/deba4a73-baa2-4c62-aa78-089197311bcb?embed=true&fullscreen=true"height="1000" width="800"
->>>>>>> main
+                    src="https://122.175.43.71:2801/kibana/s/ems/app/dashboards#/view/deba4a73-baa2-4c62-aa78-089197311bcb?embed=true&fullscreen=true"height="1000" width="800"
                     title="EMS Dashboard"
                       style={{ border: 'none'}}
                   ></iframe>
