@@ -924,16 +924,16 @@ const CompanyRegistration = () => {
                           required: "Company Address is Required",
                           pattern: {
                             value:
-                              /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
-                            message: "Please enter a valid Address",
+                              /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.+()^\-/]*$/,
+                            message: "Please enter valid Address",
                           },
                           minLength: {
                             value: 3,
                             message: "Minimum 3 Characters allowed",
                           },
                           maxLength: {
-                            value: 200,
-                            message: "Maximum 200 Characters allowed",
+                            value: 250,
+                            message: "Maximum 250 Characters allowed",
                           },
                           validate: validateAddress
                         })}
@@ -1230,16 +1230,16 @@ const CompanyRegistration = () => {
                           required: "Address is Required",
                           pattern: {
                             value:
-                              /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
-                            message: "Please enter a valid Address",
+                              /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.+()^\-/]*$/,
+                            message: "Please enter valid Address",
                           },
                           minLength: {
                             value: 3,
                             message: "Minimum 3 Characters allowed",
                           },
                           maxLength: {
-                            value: 200,
-                            message: "Maximum 200 Characters allowed",
+                            value: 250,
+                            message: "Maximum 250 Characters allowed",
                           },
                           validate:validateAddress
                         })}
