@@ -80,7 +80,7 @@ const AttendanceReport = () => {
   const fetchAttendanceData = async (empId, month = "", year = "") => {
     try {
       if (!month) {
-        month = ""; // Set to empty string if month is "Select Month" or null/empty
+        month = ""; // Set default to last month if not provided
       }
 
       if (!year) {
@@ -99,15 +99,14 @@ const AttendanceReport = () => {
       setNoDataFound(true); // Set to true in case of an error
     }
   };
-
   useEffect(() => {
     const lastMonth = getLastMonth(); // Get the last month
     const currentYear = new Date().getFullYear(); // Get the current year
     setSelectedMonth(lastMonth); // Default to last month
     setSelectedYear(currentYear); // Default to current year
-    fetchAttendanceData(employeeId, lastMonth, currentYear);
-    
-  }, [employeeId]);
+    fetchAttendanceData(employeeId, lastMonth, currentYear); // Fetch data with both last month and current year
+  }, []);
+
   const handleEmployeeChange = (selectedOption) => {
     setEmployeeId(selectedOption.value);
     setSelectedEmployee(selectedOption); // Set the selected employee details
@@ -133,8 +132,6 @@ const AttendanceReport = () => {
       new Date(0, i).toLocaleString("en-US", { month: "long" })
     );
   };
-
-  const year = new Date().getFullYear();
 
   const getRecentYears = () => {
     const currentYear = new Date().getFullYear();
@@ -339,8 +336,7 @@ const AttendanceReport = () => {
                       value={selectedMonth}
                       onChange={(e) => setSelectedMonth(e.target.value)} // Update the selectedMonth state
                     >
-                      <option value="">Select Month</option>{" "}
-                      {/* Default option */}
+                      <option value=''>Select Month</option>
                       {Array.from({ length: 12 }, (_, i) =>
                         new Date(0, i).toLocaleString("en-US", {
                           month: "long",

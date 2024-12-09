@@ -97,11 +97,7 @@ const AppraisalTemplate2 = ({
         </p>
 
         <p>
-          We are pleased to inform you that based on your performance and
-          contribution to the company, our management has revised your
-          compensation to Rs.<strong>{salaryIncrease}</strong> pa which is cost
-          to company with effect from <strong>{effectiveDate}</strong>.All other
-          T&C are same as per the original offer letter.
+        We are pleased to inform you that based on your performance and contribution to the company, our management has revised your compensation to Rs.<strong>{salaryIncrease}</strong> per Annum, which is cost to company with effect from <strong>{effectiveDate}</strong>.All other T&C are same as per the original offer letter.
         </p>
         <table className="table border-collapse mb-5">
           <thead>

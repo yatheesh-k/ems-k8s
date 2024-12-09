@@ -307,41 +307,39 @@ const CompanyRegistration = () => {
     const input = e.target;
     let value = input.value;
     const cursorPosition = input.selectionStart; // Save the cursor position
-    // Remove leading spaces
-    value = value.replace(/^\s+/g, "");
+  
+    // Remove leading spaces but keep trailing spaces
+    const leadingTrimmedValue = value.replace(/^\s+/g, "");
+  
     // Ensure only alphabets (upper and lower case), numbers, and allowed special characters
     const allowedCharsRegex = /^[a-zA-Z0-9\s!-_@#&()*/,.\\-{}]+$/;
-    value = value
-      .split("")
-      .filter((char) => allowedCharsRegex.test(char))
-      .join("");
-
-    // Capitalize the first letter of each word, but allow uppercase letters in the middle of the word
+    value = leadingTrimmedValue
+      .split("") // Split value into characters
+      .filter((char) => allowedCharsRegex.test(char)) // Keep only allowed characters
+      .join(""); // Join characters back to a string
+  
+    // Capitalize the first letter of each word
     const words = value.split(" ");
     const capitalizedWords = words.map((word) => {
-      if (word.length > 0) {
-        // Capitalize the first letter, but leave the middle of the word intact
-        return word.charAt(0).toUpperCase() + word.slice(1);
-      }
-      return "";
+      // Capitalize first letter, ensure the rest of the word is lowercase
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
     });
-
-    // Join the words back into a string
+  
+    // Join the words back into a string with a single space between them
     let formattedValue = capitalizedWords.join(" ");
-
-    // Remove spaces not allowed (before the first two characters)
-    if (formattedValue.length > 2) {
-      formattedValue =
-        formattedValue.slice(0, 2) +
-        formattedValue.slice(2).replace(/\s+/g, " ");
+  
+    // Allow spaces at the end if the user typed them (by preserving the original input length)
+    if (value.length < leadingTrimmedValue.length) {
+      formattedValue = formattedValue + " ".repeat(input.value.length - formattedValue.length);
     }
-
+  
     // Update input value
     input.value = formattedValue;
-
+  
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
+   
 
   const validateREGISTER = (value) => {
     const spaceError = "Spaces are not allowed in the Register Number.";
@@ -403,10 +401,6 @@ const CompanyRegistration = () => {
     // Trim leading and trailing spaces
     const trimmedValue = value.trim();
 
-    if (!trimmedValue || trimmedValue.length === 0) {
-      return "Company Name is Required.";
-    }
-
     // Check for leading or trailing spaces
     if (/^\s/.test(value)) {
       return "Leading space not allowed."; // Leading space error
@@ -453,6 +447,29 @@ const CompanyRegistration = () => {
 
     return true; // Return true if all conditions are satisfied
   };
+
+  const validateAddress = (value) => {
+    // Check for leading or trailing spaces
+    if (/^\s/.test(value)) {
+      return "Leading space not allowed."; // Leading space error
+    } else if (/\s$/.test(value)) {
+      return "Spaces at the end are not allowed."; // Trailing space error
+    }
+  
+    // Check for multiple spaces between words
+    if (/\s{2,}/.test(value)) {
+      return "No multiple spaces between words allowed."; // Multiple spaces error
+    }
+  
+    // Validate special characters and alphanumeric characters
+    const validCharsRegex = /^[A-Za-z0-9\s,.'\-/&@#$()*+!]*$/;
+    if (!validCharsRegex.test(value)) {
+      return "Invalid characters used. Only alphabets, numbers, and special characters (, . ' - / & @ # $ ( ) *) are allowed.";
+    }
+  
+    return true; // Return true if all conditions are satisfied
+  };
+  
 
   const validatePAN = (value) => {
     const spaceError = "Spaces are not allowed in the PAN Number.";
@@ -615,6 +632,10 @@ const CompanyRegistration = () => {
                           minLength: {
                             value: 2,
                             message: "Minimum 2 Characters Required",
+                          },
+                          maxLength: {
+                            value: 200,
+                            message: "Maximum 2 Characters Required",
                           },
                         })}
                         disabled={editMode}
@@ -914,6 +935,7 @@ const CompanyRegistration = () => {
                             value: 250,
                             message: "Maximum 250 Characters allowed",
                           },
+                          validate: validateAddress
                         })}
                       />
                       {errors.companyAddress && (
@@ -1104,9 +1126,8 @@ const CompanyRegistration = () => {
                             value: 100,
                             message: "Name must not exceed 100 characters",
                           },
-                          pattern: {
-                            value: /^[a-zA-Z\s]*$/,
-                            message: "Name should contain only alphabets",
+                          validate: {
+                            validateName,
                           },
                         })}
                       />
@@ -1220,6 +1241,7 @@ const CompanyRegistration = () => {
                             value: 250,
                             message: "Maximum 250 Characters allowed",
                           },
+                          validate:validateAddress
                         })}
                       />
                       {errors.address && (

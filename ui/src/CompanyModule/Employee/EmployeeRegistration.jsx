@@ -5,11 +5,16 @@ import { Eye, EyeSlash } from "react-bootstrap-icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import LayOut from "../../LayOut/LayOut";
-import { DepartmentGetApi, DesignationGetApi, EmployeeGetApiById, EmployeePatchApiById, EmployeePostApi } from "../../Utils/Axios";
+import {
+  DepartmentGetApi,
+  DesignationGetApi,
+  EmployeeGetApiById,
+  EmployeePatchApiById,
+  EmployeePostApi,
+} from "../../Utils/Axios";
 import { useAuth } from "../../Context/AuthContext";
 
 const EmployeeRegistration = () => {
-
   const {
     register,
     watch,
@@ -21,7 +26,7 @@ const EmployeeRegistration = () => {
   } = useForm({
     defaultValues: {
       status: "Active", // Initialize with default value or leave empty if fetching dynamically
-      roles: null
+      roles: null,
     },
     mode: "onChange",
   });
@@ -34,10 +39,10 @@ const EmployeeRegistration = () => {
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
   const [companyName, setCompanyName] = useState("");
   const [showNoticePeriodOption, setShowNoticePeriodOption] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(''); // State for error message
+  const [errorMessage, setErrorMessage] = useState(""); // State for error message
   const navigate = useNavigate();
   const location = useLocation();
-  console.log(user.company)
+  console.log(user.company);
   const [passwordShown, setPasswordShown] = useState(false);
   const togglePasswordVisiblity = () => {
     setPasswordShown(!passwordShown);
@@ -94,7 +99,6 @@ const EmployeeRegistration = () => {
     return newEmployeeId;
   };
 
-
   const fetchDepartments = async () => {
     try {
       const data = await DepartmentGetApi();
@@ -128,30 +132,35 @@ const EmployeeRegistration = () => {
     const cursorPosition = input.selectionStart; // Save the cursor position
 
     // Remove leading spaces
-    value = value.replace(/^\s+/g, '');
+    value = value.replace(/^\s+/g, "");
 
     // Ensure only allowed characters (alphabets, numbers, and some special chars)
     const allowedCharsRegex = /^[a-zA-Z\s]+$/;
-    value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
+    value = value
+      .split("")
+      .filter((char) => allowedCharsRegex.test(char))
+      .join("");
 
     // Capitalize the first letter of each word
-    const words = value.split(' ');
+    const words = value.split(" ");
 
     // Capitalize the first letter of each word and leave the rest of the characters as they are
-    const capitalizedWords = words.map(word => {
+    const capitalizedWords = words.map((word) => {
       if (word.length > 0) {
         // Capitalize the first letter, keep the rest as is
         return word.charAt(0).toUpperCase() + word.slice(1);
       }
-      return '';
+      return "";
     });
 
     // Join the words back into a string
-    let formattedValue = capitalizedWords.join(' ');
+    let formattedValue = capitalizedWords.join(" ");
 
     // Remove spaces not allowed (before the first two characters)
     if (formattedValue.length > 1) {
-      formattedValue = formattedValue.slice(0, 1) + formattedValue.slice(1).replace(/\s+/g, ' ');
+      formattedValue =
+        formattedValue.slice(0, 1) +
+        formattedValue.slice(1).replace(/\s+/g, " ");
     }
 
     // Update input value
@@ -165,21 +174,21 @@ const EmployeeRegistration = () => {
     const input = e.target;
     let value = input.value;
     // Remove leading spaces
-    value = value.replace(/^\s+/g, '');
+    value = value.replace(/^\s+/g, "");
 
     // Initially disallow spaces if there are no non-space characters
     if (!/\S/.test(value)) {
       // If no non-space characters are present, prevent spaces
-      value = value.replace(/\s+/g, '');
+      value = value.replace(/\s+/g, "");
     } else {
       // Allow spaces if there are non-space characters
       value = value.toLowerCase();
-      value = value.replace(/^\s+/g, ''); // Remove leading spaces
-      const words = value.split(' ');
-      const capitalizedWords = words.map(word => {
+      value = value.replace(/^\s+/g, ""); // Remove leading spaces
+      const words = value.split(" ");
+      const capitalizedWords = words.map((word) => {
         return word.charAt(0).toLowerCase() + word.slice(1);
       });
-      value = capitalizedWords.join(' ');
+      value = capitalizedWords.join(" ");
     }
     // Update input value
     input.value = value;
@@ -188,7 +197,7 @@ const EmployeeRegistration = () => {
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
     let newValue = "";
-    let capitalizeNext = true;  // Flag to determine if the next character should be capitalized
+    let capitalizeNext = true; // Flag to determine if the next character should be capitalized
 
     // Remove spaces from the beginning of inputValue
     inputValue = inputValue.trimStart();
@@ -199,12 +208,12 @@ const EmployeeRegistration = () => {
       // Check if the current character is a space
       if (char === " ") {
         newValue += char;
-        capitalizeNext = true;  // Set flag to capitalize next non-space character
+        capitalizeNext = true; // Set flag to capitalize next non-space character
       } else if (capitalizeNext && char.match(/[a-zA-Z0-9]/)) {
         newValue += char.toUpperCase();
-        capitalizeNext = false;  // Reset flag after capitalizing a character
+        capitalizeNext = false; // Reset flag after capitalizing a character
       } else {
-        newValue += char;  // Add character as is if it's not the first one after a space
+        newValue += char; // Add character as is if it's not the first one after a space
       }
     }
 
@@ -212,9 +221,9 @@ const EmployeeRegistration = () => {
     e.target.value = newValue;
   };
 
-  let company = user.company
+  let company = user.company;
   const onSubmit = async (data) => {
-    // const roles = data.roles ? [data.roles] : []; 
+    // const roles = data.roles ? [data.roles] : [];
     // Constructing the payload
     let payload = {
       companyName: company,
@@ -230,7 +239,7 @@ const EmployeeRegistration = () => {
       accountNo: data.accountNo,
       ifscCode: data.ifscCode,
       bankName: data.bankName,
-      aadhaarId: data.aadhaarId
+      aadhaarId: data.aadhaarId,
     };
     if (location.state && location.state.id) {
       payload = {
@@ -242,7 +251,7 @@ const EmployeeRegistration = () => {
         department: data.department,
         panNo: data.panNo,
         uanNo: data.uanNo,
-        dateOfBirth: data.dateOfBirth
+        dateOfBirth: data.dateOfBirth,
       };
     } else {
       payload = {
@@ -255,7 +264,7 @@ const EmployeeRegistration = () => {
         panNo: data.panNo,
         aadhaarId: data.aadhaarId,
         uanNo: data.uanNo,
-        dateOfBirth: data.dateOfBirth
+        dateOfBirth: data.dateOfBirth,
       };
     }
 
@@ -306,7 +315,7 @@ const EmployeeRegistration = () => {
           // Check if data contains specific conflict details (e.g., duplicate values)
           Object.keys(conflictData).forEach((key) => {
             const value = conflictData[key];
-            conflictMessage += `${key}: ${value}\n`;
+            conflictMessage += `${key}: ${value}\n,`;
           });
 
           // Display detailed conflict message in toast and add to error list
@@ -315,14 +324,13 @@ const EmployeeRegistration = () => {
 
         // Handle HTTP 409 Conflict Error (duplicate or other conflicts)
         if (error.response.status === 409) {
-          const conflictMessage = error.response.data.message || "A conflict occurred.";
-          // toast.error(conflictMessage);  // Show conflict error in toast
+          const conflictMessage = "A conflict occurred.";
+          toast.error(conflictMessage); // Show conflict error in toast
         }
-
       } else {
         // General error (non-Axios)
-        console.log('Error without response:', error);
-        toast.error('An unexpected error occurred. Please try again later.');
+        console.log("Error without response:", error);
+        toast.error("An unexpected error occurred. Please try again later.");
       }
 
       // Update the error messages in the state
@@ -335,9 +343,14 @@ const EmployeeRegistration = () => {
     //   const alertMessage = `${error.response.data.message} (Duplicate Values)`;
     //   alert(alertMessage);
     // }
-    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+    if (
+      error.response &&
+      error.response.data &&
+      error.response.data.error &&
+      error.response.data.error.message
+    ) {
       const errorMessage = error.response.data.error.message;
-      setErrorMessage(errorMessage)
+      setErrorMessage(errorMessage);
       toast.error(errorMessage);
     } else {
       // toast.error("Network Error !");
@@ -355,17 +368,17 @@ const EmployeeRegistration = () => {
           setIsUpdating(true);
           // Assuming roles is an array and setting the first role
           const status = response.data.data.status;
-          setValue('status', status.toString());
+          setValue("status", status.toString());
 
           // Conditionally show the "Notice Period" option based on the status
-          if (status === 'NoticePeriod') {
+          if (status === "NoticePeriod") {
             setShowNoticePeriodOption(true);
           }
 
           // Check if roles array has any items
           const role = response.data.data.roles[0]; // Assuming roles is an array
-          const selectedRole = Roles.find(option => option.value === role);
-          setValue('roles', selectedRole || null);
+          const selectedRole = Roles.find((option) => option.value === role);
+          setValue("roles", selectedRole || null);
         } catch (error) {
           handleApiErrors(error);
         }
@@ -375,9 +388,14 @@ const EmployeeRegistration = () => {
     }
   }, [location.state, reset, setValue]);
 
-
   const today = new Date();
-  const threeMonthsFromNow = new Date(today.getFullYear(), today.getMonth() + 3, today.getDate()).toISOString().split('T')[0];
+  const threeMonthsFromNow = new Date(
+    today.getFullYear(),
+    today.getMonth() + 3,
+    today.getDate()
+  )
+    .toISOString()
+    .split("T")[0];
   const getCurrentDate = () => {
     const today = new Date();
     const year = today.getFullYear();
@@ -413,7 +431,6 @@ const EmployeeRegistration = () => {
 
     // Validate against the limits
     if (selectedDateOfBirth > minDateOfBirth) {
-
       return "Date of Birth must be at least 21 years before the Date of Joining.";
     }
     if (selectedDateOfBirth < maxDateOfBirth) {
@@ -447,7 +464,7 @@ const EmployeeRegistration = () => {
     return true; // Return true if all conditions are satisfied
   };
 
-  const validateName = (value) => {
+  const validateLastName = (value) => {
     // Trim leading and trailing spaces before further validation
     const trimmedValue = value.trim();
 
@@ -465,16 +482,16 @@ const EmployeeRegistration = () => {
       // Check for minimum and maximum word length
       for (const word of words) {
         if (word.length < 1) {
-          return "Minimum Length 1 Character Required.";  // If any word is shorter than 1 character
+          return "Minimum Length 1 Character Required."; // If any word is shorter than 1 character
         } else if (word.length > 100) {
-          return "Max Length 100 Characters Required.";  // If any word is longer than 40 characters
+          return "Max Length 100 Characters Required."; // If any word is longer than 40 characters
         }
       }
 
       if (/\s$/.test(value)) {
-        return "Spaces at the end are not allowed.";  // Trailing space error
+        return "Spaces at the end are not allowed."; // Trailing space error
       } else if (/^\s/.test(value)) {
-        return "No Leading Space Allowed.";  // Leading space error
+        return "No Leading Space Allowed."; // Leading space error
       }
 
       // Check if there are multiple spaces between words
@@ -487,16 +504,11 @@ const EmployeeRegistration = () => {
   };
 
   const validateFirstName = (value) => {
-    // Trim leading and trailing spaces before further validation
     const trimmedValue = value.trim();
 
-    // Check if value is empty after trimming (meaning it only had spaces)
     if (trimmedValue.length === 0) {
       return "Field is Required.";
-    }
-
-    // Allow alphabetic characters, spaces, and numbers
-    else if (!/^[A-Za-z\s]+$/.test(trimmedValue)) {
+    } else if (!/^[A-Za-z\s]+$/.test(trimmedValue)) {
       return "Only Alphabetic Characters are Allowed.";
     } else {
       const words = trimmedValue.split(" ");
@@ -518,9 +530,9 @@ const EmployeeRegistration = () => {
 
       // Check for trailing and leading spaces
       if (/\s$/.test(value)) {
-        return "Spaces at the end are not allowed.";  // Trailing space error
+        return "Spaces at the end are not allowed."; // Trailing space error
       } else if (/^\s/.test(value)) {
-        return "No Leading Space Allowed.";  // Leading space error
+        return "No Leading Space Allowed."; // Leading space error
       }
 
       // Check if there are multiple spaces between words
@@ -554,14 +566,28 @@ const EmployeeRegistration = () => {
     }
 
     // Optionally: Check if the number is composed of repeating digits
-    const isRepeating = /^(\d)\1{11}$/.test(value);  // Check if all digits are the same (e.g., "111111111111")
+    const isRepeating = /^(\d)\1{11}$/.test(value); // Check if all digits are the same (e.g., "111111111111")
     if (isRepeating) {
       return "The Number Cannot Consist Of The Same Digit Repeated.";
     }
 
     return true; // Return true if all validations pass
   };
+  const validatePAN = (value) => {
+    const spaceError = "Spaces are not allowed in the PAN Number.";
+    const patternError = "Invalid PAN Number format";
 
+    if (/\s/.test(value)) {
+      return spaceError; // Return space error if spaces are found
+    }
+
+    // Check the pattern for the CIN Number
+    if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(value)) {
+      return patternError; // Return pattern error if it doesn't match
+    }
+
+    return true; // Return true if all checks pass
+  };
 
   const validateLocation = (value) => {
     if (!value || value.trim().length === 0) {
@@ -571,11 +597,18 @@ const EmployeeRegistration = () => {
     } else {
       const words = value.split(" ");
 
-      for (const word of words) {
-        if (word.length < 1) {
-          return "Minimum Length 1 Character Required.";  // If any word is shorter than 2 characters, return this message
-        } else if (word.length > 200) {
-          return "Maximum Length 200 Characters Required.";  // If any word is longer than 40 characters, return this message
+      // Check for minimum and maximum word length, allowing one-character words at the end
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+
+        // If the word length is less than 3 and it's not the last word, show error
+        if (word.length < 3 && i !== words.length - 1) {
+          return "Minimum Length 3 Characters Required.";
+        }
+
+        // Check maximum word length
+        if (word.length > 100) {
+          return "Max Length 100 Characters Exceeded.";
         }
       }
 
@@ -585,38 +618,44 @@ const EmployeeRegistration = () => {
         return "No Multiple Spaces Between Words Allowed.";
       }
       if (/\s$/.test(value)) {
-        return "No Trailing Space Allowed.";  // Space after the last character is not allowed
+        return "No Trailing Space Allowed."; // Space after the last character is not allowed
       }
     }
 
     return true; // Return true if all conditions are satisfied
   };
+
   const toInputAddressCase = (e) => {
     const input = e.target;
     let value = input.value;
     const cursorPosition = input.selectionStart; // Save the cursor position
     // Remove leading spaces
-    value = value.replace(/^\s+/g, '');
+    value = value.replace(/^\s+/g, "");
     // Ensure only alphabets (upper and lower case), numbers, and allowed special characters
-    const allowedCharsRegex = /^[a-zA-Z0-9\s!-_@#&()*/,.\\-{}]+$/
-    value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
+    const allowedCharsRegex = /^[a-zA-Z0-9\s!-_@#&()*/,.\\-{}]+$/;
+    value = value
+      .split("")
+      .filter((char) => allowedCharsRegex.test(char))
+      .join("");
 
     // Capitalize the first letter of each word, but allow uppercase letters in the middle of the word
-    const words = value.split(' ');
-    const capitalizedWords = words.map(word => {
+    const words = value.split(" ");
+    const capitalizedWords = words.map((word) => {
       if (word.length > 0) {
         // Capitalize the first letter, but leave the middle of the word intact
         return word.charAt(0).toUpperCase() + word.slice(1);
       }
-      return '';
+      return "";
     });
 
     // Join the words back into a string
-    let formattedValue = capitalizedWords.join(' ');
+    let formattedValue = capitalizedWords.join(" ");
 
     // Remove spaces not allowed (before the first two characters)
     if (formattedValue.length > 2) {
-      formattedValue = formattedValue.slice(0, 2) + formattedValue.slice(2).replace(/\s+/g, ' ');
+      formattedValue =
+        formattedValue.slice(0, 2) +
+        formattedValue.slice(2).replace(/\s+/g, " ");
     }
 
     // Update input value
@@ -636,7 +675,7 @@ const EmployeeRegistration = () => {
     }
 
     // Allow only numeric characters after +91 and the space
-    const numericValue = value.slice(4).replace(/[^0-9]/g, ''); // Remove any non-numeric characters after +91 
+    const numericValue = value.slice(4).replace(/[^0-9]/g, ""); // Remove any non-numeric characters after +91
     if (numericValue.length <= 10) {
       value = "+91 " + numericValue; // Keep the +91 with a space
     }
@@ -664,7 +703,7 @@ const EmployeeRegistration = () => {
     let value = input.value;
 
     // Remove all spaces from the input
-    value = value.replace(/\s+/g, '');
+    value = value.replace(/\s+/g, "");
 
     // If the first character is not lowercase, make it lowercase
     if (value.length > 0 && value[0] !== value[0].toLowerCase()) {
@@ -681,13 +720,19 @@ const EmployeeRegistration = () => {
   const clearForm = () => {
     reset();
   };
+  const backForm = () => {
+    reset();
+    navigate("/employeeView");
+  };
 
   return (
     <LayOut>
       <div className="container-fluid p-0">
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
-            <h1 className="h3 mb-3"><strong>Registration</strong> </h1>
+            <h1 className="h3 mb-3">
+              <strong>Registration</strong>{" "}
+            </h1>
           </div>
           <div className="col-auto">
             <nav aria-label="breadcrumb">
@@ -698,9 +743,7 @@ const EmployeeRegistration = () => {
                 <li className="breadcrumb-item">
                   <a href="/employeeView">Employees</a>
                 </li>
-                <li className="breadcrumb-item active">
-                  Registration
-                </li>
+                <li className="breadcrumb-item active">Registration</li>
               </ol>
             </nav>
           </div>
@@ -735,7 +778,8 @@ const EmployeeRegistration = () => {
                             required: "Employee Type Required",
                             pattern: {
                               value: /^[A-Za-z ]+$/,
-                              message: "This field accepts only alphabetic characters",
+                              message:
+                                "This field accepts only alphabetic characters",
                             },
                           })}
                         />
@@ -753,12 +797,14 @@ const EmployeeRegistration = () => {
                         <Controller
                           name="employeeType"
                           control={control}
-                          rules={{ required: 'Employee Type is Required' }}
+                          rules={{ required: "Employee Type is Required" }}
                           render={({ field }) => (
                             <Select
                               {...field}
                               options={Employement}
-                              value={Employement.find(option => option.value === field.value)}
+                              value={Employement.find(
+                                (option) => option.value === field.value
+                              )}
                               onChange={(val) => field.onChange(val.value)}
                               placeholder="Select Employee Type"
                             />
@@ -773,21 +819,25 @@ const EmployeeRegistration = () => {
                     )}
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Employee Id <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">
+                        Employee Id <span style={{ color: "red" }}>*</span>
+                      </label>
                       <input
                         type={isUpdating ? "text" : "text"}
                         readOnly={isUpdating}
                         className="form-control"
                         placeholder="Enter Employee Id"
                         name="employeeId"
-                        minLength={1} maxLength={20}
+                        minLength={1}
+                        maxLength={20}
                         onKeyDown={handleEmailChange}
-                        autoComplete='off'
+                        autoComplete="off"
                         {...register("employeeId", {
                           required: "Employee Id is Required",
                           pattern: {
                             value: /^(?=.*\d)[A-Z0-9]+$/,
-                            message: "These fields accepts only Integers and Alphanumerical Characters",
+                            message:
+                              "These fields accepts only Integers and UpperCase Alphabets Characters",
                           },
                           minLength: {
                             value: 2,
@@ -804,7 +854,9 @@ const EmployeeRegistration = () => {
                       )}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">First Name <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">
+                        First Name <span style={{ color: "red" }}>*</span>
+                      </label>
                       <input
                         type="text"
                         readOnly={isUpdating}
@@ -818,8 +870,8 @@ const EmployeeRegistration = () => {
                         {...register("firstName", {
                           required: "First Name is Required",
                           validate: {
-                            validateName
-                          }
+                            validateFirstName,
+                          },
                         })}
                       />
                       {errors.firstName && (
@@ -828,7 +880,9 @@ const EmployeeRegistration = () => {
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Last Name <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">
+                        Last Name <span style={{ color: "red" }}>*</span>
+                      </label>
                       <input
                         type="text"
                         className="form-control"
@@ -841,7 +895,11 @@ const EmployeeRegistration = () => {
                         onKeyDown={handleEmailChange}
                         {...register("lastName", {
                           required: "Last Name is Required",
-                          validate: { validateName }
+                          validate: { validateLastName },
+                          minLength: {
+                            value: 3,
+                            message: "Minimum 3 Characters Required",
+                          },
                         })}
                       />
                       {errors.lastName && (
@@ -849,7 +907,9 @@ const EmployeeRegistration = () => {
                       )}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Email Id <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">
+                        Email Id <span style={{ color: "red" }}>*</span>
+                      </label>
                       <input
                         type={isUpdating ? "email" : "email"}
                         readOnly={isUpdating}
@@ -863,7 +923,7 @@ const EmployeeRegistration = () => {
                           required: "Email Id is Required",
                           pattern: {
                             value:
-                            /^[a-z][a-zA-Z0-9._+-]*@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                              /^[a-z][a-zA-Z0-9._+-]*@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid Email Format",
                           },
                         })}
@@ -874,7 +934,9 @@ const EmployeeRegistration = () => {
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Date of Joining <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">
+                        Date of Joining <span style={{ color: "red" }}>*</span>
+                      </label>
                       <input
                         type={isUpdating ? "date" : "date"}
                         readOnly={isUpdating}
@@ -885,11 +947,14 @@ const EmployeeRegistration = () => {
                         max={threeMonthsFromNow}
                         {...register("dateOfHiring", {
                           required: true,
-                          validate: validateDate
+                          validate: validateDate,
                         })}
                       />
                       {errors.dateOfHiring && (
-                        <p className="errorMsg">{errors.dateOfHiring.message || "Date of Joining is Required"}</p>
+                        <p className="errorMsg">
+                          {errors.dateOfHiring.message ||
+                            "Date of Joining is Required"}
+                        </p>
                       )}
                     </div>
                     <div className="col-lg-1"></div>
@@ -904,8 +969,10 @@ const EmployeeRegistration = () => {
                         rules={{ required: "Department is Required" }}
                         render={({ field }) => (
                           <select {...field} className="form-select">
-                            <option value="" disabled>Select Department</option>
-                            {departments.map(department => (
+                            <option value="" disabled>
+                              Select Department
+                            </option>
+                            {departments.map((department) => (
                               <option key={department.id} value={department.id}>
                                 {department.name}
                               </option>
@@ -914,24 +981,29 @@ const EmployeeRegistration = () => {
                         )}
                       />
                       {errors.department && (
-                        <p className="errorMsg">
-                          {errors.department.message}
-                        </p>
+                        <p className="errorMsg">{errors.department.message}</p>
                       )}
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
-                      <label className="form-label">Designation <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">
+                        Designation <span style={{ color: "red" }}>*</span>
+                      </label>
                       <Controller
                         name="designation"
                         control={control}
                         defaultValue=""
                         rules={{ required: true }}
                         render={({ field }) => (
-                          <select {...field} className="form-select" >
-                            <option value="" disabled>Select Designation</option>
-                            {designations.map(designation => (
-                              <option key={designation.id} value={designation.id}>
+                          <select {...field} className="form-select">
+                            <option value="" disabled>
+                              Select Designation
+                            </option>
+                            {designations.map((designation) => (
+                              <option
+                                key={designation.id}
+                                value={designation.id}
+                              >
                                 {designation.name}
                               </option>
                             ))}
@@ -945,20 +1017,23 @@ const EmployeeRegistration = () => {
 
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Manager <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">
+                        Manager <span style={{ color: "red" }}>*</span>
+                      </label>
                       <input
                         type="text"
                         className="form-control"
                         placeholder="Enter Manager"
                         onInput={toInputTitleCase}
-                        autoComplete="off" minLength={1}
+                        autoComplete="off"
+                        minLength={1}
                         onKeyDown={handleEmailChange}
                         {...register("manager", {
                           required: "Manager is Required",
 
                           validate: {
-                            validateName,
-                          }
+                            validateFirstName,
+                          },
                         })}
                       />
                       {errors.manager && (
@@ -967,22 +1042,21 @@ const EmployeeRegistration = () => {
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Location <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">
+                        Location <span style={{ color: "red" }}>*</span>
+                      </label>
                       <input
                         type="text"
                         className="form-control"
                         placeholder="Enter Location"
                         //onInput={toInputTitleCase}
-                        autoComplete="off" minLength={2}
+                        autoComplete="off"
+                        minLength={2}
                         onKeyDown={handleEmailChange}
                         onInput={toInputAddressCase}
                         {...register("location", {
                           required: "Location is Required",
-                          pattern: {
-                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
-                            message:
-                              "Please enter valid Address",
-                          },
+                          validate: validateLocation,
                           minLength: {
                             value: 3,
                             message: "Minimum 3 Characters allowed",
@@ -997,22 +1071,23 @@ const EmployeeRegistration = () => {
                         <p className="errorMsg">{errors.location.message}</p>
                       )}
                     </div>
-                    {isUpdating && (
-                      <div className="col-lg-1"></div>
-                    )}
+                    {isUpdating && <div className="col-lg-1"></div>}
                     {isUpdating ? (
                       <></>
                     ) : (
                       <>
                         <div className="col-12 col-md-6 col-lg-5 mb-3">
-                          <label className="form-label">Password <span style={{ color: "red" }}>*</span></label>
+                          <label className="form-label">
+                            Password <span style={{ color: "red" }}>*</span>
+                          </label>
                           <div className="col-sm-12  password-input-container">
                             <input
                               className="form-control"
                               placeholder="Enter Password"
                               onChange={handlePasswordChange}
                               autoComplete="off"
-                              onKeyDown={handleEmailChange} maxLength={16}
+                              onKeyDown={handleEmailChange}
+                              maxLength={16}
                               type={passwordShown ? "text" : "password"}
                               {...register("password", {
                                 required: "Password is Required",
@@ -1028,23 +1103,29 @@ const EmployeeRegistration = () => {
                               })}
                             />
                             <span
-                              className={`bi bi-eye field-icon pb-1 toggle-password ${passwordShown ? 'text-primary' : ''}`} onClick={togglePasswordVisiblity}
-                              style={{ background: "transparent", borderLeft: "none" }}
-                            >
-                            </span>
+                              className={`bi bi-eye field-icon pb-1 toggle-password ${
+                                passwordShown ? "text-primary" : ""
+                              }`}
+                              onClick={togglePasswordVisiblity}
+                              style={{
+                                background: "transparent",
+                                borderLeft: "none",
+                              }}
+                            ></span>
                           </div>
                           {errors.password && (
-                            <p className="errorMsg">{errors.password.message}</p>
+                            <p className="errorMsg">
+                              {errors.password.message}
+                            </p>
                           )}
                         </div>
-
                       </>
                     )}
-                    {!isUpdating && (
-                      <div className="col-lg-1"></div>
-                    )}
+                    {!isUpdating && <div className="col-lg-1"></div>}
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Date of Birth <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">
+                        Date of Birth <span style={{ color: "red" }}>*</span>
+                      </label>
                       <input
                         type={isUpdating ? "date" : "date"}
                         readOnly={isUpdating}
@@ -1054,8 +1135,8 @@ const EmployeeRegistration = () => {
                         autoComplete="off"
                         {...register("dateOfBirth", {
                           required: true,
-                          validate: (value) => validateDateOfBirth(value, dateOfHiring) // Custom validation
-
+                          validate: (value) =>
+                            validateDateOfBirth(value, dateOfHiring), // Custom validation
                         })}
                         max={getCurrentDate()}
                         {...register("dateOfBirth", {
@@ -1063,12 +1144,13 @@ const EmployeeRegistration = () => {
                         })}
                       />
                       {errors.dateOfBirth && (
-                        <p className="errorMsg">{errors.dateOfBirth.message || "Date of Birth is Required"}</p>
+                        <p className="errorMsg">
+                          {errors.dateOfBirth.message ||
+                            "Date of Birth is Required"}
+                        </p>
                       )}
                     </div>
-                    {isUpdating && (
-                      <div className="col-lg-1"></div>
-                    )}
+                    {isUpdating && <div className="col-lg-1"></div>}
                     <div className="col-12 col-md-6 col-lg-5 mb-2">
                       <label className="form-label">
                         Status <span style={{ color: "red" }}>*</span>
@@ -1084,14 +1166,17 @@ const EmployeeRegistration = () => {
                             options={
                               showNoticePeriodOption
                                 ? [
-                                  { value: "Active", label: "Active" },
-                                  { value: "InActive", label: "InActive" },
-                                  { value: "NoticePeriod", label: "Notice Period" }, // Show Notice Period
-                                ]
+                                    { value: "Active", label: "Active" },
+                                    { value: "InActive", label: "InActive" },
+                                    {
+                                      value: "NoticePeriod",
+                                      label: "Notice Period",
+                                    }, // Show Notice Period
+                                  ]
                                 : [
-                                  { value: "Active", label: "Active" },
-                                  { value: "InActive", label: "InActive" }, // Show only Active and InActive
-                                ]
+                                    { value: "Active", label: "Active" },
+                                    { value: "InActive", label: "InActive" }, // Show only Active and InActive
+                                  ]
                             }
                             value={
                               field.value
@@ -1103,7 +1188,9 @@ const EmployeeRegistration = () => {
                           />
                         )}
                       />
-                      {errors.status && <p className="errorMsg">Status is Required</p>}
+                      {errors.status && (
+                        <p className="errorMsg">Status is Required</p>
+                      )}
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
@@ -1135,7 +1222,10 @@ const EmployeeRegistration = () => {
                             },
                             notRepeatingDigits: (value) => {
                               const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                              return !isRepeating || "Mobile Number cannot consist of the same digit repeated.";
+                              return (
+                                !isRepeating ||
+                                "Mobile Number cannot consist of the same digit repeated."
+                              );
                             },
                           },
                           pattern: {
@@ -1149,16 +1239,17 @@ const EmployeeRegistration = () => {
                       )}
                     </div>
                     <div className="card-header" style={{ paddingLeft: "0px" }}>
-                      <h5 className="card-title ">
-                        Account Details
-                      </h5>
+                      <h5 className="card-title ">Account Details</h5>
                       <div
                         className="dropdown-divider"
                         style={{ borderTopColor: "#d7d9dd" }}
                       />
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Bank Account Number <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">
+                        Bank Account Number{" "}
+                        <span style={{ color: "red" }}>*</span>
+                      </label>
                       <input
                         type="text"
                         className="form-control"
@@ -1172,23 +1263,27 @@ const EmployeeRegistration = () => {
                           required: "Bank Account Number is Required",
                           pattern: {
                             value: /^\d{9,18}$/,
-                            message:
-                              "These fields accepts only Integers",
+                            message: "These fields accepts only Integers",
                           },
                           minLength: {
                             value: 9,
-                            message: "Account Number Minimum 9 Numbers Required",
+                            message:
+                              "Account Number Minimum 9 Numbers Required",
                           },
                           maxLength: {
                             value: 18,
-                            message: "Account Number must not exceed 18 Characters",
+                            message:
+                              "Account Number must not exceed 18 Characters",
                           },
                           validate: {
-                            notRepeatingDigits: value => {
+                            notRepeatingDigits: (value) => {
                               const isRepeating = /^(\d)\1{9}$/.test(value); // Check for repeated digits
-                              return !isRepeating || "Account Number cannot consist of the same digit repeated.";
-                            }
-                          }
+                              return (
+                                !isRepeating ||
+                                "Account Number cannot consist of the same digit repeated."
+                              );
+                            },
+                          },
                         })}
                       />
                       {errors.accountNo && (
@@ -1197,7 +1292,9 @@ const EmployeeRegistration = () => {
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Bank IFSC Code <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">
+                        Bank IFSC Code <span style={{ color: "red" }}>*</span>
+                      </label>
                       <input
                         type="text"
                         className="form-control"
@@ -1211,8 +1308,7 @@ const EmployeeRegistration = () => {
                           required: "Bank IFSC Code is Required",
                           pattern: {
                             value: /^[A-Z]{4}0[A-Z0-9]{6}$/,
-                            message:
-                              "Please enter a valid IFSC code ",
+                            message: "Please enter a valid IFSC code ",
                           },
                           maxLength: {
                             value: 11,
@@ -1225,7 +1321,9 @@ const EmployeeRegistration = () => {
                       )}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Bank Name <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">
+                        Bank Name <span style={{ color: "red" }}>*</span>
+                      </label>
                       <input
                         type="text"
                         className="form-control"
@@ -1236,11 +1334,7 @@ const EmployeeRegistration = () => {
                         onKeyDown={handleEmailChange}
                         {...register("bankName", {
                           required: "Bank Name is Required",
-                          pattern: {
-                            value: /^[A-Za-z&'(),./\- ]{1,100}$/,
-                            message:
-                              "Invalid Bank Name format",
-                          },
+                          validate: validateFirstName,
                           minLength: {
                             value: 3,
                             message: "Minimum 3 Characters Required",
@@ -1250,7 +1344,7 @@ const EmployeeRegistration = () => {
                             message: "Maximum 50 Characters Required",
                           },
                         })}
-                      // disabled={editMode}
+                        // disabled={editMode}
                       />
                       {errors.bankName && (
                         <p className="errorMsg">{errors.bankName.message}</p>
@@ -1273,8 +1367,7 @@ const EmployeeRegistration = () => {
                           validate: validateNumber,
                           pattern: {
                             value: /^\d{12}$/,
-                            message:
-                              "Only 12 digits are allowed.",
+                            message: "Only 12 digits are allowed.",
                           },
                           minLength: {
                             value: 12,
@@ -1284,7 +1377,6 @@ const EmployeeRegistration = () => {
                             value: 12,
                             message: "UAN Number Must Not Exceed 12 Digits",
                           },
-
                         })}
                       />
                       {errors.uanNo && (
@@ -1293,7 +1385,9 @@ const EmployeeRegistration = () => {
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">PAN Number <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">
+                        PAN Number <span style={{ color: "red" }}>*</span>
+                      </label>
                       <input
                         type={isUpdating ? "text" : "text"}
                         readOnly={isUpdating}
@@ -1312,15 +1406,17 @@ const EmployeeRegistration = () => {
                           },
                           pattern: {
                             value: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,
-                            message:
-                              "Pan Number is Invalid Format",
+                            message: "Pan Number is Invalid Format",
                           },
                           validate: {
-                            notRepeatingDigits: value => {
+                            notRepeatingDigits: (value) => {
                               const isRepeating = /^(\d)\1{9}$/.test(value); // Check for repeated digits
-                              return !isRepeating || " PAN cannot consist of the same digit repeated.";
-                            }
-                          }
+                              return (
+                                !isRepeating ||
+                                " PAN cannot consist of the same digit repeated."
+                              );
+                            },
+                          },
                         })}
                       />
                       {errors.panNo && (
@@ -1329,7 +1425,9 @@ const EmployeeRegistration = () => {
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Aadhaar Number <span style={{ color: "red" }}>*</span></label>
+                      <label className="form-label">
+                        Aadhaar Number <span style={{ color: "red" }}>*</span>
+                      </label>
                       <input
                         type="text"
                         readOnly={isUpdating}
@@ -1344,19 +1442,22 @@ const EmployeeRegistration = () => {
                           required: "Aadhaar Number is Required",
                           pattern: {
                             value: /^\d{12}$/,
-                            message:
-                              "Allows only Integers",
+                            message: "Allows only Integers",
                           },
                           maxLength: {
                             value: 12,
-                            message: "Aadhar Number must not exceed 12 Characters",
+                            message:
+                              "Aadhar Number must not exceed 12 Characters",
                           },
                           validate: {
-                            notRepeatingDigits: value => {
+                            notRepeatingDigits: (value) => {
                               const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeated digits
-                              return !isRepeating || "Aadhar Number cannot consist of the same digit repeated.";
-                            }
-                          }
+                              return (
+                                !isRepeating ||
+                                "Aadhar Number cannot consist of the same digit repeated."
+                              );
+                            },
+                          },
                         })}
                       />
                       {errors.aadhaarId && (
@@ -1372,11 +1473,24 @@ const EmployeeRegistration = () => {
                       className="col-12 mt-4  d-flex justify-content-end"
                       style={{ background: "none" }}
                     >
-                      {!isUpdating && (
-                        <button className="btn btn-secondary me-2" type="button" onClick={clearForm}>
+                      {!isUpdating ? (
+                        <button
+                          className="btn btn-secondary me-2"
+                          type="button"
+                          onClick={clearForm}
+                        >
                           Clear
                         </button>
+                      ) : (
+                        <button
+                          className="btn btn-secondary me-2"
+                          type="button"
+                          onClick={backForm}
+                        >
+                          Back
+                        </button>
                       )}
+
                       <button
                         className={
                           isUpdating

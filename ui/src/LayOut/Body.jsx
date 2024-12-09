@@ -85,14 +85,15 @@ const Body = () => {
         </h1>
         <div className="row h-100">
           {user && user.userRole && user.userRole.includes("ems_admin") ? (
-            <iframe
-            //src='https://122.175.43.71:5601/kibana/'
-            // src="http://122.175.43.71:5701/s/ems/app/dashboards#/view/deba4a73-baa2-4c62-aa78-089197311bcb?_g=(refreshInterval%3A(pause%3A!t%2Cvalue%3A60000)%2Ctime%3A(from%3Anow-15m%2Cto%3Anow))&hide-filter-bar=true"              height="100%"
-            src='https://122.175.43.71:2800/kibana/s/ems/app/dashboards#/view/deba4a73-baa2-4c62-aa78-089197311bcb?_g=(refreshInterval:(pause:!t,value:60000),time:(from:now-15m,to:now))'  
-            width="100%"
-              title="EMS Dashboard"
-              style={{ border: 'none' }}
-            ></iframe>
+           
+                <div className='card'>
+                  <iframe
+                    src="https://122.175.43.71:5601/kibana/s/ems/app/dashboards#/view/deba4a73-baa2-4c62-aa78-089197311bcb?embed=true&fullscreen=true"height="1000" width="800"
+                    title="EMS Dashboard"
+                      style={{ border: 'none'}}
+                  ></iframe>
+          </div>
+           
           ) : (
             <>
               {loading ? (

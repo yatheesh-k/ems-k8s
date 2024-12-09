@@ -20,7 +20,6 @@ const EmployeeSalaryStructure = () => {
     handleSubmit,
     setValue,
     reset,
-    getValues,
     formState: { errors },
   } = useForm({ mode: "onChange" });
   const { user } = useAuth();
@@ -50,7 +49,6 @@ const EmployeeSalaryStructure = () => {
   const [pfEmployer, setPfEmployer] = useState(0);
   const [travelAllowance, setTravelAllowance] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
-  const [totalEarnings, setTotalEarnings] = useState(0); // Define state for total earnings
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("Active");
   const [isReadOnly, setIsReadOnly] = useState(false);
@@ -197,37 +195,42 @@ const EmployeeSalaryStructure = () => {
 
   const handleAllowanceChange = (key, newValue) => {
     let validValue = newValue;
-    const isPercentage = newValue.includes("%");
+    const isPercentage = newValue.includes("%");  
     // Initialize the error message state to empty before validating
     let errorMessage = "";
+  
     // Check for non-numeric characters (excluding the '%' symbol)
     if (!isPercentage && /[^0-9.-]/.test(newValue)) {
       errorMessage = "Only numeric values are allowed.";
     }
+  
     // Handle percentage-specific validation
     if (isPercentage) {
       // Remove any non-numeric characters except for '%'
-      validValue = newValue.replace(/[^0-9%]/g, "");
+      validValue = newValue.replace(/[^0-9%]/g, '');
+  
       // Limit to 1-2 digits before the '%' symbol
-      if (validValue.includes("%")) {
-        const digitsBeforePercentage = validValue.split("%")[0].slice(0, 2);
-        validValue = digitsBeforePercentage + "%";
+      if (validValue.includes('%')) {
+        const digitsBeforePercentage = validValue.split('%')[0].slice(0, 2);
+        validValue = digitsBeforePercentage + '%';
       }
+  
       // If more than 3 characters (e.g., "100%"), show an error message
       if (validValue.length > 4) {
-        errorMessage =
-          "Percentage value should have up to 2 digits before '%'.";
+        errorMessage = "Percentage value should have up to 2 digits before '%'.";
       }
     } else {
       // For numeric fields, allow only digits and check for validity
       if (validValue.length > 10) {
         errorMessage = "Numeric value cannot exceed 10 digits.";
       }
+  
       // Allow negative values and zero (if needed)
       if (parseFloat(validValue) < 0) {
         errorMessage = "Allowance value cannot be negative.";
       }
     }
+  
     // Update the allowances state if no errors
     if (!errorMessage) {
       setAllowances((prevAllowances) => ({
@@ -238,7 +241,7 @@ const EmployeeSalaryStructure = () => {
     // Set the error message state
     setErrorMessage(errorMessage);
   };
-
+  
   const handleInputChange = (key, e) => {
     let newValue = e.target.value;
 
@@ -269,36 +272,6 @@ const EmployeeSalaryStructure = () => {
     // Call the validation and update logic
     handleAllowanceChange(key, newValue);
   };
-
-  // const handleKeyDown = (e, key) => {
-  //   if (e.key === 'Backspace') {
-  //     let newValue = allowances[key];
-
-  //     // If value contains '%' and we're deleting a digit before it
-  //     if (newValue.includes('%')) {
-  //       const valueBeforePercent = newValue.slice(0, -1); // Remove '%'
-  //       if (valueBeforePercent.length > 0) {
-  //         // Allow the deletion of one character at a time before '%'
-  //         newValue = valueBeforePercent.slice(0, -1) + '%';
-  //       }
-  //     }
-
-  //     // If we're trying to clear everything before '%'
-  //     if (newValue.slice(0, -1) === '') {
-  //       newValue = '';
-  //     }
-
-  //     // Update the allowances with the new value
-  //     setAllowances((prev) => ({
-  //       ...prev,
-  //       [key]: newValue,
-  //     }));
-
-  //     // Prevent default behavior to avoid unwanted deletion
-  //     e.preventDefault();
-  //   }
-  // };
-
   useEffect(() => {
     const totalAllow = calculateTotalAllowances();
     const newOtherAllowances = grossAmount - totalAllow;
@@ -329,25 +302,25 @@ const EmployeeSalaryStructure = () => {
       setErrorMessage("Alphabetic characters are not allowed.");
       return; // Prevent the change if any alphabet is detected
     }
+  
     // Ensure '%' is only allowed at the end and no characters are added after it
-    if (value.includes("%")) {
+    if (value.includes('%')) {
       // Check if there are any characters after the '%' symbol
-      if (value.indexOf("%") !== value.length - 1) {
+      if (value.indexOf('%') !== value.length - 1) {
         setErrorMessage("No values are allowed after '%'.");
         return; // Prevent input if there's anything after '%'
       }
     }
+  
     // If there's a percentage symbol at the end, validate the percentage logic
-    if (value.endsWith("%")) {
+    if (value.endsWith('%')) {
       const numericValue = value.slice(0, -1); // Remove '%' symbol to check the number part
       if (numericValue && parseFloat(numericValue) > 100) {
         setErrorMessage("Percentage value cannot exceed 100%.");
         return; // Prevent the change if the value exceeds 100%
       }
       if (value.length > 4) {
-        setErrorMessage(
-          "Percentage value cannot exceed 4 characters (including '%')."
-        );
+        setErrorMessage("Percentage value cannot exceed 4 characters (including '%').");
         return; // Prevent the change if the length exceeds 4 characters (like 100%)
       }
       // Check for negative percentage values
@@ -356,8 +329,9 @@ const EmployeeSalaryStructure = () => {
         return; // Prevent the change if the value is negative
       }
     }
+  
     // Validation for numeric values (without '%')
-    if (!value.endsWith("%")) {
+    if (!value.endsWith('%')) {
       const numericValue = value.replace(/[^0-9]/g, ""); // Remove non-numeric characters
       if (numericValue.length > 10) {
         setErrorMessage("Numeric value cannot exceed 10 digits.");
@@ -368,12 +342,14 @@ const EmployeeSalaryStructure = () => {
         return; // Prevent deduction if value is negative
       }
     }
+  
     // Clear error message if no issues
     setErrorMessage("");
+  
     // Update the deductions state
     const newDeductions = { ...deductions, [key]: value };
     setDeductions(newDeductions);
-  };
+  };  
 
   useEffect(() => {
     const totalDed = calculateTotalDeductions();
@@ -600,13 +576,7 @@ const EmployeeSalaryStructure = () => {
                 <div className="col-12">
                   <div className="card">
                     <div className="card-header">
-                      <h5
-                        className="card-title"
-                        style={{ marginBottom: "0px" }}
-                      >
-                        {" "}
-                        Salary Details{" "}
-                      </h5>
+                      <h5 className="card-title" style={{ marginBottom: "0px" }}> Salary Details </h5>
                     </div>
                     <div className="card-body" style={{ marginLeft: "20px" }}>
                       <div className="row">
@@ -728,12 +698,7 @@ const EmployeeSalaryStructure = () => {
                         <div className="col-6 mb-4">
                           <div className="card">
                             <div className="card-header">
-                              <h5
-                                className="card-title"
-                                style={{ marginBottom: "0px" }}
-                              >
-                                Allowances
-                              </h5>
+                              <h5 className="card-title" style={{ marginBottom: "0px" }}>Allowances</h5>
                             </div>
                             <div className="card-body">
                               {errorMessage && (
@@ -741,46 +706,42 @@ const EmployeeSalaryStructure = () => {
                                   {errorMessage}
                                 </span>
                               )}
-                              {Object.keys(allowances).map((key) => {
-                                const allowanceValue = allowances[key];
-                                const isPercentage =
-                                  allowanceValue.includes("%");
-                                return (
-                                  <div key={key} className="mb-2">
-                                    <label className="form-label">
-                                      {key}:
-                                      <span className="text-danger me-1">
-                                        ({allowanceValue})
-                                      </span>
-                                      {isPercentage && (
-                                        <span
-                                          className="m-1"
-                                          data-toggle="tooltip"
-                                          title="Percentage values are calculated based on Gross Amount."
-                                        >
-                                          <span className="text-primary">
-                                            <i className="bi bi-info-circle"></i>
-                                          </span>
-                                        </span>
-                                      )}
-                                    </label>
-                                    <input
-                                      type="text"
-                                      className="form-control"
-                                      value={allowanceValue}
-                                      onChange={(e) => {
-                                        // Allow only numbers and '%' characters
-                                        const newValue = e.target.value.replace(
-                                          /[^0-9%]/g,
-                                          ""
-                                        );
-                                        handleAllowanceChange(key, newValue);
-                                      }}
-                                      maxLength={isPercentage ? 4 : 10}
-                                    />
-                                  </div>
-                                );
-                              })}
+                            {Object.keys(allowances).map((key) => {
+        const allowanceValue = allowances[key];
+        const isPercentage = allowanceValue.includes("%");
+        return (
+          <div key={key} className="mb-2">
+            <label className="form-label">
+              {key}:
+              <span className="text-danger me-1">
+                ({allowanceValue})
+              </span>
+              {isPercentage && (
+                <span
+                  className="m-1"
+                  data-toggle="tooltip"
+                  title="Percentage values are calculated based on Gross Amount."
+                >
+                  <span className="text-primary">
+                    <i className="bi bi-info-circle"></i>
+                  </span>
+                </span>
+              )}
+            </label>
+            <input
+              type="text"
+              className="form-control"
+              value={allowanceValue}
+              onChange={(e) => {
+                // Allow only numbers and '%' characters
+                const newValue = e.target.value.replace(/[^0-9%]/g, "");
+                handleAllowanceChange(key, newValue);
+              }}
+              maxLength={isPercentage ? 4 : 10}
+            />
+          </div>
+        );
+                             })}
                               <div className="mb-3">
                                 <label>Total Allowances:</label>
                                 <input
@@ -792,9 +753,9 @@ const EmployeeSalaryStructure = () => {
                                   data-toggle="tooltip"
                                   title="This is the total of all allowances."
                                 />
-                                {errorMessage && (
-                                  <p className="text-danger">{errorMessage}</p>
-                                )}
+                                 {errorMessage && (
+              <p className="text-danger">{errorMessage}</p>
+            )}
                               </div>
                             </div>
                           </div>
@@ -802,12 +763,7 @@ const EmployeeSalaryStructure = () => {
                           <div className="card">
                             <div className="card-header">
                               <div className="d-flex justify-content-start align-items-start">
-                                <h5
-                                  className="card-title me-2"
-                                  style={{ marginBottom: "0px" }}
-                                >
-                                  Status
-                                </h5>
+                                <h5 className="card-title me-2" style={{ marginBottom: "0px" }}>Status</h5>
                                 <span className="text-danger">
                                   {errors.status && (
                                     <p className="mb-0">
@@ -858,63 +814,49 @@ const EmployeeSalaryStructure = () => {
                         <div className="col-6 mb-4">
                           <div className="card">
                             <div className="card-header">
-                              <h5
-                                className="card-title"
-                                style={{ marginBottom: "0px" }}
-                              >
-                                Deductions
-                              </h5>
+                              <h5 className="card-title" style={{ marginBottom: "0px" }}>Deductions</h5>
                             </div>
                             <div className="card-body">
-                              {Object.entries(deductions).map(
-                                ([key, value]) => (
-                                  <div key={key} className="mb-3">
-                                    <label>
-                                      {key}:
-                                      <span className="text-danger">
-                                        ({deductions[key]})
+                            {Object.entries(deductions).map(([key, value]) => (
+                              <div key={key} className="mb-3">
+                                <label>
+                                  {key}:
+                                  <span className="text-danger">
+                                    ({deductions[key]})
+                                  </span>
+                                  {deductions[key].endsWith("%") && (
+                                    <span
+                                      className="m-1"
+                                      data-toggle="tooltip"
+                                      title="Percentage values are calculated based on Gross Amount."
+                                    >
+                                      <span className="text-primary">
+                                        <i className="bi bi-info-circle"></i>
                                       </span>
-                                      {deductions[key].endsWith("%") && (
-                                        <span
-                                          className="m-1"
-                                          data-toggle="tooltip"
-                                          title="Percentage values are calculated based on Gross Amount."
-                                        >
-                                          <span className="text-primary">
-                                            <i className="bi bi-info-circle"></i>
-                                          </span>
-                                        </span>
-                                      )}
-                                    </label>
-                                    <input
-                                      className="form-control"
-                                      type="text"
-                                      maxLength={10}
-                                      value={deductions[key]}
-                                      onChange={(e) => {
-                                        // Allow only numbers and '%' characters
-                                        const newValue = e.target.value.replace(
-                                          /[^0-9%]/g,
-                                          ""
-                                        );
-                                        handleDeductionChange(key, newValue);
-                                      }}
-                                    />
-                                    {/* Display error message */}
-                                    {errorMessage && (
-                                      <p className="text-danger">
-                                        {errorMessage}
-                                      </p>
-                                    )}
-                                  </div>
-                                )
-                              )}
+                                    </span>
+                                  )}
+                                </label>
+                                <input
+                                  className="form-control"
+                                  type="text"
+                                  maxLength={10}
+                                  value={deductions[key]}
+                                  onChange={(e) => {
+                                    // Allow only numbers and '%' characters
+                                    const newValue = e.target.value.replace(/[^0-9%]/g, "");
+                                    handleDeductionChange(key, newValue);
+                                  }}
+                                />
+                                {/* Display error message */}
+                                {errorMessage && <p className="text-danger">{errorMessage}</p>}
+                              </div>
+                             ))}
                               <div className="mb-3">
                                 <label>Total Deductions</label>
                                 <input
                                   className="form-control"
                                   type="number"
-                                  value={Math.round(totalDeductions.toFixed(2))}
+                                  value={totalDeductions.toFixed(2)}
                                   readOnly
                                   data-toggle="tooltip"
                                   title="This is the total of all deductions."
@@ -925,12 +867,7 @@ const EmployeeSalaryStructure = () => {
                           <div className="card">
                             <div className="card-header ">
                               <div className="d-flex justify-content-start align-items-start">
-                                <h5
-                                  className="card-title me-2"
-                                  style={{ marginBottom: "0px" }}
-                                >
-                                  TDS
-                                </h5>
+                                <h5 className="card-title me-2" style={{ marginBottom: "0px" }}>TDS</h5>
                                 <span className="text-danger">
                                   {errors.incomeTax && (
                                     <p className="mb-0">
@@ -978,24 +915,16 @@ const EmployeeSalaryStructure = () => {
 
                           <div className="card">
                             <div className="card-header">
-                              <h5
-                                className="card-title"
-                                style={{ marginBottom: "0px" }}
-                              >
-                                Net Salary
-                              </h5>
+                              <h5 className="card-title" style={{ marginBottom: "0px" }}>Net Salary</h5>
                             </div>
-                            <div
-                              className="card-body"
-                              style={{ paddingLeft: "20px" }}
-                            >
+                            <div className="card-body" style={{ paddingLeft: "20px" }}>
                               <div className="mb-3">
                                 <label>Net Salary</label>
                                 <input
                                   className="form-control"
                                   type="text"
                                   name="netSalary"
-                                  value={Math.round(netSalary.toFixed(2))}
+                                  value={netSalary.toFixed(2)}
                                   readOnly
                                   data-toggle="tooltip"
                                   title="This is the final salary after all deductions and allowances."
