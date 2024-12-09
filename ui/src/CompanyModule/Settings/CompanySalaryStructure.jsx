@@ -366,8 +366,8 @@ const CompanySalaryStructure = () => {
     })
     .filter((field) => field && field.value) // Ensure the field has a value
     .reduce((total, field) => {
-      // Check if the field is basicSalary or hra and treat them as percentages
-      if (field.label === "basicSalary" || field.label === "hra") {
+      // Check if the field is Basic Salary or HRA and treat them as percentages
+      if (field.label === "Basic Salary" || field.label === "HRA") {
         return total + (parseFloat(field.value) || 0); // Add the percentage directly if the value is numeric
       } else if (field.type === "percentage") {
         return total + parseFloat(field.value); // Add percentage values for other fields
@@ -404,8 +404,8 @@ const CompanySalaryStructure = () => {
     // Populate the allowances and deductions data for submission
     selectedAllowances.forEach((field) => {
       if (field.label && field.value) {
-        if (field.label === "basicSalary" || field.label === "hra") {
-          // For basicSalary and hra, store as percentage value (e.g., "50%")
+        if (field.label === "Basic Salary" || field.label === "HRA") {
+          // For Basic Salary and HRA, store as percentage value (e.g., "50%")
           jsonData.allowances[field.label] = `${field.value}%`;
         } else {
           // For other fields, store based on their type (percentage or value)
@@ -744,23 +744,23 @@ const CompanySalaryStructure = () => {
                           <select
                             className="form-select"
                             value={
-                              field.label === "basicSalary" ||
-                              field.label === "hra"
+                              field.label === "Basic Salary" ||
+                              field.label === "HRA"
                                 ? "percentage"
                                 : field.type
                             }
                             onChange={(e) => {
                               if (
-                                field.label !== "basicSalary" &&
-                                field.label !== "hra"
+                                field.label !== "Basic Salary" &&
+                                field.label !== "HRA"
                               ) {
                                 handleTypeChange(index, e.target.value);
                               }
                             }}
                             disabled={
                               !isEditing ||
-                              field.label === "basicSalary" ||
-                              field.label === "hra"
+                              field.label === "Basic Salary" ||
+                              field.label === "HRA"
                             }
                           >
                             <option value="percentage">%</option>
@@ -789,10 +789,10 @@ const CompanySalaryStructure = () => {
                               !fieldCheckboxes.allowances[field.label] ||
                               !isEditing
                             }
-                            // Set maxLength conditionally for basicSalary and hra
+                            // Set maxLength conditionally for Basic Salary and HRA
                             maxLength={
-                              field.label === "basicSalary" ||
-                              field.label === "hra"
+                              field.label === "Basic Salary" ||
+                              field.label === "HRA"
                                 ? 2
                                 : 7
                             }
