@@ -367,6 +367,7 @@ export const AttendanceDeleteById = (employeeId, attendanceId) => {
   const company = localStorage.getItem("company")
   return axiosInstance.delete(`/${company}/employee/${employeeId}/attendance/${attendanceId}`);
 }
+
 export const CompanyImagePatchApi = (companyId, formData) => {
   return axiosInstance.patch(`/company/image/${companyId}`, formData);
 }

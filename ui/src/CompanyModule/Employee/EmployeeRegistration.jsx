@@ -818,7 +818,7 @@ const EmployeeRegistration = () => {
                         {...register("firstName", {
                           required: "First Name is Required",
                           validate: {
-                            validateFirstName
+                            validateName
                           }
                         })}
                       />

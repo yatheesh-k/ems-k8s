@@ -132,6 +132,7 @@ const Reset = ({ companyName, onClose, show }) => {
                   className="form-control"
                   name="password"
                   id="password"
+                  maxLength={16}
                   placeholder="Enter your old password"
                   type={oldPasswordShown ? "text" : "password"}
                   onKeyDown={handleEmailChange}
@@ -165,6 +166,7 @@ const Reset = ({ companyName, onClose, show }) => {
                   className="form-control"
                   name="newPassword"
                   id="newPassword"
+                  maxLength={16}
                   placeholder="Enter your new password"
                   type={newPasswordShown ? "text" : "password"}
                   onKeyDown={handleEmailChange}
@@ -197,6 +199,7 @@ const Reset = ({ companyName, onClose, show }) => {
                   className="form-control"
                   name="confirmPassword"
                   id="confirmPassword"
+                  maxLength={16}
                   placeholder="Confirm your new password"
                   type={confirmPasswordShown ? "text" : "password"}
                   onKeyDown={handleEmailChange}
