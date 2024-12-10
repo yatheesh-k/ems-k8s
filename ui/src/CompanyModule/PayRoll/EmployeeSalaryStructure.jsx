@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../Context/AuthContext";
 import Loader from "../../Utils/Loader";
+import { Button, Modal, ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
 
 const EmployeeSalaryStructure = () => {
   const {
@@ -29,9 +30,10 @@ const EmployeeSalaryStructure = () => {
   const id = queryParams.get("employeeId");
 
   const [employes, setEmployes] = useState([]);
-  const [salaryStructure, setSalaryStructure] = useState(0);
+  const [basicSalary, setBasicSalary] = useState(0); // State for Basic Salary
   const [allowances, setAllowances] = useState({});
   const [deductions, setDeductions] = useState({});
+  const [updatedDeductions, setUpdatedDeductions] = useState({});
   const [grossAmount, setGrossAmount] = useState(0);
   const [totalAllowances, setTotalAllowances] = useState({});
   const [totalDeductions, setTotalDeductions] = useState({});
@@ -47,6 +49,9 @@ const EmployeeSalaryStructure = () => {
   const [pfTax, setPfTax] = useState(0);
   const [pfEmployee, setPfEmployee] = useState(0);
   const [pfEmployer, setPfEmployer] = useState(0);
+  const [showPfModal, setShowPfModal] = useState(false); // Modal visibility
+  const [selectedPF, setSelectedPF] = useState('calculated'); 
+  const [calculatedPF, setCalculatedPF] = useState({ pfEmployee: 0, pfEmployer: 0 });
   const [travelAllowance, setTravelAllowance] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
   const [message, setMessage] = useState("");
@@ -110,27 +115,6 @@ const EmployeeSalaryStructure = () => {
     }
   }, [id, salaryId, setValue]);
 
-  // useEffect(() => {
-  //   const fetchSalaryStructures = async () => {
-  //     try {
-  //       const response = await CompanySalaryStructureGetApi();
-  //       const allSalaryStructures = response.data.data;
-  //       const activeSalaryStructures = allSalaryStructures.filter(structure => structure.status === "Active");
-
-  //       if (activeSalaryStructures.length > 0) {
-  //         setSalaryStructure(activeSalaryStructures);
-  //         setAllowances(activeSalaryStructures[0].allowances);
-  //         setDeductions(activeSalaryStructures[0].deductions);
-  //       }
-  //     } catch (error) {
-  //       console.error("API fetch error:", error);
-  //       setError('Error fetching salary structures.');
-  //     }
-  //   };
-
-  //   fetchSalaryStructures();
-  // }, []);
-
   useEffect(() => {
     const fetchSalaryStructures = async () => {
       try {
@@ -138,65 +122,147 @@ const EmployeeSalaryStructure = () => {
         const allSalaryStructures = response.data.data;
 
         if (allSalaryStructures.length === 0) {
-          setError("Company Salary Structure is not defined");
-          setSalaryStructure([]);
+          setErrorMessage("Company Salary Structure is not defined");
         } else {
           const activeSalaryStructures = allSalaryStructures.filter(
             (structure) => structure.status === "Active"
           );
 
           if (activeSalaryStructures.length > 0) {
-            setSalaryStructure(activeSalaryStructures);
-            setAllowances(activeSalaryStructures[0].allowances);
-            setDeductions(activeSalaryStructures[0].deductions);
-            setError(""); // Clear error if salary structures are found
+            const firstStructure = activeSalaryStructures[0];
+            setAllowances(firstStructure.allowances);
+            setDeductions(firstStructure.deductions);
+           // Extract Basic Salary and HRA from the allowances
+           const basicAllowance = firstStructure.allowances.find(
+            (allowance) => allowance.type === "Basic"
+          );
+          const hraAllowance = firstStructure.allowances.find(
+            (allowance) => allowance.type === "HRA"
+          );
+          setBasicSalary(basicAllowance ? basicAllowance.amount : 0);
+          setHra(hraAllowance ? hraAllowance.amount : 0);
+            setErrorMessage(""); // Clear error if salary structures are found
+            console.log("deductions",firstStructure.deductions)
+            console.log("allowances",firstStructure.allowances)
+
           } else {
-            setError("No active salary structure found");
+            setErrorMessage("No active salary structure found");
           }
         }
       } catch (error) {
-        setError("Error fetching salary structures.");
+        setErrorMessage("Error fetching salary structures.");
         console.error("API fetch error:", error);
       }
     };
 
     fetchSalaryStructures();
   }, []);
-
-  const calculateTotalDeductions = () => {
-    let total = 0;
-    Object.entries(deductions).forEach(([key, value]) => {
-      if (value.endsWith("%")) {
-        const parsedValue = parseFloat(value.slice(0, -1));
-        const percentageValue = (parsedValue / 100) * (grossAmount || 0);
-        total += percentageValue;
-      } else {
-        total += parseFloat(value) || 0;
-      }
-    });
-    return total;
-  };
-
+ 
   const calculateTotalAllowances = () => {
-    let total = 0;
+    let totalAllowances = 0;
+    // Calculate other allowances (travel, provident fund, etc.)
     Object.entries(allowances).forEach(([key, value]) => {
-      if (key !== "otherAllowances") {
-        if (value.endsWith("%")) {
-          const parsedValue = parseFloat(value.slice(0, -1));
-          const percentageValue = (parsedValue / 100) * (grossAmount || 0);
-          total += percentageValue;
+      if (key !== "HRA" && key !== "Basic Salary") {
+        if (value.includes("%")) {
+          const percentageValue = parseFloat(value.replace("%", ""));
+          if (key === "Provident Fund Employer") {
+            totalAllowances += (percentageValue / 100) * grossAmount;
+          } else {
+            totalAllowances += (percentageValue / 100) * grossAmount;
+          }
         } else {
-          total += parseFloat(value) || 0;
+          totalAllowances += parseFloat(value);
         }
       }
     });
-    return total;
+
+    setTotalAllowances(totalAllowances);
   };
 
+  useEffect(() => {
+    calculateAllowances();
+  }, [allowances, basicSalary, grossAmount]);
+       
+  
+  const calculatePFContributions = () => {
+    const basicSalaryPercentage = parseFloat(allowances["Basic Salary"]) || 0; // Basic Salary percentage
+    const pfEmployeePercentage = parseFloat(deductions["Provident Fund Employee"]) || 0; // Employee PF percentage
+    const pfEmployerPercentage = parseFloat(deductions["Provident Fund Employer"]) || 0; // Employer PF percentage
+
+    // Calculate Basic Salary Amount from the gross salary
+    const basicSalaryAmount = (basicSalaryPercentage / 100) * grossAmount;
+
+    // Calculate PF Contributions
+    const pfEmployee = (pfEmployeePercentage / 100) * basicSalaryAmount;
+    const pfEmployer = (pfEmployerPercentage / 100) * basicSalaryAmount;
+    return {
+      pfEmployee,
+      pfEmployer,
+    };
+  };
+
+  // Function to handle PF limit check and show the modal
+  const handlePFLimitCheck = () => {
+    const { pfEmployee, pfEmployer } = calculatePFContributions();
+    const totalPF = pfEmployee + pfEmployer;
+
+    setCalculatedPF({ pfEmployee, pfEmployer }); // Set calculated PF values
+
+    // Case: If total PF exceeds ₹43,200 per year or is less than ₹43,200
+    if (totalPF !== 43200) {
+    } else {
+      // If total PF is exactly ₹43,200 per year, no confirmation needed
+      updateDeductions(43200 /2, 43200 /2); // Use fixed PF values of ₹43,200 per year (monthly)
+    }
+  };
+
+  // Update the deductions with PF values
+  const updateDeductions = (pfEmployee, pfEmployer) => {
+    const newDeductions = {
+      ...deductions,
+      "Provident Fund Employee": pfEmployee.toFixed(2),
+      "Provident Fund Employer": pfEmployer.toFixed(2),
+    };
+    setUpdatedDeductions(newDeductions); // Save the updated deductions in state
+  };
+
+  // Handle modal close and update PF values based on selection
+  const handleModalClose = () => {
+    const { pfEmployee, pfEmployer } = calculatedPF;
+   
+    if (selectedPF === 'calculated') {
+      updateDeductions(pfEmployee, pfEmployer); // Use calculated PF
+    } else {
+      const fixedPF = 43200 /2; // Use ₹43,200 per year
+      updateDeductions(fixedPF, fixedPF); // Set fixed PF
+    }
+    setShowPfModal(false); // Close the modal
+  };
+
+  // Function to calculate the total deductions including PF
+  const calculateTotalDeductions = () => {
+    let total = 0;
+
+    // Loop through the updated deductions
+    Object.entries(updatedDeductions).forEach(([key, value]) => {
+      if (typeof value === "string" && value.endsWith("%")) {
+        const percentageValue = parseFloat(value.slice(0, -1)); // Remove '%' and parse as number
+        total += (percentageValue / 100) * grossAmount; // Apply percentage to gross amount
+      } else {
+        total += parseFloat(value) || 0; // Add fixed deduction amount
+      }
+    });
+
+    return isNaN(total) ? 0 : total;
+  };
+
+  useEffect(() => {
+    handlePFLimitCheck(); // Trigger the PF limit check on initial load or relevant updates
+  }, [grossAmount, allowances, deductions]);
+  
   const handleAllowanceChange = (key, newValue) => {
     let validValue = newValue;
-    const isPercentage = newValue.includes("%");  
-    // Initialize the error message state to empty before validating
+    const isPercentage = newValue.includes("%");
     let errorMessage = "";
   
     // Check for non-numeric characters (excluding the '%' symbol)
@@ -206,26 +272,21 @@ const EmployeeSalaryStructure = () => {
   
     // Handle percentage-specific validation
     if (isPercentage) {
-      // Remove any non-numeric characters except for '%'
       validValue = newValue.replace(/[^0-9%]/g, '');
-  
       // Limit to 1-2 digits before the '%' symbol
       if (validValue.includes('%')) {
         const digitsBeforePercentage = validValue.split('%')[0].slice(0, 2);
         validValue = digitsBeforePercentage + '%';
       }
   
-      // If more than 3 characters (e.g., "100%"), show an error message
       if (validValue.length > 4) {
         errorMessage = "Percentage value should have up to 2 digits before '%'.";
       }
     } else {
-      // For numeric fields, allow only digits and check for validity
       if (validValue.length > 10) {
         errorMessage = "Numeric value cannot exceed 10 digits.";
       }
   
-      // Allow negative values and zero (if needed)
       if (parseFloat(validValue) < 0) {
         errorMessage = "Allowance value cannot be negative.";
       }
@@ -238,148 +299,99 @@ const EmployeeSalaryStructure = () => {
         [key]: validValue,
       }));
     }
-    // Set the error message state
+  
     setErrorMessage(errorMessage);
   };
   
-  const handleInputChange = (key, e) => {
-    let newValue = e.target.value;
-
-    // If the value contains '%' (percentage), we ensure no extra characters after it
-    if (newValue.includes("%")) {
-      // If length exceeds 4 (e.g., "100%"), truncate to the first 4 characters
-      if (newValue.length > 4) {
-        newValue = newValue.slice(0, 4); // Limit to 3 digits + '%'
-      }
-
-      // Ensure only digits before the '%' symbol
-      const validPercentageValue =
-        newValue.slice(0, -1).replace(/[^0-9]/g, "") + "%";
-      newValue = validPercentageValue; // Update with the valid percentage format
-    } else {
-      // If it's a number (no '%'), restrict to a maximum of 10 digits
-      if (newValue.length > 10) {
-        newValue = newValue.slice(0, 10); // Limit to 10 digits
-      }
-
-      // Allow only numeric values (remove any non-numeric characters)
-      newValue = newValue.replace(/[^0-9]/g, "");
+  const handleDeductionChange = (key, value) => {
+    if (/[a-zA-Z]/.test(value)) {
+      setErrorMessage("Alphabetic characters are not allowed.");
+      return;
     }
-
-    // Clear the error message if the input is valid
-    setErrorMessage("");
-
-    // Call the validation and update logic
-    handleAllowanceChange(key, newValue);
+  
+    if (value.includes('%')) {
+      const numericValue = value.slice(0, -1); // Remove '%' and convert to number
+      if (numericValue && parseFloat(numericValue) > 100) {
+        setErrorMessage("Percentage value cannot exceed 100%.");
+        return;
+      }
+      const percentageValue = parseFloat(numericValue) / 100;
+      setDeductions(prevDeductions => ({
+        ...prevDeductions,
+        [key]: percentageValue,
+      }));
+      setErrorMessage("");
+      return;
+    }
+  
+    if (!value.endsWith('%')) {
+      const numericValue = value.replace(/[^0-9.]/g, "");
+      if (numericValue.length > 10) {
+        setErrorMessage("Numeric value cannot exceed 10 digits.");
+        return;
+      }
+  
+      if (parseFloat(numericValue) < 0) {
+        setErrorMessage("Deduction value cannot be negative.");
+        return;
+      }
+  
+      setDeductions(prevDeductions => ({
+        ...prevDeductions,
+        [key]: parseFloat(numericValue),
+      }));
+      setErrorMessage("");
+    }
   };
+  
   useEffect(() => {
-    const totalAllow = calculateTotalAllowances();
-    const newOtherAllowances = grossAmount - totalAllow;
-    // Check for errors
+    const totalAllowances = calculateTotalAllowances(); // Get total allowances
+    const newOtherAllowances = grossAmount - totalAllowances; // Calculate the remaining amount for Other Allowances
+  
+    // If total allowances exceed gross salary, show an error or adjust accordingly
     if (newOtherAllowances < 0) {
-      setErrorMessage(
-        "Total allowances exceed gross amount. Please adjust allowances."
-      );
-      setIsSubmitDisabled(true); // Disable the button
+      setErrorMessage("Total allowances exceed gross amount. Please adjust allowances.");
+      setIsSubmitDisabled(true); // Disable the submit button
     } else {
       setErrorMessage(""); // Clear error message if valid
       setIsSubmitDisabled(false); // Enable the button
     }
-
-    // Update total allowances
+  
+    // Ensure Other Allowances cannot be negative
     const validOtherAllowances = Math.max(0, newOtherAllowances);
-    setTotalAllowances(totalAllow + validOtherAllowances);
-
+  
+    // Update allowances with the new value of Other Allowances
     setAllowances((prevAllowances) => ({
       ...prevAllowances,
-      otherAllowances: validOtherAllowances.toFixed(2),
+      "Other Allowances": validOtherAllowances.toFixed(2),  // Ensure 2 decimal places for consistency
     }));
+  
+    // Set the total allowances including the valid Other Allowances
+    setTotalAllowances(totalAllowances + validOtherAllowances);
   }, [allowances, grossAmount]);
+   // Trigger when grossAmount or any allowance changes
 
-  const handleDeductionChange = (key, value) => {
-    // Block alphabetic characters
-    if (/[a-zA-Z]/.test(value)) {
-      setErrorMessage("Alphabetic characters are not allowed.");
-      return; // Prevent the change if any alphabet is detected
-    }
-  
-    // Ensure '%' is only allowed at the end and no characters are added after it
-    if (value.includes('%')) {
-      // Check if there are any characters after the '%' symbol
-      if (value.indexOf('%') !== value.length - 1) {
-        setErrorMessage("No values are allowed after '%'.");
-        return; // Prevent input if there's anything after '%'
-      }
-    }
-  
-    // If there's a percentage symbol at the end, validate the percentage logic
-    if (value.endsWith('%')) {
-      const numericValue = value.slice(0, -1); // Remove '%' symbol to check the number part
-      if (numericValue && parseFloat(numericValue) > 100) {
-        setErrorMessage("Percentage value cannot exceed 100%.");
-        return; // Prevent the change if the value exceeds 100%
-      }
-      if (value.length > 4) {
-        setErrorMessage("Percentage value cannot exceed 4 characters (including '%').");
-        return; // Prevent the change if the length exceeds 4 characters (like 100%)
-      }
-      // Check for negative percentage values
-      if (numericValue.startsWith("-")) {
-        setErrorMessage("Percentage value cannot be negative.");
-        return; // Prevent the change if the value is negative
-      }
-    }
-  
-    // Validation for numeric values (without '%')
-    if (!value.endsWith('%')) {
-      const numericValue = value.replace(/[^0-9]/g, ""); // Remove non-numeric characters
-      if (numericValue.length > 10) {
-        setErrorMessage("Numeric value cannot exceed 10 digits.");
-        return; // Prevent further input if the length exceeds 10 digits
-      }
-      if (parseFloat(value) < 0) {
-        setErrorMessage("Deduction value cannot be negative.");
-        return; // Prevent deduction if value is negative
-      }
-    }
-  
-    // Clear error message if no issues
-    setErrorMessage("");
-  
-    // Update the deductions state
-    const newDeductions = { ...deductions, [key]: value };
-    setDeductions(newDeductions);
-  };  
+useEffect(() => {
+  const totalDed = calculateTotalDeductions();
 
-  useEffect(() => {
-    const totalDed = calculateTotalDeductions();
-    setTotalDeductions(totalDed);
-  }, [deductions, grossAmount]);
+  // Ensure the result is a number before setting it
+  if (typeof totalDed === 'number') {
+    setTotalDeductions(totalDed); // Store as a number
+  } else {
+    setTotalDeductions(0); // Default to 0 if totalDed is not a valid number
+  }
+}, [deductions, grossAmount]);
 
-  //Calculate total allowances when allowances or grossAmount change
-  useEffect(() => {
-    const totalAllow = calculateTotalAllowances();
-    const newOtherAllowances = grossAmount - totalAllow;
+useEffect(() => {
+  // Calculate total allowances and total deductions whenever the gross amount changes
+  const totalAllowances = calculateTotalAllowances();
+  const totalDeductions = calculateTotalDeductions();
 
-    // Check for errors and set the error message accordingly
-    if (newOtherAllowances < 0) {
-      setErrorMessage(
-        "Total allowances exceed gross amount. Please adjust allowances."
-      );
-    } else {
-      setErrorMessage(""); // Clear error message if valid
-    }
+  // Update state
+  setTotalAllowances(totalAllowances);
+  setTotalDeductions(totalDeductions);
 
-    // Update total allowances only if valid
-    const validOtherAllowances = Math.max(0, newOtherAllowances);
-    setTotalAllowances(totalAllow + validOtherAllowances);
-
-    // Update other allowances
-    setAllowances((prevAllowances) => ({
-      ...prevAllowances,
-      otherAllowances: validOtherAllowances.toFixed(2),
-    }));
-  }, [allowances, grossAmount]);
+}, [grossAmount, allowances, deductions]); // Ensure dependencies include `grossAmount`, `allowances`, and `deductions`
 
   const calculateAllowances = () => {
     calculateTotalAllowances();
@@ -434,6 +446,7 @@ const EmployeeSalaryStructure = () => {
   };
 
   const handleGoClick = () => {
+    setShowPfModal(false);
     if (!employeeId) {
       setMessage("Please Select Employee Name");
       setShowFields(false);
@@ -455,6 +468,33 @@ const EmployeeSalaryStructure = () => {
   const handleFixedAmountChange = (e) => {
     setFixedAmount(parseFloat(e.target.value) || 0);
     setValue("fixedAmount", e.target.value, { shouldValidate: true });
+  };
+  const handleSubmitButtonClick = () => {
+    // Calculate total allowances
+    const totalAllowances = calculateTotalAllowances();
+  
+    // Calculate total deductions
+    const totalDeductions = calculateTotalDeductions();
+  
+    // Calculate net salary
+    const netSalary = grossAmount + totalAllowances - totalDeductions;
+  
+    // Set the calculated values to state
+    setTotalAllowances(totalAllowances);
+    setTotalDeductions(totalDeductions);
+    setNetSalary(netSalary);
+  
+    // Optionally, show any relevant messages
+    if (netSalary < 0) {
+      setErrorMessage('Net Salary cannot be negative');
+    } else {
+      setErrorMessage('');
+    }
+    
+    // Check PF limit if necessary
+    handlePFLimitCheck();
+    setShowPfModal(true);
+    setShowCards(true);
   };
 
   useEffect(() => {
@@ -680,7 +720,7 @@ const EmployeeSalaryStructure = () => {
                           <button
                             type="button"
                             className="btn btn-primary"
-                            onClick={calculateAllowances}
+                            onClick={handleSubmitButtonClick}
                           >
                             Submit
                           </button>
@@ -706,43 +746,42 @@ const EmployeeSalaryStructure = () => {
                                   {errorMessage}
                                 </span>
                               )}
-                            {Object.keys(allowances).map((key) => {
-        const allowanceValue = allowances[key];
-        const isPercentage = allowanceValue.includes("%");
-        return (
-          <div key={key} className="mb-2">
-            <label className="form-label">
-              {key}:
-              <span className="text-danger me-1">
-                ({allowanceValue})
-              </span>
-              {isPercentage && (
-                <span
-                  className="m-1"
-                  data-toggle="tooltip"
-                  title="Percentage values are calculated based on Gross Amount."
-                >
-                  <span className="text-primary">
-                    <i className="bi bi-info-circle"></i>
-                  </span>
-                </span>
-              )}
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              value={allowanceValue}
-              onChange={(e) => {
-                // Allow only numbers and '%' characters
-                const newValue = e.target.value.replace(/[^0-9%]/g, "");
-                handleAllowanceChange(key, newValue);
-              }}
-              maxLength={isPercentage ? 4 : 10}
-            />
-          </div>
-        );
-                             })}
-                              <div className="mb-3">
+                                  {Object.entries(allowances).map(([key, value]) => {
+                                    const isPercentage = typeof value === 'string' && value.endsWith('%');
+                                    let displayValue = value;
+
+                                    if (isPercentage) {
+                                      const percentageValue = parseFloat(value.slice(0, -1)); // Extract percentage
+
+                                      // For HRA, use basicSalary; for other allowances, use grossAmount
+                                      if (key === "HRA") {
+                                        displayValue = (percentageValue / 100) * basicSalary; // Calculate based on basicSalary
+                                      } else {
+                                        displayValue = (percentageValue / 100) * grossAmount; // Calculate based on grossAmount
+                                      }
+                                    } else if (!isNaN(parseFloat(value))) {
+                                      // If it's a fixed allowance (like Travel Allowance), just use the numeric value
+                                      displayValue = parseFloat(value);
+                                    }
+
+                                    // Ensure displayValue is a number, and avoid displaying NaN
+                                    if (isNaN(displayValue)) {
+                                      displayValue = 0;
+                                    }
+
+                                    return (
+                                      <div key={key} className="mb-3">
+                                        <label>{key}</label>
+                                        <input
+                                          className="form-control"
+                                          type="text"
+                                          value={displayValue} // Display the actual value
+                                          onChange={(e) => handleAllowanceChange(key, e.target.value)} // Handle change
+                                        />
+                                      </div>
+                                    );
+                                  })}
+                                <div className="mb-3">
                                 <label>Total Allowances:</label>
                                 <input
                                   className="form-control"
@@ -754,8 +793,8 @@ const EmployeeSalaryStructure = () => {
                                   title="This is the total of all allowances."
                                 />
                                  {errorMessage && (
-              <p className="text-danger">{errorMessage}</p>
-            )}
+                                  <p className="text-danger">{errorMessage}</p>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -817,51 +856,37 @@ const EmployeeSalaryStructure = () => {
                               <h5 className="card-title" style={{ marginBottom: "0px" }}>Deductions</h5>
                             </div>
                             <div className="card-body">
-                            {Object.entries(deductions).map(([key, value]) => (
-                              <div key={key} className="mb-3">
-                                <label>
-                                  {key}:
-                                  <span className="text-danger">
-                                    ({deductions[key]})
-                                  </span>
-                                  {deductions[key].endsWith("%") && (
-                                    <span
-                                      className="m-1"
-                                      data-toggle="tooltip"
-                                      title="Percentage values are calculated based on Gross Amount."
-                                    >
-                                      <span className="text-primary">
-                                        <i className="bi bi-info-circle"></i>
-                                      </span>
-                                    </span>
-                                  )}
-                                </label>
-                                <input
-                                  className="form-control"
-                                  type="text"
-                                  maxLength={10}
-                                  value={deductions[key]}
-                                  onChange={(e) => {
-                                    // Allow only numbers and '%' characters
-                                    const newValue = e.target.value.replace(/[^0-9%]/g, "");
-                                    handleDeductionChange(key, newValue);
-                                  }}
-                                />
-                                {/* Display error message */}
+                            {Object.entries(updatedDeductions).map(([key, value]) => {
+                                let displayValue = value;
+                                // If the deduction is a percentage, apply it to the gross amount
+                                if (typeof value === "number" && value < 1) {
+                                  displayValue = value * grossAmount;
+                                }
+
+                                return (
+                                  <div key={key} className="mb-3">
+                                    <label>{key}</label>
+                                    <input
+                                      className="form-control"
+                                      type="text"
+                                      value={displayValue} // Display the value (either percentage or calculated value)
+                                      onChange={(e) => handleDeductionChange(key, e.target.value)} // Handle change
+                                    />
+                                  </div>
+                                );
+                              })}
+                           <div className="mb-3">
+                              <label>Total Deductions</label>
+                              <input
+                                className="form-control"
+                                type="number"
+                                value={totalDeductions.toFixed(2)} // Format as string here
+                                readOnly
+                                data-toggle="tooltip"
+                                title="This is the total of all deductions."
+                              />
                                 {errorMessage && <p className="text-danger">{errorMessage}</p>}
-                              </div>
-                             ))}
-                              <div className="mb-3">
-                                <label>Total Deductions</label>
-                                <input
-                                  className="form-control"
-                                  type="number"
-                                  value={totalDeductions.toFixed(2)}
-                                  readOnly
-                                  data-toggle="tooltip"
-                                  title="This is the total of all deductions."
-                                />
-                              </div>
+                            </div>
                             </div>
                           </div>
                           <div className="card">
@@ -1026,6 +1051,57 @@ const EmployeeSalaryStructure = () => {
             )}
           </div>
         </form>
+        <Modal show={showPfModal} onHide={() => setShowPfModal(false)} centered style={{ zIndex: '1050' }} className="custom-modal">
+        <ModalHeader closeButton >
+          <ModalTitle className="text-center">Confirm Provident Fund Option</ModalTitle>
+        </ModalHeader>
+        <ModalBody className="text-center fs-bold">
+          <p>
+            The Total Provident Fund is ₹{calculatedPF.pfEmployee + calculatedPF.pfEmployer}. 
+            Please choose your preferred option:
+          </p>
+          <div className="d-flex align-items-center mb-3">
+  <input
+    className="form-check-input me-2"
+    type="radio"
+    name="pfOption"
+    value="calculated"
+    checked={selectedPF === 'calculated'}
+    onChange={() => setSelectedPF('calculated')}
+  />
+  <label className="mb-0">
+  Use Calculated PF:  ₹{calculatedPF.pfEmployee + calculatedPF.pfEmployer} per year
+  </label>
+</div>
+
+<div className="d-flex align-items-center mb-3">
+  <input
+    className="form-check-input me-2"
+    type="radio"
+    name="pfOption"
+    value="fixed"
+    checked={selectedPF === 'fixed'}
+    onChange={() => setSelectedPF('fixed')}
+
+  />
+  <label className="mb-0 ml-2">
+  Use Calculated PF: ₹43,200 per year  
+  <span
+    className="d-inline-block" 
+    data-bs-toggle="tooltip" 
+    data-bs-placement="top"
+    title="₹43,200 is the standard PF for an employee (₹3,600 per month)"
+  >
+    <i className="bi bi-info-circle text-primary"></i> {/* Info icon from Bootstrap Icons */}
+  </span>
+  </label>
+</div>
+        </ModalBody>
+        <div className="text-center">
+          <Button variant="primary ml-2" onClick={handleModalClose}>Confirm</Button>
+          <Button variant="secondary" onClick={() => setShowPfModal(false)}>Cancel</Button>
+        </div>
+      </Modal>
       </div>
     </LayOut>
   );

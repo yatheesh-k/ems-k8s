@@ -3,29 +3,29 @@ import { EmployeeSalaryGetApi } from '../Utils/Axios';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ChevronRight } from 'react-bootstrap-icons';
 import LayOut from '../LayOut/LayOut';
-import { userId } from '../Utils/Auth';
+import { useAuth } from '../Context/AuthContext';
 
 const EmployeeSalaryById = () => {
   const [employeeSalaryView, setEmployeeSalaryView] = useState([]);
   const [expanded, setExpanded] = useState({});
   const location = useLocation();
   const navigate = useNavigate();
- 
+  const { user } = useAuth();
   const toggleExpand = (index) => {
     setExpanded(prevState => ({ ...prevState, [index]: !prevState[index] }));
   };
 
   useEffect(() => {
-    if (userId) {
-      EmployeeSalaryGetApi(userId).then(response => {
+    if (user.userId) {
+      EmployeeSalaryGetApi(user.userId).then(response => {
         setEmployeeSalaryView(response.data.data);
       });
     }
-  }, [userId]);
+  }, [user.userId]);
 
   const handleEditClick = (salaryId, event) => {
     event.stopPropagation(); // Prevent the card from toggling when editing
-    navigate(`/employeeSalaryView?salaryId=${salaryId}&employeeId=${userId}`); // Navigate with both parameters
+    navigate(`/employeeSalaryView?salaryId=${salaryId}&employeeId=${user.userId}`); // Navigate with both parameters
   };
 
   return (
