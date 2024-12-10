@@ -388,16 +388,16 @@ const ExperienceForm = () => {
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Date of Experience</label>
                       <Controller
-                        name="relievingDate"
+                        name="experienceDate"
                         control={control}
                         max={sixMonthsFromNow}
                         rules={{
-                          required: "Relieving Date is required",
+                          required: "Experience Date is required",
                           validate: (value) => {
                             const today = new Date();
                             const selectedDate = new Date(value);
                             if (selectedDate < today) {
-                              return "Relieving Date cannot be in the past"; // Custom validation message
+                              return "Experience Date cannot be in the past"; // Custom validation message
                             }
                             return true; // No error, validation passed
                           },
@@ -411,9 +411,9 @@ const ExperienceForm = () => {
                           />
                         )}
                       />
-                      {errors.relievingDate && (
+                      {errors.experienceDate && (
                         <p className="errorMsg">
-                          {errors.relievingDate.message}
+                          {errors.experienceDate.message}
                         </p>
                       )}
                     </div>

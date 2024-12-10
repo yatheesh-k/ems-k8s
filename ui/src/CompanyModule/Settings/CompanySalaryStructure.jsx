@@ -1,42 +1,64 @@
-import React, { useEffect, useState } from 'react';
-import LayOut from '../../LayOut/LayOut';
-import { AllowancesGetApi, CompanySalaryStructurePostApi, DeductionsGetApi } from '../../Utils/Axios';
-import { useAuth } from '../../Context/AuthContext';
-import { Controller, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import React, { useEffect, useState } from "react";
+import LayOut from "../../LayOut/LayOut";
+import {
+  AllowancesGetApi,
+  CompanySalaryStructurePostApi,
+  DeductionsGetApi,
+} from "../../Utils/Axios";
+import { useAuth } from "../../Context/AuthContext";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import Select from "react-select";
-import { ModalBody, ModalHeader, ModalTitle } from 'react-bootstrap';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const CompanySalaryStructure = () => {
-  const { register, handleSubmit, control, getValues, trigger, reset, formState: { errors } } = useForm({ mode: "onChange" });
-  const [activeTab, setActiveTab] = useState('nav-home');
-  const [allowanceFields, setAllowanceFields] = useState([{ label: '', type: 'text', value: '' }]);
-  const [deductionFields, setDeductionFields] = useState([{ label: '', type: 'text', value: '' }]);
+  const {
+    register,
+    handleSubmit,
+    control,
+    getValues,
+    trigger,
+    reset,
+    formState: { errors },
+  } = useForm({ mode: "onChange" });
+  const [activeTab, setActiveTab] = useState("nav-home");
+  const [allowanceFields, setAllowanceFields] = useState([
+    { label: "", type: "text", value: "" },
+  ]);
+  const [deductionFields, setDeductionFields] = useState([
+    { label: "", type: "text", value: "" },
+  ]);
   const [isEditing, setIsEditing] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [allowanceError, setAllowanceError] = useState("");
   const [selectedAllowances, setSelectedAllowances] = useState([]);
   const [allowances, setAllowances] = useState([]);
   const [deductions, setDeductions] = useState([]);
-  const [newFieldName, setNewFieldName] = useState('');
-  const [modalType, setModalType] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [newFieldName, setNewFieldName] = useState("");
+  const [modalType, setModalType] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [validationErrors, setValidationErrors] = useState("");
   const { user } = useAuth();
-  const [fieldCheckboxes, setFieldCheckboxes] = useState({ allowances: {}, deductions: {} });
+  const [fieldCheckboxes, setFieldCheckboxes] = useState({
+    allowances: {},
+    deductions: {},
+  });
   const navigate = useNavigate();
 
   const addField = (fieldName) => {
-    const newField = { label: fieldName, type: 'text', value: '' };
+    const newField = { label: fieldName, type: "text", value: "" };
 
     // Determine which fields to check based on the active tab
-    const fieldsToCheck = activeTab === 'nav-home' ? allowanceFields : deductionFields;
-    const fieldExists = fieldsToCheck.some(field => field.label === fieldName);
+    const fieldsToCheck =
+      activeTab === "nav-home" ? allowanceFields : deductionFields;
+    const fieldExists = fieldsToCheck.some(
+      (field) => field.label === fieldName
+    );
 
     // If the field doesn't exist, add it
     if (!fieldExists) {
-      if (activeTab === 'nav-home') {
+      if (activeTab === "nav-home") {
         setAllowanceFields((prev) => [...prev, newField]);
         setFieldCheckboxes((prev) => ({
           ...prev,
@@ -51,17 +73,17 @@ const CompanySalaryStructure = () => {
       }
 
       // Clear modal, error messages, and reset form
-      setNewFieldName('');
+      setNewFieldName("");
       setShowModal(false);
       reset();
-      setErrorMessage('');
+      setErrorMessage("");
 
       // Validation for the new field
       const validationErrorsCopy = { ...validationErrors };
-      if (!newField.value || newField.value === '') {
-        validationErrorsCopy[fieldName] = 'Value is required';
+      if (!newField.value || newField.value === "") {
+        validationErrorsCopy[fieldName] = "Value is required";
       } else if (!/^\d+$/.test(newField.value)) {
-        validationErrorsCopy[fieldName] = 'This field accepts only Integers';
+        validationErrorsCopy[fieldName] = "This field accepts only Integers";
       } else {
         delete validationErrorsCopy[fieldName];
       }
@@ -75,9 +97,11 @@ const CompanySalaryStructure = () => {
 
   const handleDeleteField = (fieldLabel) => {
     // Remove from allowance or deduction fields based on the active tab
-    if (activeTab === 'nav-home') {
+    if (activeTab === "nav-home") {
       // Filter out the deleted field from the allowanceFields
-      setAllowanceFields((prev) => prev.filter(field => field.label !== fieldLabel));
+      setAllowanceFields((prev) =>
+        prev.filter((field) => field.label !== fieldLabel)
+      );
       // Update fieldCheckboxes for allowances
       setFieldCheckboxes((prev) => {
         const { [fieldLabel]: deleted, ...rest } = prev.allowances;
@@ -85,7 +109,9 @@ const CompanySalaryStructure = () => {
       });
     } else {
       // Filter out the deleted field from the deductionFields
-      setDeductionFields((prev) => prev.filter(field => field.label !== fieldLabel));
+      setDeductionFields((prev) =>
+        prev.filter((field) => field.label !== fieldLabel)
+      );
       // Update fieldCheckboxes for deductions
       setFieldCheckboxes((prev) => {
         const { [fieldLabel]: deleted, ...rest } = prev.deductions;
@@ -99,10 +125,10 @@ const CompanySalaryStructure = () => {
   };
 
   const handleLabelChange = (index, value) => {
-    const fields = activeTab === 'nav-home' ? allowanceFields : deductionFields;
+    const fields = activeTab === "nav-home" ? allowanceFields : deductionFields;
     const newFields = [...fields];
     newFields[index].label = value;
-    if (activeTab === 'nav-home') {
+    if (activeTab === "nav-home") {
       setAllowanceFields(newFields);
     } else {
       setDeductionFields(newFields);
@@ -110,10 +136,10 @@ const CompanySalaryStructure = () => {
   };
 
   const handleTypeChange = (index, value) => {
-    const fields = activeTab === 'nav-home' ? allowanceFields : deductionFields;
+    const fields = activeTab === "nav-home" ? allowanceFields : deductionFields;
     const newFields = [...fields];
     newFields[index].type = value;
-    if (activeTab === 'nav-home') {
+    if (activeTab === "nav-home") {
       setAllowanceFields(newFields);
     } else {
       setDeductionFields(newFields);
@@ -122,33 +148,40 @@ const CompanySalaryStructure = () => {
 
   /**Checkbox functionality */
   const handleCheckboxChange = (index) => {
-    const fields = activeTab === 'nav-home' ? allowanceFields : deductionFields;
+    const fields = activeTab === "nav-home" ? allowanceFields : deductionFields;
     const fieldLabel = fields[index].label;
 
     // Update the checkbox selection state
     setFieldCheckboxes((prev) => {
       const newCheckboxes = {
         ...prev,
-        [activeTab === 'nav-home' ? 'allowances' : 'deductions']: {
-          ...prev[activeTab === 'nav-home' ? 'allowances' : 'deductions'],
-          [fieldLabel]: !prev[activeTab === 'nav-home' ? 'allowances' : 'deductions'][fieldLabel],
-        }
+        [activeTab === "nav-home" ? "allowances" : "deductions"]: {
+          ...prev[activeTab === "nav-home" ? "allowances" : "deductions"],
+          [fieldLabel]:
+            !prev[activeTab === "nav-home" ? "allowances" : "deductions"][
+              fieldLabel
+            ],
+        },
       };
 
       // Get selected allowances and selected deductions
-      const selectedAllowances = Object.entries(newCheckboxes.allowances).filter(([key, value]) => value);
-      const selectedDeductions = Object.entries(newCheckboxes.deductions).filter(([key, value]) => value);
+      const selectedAllowances = Object.entries(
+        newCheckboxes.allowances
+      ).filter(([key, value]) => value);
+      const selectedDeductions = Object.entries(
+        newCheckboxes.deductions
+      ).filter(([key, value]) => value);
 
       // Calculate total percentage for selected allowances
       const totalAllowancePercentage = selectedAllowances
-        .map(([key]) => allowanceFields.find(f => f.label === key))
-        .filter(field => field.type === 'percentage' && field.value)
+        .map(([key]) => allowanceFields.find((f) => f.label === key))
+        .filter((field) => field.type === "percentage" && field.value)
         .reduce((total, field) => total + parseFloat(field.value), 0);
 
       // Calculate total percentage for selected deductions
       const totalDeductionPercentage = selectedDeductions
-        .map(([key]) => deductionFields.find(f => f.label === key))
-        .filter(field => field.type === 'percentage' && field.value)
+        .map(([key]) => deductionFields.find((f) => f.label === key))
+        .filter((field) => field.type === "percentage" && field.value)
         .reduce((total, field) => total + parseFloat(field.value), 0);
 
       // Initialize error object
@@ -158,7 +191,8 @@ const CompanySalaryStructure = () => {
       if (totalAllowancePercentage > 100) {
         updatedErrors = {
           ...updatedErrors,
-          totalAllowancePercentage: 'The total percentage for allowances cannot exceed 100%',
+          totalAllowancePercentage:
+            "The total percentage for allowances cannot exceed 100%",
         };
       } else {
         // Clear the error message for allowances if the total is valid
@@ -166,10 +200,11 @@ const CompanySalaryStructure = () => {
       }
 
       // Check if total percentage for deductions exceeds 100%
-      if (totalDeductionPercentage > 100) {
+      if (totalDeductionPercentage > 88) {
         updatedErrors = {
           ...updatedErrors,
-          totalDeductionPercentage: 'The total percentage for deductions cannot exceed 100%',
+          totalDeductionPercentage:
+            "The total percentage for deductions cannot exceed 100%",
         };
       } else {
         // Clear the error message for deductions if the total is valid
@@ -177,7 +212,10 @@ const CompanySalaryStructure = () => {
       }
 
       // If there are any errors, return the previous state to prevent changing the checkbox state
-      if (updatedErrors.totalAllowancePercentage || updatedErrors.totalDeductionPercentage) {
+      if (
+        updatedErrors.totalAllowancePercentage ||
+        updatedErrors.totalDeductionPercentage
+      ) {
         setValidationErrors(updatedErrors);
         return prev; // Prevent state change if there's an error
       }
@@ -190,7 +228,10 @@ const CompanySalaryStructure = () => {
     });
 
     // Handle validation for the current field
-    const isChecked = !fieldCheckboxes[activeTab === 'nav-home' ? 'allowances' : 'deductions'][fieldLabel];
+    const isChecked =
+      !fieldCheckboxes[activeTab === "nav-home" ? "allowances" : "deductions"][
+        fieldLabel
+      ];
     if (isChecked) {
       validateField(fields[index]);
     } else {
@@ -205,7 +246,7 @@ const CompanySalaryStructure = () => {
   const validateField = (field) => {
     const errors = { ...validationErrors };
 
-    if (field.value === '') {
+    if (field.value === "") {
       errors[field.label] = "Value is Required";
     } else if (!/^\d+$/.test(field.value)) {
       errors[field.label] = "This field accepts only Integers";
@@ -220,13 +261,19 @@ const CompanySalaryStructure = () => {
       const response = await AllowancesGetApi();
       const allowancesData = response.data;
       setAllowances(allowancesData);
-      setAllowanceFields(allowancesData.map(allowance => ({ label: allowance, type: 'text', value: '' })));
-      setFieldCheckboxes(prev => ({
+      setAllowanceFields(
+        allowancesData.map((allowance) => ({
+          label: allowance,
+          type: "text",
+          value: "",
+        }))
+      );
+      setFieldCheckboxes((prev) => ({
         ...prev,
         allowances: allowancesData.reduce((acc, allowance) => {
           acc[allowance] = false;
           return acc;
-        }, {})
+        }, {}),
       }));
     } catch (error) {
       console.error("API fetch error:", error);
@@ -242,13 +289,19 @@ const CompanySalaryStructure = () => {
       const response = await DeductionsGetApi();
       const deductionsData = response.data;
       setDeductions(deductionsData);
-      setDeductionFields(deductionsData.map(deduction => ({ label: deduction, type: 'text', value: '' })));
-      setFieldCheckboxes(prev => ({
+      setDeductionFields(
+        deductionsData.map((deduction) => ({
+          label: deduction,
+          type: "text",
+          value: "",
+        }))
+      );
+      setFieldCheckboxes((prev) => ({
         ...prev,
         deductions: deductionsData.reduce((dcc, deduction) => {
           dcc[deduction] = false;
           return dcc;
-        }, {})
+        }, {}),
       }));
     } catch (error) {
       console.error("API fetch error:", error);
@@ -260,10 +313,10 @@ const CompanySalaryStructure = () => {
   }, []);
 
   const handleValueChange = (index, value) => {
-    const fields = activeTab === 'nav-home' ? allowanceFields : deductionFields;
+    const fields = activeTab === "nav-home" ? allowanceFields : deductionFields;
     const newFields = [...fields];
     newFields[index].value = value;
-    if (activeTab === 'nav-home') {
+    if (activeTab === "nav-home") {
       setAllowanceFields(newFields);
     } else {
       setDeductionFields(newFields);
@@ -272,119 +325,145 @@ const CompanySalaryStructure = () => {
 
   const onSubmit = async () => {
     const jsonData = {
-        companyName: user.company,
-        status: "Active",
-        allowances: {},
-        deductions: {},
+      companyName: user.company,
+      status: "Active",
+      allowances: {},
+      deductions: {
+        pfEmployee: "6%",
+        pfEmplpoyer: "6%",
+      },
     };
 
     // Get selected allowances and deductions
-    const selectedAllowances = allowanceFields.filter((field) => fieldCheckboxes.allowances[field.label]);
-    const selectedDeductions = deductionFields.filter((field) => fieldCheckboxes.deductions[field.label]);
+    const selectedAllowances = allowanceFields.filter(
+      (field) => fieldCheckboxes.allowances[field.label]
+    );
+    const selectedDeductions = deductionFields.filter(
+      (field) => fieldCheckboxes.deductions[field.label]
+    );
 
     // Validation: Check if any selected allowance or deduction has an empty value
     const errors = {};
 
     selectedAllowances.forEach((field) => {
-        if (!field.value) {
-            errors[field.label] = "Value is required for selected allowance.";
-        }
+      if (!field.value) {
+        errors[field.label] = "Value is required for selected allowance.";
+      }
     });
 
     selectedDeductions.forEach((field) => {
-        if (!field.value) {
-            errors[field.label] = "Value is required for selected deduction.";
-        }
+      if (!field.value) {
+        errors[field.label] = "Value is required for selected deduction.";
+      }
     });
 
     // Validation: Check if the total percentage for allowances exceeds 100%
     const totalAllowancePercentage = selectedAllowances
-        .map((field) => {
-            // Ensure the field exists before trying to access its properties
-            const foundField = allowanceFields.find(f => f.label === field.label);
-            return foundField ? foundField : null; // If field is found, return it, otherwise return null
-        })
-        .filter(field => field && field.type === 'percentage' && field.value)
-        .reduce((total, field) => total + parseFloat(field.value), 0);
-
-    if (totalAllowancePercentage > 100) {
-        errors.totalAllowancePercentage = 'The total percentage for allowances cannot exceed 100%. Please Adjust';
-    }
+    .map((field) => {
+      // Ensure the field exists before trying to access its properties
+      const foundField = allowanceFields.find((f) => f.label === field.label);
+      return foundField ? foundField : null; // If field is found, return it, otherwise return null
+    })
+    .filter((field) => field && field.value) // Ensure the field has a value
+    .reduce((total, field) => {
+      // Check if the field is Basic Salary or HRA and treat them as percentages
+      if (field.label === "Basic Salary" || field.label === "HRA") {
+        return total + (parseFloat(field.value) || 0); // Add the percentage directly if the value is numeric
+      } else if (field.type === "percentage") {
+        return total + parseFloat(field.value); // Add percentage values for other fields
+      }
+      return total;
+    }, 0);
+  
+  if (totalAllowancePercentage > 100) {
+    errors.totalAllowancePercentage =
+      "The total percentage for allowances cannot exceed 100%. Please Adjust";
+  }  
 
     // Validation: Check if the total percentage for deductions exceeds 100%
     const totalDeductionPercentage = selectedDeductions
-        .map((field) => {
-            // Ensure the field exists before trying to access its properties
-            const foundField = deductionFields.find(f => f.label === field.label);
-            return foundField ? foundField : null; // If field is found, return it, otherwise return null
-        })
-        .filter(field => field && field.type === 'percentage' && field.value)
-        .reduce((total, field) => total + parseFloat(field.value), 0);
+      .map((field) => {
+        // Ensure the field exists before trying to access its properties
+        const foundField = deductionFields.find((f) => f.label === field.label);
+        return foundField ? foundField : null; // If field is found, return it, otherwise return null
+      })
+      .filter((field) => field && field.type === "percentage" && field.value)
+      .reduce((total, field) => total + parseFloat(field.value), 0);
 
-    if (totalDeductionPercentage > 100) {
-        errors.totalDeductionPercentage = 'The total percentage for deductions cannot exceed 100%. Please Adjust';
+    if (totalDeductionPercentage > 88) {
+      errors.totalDeductionPercentage =
+        "The total percentage for deductions cannot exceed 100%. Please Adjust";
     }
 
     // If there are validation errors, show them and prevent submission
     if (Object.keys(errors).length > 0) {
-        setValidationErrors(errors); // Set validation errors to state
-          // alert("Please fill in the required values for the selected allowances and deductions, and make sure percentages do not exceed 100.");
-        return; // Prevent form submission
+      setValidationErrors(errors); // Set validation errors to state
+      return; // Prevent form submission
     }
 
     // Populate the allowances and deductions data for submission
     selectedAllowances.forEach((field) => {
-        if (field.label && field.value) {
-            jsonData.allowances[field.label] = field.type === "percentage" ? `${field.value}%` : field.value;
+      if (field.label && field.value) {
+        if (field.label === "Basic Salary" || field.label === "HRA") {
+          // For Basic Salary and HRA, store as percentage value (e.g., "50%")
+          jsonData.allowances[field.label] = `${field.value}%`;
+        } else {
+          // For other fields, store based on their type (percentage or value)
+          jsonData.allowances[field.label] =
+            field.type === "percentage" ? `${field.value}%` : field.value;
         }
+      }
     });
 
     selectedDeductions.forEach((field) => {
-        if (field.label && field.value) {
-            jsonData.deductions[field.label] = field.type === "percentage" ? `${field.value}%` : field.value;
-        }
+      if (field.label && field.value) {
+        jsonData.deductions[field.label] =
+          field.type === "percentage" ? `${field.value}%` : field.value;
+      }
     });
 
     console.log("Submitting data:", jsonData);
 
     try {
-        // Submit the data to the backend
-        await CompanySalaryStructurePostApi(jsonData);
-        
-        // If submission is successful, show a success message
-        toast.success("Salary structure submitted successfully");
-        
-        // Reset the form, navigate, or reload as needed
-        reset();
-        navigate('/companySalaryView');
-        window.location.reload();
+      // Submit the data to the backend
+      await CompanySalaryStructurePostApi(jsonData);
+
+      // If submission is successful, show a success message
+      toast.success("Salary structure submitted successfully");
+
+      // Reset the form, navigate, or reload as needed
+      reset();
+      navigate("/companySalaryView");
+      window.location.reload();
     } catch (error) {
-        if (error.response) {
-            console.error("Error response from backend:", error.response.data);
-            toast.error(`Error: ${error.response.data.message || 'An error occurred'}`);
-        } else {
-            console.error("Fetch error:", error);
-            toast.error("An unexpected error occurred. Please try again.");
-        }
+      if (error.response) {
+        console.error("Error response from backend:", error.response.data);
+        toast.error(
+          `Error: ${error.response.data.message || "An error occurred"}`
+        );
+      } else {
+        console.error("Fetch error:", error);
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     }
-};
+  };
 
   const clearForm = () => {
     reset();
-    navigate('/companySalaryView');
-  }
+    navigate("/companySalaryView");
+  };
   const formatFieldName = (fieldName) => {
     return fieldName
-      .replace(/([A-Z])/g, ' $1')
+      .replace(/([A-Z])/g, " $1")
       .replace(/^./, (str) => str.toUpperCase())
       .trim();
   };
 
   const handleCloseNewFieldModal = () => {
-    setNewFieldName('');
+    setNewFieldName("");
     setShowModal(false);
     reset();
-    setErrorMessage('');
+    setErrorMessage("");
   };
 
   const toInputTitleCase = (e) => {
@@ -392,24 +471,29 @@ const CompanySalaryStructure = () => {
     let value = input.value;
     const cursorPosition = input.selectionStart; // Save the cursor position
     // Remove leading spaces
-    value = value.replace(/^\s+/g, '');
+    value = value.replace(/^\s+/g, "");
     // Ensure only alphabets and spaces are allowed
     const allowedCharsRegex = /^[a-zA-Z0-9\s!@#&()*/,.\\-]+$/;
-    value = value.split('').filter(char => allowedCharsRegex.test(char)).join('');
+    value = value
+      .split("")
+      .filter((char) => allowedCharsRegex.test(char))
+      .join("");
     // Capitalize the first letter of each word
-    const words = value.split(' ');
+    const words = value.split(" ");
     // Capitalize the first letter of each word and lowercase the rest
-    const capitalizedWords = words.map(word => {
+    const capitalizedWords = words.map((word) => {
       if (word.length > 0) {
         return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
       }
-      return '';
+      return "";
     });
     // Join the words back into a string
-    let formattedValue = capitalizedWords.join(' ');
+    let formattedValue = capitalizedWords.join(" ");
     // Remove spaces not allowed (before the first two characters)
     if (formattedValue.length > 3) {
-      formattedValue = formattedValue.slice(0, 3) + formattedValue.slice(3).replace(/\s+/g, ' ');
+      formattedValue =
+        formattedValue.slice(0, 3) +
+        formattedValue.slice(3).replace(/\s+/g, " ");
     }
     // Update input value
     input.value = formattedValue;
@@ -422,7 +506,7 @@ const CompanySalaryStructure = () => {
     const value = e.target.value;
 
     // Check if the value is empty
-    if (value.trim() !== '') {
+    if (value.trim() !== "") {
       return; // Allow space button
     }
 
@@ -434,7 +518,7 @@ const CompanySalaryStructure = () => {
 
   const handleKeyDown = async (e) => {
     // Check if the key pressed is "Enter"
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault(); // Prevent default form submission
 
       // Trigger validation for the field
@@ -443,11 +527,10 @@ const CompanySalaryStructure = () => {
       // If validation passes, save the data
       if (isValid) {
         const fieldName = getValues("fieldName");
-        addField(fieldName);  // Call your function to save the data
+        addField(fieldName); // Call your function to save the data
       }
     }
   };
-
 
   const toInputSpaceCase = (e) => {
     let inputValue = e.target.value;
@@ -477,17 +560,20 @@ const CompanySalaryStructure = () => {
   };
 
   const isSubmitEnabled = () => {
-    const hasSelectedAllowance = allowanceFields.some((field, index) => fieldCheckboxes.allowances[field.label]);
-    const hasSelectedDeduction = deductionFields.some((field, index) => fieldCheckboxes.deductions[field.label]);
-    return hasSelectedAllowance && hasSelectedDeduction;
+    const hasSelectedAllowance = allowanceFields.some(
+      (field, index) => fieldCheckboxes.allowances[field.label]
+    );
+    return hasSelectedAllowance;
   };
 
   const handleTabChange = (tab) => {
     // Check for the allowances errors
-    if (tab === 'nav-profile') {
+    if (tab === "nav-profile") {
       // Ensure at least one allowance is selected
-      if (Object.values(fieldCheckboxes.allowances).every(checkbox => !checkbox)) {
-        setAllowanceError('Please select at least one allowance.');
+      if (
+        Object.values(fieldCheckboxes.allowances).every((checkbox) => !checkbox)
+      ) {
+        setAllowanceError("Please select at least one allowance.");
         return; // Prevent changing the tab if no allowances are selected
       }
 
@@ -506,28 +592,31 @@ const CompanySalaryStructure = () => {
       // }
 
       // Clear the allowance error if everything is valid
-      setAllowanceError('');
+      setAllowanceError("");
     }
 
     // Check for the deductions errors if navigating to the deductions tab
-    if (tab === 'nav-home') {
+    if (tab === "nav-home") {
       // Check if the total percentage for deductions exceeds 100%
-      const selectedDeductions = Object.entries(fieldCheckboxes.deductions).filter(([key, value]) => value);
+      const selectedDeductions = Object.entries(
+        fieldCheckboxes.deductions
+      ).filter(([key, value]) => value);
       const totalDeductionPercentage = selectedDeductions
-        .map(([key]) => deductionFields.find(f => f.label === key))
-        .filter(field => field.type === 'percentage' && field.value)
+        .map(([key]) => deductionFields.find((f) => f.label === key))
+        .filter((field) => field.type === "percentage" && field.value)
         .reduce((total, field) => total + parseFloat(field.value), 0);
 
-      if (totalDeductionPercentage > 100) {
+      if (totalDeductionPercentage > 88) {
         setValidationErrors({
-          totalDeductionPercentage: 'The total percentage for deductions cannot exceed 100%. Please Adjust',
+          totalDeductionPercentage:
+            "The total percentage for deductions cannot exceed 100%. Please Adjust",
         });
         return; // Prevent changing the tab if deduction percentage exceeds 100%
       }
     }
 
     // Clear the validation errors if everything is valid
-    setValidationErrors(prevErrors => {
+    setValidationErrors((prevErrors) => {
       const newErrors = { ...prevErrors };
       delete newErrors.totalAllowancePercentage;
       delete newErrors.totalDeductionPercentage;
@@ -543,12 +632,16 @@ const CompanySalaryStructure = () => {
       <div className="container-fluid p-0">
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
-            <h1 className="h3 mb-3"><strong>Salary Structure</strong></h1>
+            <h1 className="h3 mb-3">
+              <strong>Salary Structure</strong>
+            </h1>
           </div>
           <div className="col-auto">
             <nav aria-label="breadcrumb">
               <ol className="breadcrumb mb-0">
-                <li className="breadcrumb-item"><a href="/main">Home</a></li>
+                <li className="breadcrumb-item">
+                  <a href="/main">Home</a>
+                </li>
                 <li className="breadcrumb-item active">Salary Structure</li>
               </ol>
             </nav>
@@ -558,18 +651,32 @@ const CompanySalaryStructure = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="card">
               <div className="card-header">
-                <div className="card-title" style={{ marginBottom: "0px" }}>Company Salary Structure</div>
+                <div className="card-title" style={{ marginBottom: "0px" }}>
+                  Company Salary Structure
+                </div>
               </div>
               {validationErrors.totalAllowancePercentage && (
-                <div className="col-12 mt-2" style={{ marginLeft: "60px", marginRight: "16px" }}>
-                  <div className="alert alert-danger" style={{marginRight:"75px"}}>
+                <div
+                  className="col-12 mt-2"
+                  style={{ marginLeft: "60px", marginRight: "16px" }}
+                >
+                  <div
+                    className="alert alert-danger"
+                    style={{ marginRight: "75px" }}
+                  >
                     {validationErrors.totalAllowancePercentage}
                   </div>
                 </div>
               )}
               {validationErrors.totalDeductionPercentage && (
-                <div className="col-12 mt-2" style={{marginLeft:"60px", marginRight:"16px"}}>
-                  <div className="alert alert-danger" style={{marginRight:"75px"}}>
+                <div
+                  className="col-12 mt-2"
+                  style={{ marginLeft: "60px", marginRight: "16px" }}
+                >
+                  <div
+                    className="alert alert-danger"
+                    style={{ marginRight: "75px" }}
+                  >
                     {validationErrors.totalDeductionPercentage}
                   </div>
                 </div>
@@ -577,29 +684,46 @@ const CompanySalaryStructure = () => {
               <div className="card-body">
                 <nav className="companyNavOuter">
                   <div className="nav nav-tabs" id="nav-tab" role="tablist">
-                    <button type='button'
-                      className={`nav-link ${activeTab === 'nav-home' ? 'active' : ''}`}
-                      onClick={() => handleTabChange('nav-home')}
+                    <button
+                      type="button"
+                      className={`nav-link ${
+                        activeTab === "nav-home" ? "active" : ""
+                      }`}
+                      onClick={() => handleTabChange("nav-home")}
                     >
                       Allowances
                     </button>
-                    <button type='button'
-                      className={`nav-link ${activeTab === 'nav-profile' ? 'active' : ''}`}
-                      onClick={() => handleTabChange('nav-profile')}
+                    <button
+                      type="button"
+                      className={`nav-link ${
+                        activeTab === "nav-profile" ? "active" : ""
+                      }`}
+                      onClick={() => handleTabChange("nav-profile")}
                     >
                       Deductions
                     </button>
                   </div>
                 </nav>
-                <div className="tab-content companyTabContent" id="nav-tabContent">
+                <div
+                  className="tab-content companyTabContent"
+                  id="nav-tabContent"
+                >
                   {/* Allowance Tab */}
-                  <div className={`tab-pane fade ${activeTab === 'nav-home' ? 'show active' : ''}`} id="nav-home" role="tabpanel">
+                  <div
+                    className={`tab-pane fade ${
+                      activeTab === "nav-home" ? "show active" : ""
+                    }`}
+                    id="nav-home"
+                    role="tabpanel"
+                  >
                     {allowanceFields.map((field, index) => (
                       <div className="row bbl ptb25" key={index}>
                         <div className="col-auto mt-2">
                           <input
                             type="checkbox"
-                            checked={fieldCheckboxes.allowances[field.label] || false}
+                            checked={
+                              fieldCheckboxes.allowances[field.label] || false
+                            }
                             onChange={() => handleCheckboxChange(index)}
                           />
                         </div>
@@ -609,7 +733,9 @@ const CompanySalaryStructure = () => {
                             className="form-control"
                             readOnly
                             value={field.label}
-                            onChange={(e) => handleLabelChange(index, e.target.value)}
+                            onChange={(e) =>
+                              handleLabelChange(index, e.target.value)
+                            }
                             placeholder="Label Name"
                             disabled={!isEditing}
                           />
@@ -617,45 +743,70 @@ const CompanySalaryStructure = () => {
                         <div className="col-sm-3">
                           <select
                             className="form-select"
-                            value={field.type}
-                            onChange={(e) => handleTypeChange(index, e.target.value)}
-                            disabled={!isEditing}
+                            value={
+                              field.label === "Basic Salary" ||
+                              field.label === "HRA"
+                                ? "percentage"
+                                : field.type
+                            }
+                            onChange={(e) => {
+                              if (
+                                field.label !== "Basic Salary" &&
+                                field.label !== "HRA"
+                              ) {
+                                handleTypeChange(index, e.target.value);
+                              }
+                            }}
+                            disabled={
+                              !isEditing ||
+                              field.label === "Basic Salary" ||
+                              field.label === "HRA"
+                            }
                           >
-                            <option value="text">₹</option>
                             <option value="percentage">%</option>
+                            <option value="text">₹</option>
                           </select>
                         </div>
                         <div className="col-sm-3">
                           <input
-                            type="text" // Keep the type as text, but we will restrict the value
+                            type="text"
                             className="form-control"
                             value={field.value}
                             onInput={toInputSpaceCase}
                             onChange={(e) => {
                               const newValue = e.target.value;
-
-                              // Check if the field type is 'percentage'
-                              if (field.type === 'percentage') {
-                                // Restrict input to a maximum of 2 digits for percentage
+                              if (field.type === "percentage") {
                                 if (/^\d{0,2}$/.test(newValue)) {
                                   handleValueChange(index, newValue);
                                 }
                               } else {
-                                // Otherwise allow the regular input handling
                                 handleValueChange(index, newValue);
                               }
-
-                              // Validate the field value
                               validateField({ ...field, value: newValue });
                             }}
                             placeholder="Enter Value"
-                            disabled={!fieldCheckboxes.allowances[field.label] || !isEditing}
-                            maxLength={7}  // You can adjust this to a larger number if needed
+                            disabled={
+                              !fieldCheckboxes.allowances[field.label] ||
+                              !isEditing
+                            }
+                            // Set maxLength conditionally for Basic Salary and HRA
+                            maxLength={
+                              field.label === "Basic Salary" ||
+                              field.label === "HRA"
+                                ? 2
+                                : 7
+                            }
                             data-bs-toggle="tooltip"
-                            title={!fieldCheckboxes.allowances[field.label] ? 'Please select checkbox' : ''}
+                            title={
+                              !fieldCheckboxes.allowances[field.label]
+                                ? "Please select checkbox"
+                                : ""
+                            }
                           />
                           {validationErrors[field.label] && (
-                            <div className="text-danger">{validationErrors[field.label]}</div>
+                            <div className="text-danger">
+                              {validationErrors[field.label]}
+                            </div>
                           )}
                         </div>
                       </div>
@@ -668,76 +819,171 @@ const CompanySalaryStructure = () => {
                       Add Field
                     </button>
                   </div>
-
                   {/* Deduction Tab */}
-                  <div className={`tab-pane fade ${activeTab === 'nav-profile' ? 'show active' : ''}`} id="nav-profile" role="tabpanel">
-                    {deductionFields.map((field, index) => (
-                      <div className="row bbl ptb25" key={index}>
-                        <div className="col-auto mt-2">
-                          <input
-                            type="checkbox"
-                            checked={fieldCheckboxes.deductions[field.label] || false}
-                            onChange={() => handleCheckboxChange(index)}
-                          />
-                        </div>
-                        <div className="col-sm-3">
-                          <input
-                            type="text"
-                            className="form-control"
-                            readOnly
-                            value={field.label}
-                            onChange={(e) => handleLabelChange(index, e.target.value)}
-                            placeholder="Label Name"
-                            disabled={!isEditing}
-                          />
-                        </div>
-                        <div className="col-sm-3">
-                          <select
-                            className="form-select"
-                            value={field.type}
-                            onChange={(e) => handleTypeChange(index, e.target.value)}
-                            disabled={!isEditing}
-                          >
-                            <option value="text">₹</option>
-                            <option value="percentage">%</option>
-                          </select>
-                        </div>
-                        <div className="col-sm-3">
-                          <input
-                            type="text" // Keep the type as text, but we will restrict the value
-                            className="form-control"
-                            value={field.value}
-                            onInput={toInputSpaceCase}
-                            onChange={(e) => {
-                              const newValue = e.target.value;
-
-                              // Check if the field type is 'percentage'
-                              if (field.type === 'percentage') {
-                                // Restrict input to a maximum of 2 digits for percentage
-                                if (/^\d{0,2}$/.test(newValue)) {
-                                  handleValueChange(index, newValue);
-                                }
-                              } else {
-                                // Otherwise allow the regular input handling
-                                handleValueChange(index, newValue);
-                              }
-
-                              // Validate the field value
-                              validateField({ ...field, value: newValue });
-                            }}
-                            placeholder="Enter Value"
-                            disabled={!fieldCheckboxes.deductions[field.label] || !isEditing}
-                            maxLength={7}  // You can adjust this to a larger number if needed
-                            data-bs-toggle="tooltip"
-                            title={!fieldCheckboxes.deductions[field.label] ? 'Please select checkbox' : ''}
-                          />
-                          {validationErrors[field.label] && (
-                            <div className="text-danger">{validationErrors[field.label]}</div>
-                          )}
-                        </div>
-
+                  <div
+                    className={`tab-pane fade ${
+                      activeTab === "nav-profile" ? "show active" : ""
+                    }`}
+                    id="nav-profile"
+                    role="tabpanel"
+                  >
+                    <div className="row bbl ptb25">
+                      <div className="col-auto mt-2">
+                        <input type="checkbox" checked={true} />
                       </div>
-                    ))}
+                      <div className="col-sm-3">
+                        <input
+                          type="text"
+                          className="form-control"
+                          readOnly
+                          value="PF Employee"
+                          onChange={(e) =>
+                            handleLabelChange("PF Employee", e.target.value)
+                          }
+                          placeholder="Label Name"
+                          disabled={!isEditing}
+                        />
+                      </div>
+                      <div className="col-sm-3">
+                        <input
+                          className="form-control"
+                          value="%"
+                          onChange={() => {}}
+                          readOnly
+                          disabled={!isEditing}
+                        ></input>
+                      </div>
+                      <div className="col-sm-3">
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={6}
+                          onChange={(e) =>
+                            handleValueChange("PF Employee", e.target.value)
+                          }
+                          placeholder="Enter Value"
+                          disabled={
+                            !fieldCheckboxes.deductions["PF Employee"] ||
+                            !isEditing
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <div className="row bbl ptb25">
+                      <div className="col-auto mt-2">
+                        <input type="checkbox" checked={true} />
+                      </div>
+                      <div className="col-sm-3">
+                        <input
+                          type="text"
+                          className="form-control"
+                          readOnly
+                          value="PF Employer"
+                          onChange={(e) =>
+                            handleLabelChange("PF Employer", e.target.value)
+                          }
+                          placeholder="Label Name"
+                          disabled={!isEditing}
+                        />
+                      </div>
+                      <div className="col-sm-3">
+                        <input
+                          className="form-control"
+                          value="%"
+                          onChange={() => {}}
+                          readOnly
+                          disabled={!isEditing}
+                        ></input>
+                      </div>
+                      <div className="col-sm-3">
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={6}
+                          onChange={(e) =>
+                            handleValueChange("PF Employer", e.target.value)
+                          }
+                          placeholder="Enter Value"
+                          disabled={
+                            !fieldCheckboxes.deductions["PF Employer"] ||
+                            !isEditing
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    {/* Dynamically Added Deduction Fields */}
+                    {deductionFields.map((field, index) => {
+                      const isChecked =
+                        fieldCheckboxes.deductions[field.label] || false;
+                      return (
+                        isChecked && (
+                          <div className="row bbl ptb25" key={index}>
+                            {/* Checkbox Field */}
+                            <div className="col-auto mt-2">
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={() => handleCheckboxChange(index)} // Handle checkbox change
+                              />
+                            </div>
+
+                            {/* Label Field */}
+                            <div className="col-sm-3">
+                              <input
+                                type="text"
+                                className="form-control"
+                                readOnly
+                                value={field.label}
+                                onChange={(e) =>
+                                  handleLabelChange(index, e.target.value)
+                                }
+                                disabled={!isEditing || !isChecked}
+                              />
+                            </div>
+
+                            {/* Type Field */}
+                            <div className="col-sm-3">
+                              <select
+                                className="form-select"
+                                value={field.type}
+                                onChange={(e) =>
+                                  handleTypeChange(index, e.target.value)
+                                }
+                                disabled={!isEditing || !isChecked}
+                              >
+                                <option value="percentage">%</option>
+                                <option value="text">₹</option>
+                              </select>
+                            </div>
+
+                            {/* Value Field */}
+                            <div className="col-sm-3">
+                              <input
+                                type="text"
+                                className="form-control"
+                                value={field.value}
+                                onChange={(e) => {
+                                  const newValue = e.target.value;
+                                  if (field.type === "percentage") {
+                                    if (/^\d{0,2}$/.test(newValue)) {
+                                      handleValueChange(index, newValue);
+                                    }
+                                  } else {
+                                    handleValueChange(index, newValue);
+                                  }
+                                  validateField({ ...field, value: newValue });
+                                }}
+                                placeholder="Enter Value"
+                                disabled={!isEditing || !isChecked}
+                                maxLength={7}
+                              />
+                            </div>
+                          </div>
+                        )
+                      );
+                    })}
                     <button
                       type="button"
                       onClick={() => setShowModal(true)}
@@ -747,7 +993,10 @@ const CompanySalaryStructure = () => {
                     </button>
                   </div>
                 </div>
-                <div className="row col-12 mt-3 align-items-center" style={{ marginLeft: "65%" }}>
+                <div
+                  className="row col-12 mt-3 align-items-center"
+                  style={{ marginLeft: "65%" }}
+                >
                   {/* <div className="col-6">
                     <div className="row d-flex flex-column">
                       <label className="form-label mb-0">Status: {errors.status && <p className="errorMsg text-danger">Status is required</p>}
@@ -794,16 +1043,15 @@ const CompanySalaryStructure = () => {
                     </button>
                   </div>
                 </div>
-
               </div>
             </div>
           </form>
         </div>
         {showModal && (
           <div
-            role='dialog'
+            role="dialog"
             aria-modal="true"
-            className='fade modal show'
+            className="fade modal show"
             tabIndex="-1"
             style={{ zIndex: "9999", display: "block" }}
           >
@@ -811,7 +1059,9 @@ const CompanySalaryStructure = () => {
               <div className="modal-content">
                 <ModalHeader>
                   <ModalTitle className="modal-title">
-                    Add New {modalType === 'allowances' ? 'Allowance' : 'Deduction'} Field
+                    Add New{" "}
+                    {modalType === "allowances" ? "Allowance" : "Deduction"}{" "}
+                    Field
                   </ModalTitle>
                   <button
                     type="button"
@@ -828,15 +1078,20 @@ const CompanySalaryStructure = () => {
                           <input
                             type="text"
                             className="form-control"
-                            placeholder={`Enter New ${modalType === 'allowances' ? 'Allowance' : 'Deduction'} Name`}
+                            placeholder={`Enter New ${
+                              modalType === "allowances"
+                                ? "Allowance"
+                                : "Deduction"
+                            } Name`}
                             onInput={toInputTitleCase}
                             onKeyDown={handleKeyDown}
-                            autoComplete='off'
+                            autoComplete="off"
                             {...register("fieldName", {
                               required: "Field name is required",
                               pattern: {
                                 value: /^[A-Za-z\s]+$/,
-                                message: "This field accepts only alphabetic characters",
+                                message:
+                                  "This field accepts only alphabetic characters",
                               },
                               minLength: {
                                 value: 2,
@@ -848,14 +1103,22 @@ const CompanySalaryStructure = () => {
                               },
                             })}
                           />
-                          {errors.fieldName && <p className="errorMsg text-danger">{errors.fieldName.message}</p>}
-                          {errorMessage && <p className="errorMsg text-danger">{errorMessage}</p>}
+                          {errors.fieldName && (
+                            <p className="errorMsg text-danger">
+                              {errors.fieldName.message}
+                            </p>
+                          )}
+                          {errorMessage && (
+                            <p className="errorMsg text-danger">
+                              {errorMessage}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
-                    <div className='modal-footer'>
+                    <div className="modal-footer">
                       <button
-                        type='button'
+                        type="button"
                         className="btn btn-primary"
                         onClick={async () => {
                           const isValid = await trigger("fieldName");
@@ -870,7 +1133,13 @@ const CompanySalaryStructure = () => {
                       >
                         Save
                       </button>
-                      <button type='button' className="btn btn-secondary" onClick={handleCloseNewFieldModal}>Cancel</button>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={handleCloseNewFieldModal}
+                      >
+                        Cancel
+                      </button>
                     </div>
                   </form>
                 </ModalBody>

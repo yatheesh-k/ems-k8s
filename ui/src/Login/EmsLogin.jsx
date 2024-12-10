@@ -53,7 +53,7 @@ const EmsLogin = () => {
           } = decodedToken;
           setAuthUser({ userId, userRole, company, employeeId });
           toast.success("Login Successful");
-          navigate("/main");
+          window.location.href = "/main";    
         } catch (decodeError) {
           setErrorMessage("Failed to decode token. Ensure token is valid.");
           setShowErrorModal(true);

@@ -19,12 +19,14 @@
             background-color: #9fc7df;
             height: 200px;
             padding-bottom: 30px;
+            width: 350px
         }
 
         .logo img {
             width: 250px;
             height: 150px;
             margin-left: 30px;
+            justify-content: center;
         }
 
         .company {
