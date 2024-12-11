@@ -242,11 +242,8 @@
             <h6>Dear ${offerLetter.employeeName}</h6>
             <p>We welcome you to our pursuit of excellence and we feel proud to have a professional of your stature as a
                 member of the ${company.companyName} family and wish you a long, rewarding, and satisfying career with
-                us.
-            </p>
-            <p>On behalf of ${company.companyName}., here in after referred to as ‘the Company’, we are pleased to
-                extend
-                an offer for the position of ‘${offerLetter.employeePosition}’ in our organization with the following
+                us. On behalf of ${company.companyName}., here in after referred to as ‘the Company’, we are pleased to
+                extend an offer for the position of ‘${offerLetter.employeePosition}’ in our organization with the following
                 mentioned details:
             </p>
             <div class="top-navbar">
