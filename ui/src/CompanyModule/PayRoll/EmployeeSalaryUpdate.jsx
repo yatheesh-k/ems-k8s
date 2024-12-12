@@ -156,7 +156,7 @@ const EmployeeSalaryUpdate = () => {
   const calculateTotalAllowances = () => {
     let total = 0;
     Object.entries(allowances).forEach(([key, value]) => {
-      if (key !== "otherAllowances") {
+      if (key !== "Other Allowances") {
         if (value.endsWith("%")) {
           const parsedValue = parseFloat(value.slice(0, -1));
           const percentageValue = (parsedValue / 100) * (grossAmount || 0);
@@ -246,7 +246,7 @@ const EmployeeSalaryUpdate = () => {
 
     setAllowances((prevAllowances) => ({
       ...prevAllowances,
-      otherAllowances: validOtherAllowances.toFixed(2),
+      "Other Allowances": validOtherAllowances.toFixed(2),
     }));
   }, [allowances, grossAmount]);
 
@@ -328,7 +328,7 @@ const EmployeeSalaryUpdate = () => {
     // Update other allowances
     setAllowances((prevAllowances) => ({
       ...prevAllowances,
-      otherAllowances: validOtherAllowances.toFixed(2),
+      "Other Allowances": validOtherAllowances.toFixed(2),
     }));
   }, [allowances, grossAmount]);
 
@@ -633,13 +633,13 @@ const EmployeeSalaryUpdate = () => {
                     {Object.keys(allowances).map((key) => {
                       const allowanceValue = allowances[key];
                       const isPercentage = allowanceValue.includes("%");
-                      let displayValue = allowanceValue;
+                     // let displayValue = allowanceValue;
                       const isOtherAllowanceReadOnly =
-                        key === "otherAllowances";
+                        key === "Other Allowances";
                       // Folr numeric fields, we display them as whole numbers
-                      if (!isPercentage) {
-                        displayValue = Math.floor(allowanceValue);
-                      }
+                      // if (!isPercentage) {
+                      //   displayValue = Math.floor(allowanceValue);
+                      // }
 
                       return (
                         <div key={key} className="mb-2">

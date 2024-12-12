@@ -6,8 +6,8 @@ import { Eye, XSquareFill } from "react-bootstrap-icons";
 import { toast, Bounce } from "react-toastify";
 import DataTable from "react-data-table-component";
 import DeletePopup from "../Utils/DeletePopup";
-import { EmployeePayslipGetById, EmployeePayslipDeleteById, EmployeePayslipsGet, EmployeeGetApiById, TemplateGetAPI } from "../Utils/Axios";
-import { userId } from "../Utils/Auth";
+import {EmployeePayslipDeleteById, EmployeePayslipsGet, EmployeeGetApiById, TemplateGetAPI } from "../Utils/Axios";
+import { useAuth } from "../Context/AuthContext";
 
 const EmployeePayslips = () => {
   const [employeeSalaryView, setEmployeeSalaryView] = useState([]);
@@ -21,10 +21,10 @@ const EmployeePayslips = () => {
   const [refreshData, setRefreshData] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
-
+  const { user} = useAuth();
   const navigate = useNavigate();
-  console.log("userId:", userId);
-  const id = userId;
+  console.log("userId:", user.userId);
+  const id = user.userId;
   console.log(id);
 
   const fetchTemplate = async () => {
@@ -46,13 +46,13 @@ const EmployeePayslips = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (userId) { console.log("userId",userId);
+        if (id) { console.log("userId",id);
           const [employeeDetailsResponse, payslipsResponse] = await Promise.all(
             [
-              EmployeeGetApiById(userId),
+              EmployeeGetApiById(id),
              
               EmployeePayslipsGet(
-                userId,
+                id,
                 selectedMonth,
                 selectedYear
               ),
@@ -88,7 +88,7 @@ const EmployeePayslips = () => {
     };
 
     fetchData();
-  }, [userId, selectedMonth, selectedYear, refreshData]);
+  }, [id, selectedMonth, selectedYear, refreshData]);
 
   const handleGoClick = () => {
     setShowFields(true); // Display payslip details
