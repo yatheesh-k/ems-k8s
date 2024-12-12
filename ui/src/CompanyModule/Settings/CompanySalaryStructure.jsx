@@ -6,17 +6,15 @@ import {
   DeductionsGetApi,
 } from "../../Utils/Axios";
 import { useAuth } from "../../Context/AuthContext";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import Select from "react-select";
 import { ModalBody, ModalHeader, ModalTitle } from "react-bootstrap";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const CompanySalaryStructure = () => {
   const {
     register,
     handleSubmit,
-    control,
     getValues,
     trigger,
     reset,
@@ -32,7 +30,6 @@ const CompanySalaryStructure = () => {
   const [isEditing, setIsEditing] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [allowanceError, setAllowanceError] = useState("");
-  const [selectedAllowances, setSelectedAllowances] = useState([]);
   const [allowances, setAllowances] = useState([]);
   const [deductions, setDeductions] = useState([]);
   const [newFieldName, setNewFieldName] = useState("");
@@ -93,35 +90,6 @@ const CompanySalaryStructure = () => {
       // If the field already exists, show an error
       setErrorMessage(`Field "${fieldName}" already exists.`);
     }
-  };
-
-  const handleDeleteField = (fieldLabel) => {
-    // Remove from allowance or deduction fields based on the active tab
-    if (activeTab === "nav-home") {
-      // Filter out the deleted field from the allowanceFields
-      setAllowanceFields((prev) =>
-        prev.filter((field) => field.label !== fieldLabel)
-      );
-      // Update fieldCheckboxes for allowances
-      setFieldCheckboxes((prev) => {
-        const { [fieldLabel]: deleted, ...rest } = prev.allowances;
-        return { ...prev, allowances: rest };
-      });
-    } else {
-      // Filter out the deleted field from the deductionFields
-      setDeductionFields((prev) =>
-        prev.filter((field) => field.label !== fieldLabel)
-      );
-      // Update fieldCheckboxes for deductions
-      setFieldCheckboxes((prev) => {
-        const { [fieldLabel]: deleted, ...rest } = prev.deductions;
-        return { ...prev, deductions: rest };
-      });
-    }
-    setValidationErrors((prev) => {
-      const { [fieldLabel]: deleted, ...rest } = prev;
-      return rest;
-    });
   };
 
   const handleLabelChange = (index, value) => {
@@ -260,9 +228,13 @@ const CompanySalaryStructure = () => {
     try {
       const response = await AllowancesGetApi();
       const allowancesData = response.data;
-      setAllowances(allowancesData);
+      const filteredAllowances = allowancesData.filter(
+        (allowance) => allowance !== "Provident Fund Employer"
+      );
+  
+      setAllowances(filteredAllowances);
       setAllowanceFields(
-        allowancesData.map((allowance) => ({
+        filteredAllowances.map((allowance) => ({
           label: allowance,
           type: "text",
           value: "",
@@ -329,8 +301,8 @@ const CompanySalaryStructure = () => {
       status: "Active",
       allowances: {},
       deductions: {
-        pfEmployee: "6%",
-        pfEmplpoyer: "6%",
+        "Provident Fund Employee": "6%", // Changed key here
+        "Provident Fund Employer": "6%", // Changed key here
       },
     };
 
@@ -836,9 +808,9 @@ const CompanySalaryStructure = () => {
                           type="text"
                           className="form-control"
                           readOnly
-                          value="PF Employee"
+                          value="Provident Fund Employee"
                           onChange={(e) =>
-                            handleLabelChange("PF Employee", e.target.value)
+                            handleLabelChange("Provident Fund Employee", e.target.value)
                           }
                           placeholder="Label Name"
                           disabled={!isEditing}
@@ -859,11 +831,11 @@ const CompanySalaryStructure = () => {
                           className="form-control"
                           value={6}
                           onChange={(e) =>
-                            handleValueChange("PF Employee", e.target.value)
+                            handleValueChange("Provident Fund Employee", e.target.value)
                           }
                           placeholder="Enter Value"
                           disabled={
-                            !fieldCheckboxes.deductions["PF Employee"] ||
+                            !fieldCheckboxes.deductions["Provident Fund Employee"] ||
                             !isEditing
                           }
                         />
@@ -879,9 +851,9 @@ const CompanySalaryStructure = () => {
                           type="text"
                           className="form-control"
                           readOnly
-                          value="PF Employer"
+                          value="Provident Fund Employer"
                           onChange={(e) =>
-                            handleLabelChange("PF Employer", e.target.value)
+                            handleLabelChange("Provident Fund Employer", e.target.value)
                           }
                           placeholder="Label Name"
                           disabled={!isEditing}
@@ -902,11 +874,11 @@ const CompanySalaryStructure = () => {
                           className="form-control"
                           value={6}
                           onChange={(e) =>
-                            handleValueChange("PF Employer", e.target.value)
+                            handleValueChange("Provident Fund Employer", e.target.value)
                           }
                           placeholder="Enter Value"
                           disabled={
-                            !fieldCheckboxes.deductions["PF Employer"] ||
+                            !fieldCheckboxes.deductions["Provident Fund Employer"] ||
                             !isEditing
                           }
                         />
