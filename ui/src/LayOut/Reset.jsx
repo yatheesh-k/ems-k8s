@@ -4,8 +4,8 @@ import { UnlockFill, LockFill } from "react-bootstrap-icons";
 import { Modal } from "react-bootstrap";
 import { EmployeeGetApiById, resetPassword } from "../Utils/Axios";
 import { toast } from "react-toastify";
-import { userId } from "../Utils/Auth";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
 
 const Reset = ({ companyName, onClose, show }) => {
   const { register, handleSubmit, formState: { errors }, getValues,reset } = useForm({ mode: "onChange" });
@@ -16,7 +16,7 @@ const Reset = ({ companyName, onClose, show }) => {
   const [id, setEmployeeId] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
+  const { user } = useAuth();
   const toggleOldPasswordVisibility = () => {
     setOldPasswordShown(!oldPasswordShown);
   };
@@ -32,7 +32,7 @@ const Reset = ({ companyName, onClose, show }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await EmployeeGetApiById(userId);
+        const response = await EmployeeGetApiById(user.userId);
         const id = response.data.id;
         setEmployeeId(id);
       } catch (error) {

@@ -897,8 +897,8 @@ const EmployeeRegistration = () => {
                           required: "Last Name is Required",
                           validate: { validateLastName },
                           minLength: {
-                            value: 3,
-                            message: "Minimum 3 Characters Required",
+                            value: 1,
+                            message: "Minimum 1 Character Required",
                           },
                         })}
                       />
