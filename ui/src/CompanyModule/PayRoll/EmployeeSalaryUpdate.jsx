@@ -325,7 +325,7 @@ const EmployeeSalaryUpdate = () => {
     const validOtherAllowances = Math.max(0, newOtherAllowances);
     setTotalAllowances(totalAllow + validOtherAllowances);
 
-    // Update other allowances
+    // Update//// other allowances
     setAllowances((prevAllowances) => ({
       ...prevAllowances,
       "Other Allowances": validOtherAllowances.toFixed(2),
@@ -664,7 +664,7 @@ const EmployeeSalaryUpdate = () => {
                             type="text"
                             className="form-control"
                             readOnly={isOtherAllowanceReadOnly}
-                            value={allowanceValue}
+                            value={Math.round(allowanceValue)}
                             onChange={(e) => {
                               // Allow only numbers and '%' characters
                               const newValue = e.target.value.replace(

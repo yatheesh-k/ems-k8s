@@ -177,6 +177,7 @@ const EmployeeSalaryStructure = () => {
       if (
         key !== "Basic Salary" &&
         key !== "HRA" &&
+        key !== "Provident Fund Employer" &&
         key !== "Other Allowances"
       ) {
         // Skip Basic Salary and HRA since already calculated
@@ -186,7 +187,7 @@ const EmployeeSalaryStructure = () => {
           if (!isNaN(percentageValue)) {
             let allowanceAmount;
             // Check if the allowance is related to HRA or gross amount
-            if (key === "HRA") {
+            if (key === "HRA" || key === "Provident Fund Employer") {
               allowanceAmount = (percentageValue / 100) * basicSalaryAmount; // HRA based on Basic Salary
             } else {
               allowanceAmount = (percentageValue / 100) * grossAmount; // For other allowances, use gross amount
@@ -303,6 +304,7 @@ const EmployeeSalaryStructure = () => {
 
     return isNaN(total) ? 0 : total;
   };
+
   useEffect(() => {
     const totalDeductions = calculateTotalDeductions();
     setTotalDeductions(totalDeductions);
@@ -312,7 +314,7 @@ const EmployeeSalaryStructure = () => {
     handlePFLimitCheck(); // Trigger the PF limit check on initial load or relevant updates
   }, [grossAmount, allowances, deductions]);
 
-  const handleAllowanceChange = (key, newValue, grossSalary, basicSalary) => {
+const handleAllowanceChange = (key, newValue, grossSalary, basicSalary) => {
     let validValue = newValue;
     const isPercentage = newValue.includes("%");
     let errorMessage = "";
@@ -855,7 +857,7 @@ const EmployeeSalaryStructure = () => {
                                     );
                                     if (!isNaN(percentage)) {
                                       // Calculate based on grossAmount or basicAmount
-                                      if (key === "HRA") {
+                                      if (key === "HRA"|| key === 'Provident Fund Employer') {
                                         displayValue =
                                           (percentage / 100) * basicAmount; // For HRA, use basicAmount
                                       } else {
@@ -876,6 +878,7 @@ const EmployeeSalaryStructure = () => {
                                       <input
                                         className="form-control"
                                         type="text"
+                                        maxLength={7}
                                         value={Math.round(displayValue)} // Display the calculated value
                                         onChange={(e) =>
                                           handleAllowanceChange(
@@ -899,6 +902,7 @@ const EmployeeSalaryStructure = () => {
                                   className="form-control"
                                   type="text"
                                   name="totalAllowance"
+                                  maxLength={7}
                                   value={Math.round(totalAllowances)}
                                   readOnly
                                   data-toggle="tooltip"
@@ -1027,7 +1031,8 @@ const EmployeeSalaryStructure = () => {
                                 <input
                                   className="form-control"
                                   type="number"
-                                  value={Math.round(totalDeductions.toFixed(2))} // Format as string here
+                                  maxLength={7}
+                                  value={Math.round(totalDeductions)} // Format as string here
                                   readOnly
                                   data-toggle="tooltip"
                                   title="This is the total of all deductions."
@@ -1269,7 +1274,7 @@ const EmployeeSalaryStructure = () => {
             </div>
           </ModalBody>
           <div className="text-center">
-            <Button variant="primary ml-2" onClick={handleModalClose}>
+            <Button variant="primary" className="ml-2" onClick={handleModalClose}>
               Confirm
             </Button>
             <Button variant="secondary" onClick={() => setShowPfModal(false)}>

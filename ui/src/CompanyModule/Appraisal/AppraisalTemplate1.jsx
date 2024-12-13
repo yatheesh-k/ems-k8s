@@ -156,7 +156,7 @@ const AppraisalTemplate1 = ({
             })}
             <tr>
               <td><strong>Other Allowance</strong></td>
-              <td>{Math.floor(grossAmount - calculatedValues.totalAllowances)}</td>
+              {/* <td>{Math.floor(grossAmount - calculatedValues.totalAllowances)}</td> */}
             </tr>
             {/* Add a row for Gross Salary after the allowances */}
             {salaryIncrease && (
