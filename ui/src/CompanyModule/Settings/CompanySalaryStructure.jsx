@@ -1031,9 +1031,7 @@ const CompanySalaryStructure = () => {
               <div className="modal-content">
                 <ModalHeader>
                   <ModalTitle className="modal-title">
-                    Add New{" "}
-                    {modalType === "allowances" ? "Allowance" : "Deduction"}{" "}
-                    Field
+                    Add New Field
                   </ModalTitle>
                   <button
                     type="button"
@@ -1050,11 +1048,7 @@ const CompanySalaryStructure = () => {
                           <input
                             type="text"
                             className="form-control"
-                            placeholder={`Enter New ${
-                              modalType === "allowances"
-                                ? "Allowance"
-                                : "Deduction"
-                            } Name`}
+                            placeholder="Enter New Field Name"
                             onInput={toInputTitleCase}
                             onKeyDown={handleKeyDown}
                             autoComplete="off"

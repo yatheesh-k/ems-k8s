@@ -20,6 +20,7 @@ const Template = () => {
     const [error, setError] = useState(null);
     const [calculatedValues, setCalculatedValues] = useState({});
     const [salaryStructures, setSalaryStructures] = useState([]);
+    const[basic,setBasic]=useState(0);
     const [salaryConfigurationId, setSalaryConfigurationId] = useState(null);
     const [refNo, setRefNo] = useState('OFLTR-09');
     const [companyDetails, setCompanyDetails] = useState(null);
@@ -94,33 +95,49 @@ const Template = () => {
 
     const calculateValues = () => {
         console.log("Gross Amount: ", grossAmount); // Log the grossAmount
-
+    
         if (salaryStructures.length === 0) {
             toast.error("No salary structure available for calculation.");
             return;
         }
-
+    
         const activeStructure = salaryStructures.find(structure => structure.status === "Active");
         if (!activeStructure) {
             toast.error("No active salary structure available.");
             return;
         }
-
+    
         const allowances = activeStructure.allowances;
         const deductions = activeStructure.deductions;
         console.log("Deductions: ", deductions); // Log deductions to check the structure
-
+    
+        // Extract Basic Salary from allowances
+        const basicSalary = allowances["Basic Salary"] ? parseFloat(allowances["Basic Salary"]) : 0; // Assuming "Basic" is the key
+        console.log("Basic Salary: ", basicSalary); // Log the Basic Salary
+            setBasic(basicSalary)
         const totalAllowances = Object.entries(allowances).reduce((dcc, [key, value]) => {
             let allowanceAmount = 0;
-            if (typeof value === 'string' && value.includes('%')) {
-                const percentageValue = parseFloat(value.slice(0, -1));
-                allowanceAmount = grossAmount * (percentageValue / 100);
+    
+            if (key === "HRA" || key ==='Provident Fund Employer') {
+                // If the allowance is HRA, calculate it using Basic Salary
+                if (typeof value === 'string' && value.includes('%')) {
+                    const percentageValue = parseFloat(value.slice(0, -1));
+                    allowanceAmount = basicSalary * (percentageValue / 100); // HRA based on Basic Salary
+                } else {
+                    allowanceAmount = parseFloat(value);
+                }
             } else {
-                allowanceAmount = parseFloat(value);
+                // For other allowances, calculate based on Gross Amount
+                if (typeof value === 'string' && value.includes('%')) {
+                    const percentageValue = parseFloat(value.slice(0, -1));
+                    allowanceAmount = grossAmount * (percentageValue / 100);
+                } else {
+                    allowanceAmount = parseFloat(value);
+                }
             }
             return dcc + allowanceAmount;
         }, 0);
-
+    
         const totalDeductions = Object.entries(deductions).reduce((acc, [key, value]) => {
             let deductionAmount = 0;
             if (typeof value === 'string' && value.includes('%')) {
@@ -131,50 +148,20 @@ const Template = () => {
             }
             return acc + deductionAmount;
         }, 0);
-
+    
         console.log("Calculated Total Deductions: ", totalDeductions); // Log totalDeductions
-
+    
         const netSalary = grossAmount - totalDeductions;
         console.log("Net Salary: ", netSalary); // Log netSalary
-
+    
         setCalculatedValues({
             totalAllowances,
             totalDeductions,
             netSalary,
         });
-    };
+    };    
 
     console.log("calculateValues", calculatedValues)
-    const handleDownload = async () => {
-        const payload = {
-            offerDate: date,
-            referenceNo: refNo,
-            employeeName: recipientName,
-            employeeFatherName: fatherName,
-            employeeAddress: address,
-            employeeContactNo: contactNumber,
-            joiningDate: joiningDate,
-            jobLocation: location,
-            salaryConfigurationId: salaryConfigurationId,
-            grossCompensation: grossAmount,
-            companyId: user.companyId,
-            employeePosition: role,
-        };
-
-        console.log("Payload being sent:", payload);
-
-        try {
-            const success = await OfferLetterDownload(payload);
-            if (success) {
-                toast.success("Offer Letter downloaded successfully");
-            } else {
-                toast.error("Failed to download Offer Letter");
-            }
-        } catch (err) {
-            console.error("Error:", err.response ? err.response.data : err);
-            toast.error("Failed to save or download Offer Letter");
-        }
-    };
 
     return (
         <LayOut>
@@ -487,28 +474,39 @@ const Template = () => {
                                 .filter(structure => structure.status === "Active")
                                 .map(structure => (
                                     <React.Fragment key={structure.id}>
-                                        {Object.entries(structure.allowances).map(([key, value]) => {
-                                            let allowanceAmount;
-                                            if (value.includes('%')) {
-                                                allowanceAmount = grossAmount * (parseFloat(value) / 100);
-                                            } else {
-                                                allowanceAmount = parseFloat(value);
-                                            }
-                                            return (
-                                                <tr key={key}>
-                                                    <td>
-                                                        {key
-                                                            .replace(/([A-Z])/g, ' $1')
-                                                            .replace(/^./, str => str.toUpperCase())
-                                                        }
-                                                    </td>
-                                                    <td>{Math.floor(allowanceAmount.toFixed(2) / 12)}</td>
-                                                    <td>{Math.floor(allowanceAmount.toFixed(2))}</td>
-                                                </tr>
-                                            );
-                                        })}
+                                   {Object.entries(structure.allowances).map(([key, value]) => {
+    let allowanceAmount;
+    if (key === "HRA") {
+        // Assuming Basic Salary is part of structure and it can be accessed, calculate HRA as a percentage of Basic Salary
+        if (value.includes('%')) {
+            allowanceAmount = basic * (parseFloat(value) / 100); // HRA is calculated on Basic Salary
+        } else {
+            allowanceAmount = parseFloat(value);
+        }
+    } else {
+        // For all other allowances, calculate excluding HRA first
+        if (value.includes('%')) {
+            allowanceAmount = grossAmount * (parseFloat(value) / 100);
+        } else {
+            allowanceAmount = parseFloat(value);
+        }
+    }
+
+    return (
+        <tr key={key}>
+            <td>
+                {key
+                    .replace(/([A-Z])/g, ' $1')
+                    .replace(/^./, str => str.toUpperCase())
+                }
+            </td>
+            <td>{Math.floor(allowanceAmount.toFixed(2) / 12)}</td> {/* Monthly calculation */}
+            <td>{Math.floor(allowanceAmount.toFixed(2))}</td> {/* Annual calculation */}
+        </tr>
+    );
+})}
                                          <tr>
-                                            <td><strong>Other Allowance</strong></td>
+                                            <td>Other Allowance</td>
                                             <td>{Math.round((grossAmount - calculatedValues.totalAllowances) / 12)}</td>
                                             <td>{Math.floor(grossAmount-calculatedValues.totalAllowances)}</td>
                                         </tr>

@@ -1,8 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { useLocation } from "react-router-dom";
+import React from "react";
 import { useAuth } from "../../../Context/AuthContext";
-import { companyViewByIdApi, EmployeeGetApiById } from "../../../Utils/Axios";
 
 const AppraisalTemplate1 = ({
   companyLogo,
@@ -14,14 +11,13 @@ const AppraisalTemplate1 = ({
   period,
   effectiveDate,
   salaryIncrease,
+  basicSalary,
   allowances,
 }) => {
-  const [employeeDetails, setEmployeeDetails] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const { user, logoFileName } = useAuth();
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const idFromQuery = queryParams.get("employeeId"); // Extract employeeId from URL query params if needed
+  console.log("Basic Salary: ", basicSalary);
+
+  const {logoFileName } = useAuth();
+ // Extract employeeId from URL query params if needed
 
   return (
     <div
@@ -122,42 +118,68 @@ const AppraisalTemplate1 = ({
             </tr>
           </thead>
           <tbody>
-            {allowances &&
-              Object.keys(allowances).map((key, index) => {
-                const value = allowances[key];
-                let allowanceAmount = 0;
-                // Check if the value contains a '%' (percentage)
-                if (typeof value === "string" && value.includes("%")) {
-                  // Extract the numeric part and calculate the allowance as a percentage of salaryIncrease
-                  const percentageValue = parseFloat(value.slice(0, -1)); // Remove '%' and convert to a number
-                  allowanceAmount = salaryIncrease * (percentageValue / 100);
-                } else {
-                  // Otherwise, treat the value as a fixed amount
-                  allowanceAmount = parseFloat(value); // Convert to number directly
-                }
-                return (
-                  <tr key={index}>
-                    <td>
-                      {key
-                        .replace(/([A-Z])/g, " $1")
-                        .replace(/^./, (str) => str.toUpperCase())}
-                    </td>
-                    {/* Show the allowance amount (rounded to nearest integer) */}
-                    <td>{Math.floor(allowanceAmount.toFixed(2))}</td>
-                  </tr>
-                );
-              })}
-            {/* Add a row for Gross Salary after the allowances */}
-            {salaryIncrease && (
-              <tr>
-                <td>
-                  <strong>Gross Salary</strong>
-                </td>
-                <td>
-                  <strong>{salaryIncrease}</strong>
-                </td>
-              </tr>
-            )}
+          {allowances &&
+  Object.keys(allowances).map((key, index) => {
+    const value = allowances[key];
+    let allowanceAmount = 0;
+    console.log(`Processing allowance for key: ${key}, value: ${value}`);
+    // Step 2: Calculate HRA based on Basic Salary
+    if (key === "HRA" || key === 'Provident Fund Employer') {
+      console.log("Calculating HRA based on Basic Salary: ", basicSalary);
+      if (typeof value === "string" && value.includes("%")) {
+        console.log("basicSalary",basicSalary)
+        // HRA is a percentage of Basic Salary
+        const percentageValue = parseFloat(value.slice(0, -1)); // Remove '%' and convert to a number
+        allowanceAmount = basicSalary * (percentageValue / 100); // HRA Calculation
+        console.log("HRA calculated: ", allowanceAmount); // Debugging
+      } else {
+        // HRA is a fixed value
+        allowanceAmount = parseFloat(value);
+        console.log("Fixed HRA: ", allowanceAmount); // Debugging
+      }
+    }
+
+    // Step 3: Calculate Other Allowances (based on salaryIncrease or fixed)
+    else {
+      if (typeof value === "string" && value.includes("%")) {
+        // If the allowance is a percentage of salaryIncrease
+        const percentageValue = parseFloat(value.slice(0, -1)); // Remove '%' and convert to a number
+        allowanceAmount = salaryIncrease * (percentageValue / 100);
+        console.log(`${key} allowance calculated as percentage: `, allowanceAmount);
+      } else {
+        // If the allowance is a fixed value
+        allowanceAmount = parseFloat(value);
+        console.log(`${key} allowance as fixed value: `, allowanceAmount);
+      }
+    }
+
+    return (
+      <tr key={index}>
+        <td>
+          {/* Convert camelCase keys to human-readable format */}
+          {key
+            .replace(/([A-Z])/g, " $1") // Add space before uppercase letters
+            .replace(/^./, (str) => str.toUpperCase())}{" "}
+          {/* Capitalize the first letter */}
+        </td>
+        <td>{Math.floor(allowanceAmount)}</td>{" "}
+        {/* Round the allowance amount to the nearest integer */}
+      </tr>
+    );
+  })}
+
+{/* Add a row for Gross Salary after the allowances */}
+{salaryIncrease && (
+  <tr>
+    <td>
+      <strong>Gross Salary</strong>
+    </td>
+    <td>
+      <strong>{salaryIncrease}</strong>
+    </td>
+  </tr>
+)}
+
           </tbody>
         </table>
         <p>
