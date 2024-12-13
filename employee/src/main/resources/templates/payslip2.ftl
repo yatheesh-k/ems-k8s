@@ -183,8 +183,8 @@
     <table class="salary-table">
         <tr>
             <th style="width:25%;">Earnings (A)</th>
-            <th style="width:25%;">Amount (A)</th>
-            <th style="width:25%;">Deductions (B)</th>
+            <th style="width:20%;">Amount (A)</th>
+            <th style="width:30%;">Deductions (B)</th>
             <th style="width:25%;">Amount (B)</th>
         </tr>
        <tr>
