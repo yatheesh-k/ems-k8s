@@ -786,11 +786,22 @@ const OfferLetterPreview = () => {
                       {Object.entries(structure.deductions).map(
                         ([key, value]) => {
                           let deductionAmount;
-                          if (value.includes("%")) {
-                            deductionAmount =
-                              grossAmount * (parseFloat(value) / 100);
+                          if (key === "Provident Fund Employee" || key==='Provident Fund Employer') {
+                            // Assuming Basic Salary is part of structure and it can be accessed, calculate HRA as a percentage of Basic Salary
+                            if (value.includes("%")) {
+                              deductionAmount =
+                                basic * (parseFloat(value) / 100); // HRA is calculated on Basic Salary
+                            } else {
+                              deductionAmount = parseFloat(value);
+                            }
                           } else {
-                            deductionAmount = parseFloat(value);
+                            // For all other allowances, calculate excluding HRA first
+                            if (value.includes("%")) {
+                              deductionAmount =
+                                grossAmount * (parseFloat(value) / 100);
+                            } else {
+                              deductionAmount = parseFloat(value);
+                            }
                           }
 
                           return (
