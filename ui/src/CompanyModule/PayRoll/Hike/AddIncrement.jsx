@@ -612,11 +612,56 @@ const AddIncrement = () => {
     const deductionsData = {};
 
     Object.entries(allowances).forEach(([key, value]) => {
-      allowancesData[key] = value;
+      let displayValue = value;
+
+      // If the allowance is a percentage, calculate the actual value using grossAmount or basicAmount
+      if (typeof value === "string" && value.includes("%")) {
+        const percentage = parseFloat(value.replace("%", ""));
+        if (!isNaN(percentage)) {
+          // Calculate based on grossAmount or basicAmount
+          if (key === "HRA") {
+            displayValue = (percentage / 100) * basicAmount; // For HRA, use basicAmount
+          } else {
+            displayValue = (percentage / 100) * grossAmountValue; // For other allowances, use grossAmount
+          }
+        }
+      } else if (typeof value === "number") {
+        // If it's a number (fixed value), just display that value
+        displayValue = value;
+      }
+
+      // Ensure that displayValue is a number and set it to 0 if not
+      displayValue = isNaN(displayValue) ? 0 : displayValue;
+
+      // Add the allowance value to the allowancesData object, formatted with 2 decimal places
+      allowancesData[key] = displayValue; // Ensure we pass the value as a fixed number
     });
 
+    // Add calculated deductions
     Object.entries(deductions).forEach(([key, value]) => {
-      deductionsData[key] = value;
+      let displayValue = value;
+
+      // If the deduction is a percentage, calculate the actual value using grossAmount
+      if (typeof value === "string" && value.includes("%")) {
+        const percentage = parseFloat(value.replace("%", ""));
+        if (!isNaN(percentage)) {
+          // Calculate based on grossAmount or basicAmount
+          if (key === "Provident Fund Employee" || key === "Provident Fund Employer") {
+            displayValue = (percentage / 100) * basicAmount;  // For HRA, use basicAmount
+          } else {
+            displayValue = (percentage / 100) * grossAmountValue;  // For other allowances, use grossAmount
+          }
+        }
+      } else if (typeof value === "number") {
+        // If it's a number (fixed value), just display that value
+        displayValue = value;
+      }
+  
+      // Ensure that displayValue is a number and set it to 0 if not
+      displayValue = isNaN(displayValue) ? 0 : displayValue;
+
+      // Add the deduction value to the deductionsData object, formatted with 2 decimal places
+      deductionsData[key] = displayValue; // Ensure we pass the value as a fixed number
     });
 
     const dataToSubmit = {
@@ -627,6 +672,13 @@ const AddIncrement = () => {
       salaryConfigurationEntity: {
         allowances: allowancesData,
         deductions: deductionsData,
+      },salaryConfigurationEntity: {
+        allowances: {
+          ...allowancesData, // Pass the calculated allowances data
+        },
+        deductions: {
+          ...deductionsData, // Pass the calculated deductions data
+        },
       },
       totalEarnings: totalEarningsValue.toFixed(2),
       netSalary: netSalaryValue.toFixed(2),
