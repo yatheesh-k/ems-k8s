@@ -863,7 +863,7 @@ const EmployeeSalaryUpdate = () => {
                         className="form-control"
                         type="text"
                         name="netSalary"
-                        value={netSalary.toFixed(2)}
+                        value={Math.round(netSalary.toFixed(2))}
                         readOnly
                         data-toggle="tooltip"
                         title="This is the final salary after all deductions and allowances."
