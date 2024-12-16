@@ -129,7 +129,7 @@ const OfferLetterPreview = () => {
 
   const calculateValues = () => {
     if (salaryStructures.length === 0) {
-      toast.error("No salary structure available for calculation.");
+      // toast.error("No salary structure available for calculation.");
       return;
     }
 
@@ -191,25 +191,37 @@ const OfferLetterPreview = () => {
     const totalDeductions = Object.entries(deductions).reduce(
       (acc, [key, value]) => {
         let deductionAmount = 0;
-
-        if (typeof value === "string" && value.includes("%")) {
-          const percentageValue = parseFloat(value.slice(0, -1)) / 100; // Convert percentage to decimal
-          deductionAmount = grossAmount * percentageValue;
-          console.log(
-            `${key} deduction calculated as percentage: ${deductionAmount}`
-          ); // Log percentage-based deduction calculation
+    
+        if (key === "Provident Fund Employee" || key === "Provident Fund Employer") {
+          console.log(`Calculating ${key} deduction.`); // Log for debugging
+    
+          if (typeof value === "string" && value.includes("%")) {
+            const percentageValue = parseFloat(value.slice(0, -1)) / 100; // Convert percentage to decimal
+            deductionAmount = basicSalaryAmount * percentageValue;  // Provident Fund deduction based on Gross Amount
+            console.log(`${key} deduction calculated as percentage: ${deductionAmount}`); // Log percentage-based deduction calculation
+          } else {
+            deductionAmount = parseFloat(value); // Fixed deduction value for Provident Fund
+            console.log(`${key} deduction as fixed value: ${deductionAmount}`); // Log fixed deduction value
+          }
         } else {
-          deductionAmount = parseFloat(value);
-          console.log(`${key} deduction as fixed value: ${deductionAmount}`); // Log fixed deduction value
+          // For other deductions, calculate based on Gross Amount
+          if (typeof value === "string" && value.includes("%")) {
+            const percentageValue = parseFloat(value.slice(0, -1)) / 100; // Convert percentage to decimal
+            deductionAmount = grossAmount * percentageValue; // Other deductions based on Gross Amount
+            console.log(`${key} deduction calculated as percentage: ${deductionAmount}`); // Log percentage-based deduction calculation
+          } else {
+            deductionAmount = parseFloat(value); // Fixed deduction value
+            console.log(`${key} deduction as fixed value: ${deductionAmount}`); // Log fixed deduction value
+          }
         }
-
+    
         return acc + deductionAmount;
       },
       0
     );
-
+    
     console.log("Total Deductions: ", totalDeductions); // Log the total calculated deductions
-
+    
     const netSalary = grossAmount - totalDeductions;
     console.log("Net Salary: ", netSalary); // Log the calculated net salary
 
