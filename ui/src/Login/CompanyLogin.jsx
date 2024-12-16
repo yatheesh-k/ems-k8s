@@ -118,7 +118,7 @@ const CompanyLogin = () => {
         });
         setTimeout(() => {
           window.location.href = "/main";        
-        }, 2000);
+        }, 1000);
 
       })
       .catch((error) => {
