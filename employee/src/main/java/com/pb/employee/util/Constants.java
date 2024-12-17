@@ -141,4 +141,7 @@ public class Constants {
     public static final String IMAGE_PNG = "image/png";
     public static final String IMAGE_SVG = "image/svg+xml";
     public static final String PERCENTAGE = "%";
+    public static final String CUSTOMER_ADD = "/customer";
+    public static final String CUSTOMER_GET = "/customer/{customerId}";
+    public static final String SALARY_ID = "salaryId";
 }

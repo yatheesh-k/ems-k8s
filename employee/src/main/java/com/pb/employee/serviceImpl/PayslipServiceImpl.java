@@ -642,7 +642,7 @@ public class PayslipServiceImpl implements PayslipService {
     }
 
     @Override
-    public ResponseEntity<?> generatePaySlipForEmployees(PayslipRequest payslipRequest) throws EmployeeException, IOException {
+    public ResponseEntity<?> generatePaySlipForEmployees(String salaryId,PayslipRequest payslipRequest) throws EmployeeException, IOException {
         String index = ResourceIdUtils.generateCompanyIndex(payslipRequest.getCompanyName());
         AttendanceEntity attendanceEntities = null;
         List<PayslipEntity> generatedPayslips = new ArrayList<>();
@@ -657,6 +657,16 @@ public class PayslipServiceImpl implements PayslipService {
                     log.error("Employee Salary with employeeId {} is not found", employee.getId());
                     throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES_SALARY),
                             HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+                // If salaryId is provided, filter the relevant salary entity
+                if (salaryId != null && !salaryId.isEmpty()) {
+                    salaryEntities = salaryEntities.stream()
+                            .filter(salary -> salary.getSalaryId().equals(salaryId))
+                            .collect(Collectors.toList());
+                    if (salaryEntities.isEmpty()) {
+                        log.error("SalaryId {} not found for employee {}", salaryId, employee.getId());
+                        continue; // Skip if salaryId doesn't match
+                    }
                 }
 
                 String attendanceId = ResourceIdUtils.generateAttendanceId(payslipRequest.getCompanyName(), employee.getId(), payslipRequest.getYear(), payslipRequest.getMonth());
