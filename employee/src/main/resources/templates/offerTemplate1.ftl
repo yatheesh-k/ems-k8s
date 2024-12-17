@@ -242,21 +242,18 @@
             <h6>Dear ${offerLetter.employeeName}</h6>
             <p>We welcome you to our pursuit of excellence and we feel proud to have a professional of your stature as a
                 member of the ${company.companyName} family and wish you a long, rewarding, and satisfying career with
-                us.
-            </p>
-            <p>On behalf of ${company.companyName}., here in after referred to as ‘the Company’, we are pleased to
-                extend
-                an offer for the position of ‘${offerLetter.employeePosition}’ in our organization with the following
+                us. On behalf of ${company.companyName}., here in after referred to as 'the Company', we are pleased to
+                extend an offer for the position of '${offerLetter.employeePosition}' in our organization with the following
                 mentioned details:
             </p>
             <div class="top-navbar">
-                <p class="with-arrow">You would join us on or before ‘${offerLetter.joiningDate}’ or else this offer
+                <p class="with-arrow">You would join us on or before '${offerLetter.joiningDate}' or else this offer
                     would be null and
                     void.</p>
                 <p class="with-arrow">You will be deployed at our office site and your job location would be at
-                    ‘${offerLetter.jobLocation}’.
+                    '${offerLetter.jobLocation}'.
                 </p>
-                <p class="with-arrow">Your gross compensation per annum is ‘${offerLetter.grossCompensation}’</p>
+                <p class="with-arrow">Your gross compensation per annum is '${offerLetter.grossCompensation}'</p>
                 <p class="with-dot"><b>The proposed compensation details are attached as Annexure '1' , And details of
                         required
                         documents at the time of joining are attached as Annexure '2'.</b></p>
@@ -274,7 +271,7 @@
                 appraisal process.
             </p>
         </div>
-        <h5 style="text-align: center; margin-top: 30px;">
+        <h5 style="text-align: center; margin-top: 10px;">
             <#if company.cinNo?has_content>
                 CIN: ${company.cinNo}
                 <#elseif company.companyRegNo?has_content>
@@ -296,7 +293,7 @@
     <div class="logo">
         <img src="${company.imageFile}" alt="Company Logo" />
     </div>
-    <div style="margin-top: -27px;">
+    <div style="margin-top: -50px;">
         <p>
             <b>Attendance:</b> Attendance cycle will be from 26th to 25th of every month. Any employee joining after
             20th of
@@ -333,7 +330,9 @@
             circumstances
             where appropriate.
         </p>
-        <p><b>Leave and Holidays:</b>
+
+3:47
+  <p><b>Leave and Holidays:</b>
             Public/festival holidays would be divided into fixed holidays and an optional holiday (floater) for per
             Calendar
             year, Total Number of holidays may vary as per work location and / or operation.
@@ -362,7 +361,7 @@
             been duly served.
         </p>
     </div>
-    <h5 style="text-align: center; margin-top: 40px;">
+    <h5 style="text-align: center; margin-top: 0px;">
         <#if company.cinNo?has_content>
             CIN: ${company.cinNo}
             <#elseif company.companyRegNo?has_content>
@@ -391,11 +390,11 @@
             your reporting manager. Resignation sent on weekly / public holidays, after working hours will be considered
             with effect from next business day. Resignation will not be considered if you have tendered the same while
             being
-            on leave. You need to serve 30 days’ notice period from the date of resignation based on designation.
+            on leave. You need to serve 30 days' notice period from the date of resignation based on designation.
         </p>
         <p>
             <b>Notice Period without Cause:</b>
-            In the event that the employment is ceased without cause, you will be provided 30 days’ notice prior to such
+            In the event that the employment is ceased without cause, you will be provided 30 days' notice prior to such
             cessation or paid severance pay in lieu of thereof equivalent to the consolidated compensation package for
             period of 60 days calculated on the basis of last gross salary.
             • A letter of appointment shall be issued to you within 15 days of joining, subjecting the completion of all
@@ -409,7 +408,7 @@
                 by a written mail and signed copy within the next 24 hours.</b>
         </p>
         <p>Please do not hesitate to contact us in case you have any queries.</p>
-        <h5 style="text-align: center; margin-top: 440px;">
+        <h5 style="text-align: center; margin-top: 340px;">
             <#if company.cinNo?has_content>
                 CIN: ${company.cinNo}
                 <#elseif company.companyRegNo?has_content>
@@ -455,7 +454,7 @@
         <p>*Income Tax deduction is subjected to timely submission of the investment details.</p>
         <p>*Pan Card submission is mandatory for the disbursement of the salary.</p>
 
-        <div style="margin-top: 90px;">
+        <div style="margin-top: 20px;">
             <h5 style="text-align: center;">
                 <#if company.cinNo?has_content>
                     CIN: ${company.cinNo}
@@ -535,15 +534,15 @@
                 <td></td>
             </tr>
             <tr>
-                <td>Husband’s / Wife’s Full Name</td>
+                <td>Husband's / Wife's Full Name</td>
                 <td></td>
             </tr>
             <tr>
-                <td>Husband’s / Wife’s Date of Birth, Age</td>
+                <td>Husband's / Wife's Date of Birth, Age</td>
                 <td></td>
             </tr>
             <tr>
-                <td>Husband’s / Wife’s Blood Group</td>
+                <td>Husband's / Wife's Blood Group</td>
                 <td></td>
             </tr>
             <tr>
@@ -564,7 +563,7 @@
             </tr>
         </table>
     </div>
-    <h5 style="text-align: center; margin-top: 100px;">
+    <h5 style="text-align: center; margin-top: 35px;">
         <#if company.cinNo?has_content>
             CIN: ${company.cinNo}
             <#elseif company.companyRegNo?has_content>
@@ -597,11 +596,13 @@
         </p>
         <p>
             Your present and permanent addresses/ contact details, as mentioned in your application form, are put on
-            company’s record. You would be expected to inform the company about any change in your address and telephone
+            company's record. You would be expected to inform the company about any change in your address and telephone
             numbers.
         </p>
-    </div>
-    <h5 style="text-align: center; margin-top: 549px;">
+
+3:48
+ </div>
+    <h5 style="text-align: center; margin-top: 460px;">
         <#if company.cinNo?has_content>
             CIN: ${company.cinNo}
             <#elseif company.companyRegNo?has_content>

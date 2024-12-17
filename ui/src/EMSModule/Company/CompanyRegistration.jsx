@@ -177,6 +177,12 @@ const CompanyRegistration = () => {
     reset();
     // setEditMode(true);  // Optionally, if you want to reset edit mode
   };
+  const backForm = () => {
+    setCompanyType("");
+    reset();
+    navigate("/companyView")
+    // setEditMode(true);  // Optionally, if you want to reset edit mode
+  };
   const toInputTitleCase = (e) => {
     const input = e.target;
     let value = input.value;
@@ -470,7 +476,6 @@ const CompanyRegistration = () => {
     return true; // Return true if all conditions are satisfied
   };
   
-
   const validatePAN = (value) => {
     const spaceError = "Spaces are not allowed in the PAN Number.";
     const patternError = "Invalid PAN Number format";
@@ -924,16 +929,16 @@ const CompanyRegistration = () => {
                           required: "Company Address is Required",
                           pattern: {
                             value:
-                              /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
-                            message: "Please enter a valid Address",
+                              /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.+()^\-/]*$/,
+                            message: "Please enter valid Address",
                           },
                           minLength: {
                             value: 3,
                             message: "Minimum 3 Characters allowed",
                           },
                           maxLength: {
-                            value: 200,
-                            message: "Maximum 200 Characters allowed",
+                            value: 250,
+                            message: "Maximum 250 Characters allowed",
                           },
                           validate: validateAddress
                         })}
@@ -1230,16 +1235,16 @@ const CompanyRegistration = () => {
                           required: "Address is Required",
                           pattern: {
                             value:
-                              /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
-                            message: "Please enter a valid Address",
+                              /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.+()^\-/]*$/,
+                            message: "Please enter valid Address",
                           },
                           minLength: {
                             value: 3,
                             message: "Minimum 3 Characters allowed",
                           },
                           maxLength: {
-                            value: 200,
-                            message: "Maximum 200 Characters allowed",
+                            value: 250,
+                            message: "Maximum 250 Characters allowed",
                           },
                           validate:validateAddress
                         })}
@@ -1266,7 +1271,7 @@ const CompanyRegistration = () => {
 
             <div className="d-flex justify-content-end mt-1">
               {/* Conditionally render the "Clear" button only when not in editMode */}
-              {!editMode && (
+              {!editMode ? (
                 <button
                   className="btn btn-secondary me-2"
                   type="button"
@@ -1274,6 +1279,14 @@ const CompanyRegistration = () => {
                 >
                   Clear
                 </button>
+              ):(
+                <button
+                className="btn btn-secondary me-2"
+                type="button"
+                onClick={backForm}
+              >
+                Back
+              </button>
               )}
 
               <button

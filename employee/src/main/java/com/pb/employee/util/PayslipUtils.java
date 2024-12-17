@@ -187,6 +187,8 @@ public class PayslipUtils {
         payslipEntity.setSalaryId(salaryRequest.getSalaryId());
         payslipEntity.setSalary(salary);
         payslipEntity.setAttendance(attendance);
+        String inWords =  numberToWords(Double.valueOf(net));
+        payslipEntity.setInWords(inWords + " Rupees Only.");
         payslipEntity.setType(Constants.PAYSLIP);
 
 
@@ -637,26 +639,81 @@ public class PayslipUtils {
 
         double totalAllowanceAnnual = 0.0;
         double totalAllowanceMonthly = 0.0;
+        double basicSalaryAnnual = 0.0;
+        double basicSalaryMonthly = 0.0;
 
-        // Calculate allowances and accumulate totals
+        // **Dynamic Fields Calculation** (Basic Salary, HRA, Provident Fund)
+        Map<String, String> dynamicAllowances = salaryConfiguration.getAllowances();  // Assuming dynamic fields are stored in a map
+
+        // Check if Basic Salary is part of the dynamic fields and calculate it
+        if (dynamicAllowances.containsKey(Constants.BASIC_SALARY)) {
+            String basicSalaryPercentage = dynamicAllowances.get(Constants.BASIC_SALARY);
+
+            // Remove the percentage sign and trim any spaces
+            basicSalaryPercentage = basicSalaryPercentage.replace(Constants.PERCENTAGE, "").trim();
+
+            // Convert the percentage to a double and calculate the annual and monthly salary
+            double formatBasicSalary = Double.parseDouble(basicSalaryPercentage);
+            basicSalaryAnnual = grossAmount * (formatBasicSalary / 100); // Calculate annual Basic Salary
+            basicSalaryMonthly = basicSalaryAnnual / 12; // Calculate monthly Basic Salary
+
+            // Add the Basic Salary to components
+            Map<String, String> basicSalaryData = new HashMap<>();
+            basicSalaryData.put(Constants.MONTH, formatValue(String.valueOf(basicSalaryMonthly)));
+            basicSalaryData.put(Constants.ANNUAL, formatValue(String.valueOf(basicSalaryAnnual)));
+            components.put(Constants.BASIC_SALARY , basicSalaryData);
+
+            // Accumulate total allowances
+            totalAllowanceAnnual += basicSalaryAnnual;
+            totalAllowanceMonthly += basicSalaryMonthly;
+        }
+
+        // Check if HRA is part of the dynamic fields and calculate it
+        if (dynamicAllowances.containsKey(Constants.HRA)) {
+            String hraPercentageString = dynamicAllowances.get(Constants.HRA);
+
+            // Remove the percentage sign and trim any spaces
+            hraPercentageString = hraPercentageString.replace(Constants.PERCENTAGE, "").trim();
+
+            // Convert the percentage to a double and calculate the annual and monthly HRA
+            double hraPercentage = Double.parseDouble(hraPercentageString);
+            double hraAnnual = basicSalaryAnnual * (hraPercentage / 100);  // Calculate annual HRA from Basic Salary
+            double hraMonthly = hraAnnual / 12;  // Calculate monthly HRA
+
+            // Add the HRA to components
+            Map<String, String> hraData = new HashMap<>();
+            hraData.put(Constants.MONTH, formatValue(String.valueOf(hraMonthly)));
+            hraData.put(Constants.ANNUAL, formatValue(String.valueOf(hraAnnual)));
+            components.put(Constants.HRA , hraData);
+
+            // Accumulate total allowances
+            totalAllowanceAnnual += hraAnnual;
+            totalAllowanceMonthly += hraMonthly;
+        }
+
+        // **Other Allowances Calculation** (not Basic Salary or HRA)
         Map<String, String> allowances = salaryConfiguration.getAllowances();
         if (allowances != null) {
             for (Map.Entry<String, String> entry : allowances.entrySet()) {
-                // Calculate allowance values
-                double allowanceAnnualValue = Double.parseDouble(persentageOrValueForYearly(entry.getValue(), grossAmount));
-                double allowanceMonthlyValue = allowanceAnnualValue / 12;
+                // Skip Basic Salary and HRA, they have already been processed
+                if (!Constants.BASIC_SALARY.equals(entry.getKey()) && !Constants.HRA.equals(entry.getKey())) {
+                    // Calculate allowance values
+                    double allowanceAnnualValue = Double.parseDouble(persentageOrValueForYearly(entry.getValue(), grossAmount));
+                    double allowanceMonthlyValue = allowanceAnnualValue / 12;
 
-                // Add the formatted allowance to components
-                Map<String, String> allowanceData = new HashMap<>();
-                allowanceData.put(Constants.MONTH, formatValue(String.valueOf(allowanceMonthlyValue)));
-                allowanceData.put(Constants.ANNUAL, formatValue(String.valueOf(allowanceAnnualValue)));
-                components.put(formatComponentName(entry.getKey()), allowanceData);
+                    // Add the formatted allowance to components
+                    Map<String, String> allowanceData = new HashMap<>();
+                    allowanceData.put(Constants.MONTH, formatValue(String.valueOf(allowanceMonthlyValue)));
+                    allowanceData.put(Constants.ANNUAL, formatValue(String.valueOf(allowanceAnnualValue)));
+                    components.put(formatComponentName(entry.getKey()), allowanceData);
 
-                // Accumulate total allowances
-                totalAllowanceAnnual += allowanceAnnualValue;
-                totalAllowanceMonthly += allowanceMonthlyValue;
+                    // Accumulate total allowances
+                    totalAllowanceAnnual += allowanceAnnualValue;
+                    totalAllowanceMonthly += allowanceMonthlyValue;
+                }
             }
         }
+
         // **Other Allowance** (Gross CTC - Total Allowances - Deductions)
         double otherAllowanceAnnual = grossAmount - totalAllowanceAnnual;
         double otherAllowanceMonthly = otherAllowanceAnnual / 12;
@@ -674,28 +731,79 @@ public class PayslipUtils {
         grossSalaryData.put(Constants.ANNUAL, "<b>" + formatValue(String.valueOf(grossAmount)) + "</b>");
         components.put("<b>" + Constants.GROSS_CTC + "</b>", grossSalaryData);
 
+        // **Provident Fund (Employee and Employer) Calculations** from Basic Salary
+        Map<String, String> dynamicDeductions = salaryConfiguration.getDeductions();  // Assuming dynamic fields are stored in a map
+
+        // **Deductions Calculation**
         double totalDedMonthlySalary = 0.0;
         double totalDedAnnualSalary = 0.0;
+        // Check if Provident Fund (Employee) is part of the dynamic fields and calculate it
+        if (dynamicDeductions.containsKey(Constants.PF_EMPLOYEE)) {
+            String pfEmployeePercentageString = dynamicDeductions.get(Constants.PF_EMPLOYEE);
+
+            // Remove the percentage sign and trim any spaces
+            pfEmployeePercentageString = pfEmployeePercentageString.replace(Constants.PERCENTAGE, "").trim();
+
+            // Convert the percentage to a double and calculate the annual and monthly Provident Fund Employee
+            double pfEmployeePercentage = Double.parseDouble(pfEmployeePercentageString);
+            double pfEmployeeAnnual = basicSalaryAnnual * (pfEmployeePercentage / 100);  // Calculate annual PF Employee from Basic Salary
+            double pfEmployeeMonthly = pfEmployeeAnnual / 12; // Calculate monthly PF Employee
+
+            // Add the Provident Fund Employee contribution to components
+            Map<String, String> pfEmployeeData = new HashMap<>();
+            pfEmployeeData.put(Constants.MONTH, formatValue(String.valueOf(pfEmployeeMonthly)));
+            pfEmployeeData.put(Constants.ANNUAL, formatValue(String.valueOf(pfEmployeeAnnual)));
+            components.put(Constants.PF_EMPLOYEE, pfEmployeeData);
+
+            totalDedMonthlySalary += pfEmployeeMonthly;
+            totalDedAnnualSalary += pfEmployeeAnnual;
+        }
+
+        // Check if Provident Fund (Employer) is part of the dynamic fields and calculate it
+        if (dynamicDeductions.containsKey(Constants.PF_EMPLOYER)) {
+            String pfEmployerPercentageString = dynamicDeductions.get(Constants.PF_EMPLOYER);
+
+            // Remove the percentage sign and trim any spaces
+            pfEmployerPercentageString = pfEmployerPercentageString.replace(Constants.PERCENTAGE, "").trim();
+
+            // Convert the percentage to a double and calculate the annual and monthly Provident Fund Employer
+            double pfEmployerPercentage = Double.parseDouble(pfEmployerPercentageString);
+            double pfEmployerAnnual = basicSalaryAnnual * (pfEmployerPercentage / 100);  // Calculate annual PF Employer from Basic Salary
+            double pfEmployerMonthly = pfEmployerAnnual / 12; // Calculate monthly PF Employer
+
+            // Add the Provident Fund Employer contribution to components
+            Map<String, String> pfEmployerData = new HashMap<>();
+            pfEmployerData.put(Constants.MONTH, formatValue(String.valueOf(pfEmployerMonthly)));
+            pfEmployerData.put(Constants.ANNUAL, formatValue(String.valueOf(pfEmployerAnnual)));
+            components.put(Constants.PF_EMPLOYER, pfEmployerData);
+
+            totalDedMonthlySalary += pfEmployerMonthly;
+            totalDedAnnualSalary += pfEmployerAnnual;
+        }
+
         // Calculate deductions without affecting Gross Salary
         Map<String, String> deductions = salaryConfiguration.getDeductions();
         if (deductions != null) {
             for (Map.Entry<String, String> entry : deductions.entrySet()) {
-                double deductionAnnualValue = Double.parseDouble(persentageOrValueForYearly(entry.getValue(), grossAmount));
-                double deductionMonthlyValue = deductionAnnualValue / 12;
+                // Skip PF Employee and PF Employer, they have already been processed
+                if (!Constants.PF_EMPLOYEE.equals(entry.getKey()) && !Constants.PF_EMPLOYER.equals(entry.getKey())) {
+                    double deductionAnnualValue = Double.parseDouble(persentageOrValueForYearly(entry.getValue(), grossAmount));
+                    double deductionMonthlyValue = deductionAnnualValue / 12;
 
-                // Add formatted deduction to components only
-                Map<String, String> deductionData = new HashMap<>();
-                String formatMonthlyValue =  formatValue(String.valueOf(deductionMonthlyValue));
-                String formatYearlyValue =  formatValue(String.valueOf(deductionAnnualValue));
-                deductionData.put(Constants.MONTH, formatMonthlyValue);
-                deductionData.put(Constants.ANNUAL, formatYearlyValue);
-                components.put(formatComponentName(entry.getKey()), deductionData);
+                    // Add formatted deduction to components only
+                    Map<String, String> deductionData = new HashMap<>();
+                    String formatMonthlyValue = formatValue(String.valueOf(deductionMonthlyValue));
+                    String formatYearlyValue = formatValue(String.valueOf(deductionAnnualValue));
+                    deductionData.put(Constants.MONTH, formatMonthlyValue);
+                    deductionData.put(Constants.ANNUAL, formatYearlyValue);
+                    components.put(formatComponentName(entry.getKey()), deductionData);
 
-                totalDedMonthlySalary += Double.parseDouble(formatMonthlyValue);
-                totalDedAnnualSalary += Double.parseDouble(formatYearlyValue);
-
+                    totalDedMonthlySalary += Double.parseDouble(formatMonthlyValue);
+                    totalDedAnnualSalary += Double.parseDouble(formatYearlyValue);
+                }
             }
         }
+
         // **Total Deductions** (from monthly and annual totals)
         Map<String, String> grossSalaryCtcData = new HashMap<>();
         grossSalaryCtcData.put(Constants.MONTH, "<b>" + formatValue(String.valueOf(totalDedMonthlySalary)) + "</b>");
@@ -708,60 +816,166 @@ public class PayslipUtils {
         netSalary.put(Constants.ANNUAL, "<b>" + formatValue(String.valueOf(grossAmount - totalDedAnnualSalary)) + "</b>");
         components.put("<b>" + Constants.NET_SALARY + "</b>", netSalary);
 
-
         return components;
     }
-
 
     public static Map<String, Map<String, String>> calculateSalaryYearlyComponents(SalaryConfigurationEntity salaryConfiguration, String grossAnnualSalary) {
         Map<String, Map<String, String>> components = new LinkedHashMap<>(); // Use LinkedHashMap to maintain order
 
-        // Store Basic Salary breakdown without adding to total initially
-        Map<String, String> basicSalaryData = new HashMap<>();
-        basicSalaryData.put(Constants.ANNUAL, formatValue(grossAnnualSalary));
-        components.put(Constants.BASIC_SALARY, basicSalaryData); // Add Basic Salary first but don’t yet add to total
+        Double grossAmount = Double.parseDouble(grossAnnualSalary);
+        double totalAllowanceAnnual = 0.0;
+        double basicSalaryAnnual = 0.0;
 
-        double totalAllowances = 0.0;
-        double grossAnnual = Double.parseDouble(grossAnnualSalary); // Convert gross annual salary to double for calculations
+        // **Dynamic Fields Calculation** (Basic Salary, HRA, Provident Fund)
+        Map<String, String> dynamicAllowances = salaryConfiguration.getAllowances();  // Assuming dynamic fields are stored in a map
 
-        // Calculate allowances and accumulate totals
+        // Check if Basic Salary is part of the dynamic fields and calculate it
+        if (dynamicAllowances.containsKey(Constants.BASIC_SALARY)) {
+            String basicSalaryPercentage = dynamicAllowances.get(Constants.BASIC_SALARY);
+
+            // Remove the percentage sign and trim any spaces
+            basicSalaryPercentage = basicSalaryPercentage.replace(Constants.PERCENTAGE, "").trim();
+
+            // Convert the percentage to a double and calculate the annual and monthly salary
+            double formatBasicSalary = Double.parseDouble(basicSalaryPercentage);
+            basicSalaryAnnual = grossAmount * (formatBasicSalary / 100); // Calculate annual Basic Salary
+
+            // Add the Basic Salary to components
+            Map<String, String> basicSalaryData = new HashMap<>();
+            basicSalaryData.put(Constants.ANNUAL, formatValue(String.valueOf(basicSalaryAnnual)));
+            components.put(Constants.BASIC_SALARY , basicSalaryData);
+
+            // Accumulate total allowances
+            totalAllowanceAnnual += basicSalaryAnnual;
+        }
+
+        // Check if HRA is part of the dynamic fields and calculate it
+        if (dynamicAllowances.containsKey(Constants.HRA)) {
+            String hraPercentageString = dynamicAllowances.get(Constants.HRA);
+
+            // Remove the percentage sign and trim any spaces
+            hraPercentageString = hraPercentageString.replace(Constants.PERCENTAGE, "").trim();
+
+            // Convert the percentage to a double and calculate the annual and monthly HRA
+            double hraPercentage = Double.parseDouble(hraPercentageString);
+            double hraAnnual = basicSalaryAnnual * (hraPercentage / 100);  // Calculate annual HRA from Basic Salary
+
+            // Add the HRA to components
+            Map<String, String> hraData = new HashMap<>();
+            hraData.put(Constants.ANNUAL, formatValue(String.valueOf(hraAnnual)));
+            components.put(Constants.HRA , hraData);
+
+            // Accumulate total allowances
+            totalAllowanceAnnual += hraAnnual;
+        }
+
+        // **Other Allowances Calculation** (not Basic Salary or HRA)
         Map<String, String> allowances = salaryConfiguration.getAllowances();
         if (allowances != null) {
             for (Map.Entry<String, String> entry : allowances.entrySet()) {
-                // Calculate allowance values
-                double allowanceAnnualValue = Double.parseDouble(persentageOrValueForYearly(entry.getValue(), grossAnnual));
-                // Accumulate allowance totals
-                totalAllowances += allowanceAnnualValue;
+                // Skip Basic Salary and HRA, they have already been processed
+                if (!Constants.BASIC_SALARY.equals(entry.getKey()) && !Constants.HRA.equals(entry.getKey())) {
+                    // Calculate allowance values
+                    double allowanceAnnualValue = Double.parseDouble(persentageOrValueForYearly(entry.getValue(), grossAmount));
 
-                // Add the formatted allowance to components
-                Map<String, String> allowanceData = new HashMap<>();
-                allowanceData.put(Constants.ANNUAL, formatValue(String.valueOf(allowanceAnnualValue)));
-                components.put(formatComponentName(entry.getKey()), allowanceData);
+                    // Add the formatted allowance to components
+                    Map<String, String> allowanceData = new HashMap<>();
+                    allowanceData.put(Constants.ANNUAL, formatValue(String.valueOf(allowanceAnnualValue)));
+                    components.put(formatComponentName(entry.getKey()), allowanceData);
+
+                    // Accumulate total allowances
+                    totalAllowanceAnnual += allowanceAnnualValue;
+                }
             }
         }
         // **Other Allowance** (Gross CTC - Total Allowances - Deductions)
-        double otherAllowanceAnnual = grossAnnual - totalAllowances;
-        double otherAllowanceMonthly = otherAllowanceAnnual / 12;
+        double otherAllowanceAnnual = grossAmount - totalAllowanceAnnual;
 
         if (otherAllowanceAnnual > 0) {
             Map<String, String> otherAllowanceData = new HashMap<>();
-            otherAllowanceData.put(Constants.MONTH, formatValue(String.valueOf(otherAllowanceMonthly)));
             otherAllowanceData.put(Constants.ANNUAL, formatValue(String.valueOf(otherAllowanceAnnual)));
             components.put(Constants.OTHER_ALLOWANCES, otherAllowanceData);
         }
-        // Calculate Total Deductions as the difference between gross annual and total allowances
-        double totalDeductions = grossAnnual - totalAllowances;
 
-        // Add Total Deductions to components
-        Map<String, String> deductionsData = new HashMap<>();
-        deductionsData.put(Constants.ANNUAL, formatValue(String.valueOf(totalDeductions)));
+        // **Gross CTC** (directly using the provided grossAnnualSalary)
+        Map<String, String> grossSalaryData = new HashMap<>();
+        grossSalaryData.put(Constants.ANNUAL, "<b>" + formatValue(String.valueOf(grossAmount)) + "</b>");
+        components.put("<b>" + Constants.GROSS_CTC + "</b>", grossSalaryData);
+
+        // **Provident Fund (Employee and Employer) Calculations** from Basic Salary
+        Map<String, String> dynamicDeductions = salaryConfiguration.getDeductions();  // Assuming dynamic fields are stored in a map
+
+        // **Deductions Calculation**
+        double totalDedAnnualSalary = 0.0;
+        // Check if Provident Fund (Employee) is part of the dynamic fields and calculate it
+        if (dynamicDeductions.containsKey(Constants.PF_EMPLOYEE)) {
+            String pfEmployeePercentageString = dynamicDeductions.get(Constants.PF_EMPLOYEE);
+
+            // Remove the percentage sign and trim any spaces
+            pfEmployeePercentageString = pfEmployeePercentageString.replace(Constants.PERCENTAGE, "").trim();
+
+            // Convert the percentage to a double and calculate the annual and monthly Provident Fund Employee
+            double pfEmployeePercentage = Double.parseDouble(pfEmployeePercentageString);
+            double pfEmployeeAnnual = basicSalaryAnnual * (pfEmployeePercentage / 100);  // Calculate annual PF Employee from Basic Salary
+
+            // Add the Provident Fund Employee contribution to components
+            Map<String, String> pfEmployeeData = new HashMap<>();
+            pfEmployeeData.put(Constants.ANNUAL, formatValue(String.valueOf(pfEmployeeAnnual)));
+            components.put(Constants.PF_EMPLOYEE, pfEmployeeData);
+
+            totalDedAnnualSalary += pfEmployeeAnnual;
+        }
+
+        // Check if Provident Fund (Employer) is part of the dynamic fields and calculate it
+        if (dynamicDeductions.containsKey(Constants.PF_EMPLOYER)) {
+            String pfEmployerPercentageString = dynamicDeductions.get(Constants.PF_EMPLOYER);
+
+            // Remove the percentage sign and trim any spaces
+            pfEmployerPercentageString = pfEmployerPercentageString.replace(Constants.PERCENTAGE, "").trim();
+
+            // Convert the percentage to a double and calculate the annual and monthly Provident Fund Employer
+            double pfEmployerPercentage = Double.parseDouble(pfEmployerPercentageString);
+            double pfEmployerAnnual = basicSalaryAnnual * (pfEmployerPercentage / 100);  // Calculate annual PF Employer from Basic Salary
+
+            // Add the Provident Fund Employer contribution to components
+            Map<String, String> pfEmployerData = new HashMap<>();
+            pfEmployerData.put(Constants.ANNUAL, formatValue(String.valueOf(pfEmployerAnnual)));
+            components.put(Constants.PF_EMPLOYER, pfEmployerData);
+
+            totalDedAnnualSalary += pfEmployerAnnual;
+        }
+
+        // Calculate deductions without affecting Gross Salary
+        Map<String, String> deductions = salaryConfiguration.getDeductions();
+        if (deductions != null) {
+            for (Map.Entry<String, String> entry : deductions.entrySet()) {
+                // Skip PF Employee and PF Employer, they have already been processed
+                if (!Constants.PF_EMPLOYEE.equals(entry.getKey()) && !Constants.PF_EMPLOYER.equals(entry.getKey())) {
+                    double deductionAnnualValue = Double.parseDouble(persentageOrValueForYearly(entry.getValue(), grossAmount));
+
+                    // Add formatted deduction to components only
+                    Map<String, String> deductionData = new HashMap<>();
+                    String formatYearlyValue = formatValue(String.valueOf(deductionAnnualValue));
+                    deductionData.put(Constants.ANNUAL, formatYearlyValue);
+                    components.put(formatComponentName(entry.getKey()), deductionData);
+
+                    totalDedAnnualSalary += Double.parseDouble(formatYearlyValue);
+                }
+            }
+        }
+
+        // **Total Deductions** (from monthly and annual totals)
+        Map<String, String> grossSalaryCtcData = new HashMap<>();
+        grossSalaryCtcData.put(Constants.ANNUAL, "<b>" + formatValue(String.valueOf(totalDedAnnualSalary)) + "</b>");
+        components.put("<b>" + Constants.TOTAL_DEDUCTIONS + "</b>", grossSalaryCtcData);
+
+        // **Net Salary** after deductions
+        Map<String, String> netSalary = new HashMap<>();
+        netSalary.put(Constants.ANNUAL, "<b>" + formatValue(String.valueOf(grossAmount - totalDedAnnualSalary)) + "</b>");
+        components.put("<b>" + Constants.NET_SALARY + "</b>", netSalary);
 
         return components;
     }
-
-
-
-
 
     private static String formatComponentName(String componentName) {
         if (componentName == null || componentName.isEmpty()) {

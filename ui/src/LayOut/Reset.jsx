@@ -4,8 +4,8 @@ import { UnlockFill, LockFill } from "react-bootstrap-icons";
 import { Modal } from "react-bootstrap";
 import { EmployeeGetApiById, resetPassword } from "../Utils/Axios";
 import { toast } from "react-toastify";
-import { userId } from "../Utils/Auth";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
 
 const Reset = ({ companyName, onClose, show }) => {
   const { register, handleSubmit, formState: { errors }, getValues,reset } = useForm({ mode: "onChange" });
@@ -16,7 +16,7 @@ const Reset = ({ companyName, onClose, show }) => {
   const [id, setEmployeeId] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-
+  const { user } = useAuth();
   const toggleOldPasswordVisibility = () => {
     setOldPasswordShown(!oldPasswordShown);
   };
@@ -32,7 +32,7 @@ const Reset = ({ companyName, onClose, show }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await EmployeeGetApiById(userId);
+        const response = await EmployeeGetApiById(user.userId);
         const id = response.data.id;
         setEmployeeId(id);
       } catch (error) {
@@ -132,6 +132,7 @@ const Reset = ({ companyName, onClose, show }) => {
                   className="form-control"
                   name="password"
                   id="password"
+                  maxLength={16}
                   placeholder="Enter your old password"
                   type={oldPasswordShown ? "text" : "password"}
                   onKeyDown={handleEmailChange}
@@ -165,6 +166,7 @@ const Reset = ({ companyName, onClose, show }) => {
                   className="form-control"
                   name="newPassword"
                   id="newPassword"
+                  maxLength={16}
                   placeholder="Enter your new password"
                   type={newPasswordShown ? "text" : "password"}
                   onKeyDown={handleEmailChange}
@@ -201,6 +203,7 @@ const Reset = ({ companyName, onClose, show }) => {
                   className="form-control"
                   name="confirmPassword"
                   id="confirmPassword"
+                  maxLength={16}
                   placeholder="Confirm your new password"
                   type={confirmPasswordShown ? "text" : "password"}
                   onKeyDown={handleEmailChange}

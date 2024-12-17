@@ -57,6 +57,7 @@ const AppraisalPreview = ({ previewData, selectedTemplate }) => { // Accept prev
         effectiveDate={previewData.dateOfSalaryIncrement}
         salaryIncrease={previewData.grossCompensation} 
         totalAllowances= {previewData.totalAllowances}
+        basicSalary= {previewData.basicSalary}
         />
       ),
     },
@@ -75,6 +76,7 @@ const AppraisalPreview = ({ previewData, selectedTemplate }) => { // Accept prev
           effectiveDate={previewData.dateOfSalaryIncrement}
           salaryIncrease={previewData.grossCompensation} 
           totalAllowances= {previewData.totalAllowances}
+          basicSalary= {previewData.basicSalary}
          />
       ),
     },

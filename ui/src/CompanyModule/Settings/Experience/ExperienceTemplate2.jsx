@@ -13,7 +13,7 @@ const ExperienceTemplate2 = ({
     experienceDate
 
 }) => {
-  const {logofileName} = useAuth();
+  const {logoFileName} = useAuth();
 
     return (
             <div
@@ -48,7 +48,7 @@ const ExperienceTemplate2 = ({
         right: '30%',
         width: '50%',
         height: '50%',
-        backgroundImage: `url(${logofileName})`, // Use the logo or another image
+        backgroundImage: `url(${logoFileName})`, // Use the logo or another image
         transform: 'rotate(340deg)',
         backgroundSize: 'contain',
         backgroundRepeat: 'no-repeat',

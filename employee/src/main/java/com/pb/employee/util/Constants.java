@@ -134,10 +134,14 @@ public class Constants {
     public static final String NOTICE_PERIOD = "NoticePeriod";
     public static final String INACTIVE = "InActive";
     public static final String STATUS = "status";
-    public static final String PF_EMPLOYEE = "pfEmployee";
-    public static final String PF_EMPLOYER = "pfEmployer";
+    public static final String PF_EMPLOYEE = "Provident Fund Employee";
+    public static final String PF_EMPLOYER = "Provident Fund Employer";
     public static final String RELIEVING_LETTER3 = "relievingLetter3.ftl";
     public static final String IMAGE_JPG = "image/jpeg";
     public static final String IMAGE_PNG = "image/png";
     public static final String IMAGE_SVG = "image/svg+xml";
+    public static final String PERCENTAGE = "%";
+    public static final String CUSTOMER_ADD = "/customer";
+    public static final String CUSTOMER_GET = "/customer/{customerId}";
+    public static final String SALARY_ID = "salaryId";
 }

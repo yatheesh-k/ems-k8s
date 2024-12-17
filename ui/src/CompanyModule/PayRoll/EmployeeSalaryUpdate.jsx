@@ -156,7 +156,7 @@ const EmployeeSalaryUpdate = () => {
   const calculateTotalAllowances = () => {
     let total = 0;
     Object.entries(allowances).forEach(([key, value]) => {
-      if (key !== "otherAllowances") {
+      if (key !== "Other Allowances") {
         if (value.endsWith("%")) {
           const parsedValue = parseFloat(value.slice(0, -1));
           const percentageValue = (parsedValue / 100) * (grossAmount || 0);
@@ -246,7 +246,7 @@ const EmployeeSalaryUpdate = () => {
 
     setAllowances((prevAllowances) => ({
       ...prevAllowances,
-      otherAllowances: validOtherAllowances.toFixed(2),
+      "Other Allowances": validOtherAllowances.toFixed(2),
     }));
   }, [allowances, grossAmount]);
 
@@ -325,10 +325,10 @@ const EmployeeSalaryUpdate = () => {
     const validOtherAllowances = Math.max(0, newOtherAllowances);
     setTotalAllowances(totalAllow + validOtherAllowances);
 
-    // Update other allowances
+    // Update//// other allowances
     setAllowances((prevAllowances) => ({
       ...prevAllowances,
-      otherAllowances: validOtherAllowances.toFixed(2),
+      "Other Allowances": validOtherAllowances.toFixed(2),
     }));
   }, [allowances, grossAmount]);
 
@@ -633,13 +633,13 @@ const EmployeeSalaryUpdate = () => {
                     {Object.keys(allowances).map((key) => {
                       const allowanceValue = allowances[key];
                       const isPercentage = allowanceValue.includes("%");
-                      let displayValue = allowanceValue;
+                     // let displayValue = allowanceValue;
                       const isOtherAllowanceReadOnly =
-                        key === "otherAllowances";
+                        key === "Other Allowances";
                       // Folr numeric fields, we display them as whole numbers
-                      if (!isPercentage) {
-                        displayValue = Math.floor(allowanceValue);
-                      }
+                      // if (!isPercentage) {
+                      //   displayValue = Math.floor(allowanceValue);
+                      // }
 
                       return (
                         <div key={key} className="mb-2">
@@ -664,7 +664,7 @@ const EmployeeSalaryUpdate = () => {
                             type="text"
                             className="form-control"
                             readOnly={isOtherAllowanceReadOnly}
-                            value={allowanceValue}
+                            value={Math.round(allowanceValue)}
                             onChange={(e) => {
                               // Allow only numbers and '%' characters
                               const newValue = e.target.value.replace(
@@ -863,7 +863,7 @@ const EmployeeSalaryUpdate = () => {
                         className="form-control"
                         type="text"
                         name="netSalary"
-                        value={netSalary.toFixed(2)}
+                        value={Math.round(netSalary.toFixed(2))}
                         readOnly
                         data-toggle="tooltip"
                         title="This is the final salary after all deductions and allowances."
