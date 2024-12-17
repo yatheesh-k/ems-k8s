@@ -57,8 +57,9 @@ const GeneratePaySlip = () => {
       month: capitalizedMonth,
       year: year.label,
     };
+    const salaryId=user.salaryId||null;
 
-    EmployeePayslipResponse(payload)
+    EmployeePayslipResponse(salaryId,payload)
       .then((response) => {
         const { generatePayslip } = response.data.data;
         setView(generatePayslip);
@@ -137,7 +138,7 @@ const GeneratePaySlip = () => {
         <button
           className="btn btn-sm"
           style={{ backgroundColor: "transparent", border: "none", padding: "0", marginRight: "10px" }}
-          onClick={() => handleEditClick(row.employeeId, row.payslipId, row.month, row.year)} // Pass employeeId, month, and year
+          onClick={() => handleEditClick(row.employeeId, row.payslipId,row.salaryId, row.month, row.year)} // Pass employeeId, month, and year
           title="Edit"
         >
           <PencilSquare size={22} color='#2255a4' />
@@ -162,11 +163,11 @@ const GeneratePaySlip = () => {
       // toast.error("Failed to fetch payslip templates. Please try again.");
     }
   };
-  const handleEditClick = (employeeId, payslipId, month, year) => {
+  const handleEditClick = (employeeId, payslipId,salaryId,month, year) => {
     const payslipTemplateNo = currentTemplate?.payslipTemplateNo;
 
     if (payslipTemplateNo) {
-      navigate(`/payslipUpdate${payslipTemplateNo}?employeeId=${employeeId}&payslipId=${payslipId}&month=${month}&year=${year}`);
+      navigate(`/payslipUpdate${payslipTemplateNo}?employeeId=${employeeId}&payslipId=${payslipId}&salaryId=${salaryId}&month=${month}&year=${year}`);
     } else {
       toast.error("Payslip template number not found.");
     }

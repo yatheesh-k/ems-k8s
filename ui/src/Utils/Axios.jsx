@@ -270,9 +270,19 @@ export const EmployeePayslipGenerationPostById = (employeeId, salaryId, data) =>
   return axiosInstance.post(`/${employeeId}/salary/${salaryId}`, data);
 }
 
-export const EmployeePayslipResponse = (data) => {
-  return axiosInstance.post("/payslip", data);
-}
+export const EmployeePayslipResponse = (salaryId, data) => {
+  const params = {};
+
+  // Ensure salaryId is added as a query parameter, not a part of the data
+  if (salaryId) {
+    params.salaryId = salaryId;
+  }
+
+  return axiosInstance.post("/payslip", data, {
+    params: params, // Attach salaryId in the query params
+  });
+};
+
 
 export const EmployeePayslipGeneration = (data) => {
   return axiosInstance.post("/salary", data);

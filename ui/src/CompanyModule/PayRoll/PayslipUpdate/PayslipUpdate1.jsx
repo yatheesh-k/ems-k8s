@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "../../../Context/AuthContext";
 import LayOut from "../../../LayOut/LayOut";
 import { companyViewByIdApi, EmployeeGetApiById, EmployeePayslipResponse, EmployeePayslipUpdate } from "../../../Utils/Axios";
+import Loader from "../../../Utils/Loader";
 
 const PayslipUpdate1 = () => {
     const { register, getValues, trigger, reset, formState: { errors } } = useForm({ mode: "onChange" });
@@ -37,6 +38,7 @@ const PayslipUpdate1 = () => {
     const queryParams = new URLSearchParams(location.search);
     const employeeId = queryParams.get("employeeId");
     const payslipId = queryParams.get("payslipId");
+    const salaryId=queryParams.get("salaryId");
     const month = queryParams.get("month");
     const year = queryParams.get("year");
     const { user, logoFileName } = useAuth();
@@ -72,10 +74,19 @@ const PayslipUpdate1 = () => {
                 month,
                 year,
             };
-            const response = await EmployeePayslipResponse(payload);
+            const response = await EmployeePayslipResponse(salaryId,payload);
             const generatedPayslips = response.data?.data?.generatePayslip || [];
-            setPayslipData(generatedPayslips[0]);
-            if (!generatedPayslips.length) {
+            if (generatedPayslips.length) {
+                // Find the specific payslip based on the salaryId or employeeId
+                const selectedPayslip = generatedPayslips.find(
+                    (payslip) => payslip.salaryId === salaryId || payslip.employeeId === employeeId
+                );
+                if (selectedPayslip) {
+                    setPayslipData(selectedPayslip);
+                } else {
+                    toast.error("Payslip not found for the selected employee.");
+                }
+            } else {
                 toast.error("No payslip data available");
             }
         } catch (err) {
@@ -222,11 +233,19 @@ const PayslipUpdate1 = () => {
     }
 
     if (loading) {
-        return <div>Loading...</div>;
+        return (
+            <LayOut>
+            <Loader/>
+            </LayOut>
+        );
     }
 
     if (!payslipData) {
-        return <div>No payslip data available</div>;
+        return (
+            <LayOut>
+             <div className="text-center">No payslip data available</div>
+            </LayOut>
+        ) ;
     }
 
     const formatFieldName = (fieldName) => {
