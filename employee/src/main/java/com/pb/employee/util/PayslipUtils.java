@@ -187,6 +187,8 @@ public class PayslipUtils {
         payslipEntity.setSalaryId(salaryRequest.getSalaryId());
         payslipEntity.setSalary(salary);
         payslipEntity.setAttendance(attendance);
+        String inWords =  numberToWords(Double.valueOf(net));
+        payslipEntity.setInWords(inWords + " Rupees Only.");
         payslipEntity.setType(Constants.PAYSLIP);
 
 
