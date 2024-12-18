@@ -48,18 +48,39 @@ const GeneratePaySlip = () => {
     );
   };
 
+  const handleApiErrors = (error) => {
+    // Check if the error object has the response property (for HTTP errors)
+    if (error && error.response) {
+      // Check if the response has the error message
+      if (error.response.data && error.response.data.error && error.response.data.error.message) {
+        const errorMessage = error.response.data.error.message;
+        toast.error(errorMessage);  // Display the error message using toast
+      } else {
+        // If there's no specific error message, display a generic network error message
+        toast.error("Network Error!");
+      }
+      
+      // Optionally log the error for debugging purposes
+      console.error(error.response);
+    } else {
+      // If it's a network error or no response is available, handle it separately
+      toast.error("An error occurred. Please try again later.");
+      console.error(error);  // Log the error details for further debugging
+    }
+  };
+  
   const onSubmit = (data) => {
     const { month, year } = data;
     const capitalizedMonth = month.label.charAt(0).toUpperCase() + month.label.slice(1);
-
+  
     const payload = {
       companyName: user.company,
       month: capitalizedMonth,
       year: year.label,
     };
-    const salaryId=user.salaryId||null;
-
-    EmployeePayslipResponse(salaryId,payload)
+    const salaryId = user.salaryId || null;
+  
+    EmployeePayslipResponse(salaryId, payload)
       .then((response) => {
         const { generatePayslip } = response.data.data;
         setView(generatePayslip);
@@ -68,9 +89,10 @@ const GeneratePaySlip = () => {
       })
       .catch((error) => {
         console.error(error);
-        toast.error("Failed to generate payslips.");
+        handleApiErrors(error);  // Pass the error object to the handler
       });
   };
+  
 
   const handleSelectAllChange = () => {
     if (selectAll) {
