@@ -73,7 +73,7 @@ const PayslipUpdate3 = () => {
                 month,
                 year,
             };
-            const response = await EmployeePayslipResponse(payload);
+            const response = await EmployeePayslipResponse(salaryId,payload);
             const generatedPayslips = response.data?.data?.generatePayslip || [];
             if (generatedPayslips.length) {
                 // Find the specific payslip based on the salaryId or employeeId
@@ -247,7 +247,7 @@ const PayslipUpdate3 = () => {
     if (!payslipData) {
         return (
         <LayOut>
-        <div>No payslip data available</div>
+        <div className="text-center">No payslip data available</div>
         </LayOut>
         );
     }
