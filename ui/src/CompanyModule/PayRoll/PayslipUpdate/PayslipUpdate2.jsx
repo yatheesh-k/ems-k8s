@@ -73,7 +73,7 @@ const PayslipUpdate2 = () => {
                 month,
                 year,
             };
-            const response = await EmployeePayslipResponse(payload);
+            const response = await EmployeePayslipResponse(salaryId,payload);
             const generatedPayslips = response.data?.data?.generatePayslip || [];
             if (generatedPayslips.length) {
                 // Find the specific payslip based on the salaryId or employeeId
@@ -242,19 +242,24 @@ const PayslipUpdate2 = () => {
             navigate("/payslipGeneration");
           }
 
-    if (loading) {
-        return (
-        <LayOut>
-        <div className="text-center">
-            <Loader/>
-        </div>
-        </LayOut>
-        );
-    }
-
-    if (!payslipData) {
-        return <div>No payslip data available</div>;
-    }
+          if (loading) {
+            return (
+                <LayOut>
+                    <div className="text-center">
+                    <Loader/>
+                    </div>
+                </LayOut>
+            );
+        }
+    
+        if (!payslipData) {
+            return (
+                <LayOut>
+                 <div className="text-center">No payslip data available</div>
+                </LayOut>
+            ) ;
+        }
+    
 
     const formatFieldName = (fieldName) => {
         return fieldName
