@@ -478,44 +478,45 @@ const PayslipUpdate3 = () => {
                                             <p style={{ textAlign: "center", fontWeight: "bold", fontSize: "15px", color: "black", margin: 0 }}>Amount</p>
                                         </div>
                                         <ul style={{ listStyleType: "none", padding: 0, marginBottom: "2px" }}>
-                                            {Object.entries(payslipData.salary?.salaryConfigurationEntity?.allowances || {}).map(([key, value]) => (
-                                                <li key={key} style={{ display: "flex", padding: "4px 8px", alignItems: "center" }}>
-                                                    <span style={{ flex: 1, color: "black" }}>{formatFieldName(key)}</span>
-                                                    <input
-                                                        type="text"
-                                                        value={Math.floor(value)}
-                                                        onChange={(e) => {
-                                                            const newValue = e.target.value.replace(/[^0-9]/g, '');
-                                                            if (newValue.length <= 6) {
-                                                                const oldValue = Math.floor(value);
-                                                                const adjustment = parseInt(newValue) - oldValue;
-                                                                handleAllowanceChange(key, newValue);
-                                                                if (key !== otherAllowanceKey) {
-                                                                    const currentOtherAllowance = Math.floor(payslipData.salary.salaryConfigurationEntity.allowances[otherAllowanceKey] || 0);
-                                                                    const newOtherAllowance = currentOtherAllowance - adjustment;
-                                                                    if (newOtherAllowance < 0) {
-                                                                        setErrorMessages(prev => ({
-                                                                            ...prev,
-                                                                            otherAllowance: 'Other Allowance cannot be negative',
-                                                                        }));
-                                                                        return;
-                                                                    }
-                                                                    handleAllowanceChange(otherAllowanceKey, newOtherAllowance);
-                                                                    setErrorMessages(prev => ({ ...prev, otherAllowance: '' }));
-                                                                }
-                                                            }
-                                                        }}
-                                                        style={{ width: "100px", border: "none", textAlign: "right" }}
-                                                    />
-                                                </li>
-                                            ))}
-                                            {allowanceFields.map((field, index) => (
-                                                <li key={`new-allowance-${field.label}-${index}`} style={{ display: "flex", padding: "4px 8px", alignItems: "center" }}>
-                                                    <span style={{ flex: 1, color: "black" }}>{field.label}</span>
-                                                    <span style={{ marginRight: "15px", color: "black" }}>{field.value}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
+    {Object.entries(payslipData.salary?.salaryConfigurationEntity?.allowances || {}).map(([key, value]) => (
+        // Only render the non-otherAllowances fields, and allow changes to them
+        key !== 'otherAllowances' && (
+            <li key={key} style={{ display: "flex", padding: "4px 8px", alignItems: "center" }}>
+                <span style={{ flex: 1, color: "black" }}>{formatFieldName(key)}</span>
+                <input
+                    type="text"
+                    value={Math.floor(value)}
+                    onChange={(e) => {
+                        const newValue = e.target.value.replace(/[^0-9]/g, ''); // Only allow numbers
+                        if (newValue.length <= 6) {
+                            handleAllowanceChange(key, newValue);  // Update the specific allowance
+                        }
+                    }}
+                    style={{ width: "100px", border: "none", textAlign: "right" }}
+                />
+            </li>
+        )
+    ))}
+
+    {allowanceFields.map((field, index) => (
+        <li key={`new-allowance-${field.label}-${index}`} style={{ display: "flex", padding: "4px 8px", alignItems: "center" }}>
+            <span style={{ flex: 1, color: "black" }}>{field.label}</span>
+            <span style={{ marginRight: "15px", color: "black" }}>{field.value}</span>
+        </li>
+    ))}
+</ul>
+
+<div style={{ display: "flex", justifyContent: "space-between", padding: "4px 8px" }}>
+    <span style={{ color: "black" }}>Total Earnings (A)</span>
+    <span style={{ color: "black" }}>{Math.floor(totals.totalEarnings)}</span>
+</div>
+
+{errorMessages.otherAllowance && (
+    <div className="error-message" style={{ color: 'red', marginBottom: '10px', textAlign: "center" }}>
+        <b>{errorMessages.otherAllowance}</b>
+    </div>
+)}
+
                                         <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 8px" }}>
                                             <span style={{ color: "black" }}>Total Earnings (A)</span>
                                             <span style={{ color: "black" }}>{Math.floor(totals.totalEarnings)}</span>
