@@ -501,7 +501,7 @@ const PayslipUpdate1 = () => {
                                             <li key={key} style={{ display: "flex", padding: "4px 8px", alignItems: "center" }}>
                                                 <span style={{ flex: 1, color: "black" }}>{formatFieldName(key)}</span>
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     value={Math.floor(value)}
                                                     onChange={(e) => {
                                                         const newValue = e.target.value.replace(/[^0-9]/g, '');
@@ -537,7 +537,7 @@ const PayslipUpdate1 = () => {
                                     </ul>
                                     <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 8px" }}>
                                         <span style={{ color: "black" }}>Total Earnings (A)</span>
-                                        <span style={{ marginRight: "15px", color: "black" }}>{Math.floor(totals.totalEarnings)}</span>
+                                        <span style={{ color: "black" }}>{Math.floor(totals.totalEarnings)}</span>
                                     </div>
                                     {errorMessages.otherAllowance && (
                                         <div className="error-message" style={{ color: 'red', marginBottom: '10px', textAlign: "center" }}>
@@ -559,7 +559,7 @@ const PayslipUpdate1 = () => {
                                             <li key={key} style={{ display: "flex", padding: "4px 8px", alignItems: "center" }}>
                                                 <span style={{ flex: 1, color: "black" }}>{formatFieldName(key)}</span>
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     value={Math.floor(value)}
                                                     onChange={(e) => {
                                                         const newValue = e.target.value.replace(/[^0-9]/g, '');
@@ -581,7 +581,7 @@ const PayslipUpdate1 = () => {
                                     <div style={{ display: "flex", justifyContent: "space-between", padding: "0px 8px 4px 8px" }}>
                                         <span style={{ color: "black" }}>LOP</span>
                                         <input
-                                            type="number"
+                                            type="text"
                                             value={Math.floor(payslipData.salary.lop)}
                                             onChange={(e) => {
                                                 const newValue = e.target.value.replace(/[^0-9]/g, '');
@@ -594,7 +594,7 @@ const PayslipUpdate1 = () => {
                                     </div>
                                     <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 8px" }}>
                                         <span style={{ color: "black" }}>Total Deductions (B)</span>
-                                        <span style={{ marginRight: "15px", color: "black" }}>{Math.floor(totals.totalDeductions)}</span>
+                                        <span style={{ color: "black" }}>{Math.floor(totals.totalDeductions)}</span>
                                     </div>
                                     <button type="button" onClick={() => {
                                         setModalType('deductions');
@@ -607,7 +607,7 @@ const PayslipUpdate1 = () => {
                                     <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 8px" }}>
                                         <span style={{ color: "black" }}>Income Tax</span>
                                         <input
-                                            type="number"
+                                            type="text"
                                             value={Math.floor(payslipData.salary.incomeTax)}
                                             onChange={(e) => {
                                                 const newValue = e.target.value.replace(/[^0-9]/g, '');
@@ -621,7 +621,7 @@ const PayslipUpdate1 = () => {
                                     <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 8px" }}>
                                         <span style={{ color: "black" }}>Pf Tax</span>
                                         <input
-                                            type="number"
+                                            type="text"
                                             value={Math.floor(payslipData.salary.pfTax)}
                                             onChange={(e) => {
                                                 const newValue = e.target.value.replace(/[^0-9]/g, '');
@@ -634,7 +634,7 @@ const PayslipUpdate1 = () => {
                                     </div>
                                     <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 8px" }}>
                                         <span style={{ color: "black" }}>Total Tax (C)</span>
-                                        <span style={{ marginRight: "15px", color: "black" }}>{totals.totalTax}</span>
+                                        <span style={{ color: "black" }}>{totals.totalTax}</span>
                                     </div>
                                     {errorMessages.deductions && (
                                         <div className="error-message" style={{ color: 'red', marginBottom: '10px', textAlign: "center" }}>
