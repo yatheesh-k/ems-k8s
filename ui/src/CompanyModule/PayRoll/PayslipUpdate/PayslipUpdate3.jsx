@@ -899,6 +899,7 @@ const PayslipUpdate3 = () => {
                         <b>{errorMessages.otherAllowance}</b>
                       </div>
                     )}
+
                     <button
                       type="button"
                       onClick={() => {
