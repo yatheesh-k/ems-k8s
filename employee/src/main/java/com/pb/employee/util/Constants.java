@@ -3,6 +3,10 @@ package com.pb.employee.util;
 
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriBuilder;
+
+import java.net.URI;
+import java.util.function.Function;
 
 
 @Component
@@ -142,6 +146,7 @@ public class Constants {
     public static final String IMAGE_SVG = "image/svg+xml";
     public static final String PERCENTAGE = "%";
     public static final String CUSTOMER_ADD = "/customer";
-    public static final String CUSTOMER_GET = "/customer/{customerId}";
+    public static final String CUSTOMER = "/customer/";
     public static final String SALARY_ID = "salaryId";
+    public static final String ALL = "/all";
 }
