@@ -108,80 +108,58 @@ const PayslipUpdate2 = () => {
 
   const handleUpdate = async () => {
     if (employeeId && payslipId) {
-      try {
-        // Ensure totals are available
-        console.log("Using latest totals:", totals); // Log latest totals before updating
+        try {
+            console.log("Using latest totals:", totals);
 
-        const allowances =
-          payslipData.salary.salaryConfigurationEntity.allowances || {};
-        const deductions =
-          payslipData.salary.salaryConfigurationEntity.deductions || {};
+            const allowances = payslipData.salary.salaryConfigurationEntity.allowances || {};
+            const updatedAllowances = {
+                ...allowances,
+                ...allowanceFields.reduce((acc, field) => {
+                    acc[field.label] = Number(field.value);
+                    return acc;
+                }, {}),
+            };
 
-        // Combine updated fields with existing ones
-        const updatedAllowances = {
-          ...allowances,
-          ...allowanceFields.reduce((acc, field) => {
-            acc[field.label] = Number(field.value);
-            return acc;
-          }, {}),
-        };
+            // Recalculate 'Other Allowances' based on total allowances
+            const totalAllowances = Object.values(updatedAllowances).reduce((total, amount) => total + Number(amount || 0), 0);
+            const grossAmount = payslipData.salary.grossAmount || 0;
+            let otherAllowance = grossAmount / 12 - totalAllowances;
+            if (otherAllowance < 0) otherAllowance = 0; // Ensure it doesn't go negative
 
-        const updatedDeductions = {
-          ...deductions,
-          ...deductionFields.reduce((acc, field) => {
-            acc[field.label] = Number(field.value);
-            return acc;
-          }, {}),
-        };
-        const totalEarnings = totals.totalEarnings;
-        const totalDeductions = totals.totalDeductions;
-        const totalTax = totals.totalTax;
-        const netSalary = totals.netPay;
+            updatedAllowances['Other Allowances'] = otherAllowance.toString();
 
-        if (totalDeductions + totalTax > totalEarnings) {
-          setErrorMessages((prev) => ({
-            ...prev,
-            deductions:
-              "Total Deductions & Total Taxes cannot exceed Total Earnings",
-          }));
-          return;
+            const payload = {
+                companyName: user.company,
+                salary: {
+                    ...payslipData.salary,
+                    salaryConfigurationEntity: {
+                        ...payslipData.salary.salaryConfigurationEntity,
+                        allowances: updatedAllowances, // Updated allowances
+                    },
+                    totalEarnings: totals.totalEarnings,  // Latest total earnings
+                    totalDeductions: totals.totalDeductions,  // Latest total deductions
+                    totalTax: totals.totalTax,  // Latest total tax
+                    netSalary: totals.netPay,  // Latest net salary
+                },
+                attendance: payslipData.attendance,
+                month,
+                year,
+            };
+
+            console.log("Payload being sent:", payload);
+
+            await EmployeePayslipUpdate(employeeId, payslipId, payload);
+            toast.success("Payslip updated successfully");
+            navigate('/payslipsList');
+        } catch (err) {
+            console.error("Error updating payslip:", err);
+            toast.error("Failed to update payslip");
         }
-
-        setErrorMessages({ deductions: "" });
-
-        const payload = {
-          companyName: user.company,
-          salary: {
-            ...payslipData.salary,
-            salaryConfigurationEntity: {
-              ...payslipData.salary.salaryConfigurationEntity,
-              allowances: updatedAllowances,
-              deductions: updatedDeductions,
-            },
-            totalEarnings: totals.totalEarnings,
-            totalDeductions,
-            totalTax,
-            netSalary,
-          },
-          attendance: payslipData.attendance,
-          month,
-          year,
-        };
-
-        console.log("Payload being sent:", payload); // Debugging payload
-
-        await EmployeePayslipUpdate(employeeId, payslipId, payload);
-        toast.success("Payslip updated successfully");
-        navigate("/payslipsList");
-      } catch (err) {
-        console.error("Error updating payslip:", err);
-        toast.error("Failed to update payslip");
-      }
     } else {
-      console.error("Employee ID or Payslip ID is missing");
-      toast.error("Missing Employee ID or Payslip ID");
+        console.error("Employee ID or Payslip ID is missing");
+        toast.error("Missing Employee ID or Payslip ID");
     }
-  };
+};
 
   useEffect(() => {
     const fetchData = async () => {
@@ -201,33 +179,40 @@ const PayslipUpdate2 = () => {
 
   useEffect(() => {
     if (payslipData) {
-      const allowances =
-        payslipData.salary.salaryConfigurationEntity.allowances || {};
+      const allowances = payslipData.salary.salaryConfigurationEntity.allowances || {};
+  
+      // Calculate total earnings including additional allowances
       const totalEarnings = Object.values(allowances).reduce(
         (total, amount) => total + Number(amount || 0),
         0
       );
-
       const additionalAllowancesTotal = allowanceFields.reduce(
         (total, field) => total + Number(field.value || 0),
         0
       );
-      const totalEarningsIncludingAddedFields =
-        totalEarnings + additionalAllowancesTotal;
-
-      const deductions =
-        payslipData.salary.salaryConfigurationEntity.deductions || {};
-      const totalDeductions =
-        Object.values(deductions).reduce(
-          (total, amount) => total + Number(amount || 0),
-          0
-        ) +
-        Number(payslipData.salary.lop || 0) +
-        deductionFields.reduce(
-          (total, field) => total + Number(field.value || 0),
-          0
-        );
-
+      const totalEarningsIncludingAddedFields = totalEarnings + additionalAllowancesTotal;
+  
+      // Recalculate "Other Allowances" dynamically after other allowances are added/updated
+      const grossAmount = payslipData.salary.grossAmount || 0;
+      let otherAllowance = grossAmount / 12 - totalEarningsIncludingAddedFields;
+      otherAllowance = otherAllowance < 0 ? 0 : otherAllowance;  // Ensure it doesn't go negative
+  
+      // Update the allowances object with the newly calculated "Other Allowances"
+      const updatedAllowances = {
+        ...allowances,
+        'Other Allowances': otherAllowance.toString(),
+      };
+  
+      // Recalculate total deductions and taxes
+      const deductions = payslipData.salary.salaryConfigurationEntity.deductions || {};
+      const totalDeductions = Object.values(deductions).reduce(
+        (total, amount) => total + Number(amount || 0),
+        0
+      ) + Number(payslipData.salary.lop || 0) + deductionFields.reduce(
+        (total, field) => total + Number(field.value || 0),
+        0
+      );
+  
       const pfTax = Number(payslipData.salary.pfTax || 0);
       const incomeTax = Number(payslipData.salary.incomeTax || 0);
       const additionalTaxTotal = taxFields.reduce(
@@ -235,39 +220,27 @@ const PayslipUpdate2 = () => {
         0
       );
       const totalTax = pfTax + incomeTax + additionalTaxTotal;
-      const grossAmount = payslipData.salary.grossAmount || 0;
-      const otherAllowances = payslipData.salary.otherAllowances || 0;
-      let otherAllowance = 0;
-
-      if (otherAllowances) {
-        otherAllowance =
-          grossAmount / 12 - totalEarnings > 0
-            ? grossAmount / 12 - totalEarnings
-            : 0;
-      }
-      const netPay =
-        totalEarningsIncludingAddedFields - totalDeductions - totalTax;
-
-      // if (totalDeductions + totalTax > totalEarningsIncludingAddedFields) {
-      //   setValidationError('Total Deductions & Total Taxes and cannot exceed Total Earnings');
-      // } else {
-      //   setValidationError('');
-      // }
-
+  
+      // Calculate net salary
+      const netPay = totalEarningsIncludingAddedFields - totalDeductions - totalTax;
+  
       if (netPay < 0) {
         setNetPayError("Net Pay cannot be Negative.");
       } else {
         setNetPayError("");
       }
-
+  
+      // Update state with totals
       setTotals({
         totalEarnings: totalEarningsIncludingAddedFields,
         totalDeductions,
         totalTax,
         netPay,
+        updatedAllowances,  // Add updated allowances here
       });
     }
   }, [payslipData, allowanceFields, deductionFields, taxFields]);
+  
 
   validationError && (
     <div style={{ color: "red", margin: "10px 0" }}>{validationError}</div>
@@ -302,13 +275,31 @@ const PayslipUpdate2 = () => {
       .trim();
   };
 
-  const handleAllowanceChange = (key, value) => {
+  const handleAllowanceChange = (key, newValue) => {
     setPayslipData((prevData) => {
+      const oldAllowances = prevData.salary.salaryConfigurationEntity.allowances || {};
+      const oldValue = oldAllowances[key] || 0;
+      const newValueNumber = parseInt(newValue) || 0;
+  
+      // Calculate the difference
+      const allowanceDifference = newValueNumber - oldValue;
+  
+      // Update the changed allowance
       const newAllowances = {
-        ...prevData.salary.salaryConfigurationEntity.allowances,
-        [key]: value,
+        ...oldAllowances,
+        [key]: newValueNumber,
       };
-
+  
+      // Adjust "Other Allowances" based on the difference
+      let otherAllowance = Number(newAllowances["Other Allowances"]) || 0;
+      otherAllowance -= allowanceDifference; // Borrow or add the difference
+  
+      // Ensure "Other Allowances" doesn't go negative
+      if (otherAllowance < 0) otherAllowance = 0;
+  
+      // Update the "Other Allowances" field
+      newAllowances["Other Allowances"] = otherAllowance.toString();
+  
       return {
         ...prevData,
         salary: {
@@ -320,7 +311,7 @@ const PayslipUpdate2 = () => {
         },
       };
     });
-  };
+  };   
 
   const handleDeductionChange = (key, value) => {
     setPayslipData((prevData) => {
@@ -439,9 +430,7 @@ const PayslipUpdate2 = () => {
     setInputValue("");
     setShowModal(false);
   };
-
-  const otherAllowanceKey = "otherAllowances";
-
+  
   return (
     <LayOut>
       <div className="container mt-4">
@@ -931,96 +920,18 @@ const PayslipUpdate2 = () => {
                     </p>
                   </div>
                   <ul
-                      style={{
-                        listStyleType: "none",
-                        padding: 0,
-                        marginBottom: "2px",
-                      }}
-                    >
-                      {/* Render other allowances */}
-                      {Object.entries(
-                        payslipData.salary?.salaryConfigurationEntity
-                          ?.allowances || {}
-                      ).map(
-                        ([key, value]) =>
-                          key !== otherAllowanceKey && ( // Do not display 'otherAllowance' here
-                            <li
-                              key={key}
-                              style={{
-                                display: "flex",
-                                padding: "4px 8px",
-                                alignItems: "center",
-                              }}
-                            >
-                              <span style={{ flex: 1, color: "black" }}>
-                                {formatFieldName(key)}
-                              </span>
-                              <input
-                                type="text"
-                                value={Math.floor(value) || ""} // Ensure empty value for zero
-                                onChange={(e) => {
-                                  const newValue = e.target.value.replace(
-                                    /[^0-9]/g,
-                                    ""
-                                  ); // Allow only numbers
-                                  if (newValue.length <= 6 || newValue === "") {
-                                    // Allow empty input
-                                    const oldValue = Math.floor(value); // Get the old value of the allowance
-                                    const adjustment =
-                                      newValue === ""
-                                        ? -oldValue
-                                        : parseInt(newValue) - oldValue; // If empty, adjust by the full old value
-
-                                    handleAllowanceChange(key, newValue || 0); // Update the specific allowance with a fallback to 0 if empty
-
-                                    if (key !== otherAllowanceKey) {
-                                      // Get the current value of otherAllowance
-                                      const currentOtherAllowance = Math.floor(
-                                        payslipData.salary
-                                          .salaryConfigurationEntity.allowances[
-                                          otherAllowanceKey
-                                        ] || 0
-                                      );
-
-                                      // Calculate the new otherAllowance value
-                                      const newOtherAllowance =
-                                        currentOtherAllowance - adjustment;
-
-                                      // Update otherAllowance with the new calculated value (negative allowed now)
-                                      handleAllowanceChange(
-                                        otherAllowanceKey,
-                                        newOtherAllowance
-                                      );
-
-                                      // If the new otherAllowance is negative, show an error
-                                      if (newOtherAllowance < 0) {
-                                        setErrorMessages((prev) => ({
-                                          ...prev,
-                                          otherAllowance:
-                                            "Other Allowance cannot be negative",
-                                        }));
-                                      } else {
-                                        setErrorMessages((prev) => ({
-                                          ...prev,
-                                          otherAllowance: "", // Clear the error if no negative value
-                                        }));
-                                      }
-                                    }
-                                  }
-                                }}
-                                style={{
-                                  width: "100px",
-                                  border: "none",
-                                  textAlign: "right",
-                                }}
-                              />
-                            </li>
-                          )
-                      )}
-
-                      {/* Render the 'Other Allowance' input */}
+                    style={{
+                      listStyleType: "none",
+                      padding: 0,
+                      marginBottom: "2px",
+                    }}
+                  >
+                    {Object.entries(
+                      payslipData.salary?.salaryConfigurationEntity
+                        ?.allowances || {}
+                    ).map(([key, value]) => (
                       <li
-                        key={otherAllowanceKey}
+                        key={key}
                         style={{
                           display: "flex",
                           padding: "4px 8px",
@@ -1028,66 +939,97 @@ const PayslipUpdate2 = () => {
                         }}
                       >
                         <span style={{ flex: 1, color: "black" }}>
-                          {formatFieldName(otherAllowanceKey)}
+                          {formatFieldName(key)}
                         </span>
                         <input
                           type="text"
-                          value={Math.floor(
-                            payslipData.salary.salaryConfigurationEntity
-                              .allowances[otherAllowanceKey] || 0
-                          )} // Display negative value as well
-                          disabled={true} // Disabled input since it's auto-calculated
+                          value={Math.floor(value)} // Display the value (round it if needed)
+                          onChange={(e) => {
+                            const newValue = e.target.value.replace(
+                              /[^0-9]/g,
+                              ""
+                            );
+                            if (newValue.length <= 6) {
+                              const oldValue = Math.floor(value);
+                              const adjustment = parseInt(newValue) - oldValue;
+
+                              // Handle change for the general allowance fields
+                              handleAllowanceChange(key, newValue);
+
+                              // If "Other Allowances" is modified, prevent further manual input
+                              if (key === "Other Allowances") {
+                                const updatedOtherAllowance = Math.max(
+                                  0,
+                                  parseInt(newValue)
+                                ); // Prevent negative values
+                                const updatedAllowances = {
+                                  ...payslipData.salary
+                                    .salaryConfigurationEntity.allowances,
+                                  "Other Allowances":
+                                    updatedOtherAllowance.toString(),
+                                };
+
+                                // Update "Other Allowances" in the state
+                                handleAllowanceChange(
+                                  "Other Allowances",
+                                  updatedAllowances
+                                );
+                              } else {
+                                // For other fields, handle normally
+                              }
+                            }
+                          }}
                           style={{
                             width: "100px",
                             border: "none",
                             textAlign: "right",
                           }}
+                         // readOnly={key === "Other Allowances"} // Make "Other Allowances" field read-only
                         />
                       </li>
-
-                      {allowanceFields.map((field, index) => (
-                        <li
-                          key={`new-allowance-${field.label}-${index}`}
-                          style={{
-                            display: "flex",
-                            padding: "4px 8px",
-                            alignItems: "center",
-                          }}
-                        >
-                          <span style={{ flex: 1, color: "black" }}>
-                            {field.label}
-                          </span>
-                          <span style={{ marginRight: "15px", color: "black" }}>
-                            {field.value}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        padding: "4px 8px",
-                      }}
-                    >
-                      <span style={{ color: "black" }}>Total Earnings (A)</span>
-                      <span style={{ color: "black" }}>
-                        {Math.floor(totals.totalEarnings)}
-                      </span>
-                    </div>
-                    {errorMessages.otherAllowance && (
-                      <div
-                        className="error-message"
+                    ))}
+                    {allowanceFields.map((field, index) => (
+                      <li
+                        key={`new-allowance-${field.label}-${index}`}
                         style={{
-                          color: "red",
-                          marginBottom: "10px",
-                          textAlign: "center",
+                          display: "flex",
+                          padding: "4px 8px",
+                          alignItems: "center",
                         }}
                       >
-                        <b>{errorMessages.otherAllowance}</b>
-                      </div>
-                    )}
+                        <span style={{ flex: 1, color: "black" }}>
+                          {field.label}
+                        </span>
+                        <span style={{ marginRight: "15px", color: "black" }}>
+                          {field.value}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      padding: "4px 8px",
+                    }}
+                  >
+                    <span style={{ color: "black" }}>Total Earnings (A)</span>
+                    <span style={{ color: "black" }}>
+                      {Math.floor(totals.totalEarnings)}
+                    </span>
+                  </div>
+                  {errorMessages.otherAllowance && (
+                    <div
+                      className="error-message"
+                      style={{
+                        color: "red",
+                        marginBottom: "10px",
+                        textAlign: "center",
+                      }}
+                    >
+                      <b>{errorMessages.otherAllowance}</b>
+                    </div>
+                  )}
                   <button
                     type="button"
                     onClick={() => {
@@ -1215,7 +1157,7 @@ const PayslipUpdate2 = () => {
                   >
                     <span style={{ color: "black" }}>LOP</span>
                     <input
-                      type="number"
+                      type="text"
                       value={Math.floor(payslipData.salary.lop)}
                       onChange={(e) => {
                         const newValue = e.target.value.replace(/[^0-9]/g, "");
