@@ -591,7 +591,7 @@ const PayslipUpdate1 = () => {
                                         {allowanceFields.map((field, index) => (
                                             <li key={`new-allowance-${field.label}-${index}`} style={{ display: "flex", padding: "4px 8px", alignItems: "center" }}>
                                                 <span style={{ flex: 1, color: "black" }}>{field.label}</span>
-                                                <span style={{ marginRight: "15px", color: "black" }}>{field.value}</span>
+                                                <span style={{ color: "black" }}>{field.value}</span>
                                             </li>
                                         ))}
                                     </ul>
@@ -634,7 +634,7 @@ const PayslipUpdate1 = () => {
                                         {deductionFields.map((field, index) => (
                                             <li key={`new-deduction-${field.label}-${index}`} style={{ display: "flex", padding: "4px 8px", alignItems: "center" }}>
                                                 <span style={{ flex: 1, color: "black" }}>{field.label}</span>
-                                                <span style={{ marginRight: "15px", color: "black", marginRight: "15px" }}>{field.value}</span>
+                                                <span style={{ color: "black" }}>{field.value}</span>
                                             </li>
                                         ))}
                                     </ul>

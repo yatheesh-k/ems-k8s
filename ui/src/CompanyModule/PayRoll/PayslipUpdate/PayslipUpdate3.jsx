@@ -873,7 +873,7 @@ const PayslipUpdate3 = () => {
                           <span style={{ flex: 1, color: "black" }}>
                             {field.label}
                           </span>
-                          <span style={{ marginRight: "15px", color: "black" }}>
+                          <span style={{ color: "black" }}>
                             {field.value}
                           </span>
                         </li>
@@ -1012,9 +1012,7 @@ const PayslipUpdate3 = () => {
                           </span>
                           <span
                             style={{
-                              marginRight: "15px",
-                              color: "black",
-                              marginRight: "15px",
+                              color: "black"
                             }}
                           >
                             {field.value}
