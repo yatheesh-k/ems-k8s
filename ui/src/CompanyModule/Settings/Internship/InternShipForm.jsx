@@ -23,7 +23,7 @@ const InternShipForm = () => {
     control,
     formState: { errors },
     reset,
-  } = useForm();
+  } = useForm({ mode: 'onChange' });
   const { user, companyData, logoFileName } = useAuth();
   const [emp, setEmp] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -260,14 +260,52 @@ const InternShipForm = () => {
       return false; // Return false if required dates are missing
     }
   };
-  const getCurrentDate = () => {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = (today.getMonth() + 1).toString().padStart(2, '0');
-    const dd = today.getDate().toString().padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
-  };  
 
+  const validateName = (value) => {
+    // Trim leading and trailing spaces before further validation
+    const trimmedValue = value.trim();
+
+    // Check if value is empty after trimming (meaning it only had spaces)
+    if (trimmedValue.length === 0) {
+      return "Field is Required.";
+    }
+
+    // Allow alphabetic characters, spaces, and numbers
+    else if (!/^[A-Za-z\s]+$/.test(trimmedValue)) {
+      return "Only Alphabetic Characters are Allowed.";
+    } else {
+      const words = trimmedValue.split(" ");
+
+      // Check for minimum and maximum word length, allowing one-character words at the end
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+
+        // If the word length is less than 3 and it's not the last word, show error
+        if (word.length < 3 && i !== words.length - 1) {
+          return "Minimum Length 3 Characters Required.";
+        }
+
+        // Check maximum word length
+        if (word.length > 100) {
+          return "Max Length 100 Characters Exceeded.";
+        }
+      }
+
+      // Check for trailing and leading spaces
+      if (/\s$/.test(value)) {
+        return "Spaces at the end are not allowed."; // Trailing space error
+      } else if (/^\s/.test(value)) {
+        return "No Leading Space Allowed."; // Leading space error
+      }
+
+      // Check if there are multiple spaces between words
+      else if (/\s{2,}/.test(trimmedValue)) {
+        return "No Multiple Spaces Between Words Allowed.";
+      }
+    }
+
+    return true; // Return true if all conditions are satisfied
+  };
   // Render loading message or template not available message
   if (!templateAvailable) {
     return (
@@ -330,28 +368,27 @@ const InternShipForm = () => {
                       <label className="form-label">Employee Name</label>
                       <input
                         type="text"
-                        onInput={toInputTitleCase}
                         className="form-control"
-                        name="employeeName"
+                        placeholder="Enter Employee Name"
+                        name="firstName"
+                        onInput={toInputTitleCase}
+                        minLength={2}
+                        autoComplete="off"
                         {...register("employeeName", {
                           required: "Employee Name is Required",
-                          pattern: {
-                            value: /^[A-Za-z ]+$/,
-                            message:
-                              "These fields accepts only Alphabetic Characters",
-                          },
                           minLength: {
                             value: 3,
                             message: "Minimum 3 Characters Required",
                           },
-                          maxLength: {
-                            value: 100,
-                            message: "Maximum 100 Characters Required",
+                          validate: {
+                            validateName,
                           },
                         })}
                       />
                       {errors.employeeName && (
-                        <p className="errorMsg">Employee Name Required</p>
+                        <p className="errorMsg">
+                          {errors.employeeName.message}
+                        </p>
                       )}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
@@ -413,25 +450,21 @@ const InternShipForm = () => {
                       <input
                         type="date"
                         className="form-control"
-                        placeholder="Date of Joining"
+                        placeholder="Resignation Date"
                         name="dateOfHiring"
-                        max={getCurrentDate()} // This restricts the date to today
-                        {...register("dateOfHiring", {
-                          required: "Date of Joining is required",
-                        })} // Required validation
+                        {...register("dateOfHiring", { required: true })}
                       />
                       {errors.dateOfHiring && (
                         <p className="errorMsg">Date of Joining Required</p>
                       )}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Date of Internship</label>
+                      <label className="form-label">Date of Intenrship</label>
                       <input
                         type="date"
                         className="form-control"
                         placeholder="Last Working Date"
                         name="lastWorkingDate"
-                        max={getCurrentDate()}
                         {...register("lastWorkingDate", { required: true })}
                         onBlur={(e) =>
                           validateDatePeriod(
@@ -441,7 +474,7 @@ const InternShipForm = () => {
                         } // Validate onBlur
                       />
                       {errors.lastWorkingDate && (
-                        <p className="errorMsg">Date of Internship Required</p>
+                        <p className="errorMsg">Date of Experience Required</p>
                       )}
                     </div>
                     <div className="col-12 d-flex align-items-start mt-5">
