@@ -55,7 +55,7 @@ const Reset = ({ companyName, onClose, show }) => {
         }
       } catch (error) {
         console.error("Error fetching employee data:", error);
-        toast.error("Error fetching employee data");
+        // toast.error("Error fetching employee data");
       }
     };
 
@@ -130,6 +130,13 @@ const Reset = ({ companyName, onClose, show }) => {
     }
   };
 
+  const handlePaste = (e) => {
+    const pastedText = e.clipboardData.getData('Text');
+    const sanitizedText = pastedText.replace(/[^A-Za-z0-9]/g, ''); // Keep only alphanumeric characters
+    e.preventDefault(); // Prevent the default paste action
+    e.target.value = sanitizedText; // Insert the sanitized text back into the input
+  };
+
   return (
     <Modal
       show={show}
@@ -166,6 +173,7 @@ const Reset = ({ companyName, onClose, show }) => {
                   placeholder="Enter your old password"
                   type={oldPasswordShown ? "text" : "password"}
                   onKeyDown={handleEmailChange}
+                  onPaste={handlePaste}
                   {...register("password", {
                     required: "Old Password is Required",
                     minLength: {
@@ -213,6 +221,7 @@ const Reset = ({ companyName, onClose, show }) => {
                   placeholder="Enter your new password"
                   type={newPasswordShown ? "text" : "password"}
                   onKeyDown={handleEmailChange}
+                  onPaste={handlePaste}
                   {...register("newPassword", {
                     required: "New Password is Required",
                     minLength: {
@@ -262,6 +271,7 @@ const Reset = ({ companyName, onClose, show }) => {
                   placeholder="Confirm your new password"
                   type={confirmPasswordShown ? "text" : "password"}
                   onKeyDown={handleEmailChange}
+                  onPaste={handlePaste}
                   {...register("confirmPassword", {
                     required: "Please confirm your password",
                     validate: (value) =>
