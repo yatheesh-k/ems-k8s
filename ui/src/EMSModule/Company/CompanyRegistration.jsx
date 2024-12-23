@@ -468,7 +468,7 @@ const CompanyRegistration = () => {
     }
   
     // Validate special characters and alphanumeric characters
-    const validCharsRegex = /^[A-Za-z0-9\s,.'\-/&@#$()*+!]*$/;
+    const validCharsRegex = /^[A-Za-z0-9\s,.'\-/&@#$()*+!:;]*$/;
     if (!validCharsRegex.test(value)) {
       return "Invalid characters used. Only alphabets, numbers, and special characters (, . ' - / & @ # $ ( ) *) are allowed.";
     }
@@ -640,7 +640,7 @@ const CompanyRegistration = () => {
                           },
                           maxLength: {
                             value: 200,
-                            message: "Maximum 2 Characters Required",
+                            message: "Maximum 200 Characters Required",
                           },
                         })}
                         disabled={editMode}
@@ -929,7 +929,7 @@ const CompanyRegistration = () => {
                           required: "Company Address is Required",
                           pattern: {
                             value:
-                              /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.+()^\-/]*$/,
+                              /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.+()^\-/:;]*$/,
                             message: "Please enter valid Address",
                           },
                           minLength: {
@@ -1125,7 +1125,7 @@ const CompanyRegistration = () => {
                           required: "Name is Required",
                           minLength: {
                             value: 3,
-                            message: "Minimun 3 characters Required",
+                            message: "Minimum 3 characters Required",
                           },
                           maxLength: {
                             value: 100,
@@ -1235,7 +1235,7 @@ const CompanyRegistration = () => {
                           required: "Address is Required",
                           pattern: {
                             value:
-                              /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.+()^\-/]*$/,
+                              /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.+()^\-/:;]*$/,
                             message: "Please enter valid Address",
                           },
                           minLength: {
