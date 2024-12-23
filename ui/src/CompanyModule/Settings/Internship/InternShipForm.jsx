@@ -23,11 +23,7 @@ const InternShipForm = () => {
     control,
     formState: { errors },
     reset,
-<<<<<<< HEAD
-  } = useForm();
-=======
   } = useForm({ mode: 'onChange' });
->>>>>>> main
   const { user, companyData, logoFileName } = useAuth();
   const [emp, setEmp] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -264,7 +260,6 @@ const InternShipForm = () => {
       return false; // Return false if required dates are missing
     }
   };
-<<<<<<< HEAD
   const getCurrentDate = () => {
     const today = new Date();
     const yyyy = today.getFullYear();
@@ -273,7 +268,6 @@ const InternShipForm = () => {
     return `${yyyy}-${mm}-${dd}`;
   };  
 
-=======
 
   const validateName = (value) => {
     // Trim leading and trailing spaces before further validation
@@ -320,7 +314,6 @@ const InternShipForm = () => {
 
     return true; // Return true if all conditions are satisfied
   };
->>>>>>> main
   // Render loading message or template not available message
   if (!templateAvailable) {
     return (
@@ -383,18 +376,6 @@ const InternShipForm = () => {
                       <label className="form-label">Employee Name</label>
                       <input
                         type="text"
-<<<<<<< HEAD
-                        onInput={toInputTitleCase}
-                        className="form-control"
-                        name="employeeName"
-                        {...register("employeeName", {
-                          required: "Employee Name is Required",
-                          pattern: {
-                            value: /^[A-Za-z ]+$/,
-                            message:
-                              "These fields accepts only Alphabetic Characters",
-                          },
-=======
                         className="form-control"
                         placeholder="Enter Employee Name"
                         name="firstName"
@@ -403,30 +384,23 @@ const InternShipForm = () => {
                         autoComplete="off"
                         {...register("employeeName", {
                           required: "Employee Name is Required",
->>>>>>> main
                           minLength: {
                             value: 3,
                             message: "Minimum 3 Characters Required",
                           },
-<<<<<<< HEAD
                           maxLength: {
                             value: 100,
                             message: "Maximum 100 Characters Required",
-=======
                           validate: {
                             validateName,
->>>>>>> main
                           },
+                        }
                         })}
                       />
                       {errors.employeeName && (
-<<<<<<< HEAD
-                        <p className="errorMsg">Employee Name Required</p>
-=======
                         <p className="errorMsg">
                           {errors.employeeName.message}
                         </p>
->>>>>>> main
                       )}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
