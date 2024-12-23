@@ -383,16 +383,6 @@ const PayslipUpdate1 = () => {
         input.setSelectionRange(cursorPosition, cursorPosition);
     };
 
-    const handleEmailChange = (e) => {
-        const value = e.target.value;
-        if (value.trim() !== '') {
-            return;
-        }
-        if (e.keyCode === 32) {
-            e.preventDefault();
-        }
-    };
-
     const handleCloseNewFieldModal = () => {
         setNewFieldName('');
         setShowModal(false);
@@ -420,7 +410,7 @@ const PayslipUpdate1 = () => {
         setShowModal(false);
     };
 
-    const otherAllowanceKey = 'otherAllowances';
+    const otherAllowanceKey = 'Other Allowances';
 
     const backForm=()=>{
         reset();
@@ -451,7 +441,7 @@ const PayslipUpdate1 = () => {
                         </div>
                     </div>
                     <div style={{ textAlign: "center", margin: "0px 25px" }}>
-                        <h3 style={{ marginBottom: "0px", borderLeft: "1px solid black", backgroundColor: "#ccc", color: "#ccc", height:"30px" }}></h3>
+                        {/* <h3 style={{ marginBottom: "0px", borderLeft: "1px solid black", backgroundColor: "#ccc", color: "#ccc", height:"30px" }}></h3> */}
                     </div>
                     <div className="card-body" style={{ padding: "0px 25px" }}>
                         <div style={{ display: "flex", justifyContent: "space-between", textAlign: "center", backgroundColor: "#9fc7df", paddingTop: "10px", borderLeft: "1px solid black", borderRight: "1px solid black" }}>

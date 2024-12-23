@@ -23,7 +23,11 @@ const InternShipForm = () => {
     control,
     formState: { errors },
     reset,
+<<<<<<< HEAD
+  } = useForm();
+=======
   } = useForm({ mode: 'onChange' });
+>>>>>>> main
   const { user, companyData, logoFileName } = useAuth();
   const [emp, setEmp] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -260,6 +264,16 @@ const InternShipForm = () => {
       return false; // Return false if required dates are missing
     }
   };
+<<<<<<< HEAD
+  const getCurrentDate = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = (today.getMonth() + 1).toString().padStart(2, '0');
+    const dd = today.getDate().toString().padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };  
+
+=======
 
   const validateName = (value) => {
     // Trim leading and trailing spaces before further validation
@@ -306,6 +320,7 @@ const InternShipForm = () => {
 
     return true; // Return true if all conditions are satisfied
   };
+>>>>>>> main
   // Render loading message or template not available message
   if (!templateAvailable) {
     return (
@@ -368,6 +383,18 @@ const InternShipForm = () => {
                       <label className="form-label">Employee Name</label>
                       <input
                         type="text"
+<<<<<<< HEAD
+                        onInput={toInputTitleCase}
+                        className="form-control"
+                        name="employeeName"
+                        {...register("employeeName", {
+                          required: "Employee Name is Required",
+                          pattern: {
+                            value: /^[A-Za-z ]+$/,
+                            message:
+                              "These fields accepts only Alphabetic Characters",
+                          },
+=======
                         className="form-control"
                         placeholder="Enter Employee Name"
                         name="firstName"
@@ -376,19 +403,30 @@ const InternShipForm = () => {
                         autoComplete="off"
                         {...register("employeeName", {
                           required: "Employee Name is Required",
+>>>>>>> main
                           minLength: {
                             value: 3,
                             message: "Minimum 3 Characters Required",
                           },
+<<<<<<< HEAD
+                          maxLength: {
+                            value: 100,
+                            message: "Maximum 100 Characters Required",
+=======
                           validate: {
                             validateName,
+>>>>>>> main
                           },
                         })}
                       />
                       {errors.employeeName && (
+<<<<<<< HEAD
+                        <p className="errorMsg">Employee Name Required</p>
+=======
                         <p className="errorMsg">
                           {errors.employeeName.message}
                         </p>
+>>>>>>> main
                       )}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
@@ -450,21 +488,25 @@ const InternShipForm = () => {
                       <input
                         type="date"
                         className="form-control"
-                        placeholder="Resignation Date"
+                        placeholder="Date of Joining"
                         name="dateOfHiring"
-                        {...register("dateOfHiring", { required: true })}
+                        max={getCurrentDate()} // This restricts the date to today
+                        {...register("dateOfHiring", {
+                          required: "Date of Joining is required",
+                        })} // Required validation
                       />
                       {errors.dateOfHiring && (
                         <p className="errorMsg">Date of Joining Required</p>
                       )}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">Date of Intenrship</label>
+                      <label className="form-label">Date of Internship</label>
                       <input
                         type="date"
                         className="form-control"
                         placeholder="Last Working Date"
                         name="lastWorkingDate"
+                        max={getCurrentDate()}
                         {...register("lastWorkingDate", { required: true })}
                         onBlur={(e) =>
                           validateDatePeriod(
@@ -474,7 +516,7 @@ const InternShipForm = () => {
                         } // Validate onBlur
                       />
                       {errors.lastWorkingDate && (
-                        <p className="errorMsg">Date of Experience Required</p>
+                        <p className="errorMsg">Date of Internship Required</p>
                       )}
                     </div>
                     <div className="col-12 d-flex align-items-start mt-5">
