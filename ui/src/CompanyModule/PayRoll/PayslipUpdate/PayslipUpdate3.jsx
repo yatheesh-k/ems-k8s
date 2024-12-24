@@ -294,12 +294,31 @@ const PayslipUpdate3 = () => {
       .trim();
   };
 
-  const handleAllowanceChange = (key, value) => {
+  const handleAllowanceChange = (key, newValue) => {
     setPayslipData((prevData) => {
+      const oldAllowances =
+        prevData.salary.salaryConfigurationEntity.allowances || {};
+      const oldValue = oldAllowances[key] || 0;
+      const newValueNumber = parseInt(newValue) || 0;
+
+      // Calculate the difference
+      const allowanceDifference = newValueNumber - oldValue;
+
+      // Update the changed allowance
       const newAllowances = {
-        ...prevData.salary.salaryConfigurationEntity.allowances,
-        [key]: value,
+        ...oldAllowances,
+        [key]: newValueNumber,
       };
+
+      // Adjust "Other Allowances" based on the difference
+      let otherAllowance = Number(newAllowances["Other Allowances"]);
+      otherAllowance -= allowanceDifference; // Borrow or add the difference
+
+      // Ensure "Other Allowances" doesn't go negative
+      //   if (otherAllowance < 0) otherAllowance = 0;
+
+      // Update the "Other Allowances" field
+      newAllowances["Other Allowances"] = otherAllowance.toString();
 
       return {
         ...prevData,
