@@ -148,5 +148,9 @@ public class Constants {
     public static final String CUSTOMER_ADD = "/customer";
     public static final String CUSTOMER = "/customer/";
     public static final String SALARY_ID = "salaryId";
+    public static final String BANK = "bank_details";
+    public static final String DUPLICATE_ACCOUNT_NUMBER = "Account Number";
     public static final String ALL = "/all";
+    public static final String ACCOUNTANT = "Accountant";
+    public static final String HR = "HR";
 }
