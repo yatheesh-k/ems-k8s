@@ -288,8 +288,6 @@ public class OpenSearchOperations {
         return subscriberEntities;
     }
 
-
-
     public List<EmployeeEntity> getCompanyEmployeeByData(String companyName, String empId, String emailId) throws EmployeeException {
         logger.debug("Getting the Resource by  , companyName{} empId,{},emailId {}", companyName, empId, emailId);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
@@ -352,8 +350,6 @@ public class OpenSearchOperations {
         return departmentEntities;
     }
 
-
-
     public List<CompanyEntity> getCompanies() throws EmployeeException {
         logger.debug("Getting all the companies ");
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
@@ -380,8 +376,6 @@ public class OpenSearchOperations {
         return companyEntities;
     }
 
-
-
     public SearchResponse<Object> searchByQuery(BoolQuery.Builder query, String index, Class targetClass) throws EmployeeException {
         SearchResponse searchResponse = null;
         try {
@@ -393,7 +387,6 @@ public class OpenSearchOperations {
         }
         return searchResponse;
     }
-
 
     public List<EmployeeEntity> getCompanyEmployees(String companyName) throws EmployeeException {
         logger.debug("Getting employees for company {}", companyName);
@@ -545,7 +538,6 @@ public class OpenSearchOperations {
         }
     }
 
-
     public List<AttendanceEntity> getAttendanceByMonthAndYear(String companyName, String employeeId, String month, String year) throws EmployeeException {
         logger.debug("Getting attendance for employee {} for month {} and year {}", employeeId, month, year);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
@@ -612,7 +604,6 @@ public class OpenSearchOperations {
         }
         return attendanceEntities;
     }
-
 
     public List<PayslipEntity> getAllPayslips(String companyName, String month, String year) throws EmployeeException{
         logger.debug("Getting payslips for  for month {} and year {}", month, year);
@@ -838,4 +829,18 @@ public class OpenSearchOperations {
             throw new IOException("Error updating employee status in OpenSearch", e);
         }
     }
+
+    public BankEntity getBankById(String index, String type,String resourceId) throws IOException {
+        if(type != null) {
+            resourceId = type+"_"+resourceId;
+        }
+        GetRequest getRequest = new GetRequest.Builder().id(resourceId)
+                .index(index).build();
+        GetResponse<BankEntity> searchResponse = esClient.get(getRequest, BankEntity.class);
+        if(searchResponse != null && searchResponse.source() != null){
+            return searchResponse.source();
+        }
+        return null;
+    }
+
 }
