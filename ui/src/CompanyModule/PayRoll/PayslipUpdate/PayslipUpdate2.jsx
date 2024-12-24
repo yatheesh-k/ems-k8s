@@ -291,11 +291,11 @@ const PayslipUpdate2 = () => {
       };
   
       // Adjust "Other Allowances" based on the difference
-      let otherAllowance = Number(newAllowances["Other Allowances"]) || 0;
+      let otherAllowance = Number(newAllowances["Other Allowances"]);
       otherAllowance -= allowanceDifference; // Borrow or add the difference
   
       // Ensure "Other Allowances" doesn't go negative
-      if (otherAllowance < 0) otherAllowance = 0;
+      // if (otherAllowance < 0) otherAllowance = 0;
   
       // Update the "Other Allowances" field
       newAllowances["Other Allowances"] = otherAllowance.toString();
