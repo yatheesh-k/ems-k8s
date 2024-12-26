@@ -532,7 +532,7 @@ const OfferLetterForm = () => {
                           },
                           pattern: {
                             value: /^[0-9]+$/,
-                            message: "These field accepcts only Integers",
+                            message: "These field Accepts Only Integers",
                           },
                         })}
                       />
