@@ -279,15 +279,6 @@ public class PayslipUtils {
                 deductions.put(entry.getKey(), maskValue(entry.getValue()));
             }
         }
-        if (payslipRequest.getDepartment() != null) {
-            department  = Base64.getEncoder().encodeToString((payslipRequest.getDepartment()).getBytes());
-            payslipRequest.setDepartment(department);
-
-        }
-        if (payslipRequest.getDesignation() != null) {
-            designation  = Base64.getEncoder().encodeToString((payslipRequest.getDesignation()).getBytes());
-            payslipRequest.setDesignation(designation);
-        }
 
         ObjectMapper objectMapper = new ObjectMapper();
         AttendanceEntity attendanceEntity = objectMapper.convertValue(attendance,AttendanceEntity.class);
@@ -398,14 +389,6 @@ public class PayslipUtils {
         if (payslipRequest.getSalary().getLop() != null) {
             lop = new String(Base64.getDecoder().decode(payslipRequest.getSalary().getLop()));
         }
-        if (payslipRequest.getDesignation() != null) {
-            designation = new String(Base64.getDecoder().decode(payslipRequest.getDesignation()));
-            payslipRequest.setDesignation(designation);
-        }
-        if (payslipRequest.getDesignation() != null) {
-            department = new String(Base64.getDecoder().decode(payslipRequest.getDepartment()));
-            payslipRequest.setDepartment(department);
-        }
 
         payslipRequest.getSalary().setFixedAmount(fix);
         payslipRequest.getSalary().setGrossAmount(gross);
@@ -424,6 +407,8 @@ public class PayslipUtils {
         payslipRequest.getAttendance().setTotalWorkingDays(totalWorkingDays);
         payslipRequest.getAttendance().setFirstName(firstName);
         payslipRequest.getAttendance().setLastName(lastName);
+        payslipRequest.getAttendance().setEmailId(email);
+        payslipRequest.getAttendance().setEmailId(email);
         payslipRequest.getAttendance().setEmailId(email);
         payslipRequest.setType(Constants.PAYSLIP);
 
