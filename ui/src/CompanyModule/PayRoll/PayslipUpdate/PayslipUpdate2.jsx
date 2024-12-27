@@ -459,7 +459,7 @@ const PayslipUpdate2 = () => {
     setShowModal(false);
   };
 
-  const isButtonDisabled = !!netPayError || !!otherAllowanceError;
+  const isButtonDisabled = !!netPayError;
 
   return (
     <LayOut>

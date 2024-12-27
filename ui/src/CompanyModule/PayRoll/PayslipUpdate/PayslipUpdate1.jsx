@@ -459,7 +459,7 @@ const PayslipUpdate1 = () => {
   };
 
   const otherAllowanceKey = "otherAllowances";
-  const isButtonDisabled = !!netPayError || !!otherAllowanceError;
+  const isButtonDisabled = !!netPayError;
 
   const backForm = () => {
     reset();
