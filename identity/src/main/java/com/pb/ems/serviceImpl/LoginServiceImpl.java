@@ -131,6 +131,9 @@ public class LoginServiceImpl implements LoginService {
                 } else if (Constants.HR.equalsIgnoreCase(department.getName())) {
                     roles.add(Constants.HR);
                 }
+                else {
+                    roles.add(Constants.EMPLOYEE);
+                }
             }
         }
         token = JwtTokenUtil.generateEmployeeToken(employee.getId(), roles, request.getCompany(), request.getUsername());
