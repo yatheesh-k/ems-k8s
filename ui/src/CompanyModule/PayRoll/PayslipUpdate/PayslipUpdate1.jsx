@@ -34,6 +34,7 @@ const PayslipUpdate1 = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [netPayError, setNetPayError] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [otherAllowanceError, setOtherAllowanceError] = useState("");
   const [totals, setTotals] = useState({
     totalEarnings: 0,
     totalDeductions: 0,
@@ -114,6 +115,7 @@ const PayslipUpdate1 = () => {
 
         const allowances =
           payslipData.salary.salaryConfigurationEntity.allowances || {};
+
         const updatedAllowances = {
           ...allowances,
           ...allowanceFields.reduce((acc, field) => {
@@ -122,24 +124,38 @@ const PayslipUpdate1 = () => {
           }, {}),
         };
 
-        // Recalculate 'Other Allowances' based on total allowances
-        const totalAllowances = Object.values(updatedAllowances).reduce(
-          (total, amount) => total + Number(amount || 0),
-          0
-        );
+        // Recalculate the total of all allowances except "Other Allowances"
+        const totalAllowances = Object.entries(updatedAllowances)
+          .filter(([key]) => key !== "Other Allowances")
+          .reduce((total, [, amount]) => total + (Number(amount) || 0), 0);
+
         const grossAmount = payslipData.salary.grossAmount || 0;
-        let otherAllowance = grossAmount / 12 - totalAllowances;
-        if (otherAllowance < 0) otherAllowance = 0; // Ensure it doesn't go negative
+        let updatedOtherAllowance = grossAmount / 12 - totalAllowances;
+        console.log("updatedOtherAllowance", updatedOtherAllowance);
 
-        updatedAllowances["Other Allowances"] = otherAllowance.toString();
+        if (updatedOtherAllowance < 0) {
+          setOtherAllowanceError("Other Allowance cannot be negative.");
+          console.log(
+            "Other Allowance cannot be negative.",
+            updatedOtherAllowance
+          );
 
+          return; // Stop the update process if the value is negative
+        } else {
+          setOtherAllowanceError(""); // Clear the error if the allowance is valid
+        }
+        // Update the "Other Allowances" in the allowances object
+        updatedAllowances["Other Allowances"] =
+          updatedOtherAllowance.toString();
+
+        // Create the payload to send to the server
         const payload = {
           companyName: user.company,
           salary: {
             ...payslipData.salary,
             salaryConfigurationEntity: {
               ...payslipData.salary.salaryConfigurationEntity,
-              allowances: updatedAllowances, // Updated allowances
+              allowances: updatedAllowances, // Pass updated allowances including the calculated "Other Allowance"
             },
             totalEarnings: totals.totalEarnings, // Latest total earnings
             totalDeductions: totals.totalDeductions, // Latest total deductions
@@ -149,6 +165,7 @@ const PayslipUpdate1 = () => {
           attendance: payslipData.attendance,
           month,
           year,
+          updatedOtherAllowance, // Include updatedOtherAllowance in the payload
         };
 
         console.log("Payload being sent:", payload);
@@ -305,7 +322,7 @@ const PayslipUpdate1 = () => {
       otherAllowance -= allowanceDifference; // Borrow or add the difference
 
       // Ensure "Other Allowances" doesn't go negative
-    //   if (otherAllowance < 0) otherAllowance = 0;
+      //   if (otherAllowance < 0) otherAllowance = 0;
 
       // Update the "Other Allowances" field
       newAllowances["Other Allowances"] = otherAllowance.toString();
@@ -442,6 +459,7 @@ const PayslipUpdate1 = () => {
   };
 
   const otherAllowanceKey = "otherAllowances";
+  const isButtonDisabled = !!netPayError;
 
   const backForm = () => {
     reset();
@@ -985,7 +1003,7 @@ const PayslipUpdate1 = () => {
                             border: "none",
                             textAlign: "right",
                           }}
-                          // readOnly={key === "Other Allowances"} // Make "Other Allowances" field read-only
+                          readOnly={key === "Other Allowances"} // Make "Other Allowances" field read-only
                         />
                       </li>
                     ))}
@@ -1017,16 +1035,15 @@ const PayslipUpdate1 = () => {
                       {Math.floor(totals.totalEarnings)}
                     </span>
                   </div>
-                  {errorMessages.otherAllowance && (
+                  {otherAllowanceError && (
                     <div
-                      className="error-message"
                       style={{
                         color: "red",
-                        marginBottom: "10px",
-                        textAlign: "center",
+                        marginTop: "5px",
+                        marginLeft: "10px",
                       }}
                     >
-                      <b>{errorMessages.otherAllowance}</b>
+                      {otherAllowanceError}
                     </div>
                   )}
                   <button
@@ -1507,11 +1524,11 @@ const PayslipUpdate1 = () => {
           Back
         </button>
         <button
-          type="button"
           className="btn btn-primary"
           onClick={handleUpdate}
+          disabled={isButtonDisabled}
         >
-          <span className="m-2">Generate Payslip</span>
+          Generate Payslip
         </button>
       </div>
     </LayOut>
