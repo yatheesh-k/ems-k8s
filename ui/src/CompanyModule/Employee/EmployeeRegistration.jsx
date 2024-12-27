@@ -424,14 +424,14 @@ const EmployeeRegistration = () => {
     const selectedDateOfHiring = new Date(dateOfHiring); // Ensure this is a Date object
     // Calculate limits
     const minDateOfBirth = new Date(selectedDateOfHiring);
-    minDateOfBirth.setFullYear(selectedDateOfHiring.getFullYear() - 21); // 21 years ago from date of hiring
+    minDateOfBirth.setFullYear(selectedDateOfHiring.getFullYear() - 15); // 21 years ago from date of hiring
 
     const maxDateOfBirth = new Date(selectedDateOfHiring);
     maxDateOfBirth.setFullYear(selectedDateOfHiring.getFullYear() - 80); // 80 years ago from date of hiring
 
     // Validate against the limits
     if (selectedDateOfBirth > minDateOfBirth) {
-      return "Date of Birth must be at least 21 years before the Date of Joining.";
+      return "Date of Birth must be at least 15 years before the Date of Joining.";
     }
     if (selectedDateOfBirth < maxDateOfBirth) {
       return "Date of Birth must not exceed 80 years before the Date of Joining.";
