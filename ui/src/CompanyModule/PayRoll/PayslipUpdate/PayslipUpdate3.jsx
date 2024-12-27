@@ -488,7 +488,7 @@ const PayslipUpdate3 = () => {
   };
 
   const otherAllowanceKey = "otherAllowances";
-  const isButtonDisabled = !!netPayError || !!otherAllowanceError;
+  const isButtonDisabled = !!netPayError;
 
   return (
     <LayOut>
