@@ -33,8 +33,8 @@ const PayslipUpdate3 = () => {
   const [modalType, setModalType] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [netPayError, setNetPayError] = useState("");
-  const [showModal, setShowModal] = useState(false);
   const [otherAllowanceError, setOtherAllowanceError] = useState("");
+  const [showModal, setShowModal] = useState(false);
   const [totals, setTotals] = useState({
     totalEarnings: 0,
     totalDeductions: 0,
@@ -85,6 +85,8 @@ const PayslipUpdate3 = () => {
         month,
         year,
       };
+      console.log("data", payload);
+      console.log("salaryId", salaryId);
       const response = await EmployeePayslipResponse(salaryId, payload);
       const generatedPayslips = response.data?.data?.generatePayslip || [];
       if (generatedPayslips.length) {
@@ -131,6 +133,18 @@ const PayslipUpdate3 = () => {
         const grossAmount = payslipData.salary.grossAmount || 0;
         let updatedOtherAllowance = grossAmount / 12 - totalAllowances;
         console.log("updatedOtherAllowance", updatedOtherAllowance);
+
+        if (updatedOtherAllowance < 0) {
+          setOtherAllowanceError("Other Allowance cannot be negative.");
+          console.log(
+            "Other Allowance cannot be negative.",
+            updatedOtherAllowance
+          );
+
+          return; // Stop the update process if the value is negative
+        } else {
+          setOtherAllowanceError(""); // Clear the error if the allowance is valid
+        }
         // Update the "Other Allowances" in the allowances object
         updatedAllowances["Other Allowances"] =
           updatedOtherAllowance.toString();
@@ -225,16 +239,16 @@ const PayslipUpdate3 = () => {
       const grossAmount = payslipData.salary.grossAmount || 0;
       const otherAllowances = payslipData.salary.otherAllowances || 0;
       let otherAllowance = 0;
-        const updatedAllowances = {
-          ...allowances,
-          ...allowanceFields.reduce((acc, field) => {
-            acc[field.label] = Number(field.value);
-            return acc;
-          }, {}),
-        };
+      const updatedAllowances = {
+        ...allowances,
+        ...allowanceFields.reduce((acc, field) => {
+          acc[field.label] = Number(field.value);
+          return acc;
+        }, {}),
+      };
       const totalAllowances = Object.entries(updatedAllowances)
-      .filter(([key]) => key !== "Other Allowances")
-      .reduce((total, [, amount]) => total + (Number(amount) || 0), 0);
+        .filter(([key]) => key !== "Other Allowances")
+        .reduce((total, [, amount]) => total + (Number(amount) || 0), 0);
       let updatedOtherAllowance = grossAmount / 12 - totalAllowances;
       console.log("updatedOtherAllowance", updatedOtherAllowance);
 
@@ -288,11 +302,11 @@ const PayslipUpdate3 = () => {
 
   if (loading) {
     return (
-      <LayOut>
+      <Loader>
         <div className="text-center">
           <Loader />
         </div>
-      </LayOut>
+      </Loader>
     );
   }
 
@@ -466,35 +480,6 @@ const PayslipUpdate3 = () => {
     }
     setInputValue("");
     setShowModal(false);
-  };
-
-  const updateOtherAllowance = () => {
-    // Calculate the total earnings by summing up all allowances excluding 'otherAllowance'
-    const totalEarnings = Object.entries(
-      payslipData.salary.salaryConfigurationEntity.allowances || {}
-    ).reduce((sum, [key, value]) => {
-      if (key !== "otherAllowance") {
-        return sum + (Number(value) || 0);
-      }
-      return sum;
-    }, 0);
-
-    // Get the total deductions and taxes
-    const totalDeductions =
-      Object.values(
-        payslipData.salary.salaryConfigurationEntity.deductions || {}
-      ).reduce((sum, value) => sum + Number(value || 0), 0) +
-      Number(payslipData.salary.lop || 0); // Including Leave of Absence deductions
-
-    const totalTax =
-      Number(payslipData.salary.pfTax || 0) +
-      Number(payslipData.salary.incomeTax || 0);
-
-    // Calculate the new value for otherAllowance
-    const netAmount = totalEarnings - totalDeductions - totalTax;
-
-    // Set the new value of otherAllowance based on the netAmount
-    handleAllowanceChange("otherAllowance", netAmount);
   };
 
   const otherAllowanceKey = "otherAllowances";
