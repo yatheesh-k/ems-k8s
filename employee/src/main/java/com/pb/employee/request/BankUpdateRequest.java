@@ -12,22 +12,12 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BankRequest {
-
-    @Schema(example = "accountNo")
-    @Pattern(regexp = "^\\d{9,18}$", message = "{accountNo.format}")
-    @NotBlank(message = "{accountNo.notnull.message}")
-    private String accountNumber;
+public class BankUpdateRequest {
 
     @Schema(example = "accountType")
     @Size(min = 1, max = 35, message = "{accountType.notnull.message}")
     @Pattern(regexp = "^(?:[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*|[A-Z][a-z]*\\s[A-Z])$", message = "{accountType.message}")
     private String accountType;
-
-    @Schema(example = "bankName")
-    @Pattern(regexp =  "^(?:[A-Z]{2,}(?:\\s[A-Z][a-z]+)*|[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*|[A-Z]+(?:\\s[A-Z]+)*)$", message = "{bankName.format}")
-    @Size(min = 2, max = 100, message = "{bankName.size.message}")
-    private String bankName;
 
     @Schema(example = "branch")
     @Pattern(regexp =  "^(?:[A-Z]{2,}(?:\\s[A-Z][a-z]+)*|[A-Z][a-z]+(?:\\s[A-Z][a-z]+)*|[A-Z]+(?:\\s[A-Z]+)*)$", message = "{branch.format}")

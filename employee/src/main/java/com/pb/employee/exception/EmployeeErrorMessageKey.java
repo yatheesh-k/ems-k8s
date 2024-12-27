@@ -96,7 +96,10 @@ public enum EmployeeErrorMessageKey {
     EXPERIENCE_DATE_NOT_VALID("experience.not.valid"),
     INVALID_IMAGE("invalid.image"),
     EMPTY_LOGO("company.logo"),
-    BANK_ALREADY_EXISTS("bank.already.exists");
+    BANK_ALREADY_EXISTS("bank.already.exists"),
+    UNABLE_GET_BANK_DETAILS("unable.bank.details"),
+    INVALID_BANK_DETAILS("invalid.bank.details"),
+    UNABLE_DELETE_BANK_DETAILS("unable.delete.bank");
 
     private final String key;
 
