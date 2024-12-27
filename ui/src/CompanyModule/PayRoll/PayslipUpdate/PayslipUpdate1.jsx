@@ -203,12 +203,11 @@ const PayslipUpdate1 = () => {
     if (payslipData) {
       const allowances =
         payslipData.salary.salaryConfigurationEntity.allowances || {};
-
-      // Calculate total earnings including additional allowances
       const totalEarnings = Object.values(allowances).reduce(
         (total, amount) => total + Number(amount || 0),
         0
       );
+
       const additionalAllowancesTotal = allowanceFields.reduce(
         (total, field) => total + Number(field.value || 0),
         0
@@ -216,18 +215,6 @@ const PayslipUpdate1 = () => {
       const totalEarningsIncludingAddedFields =
         totalEarnings + additionalAllowancesTotal;
 
-      // Recalculate "Other Allowances" dynamically after other allowances are added/updated
-      const grossAmount = payslipData.salary.grossAmount || 0;
-      let otherAllowance = grossAmount / 12 - totalEarningsIncludingAddedFields;
-      otherAllowance = otherAllowance < 0 ? 0 : otherAllowance; // Ensure it doesn't go negative
-
-      // Update the allowances object with the newly calculated "Other Allowances"
-      const updatedAllowances = {
-        ...allowances,
-        "Other Allowances": otherAllowance.toString(),
-      };
-
-      // Recalculate total deductions and taxes
       const deductions =
         payslipData.salary.salaryConfigurationEntity.deductions || {};
       const totalDeductions =
@@ -248,10 +235,46 @@ const PayslipUpdate1 = () => {
         0
       );
       const totalTax = pfTax + incomeTax + additionalTaxTotal;
+      const grossAmount = payslipData.salary.grossAmount || 0;
+      const otherAllowances = payslipData.salary.otherAllowances || 0;
+      let otherAllowance = 0;
+        const updatedAllowances = {
+          ...allowances,
+          ...allowanceFields.reduce((acc, field) => {
+            acc[field.label] = Number(field.value);
+            return acc;
+          }, {}),
+        };
+      const totalAllowances = Object.entries(updatedAllowances)
+      .filter(([key]) => key !== "Other Allowances")
+      .reduce((total, [, amount]) => total + (Number(amount) || 0), 0);
+      let updatedOtherAllowance = grossAmount / 12 - totalAllowances;
+      console.log("updatedOtherAllowance", updatedOtherAllowance);
 
-      // Calculate net salary
+      if (otherAllowances) {
+        otherAllowance =
+          grossAmount / 12 - totalEarnings > 0
+            ? grossAmount / 12 - totalEarnings
+            : 0;
+      }
       const netPay =
         totalEarningsIncludingAddedFields - totalDeductions - totalTax;
+
+      // if (totalDeductions + totalTax > totalEarningsIncludingAddedFields) {
+      //   setValidationError('Total Deductions & Total Taxes and cannot exceed Total Earnings');
+      // } else {
+      //   setValidationError('');
+      // }
+
+      if (updatedOtherAllowance < 0) {
+        setOtherAllowanceError("Other Allowance cannot be negative.");
+        console.log(
+          "Other Allowance cannot be negative.",
+          updatedOtherAllowance
+        );
+      } else {
+        setOtherAllowanceError(""); // Clear the error if the allowance is valid
+      }
 
       if (netPay < 0) {
         setNetPayError("Net Pay cannot be Negative.");
@@ -259,13 +282,11 @@ const PayslipUpdate1 = () => {
         setNetPayError("");
       }
 
-      // Update state with totals
       setTotals({
         totalEarnings: totalEarningsIncludingAddedFields,
         totalDeductions,
         totalTax,
         netPay,
-        updatedAllowances, // Add updated allowances here
       });
     }
   }, [payslipData, allowanceFields, deductionFields, taxFields]);
