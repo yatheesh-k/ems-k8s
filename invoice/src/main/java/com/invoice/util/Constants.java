@@ -115,4 +115,14 @@ public class Constants {
     public static final String STRING = "String";
     public static final String BINARY = "binary";
     public static final String AUTHORIZATION = "Authorization";
+    public static final String DEFAULT = "default";
+    public static final String CUSTOMER = "customer";
+    public static final String INDEX_EMS = "ems";
+    public static final String RESOURCE_ID = "ResourceId";
+    public static final String SHORT_NAME = "shortName";
+    public static final String DEPARTMENT = "department";
+    public static final String DESIGNATION = "designation";
+    public static final String NAME = "name";
+
+
 }

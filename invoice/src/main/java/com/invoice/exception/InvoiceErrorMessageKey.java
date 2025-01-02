@@ -26,7 +26,6 @@ public enum InvoiceErrorMessageKey {
     QUOTATION_UPDATE_FAILED("quotation.update.failed"),
     ERROR_DELETING_COMPANY("error.deleting.company"),
     EMAIL_ALREADY_EXISTS("email.already.exists"),
-    MOBILE_ALREADY_EXISTS("mobile.already.exists"),
     GSTNO_ALREADY_EXISTS("GSTno.already.exists"),
     ERROR_CREATING_USER("Error.creating.user"),
     COMPANY_NAME_OR_EMAIL_EXISTS("company.name.or.email.exists"),
@@ -38,9 +37,11 @@ public enum InvoiceErrorMessageKey {
     ERROR_UPDATING_COMPANY("error.updating.company"),
     INVALID_COMPANY("invalid.company"),
     UNABLE_SAVE_COMPANY("Unable to save company"),
-    COMPANY_NOT_NULL("Company request can't be null"),
-    PRODUCT_NOT_NULL("Product request can't be null"),
-    CUSTOMER_NOT_NULL("Customer request can't be null");
+    INVALID_RESOURCE_TYPE("invalid.resource"),
+    CUSTOMER_ALREADY_EXISTS("customer.already.exists"),
+    UNABLE_TO_GET_CUSTOMER("unable.to.get.customer"),
+    UNABLE_TO_UPDATE_CUSTOMER("unable.to.update.customer"),
+    UNABLE_TO_DELETE_CUSTOMER("unable.to.delete.customer");
 
     private final String message;
 
