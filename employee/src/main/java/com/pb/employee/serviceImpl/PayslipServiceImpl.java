@@ -163,7 +163,7 @@ public class PayslipServiceImpl implements PayslipService {
                 }
 
                 // Generate payslip ID based on month, year, and employee ID
-                String paySlipId = ResourceIdUtils.generatePayslipId(payslipRequest.getMonth(), payslipRequest.getYear(), employee.getEmployeeId());
+                String paySlipId = ResourceIdUtils.generatePayslipId(payslipRequest.getMonth(), payslipRequest.getYear(), employee.getId());
 
                 // Check if payslip already exists for this employee
                 PayslipEntity existingPayslip = openSearchOperations.getPayslipById(paySlipId, null, index);
@@ -677,7 +677,7 @@ public class PayslipServiceImpl implements PayslipService {
                 }
 
                 // Generate payslip ID based on month, year, and employee ID
-                String paySlipId = ResourceIdUtils.generatePayslipId(payslipRequest.getMonth(), payslipRequest.getYear(), employee.getEmployeeId());
+                String paySlipId = ResourceIdUtils.generatePayslipId(payslipRequest.getMonth(), payslipRequest.getYear(), employee.getId());
 
                 // Check if payslip already exists for this employee
                 PayslipEntity payslipEntity = openSearchOperations.getPayslipById(paySlipId, null, index);
