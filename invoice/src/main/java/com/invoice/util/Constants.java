@@ -123,6 +123,5 @@ public class Constants {
     public static final String DEPARTMENT = "department";
     public static final String DESIGNATION = "designation";
     public static final String NAME = "name";
-
-
+    public static final String PRODUCT = "product";
 }

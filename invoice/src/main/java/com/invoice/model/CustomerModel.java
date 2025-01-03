@@ -33,6 +33,4 @@ public class CustomerModel {
     private String email;
     private String gstNo;
     private String status;
-
-
 }

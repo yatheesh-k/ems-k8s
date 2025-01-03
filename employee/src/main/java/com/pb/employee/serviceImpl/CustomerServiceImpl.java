@@ -19,27 +19,27 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public ResponseEntity<?> createCustomer(String companyId, CustomerRequest customerRequest, String authToken) {
-        return entityUtils.sendPostRequest(authToken,customerRequest, Constants.COMPANY_CUSTOMER + companyId + Constants.CUSTOMER);
+        return entityUtils.sendPostRequest(authToken,customerRequest, Constants.COMPANY_ADD + companyId + Constants.CUSTOMER);
     }
 
     @Override
     public ResponseEntity<?> getCompanyByIdCustomer(String companyId,String authToken) {
-        return  entityUtils.getRequest(authToken,Constants.COMPANY_CUSTOMER + companyId + Constants.CUSTOMER+Constants.ALL);
+        return  entityUtils.getRequest(authToken,Constants.COMPANY_ADD + companyId + Constants.CUSTOMER+Constants.ALL);
     }
 
     @Override
     public ResponseEntity<?> getCustomerById(String companyId,String customerId, String authToken) {
-        return  entityUtils.getRequest(authToken,Constants.COMPANY_CUSTOMER + companyId + Constants.CUSTOMER_GET + customerId);
+        return  entityUtils.getRequest(authToken,Constants.COMPANY_ADD + companyId + Constants.CUSTOMER_GET+ customerId);
     }
 
     @Override
     public ResponseEntity<?> updateCustomer(String authToken,String companyId,String customerId, CustomerUpdateRequest customerRequest) {
-        return entityUtils.sendPatchRequest(authToken,customerRequest, Constants.COMPANY_CUSTOMER + companyId + Constants.CUSTOMER_GET + customerId);
+        return entityUtils.sendPatchRequest(authToken,customerRequest, Constants.COMPANY_ADD + companyId + Constants.CUSTOMER_GET + customerId);
     }
 
     @Override
     public ResponseEntity<?> deleteCustomer(String authToken,String companyId, String customerId) {
-        return entityUtils.deleteRequest(authToken, Constants.COMPANY_CUSTOMER + companyId + Constants.CUSTOMER_GET + customerId);
+        return entityUtils.deleteRequest(authToken, Constants.COMPANY_ADD + companyId + Constants.CUSTOMER_GET + customerId);
 
     }
 

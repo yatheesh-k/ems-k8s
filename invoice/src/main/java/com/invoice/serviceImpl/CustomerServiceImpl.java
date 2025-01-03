@@ -35,8 +35,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     private OpenSearchOperations openSearchOperations;
-
-
+    
     @Override
     public ResponseEntity<?> createCustomer(String companyId, CustomerRequest customerRequest) throws InvoiceException, IOException {
         log.debug("Creating customer: {}", customerRequest);
@@ -76,7 +75,6 @@ public class CustomerServiceImpl implements CustomerService {
             throw new InvoiceException(InvoiceErrorMessageKey.ERROR_CREATING_CUSTOMER, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     @Override
     public ResponseEntity<?> getCustomers(String companyId) throws InvoiceException,IOException {

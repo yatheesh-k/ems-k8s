@@ -41,7 +41,9 @@ public enum InvoiceErrorMessageKey {
     CUSTOMER_ALREADY_EXISTS("customer.already.exists"),
     UNABLE_TO_GET_CUSTOMER("unable.to.get.customer"),
     UNABLE_TO_UPDATE_CUSTOMER("unable.to.update.customer"),
-    UNABLE_TO_DELETE_CUSTOMER("unable.to.delete.customer");
+    UNABLE_TO_DELETE_CUSTOMER("unable.to.delete.customer"),
+    PRODUCT_NOT_NULL("product.not.null"),
+    PRODUCT_ALREADY_EXISTS("product.already.exists");
 
     private final String message;
 

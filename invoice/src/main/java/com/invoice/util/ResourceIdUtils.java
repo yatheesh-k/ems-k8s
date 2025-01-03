@@ -1,14 +1,12 @@
 package com.invoice.util;
 
 import com.invoice.model.ResourceType;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-@Component
-@Service
-@Slf4j
 public class ResourceIdUtils {
+
+    public static String generateProductResourceId(String productName, String productCategory) {
+        return generateGlobalResourceId(ResourceType.PRODUCT, productName, productCategory);
+    }
 
     public static String generateCustomerResourceId(String email, String mobileNumber) {
         return generateGlobalResourceId(ResourceType.CUSTOMER, email,mobileNumber);
@@ -18,8 +16,8 @@ public class ResourceIdUtils {
         boolean isCaseSensitive = false;
         String prefix = Constants.DEFAULT + "-";
 
-        if (type == ResourceType.CUSTOMER) {
-            prefix = Constants.CUSTOMER + "-";
+        if (type == ResourceType.PRODUCT) {
+            prefix = Constants.PRODUCT + "-";
         }
 
         StringBuilder md5Input = new StringBuilder();
@@ -42,7 +40,4 @@ public class ResourceIdUtils {
         }
         return prefix + md5Hash;
     }
-
-
-
 }
