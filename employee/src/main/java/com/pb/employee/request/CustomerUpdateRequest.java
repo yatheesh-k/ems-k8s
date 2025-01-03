@@ -1,8 +1,9 @@
-package com.invoice.request;
+package com.pb.employee.request;
 
 import io.micrometer.common.lang.Nullable;
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Getter
@@ -10,19 +11,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerRequest {
+public class CustomerUpdateRequest {
 
-    @NotBlank(message = "{customerName.notnull.message}")
-    @Size(min = 2, max = 100, message = "{customerName.size.message}")
-    private String customerName;
-
-    @NotBlank(message = "{email.notnull.message}")
-    @Email(message = "{email.message}")
-    private String email;
-
-    @NotBlank(message = "{mobileNumber.notnull.message}")
-    @Pattern(regexp = "^(\\+\\d{1,3}[- ]?)?\\d{10,15}$", message = "{mobileNumber.format}")
-    private String mobileNumber;
 
     @NotBlank(message = "{address.notnull.message}")
     @Size(max = 255, message = "{address.size.message}")
