@@ -572,3 +572,116 @@ export const AppraisalLetterDownload = async (payload) => {
     throw error; // Re-throw for handling by calling code
   }
 };
+export const CustomerGetApi = async () => {
+  return axiosInstance.get("/customer/all");
+};
+
+export const CustomerPostApi = (data) => {
+  return axiosInstance.post('/customer', data);
+}
+
+export const CustomerGetApiById = (customerId) => {
+  return axiosInstance.get(`/customer/${customerId}`)
+}
+
+// export const CustomerDeleteApiById = (customerId) => {
+//   const company = localStorage.getItem("companyName")
+//   return axiosInstance.delete(`/customer/${customerId}`)
+//       .then(response => {
+//           return response.data;
+//       })
+//       .catch(error => {
+//           console.error('Error fetching company by ID:', error);
+//           throw error;
+//       });
+// }
+
+export const CustomerPatchApiById = (customerId, data) => {
+  return axiosInstance.patch(`/customer/${customerId}`, data)
+};
+export const ProductsGetApi = async () => {
+  return axiosInstance.get("/product/all");
+};
+
+export const ProductPostApi = (data) => {
+  return axiosInstance.post('/product', data, {
+      headers: {
+          'Content-Type': 'application/json',
+      }
+  });
+}
+
+export const ProductGetApiById = (productId) => {
+  return axiosInstance.get(`/product/${productId}`)
+}
+
+export const ProductDeleteApiById = (productId) => {
+  return axiosInstance.delete(`/product/${productId}`)
+}
+
+export const ProductPutApiById = (productId, data) => {
+  return axiosInstance.patch(`/product/${productId}`, data)
+};
+export const InvoiceGetApi = () => {
+  return axiosInstance.get(`/invoice/all`);
+}
+
+export const InvoicePostApi = (data) => {
+  return axiosInstance.post('/invoice', data, {
+      headers: {
+          'Content-Type': 'application/json',
+      }
+  });
+}
+
+export const InvoiceGetApiById = (invoiceId) => {
+  return axiosInstance.get(`/invoice/${invoiceId}`)
+}
+
+export const InvoiceDeleteApiById = (invoiceId) => {
+  const company = localStorage.getItem("companyName")
+  return axiosInstance.delete(`/invoice/${invoiceId}`)
+      .then(response => {
+          return response.data;
+      })
+      .catch(error => {
+          console.error('Error fetching company by ID:', error);
+          throw error;
+      });
+}
+
+export const InvoicePutApiById = (invoiceId, data) => {
+  return axiosInstance.patch(`/invoice/${invoiceId}`, data)
+};
+
+export const InvoiceDownloadApi = async (invoiceId, data) => {
+  try {
+      const response = await axiosInstance.get(`/invoice/${invoiceId}/generate`, {
+          params: data,
+          responseType: 'blob',
+          headers: {
+              'Accept': 'application/pdf',
+          }
+      });
+      if (response.status === 200 && response.data) {
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `invoice_${invoiceId}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+          return true;
+      } else {
+          console.error('Error: Invalid response or empty data');
+          return false;
+      }
+  } catch (error) {
+      console.error('Download error:', error.response || error.message || error);
+      return false; // Return false or handle the error as needed
+  }
+};
+
+
+
