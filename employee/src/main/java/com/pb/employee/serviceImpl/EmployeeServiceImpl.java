@@ -11,10 +11,8 @@ import com.pb.employee.persistance.model.*;
 import com.pb.employee.request.EmployeeRequest;
 import com.pb.employee.request.EmployeeUpdateRequest;
 import com.pb.employee.service.EmployeeService;
-import com.pb.employee.util.CompanyUtils;
-import com.pb.employee.util.Constants;
-import com.pb.employee.util.EmployeeUtils;
-import com.pb.employee.util.ResourceIdUtils;
+import com.pb.employee.util.*;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +24,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
@@ -35,9 +34,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     private ObjectMapper objectMapper;
     @Autowired
     private OpenSearchOperations openSearchOperations;
+    @Autowired
+    private EmailUtils emailUtils;
 
     @Override
-    public ResponseEntity<?> registerEmployee(EmployeeRequest employeeRequest) throws EmployeeException{
+    public ResponseEntity<?> registerEmployee(EmployeeRequest employeeRequest, HttpServletRequest request) throws EmployeeException{
         // Check if a company with the same short or company name already exists
         log.debug("validating name {} employee Id {} exsited ", employeeRequest.getLastName(), employeeRequest.getEmployeeId());
         String resourceId = ResourceIdUtils.generateEmployeeResourceId(employeeRequest.getEmailId());
@@ -95,6 +96,18 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_SAVE_EMPLOYEE),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        // Send the email with company details
+        CompletableFuture.runAsync(() -> {
+            try {
+                String companyUrl = EmailUtils.getBaseUrl(request)+employeeRequest.getCompanyName()+"/login" ;
+                log.info("The company url : "+companyUrl);// Example URL
+                emailUtils.sendRegistrationEmail(employeeRequest.getEmailId(), employeeRequest.getPassword(), companyUrl,Constants.EMPLOYEE);
+            } catch (Exception e) {
+                log.error("Error sending email to employee: {}", employeeRequest.getEmailId());
+                throw new RuntimeException(e);
+            }
+        });
+
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.CREATED);
 

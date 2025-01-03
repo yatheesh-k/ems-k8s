@@ -46,9 +46,6 @@ public class CompanyRequest {
     @Pattern(regexp = "^\\+91 [6-9]\\d{9}$", message = "{invalid.alternateNo}")
     private String alternateNo;
 
-    @Schema(example = "12ABCDE3456Z1")
-    @NotNull(message = "{gstNo.notnull.message}")
-    @Pattern(regexp = "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9]Z[0-9A-Z]$", message = "{invalid.gstNo}")
     private String gstNo;
 
     @Schema(example = "panNo")

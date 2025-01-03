@@ -28,7 +28,8 @@ public class CompanyEntity implements Entity{
     private String mobileNo;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String alternateNo;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+
+    //gst is not mandatory field
     private String gstNo;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String panNo;

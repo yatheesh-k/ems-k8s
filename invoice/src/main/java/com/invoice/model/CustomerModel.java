@@ -34,3 +34,4 @@ public class CustomerModel {
     private String gstNo;
     private String status;
 }
+
