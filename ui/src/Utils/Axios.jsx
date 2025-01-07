@@ -1,6 +1,5 @@
 import axios from "axios";
-import { useAuth } from "../Context/AuthContext";
-import { employeeId } from "./Auth";
+import { companyId, employeeId } from "./Auth";
 import { json } from "react-router-dom";
 
 const protocol = window.location.protocol;
@@ -11,11 +10,11 @@ const BASE_URL = `${protocol}//${hostname}:8092/ems`;
 const Login_URL = `${protocol}//${hostname}:9090/ems`;
 
 const token = localStorage.getItem("token");
-
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: {
     Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
   }
 });
 export const loginApi = (data) => {
@@ -572,33 +571,78 @@ export const AppraisalLetterDownload = async (payload) => {
     throw error; // Re-throw for handling by calling code
   }
 };
-export const CustomerGetApi = async () => {
-  return axiosInstance.get("/customer/all");
+
+// export const CustomerGetAllApi = () => {
+//   const company = localStorage.getItem("companyName");
+//   return axiosInstance.get(`/company/${companyId}/customer/all`)
+//     .then(response => response.data)
+//     .catch(error => {
+//       console.error('Error fetching all customers:', error);
+//       throw error;
+//     });
+// };
+
+export const CustomerGetAllApi = (companyId) => {
+  return axiosInstance.get(`/company/${companyId}/customer/all`);
+    // .then(response => response.data)
+    // console.log("Customer",response.data)
+    // .catch(error => {
+    //   console.error('Error fetching all customers:', error);
+    //   throw error;
+    // });
 };
 
-export const CustomerPostApi = (data) => {
-  return axiosInstance.post('/customer', data);
-}
 
-export const CustomerGetApiById = (customerId) => {
-  return axiosInstance.get(`/customer/${customerId}`)
-}
-
-// export const CustomerDeleteApiById = (customerId) => {
-//   const company = localStorage.getItem("companyName")
-//   return axiosInstance.delete(`/customer/${customerId}`)
-//       .then(response => {
-//           return response.data;
-//       })
-//       .catch(error => {
-//           console.error('Error fetching company by ID:', error);
-//           throw error;
-//       });
-// }
-
-export const CustomerPatchApiById = (customerId, data) => {
-  return axiosInstance.patch(`/customer/${customerId}`, data)
+export const CustomerPostApi = (companyId,data) => {
+  return axiosInstance.post(`/company/${companyId}/customer`, data)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error creating customer:', error);
+      throw error;
+    });
 };
+
+export const CustomerGetApiById = (companyId,customerId) => {
+  return axiosInstance.get(`/company/${companyId}/customer/${customerId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error fetching customer by ID:', error);
+      throw error;
+    });
+};
+
+export const CustomerDeleteApiById = (companyId,customerId) => {
+  return axiosInstance.delete(`/company/${companyId}/customer/${customerId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error deleting customer by ID:', error);
+      throw error;
+    });
+};
+
+// export const CustomerPutApiById = (customerId, data) => {
+//   const company = localStorage.getItem("companyName");
+//   return axiosInstance.patch(`/company/${companyId}/customer/${customerId}`, data)
+//     .then(response => response.data)
+//     .catch(error => {
+//       console.error('Error updating customer by ID:', error);
+//       throw error;
+//     });
+// };
+
+export const CustomerPutApiById = (companyId, customerId, data) => {
+  return axiosInstance.patch(`/company/${companyId}/customer/${customerId}`, data,{
+    headers:{
+      "Content-Type":'application/json'
+    }
+  })
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error updating customer by ID:', error);
+      throw error;
+    });
+};
+
 export const ProductsGetApi = async () => {
   return axiosInstance.get("/product/all");
 };
