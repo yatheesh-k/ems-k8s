@@ -76,7 +76,7 @@ public class ProductController {
                                            @RequestHeader(Constants.AUTH_KEY) String authToken,
                                            @Parameter(required = true, description = "${api.deleteCompanyPayload.description}")
                                            @PathVariable String companyId,
-                                           @Parameter(required = true, description = "${api.getProductPayload.description}")
+                                           @Parameter(required = true, description = "${api.deleteProductPayload.description}")
                                            @PathVariable String productId) {
         return productService.deleteProduct(authToken,companyId,productId);
     }

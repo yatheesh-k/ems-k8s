@@ -1,7 +1,6 @@
 package com.pb.employee.request;
 
 import io.micrometer.common.lang.Nullable;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -46,10 +45,11 @@ public class CustomerRequest {
     private String status;
 
     @Nullable
+    @Pattern(regexp = "^$|[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}[Z]{1}[A-Z0-9]{1}$",
+            message = "{gstNo.invalid}")
     private String gstNo;
 
     @Nullable
     private String stateCode;
 
 }
-
