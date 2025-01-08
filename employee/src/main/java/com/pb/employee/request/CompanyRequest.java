@@ -23,8 +23,8 @@ public class CompanyRequest {
     private String emailId;
 
     @Schema(example = "password")
-    @NotNull(message = "{password.notnull.message}")
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\\W)(?!.* ).{6,16}$", message = "{invalid.password}")
+   /* @NotNull(message = "{password.notnull.message}")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\\W)(?!.* ).{6,16}$", message = "{invalid.password}")*/
     private String password;
 
     @Schema(example = "companyAddress")

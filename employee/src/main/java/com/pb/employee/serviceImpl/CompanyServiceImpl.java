@@ -142,9 +142,9 @@ public class CompanyServiceImpl implements CompanyService {
         }
         CompletableFuture.runAsync(() -> {
             try {
-                String companyUrl =EmailUtils.getBaseUrl(request)+ companyRequest.getShortName()+"/login" ;
+                String companyUrl =EmailUtils.getBaseUrl(request)+ Constants.UPDATE_NEW_PASSWORD ;
                 log.info("The company url : "+companyUrl);// Example URL
-                emailUtils.sendRegistrationEmail(companyRequest.getEmailId(), companyRequest.getPassword(), companyUrl,Constants.EMPLOYEE_TYPE);
+                emailUtils.sendRegistrationEmail(companyRequest.getEmailId(),companyUrl,Constants.EMPLOYEE_TYPE);
             } catch (Exception e) {
                 log.error("Error sending email to company: {}", companyRequest.getEmailId());
                 throw new RuntimeException(e);
