@@ -77,9 +77,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             DesignationEntity designationEntity = null;
                 departmentEntity = openSearchOperations.getDepartmentById(employeeRequest.getDepartment(), null, index);
                 if (departmentEntity == null){
-                    return new ResponseEntity<>(
-                            ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_DEPARTMENT)))),
-                            HttpStatus.CONFLICT);
+
                 }
                 designationEntity = openSearchOperations.getDesignationById(employeeRequest.getDesignation(), null, index);
                 if (designationEntity == null){

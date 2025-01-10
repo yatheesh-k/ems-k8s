@@ -103,7 +103,8 @@ public enum EmployeeErrorMessageKey {
     UNABLE_SAVE_BACKGROUND_DETAILS("unable.save.background.details"),
     BACKGROUND_ALREADY_EXISTS("background.already.exists"),
     UNABLE_GET_BACKGROUND_DETAILS("unable.background.details"),
-    INVALID_BACKGROUND_DETAILS("invalid.background.details");
+    INVALID_BACKGROUND_DETAILS("invalid.background.details"),
+    INVALID_EMPLOYEE_TYPE("invalid.employee.type");
 
     private final String key;
 
