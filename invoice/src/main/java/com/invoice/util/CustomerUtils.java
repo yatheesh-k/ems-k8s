@@ -170,4 +170,12 @@ public class CustomerUtils {
         }
         objectMapper.updateValue(customerToUpdate, customerRequest);
     }
+
+    public static String encodeCustomerName(String encodedName) {
+        if (encodedName != null) {
+            return new String(Base64.getEncoder().encode(encodedName.getBytes()));
+        }
+        return null;
+    }
+
 }

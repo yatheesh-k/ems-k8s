@@ -58,11 +58,11 @@ public class ProductServiceImpl implements ProductService {
         try {
             String productId = ResourceIdUtils.generateProductResourceId(productRequest.getHsnNo(), companyId);
 
-            // Step 2: Fetch all customers for the given companyId
-            List<ProductModel> customers = repository.findByCompanyId(companyId); // Assuming you have a method to fetch all customers for a company
+            // Step 2: Fetch all products for the given companyId
+            List<ProductModel> products = repository.findByCompanyId(companyId); // Assuming you have a method to fetch all customers for a company
 
             // Step 3: Search for the customer with the provided customerId
-            Optional<ProductModel> productOptional = customers.stream()
+            Optional<ProductModel> productOptional = products.stream()
                     .filter(product -> product.getProductId().equals(productId)) // Filter the customer by ID
                     .findFirst();
 

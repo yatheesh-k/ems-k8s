@@ -11,8 +11,9 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 @Getter
 public enum ResourceType {
-    CUSTOMER("customer"),
-    PRODUCT("PRODUCT");
+    CUSTOMER("Customer"),
+    PRODUCT("Product"),
+    INVOICE("Invoice");
 
     private final String value;
     public String value() {return this.value;}

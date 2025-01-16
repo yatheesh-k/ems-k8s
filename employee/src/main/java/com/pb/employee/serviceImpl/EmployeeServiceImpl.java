@@ -77,9 +77,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             DesignationEntity designationEntity = null;
                 departmentEntity = openSearchOperations.getDepartmentById(employeeRequest.getDepartment(), null, index);
                 if (departmentEntity == null){
-                    return new ResponseEntity<>(
-                            ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_DEPARTMENT)))),
-                            HttpStatus.CONFLICT);
+
                 }
                 designationEntity = openSearchOperations.getDesignationById(employeeRequest.getDesignation(), null, index);
                 if (designationEntity == null){
@@ -99,9 +97,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         // Send the email with company details
         CompletableFuture.runAsync(() -> {
             try {
-                String companyUrl = EmailUtils.getBaseUrl(request)+employeeRequest.getCompanyName()+"/login" ;
+                String companyUrl = EmailUtils.getBaseUrl(request)+Constants.UPDATE_NEW_PASSWORD;
                 log.info("The company url : "+companyUrl);// Example URL
-                emailUtils.sendRegistrationEmail(employeeRequest.getEmailId(), employeeRequest.getPassword(), companyUrl,Constants.EMPLOYEE);
+                emailUtils.sendRegistrationEmail(employeeRequest.getEmailId(), companyUrl,Constants.EMPLOYEE);
             } catch (Exception e) {
                 log.error("Error sending email to employee: {}", employeeRequest.getEmailId());
                 throw new RuntimeException(e);

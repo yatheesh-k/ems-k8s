@@ -28,5 +28,7 @@ public class ProductModel {
     private String gst;
     private String unitCost;
     private String companyId;
-
+  
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderModel> orderModels;
 }

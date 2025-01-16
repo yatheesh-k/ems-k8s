@@ -21,7 +21,7 @@ public class EmailUtils {
     @Autowired
     public JavaMailSender javaMailSender;
 
-    public void sendRegistrationEmail(String emailId, String password, String url,String name) {
+    public void sendRegistrationEmail(String emailId, String url,String name) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(emailId);
         mailMessage.setSubject(subject);
@@ -29,7 +29,6 @@ public class EmailUtils {
         String mailText = text;
         // Replace placeholders in the mail text
         String formattedText = mailText.replace("{emailId}", emailId);
-        formattedText = formattedText.replace("{password}", password);  // Updated the formattedText here
         formattedText = formattedText.replace("{url}", url);  // Finally replace the URL
         formattedText = formattedText.replace("{name}", name);  // Finally replace the URL
 

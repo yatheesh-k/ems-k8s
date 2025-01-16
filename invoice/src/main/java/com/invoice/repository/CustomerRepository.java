@@ -13,4 +13,6 @@ import java.util.Optional;
 public interface CustomerRepository extends JpaRepository<CustomerModel, String> {
 
     List<CustomerModel> findByCompanyId(String companyId);
+
+    Optional<CustomerModel> findByCustomerNameAndCompanyId(String encodedCustomerName, String companyId);
 }
