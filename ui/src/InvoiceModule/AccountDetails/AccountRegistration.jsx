@@ -2,25 +2,99 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Slide, toast } from 'react-toastify';
-// import { CompanyRegistrationApi, companyUpdateByIdApi, companyViewByIdApi } from '../Axios';
-import { Eye, EyeSlash } from 'react-bootstrap-icons';
+import { useAuth } from '../../Context/AuthContext';
 import LayOut from '../../LayOut/LayOut';
 import Select from 'react-select'
+import { BankGetApiById, BankPostApi, BankPutApiById, } from '../../Utils/Axios';
+
 
 const AccountRegistartion = () => {
   const { register, handleSubmit, formState: { errors }, control, trigger, setValue, reset } = useForm();
-  const [fields, setFields] = useState([{ bankAccount: '', bankName: '', branchName: '', ifscCode: '', accountType: '' }]);
-  const [companyId, setCompanyId] = useState(null);
+
   const [isUpdating, setIsUpdating] = useState(false);
+  const { user } = useAuth();
+  console.log("user", user.companyId);
+  const companyId = user.companyId
   const [passwordShown, setPasswordShown] = useState(false);
+  const [update, setUpdate] = useState([]);
   const [errorMessage, setErrorMessage] = useState(""); // State for error message
   const navigate = useNavigate();
   const location = useLocation();
-  const fileInputRef = useRef(); // To reference the file input
 
-  const togglePasswordVisiblity = () => {
-    setPasswordShown(!passwordShown);
+  const onSubmit = (data) => {
+    const payload = {
+      accountNumber: data.accountNumber,
+      bankName: data.bankName,
+      branchName: data.branchName,
+      ifscCode: data.ifscCode,
+      accountType: data.accountType.value, // Extract the value of the accountType object
+    };
+
+    console.log('Flattened Payload:', payload); // Log the payload to verify its structure
+
+    if (location && location.state && location.state.bankId) {
+      // If updating, call the PUT API
+      BankPutApiById(companyId, location.state.bankId, payload)
+        .then((res) => {
+          const successMessage = res.data.message || 'Bank Account updated successfully';
+          toast.success(successMessage, {
+            position: 'top-right',
+            autoClose: 1000,
+          });
+          setUpdate(res.data.data);
+          navigate('/accountsView');
+        })
+        .catch((error) => {
+          console.error('Error updating bank:', error); // Log the error for debugging
+          const errorMsg = error.response?.data?.error?.message || error.message || 'Error updating bank';
+          toast.error(errorMsg, {
+            position: 'top-right',
+            autoClose: 1000,
+          });
+        });
+    } else {
+      // If adding new bank, call the POST API
+      BankPostApi(companyId, payload)
+        .then((response) => {
+          toast.success('Bank Account added successfully', {
+            position: 'top-right',
+            autoClose: 1000,
+          });
+          setUpdate((prevState) => [...prevState, response.data.data]);
+          navigate('/accountsView');
+        })
+        .catch((error) => {
+          console.error('Error adding bank account:', error); // Log the full error object
+          const errorMessage = error.response?.data?.error?.message || 'Error adding bank details';
+          toast.error(errorMessage, {
+            position: 'top-right',
+            autoClose: 1000,
+          });
+        });
+    }
   };
+
+  useEffect(() => {
+    console.log('Location state:', location.state);
+    console.log('companyId:', companyId);
+    if (location && location.state && location.state.bankId) {
+      const bankId = location.state.bankId;
+      console.log('bankId:', bankId);
+      BankGetApiById(companyId, bankId)
+        .then((response) => {
+          console.log('bank data:', response);
+          reset(response.data);
+          setIsUpdating(true);
+        })
+        .catch((error) => {
+          console.error('Error fetching data:', error.response || error);
+          if (error.response) {
+            console.error('API Error Response:', error.response.data);
+          }
+          toast.error('Error fetching Bank data.');
+        });
+    }
+  }, [location.state?.bankId, companyId, reset]);
 
   const validateField = (value, type) => {
     switch (type) {
@@ -52,12 +126,12 @@ const AccountRegistartion = () => {
   };
 
   // Custom validator to check trailing spaces
-const noTrailingSpaces = (value) => {
-  if (value.endsWith(' ')) {
-    return "Spaces are not allowed at the end";
-  }
-  return true; // Return true if the value is valid
-};
+  const noTrailingSpaces = (value) => {
+    if (value.endsWith(' ')) {
+      return "Spaces are not allowed at the end";
+    }
+    return true; // Return true if the value is valid
+  };
 
   const handleInputChange = (e, fieldName) => {
     // Get the input value, trim leading spaces and replace multiple spaces with a single space
@@ -72,10 +146,9 @@ const noTrailingSpaces = (value) => {
   };
 
   const clearForm = () => {
-    // Reset form to initial state with one set of empty fields
     reset();
-    setFields([{ bankAccount: '', bankName: '', branchName: '', ifscCode: '', accountType: '' }]);
   };
+
   const backForm = () => {
     reset();
     navigate("/accountsView");
@@ -87,17 +160,6 @@ const noTrailingSpaces = (value) => {
     { value: "Business", label: "Business" },
     { value: "Corporate", label: "Corporate" },
   ];
-  const addMoreFields = () => {
-    setFields([...fields, { bankAccount: '', bankName: '', branchName: '', ifscCode: '', accountType: '' }]);
-  };
-
-  // Function to remove a set of fields
-  const removeFields = (index) => {
-    if (fields.length > 1) {
-      setFields(fields.filter((_, i) => i !== index)); // Remove the specified index
-    }
-  };
-
 
   return (
     <LayOut>
@@ -135,162 +197,184 @@ const noTrailingSpaces = (value) => {
                 />
               </div>
               <div className="card-body">
-                <form onSubmit={handleSubmit()}>
-                  <div className="d-flex justify-content-end mb-3">
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={addMoreFields} // Add more fields when clicked
-                    >
-                      Add More
-                    </button>
-                  </div>
-
-                  {fields.map((field, index) => (
-                    <div className="row" key={index}>
-                      {/* Bank Account Field */}
-                      <div className="col-12 col-md-4 col-lg-4 mb-3">
-                        <label className="form-label">Bank Account<span style={{ color: "red" }}>*</span></label>
-                        <input type="text" className="form-control" placeholder="Enter Bank Account Number"
-                          {...register(`fields[${index}].bankAccount`, {
-                            required: "Bank Account Number is Required",
-                            minLength: {
-                              value: 9,
-                              message: 'Bank Account Number must be at least 9 characters long',
-                            },
-                            maxLength: {
-                              value: 18,
-                              message: 'Bank Account Number must be at most 18 characters long'
-                            },
-                          })}
-                          onChange={(e) => handleInputChange(e, `fields[${index}].bankAccount`)}
-                          onKeyPress={(e) => preventInvalidInput(e, 'numeric')}
-                        />
-                        {errors?.fields?.[index]?.bankAccount && (<p className="errorMsg">{errors.fields[index].bankAccount.message}</p>)}
-                      </div>
-
-                      {/* Bank Name Field */}
-                      <div className="col-12 col-md-4 col-lg-4 mb-3">
-                        <label className="form-label">Bank Name<span style={{ color: "red" }}>*</span></label>
-                        <input type="text" className="form-control" placeholder="Enter Bank Name"
-                          {...register(`fields[${index}].bankName`, {
-                            required: "Bank Name is Required",
-                            validate: noTrailingSpaces,
-                            minLength: {
-                              value: 3,
-                              message: "Bank Name must be at least 3 characters long"
-                            },
-                            maxLength: {
-                              value: 60,
-                              message: "Bank Name must not exceed 60 characters."
-                            }
-                          })}
-                          onChange={(e) => handleInputChange(e, `fields[${index}].bankName`)}
-                          onKeyPress={(e) => preventInvalidInput(e, 'alpha')}
-                        />
-                        {errors?.fields?.[index]?.bankName && (<p className="errorMsg">{errors.fields[index].bankName.message}</p>)}
-                      </div>
-                      {/* Branch Name Field */}
-                      <div className="col-12 col-md-4 col-lg-4 mb-3">
-                        <label className="form-label">
-                          Branch <span style={{ color: "red" }}>*</span>
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Enter Branch Name"
-                          {...register(`fields[${index}].branchName`, {
-                            required: "Branch Name is Required",
-                            validate: noTrailingSpaces,
-                            minLength: {
-                              value: 3,
-                              message: "Branch Name must be at least 3 characters long"
-                            },
-                            maxLength: {
-                              value: 60,
-                              message: "Branch Name must not exceed 60 characters."
-                            }
-                          })}
-                          onChange={(e) => handleInputChange(e, `fields[${index}].branchName`)}
-                          onKeyPress={(e) => preventInvalidInput(e, 'alpha')}
-                        />
-                        {errors?.fields?.[index]?.branchName && (
-                          <p className="errorMsg">{errors.fields[index].branchName.message}</p>
-                        )}
-                      </div>
-
-                      {/* IFSC Code Field */}
-                      <div className="col-12 col-md-4 col-lg-4 mb-3">
-                        <label className="form-label">
-                          IFSC Code <span style={{ color: "red" }}>*</span>
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Enter IFSC Code"
-                          {...register(`fields[${index}].ifscCode`, {
-                            required: "IFSC Code is Required",
-                            maxLength: {
-                              value: 11,
-                              message: 'IFSC Code must be 11 characters long',
-                            },
-                            validate: (value) => validateField(value, 'ifscCode')
-                          })}
-                          onChange={(e) => handleInputChange(e, `fields[${index}].ifscCode`)}
-                          onKeyPress={(e) => preventInvalidInput(e, 'alphaNumeric')}
-                          onInput={(e) => {
-                            e.target.value = e.target.value.toUpperCase(); // Convert to uppercase
-                          }}
-                        />
-                        {errors?.fields?.[index]?.ifscCode && (
-                          <p className="errorMsg">{errors.fields[index].ifscCode.message}</p>
-                        )}
-                      </div>
-
-                      {/* Account Type Field */}
-                      <div className="col-12 col-md-4 col-lg-4 mb-3">
-                        <label className="form-label">
-                          Account Type <span style={{ color: "red" }}>*</span>
-                        </label>
-                        <Controller
-                          name={`fields[${index}].accountType`}
-                          control={control}
-                          render={({ field }) => (
-                            <Select
-                              {...field}
-                              options={accountTypes}
-                              getOptionLabel={(e) => e.label}
-                              getOptionValue={(e) => e.value}
-                            />
-                          )}
-                        />
-                        {errors?.fields?.[index]?.accountType && (
-                          <p className="errorMsg">{errors.fields[index].accountType.message}</p>
-                        )}
-                      </div>
-
-                      {/* Remove Field Button */}
-                      {fields.length > 1 && (
-                        <div className="col-12 col-md-4 col-lg-4 mb-3">
-                          <button
-                            type="button"
-                            className="btn btn-danger mt-4"
-                            onClick={() => {
-                              removeFields(index); // Remove the current set of fields
-                              clearForm();
-                            }}
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      )}
-                      <hr />
-                    </div>
-                  ))}
-
-                  {/* Clear and Submit Buttons */}
+                <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="row">
-                    <div className="col-12 mt-4 d-flex justify-content-end" style={{ background: "none", marginBottom: "10px" }}>
+                    <div className="col-12 col-md-4 col-lg-4 mb-3">
+                      <label className="form-label">
+                        Bank Account<span style={{ color: "red" }}>*</span>
+                      </label>
+                      <input type="text"
+                        className="form-control"
+                        placeholder="Enter Bank Account Number"
+                        name="accountNumber"
+                        autoComplete="off"
+                        {...register("accountNumber", {
+                          required: "Bank Account Number is Required",
+                          minLength: {
+                            value: 9,
+                            message: 'Bank Account Number must be at least 9 characters long',
+                          },
+                          maxLength: {
+                            value: 18,
+                            message: 'Bank Account Number must be at most 18 characters long'
+                          },
+                        })}
+                        onChange={(e) => handleInputChange(e, "accountNumber")}
+                        onKeyPress={(e) => preventInvalidInput(e, 'numeric')}
+                      />
+                      {errors.accountNumber && (
+                        <p className="errorMsg">{errors.accountNumber.message}</p>
+                      )}
+                    </div>
+                    <div className="col-12 col-md-4 col-lg-4 mb-3">
+                      <label className="form-label">
+                        Bank Name <span style={{ color: "red" }}>*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter Bank Name"
+                        name="bankName"
+                        autoComplete="off"
+                        {...register("bankName", {
+                          required: "Bank Name is Required",
+                          validate: noTrailingSpaces,
+                          minLength: {
+                            value: 3,
+                            message: "Bank Name must be at least 3 characters long",
+                          },
+                          maxLength: {
+                            value: 60,
+                            message: "Bank Name must not exceed 60 characters.",
+                          },
+                        })}
+                        onChange={(e) => handleInputChange(e, "bankName")}
+                        onKeyPress={(e) => preventInvalidInput(e, 'alpha')}
+                      />
+                      {errors.bankName && (
+                        <p className="errorMsg">{errors.bankName.message}</p>
+                      )}
+                    </div>
+                    {/* Branch Name Field */}
+                    <div className="col-12 col-md-4 col-lg-4 mb-3">
+                      <label className="form-label">
+                        Branch Name <span style={{ color: "red" }}>*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter Branch Name"
+                        name="branchName"
+                        autoComplete="off"
+                        {...register("branchName", {
+                          required: "Branch Name is Required",
+                          validate: noTrailingSpaces,
+                          minLength: {
+                            value: 3,
+                            message: "Branch Name must be at least 3 characters long",
+                          },
+                          maxLength: {
+                            value: 60,
+                            message: "Branch Name must not exceed 60 characters.",
+                          },
+                        })}
+                        onChange={(e) => handleInputChange(e, "branchName")}
+                        onKeyPress={(e) => preventInvalidInput(e, 'alpha')}
+                      />
+                      {errors.branchName && (
+                        <p className="errorMsg">{errors.branchName.message}</p>
+                      )}
+                    </div>
+
+                    {/* IFSC Code Field */}
+                    <div className="col-12 col-md-4 col-lg-4 mb-3">
+                      <label className="form-label">
+                        IFSC Code <span style={{ color: "red" }}>*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter IFSC Code"
+                        name="ifscCode"
+                        autoComplete="off"
+                        {...register("ifscCode", {
+                          required: "IFSC Code is Required",
+                          maxLength: {
+                            value: 11,
+                            message: 'IFSC Code must be 11 characters long',
+                          },
+                          validate: (value) => validateField(value, 'ifscCode'),
+                        })}
+                        onChange={(e) => handleInputChange(e, "ifscCode")}
+                        onKeyPress={(e) => preventInvalidInput(e, 'alphaNumeric')}
+                        onInput={(e) => {
+                          e.target.value = e.target.value.toUpperCase(); // Convert to uppercase
+                        }}
+                      />
+                      {errors.ifscCode && (
+                        <p className="errorMsg">{errors.ifscCode.message}</p>
+                      )}
+                    </div>
+
+                    {/* Account Type Field */}
+                    <div className="col-12 col-md-4 col-lg-4 mb-3">
+                      <label className="form-label">
+                        Account Type <span style={{ color: "red" }}>*</span>
+                      </label>
+                      <Controller
+                        name="accountType"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            {...field}
+                            options={accountTypes}
+                            getOptionLabel={(e) => e.label}
+                            getOptionValue={(e) => e.value}
+                          />
+                        )}
+                      />
+                      {errors.accountType && (
+                        <p className="errorMsg">{errors.accountType.message}</p>
+                      )}
+                    </div>
+                    <div className="col-12 col-md-4 col-lg-4 mb-3">
+                      <label className="form-label">
+                        Address <span style={{ color: "red" }}>*</span>
+                      </label>
+                      <textarea
+                        name="address"
+                        placeholder="Enter Address"
+                        className="form-control"
+                        autoComplete="off"
+                        rows="4"
+                        {...register("address", {
+                          required: "Address is Required",
+                          validate: noTrailingSpaces,
+                          minLength: {
+                            value: 3,
+                            message: 'Address must be at least 3 characters long'
+                          },
+                          maxLength: {
+                            value: 250,
+                            message: 'Address must be at most 250 characters long'
+                          }
+                        })}
+                        onChange={(e) => handleInputChange(e, "address")}
+                        onKeyPress={(e) => preventInvalidInput(e, 'address')}
+                      />
+                       {errors.address && (
+                        <p className="errorMsg">{errors.address.message}</p>
+                      )}
+                    </div>
+                    {errorMessage && (
+                      <div className="alert alert-danger mt-4 text-center">
+                        {errorMessage}
+                      </div>
+                    )}
+                    <div
+                      className="col-12 mt-4  d-flex justify-content-end"
+                      style={{ background: "none" }}
+                    >
                       {!isUpdating ? (
                         <button
                           className="btn btn-secondary me-2"
@@ -308,12 +392,17 @@ const noTrailingSpaces = (value) => {
                           Back
                         </button>
                       )}
+
                       <button
-                        type="submit"
-                        className="btn btn-primary"
+                        className={
+                          isUpdating
+                            ? "btn btn-danger bt-lg"
+                            : "btn btn-primary btn-lg"
+                        }
                         style={{ marginRight: "85px" }}
+                        type="submit"
                       >
-                        Add AccountDetails
+                        {isUpdating ? "Update BankDetail" : "Add BankDetails"}{" "}
                       </button>
                     </div>
                   </div>

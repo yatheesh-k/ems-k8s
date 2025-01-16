@@ -572,16 +572,6 @@ export const AppraisalLetterDownload = async (payload) => {
   }
 };
 
-// export const CustomerGetAllApi = () => {
-//   const company = localStorage.getItem("companyName");
-//   return axiosInstance.get(`/company/${companyId}/customer/all`)
-//     .then(response => response.data)
-//     .catch(error => {
-//       console.error('Error fetching all customers:', error);
-//       throw error;
-//     });
-// };
-
 export const CustomerGetAllApi = (companyId) => {
   return axiosInstance.get(`/company/${companyId}/customer/all`);
     // .then(response => response.data)
@@ -639,6 +629,60 @@ export const CustomerPutApiById = (companyId, customerId, data) => {
     .then(response => response.data)
     .catch(error => {
       console.error('Error updating customer by ID:', error);
+      throw error;
+    });
+};
+
+// Bank Get All API
+export const BankGetAllApi = (companyId) => {
+  return axiosInstance.get(`/company/${companyId}/bank`)
+    // .then(response => response.data)
+    // .catch(error => {
+    //   console.error('Error fetching all banks:', error);
+    //   throw error;
+    // });
+};
+
+// Bank Post API (Create a new bank)
+export const BankPostApi = (companyId, data) => {
+  return axiosInstance.post(`/company/${companyId}/bank`, data)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error creating bank:', error);
+      throw error;
+    });
+};
+
+// Bank Get API by ID
+export const BankGetApiById = (companyId, bankId) => {
+  return axiosInstance.get(`/company/${companyId}/bank/${bankId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error fetching bank by ID:', error);
+      throw error;
+    });
+};
+
+// Bank Delete API by ID
+export const BankDeleteApiById = (companyId, bankId) => {
+  return axiosInstance.delete(`/company/${companyId}/bank/${bankId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error deleting bank by ID:', error);
+      throw error;
+    });
+};
+
+// Bank Patch API by ID (Update a bank)
+export const BankPutApiById = (companyId, bankId, data) => {
+  return axiosInstance.patch(`/company/${companyId}/bank/${bankId}`, data, {
+    headers: {
+      "Content-Type": 'application/json'
+    }
+  })
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error updating bank by ID:', error);
       throw error;
     });
 };

@@ -73,7 +73,7 @@ const CustomersRegistration = () => {
           const customerData = {
             ...response,
             status: { value: response.status, label: response.status }
-          };
+            };
           reset(response);
           setIsUpdating(true);
         })
