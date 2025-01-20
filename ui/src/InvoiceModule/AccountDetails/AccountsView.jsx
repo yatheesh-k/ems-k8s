@@ -3,48 +3,60 @@ import { PencilSquare, XSquareFill } from 'react-bootstrap-icons';
 import { useNavigate, Link } from 'react-router-dom';
 import DataTable from 'react-data-table-component';
 import { Slide, toast } from 'react-toastify';
-// import { useDispatch, useSelector } from 'react-redux';
-// import { fetchCustomers } from '../Redux/CustomerSlice';
 import LayOut from "../../LayOut/LayOut"; // Assuming LayOut is being reused for consistent styling
+import { fetchBanks, removeBankFromState } from '../../Redux/BankSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { BankDeleteApiById } from '../../Utils/Axios';
+import { useAuth } from '../../Context/AuthContext';
 
 
 const AccountsView = () => {
-    // const dispatch = useDispatch();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
-    // const { customers, loading, error } = useSelector(state => state.customers); // Access Redux state
+    const { banks , loading, error } = useSelector(state => state.banks);
     const [search, setSearch] = useState("");
     const [filteredData, setFilteredData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const { user } = useAuth();
+    const companyId = user.companyId;
 
-    // Fetch all customers on component mount
-    // useEffect(() => {
-    //     dispatch(fetchCustomers());
-    // }, [dispatch]);
+    useEffect(() => {
+        if (companyId) {
+            console.log("fetchBanks",fetchBanks);
+            dispatch(fetchBanks(companyId));
+        }
+    }, [dispatch, companyId]);
 
-    // Filter customers based on search term
-    // useEffect(() => {
-    //     if (customers && Array.isArray(customers)) {
-    //         const result = customers.filter((customer) =>
-    //             customer.customerName.toLowerCase().includes(search.toLowerCase())
-    //         );
-    //         setFilteredData(result);
-    //     } else {
-    //         setFilteredData([]);
-    //     }
-    // }, [search, customers]);
+    useEffect(() => {
+        console.log('Banks from Redux store:', banks);
+    }, [banks]);
 
-    const handleEdit = (customerId) => {
-        navigate(`/accountRegistration`, { state: { customerId } });
+    // Filter banks based on search term
+    useEffect(() => {
+        if (banks && Array.isArray(banks)) {
+            const result = banks.filter((bank) =>
+                bank.bankName.toLowerCase().includes(search.toLowerCase())
+            );
+            setFilteredData(result);
+        } else {
+            setFilteredData([]);
+        }
+    }, [search, banks]);
+
+    const handleEdit = (bankId) => {
+        navigate(`/accountRegistration`, { state: { bankId } });
+        console.log("bankId from bankView", bankId);
     };
 
-    const handleDelete = async (customerId) => {
+    const handleDelete = async (bankId) => {
         try {
+            console.log('Deleting customer with companyId:', companyId, 'and bankId:', bankId);
             // Make a DELETE request to the API with the given ID
-            // Assume `CustomerDeleteApiById` is an API call function imported
-            // const response = await CustomerDeleteApiById(customerId);
-            // dispatch(fetchCustomers()); // Refetch customers from the Redux store
-            toast.error('Customer deleted successfully', { // Show toast notification
+            const response = await BankDeleteApiById(companyId, bankId);
+            console.log('Delete response:', response);
+            dispatch(removeBankFromState(bankId)) // Refetch customers from the Redux store
+            toast.error('Bank deleted successfully', {
                 position: 'top-right',
                 transition: Slide,
                 hideProgressBar: true,
@@ -52,33 +64,44 @@ const AccountsView = () => {
                 autoClose: 1000, // Close the toast after 1 second
             });
         } catch (error) {
-            console.error(error.response);
+            console.error('Error in handleDelete:', error.response || error);
             if (error.response && error.response.data) {
                 console.error('Server Error Message:', error.response.data);
             }
         }
     };
 
+
     const columns = [
         {
-            name: "Bank Name",
-            selector: (row) => row.customerId,
-            width: "150px"
+            name: "Account Number",
+            selector: (row) => row.accountNumber,
+            width: "190px"
         },
         {
-            name: "Branch Name",
-            selector: (row) => row.customerName,
-            width: "250px"
+            name: "Bank Name",
+            selector: (row) => row.bankName,
+            width: "190px"
         },
         {
             name: "IFSC Code",
-            selector: (row) => row.state,
-            width: "150px"
+            selector: (row) => row.ifscCode,
+            width: "190px"
+        },
+        {
+            name: "Branch Name",
+            selector: (row) => row.branch,
+            width: "190px"
         },
         {
             name: "Account Type",
-            selector: (row) => row.phone,
-            width: "150px"
+            selector: (row) => row.accountType,
+            width: "190px"
+        },
+        {
+            name: "Address",
+            selector: (row) => row.address,
+            width: "190px"
         },
         {
             name: "Actions",
@@ -87,7 +110,7 @@ const AccountsView = () => {
                     <button
                         className="btn btn-sm"
                         style={{ backgroundColor: "transparent" }}
-                        onClick={() => handleEdit(row.customerId)}
+                        onClick={() => handleEdit(row.bankId)}
                         title="Edit"
                     >
                         <PencilSquare size={22} color='#2255a4' />
@@ -95,7 +118,7 @@ const AccountsView = () => {
                     <button
                         className="btn btn-sm"
                         style={{ backgroundColor: "transparent" }}
-                        onClick={() => handleDelete(row.customerId)}
+                        onClick={() => handleDelete(row.bankId)}
                         title="Delete"
                     >
                         <XSquareFill size={22} color='#da542e' />

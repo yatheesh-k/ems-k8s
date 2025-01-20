@@ -3,56 +3,71 @@ import { PencilSquare, XSquareFill } from 'react-bootstrap-icons';
 import { useNavigate, Link } from 'react-router-dom';
 import DataTable from 'react-data-table-component';
 import { Slide, toast } from 'react-toastify';
-// import { useDispatch, useSelector } from 'react-redux';
-// import { fetchCustomers } from '../Redux/CustomerSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchCustomers, } from '../../Redux/CustomerSlice'
 import LayOut from "../../LayOut/LayOut"; // Assuming LayOut is being reused for consistent styling
+import { CustomerDeleteApiById } from '../../Utils/Axios';
+import { useAuth } from '../../Context/AuthContext';
+import { removeCustomerFromState } from '../../Redux/CustomerSlice';
 
 
 const CustomersView = () => {
-    // const dispatch = useDispatch();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
-    // const { customers, loading, error } = useSelector(state => state.customers); // Access Redux state
+    const { customers, loading, error } = useSelector(state => state.customers); // Access Redux state
     const [search, setSearch] = useState("");
     const [filteredData, setFilteredData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const { user } = useAuth();
+    const companyId = user.companyId;
 
     // Fetch all customers on component mount
-    // useEffect(() => {
-    //     dispatch(fetchCustomers());
-    // }, [dispatch]);
+    useEffect(() => {
+        if (companyId) {
+            dispatch(fetchCustomers(companyId));
+        }
+    }, [dispatch, companyId]);
+
+    useEffect(() => {
+        console.log('Customers from Redux store:', customers);
+    }, [customers]);
 
     // Filter customers based on search term
-    // useEffect(() => {
-    //     if (customers && Array.isArray(customers)) {
-    //         const result = customers.filter((customer) =>
-    //             customer.customerName.toLowerCase().includes(search.toLowerCase())
-    //         );
-    //         setFilteredData(result);
-    //     } else {
-    //         setFilteredData([]);
-    //     }
-    // }, [search, customers]);
+    useEffect(() => {
+        if (customers && Array.isArray(customers)) {
+            const result = customers.filter((customer) =>
+                customer.customerName.toLowerCase().includes(search.toLowerCase())
+            );
+            setFilteredData(result);
+        } else {
+            setFilteredData([]);
+        }
+    }, [search, customers]);
 
     const handleEdit = (customerId) => {
-        navigate(`/CustomersRegistration`, { state: { customerId } });
+        navigate(`/customerRegistration`, { state: { customerId } });
+        console.log("customerId from CustomerView", customerId);
     };
 
     const handleDelete = async (customerId) => {
         try {
+            console.log('Deleting customer with companyId:', companyId, 'and customerId:', customerId);
             // Make a DELETE request to the API with the given ID
-            // Assume `CustomerDeleteApiById` is an API call function imported
-            // const response = await CustomerDeleteApiById(customerId);
-            // dispatch(fetchCustomers()); // Refetch customers from the Redux store
-            toast.error('Customer deleted successfully', { // Show toast notification
+            const response = await CustomerDeleteApiById(companyId, customerId);
+            console.log('Delete response:', response);
+            dispatch(removeCustomerFromState(customerId)) // Refetch customers from the Redux store
+            toast.error('Customer deleted successfully', {
                 position: 'top-right',
                 transition: Slide,
                 hideProgressBar: true,
                 theme: "colored",
                 autoClose: 1000, // Close the toast after 1 second
             });
+            // console.log(response);
+            // console.log(response.data.data);
         } catch (error) {
-            console.error(error.response);
+            console.error('Error in handleDelete:', error.response || error);
             if (error.response && error.response.data) {
                 console.error('Server Error Message:', error.response.data);
             }
@@ -61,29 +76,29 @@ const CustomersView = () => {
 
     const columns = [
         {
-            name: "Customer ID",
-            selector: (row) => row.customerId,
-            width: "150px"
-        },
-        {
             name: "Customer Name",
             selector: (row) => row.customerName,
-            width: "250px"
+            width: "170px"
         },
         {
-            name: "State",
-            selector: (row) => row.state,
-            width: "150px"
-        },
-        {
-            name: "Contact",
-            selector: (row) => row.phone,
-            width: "150px"
+            name: "Mobile Number",
+            selector: (row) => row.mobileNumber,
+            width: "170px"
         },
         {
             name: "Email",
             selector: (row) => row.email,
             width: "200px"
+        },
+        {
+            name: "State",
+            selector: (row) => row.state,
+            width: "170px"
+        },
+        {
+            name: "City",
+            selector: (row) => row.city,
+            width: "170px"
         },
         {
             name: "Actions",

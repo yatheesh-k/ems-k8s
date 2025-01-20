@@ -1,6 +1,5 @@
 import axios from "axios";
-import { useAuth } from "../Context/AuthContext";
-import { employeeId } from "./Auth";
+import { companyId, employeeId } from "./Auth";
 import { json } from "react-router-dom";
 
 const protocol = window.location.protocol;
@@ -11,11 +10,11 @@ const BASE_URL = `${protocol}//${hostname}:8092/ems`;
 const Login_URL = `${protocol}//${hostname}:9090/ems`;
 
 const token = localStorage.getItem("token");
-
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: {
     Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
   }
 });
 export const loginApi = (data) => {
@@ -572,56 +571,150 @@ export const AppraisalLetterDownload = async (payload) => {
     throw error; // Re-throw for handling by calling code
   }
 };
-export const CustomerGetApi = async () => {
-  return axiosInstance.get("/customer/all");
+
+export const CustomerGetAllApi = (companyId) => {
+  return axiosInstance.get(`/company/${companyId}/customer/all`);
 };
 
-export const CustomerPostApi = (data) => {
-  return axiosInstance.post('/customer', data);
-}
-
-export const CustomerGetApiById = (customerId) => {
-  return axiosInstance.get(`/customer/${customerId}`)
-}
-
-// export const CustomerDeleteApiById = (customerId) => {
-//   const company = localStorage.getItem("companyName")
-//   return axiosInstance.delete(`/customer/${customerId}`)
-//       .then(response => {
-//           return response.data;
-//       })
-//       .catch(error => {
-//           console.error('Error fetching company by ID:', error);
-//           throw error;
-//       });
-// }
-
-export const CustomerPatchApiById = (customerId, data) => {
-  return axiosInstance.patch(`/customer/${customerId}`, data)
-};
-export const ProductsGetApi = async () => {
-  return axiosInstance.get("/product/all");
+export const CustomerPostApi = (companyId,data) => {
+  return axiosInstance.post(`/company/${companyId}/customer`, data)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error creating customer:', error);
+      throw error;
+    });
 };
 
-export const ProductPostApi = (data) => {
-  return axiosInstance.post('/product', data, {
-      headers: {
-          'Content-Type': 'application/json',
-      }
-  });
-}
-
-export const ProductGetApiById = (productId) => {
-  return axiosInstance.get(`/product/${productId}`)
-}
-
-export const ProductDeleteApiById = (productId) => {
-  return axiosInstance.delete(`/product/${productId}`)
-}
-
-export const ProductPutApiById = (productId, data) => {
-  return axiosInstance.patch(`/product/${productId}`, data)
+export const CustomerGetApiById = (companyId,customerId) => {
+  return axiosInstance.get(`/company/${companyId}/customer/${customerId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error fetching customer by ID:', error);
+      throw error;
+    });
 };
+
+export const CustomerDeleteApiById = (companyId,customerId) => {
+  return axiosInstance.delete(`/company/${companyId}/customer/${customerId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error deleting customer by ID:', error);
+      throw error;
+    });
+};
+
+export const CustomerPutApiById = (companyId, customerId, data) => {
+  return axiosInstance.patch(`/company/${companyId}/customer/${customerId}`, data,{
+    headers:{
+      "Content-Type":'application/json'
+    }
+  })
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error updating customer by ID:', error);
+      throw error;
+    });
+};
+
+export const ProductGetAllApi = (companyId) => {
+  return axiosInstance.get(`/company/${companyId}/product/all`);
+};
+
+export const ProductPostApi = (companyId, data) => {
+  return axiosInstance.post(`/company/${companyId}/product`, data)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error creating product:', error);
+      throw error;
+    });
+};
+
+export const ProductGetApiById = (companyId, productId) => {
+  return axiosInstance.get(`/company/${companyId}/product/${productId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error fetching product by ID:', error);
+      throw error;
+    });
+};
+
+export const ProductDeleteApiById = (companyId, productId) => {
+  return axiosInstance.delete(`/company/${companyId}/product/${productId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error deleting product by ID:', error);
+      throw error;
+    });
+};
+
+export const ProductPutApiById = (companyId, productId, data) => {
+  return axiosInstance.patch(`/company/${companyId}/product/${productId}`, data, {
+    headers: {
+      "Content-Type": 'application/json'
+    }
+  })
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error updating product by ID:', error);
+      throw error;
+    });
+};
+
+
+// Bank Get All API
+export const BankGetAllApi = (companyId) => {
+  return axiosInstance.get(`/company/${companyId}/bank`)
+    // .then(response => response.data)
+    // .catch(error => {
+    //   console.error('Error fetching all banks:', error);
+    //   throw error;
+    // });
+};
+
+// Bank Post API (Create a new bank)
+export const BankPostApi = (companyId, data) => {
+  return axiosInstance.post(`/company/${companyId}/bank`, data)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error creating bank:', error);
+      throw error;
+    });
+};
+
+// Bank Get API by ID
+export const BankGetApiById = (companyId, bankId) => {
+  return axiosInstance.get(`/company/${companyId}/bank/${bankId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error fetching bank by ID:', error);
+      throw error;
+    });
+};
+
+// Bank Delete API by ID
+export const BankDeleteApiById = (companyId, bankId) => {
+  return axiosInstance.delete(`/company/${companyId}/bank/${bankId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error deleting bank by ID:', error);
+      throw error;
+    });
+};
+
+// Bank Patch API by ID (Update a bank)
+export const BankPutApiById = (companyId, bankId, data) => {
+  return axiosInstance.patch(`/company/${companyId}/bank/${bankId}`, data, {
+    headers: {
+      "Content-Type": 'application/json'
+    }
+  })
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error updating bank by ID:', error);
+      throw error;
+    });
+};
+
 export const InvoiceGetApi = () => {
   return axiosInstance.get(`/invoice/all`);
 }

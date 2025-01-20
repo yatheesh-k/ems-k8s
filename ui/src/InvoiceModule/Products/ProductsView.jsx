@@ -3,82 +3,97 @@ import { PencilSquare, XSquareFill } from 'react-bootstrap-icons';
 import { useNavigate, Link } from 'react-router-dom';
 import DataTable from 'react-data-table-component';
 import { Slide, toast } from 'react-toastify';
-// import { useDispatch, useSelector } from 'react-redux';
-// import { fetchProducts } from '../Redux/ProductSlice'; // Redux action for fetching products
+import { useSelector,useDispatch } from 'react-redux';
+import { fetchProducts } from '../../Redux/ProductSlice';
 import LayOut from "../../LayOut/LayOut"; // Assuming LayOut is being reused for consistent styling
+import { removeProductFromState } from '../../Redux/ProductSlice';
+import { ProductDeleteApiById } from '../../Utils/Axios';
+import { useAuth } from '../../Context/AuthContext';
 
 
 const ProductsView = () => {
-    // const dispatch = useDispatch();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
-    // const { products, loading, error } = useSelector(state => state.products); // Access Redux state
+    const {products, loading, error} = useSelector(state => state.products);
     const [search, setSearch] = useState("");
     const [filteredData, setFilteredData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const {user}=useAuth();
+    const companyId=user.companyId;
 
     // Fetch all products on component mount
-    // useEffect(() => {
-    //     dispatch(fetchProducts());
-    // }, [dispatch]);
-
-    // Filter products based on search term
-    // useEffect(() => {
-    //     if (products && Array.isArray(products)) {
-    //         const result = products.filter((product) =>
-    //             product.productName.toLowerCase().includes(search.toLowerCase())
-    //         );
-    //         setFilteredData(result);
-    //     } else {
-    //         setFilteredData([]);
-    //     }
-    // }, [search, products]);
-
-    const handleEdit = (productId) => {
-        navigate(`/productsRegistration`, { state: { productId } });
-    };
-
-    const handleDelete = async (productId) => {
-        try {
-            // Make a DELETE request to the API with the given ID
-            // const response = await ProductDeleteApiById(productId);
-            // dispatch(fetchProducts()); // Refetch products from the Redux store
-            toast.error('Product deleted successfully', { // Show toast notification
-                position: 'top-right',
-                transition: Slide,
-                hideProgressBar: true,
-                theme: "colored",
-                autoClose: 1000, // Close the toast after 1 second
-            });
-            // console.log(response);
-        } catch (error) {
-            console.error(error.response);
-            if (error.response && error.response.data) {
-                console.error('Server Error Message:', error.response.data);
-            }
-        }
-    };
-
+       useEffect(() => {
+           if (companyId) {
+               dispatch(fetchProducts(companyId));
+           }
+       }, [dispatch, companyId]);
+   
+       useEffect(() => {
+           console.log('products from Redux store:', products);
+       }, [products]);
+   
+       // Filter products based on search term
+       useEffect(() => {
+           if (products && Array.isArray(products)) {
+               const result = products.filter((product) =>
+                   product.productName.toLowerCase().includes(search.toLowerCase())
+               );
+               setFilteredData(result);
+           } else {
+               setFilteredData([]);
+           }
+       }, [search, products]);
+   
+       const handleEdit = (productId) => {
+           navigate(`/productRegistartion`, { state: { productId } });
+           console.log("productId from ProductView", productId);
+       };
+   
+       const handleDelete = async (productId) => {
+           try {
+               console.log('Deleting product with companyId:', companyId, 'and productId:', productId);
+               // Make a DELETE request to the API with the given ID
+               const response = await ProductDeleteApiById(companyId, productId);
+               console.log('Delete response:', response);
+               dispatch(removeProductFromState(productId)) // Refetch products from the Redux store
+               toast.error('Product deleted successfully', {
+                   position: 'top-right',
+                   transition: Slide,
+                   hideProgressBar: true,
+                   theme: "colored",
+                   autoClose: 1000, // Close the toast after 1 second
+               });
+               // console.log(response);
+               // console.log(response.data.data);
+           } catch (error) {
+               console.error('Error in handleDelete:', error.response || error);
+               if (error.response && error.response.data) {
+                   console.error('Server Error Message:', error.response.data);
+               }
+           }
+       };
+   
     const columns = [
         {
             name: "Product ID",
             selector: (row) => row.productId,
-            width: "150px"
+            width: "280px"
         },
         {
             name: "Product Name",
             selector: (row) => row.productName,
-            width: "250px"
+            width: "210px"
         },
         {
             name: "Product Cost",
-            selector: (row) => row.cost,
-            width: "150px"
+            selector: (row) => row.productCost,
+            width: "210px"
         },
         {
             name: "HSN Code",
             selector: (row) => row.hsnNo,
-            width: "150px"
+            width: "210px"
         },
         {
             name: "Actions",

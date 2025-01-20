@@ -1,42 +1,56 @@
 import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import LayOut from '../../LayOut/LayOut';
-import { CustomerGetApiById,CustomerPostApi,CustomerPatchApiById } from '../../Utils/Axios';
+import { CustomerGetApiById, CustomerPostApi, CustomerPutApiById, } from '../../Utils/Axios';
+import Select from 'react-select'
+import { useAuth } from '../../Context/AuthContext';
+
 
 const CustomersRegistration = () => {
-  const [show, setShow] = useState("gst");
   const navigate = useNavigate();
+  const {user}=useAuth();
+  const companyId=user.companyId
+  console.log("company Id from Customer registration",companyId);
   const location = useLocation();
   const [isUpdating, setIsUpdating] = useState(false);
   const [update, setUpdate] = useState([]);
-  const { register, handleSubmit, reset, trigger, setValue, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, control, trigger, setValue, formState: { errors } } = useForm();
   const [errorMessage, setErrorMessage] = useState(""); // State for error message
 
   const onSubmit = (data) => {
+    const payload = {
+      ...data,
+      status: data.status.value,
+    };
     if (location && location.state && location.state.customerId) {
-      CustomerPatchApiById(location.state.customerId, data)
+      CustomerPutApiById(companyId,location.state.customerId, payload)
         .then((res) => {
-          toast.success(res.data.data, {
+          const successMessage = res.data.message || 'Customer updated successfully';
+          toast.success(successMessage, {
             position: 'top-right',
             autoClose: 1000,
           });
           setUpdate(res.data.data);
-          navigate('/Customers');
+          navigate('/customersView');
         })
         .catch((error) => {
-          toast.error('Error updating customer');
-          console.log('Error updating customer:', error);
+          console.error('Error updating customer:', error); // Log the error for debugging
+          const errorMsg = error.response?.data?.error?.message || error.message || 'Error updating customer';
+          toast.error(errorMsg, {
+            position: 'top-right',
+            autoClose: 1000,
+          });
         });
     } else {
-      CustomerPostApi(data)
+      CustomerPostApi(companyId, payload)
         .then((response) => {
           toast.success('Customer added successfully', {
             position: 'top-right',
             autoClose: 1000,
           });
-          navigate('/Customers');
+          navigate('/customersView');
         })
         .catch((error) => {
           // Handle API error response
@@ -48,21 +62,31 @@ const CustomersRegistration = () => {
   };
 
   useEffect(() => {
+    console.log('Location state:', location.state);
+    console.log('companyId:', companyId);
     if (location && location.state && location.state.customerId) {
-      CustomerGetApiById(location.state.customerId)
+      const customerId = location.state.customerId;
+      console.log('customerId:', customerId);
+      CustomerGetApiById(companyId, customerId)
         .then((response) => {
-          console.log('Customer data:', response.data);
-          reset(response.data);
+          console.log('Customer data:', response);
+          const customerData = {
+            ...response,
+            status: { value: response.status, label: response.status }
+            };
+          reset(response);
           setIsUpdating(true);
-          setShow(response.data.gstType || "gst");
         })
         .catch((error) => {
-          console.error('Error fetching data:', error);
+          console.error('Error fetching data:', error.response || error);
+          if (error.response) {
+            console.error('API Error Response:', error.response.data);
+          }
           toast.error('Error fetching customer data.');
         });
     }
   }, [location.state?.customerId, reset]);
-  
+
 
   const handleEmailChange = (e) => {
     // Get the current value of the input field
@@ -168,12 +192,12 @@ const CustomersRegistration = () => {
   };
 
   // Custom validator to check trailing spaces
-const noTrailingSpaces = (value) => {
-  if (value.endsWith(' ')) {
-    return "Spaces are not allowed at the end";
-  }
-  return true; // Return true if the value is valid
-};
+  const noTrailingSpaces = (value) => {
+    if (value.endsWith(' ')) {
+      return "Spaces are not allowed at the end";
+    }
+    return true; // Return true if the value is valid
+  };
 
 
   const preventInvalidInput = (e, type) => {
@@ -207,13 +231,18 @@ const noTrailingSpaces = (value) => {
   const handleInputChange = (e, fieldName) => {
     let value = e.target.value.trimStart().replace(/ {2,}/g, ' ');  // Remove leading spaces and extra spaces
 
-    if (fieldName !== "emailId") {
+    if (fieldName !== "email") {
       value = value.replace(/\b\w/g, (char) => char.toUpperCase());  // Capitalize first letter after space
     }
 
     setValue(fieldName, value);
     trigger(fieldName);  // Trigger validation
   };
+
+  const statusOptions = [
+    { label: 'Active', value: 'Active' },
+    { label: 'Inactive', value: 'InActive' },
+  ];
 
   const clearForm = () => {
     reset();
@@ -224,9 +253,9 @@ const noTrailingSpaces = (value) => {
   };
 
 
- return(
+  return (
     <LayOut>
-        <div className="container-fluid p-0">
+      <div className="container-fluid p-0">
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3">
@@ -297,22 +326,21 @@ const noTrailingSpaces = (value) => {
                         Email Id <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
-                        type={isUpdating ? "email" : "email"}
-                        readOnly={isUpdating}
+                        type='text'
                         className="form-control"
                         placeholder="Enter Email Id"
-                        name="emailId"
+                        name="email"
                         autoComplete="off"
                         // onInput={toInputEmailCase}
-                        {...register("emailId", {
+                        {...register("email", {
                           required: "Email Id is Required",
                           validate: (value) => validateField(value, 'email')
                         })}
-                        onChange={(e) => handleInputChange(e, "emailId")}
+                        onChange={(e) => handleInputChange(e, "email")}
                         onKeyPress={(e) => preventInvalidInput(e, 'whitespace')}
                       />
-                      {errors.emailId && (
-                        <p className="errorMsg">{errors.emailId.message}</p>
+                      {errors.email && (
+                        <p className="errorMsg">{errors.email.message}</p>
                       )}
                     </div>
                     <div className="col-lg-1"></div>
@@ -328,7 +356,7 @@ const noTrailingSpaces = (value) => {
                         maxLength={14} // Limit input to 14 characters (3 for +91, 1 for space, 10 for digits)
                         defaultValue="+91 " // Set the initial value to +91 with a space
                         onInput={handlePhoneNumberChange} // Handle input changes
-                        {...register("mobileNo", {
+                        {...register("mobileNumber", {
                           required: "Mobile Number is Required",
                           validate: {
                             startsWithPlus91: (value) => {
@@ -356,9 +384,10 @@ const noTrailingSpaces = (value) => {
                             message: "Mobile Number is Required.",
                           },
                         })}
+                        onChange={(e) => handleInputChange(e, "mobileNumber")}
                       />
-                      {errors.mobileNo && (
-                        <p className="errorMsg">{errors.mobileNo.message}</p>
+                      {errors.mobileNumber && (
+                        <p className="errorMsg">{errors.mobileNumber.message}</p>
                       )}
                     </div>
                     <div className="col-lg-1"></div>
@@ -368,7 +397,7 @@ const noTrailingSpaces = (value) => {
                       </label>
                       <input
                         type="text"
-                        readOnly={isUpdating}
+                        // readOnly={isUpdating}
                         name="state"
                         placeholder="Enter State Name"
                         className="form-control"
@@ -402,7 +431,7 @@ const noTrailingSpaces = (value) => {
                       </label>
                       <input
                         type="text"
-                        readOnly={isUpdating}
+                        // readOnly={isUpdating}
                         name="city"
                         placeholder="Enter City Name"
                         className="form-control"
@@ -436,7 +465,7 @@ const noTrailingSpaces = (value) => {
                       </label>
                       <input
                         type="text"
-                        readOnly={isUpdating}
+                        // readOnly={isUpdating}
                         name="pinCode"
                         placeholder="Enter Pin Code"
                         className="form-control"
@@ -458,17 +487,16 @@ const noTrailingSpaces = (value) => {
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
-                        GST Number <span style={{ color: "red" }}>*</span>
+                        GST Number <span style={{ color: "red" }}></span>
                       </label>
                       <input
                         type="text"
-                        readOnly={isUpdating}
-                        name="gstNumber"
+                        // readOnly={isUpdating}
+                        name="gstNo"
                         placeholder="Enter Gst Number"
                         className="form-control"
                         autoComplete="off"
-                        {...register("gstNumber", {
-                          required: "Gst Number is Required.",
+                        {...register("gstNo", {
                           validate: (value) =>
                             !value || validateField(value, 'gst'), // Validate only if the field is not empty
                           maxLength: {
@@ -476,15 +504,15 @@ const noTrailingSpaces = (value) => {
                             message: "GST Number should be 15 characters long",
                           },
                         })}
-                        onChange={(e) => handleInputChange(e, "gstNumber")}
+                        onChange={(e) => handleInputChange(e, "gstNo")}
                         onKeyPress={(e) => preventInvalidInput(e, 'alphaNumeric')}
                         onInput={(e) => {
                           e.target.value = e.target.value.toUpperCase(); // Convert to uppercase
                         }}
                       />
-                      {errors.gstNumber && (
+                      {errors.gstNo && (
                         <p className="errorMsg">
-                          {errors.gstNumber.message ||
+                          {errors.gstNo.message ||
                             "Gst Number is Required"}
                         </p>
                       )}
@@ -496,7 +524,7 @@ const noTrailingSpaces = (value) => {
                       </label>
                       <input
                         type="text"
-                        readOnly={isUpdating}
+                        // readOnly={isUpdating}
                         name="stateCode"
                         placeholder="Enter State Code"
                         className="form-control"
@@ -526,20 +554,40 @@ const noTrailingSpaces = (value) => {
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
+                        Status <span style={{ color: "red" }}>*</span>
+                      </label>
+                      <Controller
+                        name="status"  // The name you want for the field
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            {...field}
+                            options={statusOptions}  // Dropdown options for Active and Inactive
+                            getOptionLabel={(e) => e.label}  // What to display in the dropdown
+                            getOptionValue={(e) => e.value}  // Value submitted with the form
+                          />
+                        )}
+                      />
+                      {errors.status && (
+                        <p className="errorMsg">{errors.status.message || "Status is required"}</p>
+                      )}
+                    </div>
+                    <div className="col-lg-1"></div>
+                    <div className="col-12 col-md-6 col-lg-5 mb-3">
+                      <label className="form-label">
                         Address <span style={{ color: "red" }}>*</span>
                       </label>
-                      <input
-                        type="text"
-                        readOnly={isUpdating}
+                      <textarea
                         name="address"
                         placeholder="Enter Address"
                         className="form-control"
                         autoComplete="off"
+                        rows="4"
                         {...register("address", {
                           required: "Address is Required",
                           validate: noTrailingSpaces,
-                          minLength:{
-                            value:3,
+                          minLength: {
+                            value: 3,
                             message: 'Address must be at least 3 characters long'
                           },
                           maxLength: {
@@ -552,8 +600,7 @@ const noTrailingSpaces = (value) => {
                       />
                       {errors.address && (
                         <p className="errorMsg">
-                          {errors.address.message ||
-                            "address is Required"}
+                          {errors.address.message || "Address is Required"}
                         </p>
                       )}
                     </div>
@@ -593,7 +640,7 @@ const noTrailingSpaces = (value) => {
                         style={{ marginRight: "85px" }}
                         type="submit"
                       >
-                        {isUpdating ? "Update Employee" : "Add Employee"}{" "}
+                        {isUpdating ? "Update Customer" : "Add Customer"}{" "}
                       </button>
                     </div>
                   </div>
@@ -602,9 +649,12 @@ const noTrailingSpaces = (value) => {
             </div>
           </div>
         </div>
-        </div>
+      </div>
     </LayOut>
- );
+  );
 };
 
 export default CustomersRegistration;
+
+
+

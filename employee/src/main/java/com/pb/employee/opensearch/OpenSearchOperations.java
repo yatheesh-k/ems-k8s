@@ -11,10 +11,8 @@ import com.pb.employee.persistance.model.DepartmentEntity;
 import com.pb.employee.persistance.model.DesignationEntity;
 import com.pb.employee.persistance.model.EmployeeEntity;
 import com.pb.employee.persistance.model.Entity;
-import com.pb.employee.request.EmployeeStatus;
 import com.pb.employee.util.Constants;
 import com.pb.employee.util.ResourceIdUtils;
-import org.opensearch.client.RequestOptions;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.Result;
@@ -61,7 +59,7 @@ public class OpenSearchOperations {
             CreateIndexResponse result = esClient.indices().create(createIndexRequest);
             return result.index();
         } catch (Exception e) {
-            logger.error("Not able to create index {} " , e.getMessage());
+            logger.error("Not able to create index {} ", e.getMessage());
             throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_CREATE_COMPANY), index),
                     HttpStatus.CONFLICT);
         }
@@ -70,14 +68,14 @@ public class OpenSearchOperations {
     public Entity saveEntity(Entity entity, String Id, String index) throws EmployeeException {
         IndexResponse indexResponse = null;
         try {
-            synchronized (entity){
+            synchronized (entity) {
                 indexResponse = esClient.index(builder -> builder.index(index)
                         .id(Id)
                         .document(entity));
             }
-            logger.debug("Saved the entity. Response {}.Entity:{}",indexResponse, entity);
+            logger.debug("Saved the entity. Response {}.Entity:{}", indexResponse, entity);
         } catch (IOException e) {
-            logger.error("Exception ",e);
+            logger.error("Exception ", e);
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_SAVE_EMPLOYEE_ATTENDANCE), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return entity;
@@ -88,51 +86,52 @@ public class OpenSearchOperations {
         logger.debug("Deleting the Entity {}", id);
         DeleteResponse deleteResponse = null;
         try {
-            synchronized (id){
+            synchronized (id) {
                 deleteResponse = esClient.delete(b -> b.index(index)
                         .id(id));
             }
-            if(deleteResponse.result() == Result.NotFound) {
+            if (deleteResponse.result() == Result.NotFound) {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_EMPLOYEE), HttpStatus.NOT_FOUND);
             }
             logger.debug("Deleted the Entity {}, Delete response {}", id, deleteResponse);
         } catch (IOException e) {
-            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EXCEPTION_OCCURRED),HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EXCEPTION_OCCURRED), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return id;
     }
 
     public UserEntity getEMSAdminById(String user) throws IOException {
-        GetRequest getRequest = new GetRequest.Builder().id(Constants.EMS_ADMIN+"_"+user)
+        GetRequest getRequest = new GetRequest.Builder().id(Constants.EMS_ADMIN + "_" + user)
                 .index(Constants.INDEX_EMS).build();
         GetResponse<UserEntity> searchResponse = esClient.get(getRequest, UserEntity.class);
-        if(searchResponse != null && searchResponse.source() != null){
-            return searchResponse.source();
-        }
-        return null;
-}
-
-    public Object getById(String resourceId, String type, String index) throws IOException {
-        if(type != null) {
-            resourceId = type+"_"+resourceId;
-        }
-        GetRequest getRequest = new GetRequest.Builder().id(resourceId)
-                .index(index).build();
-        GetResponse<Object> searchResponse = esClient.get(getRequest, Object.class);
-        if(searchResponse != null && searchResponse.source() != null){
+        if (searchResponse != null && searchResponse.source() != null) {
             return searchResponse.source();
         }
         return null;
     }
+
+    public Object getById(String resourceId, String type, String index) throws IOException {
+        if (type != null) {
+            resourceId = type + "_" + resourceId;
+        }
+        GetRequest getRequest = new GetRequest.Builder().id(resourceId)
+                .index(index).build();
+        GetResponse<Object> searchResponse = esClient.get(getRequest, Object.class);
+        if (searchResponse != null && searchResponse.source() != null) {
+            return searchResponse.source();
+        }
+        return null;
+    }
+
     public AttendanceEntity getAttendanceById(String resourceId, String type, String index) throws IOException {
         logger.debug("Getting attendence by Id {} of index {}", resourceId, index);
-        if(type != null) {
-            resourceId = type+"_"+resourceId;
+        if (type != null) {
+            resourceId = type + "_" + resourceId;
         }
         GetRequest getRequest = new GetRequest.Builder().id(resourceId)
                 .index(index).build();
         GetResponse<AttendanceEntity> searchResponse = esClient.get(getRequest, AttendanceEntity.class);
-        if(searchResponse != null && searchResponse.source() != null){
+        if (searchResponse != null && searchResponse.source() != null) {
             return searchResponse.source();
         }
         return null;
@@ -140,29 +139,31 @@ public class OpenSearchOperations {
 
 
     public EmployeeEntity getEmployeeById(String resourceId, String type, String index) throws IOException {
-        if(type != null) {
-            resourceId = type+"_"+resourceId;
+        if (type != null) {
+            resourceId = type + "_" + resourceId;
         }
         GetRequest getRequest = new GetRequest.Builder().id(resourceId)
                 .index(index).build();
         GetResponse<EmployeeEntity> searchResponse = esClient.get(getRequest, EmployeeEntity.class);
-        if(searchResponse != null && searchResponse.source() != null){
+        if (searchResponse != null && searchResponse.source() != null) {
             return searchResponse.source();
         }
         return null;
     }
+
     public CompanyEntity getCompanyById(String resourceId, String type, String index) throws IOException {
-        if(type != null) {
-            resourceId = type+"_"+resourceId;
+        if (type != null) {
+            resourceId = type + "_" + resourceId;
         }
         GetRequest getRequest = new GetRequest.Builder().id(resourceId)
                 .index(index).build();
         GetResponse<CompanyEntity> searchResponse = esClient.get(getRequest, CompanyEntity.class);
-        if(searchResponse != null && searchResponse.source() != null){
+        if (searchResponse != null && searchResponse.source() != null) {
             return searchResponse.source();
         }
         return null;
     }
+
     public DepartmentEntity getDepartmentById(String resourceId, String type, String index) throws IOException {
         GetRequest getRequest = new GetRequest.Builder()
                 .id(resourceId)
@@ -170,7 +171,7 @@ public class OpenSearchOperations {
                 .build();
 
         GetResponse<DepartmentEntity> searchResponse = esClient.get(getRequest, DepartmentEntity.class);
-        if(searchResponse != null && searchResponse.source() != null){
+        if (searchResponse != null && searchResponse.source() != null) {
             if (searchResponse.source().getType().equals(Constants.DEPARTMENT)) {
                 return searchResponse.source();
             }
@@ -179,15 +180,14 @@ public class OpenSearchOperations {
     }
 
 
-
     public DesignationEntity getDesignationById(String resourceId, String type, String index) throws IOException {
-        if(type != null) {
-            resourceId = type+"_"+resourceId;
+        if (type != null) {
+            resourceId = type + "_" + resourceId;
         }
         GetRequest getRequest = new GetRequest.Builder().id(resourceId)
                 .index(index).build();
         GetResponse<DesignationEntity> searchResponse = esClient.get(getRequest, DesignationEntity.class);
-        if(searchResponse != null && searchResponse.source() != null){
+        if (searchResponse != null && searchResponse.source() != null) {
             if (searchResponse.source().getType().equals(Constants.DESIGNATION)) {
                 return searchResponse.source();
             }
@@ -196,25 +196,26 @@ public class OpenSearchOperations {
     }
 
     public EmployeeSalaryEntity getSalaryById(String resourceId, String type, String index) throws IOException {
-        if(type != null) {
-            resourceId = type+"_"+resourceId;
+        if (type != null) {
+            resourceId = type + "_" + resourceId;
         }
         GetRequest getRequest = new GetRequest.Builder().id(resourceId)
                 .index(index).build();
         GetResponse<EmployeeSalaryEntity> searchResponse = esClient.get(getRequest, EmployeeSalaryEntity.class);
-        if(searchResponse != null && searchResponse.source() != null){
+        if (searchResponse != null && searchResponse.source() != null) {
             return searchResponse.source();
         }
         return null;
     }
+
     public PayslipEntity getPayslipById(String resourceId, String type, String index) throws IOException {
-        if(type != null) {
-            resourceId = type+"_"+resourceId;
+        if (type != null) {
+            resourceId = type + "_" + resourceId;
         }
         GetRequest getRequest = new GetRequest.Builder().id(resourceId)
                 .index(index).build();
         GetResponse<PayslipEntity> searchResponse = esClient.get(getRequest, PayslipEntity.class);
-        if(searchResponse != null && searchResponse.source() != null){
+        if (searchResponse != null && searchResponse.source() != null) {
             return searchResponse.source();
         }
         return null;
@@ -227,7 +228,7 @@ public class OpenSearchOperations {
         boolQueryBuilder = boolQueryBuilder
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.DESIGNATION)));
 
-        if(designationName != null) {
+        if (designationName != null) {
             boolQueryBuilder = boolQueryBuilder
                     .filter(q -> q.term(t -> t.field(Constants.NAME + Constants.KEYWORD).value(FieldValue.of(designationName))));
         }
@@ -245,9 +246,9 @@ public class OpenSearchOperations {
         List<Hit<DesignationEntity>> hits = searchResponse.hits().hits();
         logger.info("Number of hits {}", hits.size());
         List<DesignationEntity> designationEntities = new ArrayList<>();
-        if(hits.size() > 0) {
-            for(Hit<DesignationEntity> hit : hits){
-                    designationEntities.add(hit.source());
+        if (hits.size() > 0) {
+            for (Hit<DesignationEntity> hit : hits) {
+                designationEntities.add(hit.source());
             }
         }
         return designationEntities;
@@ -258,11 +259,11 @@ public class OpenSearchOperations {
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         boolQueryBuilder = boolQueryBuilder
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(type)));
-        if(companyName != null) {
+        if (companyName != null) {
             boolQueryBuilder = boolQueryBuilder
                     .filter(q -> q.matchPhrase(t -> t.field(Constants.COMPANY_NAME).query(companyName)));
         }
-        if(shortName != null) {
+        if (shortName != null) {
             boolQueryBuilder = boolQueryBuilder
                     .filter(q -> q.matchPhrase(t -> t.field(Constants.SHORT_NAME).query(shortName)));
         }
@@ -280,8 +281,8 @@ public class OpenSearchOperations {
         List<Hit<CompanyEntity>> hits = searchResponse.hits().hits();
         logger.info("Number of hits {}", hits.size());
         List<CompanyEntity> subscriberEntities = new ArrayList<>();
-        if(hits.size() > 0) {
-            for(Hit<CompanyEntity> hit : hits){
+        if (hits.size() > 0) {
+            for (Hit<CompanyEntity> hit : hits) {
                 subscriberEntities.add(hit.source());
             }
         }
@@ -293,7 +294,7 @@ public class OpenSearchOperations {
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         boolQueryBuilder = boolQueryBuilder
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.EMPLOYEE_ID).query(empId)));
-        if(emailId != null) {
+        if (emailId != null) {
             boolQueryBuilder = boolQueryBuilder
                     .filter(q -> q.matchPhrase(t -> t.field(Constants.EMAIL_ID).query(emailId)));
         }
@@ -311,8 +312,8 @@ public class OpenSearchOperations {
         List<Hit<EmployeeEntity>> hits = searchResponse.hits().hits();
         logger.info("Number of hits {}", hits.size());
         List<EmployeeEntity> employeeEntities = new ArrayList<>();
-        if(hits.size() > 0) {
-            for(Hit<EmployeeEntity> hit : hits){
+        if (hits.size() > 0) {
+            for (Hit<EmployeeEntity> hit : hits) {
                 employeeEntities.add(hit.source());
             }
         }
@@ -323,8 +324,8 @@ public class OpenSearchOperations {
         logger.debug("Getting the Resource by id {} : {}", companyName, departmentName);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         boolQueryBuilder =
-        boolQueryBuilder.filter(q -> q.term(t -> t.field(Constants.TYPE).value(FieldValue.of(Constants.DEPARTMENT))));
-        if(departmentName != null) {
+                boolQueryBuilder.filter(q -> q.term(t -> t.field(Constants.TYPE).value(FieldValue.of(Constants.DEPARTMENT))));
+        if (departmentName != null) {
             boolQueryBuilder = boolQueryBuilder
                     .filter(q -> q.term(t -> t.field(Constants.NAME + Constants.KEYWORD).value(FieldValue.of(departmentName))));
         }
@@ -342,9 +343,9 @@ public class OpenSearchOperations {
         List<Hit<DepartmentEntity>> hits = searchResponse.hits().hits();
         logger.info("Number of hits {}", hits.size());
         List<DepartmentEntity> departmentEntities = new ArrayList<>();
-        if(hits.size() > 0) {
-            for(Hit<DepartmentEntity> hit : hits){
-                    departmentEntities.add(hit.source());
+        if (hits.size() > 0) {
+            for (Hit<DepartmentEntity> hit : hits) {
+                departmentEntities.add(hit.source());
             }
         }
         return departmentEntities;
@@ -368,8 +369,8 @@ public class OpenSearchOperations {
         List<Hit<CompanyEntity>> hits = searchResponse.hits().hits();
         logger.info("Number of hits {}", hits.size());
         List<CompanyEntity> companyEntities = new ArrayList<>();
-        if(hits.size() > 0) {
-            for(Hit<CompanyEntity> hit : hits){
+        if (hits.size() > 0) {
+            for (Hit<CompanyEntity> hit : hits) {
                 companyEntities.add(hit.source());
             }
         }
@@ -438,15 +439,15 @@ public class OpenSearchOperations {
         List<Hit<TemplateEntity>> hits = searchResponse.hits().hits();
         logger.info("Number of employee hits for company {}: {}", companyName, hits.size());
 
-        if(!hits.isEmpty()) {
+        if (!hits.isEmpty()) {
             return hits.get(0).source();
-        }
-        else {
+        } else {
             return null;
         }
 
     }
-    public List<SalaryEntity> getSalaries(String companyName, String employeeId) throws EmployeeException{
+
+    public List<SalaryEntity> getSalaries(String companyName, String employeeId) throws EmployeeException {
         logger.debug("Getting employees for salary details {}", companyName);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         boolQueryBuilder = boolQueryBuilder
@@ -476,7 +477,7 @@ public class OpenSearchOperations {
         return salaryEntities;
     }
 
-    public List<PayslipEntity> getEmployeePayslip(String companyName, String employeeId,String month, String year) throws EmployeeException {
+    public List<PayslipEntity> getEmployeePayslip(String companyName, String employeeId, String month, String year) throws EmployeeException {
         logger.debug("Getting payslips for employee {} in company {}", employeeId, companyName);
 
         // Build the BoolQuery
@@ -484,11 +485,11 @@ public class OpenSearchOperations {
         boolQueryBuilder = boolQueryBuilder
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.PAYSLIP)))
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.EMPLOYEE_ID).query(employeeId)));
-        if(year!=null){
-            boolQueryBuilder=boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.YEAR).query(year)));
+        if (year != null) {
+            boolQueryBuilder = boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.YEAR).query(year)));
         }
-           if(month!=null){
-            boolQueryBuilder=boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.MONTH).query(month)));
+        if (month != null) {
+            boolQueryBuilder = boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.MONTH).query(month)));
         }
         BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
         SearchResponse<PayslipEntity> searchResponse = null;
@@ -511,7 +512,7 @@ public class OpenSearchOperations {
         List<PayslipEntity> payslipEntities = new ArrayList<>();
         for (Hit<PayslipEntity> hit : hits) {
             PayslipEntity payslip = hit.source();
-                payslipEntities.add(payslip);
+            payslipEntities.add(payslip);
         }
 
         // Log if no payslips are found for the employee
@@ -521,6 +522,7 @@ public class OpenSearchOperations {
 
         return payslipEntities;
     }
+
     public void deleteIndex(String index) throws EmployeeException {
         try {
             // Check if the index exists before attempting deletion
@@ -543,13 +545,13 @@ public class OpenSearchOperations {
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         boolQueryBuilder = boolQueryBuilder
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.ATTENDANCE)));
-        if(employeeId!=null)
-            boolQueryBuilder=boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.EMPLOYEE_ID).query(employeeId)));
-        if(month!=null){
-            boolQueryBuilder=boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.MONTH).query(month)));
+        if (employeeId != null)
+            boolQueryBuilder = boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.EMPLOYEE_ID).query(employeeId)));
+        if (month != null) {
+            boolQueryBuilder = boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.MONTH).query(month)));
         }
-        if(year!=null){
-            boolQueryBuilder=boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.YEAR).query(year)));
+        if (year != null) {
+            boolQueryBuilder = boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.YEAR).query(year)));
         }
         BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
         SearchResponse<AttendanceEntity> searchResponse = null;
@@ -574,13 +576,13 @@ public class OpenSearchOperations {
         return attendanceEntities;
     }
 
-    public List<AttendanceEntity> getAttendanceByYear(String companyName, String employeeId, String year) throws EmployeeException{
+    public List<AttendanceEntity> getAttendanceByYear(String companyName, String employeeId, String year) throws EmployeeException {
         logger.debug("Getting attendance for employee {} for month {} and year {}", employeeId, year);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         boolQueryBuilder = boolQueryBuilder
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.ATTENDANCE)));
-        if(year!=null){
-            boolQueryBuilder=boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.YEAR).query(year)));
+        if (year != null) {
+            boolQueryBuilder = boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.YEAR).query(year)));
         }
         BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
         SearchResponse<AttendanceEntity> searchResponse = null;
@@ -605,14 +607,14 @@ public class OpenSearchOperations {
         return attendanceEntities;
     }
 
-    public List<PayslipEntity> getAllPayslips(String companyName, String month, String year) throws EmployeeException{
+    public List<PayslipEntity> getAllPayslips(String companyName, String month, String year) throws EmployeeException {
         logger.debug("Getting payslips for  for month {} and year {}", month, year);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         boolQueryBuilder = boolQueryBuilder
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.PAYSLIP)))
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.YEAR).query(year)));
-        if(month!=null){
-            boolQueryBuilder=boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.MONTH).query(month)));
+        if (month != null) {
+            boolQueryBuilder = boolQueryBuilder.filter(q -> q.matchPhrase(t -> t.field(Constants.MONTH).query(month)));
         }
 
         BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
@@ -640,17 +642,18 @@ public class OpenSearchOperations {
 
     public SalaryConfigurationEntity getSalaryStructureById(String resourceId, String type, String index) throws IOException {
         logger.debug("Getting attendence by Id {} of index {}", resourceId, index);
-        if(type != null) {
-            resourceId = type+"_"+resourceId;
+        if (type != null) {
+            resourceId = type + "_" + resourceId;
         }
         GetRequest getRequest = new GetRequest.Builder().id(resourceId)
                 .index(index).build();
         GetResponse<SalaryConfigurationEntity> searchResponse = esClient.get(getRequest, SalaryConfigurationEntity.class);
-        if(searchResponse != null && searchResponse.source() != null){
+        if (searchResponse != null && searchResponse.source() != null) {
             return searchResponse.source();
         }
         return null;
     }
+
     public List<SalaryConfigurationEntity> getSalaryStructureByCompanyDate(String companyName) throws EmployeeException {
         logger.debug("Getting the Resource by name {} ", companyName);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
@@ -711,30 +714,31 @@ public class OpenSearchOperations {
     }
 
     public EmployeeSalaryEntity getEmployeeSalaryById(String resourceId, String type, String index) throws IOException {
-        if(type != null) {
-            resourceId = type+"_"+resourceId;
+        if (type != null) {
+            resourceId = type + "_" + resourceId;
         }
         GetRequest getRequest = new GetRequest.Builder().id(resourceId)
                 .index(index).build();
         GetResponse<EmployeeSalaryEntity> searchResponse = esClient.get(getRequest, EmployeeSalaryEntity.class);
-        if(searchResponse != null && searchResponse.source() != null){
+        if (searchResponse != null && searchResponse.source() != null) {
             return searchResponse.source();
         }
         return null;
     }
 
     public TemplateEntity getTemplateById(String resourceId, String type, String index) throws IOException {
-        if(type != null) {
-            resourceId = type+"_"+resourceId;
+        if (type != null) {
+            resourceId = type + "_" + resourceId;
         }
         GetRequest getRequest = new GetRequest.Builder().id(resourceId)
                 .index(index).build();
         GetResponse<TemplateEntity> searchResponse = esClient.get(getRequest, TemplateEntity.class);
-        if(searchResponse != null && searchResponse.source() != null){
+        if (searchResponse != null && searchResponse.source() != null) {
             return searchResponse.source();
         }
         return null;
     }
+
     public RelievingEntity getRelievingByEmployeeId(String employeeId, String type, String companyName) throws IOException, EmployeeException {
 
         logger.debug("Getting employee for salary details {}", companyName);
@@ -787,8 +791,8 @@ public class OpenSearchOperations {
         List<Hit<RelievingEntity>> hits = searchResponse.hits().hits();
         logger.info("Number of hits {}", hits.size());
         List<RelievingEntity> relievingEntities = new ArrayList<>();
-        if(hits.size() > 0) {
-            for(Hit<RelievingEntity> hit : hits){
+        if (hits.size() > 0) {
+            for (Hit<RelievingEntity> hit : hits) {
                 relievingEntities.add(hit.source());
             }
         }
@@ -797,13 +801,13 @@ public class OpenSearchOperations {
     }
 
     public RelievingEntity getRelievingById(String resourceId, String type, String index) throws IOException {
-        if(type != null) {
-            resourceId = type+"_"+resourceId;
+        if (type != null) {
+            resourceId = type + "_" + resourceId;
         }
         GetRequest getRequest = new GetRequest.Builder().id(resourceId)
                 .index(index).build();
         GetResponse<RelievingEntity> searchResponse = esClient.get(getRequest, RelievingEntity.class);
-        if(searchResponse != null && searchResponse.source() != null){
+        if (searchResponse != null && searchResponse.source() != null) {
             return searchResponse.source();
         }
         return null;
@@ -830,17 +834,116 @@ public class OpenSearchOperations {
         }
     }
 
-    public BankEntity getBankById(String index, String type,String resourceId) throws IOException {
-        if(type != null) {
-            resourceId = type+"_"+resourceId;
+    public BankEntity getBankById(String index, String type, String resourceId) throws IOException {
+        if (type != null) {
+            resourceId = type + "_" + resourceId;
         }
         GetRequest getRequest = new GetRequest.Builder().id(resourceId)
                 .index(index).build();
         GetResponse<BankEntity> searchResponse = esClient.get(getRequest, BankEntity.class);
-        if(searchResponse != null && searchResponse.source() != null){
+        if (searchResponse != null && searchResponse.source() != null) {
             return searchResponse.source();
         }
         return null;
     }
 
+    public BackgroundEntity getBackgroundById(String index, String type, String resourceId) throws IOException {
+        if (type != null) {
+            resourceId = type + "_" + resourceId;
+        }
+        GetRequest getRequest = new GetRequest.Builder().id(resourceId)
+                .index(index).build();
+        GetResponse<BackgroundEntity> searchResponse = esClient.get(getRequest, BackgroundEntity.class);
+        if (searchResponse != null && searchResponse.source() != null) {
+            return searchResponse.source();
+        }
+        return null;
+    }
+
+
+    public List<BankEntity> getBankDetailsOfCompany(String index) throws EmployeeException{
+        logger.debug("Getting the Resource by id : {}", index);
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        boolQueryBuilder =
+                boolQueryBuilder.filter(q -> q.term(t -> t.field(Constants.TYPE).value(FieldValue.of(Constants.BANK))));
+
+        BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
+        SearchResponse<BankEntity> searchResponse = null;
+        try {
+            searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                    .query(finalBoolQueryBuilder.build()._toQuery()), BankEntity.class);
+        } catch (IOException e) {
+            e.getStackTrace();
+            logger.error(e.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        List<Hit<BankEntity>> hits = searchResponse.hits().hits();
+        logger.info("Number of hits {}", hits.size());
+        List<BankEntity> departmentEntities = new ArrayList<>();
+        if (hits.size() > 0) {
+            for (Hit<BankEntity> hit : hits) {
+                departmentEntities.add(hit.source());
+            }
+        }
+        return departmentEntities;
+
+    }
+    public List<BackgroundEntity> getBackGroundDetailsOfCompany(String index) throws EmployeeException{
+        logger.debug("Getting the Resource by id : {}", index);
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        boolQueryBuilder =
+                boolQueryBuilder.filter(q -> q.term(t -> t.field(Constants.TYPE).value(FieldValue.of(Constants.BACKGROUND))));
+
+        BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
+        SearchResponse<BackgroundEntity> searchResponse = null;
+        try {
+            searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                    .query(finalBoolQueryBuilder.build()._toQuery()), BackgroundEntity.class);
+        } catch (IOException e) {
+            e.getStackTrace();
+            logger.error(e.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        List<Hit<BackgroundEntity>> hits = searchResponse.hits().hits();
+        logger.info("Number of hits {}", hits.size());
+        List<BackgroundEntity> backgroundEntities = new ArrayList<>();
+        if (hits.size() > 0) {
+            for (Hit<BackgroundEntity> hit : hits) {
+                backgroundEntities.add(hit.source());
+            }
+        }
+        return backgroundEntities;
+
+    }
+
+    public List<BackgroundEntity> getBackGroundDetailsOfEmployeeId(String companyName,String employeeId) throws EmployeeException{
+        logger.debug("Getting employees for salary details {}", companyName);
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        boolQueryBuilder = boolQueryBuilder
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.BACKGROUND)))
+                .filter(q -> q.matchPhrase(t -> t.field(Constants.EMPLOYEE_ID).query(employeeId)));
+        BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
+        SearchResponse<BackgroundEntity> searchResponse = null;
+        String index = ResourceIdUtils.generateCompanyIndex(companyName);
+
+        try {
+            // Adjust the type or field according to your index structure
+            searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                    .query(finalBoolQueryBuilder.build().toQuery()), BackgroundEntity.class);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        List<Hit<BackgroundEntity>> hits = searchResponse.hits().hits();
+        logger.info("Number of employee hits for company is {}: {}", companyName, hits.size());
+
+        List<BackgroundEntity> salaryEntities = new ArrayList<>();
+        for (Hit<BackgroundEntity> hit : hits) {
+            salaryEntities.add(hit.source());
+        }
+
+        return salaryEntities;
+
+    }
 }

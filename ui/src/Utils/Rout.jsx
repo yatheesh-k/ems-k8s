@@ -57,7 +57,6 @@ import Template from '../CompanyModule/Settings/OfferLetter/Template';
 import OfferLetterForm from '../CompanyModule/Settings/OfferLetter/OfferLetterForm';
 import OfferLetterPreview from '../CompanyModule/Settings/OfferLetter/OfferLetterPreview';
 import EmployeeSalaryView from '../EmployeeModule/EmployeeSalaryView';
-import CustomersRegistration from '../InvoiceModule/Customers/CustomerRegistration';
 import CustomersView from '../InvoiceModule/Customers/CustomersView'
 import ProductRegistration from '../InvoiceModule/Products/ProductRegistration';
 import ProductsView from '../InvoiceModule/Products/ProductsView'
@@ -66,6 +65,7 @@ import InvoiceView from '../InvoiceModule/Invoice/InvoiceView'
 import InvoicePdf from '../InvoiceModule/Invoice/InvoicePdf'
 import AccountRegistration from '../InvoiceModule/AccountDetails/AccountRegistration'
 import AccountsView from '../InvoiceModule/AccountDetails/AccountsView'
+import CustomersRegistration from '../InvoiceModule/Customers/CustomerRegistration';
 
 const Rout = () => {
   const location = useLocation();
