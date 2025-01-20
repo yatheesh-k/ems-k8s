@@ -2,19 +2,20 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Slide, toast } from 'react-toastify';
-import { useAuth } from '../../Context/AuthContext';
 import LayOut from '../../LayOut/LayOut';
 import Select from 'react-select'
 import { BankGetApiById, BankPostApi, BankPutApiById, } from '../../Utils/Axios';
+import { useAuth } from '../../Context/AuthContext';
+
 
 
 const AccountRegistartion = () => {
   const { register, handleSubmit, formState: { errors }, control, trigger, setValue, reset } = useForm();
 
   const [isUpdating, setIsUpdating] = useState(false);
-  const { user } = useAuth();
-  console.log("user", user.companyId);
-  const companyId = user.companyId
+  const {user}=useAuth();
+  const companyId=user.companyId;
+  console.log("companyId from accounts registartion",companyId);
   const [passwordShown, setPasswordShown] = useState(false);
   const [update, setUpdate] = useState([]);
   const [errorMessage, setErrorMessage] = useState(""); // State for error message
@@ -25,8 +26,9 @@ const AccountRegistartion = () => {
     const payload = {
       accountNumber: data.accountNumber,
       bankName: data.bankName,
-      branchName: data.branchName,
+      branch: data.branch,
       ifscCode: data.ifscCode,
+      address:data.address,
       accountType: data.accountType.value, // Extract the value of the accountType object
     };
 
@@ -199,7 +201,7 @@ const AccountRegistartion = () => {
               <div className="card-body">
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="row">
-                    <div className="col-12 col-md-4 col-lg-4 mb-3">
+                    <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Bank Account<span style={{ color: "red" }}>*</span>
                       </label>
@@ -226,7 +228,8 @@ const AccountRegistartion = () => {
                         <p className="errorMsg">{errors.accountNumber.message}</p>
                       )}
                     </div>
-                    <div className="col-12 col-md-4 col-lg-4 mb-3">
+                    <div className="col-lg-1"></div>
+                    <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Bank Name <span style={{ color: "red" }}>*</span>
                       </label>
@@ -256,7 +259,8 @@ const AccountRegistartion = () => {
                       )}
                     </div>
                     {/* Branch Name Field */}
-                    <div className="col-12 col-md-4 col-lg-4 mb-3">
+                    <div className="col-lg-1"></div>
+                    <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Branch Name <span style={{ color: "red" }}>*</span>
                       </label>
@@ -264,9 +268,9 @@ const AccountRegistartion = () => {
                         type="text"
                         className="form-control"
                         placeholder="Enter Branch Name"
-                        name="branchName"
+                        name="branch"
                         autoComplete="off"
-                        {...register("branchName", {
+                        {...register("branch", {
                           required: "Branch Name is Required",
                           validate: noTrailingSpaces,
                           minLength: {
@@ -278,16 +282,17 @@ const AccountRegistartion = () => {
                             message: "Branch Name must not exceed 60 characters.",
                           },
                         })}
-                        onChange={(e) => handleInputChange(e, "branchName")}
+                        onChange={(e) => handleInputChange(e, "branch")}
                         onKeyPress={(e) => preventInvalidInput(e, 'alpha')}
                       />
-                      {errors.branchName && (
-                        <p className="errorMsg">{errors.branchName.message}</p>
+                      {errors.branch && (
+                        <p className="errorMsg">{errors.branch.message}</p>
                       )}
                     </div>
 
                     {/* IFSC Code Field */}
-                    <div className="col-12 col-md-4 col-lg-4 mb-3">
+                    <div className="col-lg-1"></div>
+                    <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         IFSC Code <span style={{ color: "red" }}>*</span>
                       </label>
@@ -317,7 +322,8 @@ const AccountRegistartion = () => {
                     </div>
 
                     {/* Account Type Field */}
-                    <div className="col-12 col-md-4 col-lg-4 mb-3">
+                    <div className="col-lg-1"></div>
+                    <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Account Type <span style={{ color: "red" }}>*</span>
                       </label>
@@ -337,7 +343,8 @@ const AccountRegistartion = () => {
                         <p className="errorMsg">{errors.accountType.message}</p>
                       )}
                     </div>
-                    <div className="col-12 col-md-4 col-lg-4 mb-3">
+                    <div className="col-lg-1"></div>
+                    <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Address <span style={{ color: "red" }}>*</span>
                       </label>

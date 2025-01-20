@@ -63,8 +63,6 @@ const AccountsView = () => {
                 theme: "colored",
                 autoClose: 1000, // Close the toast after 1 second
             });
-            // console.log(response);
-            // console.log(response.data.data);
         } catch (error) {
             console.error('Error in handleDelete:', error.response || error);
             if (error.response && error.response.data) {
@@ -78,26 +76,31 @@ const AccountsView = () => {
         {
             name: "Account Number",
             selector: (row) => row.accountNumber,
-            width: "230px"
+            width: "190px"
         },
         {
             name: "Bank Name",
             selector: (row) => row.bankName,
-            width: "230px"
-        },
-        {
-            name: "Branch Name",
-            selector: (row) => row.branch,
-            width: "230px"
+            width: "190px"
         },
         {
             name: "IFSC Code",
             selector: (row) => row.ifscCode,
-            width: "230px"
+            width: "190px"
+        },
+        {
+            name: "Branch Name",
+            selector: (row) => row.branch,
+            width: "190px"
         },
         {
             name: "Account Type",
             selector: (row) => row.accountType,
+            width: "190px"
+        },
+        {
+            name: "Address",
+            selector: (row) => row.address,
             width: "190px"
         },
         {

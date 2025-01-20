@@ -7,12 +7,12 @@ import { CustomerGetApiById, CustomerPostApi, CustomerPutApiById, } from '../../
 import Select from 'react-select'
 import { useAuth } from '../../Context/AuthContext';
 
+
 const CustomersRegistration = () => {
-  const [show, setShow] = useState("gst");
   const navigate = useNavigate();
-  const { user } = useAuth();
-  console.log("user", user.companyId);
-  const companyId = user.companyId
+  const {user}=useAuth();
+  const companyId=user.companyId
+  console.log("company Id from Customer registration",companyId);
   const location = useLocation();
   const [isUpdating, setIsUpdating] = useState(false);
   const [update, setUpdate] = useState([]);
@@ -326,8 +326,6 @@ const CustomersRegistration = () => {
                         Email Id <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
-                        // type={isUpdating ? "email" : "email"}
-                        // readOnly={isUpdating}
                         type='text'
                         className="form-control"
                         placeholder="Enter Email Id"
@@ -386,6 +384,7 @@ const CustomersRegistration = () => {
                             message: "Mobile Number is Required.",
                           },
                         })}
+                        onChange={(e) => handleInputChange(e, "mobileNumber")}
                       />
                       {errors.mobileNumber && (
                         <p className="errorMsg">{errors.mobileNumber.message}</p>
