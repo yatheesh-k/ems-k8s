@@ -70,6 +70,15 @@ public class PayslipServiceImpl implements PayslipService {
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_GET_EMPLOYEES),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        // Skip adding attendance for "ASSOCIATE" employees
+        if (employee.getEmployeeType().equals(Constants.ASSOCIATE)) {
+            log.error("attendance cannot be added  for Associate Type employee with ID: {}", employeeId);
+            return new ResponseEntity<>(
+                    ResponseBuilder.builder().build().
+                            createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler
+                                    .getMessage(EmployeeErrorMessageKey.INVALID_EMPLOYEE_TYPE)))),
+                    HttpStatus.CONFLICT);
+        }
         entity = openSearchOperations.getSalaryById(salaryId, null, index);
         if (entity==null){
             log.error("Exception while fetching employee for salary {}", employeeId);

@@ -23,7 +23,9 @@ public enum ResourceType {
     SALARY_STRUCTURE("salary_structure"),
     RELIEVING("relieving"),
     TEMPLATE("template"),
-    BANK("bank_details");
+    BANK("bank_details"),
+    BACKGROUND("background_details");
+
 
 
     private final String value;

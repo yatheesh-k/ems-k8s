@@ -14,5 +14,15 @@ import lombok.*;
 public class CompanyEntity {
 
     private String id;
+    private String gstNo;
+    private String panNo;
+    private String companyName;
+    private String companyAddress;
+    private String imageFile;
+    private String companyType;
+    private String companyBranch;
+    private String cinNo;
+    private String stampImage;
+    private String shortName;
 
 }

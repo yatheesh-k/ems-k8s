@@ -4,6 +4,7 @@ import com.pb.employee.request.ProductRequest;
 import com.pb.employee.service.ProductService;
 import com.pb.employee.util.Constants;
 import com.pb.employee.util.EntityUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
+@Slf4j
 public class ProductServiceImpl implements ProductService {
 
-    private static final Logger log = LoggerFactory.getLogger(ProductServiceImpl.class);
     private final WebClient webClient;
 
     @Autowired
