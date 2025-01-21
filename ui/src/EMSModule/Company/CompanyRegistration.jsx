@@ -1315,7 +1315,7 @@ const CompanyRegistration = () => {
             </div>
           </div>
         </form>
-      </div>
+      </div>,,
     </LayOut>
   );
 };

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { InvoiceGetAllApi } from '../Utils/Axios';
+import { InvoiceGetAllApi } from '../../Utils/Axios';
 
 export const fetchInvoices = createAsyncThunk('invoices/fetchInvoices', async (companyId) => {
   try {
@@ -22,14 +22,12 @@ const InvoiceSlice = createSlice({
   reducers: {
     removeInvoiceFromState: (state, action) => {
         state.invoices = state.invoices.filter(invoice => invoice.invoiceId !== action.payload);
-        console.log('Updated state after removing invoice:', state.invoices);
     }
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchInvoices.pending, (state) => {
         state.loading = true;   
-        console.log('Fetching invoices, loading state is true.');
       })
       .addCase(fetchInvoices.fulfilled, (state, action) => {
         state.loading = false; 

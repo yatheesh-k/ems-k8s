@@ -5,10 +5,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Select from "react-select";
 import LayOut from "../../LayOut/LayOut";
+import { fetchCustomers } from "../Redux/CustomerSlice";
 import { useAuth } from "../../Context/AuthContext";
+import { fetchProducts } from "../Redux/ProductSlice";
 import { InvoicePostApi } from "../../Utils/Axios";
-import { fetchCustomers } from "../../Redux/CustomerSlice";
-import { fetchProducts } from "../../Redux/ProductSlice";
+import { selectProducts, selectCustomers } from "../Redux/Store"; // Selectors for loading states
 
 const InvoiceRegistration = () => {
   const {

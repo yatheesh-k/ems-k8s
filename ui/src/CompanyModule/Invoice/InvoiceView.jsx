@@ -5,7 +5,7 @@ import DataTable from "react-data-table-component";
 import { useDispatch, useSelector } from "react-redux";
 import LayOut from "../../LayOut/LayOut";
 import { useAuth } from "../../Context/AuthContext";
-import { fetchInvoices } from "../../Redux/InvoiceSlice";
+import { fetchInvoices } from "../Redux/InvoiceSlice";
 
 const InvoiceView = () => {
   const dispatch = useDispatch();

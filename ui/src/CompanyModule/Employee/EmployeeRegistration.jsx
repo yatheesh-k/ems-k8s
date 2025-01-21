@@ -69,6 +69,7 @@ const EmployeeRegistration = () => {
     { value: "Contract", label: "Contract" },
     { value: "Trainee", label: "Trainee" },
     { value: "Support", label: "Support" },
+    { value: "Associate", label: "Associate" },
   ];
 
   const Roles = [

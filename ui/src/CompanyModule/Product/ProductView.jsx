@@ -3,16 +3,16 @@ import { PencilSquare, XSquareFill } from "react-bootstrap-icons";
 import { useNavigate, Link } from "react-router-dom";
 import DataTable from "react-data-table-component";
 import { Slide, toast } from "react-toastify";
+import { useSelector, useDispatch } from "react-redux";
 import LayOut from "../../LayOut/LayOut"; // Assuming LayOut is being reused for consistent styling
-import { fetchBanks, removeBankFromState } from "../../Redux/BankSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { BankDeleteApiById } from "../../Utils/Axios";
+import { ProductDeleteApiById } from "../../Utils/Axios";
 import { useAuth } from "../../Context/AuthContext";
+import { fetchProducts, removeProductFromState } from "../Redux/ProductSlice";
 
-const AccountsView = () => {
+const ProductView = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { banks, loading, error } = useSelector((state) => state.banks);
+  const { products, loading, error } = useSelector((state) => state.products);
   const [search, setSearch] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -20,53 +20,55 @@ const AccountsView = () => {
   const { user } = useAuth();
   const companyId = user.companyId;
 
+  // Fetch all products on component mount
   useEffect(() => {
     if (companyId) {
-      console.log("fetchBanks", fetchBanks);
-      dispatch(fetchBanks(companyId));
+      dispatch(fetchProducts(companyId));
     }
   }, [dispatch, companyId]);
 
   useEffect(() => {
-    console.log("Banks from Redux store:", banks);
-  }, [banks]);
+    console.log("products from Redux store:", products);
+  }, [products]);
 
-  // Filter banks based on search term
+  // Filter products based on search term
   useEffect(() => {
-    if (banks && Array.isArray(banks)) {
-      const result = banks.filter((bank) =>
-        bank.bankName.toLowerCase().includes(search.toLowerCase())
+    if (products && Array.isArray(products)) {
+      const result = products.filter((product) =>
+        product.productName.toLowerCase().includes(search.toLowerCase())
       );
       setFilteredData(result);
     } else {
       setFilteredData([]);
     }
-  }, [search, banks]);
+  }, [search, products]);
 
-  const handleEdit = (bankId) => {
-    navigate(`/accountRegistration`, { state: { bankId } });
-    console.log("bankId from bankView", bankId);
+  const handleEdit = (productId) => {
+    navigate(`/productRegistartion`, { state: { productId } });
+    console.log("productId from ProductView", productId);
   };
 
-  const handleDelete = async (bankId) => {
+  const handleDelete = async (productId) => {
     try {
       console.log(
-        "Deleting customer with companyId:",
+        "Deleting product with companyId:",
         companyId,
-        "and bankId:",
-        bankId
+        "and productId:",
+        productId
       );
       // Make a DELETE request to the API with the given ID
-      const response = await BankDeleteApiById(companyId, bankId);
+      const response = await ProductDeleteApiById(companyId, productId);
       console.log("Delete response:", response);
-      dispatch(removeBankFromState(bankId)); // Refetch customers from the Redux store
-      toast.error("Bank deleted successfully", {
+      dispatch(removeProductFromState(productId)); // Refetch products from the Redux store
+      toast.error("Product deleted successfully", {
         position: "top-right",
         transition: Slide,
         hideProgressBar: true,
         theme: "colored",
         autoClose: 1000, // Close the toast after 1 second
       });
+      // console.log(response);
+      // console.log(response.data.data);
     } catch (error) {
       console.error("Error in handleDelete:", error.response || error);
       if (error.response && error.response.data) {
@@ -83,46 +85,47 @@ const AccountsView = () => {
         </h6>
       ),
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
-      width: "80px",
-    },
-    // {
-    //   name: "Account Number",
-    //   selector: (row) => row.accountNumber,
-    //   width: "190px",
-    // },
-    {
-      name: <h6><b>Bank Name</b></h6>,
-      selector: (row) => row.bankName,
-      width: "250px",
-    },
-    // {
-    //   name: "IFSC Code",
-    //   selector: (row) => row.ifscCode,
-    //   width: "190px",
-    // },
-    {
-      name: <h6><b>Branch Name</b></h6>,
-      selector: (row) => row.branch,
-      width: "250px",
+      width: "120px",
     },
     {
-      name: <h6><b>Account Type</b></h6>,
-      selector: (row) => row.accountType,
-      width: "250px",
+      name: (
+        <h6>
+          <b>Product Name</b>
+        </h6>
+      ),
+      selector: (row) => row.productName,
+      width: "220px",
     },
-    // {
-    //   name: "Address",
-    //   selector: (row) => row.address,
-    //   width: "190px",
-    // },
     {
-      name: <h6><b>Actions</b></h6>,
+      name: (
+        <h6>
+          <b>Product Cost</b>
+        </h6>
+      ),
+      selector: (row) => row.productCost,
+      width: "220px",
+    },
+    {
+      name: (
+        <h6>
+          <b>HSN Code</b>
+        </h6>
+      ),
+      selector: (row) => row.hsnNo,
+      width: "220px",
+    },
+    {
+      name: (
+        <h6>
+          <b>Actions</b>
+        </h6>
+      ),
       cell: (row) => (
         <div>
           <button
             className="btn btn-sm"
             style={{ backgroundColor: "transparent" }}
-            onClick={() => handleEdit(row.bankId)}
+            onClick={() => handleEdit(row.productId)}
             title="Edit"
           >
             <PencilSquare size={22} color="#2255a4" />
@@ -130,7 +133,7 @@ const AccountsView = () => {
           <button
             className="btn btn-sm"
             style={{ backgroundColor: "transparent" }}
-            onClick={() => handleDelete(row.bankId)}
+            onClick={() => handleDelete(row.productId)}
             title="Delete"
           >
             <XSquareFill size={22} color="#da542e" />
@@ -151,7 +154,7 @@ const AccountsView = () => {
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3">
-              <strong>AccountDetails</strong>
+              <strong>Products</strong>
             </h1>
           </div>
           <div className="col-auto">
@@ -160,7 +163,7 @@ const AccountsView = () => {
                 <li className="breadcrumb-item">
                   <Link to={"/"}>Home</Link>
                 </li>
-                <li className="breadcrumb-item active">AccountDetails</li>
+                <li className="breadcrumb-item active">Products</li>
               </ol>
             </nav>
           </div>
@@ -173,8 +176,8 @@ const AccountsView = () => {
               <div className="card-header">
                 <div className="row">
                   <div className="col-md-4">
-                    <Link to={"/accountRegistration"}>
-                      <button className="btn btn-primary">Add Account</button>
+                    <Link to={"/productRegistartion"}>
+                      <button className="btn btn-primary">Add Product</button>
                     </Link>
                   </div>
                   <div className="col-md-4 offset-md-4 d-flex justify-content-end">
@@ -204,4 +207,4 @@ const AccountsView = () => {
   );
 };
 
-export default AccountsView;
+export default ProductView;
