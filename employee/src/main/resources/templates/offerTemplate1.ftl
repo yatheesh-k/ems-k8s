@@ -46,11 +46,10 @@
 
         .confidential-text {
             text-align: center;
-            /* Center the text */
             font-weight: bold;
             /* Make the text bold */
             text-decoration: underline;
-            /* Underline the text */
+            margin-top: -10px;
             font-size: 28px;
         }
 
