@@ -8,7 +8,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "./Context/AuthContext";
 import { Provider } from "react-redux";
-import store from "./CompanyModule/Redux/Store";
+import store from './Redux/Store'
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

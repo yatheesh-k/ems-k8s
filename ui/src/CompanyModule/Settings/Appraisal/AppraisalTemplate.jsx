@@ -179,8 +179,8 @@ const AppraisalTemplate = () => {
   
       // Check if the error response has details
       if (error.response) {
-        console.error("Response data:", error.response.data); // Log response data
-        const errorMessage = error.response.data.detail || "An error occurred";
+        console.error("Response data:", error.response.data.error.message); // Log response data
+        const errorMessage = error.response.data.error.message || "An error occurred";
         toast.error(`Error: ${errorMessage}`);
       } else {
         toast.error("An unexpected error occurred");

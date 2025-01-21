@@ -397,7 +397,7 @@ const SideNav = () => {
               <li className="sidebar-item">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href="#"
+                  href=" "
                   onClick={toggleCompany}
                   data-bs-target="#company"
                   data-bs-toggle="collapse"
@@ -497,7 +497,7 @@ const SideNav = () => {
               <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href="#"
+                  href=" "
                   onClick={toggleLetters}
                   data-bs-target="#letterManagement"
                   data-bs-toggle="collapse"
@@ -577,7 +577,7 @@ const SideNav = () => {
               <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href="#"
+                  href=" "
                   onClick={toggleAttendance}
                   data-bs-target="#attendenceManagement"
                   data-bs-toggle="collapse"
@@ -626,7 +626,7 @@ const SideNav = () => {
               <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href="#"
+                  href=" "
                   onClick={togglePayroll}
                   data-bs-target="#payroll"
                   data-bs-toggle="collapse"
@@ -690,7 +690,7 @@ const SideNav = () => {
               <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href="#"
+                  href=" "
                   onClick={toggleBank}
                   data-bs-target="#attendenceManagement"
                   data-bs-toggle="collapse"
@@ -740,7 +740,7 @@ const SideNav = () => {
               <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href="#"
+                  href=" "
                   onClick={toggleCustomer}
                   data-bs-target="#attendenceManagement"
                   data-bs-toggle="collapse"
@@ -791,7 +791,7 @@ const SideNav = () => {
               <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href="#"
+                  href=" "
                   onClick={toggleProducts}
                   data-bs-target="#attendenceManagement"
                   data-bs-toggle="collapse"
@@ -840,7 +840,7 @@ const SideNav = () => {
               <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href="#"
+                  href=" "
                   onClick={toggleInvoice}
                   data-bs-target="#attendenceManagement"
                   data-bs-toggle="collapse"
@@ -889,7 +889,7 @@ const SideNav = () => {
               <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href="#"
+                  href=" "
                   onClick={toggleSettings}
                   data-bs-target="#settingsManagement"
                   data-bs-toggle="collapse"
@@ -1075,7 +1075,7 @@ const SideNav = () => {
               <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href="#"
+                  href=" "
                   onClick={toggleLetters}
                   data-bs-target="#letterManagement"
                   data-bs-toggle="collapse"
@@ -1155,7 +1155,7 @@ const SideNav = () => {
               <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href="#"
+                  href=" "
                   onClick={toggleAttendance}
                   data-bs-target="#attendenceManagement"
                   data-bs-toggle="collapse"
@@ -1204,7 +1204,7 @@ const SideNav = () => {
               <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href="#"
+                  href=" "
                   onClick={togglePayroll}
                   data-bs-target="#payroll"
                   data-bs-toggle="collapse"
@@ -1269,7 +1269,7 @@ const SideNav = () => {
               <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href="#"
+                  href=" "
                   onClick={toggleSettings}
                   data-bs-target="#settingsManagement"
                   data-bs-toggle="collapse"
@@ -1377,7 +1377,7 @@ const SideNav = () => {
               <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href="#"
+                  href=" "
                   onClick={toggleBank}
                   data-bs-target="#attendenceManagement"
                   data-bs-toggle="collapse"
@@ -1426,7 +1426,7 @@ const SideNav = () => {
               <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href="#"
+                  href=" "
                   onClick={toggleCustomer}
                   data-bs-target="#attendenceManagement"
                   data-bs-toggle="collapse"
@@ -1477,7 +1477,7 @@ const SideNav = () => {
               <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href="#"
+                  href=" "
                   onClick={toggleProducts}
                   data-bs-target="#attendenceManagement"
                   data-bs-toggle="collapse"
@@ -1526,7 +1526,7 @@ const SideNav = () => {
               <li className="sidebar-item has-dropdown">
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href="#"
+                  href=" "
                   onClick={toggleBank}
                   data-bs-target="#attendenceManagement"
                   data-bs-toggle="collapse"
