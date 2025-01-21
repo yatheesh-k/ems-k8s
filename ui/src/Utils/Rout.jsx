@@ -57,6 +57,13 @@ import Template from '../CompanyModule/Settings/OfferLetter/Template';
 import OfferLetterForm from '../CompanyModule/Settings/OfferLetter/OfferLetterForm';
 import OfferLetterPreview from '../CompanyModule/Settings/OfferLetter/OfferLetterPreview';
 import EmployeeSalaryView from '../EmployeeModule/EmployeeSalaryView';
+import CustomersRegistration from '../CompanyModule/Customer/CustomerRegistration';
+import CustomersView from '../CompanyModule/Customer/CustomerView';
+import InvoiceRegistration from '../CompanyModule/Invoice/InvoiceRegistration';
+import InvoiceView from '../CompanyModule/Invoice/InvoiceView';
+import InvoicePdf from '../CompanyModule/Invoice/InvoicePdf';
+import ProductRegistration from '../CompanyModule/Product/ProductRegistration';
+import ProductView from '../CompanyModule/Product/ProductView';
 
 const Rout = () => {
   const location = useLocation();
@@ -147,6 +154,13 @@ const Rout = () => {
       <Route path='/employeePayslip' element={<EmployeePayslips />}></Route>
       <Route path='/employeeSalary' element={<EmployeeSalaryById />}></Route>
       <Route path='/employeeSalaryView' element={<EmployeeSalaryView/>}></Route>
+      <Route path='/customerRegistration' element={<CustomersRegistration/>}></Route>
+      <Route path='/customersView' element={<CustomersView/>}></Route>
+      <Route path='/productRegistartion' element={<ProductRegistration/>}></Route>
+      <Route path='/productsView' element={<ProductView/>}></Route>
+      <Route path='/invoiceRegistration' element={<InvoiceRegistration/>}></Route>
+      <Route path='/invoiceView' element={<InvoiceView/>}></Route>
+      <Route path='/invoicePdf' element={<InvoicePdf/>}></Route>
       <Route path='/offerLetter' element={<OfferLetter />}></Route>
       <Route path='/payslipLetter' element={<PaySlipLetter />}></Route>
       <Route path='/hikeLetter' element={<HikeLetter />}></Route>

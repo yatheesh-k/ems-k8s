@@ -572,3 +572,124 @@ export const AppraisalLetterDownload = async (payload) => {
     throw error; // Re-throw for handling by calling code
   }
 };
+
+export const CustomerGetAllApi = (companyId) => {
+  return axiosInstance.get(`/company/${companyId}/customer/all`);
+};
+
+export const CustomerPostApi = (companyId,data) => {
+  return axiosInstance.post(`/company/${companyId}/customer`, data)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error creating customer:', error);
+      throw error;
+    });
+};
+
+export const CustomerGetApiById = (companyId,customerId) => {
+  return axiosInstance.get(`/company/${companyId}/customer/${customerId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error fetching customer by ID:', error);
+      throw error;
+    });
+};
+
+export const CustomerDeleteApiById = (companyId,customerId) => {
+  return axiosInstance.delete(`/company/${companyId}/customer/${customerId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error deleting customer by ID:', error);
+      throw error;
+    });
+};
+
+export const CustomerPutApiById = (companyId, customerId, data) => {
+  return axiosInstance.patch(`/company/${companyId}/customer/${customerId}`, data,{
+    headers:{
+      "Content-Type":'application/json'
+    }
+  })
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error updating customer by ID:', error);
+      throw error;
+    });
+};
+
+export const ProductGetAllApi = (companyId) => {
+  return axiosInstance.get(`/company/${companyId}/product/all`);
+};
+
+export const ProductPostApi = (companyId, data) => {
+  return axiosInstance.post(`/company/${companyId}/product`, data)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error creating product:', error);
+      throw error;
+    });
+};
+
+export const ProductGetApiById = (companyId, productId) => {
+  return axiosInstance.get(`/company/${companyId}/product/${productId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error fetching product by ID:', error);
+      throw error;
+    });
+};
+
+export const ProductDeleteApiById = (companyId, productId) => {
+  return axiosInstance.delete(`/company/${companyId}/product/${productId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error deleting product by ID:', error);
+      throw error;
+    });
+};
+
+export const ProductPutApiById = (companyId, productId, data) => {
+  return axiosInstance.patch(`/company/${companyId}/product/${productId}`, data, {
+    headers: {
+      "Content-Type": 'application/json'
+    }
+  })
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error updating product by ID:', error);
+      throw error;
+    });
+};
+
+export const InvoicePostApi = (companyId, customerId, data) => {
+  return axiosInstance.post(`/company/${companyId}/customer/${customerId}/invoice`, data)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error creating product:', error);
+      throw error;
+    });
+};
+
+export const InvoiceGetAllApi = (companyId) => {
+  return axiosInstance.get(`/company/${companyId}/invoice`);
+};
+
+export const InvoiceGetByCustomerIdApi = (companyId, customerId) => {
+  return axiosInstance.get(`/company/${companyId}/customer/${customerId}/invoice`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error fetching product by ID:', error);
+      throw error;
+    });
+};
+
+export const InvoiceGetApiById = (companyId, customerId, invoiceId) => {
+  return axiosInstance.get(`/company/${companyId}/customer/${customerId}/invoice/${invoiceId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error fetching product by ID:', error);
+      throw error;
+    });
+};
+
+
