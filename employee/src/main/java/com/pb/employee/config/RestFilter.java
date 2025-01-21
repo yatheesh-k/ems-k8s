@@ -178,7 +178,7 @@ public class RestFilter implements Filter {
             Object roles = parsedToken.getBody().get("roles");
             if (roles instanceof List) {
                 List<?> rolesList = (List<?>) roles;
-                return rolesList.contains("company_admin") || rolesList.contains("employee");
+                return rolesList.contains("company_admin") || rolesList.contains("employee") || rolesList.contains("ems_admin");
             }
         }
         return false;
