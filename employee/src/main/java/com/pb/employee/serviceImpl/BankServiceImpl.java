@@ -158,7 +158,7 @@ public class BankServiceImpl implements BankService {
 
         try {
             // Fetch the bank details by bankId
-            bankEntity = openSearchOperations.getBankById(bankId, null, index);
+            bankEntity = openSearchOperations.getBankById(index, null, bankId);
             if (bankEntity == null) {
                 log.error("Unable to find the Bank details with ID {}", bankId);
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_BANK_DETAILS),
