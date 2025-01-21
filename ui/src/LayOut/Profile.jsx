@@ -34,6 +34,8 @@ function Profile() {
   const [error, setError] = useState(null);
   const [imgError, setImgError] = useState(null);
   const { user = {}, logoFileName } = useAuth();
+  console.log("user:", user.companyId);
+  
   const navigate = useNavigate();
   const [response, setResponse] = useState({ data: {} });
   const [hasCinNo, setHasCinNo] = useState(false);
