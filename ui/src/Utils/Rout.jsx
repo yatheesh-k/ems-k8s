@@ -57,15 +57,15 @@ import Template from '../CompanyModule/Settings/OfferLetter/Template';
 import OfferLetterForm from '../CompanyModule/Settings/OfferLetter/OfferLetterForm';
 import OfferLetterPreview from '../CompanyModule/Settings/OfferLetter/OfferLetterPreview';
 import EmployeeSalaryView from '../EmployeeModule/EmployeeSalaryView';
-import CustomersView from '../InvoiceModule/Customers/CustomersView'
-import ProductRegistration from '../InvoiceModule/Products/ProductRegistration';
-import ProductsView from '../InvoiceModule/Products/ProductsView'
-import InvoiceRegistration from '../InvoiceModule/Invoice/InvoiceRegistration';
-import InvoiceView from '../InvoiceModule/Invoice/InvoiceView'
-import InvoicePdf from '../InvoiceModule/Invoice/InvoicePdf'
-import AccountRegistration from '../InvoiceModule/AccountDetails/AccountRegistration'
-import AccountsView from '../InvoiceModule/AccountDetails/AccountsView'
+import AccountRegistration from '../InvoiceModule/AccountDetails/AccountRegistration';
+import AccountsView from '../InvoiceModule/AccountDetails/AccountsView';
 import CustomersRegistration from '../InvoiceModule/Customers/CustomerRegistration';
+import CustomersView from '../InvoiceModule/Customers/CustomersView'
+import InvoiceRegistration from '../InvoiceModule/Invoice/InvoiceRegistration';
+import InvoiceView from '../InvoiceModule/Invoice/InvoiceView';
+import InvoicePdf from '../InvoiceModule/Invoice/InvoicePdf';
+import ProductView from '../InvoiceModule/Products/ProductsView';
+import ProductRegistration from '../InvoiceModule/Products/ProductRegistration'
 
 const Rout = () => {
   const location = useLocation();
@@ -183,7 +183,7 @@ const Rout = () => {
       <Route path='/customerRegistration' element={<CustomersRegistration/>}></Route>
       <Route path='/customersView' element={<CustomersView/>}></Route>
       <Route path='/productRegistartion' element={<ProductRegistration/>}></Route>
-      <Route path='/productsView' element={<ProductsView/>}></Route>
+      <Route path='/productsView' element={<ProductView/>}></Route>
       <Route path='/invoiceRegistartion' element={<InvoiceRegistration/>}></Route>
       <Route path='/invoiceView' element={<InvoiceView/>}></Route>
       <Route path='/invoicePdf' element={<InvoicePdf/>}></Route>

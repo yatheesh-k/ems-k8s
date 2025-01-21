@@ -715,66 +715,37 @@ export const BankPutApiById = (companyId, bankId, data) => {
     });
 };
 
-export const InvoiceGetApi = () => {
-  return axiosInstance.get(`/invoice/all`);
-}
-
-export const InvoicePostApi = (data) => {
-  return axiosInstance.post('/invoice', data, {
-      headers: {
-          'Content-Type': 'application/json',
-      }
-  });
-}
-
-export const InvoiceGetApiById = (invoiceId) => {
-  return axiosInstance.get(`/invoice/${invoiceId}`)
-}
-
-export const InvoiceDeleteApiById = (invoiceId) => {
-  const company = localStorage.getItem("companyName")
-  return axiosInstance.delete(`/invoice/${invoiceId}`)
-      .then(response => {
-          return response.data;
-      })
-      .catch(error => {
-          console.error('Error fetching company by ID:', error);
-          throw error;
-      });
-}
-
-export const InvoicePutApiById = (invoiceId, data) => {
-  return axiosInstance.patch(`/invoice/${invoiceId}`, data)
+export const InvoicePostApi = (companyId, customerId, data) => {
+  return axiosInstance.post(`/company/${companyId}/customer/${customerId}/invoice`, data)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error creating product:', error);
+      throw error;
+    });
 };
 
-export const InvoiceDownloadApi = async (invoiceId, data) => {
-  try {
-      const response = await axiosInstance.get(`/invoice/${invoiceId}/generate`, {
-          params: data,
-          responseType: 'blob',
-          headers: {
-              'Accept': 'application/pdf',
-          }
-      });
-      if (response.status === 200 && response.data) {
-          const url = window.URL.createObjectURL(new Blob([response.data]));
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `invoice_${invoiceId}.pdf`;
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          window.URL.revokeObjectURL(url);
-          return true;
-      } else {
-          console.error('Error: Invalid response or empty data');
-          return false;
-      }
-  } catch (error) {
-      console.error('Download error:', error.response || error.message || error);
-      return false; // Return false or handle the error as needed
-  }
+export const InvoiceGetAllApi = (companyId) => {
+  return axiosInstance.get(`/company/${companyId}/invoice`);
 };
+
+export const InvoiceGetByCustomerIdApi = (companyId, customerId) => {
+  return axiosInstance.get(`/company/${companyId}/customer/${customerId}/invoice`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error fetching product by ID:', error);
+      throw error;
+    });
+};
+
+export const InvoiceGetApiById = (companyId, customerId, invoiceId) => {
+  return axiosInstance.get(`/company/${companyId}/customer/${customerId}/invoice/${invoiceId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error fetching product by ID:', error);
+      throw error;
+    });
+};
+
 
 
 
