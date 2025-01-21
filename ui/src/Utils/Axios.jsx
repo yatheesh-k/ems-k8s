@@ -1,6 +1,5 @@
 import axios from "axios";
-import { useAuth } from "../Context/AuthContext";
-import { employeeId } from "./Auth";
+import { companyId, employeeId } from "./Auth";
 import { json } from "react-router-dom";
 
 const protocol = window.location.protocol;
@@ -11,11 +10,11 @@ const BASE_URL = `${protocol}//${hostname}:8092/ems`;
 const Login_URL = `${protocol}//${hostname}:9090/ems`;
 
 const token = localStorage.getItem("token");
-
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: {
     Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
   }
 });
 export const loginApi = (data) => {
@@ -670,6 +669,26 @@ export const InvoicePostApi = (companyId, customerId, data) => {
     });
 };
 
+// Bank Get All API
+export const BankGetAllApi = (companyId) => {
+  return axiosInstance.get(`/company/${companyId}/bank`)
+    // .then(response => response.data)
+    // .catch(error => {
+    //   console.error('Error fetching all banks:', error);
+    //   throw error;
+    // });
+};
+
+// Bank Post API (Create a new bank)
+export const BankPostApi = (companyId, data) => {
+  return axiosInstance.post(`/company/${companyId}/bank`, data)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error creating bank:', error);
+      throw error;
+    });
+};
+
 export const InvoiceGetAllApi = (companyId) => {
   return axiosInstance.get(`/company/${companyId}/invoice`);
 };
@@ -682,6 +701,15 @@ export const InvoiceGetByCustomerIdApi = (companyId, customerId) => {
       throw error;
     });
 };
+// Bank Get API by ID
+export const BankGetApiById = (companyId, bankId) => {
+  return axiosInstance.get(`/company/${companyId}/bank/${bankId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error fetching bank by ID:', error);
+      throw error;
+    });
+};
 
 export const InvoiceGetApiById = (companyId, customerId, invoiceId) => {
   return axiosInstance.get(`/company/${companyId}/customer/${customerId}/invoice/${invoiceId}`)
@@ -691,5 +719,62 @@ export const InvoiceGetApiById = (companyId, customerId, invoiceId) => {
       throw error;
     });
 };
+// Bank Delete API by ID
+export const BankDeleteApiById = (companyId, bankId) => {
+  return axiosInstance.delete(`/company/${companyId}/bank/${bankId}`)
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error deleting bank by ID:', error);
+      throw error;
+    });
+};
+
+// Bank Patch API by ID (Update a bank)
+export const BankPutApiById = (companyId, bankId, data) => {
+  return axiosInstance.patch(`/company/${companyId}/bank/${bankId}`, data, {
+    headers: {
+      "Content-Type": 'application/json'
+    }
+  })
+    .then(response => response.data)
+    .catch(error => {
+      console.error('Error updating bank by ID:', error);
+      throw error;
+    });
+};
+
+export const InvoiceGetApi = () => {
+  return axiosInstance.get(`/invoice/all`);
+}
+
+export const InvoiceDownloadApi = async (invoiceId, data) => {
+  try {
+      const response = await axiosInstance.get(`/invoice/${invoiceId}/generate`, {
+          params: data,
+          responseType: 'blob',
+          headers: {
+              'Accept': 'application/pdf',
+          }
+      });
+      if (response.status === 200 && response.data) {
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `invoice_${invoiceId}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+          return true;
+      } else {
+          console.error('Error: Invalid response or empty data');
+          return false;
+      }
+  } catch (error) {
+      console.error('Download error:', error.response || error.message || error);
+      return false; // Return false or handle the error as needed
+  }
+};
+
 
 

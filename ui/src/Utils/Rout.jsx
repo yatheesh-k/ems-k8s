@@ -64,6 +64,8 @@ import InvoiceView from '../CompanyModule/Invoice/InvoiceView';
 import InvoicePdf from '../CompanyModule/Invoice/InvoicePdf';
 import ProductRegistration from '../CompanyModule/Product/ProductRegistration';
 import ProductView from '../CompanyModule/Product/ProductView';
+import AccountRegistration from '../InvoiceModule/AccountDetails/AccountRegistration'
+import AccountsView from '../InvoiceModule/AccountDetails/AccountsView'
 
 const Rout = () => {
   const location = useLocation();
@@ -185,6 +187,15 @@ const Rout = () => {
       <Route path='/payslipDoc2' element={<PayslipDoc2/>}></Route>
       <Route path='/payslipDoc3' element={<PayslipDoc3 />}></Route>
       <Route path='/payslipDoc4' element={<PayslipDoc4/>}></Route>
+      <Route path='/customerRegistration' element={<CustomersRegistration/>}></Route>
+      <Route path='/customersView' element={<CustomersView/>}></Route>
+      <Route path='/productRegistartion' element={<ProductRegistration/>}></Route>
+      <Route path='/productsView' element={<ProductView/>}></Route>
+      <Route path='/invoiceRegistartion' element={<InvoiceRegistration/>}></Route>
+      <Route path='/invoiceView' element={<InvoiceView/>}></Route>
+      <Route path='/invoicePdf' element={<InvoicePdf/>}></Route>
+      <Route path='/accountRegistration' element={<AccountRegistration/>}></Route>
+      <Route path='/accountsView' element={<AccountsView/>}></Route>
     </Routes>
   );
 };
