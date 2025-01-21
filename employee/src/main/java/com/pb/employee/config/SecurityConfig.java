@@ -26,7 +26,7 @@ public class SecurityConfig {
                         // Permit public access to the Swagger API and health check URLs
                         .requestMatchers("/**")
                         .permitAll()// Protect the other endpoints by requiring specific roles (company_admin or employee)
-                        .requestMatchers("/**").hasAnyRole("company-admin","employee")  // Ensure role is prefixed with "ROLE_"
+                        .requestMatchers("/**").hasAnyRole("company-admin","employee","ems_admin")  // Ensure role is prefixed with "ROLE_"
                         .anyRequest().authenticated())  // Require authentication for all other requests
                 .csrf(csrf -> csrf.disable());  // Disable CSRF for stateless APIs (if necessary)
 
