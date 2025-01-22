@@ -158,7 +158,7 @@ const PayslipDoc4 = () => {
                                             <th style={{ padding: "4px", width: "150px", textAlign: "left", background: "#d3d3d3", color: 'black', border: "1px solid black" }}>Bank Name</th>
                                             <td style={{ padding: "4px", textAlign: "left", border: "1px solid black" }}>{employeeDetails.bankName}</td>
                                             <th style={{ padding: "4px", width: "150px", textAlign: "left", background: "#d3d3d3", color: 'black', border: "1px solid black" }}>Location</th>
-                                            <td style={{ padding: "4px", textAlign: "left", border: "1px solid black" }}></td>
+                                            <td style={{ padding: "4px", textAlign: "left", border: "1px solid black" }}> {employeeDetails.location}</td>
                                         </tr>
                                         <tr>
                                             <th style={{ padding: "4px", width: "150px", textAlign: "left", background: "#d3d3d3", color: 'black', border: "1px solid black" }}>Total Days</th>
