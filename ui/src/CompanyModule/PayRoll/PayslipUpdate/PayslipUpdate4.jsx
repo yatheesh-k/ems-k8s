@@ -775,7 +775,9 @@ const PayslipUpdate4 = () => {
                           textAlign: "left",
                           border: "1px solid black",
                         }}
-                      ></td>
+                      >
+                         {employeeDetails.location}
+                      </td>
                     </tr>
                     <tr>
                       <th
