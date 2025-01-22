@@ -21,7 +21,7 @@
         .logo {
             text-align: right;
             flex-basis: 50%;
-            margin-top: -70px;
+            margin-top: -100px;
             /* Use negative margin to move the logo up */
 
         }
