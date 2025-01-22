@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Offer Letter</title>
     <style>
+     @page {
+         size: A4;
+         margin: 8mm;
+        }
         .employee-details {
             text-align: left;
             font-size: 20px;
