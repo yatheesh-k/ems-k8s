@@ -482,7 +482,7 @@
         <p>*Income Tax deduction is subjected to timely submission of the investment details.</p>
         <p>*Pan Card submission is mandatory for the disbursement of the salary.</p>
 
-            <h5 style="text-align: center; margin-top: 220px;">
+            <h5 style="text-align: center; margin-top: 100px;">
                 <#if company.cinNo?has_content>
                     CIN: ${company.cinNo}
                     <#elseif company.companyRegNo?has_content>
