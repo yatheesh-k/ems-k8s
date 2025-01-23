@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Offer Letter</title>
     <style>
+     @page {
+         size: A4;
+         margin: 8mm;
+        }
         .employee-details {
             text-align: left;
             font-size: 20px;
@@ -21,7 +25,7 @@
         .logo {
             text-align: right;
             flex-basis: 50%;
-            margin-top: -70px;
+            margin-top: -100px;
             /* Use negative margin to move the logo up */
 
         }
@@ -478,7 +482,7 @@
         <p>*Income Tax deduction is subjected to timely submission of the investment details.</p>
         <p>*Pan Card submission is mandatory for the disbursement of the salary.</p>
 
-            <h5 style="text-align: center; margin-top: 220px;">
+            <h5 style="text-align: center; margin-top: 100px;">
                 <#if company.cinNo?has_content>
                     CIN: ${company.cinNo}
                     <#elseif company.companyRegNo?has_content>
