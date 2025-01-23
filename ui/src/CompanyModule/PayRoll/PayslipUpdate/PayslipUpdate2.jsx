@@ -165,6 +165,7 @@ const PayslipUpdate2 = () => {
         const payload = {
           companyName: user.company,
           salary: {
+            ...payslipData.salary,
             salaryId: payslipData.salary.salaryId,
             salaryConfigurationEntity: {
               ...payslipData.salary.salaryConfigurationEntity,
