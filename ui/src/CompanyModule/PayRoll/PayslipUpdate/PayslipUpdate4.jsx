@@ -137,29 +137,47 @@ const PayslipUpdate4 = () => {
 
         const grossAmount = payslipData.salary.grossAmount || 0;
 
-        // Only recalculate "Other Allowances" if existing allowances have been updated
+        // Recalculate "Other Allowances" if necessary
         let updatedOtherAllowance =
           allowances["Other Allowances"] || grossAmount / 12 - totalAllowances;
 
         // Prevent recalculation of "Other Allowances" when new fields like Bonus are added
         if (Object.keys(newAllowances).length > 0) {
-          // If new fields are added, "Other Allowances" should remain unchanged
           updatedOtherAllowance =
             allowances["Other Allowances"] ||
             grossAmount / 12 - totalAllowances;
         }
 
         // Prevent negative "Other Allowances"
-        // if (updatedOtherAllowance < 0) {
-        //   setOtherAllowanceError("Other Allowance cannot be negative.");
-        //   console.log("Other Allowance cannot be negative.", updatedOtherAllowance);
-        //   return; // Stop the update process if the value is negative
-        // } else {
-        //   setOtherAllowanceError(""); // Clear the error if the allowance is valid
-        // }
+        if (updatedOtherAllowance < 0) {
+          setOtherAllowanceError("Other Allowance cannot be negative.");
+          console.log(
+            "Other Allowance cannot be negative.",
+            updatedOtherAllowance
+          );
+          return; // Stop the update process if the value is negative
+        } else {
+          setOtherAllowanceError(""); // Clear the error if the allowance is valid
+        }
 
         // Ensure the "Other Allowances" is always updated correctly
         allowances["Other Allowances"] = updatedOtherAllowance.toString();
+
+        // Handle new deductions (from user input) and include them in the payload
+        const updatedDeductions = deductionFields.reduce((acc, field) => {
+          acc[field.label] = field.value;
+          return acc;
+        }, {});
+
+        // Extract existing deductions from the current payslip data
+        const existingDeductions =
+          payslipData.salary.salaryConfigurationEntity.deductions || {};
+
+        // Merge the updated deductions with the existing ones, making sure to avoid duplication
+        const mergedDeductions = {
+          ...existingDeductions, // Include the existing deductions
+          ...updatedDeductions, // Add new deductions
+        };
 
         // Create the payload to send to the server
         const payload = {
@@ -171,6 +189,7 @@ const PayslipUpdate4 = () => {
               ...payslipData.salary.salaryConfigurationEntity,
               allowances: allowances, // Updated allowances including recalculated "Other Allowances"
               newAllowances: newAllowances, // Only new allowances like "Bonus"
+              deductions: mergedDeductions, // Merged deductions with the updates
             },
             totalEarnings: totals.totalEarnings,
             totalDeductions: totals.totalDeductions,
@@ -185,6 +204,7 @@ const PayslipUpdate4 = () => {
 
         console.log("Payload being sent:", payload);
 
+        // Call the API to update the payslip
         await EmployeePayslipUpdate(employeeId, payslipId, payload);
         toast.success("Payslip updated successfully");
         navigate("/payslipsList");
