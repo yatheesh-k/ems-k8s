@@ -6,28 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pay Slip Template</title>
 <style>
-   .logo img {
-               width: 250px;
-               height: 90px;
-           }
-
-           .header-table {
-               width: 100%;
-           }
-
-           .header-table td {
-               vertical-align: top;
-           }
-
-           .address {
-               text-align: right;
-               font-size: 14px;
-               line-height: 1.5;
-           }
-
-           .address h4 {
-               margin: 5px 0;
-           }
+    .logo {
+        width: 250px;
+        height: 90px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
 
    .employee-table table,.employee-table th,
    .employee-table td {
@@ -56,6 +40,10 @@
     .text {
      margin: 20px 0;
      }
+     .address {
+     text-align: center;
+     font-size: 12px;
+    }
     .allowance-fields, .allowance-values {
          margin-bottom:40px;
          border: none; /* No border for allowance tables */
@@ -78,23 +66,9 @@
 
 </head>
 <body>
-     <table class="header-table">
-            <tr>
-                <!-- Logo on the left -->
-                <td>
-                    <div class="logo">
-                        <img src="${company.imageFile}" alt="Company Logo" />
-                    </div>
-                </td>
-
-                <!-- Address on the right -->
-                <td class="address">
-                    <h4>${company.companyAddress}</h4>
-                    <h4>${company.mobileNo}</h4>
-                    <h4>${company.emailId}</h4>
-                </td>
-            </tr>
-        </table>
+    <div>
+        <img class="logo" src="${company.imageFile}" alt="Company Logo" />
+    </div>
     <div class="employee-details">
         <table class = "employee-table">
             <tr>
@@ -293,11 +267,19 @@
                 </tr>
                 </table>
 
+
         </div>
            <div class="text">
                <p><em>This is a computer-generated payslip and does not require authentication.</em></p>
            </div>
 
-
+            <div class="address">
+              <hr />
+              <p>
+              Company Address: ${company.companyAddress}<br />
+              Mobile No: ${company.mobileNo}<br />
+              Email ID: ${company.emailId}
+              </p>
+            </div>
 </body>
 </html>
