@@ -101,6 +101,7 @@ public class Constants {
     public static final String FIRM = "Firm";
 
     public static final String BASIC_SALARY = "Basic Salary";
+    public static final String BASIC_SALARY_SPACE = "Basic  Salary";
     public static final String ALLOWANCE = "Allowance";
     public static final String OTHER_ALLOWANCES = "Other Allowances";
     public static final String EXPERIENCE_LETTER = "expLetter.ftl";
