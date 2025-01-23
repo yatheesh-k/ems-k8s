@@ -108,7 +108,6 @@ const PayslipUpdate3 = () => {
       toast.error("Failed to fetch payslip data");
     }
   };
-
   const handleUpdate = async () => {
     if (employeeId && payslipId) {
       try {
@@ -121,13 +120,16 @@ const PayslipUpdate3 = () => {
         const newAllowances = {};
         allowanceFields.forEach((field) => {
           if (field.label === "Bonus") {
-            // Add Bonus only to newAllowances
+            // Add Bonus to the existing allowances
             newAllowances[field.label] = Number(field.value);
           } else {
             // Handle updates to existing allowances
             allowances[field.label] = Number(field.value);
           }
         });
+  
+        // Add new allowances (like Bonus) to the existing allowances
+        Object.assign(allowances, newAllowances);
   
         // Calculate total of other allowances (excluding "Other Allowances")
         const totalAllowances = Object.entries(allowances)
@@ -181,7 +183,7 @@ const PayslipUpdate3 = () => {
             salaryId: payslipData.salary.salaryId,
             salaryConfigurationEntity: {
               ...payslipData.salary.salaryConfigurationEntity,
-              allowances: allowances, // Updated allowances including recalculated "Other Allowances"
+              allowances: allowances, // Updated allowances including recalculated "Other Allowances" and Bonus
               newAllowances: newAllowances, // Only new allowances like "Bonus"
               deductions: mergedDeductions, // Merged deductions with the updates
             },
