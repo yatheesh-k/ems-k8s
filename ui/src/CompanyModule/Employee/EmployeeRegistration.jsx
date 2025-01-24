@@ -546,34 +546,38 @@ const EmployeeRegistration = () => {
   };
 
   const validateNumber = (value) => {
-    // Check if the input is empty
-    if (!value || value.trim().length === 0) {
-      return "UAN Number is Required.";
+    // If the field is empty or not provided, consider it valid (since it's not mandatory)
+    if (!value) {
+      return true; // Allow empty value as the field is optional
     }
 
-    // Check if the value contains only digits
-    if (!/^\d+$/.test(value)) {
+    // Trim any extra spaces from the input
+    const trimmedValue = value.trim();
+
+    // Check if the input contains only digits
+    if (!/^\d+$/.test(trimmedValue)) {
       return "Only Numeric Characters Are Allowed.";
     }
 
-    // Check if there are any leading or trailing spaces
-    if (/^\s|\s$/.test(value)) {
+    // Check if there are any leading or trailing spaces (after trimming)
+    if (value !== trimmedValue) {
       return "No Leading or Trailing Spaces Are Allowed.";
     }
 
     // Check for multiple spaces in between numbers
-    if (/\s{2,}/.test(value)) {
+    if (/\s{2,}/.test(trimmedValue)) {
       return "No Multiple Spaces Between Numbers Allowed.";
     }
 
     // Optionally: Check if the number is composed of repeating digits
-    const isRepeating = /^(\d)\1{11}$/.test(value); // Check if all digits are the same (e.g., "111111111111")
+    const isRepeating = /^(\d)\1{11}$/.test(trimmedValue); // Check if all digits are the same (e.g., "111111111111")
     if (isRepeating) {
       return "The Number Cannot Consist Of The Same Digit Repeated.";
     }
 
     return true; // Return true if all validations pass
   };
+
   const validatePAN = (value) => {
     const spaceError = "Spaces are not allowed in the PAN Number.";
     const patternError = "Invalid PAN Number format";
@@ -872,12 +876,12 @@ const EmployeeRegistration = () => {
                           required: "First Name is Required",
                           minLength: {
                             value: 3,
-                            message: "Mimimum 3 Characters Required."
+                            message: "Mimimum 3 Characters Required.",
                           },
                           maxLength: {
                             value: 150,
                             message: "Max lenght 150 Characters Exceeded.", // Maximum 150 characters
-                          },  
+                          },
                           validate: {
                             validateFirstName,
                           },
@@ -1041,7 +1045,7 @@ const EmployeeRegistration = () => {
                           required: "Manager is Required",
                           minLength: {
                             value: 3,
-                            message: "Mimimum 3 Characters Required."
+                            message: "Mimimum 3 Characters Required.",
                           },
                           maxLength: {
                             value: 150,

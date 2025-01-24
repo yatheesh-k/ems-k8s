@@ -180,7 +180,7 @@ const CompanyRegistration = () => {
   const backForm = () => {
     setCompanyType("");
     reset();
-    navigate("/companyView")
+    navigate("/companyView");
     // setEditMode(true);  // Optionally, if you want to reset edit mode
   };
   const toInputTitleCase = (e) => {
@@ -313,39 +313,39 @@ const CompanyRegistration = () => {
     const input = e.target;
     let value = input.value;
     const cursorPosition = input.selectionStart; // Save the cursor position
-  
+
     // Remove leading spaces but keep trailing spaces
     const leadingTrimmedValue = value.replace(/^\s+/g, "");
-  
+
     // Ensure only alphabets (upper and lower case), numbers, and allowed special characters
     const allowedCharsRegex = /^[a-zA-Z0-9\s!-_@#&()*/,.\\-{}]+$/;
     value = leadingTrimmedValue
       .split("") // Split value into characters
       .filter((char) => allowedCharsRegex.test(char)) // Keep only allowed characters
       .join(""); // Join characters back to a string
-  
+
     // Capitalize the first letter of each word
     const words = value.split(" ");
     const capitalizedWords = words.map((word) => {
       // Capitalize first letter, ensure the rest of the word is lowercase
       return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
     });
-  
+
     // Join the words back into a string with a single space between them
     let formattedValue = capitalizedWords.join(" ");
-  
+
     // Allow spaces at the end if the user typed them (by preserving the original input length)
     if (value.length < leadingTrimmedValue.length) {
-      formattedValue = formattedValue + " ".repeat(input.value.length - formattedValue.length);
+      formattedValue =
+        formattedValue + " ".repeat(input.value.length - formattedValue.length);
     }
-  
+
     // Update input value
     input.value = formattedValue;
-  
+
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
-   
 
   const validateREGISTER = (value) => {
     const spaceError = "Spaces are not allowed in the Register Number.";
@@ -368,8 +368,8 @@ const CompanyRegistration = () => {
   };
 
   const handlePaste = (e) => {
-    const pastedText = e.clipboardData.getData('Text');
-    const sanitizedText = pastedText.replace(/[^A-Za-z0-9]/g, ''); // Keep only alphanumeric characters
+    const pastedText = e.clipboardData.getData("Text");
+    const sanitizedText = pastedText.replace(/[^A-Za-z0-9]/g, ""); // Keep only alphanumeric characters
     e.preventDefault(); // Prevent the default paste action
     e.target.value = sanitizedText; // Insert the sanitized text back into the input
   };
@@ -398,11 +398,15 @@ const CompanyRegistration = () => {
     const spaceError = "Spaces are not allowed in the GST Number.";
     const patternError = "Invalid GST Number format";
 
+    if (!value) {
+      return true; // Allow empty value if the field is optional
+    }
+
     if (/\s/.test(value)) {
       return spaceError; // Return space error if spaces are found
     }
 
-    // Check the pattern for the CIN Number
+    // Check the pattern for the GST Number
     if (!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9]{1}Z[0-9A-Z]{1}$/.test(value)) {
       return patternError; // Return pattern error if it doesn't match
     }
@@ -468,21 +472,21 @@ const CompanyRegistration = () => {
     } else if (/\s$/.test(value)) {
       return "Spaces at the end are not allowed."; // Trailing space error
     }
-  
+
     // Check for multiple spaces between words
     if (/\s{2,}/.test(value)) {
       return "No multiple spaces between words allowed."; // Multiple spaces error
     }
-  
+
     // Validate special characters and alphanumeric characters
     const validCharsRegex = /^[A-Za-z0-9\s,.'\-/&@#$()*+!:;]*$/;
     if (!validCharsRegex.test(value)) {
       return "Invalid characters used. Only alphabets, numbers, and special characters (, . ' - / & @ # $ ( ) *) are allowed.";
     }
-  
+
     return true; // Return true if all conditions are satisfied
   };
-  
+
   const validatePAN = (value) => {
     const spaceError = "Spaces are not allowed in the PAN Number.";
     const patternError = "Invalid PAN Number format";
@@ -706,7 +710,7 @@ const CompanyRegistration = () => {
                           required: "Company Email Id is Required",
                           pattern: {
                             value:
-                          /^[a-z][a-zA-Z0-9._+-]*@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                              /^[a-z][a-zA-Z0-9._+-]*@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid email format",
                           },
                         })}
@@ -949,7 +953,7 @@ const CompanyRegistration = () => {
                             value: 250,
                             message: "Maximum 250 Characters allowed",
                           },
-                          validate: validateAddress
+                          validate: validateAddress,
                         })}
                       />
                       {errors.companyAddress && (
@@ -1050,7 +1054,7 @@ const CompanyRegistration = () => {
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Company GST Number{" "}
-                        <span style={{ color: "red" }}>*</span>
+                        {/* <span style={{ color: "red" }}>*</span> */}
                       </label>
                       <input
                         type="text"
@@ -1060,9 +1064,9 @@ const CompanyRegistration = () => {
                         onInput={toInputSpaceCase}
                         onKeyDown={handleEmailChange}
                         maxLength={15}
-                        onPaste={handlePaste} 
+                        onPaste={handlePaste}
                         {...register("gstNo", {
-                          required: "Company GST Number is Required",
+                          // Remove the required rule or make it optional
                           maxLength: {
                             value: 15,
                             message: "GST Number must not exceed 15 characters",
@@ -1075,6 +1079,7 @@ const CompanyRegistration = () => {
                         <p className="errorMsg">{errors.gstNo.message}</p>
                       )}
                     </div>
+
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
@@ -1172,7 +1177,7 @@ const CompanyRegistration = () => {
                           required: "Personal Email Id is Required",
                           pattern: {
                             value:
-                          /^[a-z][a-zA-Z0-9._+-]*@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                              /^[a-z][a-zA-Z0-9._+-]*@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                             message: "Invalid Email Format ",
                           },
                         })}
@@ -1260,7 +1265,7 @@ const CompanyRegistration = () => {
                             value: 250,
                             message: "Maximum 250 Characters allowed",
                           },
-                          validate:validateAddress
+                          validate: validateAddress,
                         })}
                       />
                       {errors.address && (
@@ -1293,14 +1298,14 @@ const CompanyRegistration = () => {
                 >
                   Clear
                 </button>
-              ):(
+              ) : (
                 <button
-                className="btn btn-secondary me-2"
-                type="button"
-                onClick={backForm}
-              >
-                Back
-              </button>
+                  className="btn btn-secondary me-2"
+                  type="button"
+                  onClick={backForm}
+                >
+                  Back
+                </button>
               )}
 
               <button
@@ -1315,7 +1320,8 @@ const CompanyRegistration = () => {
             </div>
           </div>
         </form>
-      </div>,,
+      </div>
+      ,,
     </LayOut>
   );
 };
