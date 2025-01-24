@@ -7,7 +7,7 @@ import { BriefcaseFill, EnvelopeFill, LockFill, UnlockFill } from 'react-bootstr
 import Loader from '../Utils/Loader';
 import { Modal, ModalBody, ModalHeader, ModalTitle } from 'react-bootstrap';
 
-const UpdatePassword = () => {
+const ForgotPassword = () => {
   const { register, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm({ mode: "onChange", defaultValues: {
     email: '',
     otp: '',
@@ -402,7 +402,7 @@ const UpdatePassword = () => {
               <div className="card">
                 <div className="card-header d-flex justify-content-between align-items-center pb-0">
                   <div className="text-center">
-                    <p className="lead">Forgot Password</p>
+                    <p className="lead">Update Password</p>
                   </div>
                   <button className='btn text-white' style={{ marginBottom: "6px" }} onClick={closeButton}>X</button>
                 </div>
@@ -435,4 +435,4 @@ const UpdatePassword = () => {
   );
 };
 
-export default UpdatePassword;
+export default ForgotPassword;

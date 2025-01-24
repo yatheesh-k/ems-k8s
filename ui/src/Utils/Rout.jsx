@@ -57,7 +57,6 @@ import Template from '../CompanyModule/Settings/OfferLetter/Template';
 import OfferLetterForm from '../CompanyModule/Settings/OfferLetter/OfferLetterForm';
 import OfferLetterPreview from '../CompanyModule/Settings/OfferLetter/OfferLetterPreview';
 import EmployeeSalaryView from '../EmployeeModule/EmployeeSalaryView';
-import UpdatePassword from '../Login/ForgotPassword';
 
 const Rout = () => {
   const location = useLocation();
@@ -157,7 +156,7 @@ const Rout = () => {
       <Route path='/experienceForm' element={<ExperienceForm/>}></Route>
       <Route path='/offerLetterForm' element={<OfferLetterForm/>}></Route>
       <Route path='/offerLetterPreview' element={<OfferLetterPreview/>}></Route>
-      <Route path='/updatePassword' element={<UpdatePassword />}></Route>
+      <Route path='/updatePassword' element={<ForgotPassword />}></Route>
       <Route path='/relievingTemplates' element={<RelievingLetter/>}></Route>
       <Route path='/relivingReview' element={<Preview/>}></Route>
       <Route path='/internsLetter' element={<InternShipForm/>}></Route>
