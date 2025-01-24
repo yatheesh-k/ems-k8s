@@ -26,7 +26,7 @@ const CompanyLogin = () => {
 
   const { setAuthUser } = useAuth();
     const { company } = useParams();
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const [passwordShown, setPasswordShown] = useState(false);
   const [otpSent, setOtpSent] = useState(false); 
   const [loading, setLoading] = useState(false);
@@ -37,7 +37,7 @@ const CompanyLogin = () => {
   const [otpExpired, setOtpExpired] = useState(false); 
 
   useEffect(() => {
-    localStorage.setItem("company", company);
+    localStorage.setItem("companyName", company);
   }, [company]);
 
   useEffect(() => {
@@ -284,7 +284,7 @@ const CompanyLogin = () => {
                                     </p>
                                   )}
                                   <small>
-                                    <a href="/forgotPassword">Forgot Password?</a>
+                                    <a href="/updatePassword">Forgot Password?</a>
                                   </small>
                                 </div>
 

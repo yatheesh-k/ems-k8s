@@ -42,7 +42,6 @@ const Header = ({ toggleSidebar }) => {
   }, [user]);
 
   const token = localStorage.getItem("token");
-
   useEffect(() => {
     if (token) {
       const decodedToken = jwtDecode(token);
