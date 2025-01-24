@@ -397,16 +397,16 @@ const CompanyRegistration = () => {
   const validateGST = (value) => {
     const spaceError = "Spaces are not allowed in the GST Number.";
     const patternError = "Invalid GST Number format";
-
+    if (!value){
+      return true;
+    }
     if (/\s/.test(value)) {
       return spaceError; // Return space error if spaces are found
     }
-
     // Check the pattern for the CIN Number
     if (!/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9]{1}Z[0-9A-Z]{1}$/.test(value)) {
       return patternError; // Return pattern error if it doesn't match
     }
-
     return true; // Return true if all checks pass
   };
 
@@ -1050,7 +1050,6 @@ const CompanyRegistration = () => {
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
                         Company GST Number{" "}
-                        <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
                         type="text"
@@ -1062,7 +1061,6 @@ const CompanyRegistration = () => {
                         maxLength={15}
                         onPaste={handlePaste} 
                         {...register("gstNo", {
-                          required: "Company GST Number is Required",
                           maxLength: {
                             value: 15,
                             message: "GST Number must not exceed 15 characters",
