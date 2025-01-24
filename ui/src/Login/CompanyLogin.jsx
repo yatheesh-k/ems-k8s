@@ -284,7 +284,7 @@ const CompanyLogin = () => {
                                     </p>
                                   )}
                                   <small>
-                                    <a href="/forgotPassword">Forgot Password?</a>
+                                    <a href="/updatePassword">Forgot Password?</a>
                                   </small>
                                 </div>
 
