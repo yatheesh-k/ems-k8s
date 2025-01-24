@@ -130,45 +130,41 @@ const Designation = () => {
   };
 
   const validateName = (value) => {
-    // Trim leading and trailing spaces before further validation
+    // Trim leading and trailing spaces before validation
     const trimmedValue = value.trim();
-
-    // Check if value is empty after trimming (meaning it only had spaces)
+  
+    // Check if the trimmed value is empty
     if (trimmedValue.length === 0) {
-      return "Department Name is Required.";
+      return "Designation Name is Required.";
     }
-
-    // Allow alphabetic characters, numbers, spaces, and some special characters like /, !, @, #, &...
-    else if (!/^[A-Za-z\s/]+$/.test(trimmedValue)) {
+  
+    // Check total length including spaces
+    if (trimmedValue.length > 40) {
+      return "Max Length 40 Characters Allowed (Including Spaces).";
+    }
+  
+    // Check for invalid characters
+    if (!/^[A-Za-z\s/]+$/.test(trimmedValue)) {
       return "Only Alphabetic Characters, Spaces, and '/' are Allowed.";
-    } else {
-      const words = trimmedValue.split(" ");
-
-      // Check for minimum and maximum word length
-      for (const word of words) {
-        // If the word is a single character and it's not the only word in the string, skip this rule
-        if (word.length < 2 && words.length === 1) {
-          return "Minimum Length 2 Characters Required.";  // If any word is shorter than 2 characters and it's a single word
-        } else if (word.length > 40) {
-          return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters
-        }
-      }
-
-      // Check for multiple spaces between words
-      if (/\s{2,}/.test(trimmedValue)) {
-        return "No Multiple Spaces Between Words Allowed.";
-      }
-
-      // Check if the value has leading or trailing spaces (shouldn't happen due to trimming)
-      if (/^\s/.test(value)) {
-        return "Leading space not allowed.";  // Leading space error
-      } else if (/\s$/.test(value)) {
-        return "Spaces at the end are not allowed.";  // Trailing space error
+    }
+  
+    // Check for multiple spaces between words
+    if (/\s{2,}/.test(trimmedValue)) {
+      return "No Multiple Spaces Between Words Allowed.";
+    }
+  
+    // Split the string into words and validate each word
+    const words = trimmedValue.split(" ");
+    for (const word of words) {
+      if (word.length < 2) {
+        return "Each Word Must Have at Least 2 Characters.";
       }
     }
-
-    return true; // Return true if all conditions are satisfied
+  
+    // If all conditions pass
+    return true;
   };
+  
 
   useEffect(() => {
     setFilteredData(designations);

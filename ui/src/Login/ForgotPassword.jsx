@@ -402,7 +402,7 @@ const ForgotPassword = () => {
               <div className="card">
                 <div className="card-header d-flex justify-content-between align-items-center pb-0">
                   <div className="text-center">
-                    <p className="lead">Forgot Password</p>
+                    <p className="lead">Update Password</p>
                   </div>
                   <button className='btn text-white' style={{ marginBottom: "6px" }} onClick={closeButton}>X</button>
                 </div>
