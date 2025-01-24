@@ -547,7 +547,7 @@ const EmployeeRegistration = () => {
   const validateNumber = (value) => {
     // Check if the input is empty
     if (!value || value.trim().length === 0) {
-      return "UAN Number is Required.";
+      return true;
     }
 
     // Check if the value contains only digits
