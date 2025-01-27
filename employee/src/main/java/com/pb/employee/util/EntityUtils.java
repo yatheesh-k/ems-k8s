@@ -59,6 +59,25 @@ public class EntityUtils {
         }
     }
 
+    public ResponseEntity<byte[]> getPdfRequest(String authToken, String uri)
+            throws WebClientResponseException {
+
+        try {
+            return webClient.get()
+                    .uri(uri)
+                    .header(Constants.AUTH_KEY, authToken)
+                    .retrieve()
+                    .toEntity(byte[].class)  // Handling binary response (PDF)
+                    .block();
+        } catch (WebClientResponseException e) {
+            log.error("WebClient error - Status: {}, Body: {}", e.getRawStatusCode(), e.getResponseBodyAsString());
+            log.error("Request URI: {}", uri);
+            return ResponseEntity.status(e.getRawStatusCode())
+                    .body(e.getResponseBodyAsString().getBytes());  // Ensure byte[] is returned in case of error
+        }
+    }
+
+
     public ResponseEntity<String> sendPatchRequest(
             String authToken,
             Object request,

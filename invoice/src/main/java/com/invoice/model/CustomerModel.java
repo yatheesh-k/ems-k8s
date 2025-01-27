@@ -31,6 +31,6 @@ public class CustomerModel {
     private String stateCode;
     private String mobileNumber;
     private String email;
-    private String gstNo;
+    private String customerGstNo;
     private String status;
 }

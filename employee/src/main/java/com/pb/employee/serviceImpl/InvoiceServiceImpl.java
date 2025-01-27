@@ -6,6 +6,7 @@ import com.pb.employee.request.InvoiceRequest;
 import com.pb.employee.service.InvoiceService;
 import com.pb.employee.util.Constants;
 import com.pb.employee.util.EntityUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,5 +46,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public ResponseEntity<?> getCompanyAllInvoices(String authToken, String companyId) throws EmployeeException {
         return entityUtils.getRequest(authToken,Constants.COMPANY_ADD+companyId+Constants.INVOICE);
+    }
+
+    @Override
+    public ResponseEntity<?> downloadInvoice(String authToken, String companyId, String customerId, String invoiceId, HttpServletRequest request) throws EmployeeException {
+        return entityUtils.getPdfRequest(authToken, Constants.COMPANY_ADD + companyId  + Constants.CUSTOMER_GET + customerId + Constants.INVOICE_DOWNLOAD + invoiceId);
     }
 }

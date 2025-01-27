@@ -72,4 +72,16 @@ public class OpenSearchOperations {
         return departmentEntities;
     }
 
+    public BankEntity getBankById(String index, String type, String resourceId) throws IOException {
+        if (type != null) {
+            resourceId = type + "_" + resourceId;
+        }
+        GetRequest getRequest = new GetRequest.Builder().id(resourceId)
+                .index(index).build();
+        GetResponse<BankEntity> searchResponse = esClient.get(getRequest, BankEntity.class);
+        if (searchResponse != null && searchResponse.source() != null) {
+            return searchResponse.source();
+        }
+        return null;
+    }
 }
