@@ -45,9 +45,9 @@ public class CustomerUtils {
             city = Base64.getEncoder().encodeToString(customerRequest.getCity().getBytes());
         }
 
-        if (customerRequest.getGstNo() != null) {
+        if (customerRequest.getCustomerGstNo() != null) {
             // Masking the state information
-            gst = Base64.getEncoder().encodeToString(customerRequest.getGstNo().getBytes());
+            gst = Base64.getEncoder().encodeToString(customerRequest.getCustomerGstNo().getBytes());
         }
         if (customerRequest.getPinCode() != null) {
             // Masking the state information
@@ -64,7 +64,7 @@ public class CustomerUtils {
         customerModel.setCustomerName(customerName);
         customerModel.setCity(city);
         customerModel.setEmail(email);
-        customerModel.setGstNo(gst);
+        customerModel.setCustomerGstNo(gst);
         customerModel.setState(state);
         customerModel.setAddress(address);
         customerModel.setStateCode(stateCode);
@@ -99,8 +99,8 @@ public class CustomerUtils {
         if (customerModel.getCity() != null) {
             city = new String(Base64.getDecoder().decode(customerModel.getCity()));
         }
-        if (customerModel.getGstNo() != null) {
-            gst = new String(Base64.getDecoder().decode(customerModel.getGstNo()));
+        if (customerModel.getCustomerGstNo() != null) {
+            gst = new String(Base64.getDecoder().decode(customerModel.getCustomerGstNo()));
         }
         if (customerModel.getPinCode() != null) {
             pinCode = new String(Base64.getDecoder().decode(customerModel.getPinCode()));
@@ -115,7 +115,7 @@ public class CustomerUtils {
         customerModel.setMobileNumber(mobileNo);
         customerModel.setState(state);
         customerModel.setCity(city);
-        customerModel.setGstNo(gst);
+        customerModel.setCustomerGstNo(gst);
         customerModel.setPinCode(pinCode);
         customerModel.setStateCode(stateCode);
 
@@ -156,7 +156,7 @@ public class CustomerUtils {
         }
 
         customerModel.setCity(city);
-        customerModel.setGstNo(gst);
+        customerModel.setCustomerGstNo(gst);
         customerModel.setState(state);
         customerModel.setAddress(address);
         customerModel.setStateCode(stateCode);

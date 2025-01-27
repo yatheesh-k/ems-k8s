@@ -49,46 +49,50 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ResponseEntity<?> createProduct(String companyId, @Valid ProductRequest productRequest) throws InvoiceException, IOException {
         log.debug("Creating product: {}", productRequest);
-        CompanyEntity companyEntity;
-        companyEntity = openSearchOperations.getCompanyById(companyId, null, Constants.INDEX_EMS);
+
+        // Step 1: Validate company existence
+        CompanyEntity companyEntity = openSearchOperations.getCompanyById(companyId, null, Constants.INDEX_EMS);
         if (companyEntity == null) {
+            log.error("Company not found with ID: {}", companyId);
             throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.COMPANY_NOT_FOUND),
                     HttpStatus.NOT_FOUND);
         }
+
         try {
+            // Step 2: Generate Product ID
             String productId = ResourceIdUtils.generateProductResourceId(productRequest.getHsnNo(), companyId);
+            log.debug("Generated product ID: {}", productId);
 
-            // Step 2: Fetch all products for the given companyId
-            List<ProductModel> products = repository.findByCompanyId(companyId); // Assuming you have a method to fetch all customers for a company
-
-            // Step 3: Search for the customer with the provided customerId
-            Optional<ProductModel> productOptional = products.stream()
-                    .filter(product -> product.getProductId().equals(productId)) // Filter the customer by ID
-                    .findFirst();
-
-            if (productOptional.isPresent()) {
-                log.error("Customer already exists with ID: {}", productId);
-                // Return a response indicating that the customer already exists
-                throw  new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.PRODUCT_ALREADY_EXISTS),
+            // Step 3: Check if the product already exists
+            if (repository.existsByProductId(productId)) { // Assumes repository has existsByProductId method
+                log.error("Product already exists with ID: {}", productId);
+                throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.PRODUCT_ALREADY_EXISTS),
                         HttpStatus.CONFLICT);
             }
+            // Step 4: Populate Product from Request
             ProductModel product = ProductUtils.populateProductFromRequest(productRequest);
 
+            // Step 5: Calculate total cost
             BigDecimal totalCost = calculateTotalCost(productRequest);
-            product.setUnitCost(String.valueOf(totalCost));
+            product.setUnitCost(totalCost.toPlainString());
 
+            // Step 6: Mask sensitive fields or format data
             ProductModel maskedProduct = ProductUtils.maskProductProperties(productRequest, productId, totalCost, companyId);
 
-            log.debug("Product to save: {}", maskedProduct);
-             repository.save(maskedProduct);
+            // Step 7: Save the product to the repository
+            log.debug("Saving product to the repository: {}", maskedProduct);
+            repository.save(maskedProduct);
 
             log.info("Product created successfully with ID: {}", productId);
-            return new ResponseEntity<>(ResponseBuilder.builder().build().createSuccessResponse(Constants.CREATE_SUCCESS), HttpStatus.CREATED);
+            return new ResponseEntity<>(ResponseBuilder.builder().build().createSuccessResponse(Constants.CREATE_SUCCESS),
+                    HttpStatus.CREATED);
         } catch (Exception e) {
             log.error("Error occurred while creating product: {}", e.getMessage(), e);
-            throw new InvoiceException(InvoiceErrorMessageKey.CREATE_FAILED.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.CREATE_FAILED),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     public BigDecimal calculateTotalCost(ProductRequest productRequest) {
         BigDecimal cost = parseToBigDecimal(productRequest.getProductCost());
@@ -169,29 +173,35 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ResponseEntity<?> updateProduct(String companyId, String productId, @Valid ProductRequest productRequest) throws InvoiceException, IOException {
         log.info("Starting product update process for ID: {}", productId);
-        CompanyEntity companyEntity;
-        companyEntity = openSearchOperations.getCompanyById(companyId, null, Constants.INDEX_EMS);
+
+        // Retrieve company entity
+        CompanyEntity companyEntity = openSearchOperations.getCompanyById(companyId, null, Constants.INDEX_EMS);
         if (companyEntity == null) {
             throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.COMPANY_NOT_FOUND),
                     HttpStatus.NOT_FOUND);
         }
+
         try {
-            ProductModel productToUpdate = repository.findById(productId)
+            // Find the product to update
+            ProductModel productToUpdate = repository.findByCompanyIdAndProductId(companyId, productId)
                     .orElseThrow(() -> new InvoiceException(InvoiceErrorMessageKey.PRODUCT_NOT_FOUND.getMessage(), HttpStatus.NOT_FOUND));
 
-            ProductUtils.updateProductFromRequest(productToUpdate, productRequest);
-
+            // Set additional calculations and updates (e.g., unit cost)
             BigDecimal totalCost = calculateTotalCost(productRequest);
+            productToUpdate.setUnitCost(String.valueOf(totalCost));
             log.info("Calculated total cost: {}", totalCost);
 
-            ProductModel maskedProduct = ProductUtils.maskProductProperties(productRequest, productId, totalCost, companyId);
+            ProductModel maskProduct =ProductUtils.maskProductPropertiesForUpdate(productToUpdate,productRequest,totalCost,companyId);
 
-            repository.save(maskedProduct);
+            // Save the updated product
+            repository.save(maskProduct);
             log.info("Product successfully updated with ID: {}", productId);
+
+            // Return success response
             return ResponseEntity.ok(ResponseBuilder.builder().build().createSuccessResponse(Constants.UPDATE_SUCCESS));
-        } catch (InvoiceException | JsonMappingException e) {
+        } catch (InvoiceException e) {
             log.error("InvoiceException occurred during product update: {}", e.getMessage(), e);
-            throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.ERROR_CREATING_PRODUCT),HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.ERROR_CREATING_PRODUCT), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -16,6 +16,9 @@ public class InvoiceRequest {
     @NotNull(message = "{customerName.notnull.message}")
     private String customerName;
 
+    @NotNull(message = "{bankId.notnull.message}")
+    private String bankId;
+
     @NotNull(message = "{purchaseOrder.notnull.message}")
     private String purchaseOrder;
 

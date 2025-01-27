@@ -14,6 +14,8 @@ public interface InvoiceRepository extends JpaRepository<InvoiceModel, String> {
     List<InvoiceModel> findAllByCustomerId(String customerId);
 
     List<InvoiceModel> findAllByCompanyId(String companyId);
+
+    InvoiceModel findByInvoiceId(String invoiceId);
 }
 
 

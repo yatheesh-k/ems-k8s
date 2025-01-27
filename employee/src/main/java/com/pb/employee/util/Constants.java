@@ -150,6 +150,7 @@ public class Constants {
     public static final String CUSTOMER_GET = "/customer/";
     public static final String SALARY_ID = "salaryId";
     public static final String BANK = "bank_details";
+    public static final String BANK_ADD="/bank/";
     public static final String BACKGROUND = "background_details";
     public static final String DUPLICATE_ACCOUNT_NUMBER ="Account Number";
     public static final String ALL = "/all";
@@ -162,4 +163,6 @@ public class Constants {
     public static final String ASSOCIATE = "Associate";
     public static final String INVOICE = "/invoice";
     public static final String INVOICE_GET = "/invoice/";
+    public static final String UPDATE_NEW_PASSWORD = "updatePassword";
+    public static final String INVOICE_DOWNLOAD = "/downloadInvoice/";
 }

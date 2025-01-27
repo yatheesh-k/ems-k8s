@@ -19,7 +19,6 @@ import java.util.List;
 @Table(name = "invoice")
 public class InvoiceModel {
 
-    @Id
     private String invoiceId;
 
     private String purchaseOrder;
@@ -30,7 +29,6 @@ public class InvoiceModel {
     private List<OrderModel> orderModels;
 
     private String customerId;
-    private String gst;
     private String cGst;
     private String sGst;
     private String iGst;
@@ -40,4 +38,10 @@ public class InvoiceModel {
     private String grandTotalInWords;
     private String status;
     private String companyId;
+    private String bankId;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long invoiceNumber;
+
 }

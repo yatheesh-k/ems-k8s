@@ -118,40 +118,44 @@ justify-content: space-between;
         <div class="col-md-12">
             <!-- Company Logo - Top Right -->
             <div class="company-details" style="position:absolute ; top: -20px; right: 10px;">
-                <img src="${imageFile}" alt="Company Logo" />
+                <#if imageFile??>
+                    <img src="${imageFile}" alt="Company Logo" />
+                <#else>
+                    <img src="Image" alt="Company Logo" />
+                </#if>
             </div>
         </div>
     </div>
     <!-- Invoice Heading Section -->
-<div style="position: relative; top: 10px; left: 0%; text-align: center;">
-    <h3 style="margin: 0;">Invoice</h3> <!-- Removed margin for precise top positioning -->
-</div>
+    <div style="position: relative; top: 10px; left: 0%; text-align: center;">
+        <h3 style="margin: 0;">Invoice</h3> <!-- Removed margin for precise top positioning -->
+    </div>
 
-<div style="position: absolute; top: 0; width: 100%; text-align: left; margin-left: 20px;">
-    <h6 style="margin: 0;"><b>Pan Number:</b>${pan}</h6>
-    <h6 style="margin: 0;"><b>GST Number:</b>${gstNumber}</h6>
-</div>
+    <div style="position: absolute; top: 0; width: 100%; text-align: left; margin-left: 20px;">
+        <h6 style="margin: 0;"><b>Pan Number:</b>${panNo}</h6>
+        <h6 style="margin: 0;"><b>GST Number:</b>${gstNo}</h6>
+    </div>
    <!-- Customer and Invoice Details Section -->
-<div style="position: relative; top: 20px; left: 20px; text-align: left; font-size: 20px; width: 38%; word-wrap: break-word; word-break: break-word; overflow-wrap: break-word;">
-    <!-- Customer Details (Left Side) -->
-    <div>
-        <h6 style="margin: 5px;"><b>Billed To,</b></h6>
-        <h6 style="margin: 0;" class="font-medium">${customerCompany}</h6>
-        <h6 style="margin: 0;"><b>Email:</b> ${email}</h6>
-        <h6 style="margin: 0;"><b>Contact No:</b> ${mobileNumber}</h6>
-        <h6 style="margin: 0;"><b>GST:</b> ${gstNo!0}</h6>
-        <h6 style="margin: 0; word-wrap: break-word; word-break: break-word; white-space: normal; overflow-wrap: break-word;">
-            <b>Address:</b> ${address}, ${state}
-        </h6>
+    <div style="position: relative; top: 20px; left: 20px; text-align: left; font-size: 20px; width: 38%; word-wrap: break-word; word-break: break-word; overflow-wrap: break-word;">
+        <!-- Customer Details (Left Side) -->
+        <div>
+            <h6 style="margin: 5px;"><b>Billed To,</b></h6>
+            <h6 style="margin: 0;" class="font-medium">${customerName}</h6>
+            <h6 style="margin: 0;"><b>Email:</b> ${email}</h6>
+            <h6 style="margin: 0;"><b>Contact No:</b> ${mobileNumber}</h6>
+            <h6 style="margin: 0;"><b>GST:</b> ${customerGstNo!0}</h6>
+            <h6 style="margin: 0; word-wrap: break-word; word-break: break-word; white-space: normal; overflow-wrap: break-word;">
+                <b>Address:</b> ${customerAddress}, ${state}
+            </h6>
+        </div>
     </div>
-</div>
-<div style="position: relative; top: -70px; right: 35px; text-align: right; font-size: 20px;">
-    <div>
-        <h6 style="margin: 0;"><b>Invoice ID:</b> ${invoiceId}</h6>
-        <h6 style="margin: 0;"><b>Invoice Date:</b> ${invoiceDate}</h6>
-        <h6 style="margin: 0;"><b>Due Date:</b> ${dueDate}</h6>
+    <div style="position: relative; top: -70px; right: 0; margin-left: auto; text-align: right; font-size: 20px; width: 30%;">
+        <div>
+            <h6 style="margin: 0;"><b>Invoice ID:</b> ${invoiceId}</h6>
+            <h6 style="margin: 0;"><b>Invoice Date:</b> ${invoiceDate}</h6>
+            <h6 style="margin: 0;"><b>Due Date:</b> ${dueDate}</h6>
+        </div>
     </div>
-</div>
     <!-- Product Details Table -->
     <div class="table-responsive" style="margin-left: 10px; position: relative; top: -10px;">
         <table class="table" style="width: 100%;" >
@@ -167,109 +171,122 @@ justify-content: space-between;
                 </tr>
             </thead>
             <tbody>
-                <#if orderRequests?? && (orderRequests?size > 0)>
-                    <#list orderRequests as order>
+               <#if orderDetails?? && (orderDetails?size > 0)>
+                    <#list orderDetails as order>
                         <tr style="width: 100%;">
-                            <td>${order.productId!''}</td>
-                            <td style="text-align: left;font-size: 13px;">${order.hsnNo!''}</td>
+                            <!-- Auto-incrementing number -->
+                            <td>${order?index + 1}</td> <!-- Correctly use ?index on the loop variable -->
+                            <td style="text-align: left; font-size: 13px;">${order.hsnNo!''}</td>
                             <td style="text-align: left; font-size: 13px;">${order.productName!''}</td>
                             <td style="text-align: left; font-size: 13px;">${order.service!''}</td>
                             <td style="text-align: left; font-size: 13px;">${order.quantity!0}</td>
-                            <td style="font-size: 13px;" >${order.unitCost!0}</td>
-                            <td  style="font-size: 13px;">${order.totalCost!0}</td>
+                            <td style="font-size: 13px;">${order.unitCost!0}</td>
+                            <td style="font-size: 13px;">${order.totalCost!0}</td>
                         </tr>
                     </#list>
                 <#else>
                     <tr>
-                        <td colspan="7"  style="font-size: 13px;">No orders available.</td>
+                        <td colspan="7" style="font-size: 13px;">No orders available.</td>
                     </tr>
                 </#if>
-                <tr style="text-align: right;">
-                    <td colspan="6" style="text-align: right; font-size: 13px;"><strong>Total Amount</strong></td>
-                    <td style="text-align: right; font-size: 13px;">${totalAmount}</td>
-                </tr>
-                <#if cGst?number != 0 && sGst?number != 0>
-    <tr>
-        <td colspan="6" style="text-align: right; font-size: 13px;"><strong>CGST</strong> (9%)</td>
-        <td>${cGst}</td>
-    </tr>
-    <tr>
-        <td colspan="6" style="text-align: right; font-size: 13px;"><strong>SGST</strong> (9%)</td>
-        <td>${sGst}</td>
-    </tr>
-<#elseif iGst?number != 0>
-    <tr>
-        <td colspan="6" style="text-align: right; font-size: 13px;"><strong>IGST</strong> (18%)</td>
-        <td>${iGst}</td>
-    </tr>
-<#else>
-    <tr>
-        <td colspan="6" style="text-align: right; font-size: 13px;"><strong>CGST</strong> (9%)</td>
-        <td>${cGst}</td>
-    </tr>
-    <tr>
-        <td colspan="6" style="text-align: right; font-size: 13px;"><strong>SGST</strong> (9%)</td>
-        <td>${sGst}</td>
-    </tr>
-</#if>
-<tr style="background-color:#f5f5f5;">
-                    <th class="text-right" colspan="6" style="font-size: 13px;"><b>Grand Total</b></th>
-                    <th class="text-right" style="font-size: 13px;"><b>${grandTotal}</b></th>
-                </tr>
-                <tr style="background-color:#f5f5f5;">
-                    <th colspan="7" class="text-center" style="font-size: 13px;"><b>In Words:</b> <em>${grandTotalInWords}</em>&nbsp;</th>
-                </tr>
-                <tr>
-                    <th  colspan="7" class="text-center" style="font-size: 13px;">The Payment should be made favouring <b>${companyName}</b> or Direct deposit information given above.</th>
-                </tr>
+                    <tr style="text-align: right;">
+                        <td colspan="6" style="text-align: right; font-size: 13px;"><strong>Total Amount</strong></td>
+                        <td style="text-align: right; font-size: 13px;">${totalAmount}</td>
+                    </tr>
+
+                <#if cgst?number != 0 && sgst?number != 0>
+                    <tr>
+                        <td colspan="6" style="text-align: right; font-size: 13px;"><strong>CGST</strong> (9%)</td>
+                        <td>${cgst}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" style="text-align: right; font-size: 13px;"><strong>SGST</strong> (9%)</td>
+                        <td>${sgst}</td>
+                    </tr>
+                <#elseif igst?number != 0>
+                    <tr>
+                        <td colspan="6" style="text-align: right; font-size: 13px;"><strong>IGST</strong> (18%)</td>
+                        <td>${igst}</td>
+                    </tr>
+                <#else>
+                    <tr>
+                        <td colspan="6" style="text-align: right; font-size: 13px;"><strong>CGST</strong> (9%)</td>
+                        <td>${cgst}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="6" style="text-align: right; font-size: 13px;"><strong>SGST</strong> (9%)</td>
+                        <td>${sgst}</td>
+                    </tr>
+                </#if>
+                    <tr style="background-color:#f5f5f5;">
+                        <th class="text-right" colspan="6" style="font-size: 13px;"><b>Grand Total</b></th>
+                        <th class="text-right" style="font-size: 13px;"><b>${grandTotal}</b></th>
+                    </tr>
+                    <tr style="background-color:#f5f5f5;">
+                        <th colspan="7" class="text-center" style="font-size: 13px;"><b>In Words:</b> <em>${grandTotalInWords}</em>&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <th  colspan="7" class="text-center" style="font-size: 13px;">The Payment should be made favouring <b>${companyName}</b> or Direct deposit information given above.</th>
+                    </tr>
             </tbody>
         </table>
     </div>
    <div style="position: relative; bottom: -20px; left: 10px; text-align: left; font-size: 15px;">
     <!-- Customer Details (Left Side) -->
     <div>
-        <h5 style="margin: 5px; font-size: 15px;"><b>Bank Details,</b></h5>
-        <div style="display: table;">
-            <div style="display: table-row;">
-                <div style="display: table-cell; padding-right: 10px; font-weight: bold;">Bank Name</div>
-                <div style="display: table-cell;">:${bankName}</div>
-            </div>
-            <div style="display: table-row;">
-                <div style="display: table-cell; padding-right: 10px; font-weight: bold;">Account Type</div>
-                <div style="display: table-cell;">:${accountType}</div>
-            </div>
-            <div style="display: table-row;">
-                <div style="display: table-cell; padding-right: 10px; font-weight: bold;">Account Number</div>
-                <div style="display: table-cell;">:${accountNumber}</div>
-            </div>
-            <div style="display: table-row;">
-                <div style="display: table-cell; padding-right: 10px; font-weight: bold;">IFSC Code</div>
-                <div style="display: table-cell;">:${ifscCode}</div>
-            </div>
-            <div style="display: table-row;">
-                <div style="display: table-cell; padding-right: 10px; font-weight: bold;">Branch</div>
-                <div style="display: table-cell;">:${branch}</div>
-            </div>
-        </div>
+        <#if bankDetails?? && (bankDetails?size > 0)>
+            <#list bankDetails as bank>
+                <tr>
+                    <td style="font-weight: bold;">Bank Name</td>
+                    <td>${bank.bankName! ''}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold;">Account Type</td>
+                    <td>${bank.accountType! ''}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold;">Account Number</td>
+                    <td>${bank.accountNumber! ''}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold;">IFSC Code</td>
+                    <td>${bank.ifscCode! ''}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold;">Branch</td>
+                    <td>${bank.branch! ''}</td>
+                </tr>
+            </#list>
+        <#else>
+            <tr>
+                <td colspan="2" style="font-size: 13px;">No bank details available.</td>
+            </tr>
+        </#if>
+
     </div>
 </div>
-    <!-- Authorized Signature and Seal -->
-   <div style="position: relative; bottom: -10px; right: 0; text-align: right;">
-    <div class="row">
-        <div class="footer-content" style="display: flex; align-items: center; justify-content: flex-end; text-align: right;">
-            <h6 style="margin: 0; margin-right: -15px; font-weight: bold;">${companyName}</h6>
+<!-- Authorized Signature and Seal -->
+<div style="position: relative; bottom: -10px; right: 0; text-align: right;">
+<div class="row">
+    <div class="footer-content" style="display: flex; align-items: center; justify-content: flex-end; text-align: right;">
+        <h6 style="margin: 0; margin-right: -15px; font-weight: bold;">${companyName}</h6>
+        <#if stampImage?? && stampImage != "">
             <img style="margin: -5; width: 100px; height:150px; margin-right: 40px; height: auto;" src="${stampImage}" alt="Seal" />
             <h6 style="margin: 0; font-weight: bold;">Authorized Signature:</h6>
-        </div>
+        <#else>
+            <p style="font-size: 13px; color: gray;">No authorized signature available.</p>
+        </#if>
     </div>
 </div>
-     <div style="position: absolute; bottom: -130px; width: 100%; border-top: 1px solid #ccc; text-align: center;">
+</div>
+<div style="position: absolute; bottom: -130px; width: 100%;  text-align: center;">
+    <b style="display: inline-block; margin-bottom: 5px;">${cinNo}</b>
     <div style="border-top: 1px solid #ccc;">
         <h6 style="margin: 0; word-wrap: break-word; word-break: break-word; white-space: normal; text-align: center;">
-            <b>${companyName}</b>
+        <b>${companyName}</b>
         </h6>
         <h6 style="margin: 0; word-wrap: break-word; word-break: break-word; white-space: normal; width: 100%; text-align: left;margin-left:20px">
-            <b>${address}</b><b>${phone}.</b> <b>${companyEmail}</b>
+        <b>${companyAddress}</b><b>${mobileNo}.</b> <b>${emailId}</b>
         </h6>
     </div>
 </div>
