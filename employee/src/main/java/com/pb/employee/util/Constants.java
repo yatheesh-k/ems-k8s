@@ -159,7 +159,7 @@ public class Constants {
     public static final String COMPANY_ADD = "/company/";
     public static final String PRODUCT_ADD = "/product";
     public static final String PRODUCT = "/product/";
-    public static final String UPDATE_NEW_PASSWORD = "updatePassword";
+    public static final String CREATE_PASSWORD = "createPassword";
     public static final String ASSOCIATE = "Associate";
     public static final String INVOICE = "/invoice";
     public static final String INVOICE_GET = "/invoice/";
