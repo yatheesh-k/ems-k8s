@@ -37,7 +37,7 @@ const CompanyLogin = () => {
   const [otpExpired, setOtpExpired] = useState(false); 
 
   useEffect(() => {
-    localStorage.setItem("company", company);
+    localStorage.setItem("companyName", company);
   }, [company]);
 
   useEffect(() => {

@@ -121,10 +121,6 @@ public class ProductUtils {
         ObjectMapper objectMapper = new ObjectMapper();
 
         // Update the product properties from the request if they are not null
-        if (productRequest.getProductName() != null) {
-            String productName = Base64.getEncoder().encodeToString(productRequest.getProductName().getBytes());
-            productToUpdate.setProductName(productName);
-        }
 
         if (productRequest.getProductCost() != null) {
             String productCost = Base64.getEncoder().encodeToString(productRequest.getProductCost().getBytes());
@@ -134,11 +130,6 @@ public class ProductUtils {
         if (productRequest.getService() != null) {
             String service = Base64.getEncoder().encodeToString(productRequest.getService().getBytes());
             productToUpdate.setService(service);
-        }
-
-        if (productRequest.getHsnNo() != null) {
-            String hsnNo = Base64.getEncoder().encodeToString(productRequest.getHsnNo().getBytes());
-            productToUpdate.setHsnNo(hsnNo);
         }
 
         if (productRequest.getGst() != null) {
