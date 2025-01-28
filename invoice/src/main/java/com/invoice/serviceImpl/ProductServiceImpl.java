@@ -60,7 +60,7 @@ public class ProductServiceImpl implements ProductService {
 
         try {
             // Step 2: Generate Product ID
-            String productId = ResourceIdUtils.generateProductResourceId(productRequest.getHsnNo(), companyId);
+            String productId = ResourceIdUtils.generateProductResourceId(productRequest.getHsnNo(),productRequest.getProductName(),companyId);
             log.debug("Generated product ID: {}", productId);
 
             // Step 3: Check if the product already exists

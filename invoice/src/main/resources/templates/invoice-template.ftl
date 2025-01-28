@@ -149,9 +149,9 @@ justify-content: space-between;
             </h6>
         </div>
     </div>
-    <div style="position: relative; top: -70px; right: 0; margin-left: auto; text-align: right; font-size: 20px; width: 30%;">
+    <div style="position: relative; top: -70px; right: 0; margin-left: auto; text-align: right; font-size: 20px;">
         <div>
-            <h6 style="margin: 0;"><b>Invoice ID:</b> ${invoiceId}</h6>
+            <h6 style="margin: 0;"><b>Invoice Number:</b> ${invoiceNumber}</h6>
             <h6 style="margin: 0;"><b>Invoice Date:</b> ${invoiceDate}</h6>
             <h6 style="margin: 0;"><b>Due Date:</b> ${dueDate}</h6>
         </div>
@@ -269,7 +269,7 @@ justify-content: space-between;
 <div style="position: relative; bottom: -10px; right: 0; text-align: right;">
 <div class="row">
     <div class="footer-content" style="display: flex; align-items: center; justify-content: flex-end; text-align: right;">
-        <h6 style="margin: 0; margin-right: -15px; font-weight: bold;">${companyName}</h6>
+        <h6 style="margin: 0; font-weight: bold;">${companyName}</h6>
         <#if stampImage?? && stampImage != "">
             <img style="margin: -5; width: 100px; height:150px; margin-right: 40px; height: auto;" src="${stampImage}" alt="Seal" />
             <h6 style="margin: 0; font-weight: bold;">Authorized Signature:</h6>
@@ -280,7 +280,7 @@ justify-content: space-between;
 </div>
 </div>
 <div style="position: absolute; bottom: -130px; width: 100%;  text-align: center;">
-    <b style="display: inline-block; margin-bottom: 5px;">${cinNo}</b>
+    <b style="display: inline-block; margin-bottom: 5px;">${cinNo!''}</b>
     <div style="border-top: 1px solid #ccc;">
         <h6 style="margin: 0; word-wrap: break-word; word-break: break-word; white-space: normal; text-align: center;">
         <b>${companyName}</b>

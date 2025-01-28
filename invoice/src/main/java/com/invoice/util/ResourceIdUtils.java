@@ -4,8 +4,8 @@ import com.invoice.model.ResourceType;
 
 public class ResourceIdUtils {
 
-    public static String generateProductResourceId(String hsnNo, String productCategory) {
-        return generateGlobalResourceId(ResourceType.PRODUCT, hsnNo, productCategory);
+    public static String generateProductResourceId(String hsnNo,String productName, String productCategory) {
+        return generateGlobalResourceId(ResourceType.PRODUCT, hsnNo,productName, productCategory);
     }
 
     public static String generateCustomerResourceId(String email, String mobileNumber) {
