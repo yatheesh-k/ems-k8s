@@ -3,6 +3,8 @@ package com.pb.employee.util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -63,12 +65,20 @@ public class EntityUtils {
             throws WebClientResponseException {
 
         try {
-            return webClient.get()
+            byte[] pdfData = webClient.get()
                     .uri(uri)
                     .header(Constants.AUTH_KEY, authToken)
                     .retrieve()
                     .toEntity(byte[].class)  // Handling binary response (PDF)
-                    .block();
+                    .block()
+                    .getBody();
+
+            // Return the PDF as a response with the correct content type
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=invoice.pdf")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(pdfData);  // Send the PDF binary data
+
         } catch (WebClientResponseException e) {
             log.error("WebClient error - Status: {}, Body: {}", e.getRawStatusCode(), e.getResponseBodyAsString());
             log.error("Request URI: {}", uri);
@@ -76,7 +86,6 @@ public class EntityUtils {
                     .body(e.getResponseBodyAsString().getBytes());  // Ensure byte[] is returned in case of error
         }
     }
-
 
     public ResponseEntity<String> sendPatchRequest(
             String authToken,

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pb.employee.exception.EmployeeException;
 import com.pb.employee.persistance.model.*;
 import com.pb.employee.request.*;
+import com.pb.employee.service.BankService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -62,7 +63,7 @@ public class BankUtils {
     }
 
 
-    public static Entity maskCompanyBankUpdateProperties(BankUpdateRequest bankUpdateRequest, String bankId, String companyId) {
+    public static Entity maskCompanyBankUpdateProperties(BankUpdateRequest bankUpdateRequest, BankEntity bankEntity, String bankId, String companyId) {
 
         // Declare masked variables
         String  ifscCode = null, address = null, accountType = null,branch =null;
@@ -82,16 +83,11 @@ public class BankUtils {
             accountType = Base64.getEncoder().encodeToString(bankUpdateRequest.getAccountType().getBytes());
         }
 
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        BankEntity bankEntity = objectMapper.convertValue(bankUpdateRequest, BankEntity.class);
         bankEntity.setIfscCode(ifscCode); // Set the masked IFSC code
         bankEntity.setBranch(branch); // Set the masked IFSC code
         bankEntity.setAccountType(accountType); // Set the masked IFSC code
         bankEntity.setAddress(address); // Set the masked address (or branch/state if needed)
         bankEntity.setType(Constants.BANK); // Assuming the type is "BANK"
-
-        // Add any other fields that need masking and setting...
 
         return bankEntity;
     }
