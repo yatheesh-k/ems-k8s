@@ -12,9 +12,9 @@ const InvoiceView = () => {
   const navigate = useNavigate();
   const { invoices, loading, error } = useSelector((state) => state.invoices);
   const [search, setSearch] = useState("");
-  const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [filteredData, setFilteredData] = useState([]);
   const { user } = useAuth();
   const companyId = user.companyId;
 
@@ -25,24 +25,23 @@ const InvoiceView = () => {
     }
   }, [dispatch, companyId]);
 
-    useEffect(() => {
-      console.log("products from Redux store:", invoices);
-    }, [invoices]);
-
   // Filter invoices based on search
   useEffect(() => {
-        if (invoices && Array.isArray(invoices)) {
-            const result = invoices.filter((invoice) =>
-                invoice.invoiceNumber.toLowerCase().includes(search.toLowerCase())
-            );
-            setFilteredData(result);
-        } else {
-            setFilteredData([]);
-        }
-    }, [search, invoices]);
+    if (invoices && Array.isArray(invoices)) {
+      const result = invoices.filter((invoice) =>
+        invoice.invoiceNumber.toLowerCase().includes(search.toLowerCase())
+      );
+      setFilteredData(result);
+    } else {
+      setFilteredData([]);
+    }
+  }, [search, invoices]);
 
-  const handleView = (invoiceId) => {
-    navigate(`/invoicePdf`, { state: { invoiceId } });
+  // Navigate to the Invoice PDF view page
+  const handleView = (customerId, invoiceId) => {
+    console.log("Customer ID:", customerId); // Debugging log
+    console.log("Invoice ID:", invoiceId); // Debugging log
+    navigate("/invoicePdf", { state: { customerId, invoiceId } });
   };
 
   const columns = [
@@ -56,12 +55,20 @@ const InvoiceView = () => {
       width: "50px",
     },
     {
-      name: <h6><b>Customer Name</b></h6>,
+      name: (
+        <h6>
+          <b>Customer Name</b>
+        </h6>
+      ),
       selector: (row) => row.customerName,
       width: "190px",
     },
     {
-      name:<h6><b>Mobile Number</b></h6>,
+      name: (
+        <h6>
+          <b>Mobile Number</b>
+        </h6>
+      ),
       selector: (row) => row.contactNumber,
       width: "170px",
     },
@@ -71,7 +78,11 @@ const InvoiceView = () => {
     //   width: "200px",
     // },
     {
-      name: <h6><b>State</b></h6>,
+      name: (
+        <h6>
+          <b>State</b>
+        </h6>
+      ),
       selector: (row) => row.customerState,
       width: "150px",
     },
@@ -81,28 +92,40 @@ const InvoiceView = () => {
     //   width: "150px",
     // },
     {
-      name: <h6><b>Invoice Number</b></h6>,
+      name: (
+        <h6>
+          <b>Invoice Number</b>
+        </h6>
+      ),
       selector: (row) => row.invoiceNumber,
       width: "180px",
     },
     {
-        name: <h6><b>Invoice Date</b></h6>,
-        selector: (row) => row.invoiceDate,
-        width: "160px",
-      },
+      name: (
+        <h6>
+          <b>Invoice Date</b>
+        </h6>
+      ),
+      selector: (row) => row.invoiceDate,
+      width: "160px",
+    },
     // {
     //   name: "Total Amount",
     //   selector: (row) => row.totalAmount,
     //   width: "150px",
     // },
     {
-      name:<h6><b>Actions</b></h6>,
+      name: (
+        <h6>
+          <b>Actions</b>
+        </h6>
+      ),
       cell: (row) => (
         <div>
           <button
             className="btn btn-sm"
             style={{ backgroundColor: "transparent" }}
-            onClick={() => handleView(row.invoiceNumber)}
+            onClick={() =>handleView(row.customerId, row.invoiceId)}
             title="View Invoice"
           >
             <Eye size={22} color="green" />
@@ -145,7 +168,7 @@ const InvoiceView = () => {
               <div className="card-header">
                 <div className="row">
                   <div className="col-md-4">
-                    <Link to={"/invoiceRegistration"}>
+                    <Link to={"/invoiceRegistartion"}>
                       <button className="btn btn-primary">Add Invoice</button>
                     </Link>
                   </div>

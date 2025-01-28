@@ -9,6 +9,7 @@ import { useAuth } from "../../Context/AuthContext";
 import { InvoicePostApi } from "../../Utils/Axios";
 import { fetchCustomers } from "../../Redux/CustomerSlice";
 import { fetchProducts } from "../../Redux/ProductSlice";
+import { fetchBanks } from "../../Redux/BankSlice";
 
 const InvoiceRegistration = () => {
   const {
@@ -26,6 +27,7 @@ const InvoiceRegistration = () => {
   const dispatch = useDispatch();
   const { customers, loading, error } = useSelector((state) => state.customers);
   const { products } = useSelector((state) => state.products);
+  const { banks } = useSelector((state) => state.banks);
 
   console.log("products", products);
   const [invoiceData, setInvoiceData] = useState(null);
@@ -51,7 +53,9 @@ const InvoiceRegistration = () => {
   const [load, setLoad] = useState(false); // to manage loading state for API calls
   const [customer, setCustomer] = useState(customers); // List of customers for the dropdown
   const [product, setProduct] = useState(products);
+  const [bank, setBank] = useState(banks);
   const [formattedProducts, setFormattedProducts] = useState(products);
+  const [formattedBanks, setFormattedBanks] = useState(banks);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -63,6 +67,7 @@ const InvoiceRegistration = () => {
   useEffect(() => {
     dispatch(fetchCustomers());
     dispatch(fetchProducts());
+    dispatch(fetchBanks(companyId));
   }, [dispatch]);
 
   useEffect(() => {
@@ -76,6 +81,33 @@ const InvoiceRegistration = () => {
       setFormattedProducts(productOptions);
     }
   }, [products]);
+
+  useEffect(() => {
+    if (companyId) {
+      console.log("fetchBanks", fetchBanks);
+      dispatch(fetchBanks(companyId));
+    }
+  }, [dispatch, companyId]);
+
+  useEffect(() => {
+    console.log("Banks from Redux store:", banks);
+  }, [banks]);
+
+  // Filter banks based on search term
+  useEffect(() => {
+    if (Array.isArray(banks)) {
+      const bankOptions = banks.map((bank) => ({
+        value: bank.bankId, // Assuming `bank.id` is the unique identifier
+        label: bank.bankName, // Assuming `bank.bankName` is the name of the bank
+      }));
+      setFormattedBanks(bankOptions);
+    }
+  }, [banks]);
+
+  const handleBankChange = (selectedOption) => {
+    console.log("Selected Bank:", selectedOption);
+    // Additional actions can be performed here, if necessary
+  };
 
   console.log("this is from product options ", formattedProducts);
 
@@ -226,6 +258,7 @@ const InvoiceRegistration = () => {
 
       const invoiceDataToSend = {
         customerName: data.customerName.label,
+        bankId: data.bankName,
         purchaseOrder: data.purchaseOrder,
         vendorCode: data.vendorCode,
         invoiceDate: data.invoiceDate,
@@ -377,6 +410,47 @@ const InvoiceRegistration = () => {
                       <p className="errorMsg" style={{ marginLeft: "170px" }}>
                         {errors.customerName.message}
                       </p> // Display error message
+                    )}
+                  </div>
+
+                  <div className="form-group row mt-1">
+                    <label
+                      htmlFor="bankName"
+                      className="col-sm-2 text-right control-label col-form-label"
+                    >
+                      Bank Name
+                      <span style={{ color: "red" }}>*</span>
+                    </label>
+                    <div className="col-sm-9 mb-3">
+                      <Controller
+                        name="bankName" // This is the field name in the form
+                        control={control}
+                        rules={{ required: "Bank Name is required" }} // Validation rule
+                        render={({ field }) => (
+                          <Select
+                            {...field} // Spread the react-hook-form field props
+                            options={formattedBanks} // The list of bank options
+                            value={
+                              formattedBanks.find(
+                                (bank) => bank.value === field.value
+                              ) || null
+                            } // Find the selected bank by matching value (bankId)
+                            onChange={(selectedOption) => {
+                              // Handle bank selection
+                              field.onChange(
+                                selectedOption ? selectedOption.value : null
+                              ); // Update the bankId (value) in form
+                            }}
+                            getOptionLabel={(e) => e.label} // Display the bank name (label) in the dropdown
+                            getOptionValue={(e) => e.value} // The value corresponds to bankId
+                          />
+                        )}
+                      />
+                    </div>
+                    {errors.bankName && (
+                      <p className="errorMsg" style={{ marginLeft: "170px" }}>
+                        {errors.bankName.message}
+                      </p>
                     )}
                   </div>
 

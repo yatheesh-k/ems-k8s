@@ -746,6 +746,34 @@ export const InvoiceGetApiById = (companyId, customerId, invoiceId) => {
     });
 };
 
+export const InvoiceDownloadById = async (companyId, customerId, invoiceId) => {
+  try {
+    // Make the API request with specific headers for this request
+    const response = await axiosInstance.get(`/company/${companyId}/customer/${customerId}/downloadInvoice/${invoiceId}`, {
+      responseType: 'blob', // Handle the response as a binary blob (PDF)
+      headers: {
+        'Accept': 'application/pdf',  // Indicate that we expect a PDF
+      },
+    });
 
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+
+    // Create a link element to trigger the download
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `invoice_${customerId}_${invoiceId}.pdf`; // Customize the filename
+    document.body.appendChild(link);
+    link.click(); // Trigger the download
+    document.body.removeChild(link); // Clean up the link element
+
+    // Optionally revoke the URL to free up memory
+    window.URL.revokeObjectURL(url);
+
+    return true;  // Indicate success
+  } catch (error) {
+    console.error('Download error:', error);
+    return false;  // Indicate failure
+  }
+};
 
 
