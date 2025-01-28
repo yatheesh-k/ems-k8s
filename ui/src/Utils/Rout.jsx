@@ -66,6 +66,7 @@ import InvoiceView from '../InvoiceModule/Invoice/InvoiceView';
 import InvoicePdf from '../InvoiceModule/Invoice/InvoicePdf';
 import ProductView from '../InvoiceModule/Products/ProductsView';
 import ProductRegistration from '../InvoiceModule/Products/ProductRegistration'
+import CreatePassword from '../Login/CreatePassword';
 
 const Rout = () => {
   const location = useLocation();
@@ -189,6 +190,7 @@ const Rout = () => {
       <Route path='/invoicePdf' element={<InvoicePdf/>}></Route>
       <Route path='/accountRegistration' element={<AccountRegistration/>}></Route>
       <Route path='/accountsView' element={<AccountsView/>}></Route>
+      <Route path='/:company/createPassword' element={<CreatePassword/>}></Route>
     </Routes>
   );
 };
