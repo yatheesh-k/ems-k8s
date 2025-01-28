@@ -496,7 +496,7 @@ const CustomersRegistration = () => {
                         placeholder="Enter Gst Number"
                         className="form-control"
                         autoComplete="off"
-                        {...register("gstNo", {
+                        {...register("customerGstNo", {
                           validate: (value) =>
                             !value || validateField(value, 'gst'), // Validate only if the field is not empty
                           maxLength: {
@@ -504,7 +504,7 @@ const CustomersRegistration = () => {
                             message: "GST Number should be 15 characters long",
                           },
                         })}
-                        onChange={(e) => handleInputChange(e, "gstNo")}
+                        onChange={(e) => handleInputChange(e, "customerGstNo")}
                         onKeyPress={(e) => preventInvalidInput(e, 'alphaNumeric')}
                         onInput={(e) => {
                           e.target.value = e.target.value.toUpperCase(); // Convert to uppercase
