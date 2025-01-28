@@ -74,7 +74,7 @@ const CustomersRegistration = () => {
             ...response,
             status: { value: response.status, label: response.status }
             };
-          reset(response);
+          reset(customerData);
           setIsUpdating(true);
         })
         .catch((error) => {

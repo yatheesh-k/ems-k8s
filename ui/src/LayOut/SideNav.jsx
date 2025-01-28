@@ -277,17 +277,6 @@ const SideNav = () => {
     setIsCustomerOpen(!isCustomerOpne);
   };
 
-  const toggleBank = (e) => {
-    e.preventDefault(); // Prevent default anchor behavior
-    setIsAttendanceOpen(false);
-    setIsCompanyOpen(false);
-    setIsPayrollOpen(false);
-    setIsLettersOpen(false);
-    setIsCustomerOpen(false);
-    setIsProductsOpen(false);
-    setIsBankOpen(!isBankOpen);
-  };
-
   const toggleInvoice = (e) => {
     e.preventDefault(); // Prevent default anchor behavior
     setIsAttendanceOpen(false);
@@ -691,56 +680,6 @@ const SideNav = () => {
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
                   href=" "
-                  onClick={toggleBank}
-                  data-bs-target="#attendenceManagement"
-                  data-bs-toggle="collapse"
-                >
-                  <span className="align-middle">
-                    <i
-                      className="bi bi-credit-card"
-                      style={{ fontSize: "medium" }}
-                    ></i>
-                  </span>
-                  <span className="align-middle">Bank Details</span>
-                  <i
-                    className={`bi ${
-                      isBankOpen ? "bi-chevron-up" : "bi-chevron-down"
-                    } ms-auto`}
-                  ></i>
-                </a>
-                <ul
-                  id="attendenceManagement"
-                  className={`sidebar-dropDown list-unstyled collapse ${
-                    isBankOpen ? "show" : ""
-                  }`}
-                >
-                  <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${
-                      location.pathname === "/addAttendance" ? "active" : ""
-                    }`}
-                  >
-                    <Link className="sidebar-link" to="/accountRegistration">
-                      Bank Registartion
-                    </Link>
-                  </li>
-                  <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${
-                      location.pathname === "/attendanceReport" ? "active" : ""
-                    }`}
-                  >
-                    <Link className="sidebar-link" to="/accountsView">
-                      Bank View
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-
-              <li className="sidebar-item has-dropdown">
-                <a
-                  className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href=" "
                   onClick={toggleCustomer}
                   data-bs-target="#attendenceManagement"
                   data-bs-toggle="collapse"
@@ -921,6 +860,16 @@ const SideNav = () => {
                   >
                     <Link className="sidebar-link" to="/companySalaryView">
                       Company Salary Structure
+                    </Link>
+                  </li>
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${
+                      location.pathname === "/accountsView" ? "active" : ""
+                    }`}
+                  >
+                    <Link className="sidebar-link" to="/accountsView">
+                      Bank View
                     </Link>
                   </li>
                   <li
@@ -1378,55 +1327,6 @@ const SideNav = () => {
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
                   href=" "
-                  onClick={toggleBank}
-                  data-bs-target="#attendenceManagement"
-                  data-bs-toggle="collapse"
-                >
-                  <span className="align-middle">
-                    <i
-                      className="bi bi-credit-card"
-                      style={{ fontSize: "medium" }}
-                    ></i>
-                  </span>
-                  <span className="align-middle">Bank</span>
-                  <i
-                    className={`bi ${
-                      isBankOpen ? "bi-chevron-up" : "bi-chevron-down"
-                    } ms-auto`}
-                  ></i>
-                </a>
-                <ul
-                  id="attendenceManagement"
-                  className={`sidebar-dropDown list-unstyled collapse ${
-                    isBankOpen ? "show" : ""
-                  }`}
-                >
-                  <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${
-                      location.pathname === "/addAttendance" ? "active" : ""
-                    }`}
-                  >
-                    <Link className="sidebar-link" to="/accountRegistration">
-                      Bank Registartion
-                    </Link>
-                  </li>
-                  <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${
-                      location.pathname === "/attendanceReport" ? "active" : ""
-                    }`}
-                  >
-                    <Link className="sidebar-link" to="/accountsView">
-                      Bank View
-                    </Link>
-                  </li>
-                </ul>
-              </li>
-              <li className="sidebar-item has-dropdown">
-                <a
-                  className="sidebar-link collapsed d-flex justify-content-between align-items-center"
-                  href=" "
                   onClick={toggleCustomer}
                   data-bs-target="#attendenceManagement"
                   data-bs-toggle="collapse"
@@ -1547,7 +1447,7 @@ const SideNav = () => {
                 <ul
                   id="attendenceManagement"
                   className={`sidebar-dropDown list-unstyled collapse ${
-                    isBankOpen ? "show" : ""
+                    isInvoiceOpen ? "show" : ""
                   }`}
                 >
                   <li
