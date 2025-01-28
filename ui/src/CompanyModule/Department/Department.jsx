@@ -196,6 +196,10 @@ const Department = () => {
           return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters
         }
       }
+
+      if (trimmedValue.length > 40) {
+        return "Department name must not exceed 40 characters.";  // If the total length of the input is more than 40 characters
+      }
   
       // Check for multiple spaces between words
       if (/\s{2,}/.test(trimmedValue)) {

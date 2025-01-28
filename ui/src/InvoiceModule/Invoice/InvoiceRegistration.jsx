@@ -521,6 +521,7 @@ const InvoiceRegistration = () => {
                         className="form-control"
                         name="dueDate"
                         id="dueDate"
+                        autoComplete="off"
                         {...register("dueDate", {
                           required: "Due date is required",
                           validate: {
@@ -581,6 +582,7 @@ const InvoiceRegistration = () => {
                         className="form-control"
                         name="invoiceDate"
                         id="invoiceDate"
+                        autoComplete="off"
                         {...register("invoiceDate", {
                           required: "Invoice date is required",
                         })}
@@ -689,6 +691,7 @@ const InvoiceRegistration = () => {
                                 id={`purchaseDate-${index}`}
                                 name={`productsInfo[${index}].purchaseDate`}
                                 type="date"
+                                autoComplete="off"
                                 {...register(
                                   `productsInfo[${index}].purchaseDate`,
                                   {
@@ -731,7 +734,7 @@ const InvoiceRegistration = () => {
                                 htmlFor={`productCost-${index}`}
                                 className=" text-right control-label col-form-label"
                               >
-                                Cost
+                               Unit Cost
                               </label>
                               <input
                                 className="form-control"
