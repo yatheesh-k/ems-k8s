@@ -548,7 +548,7 @@ const EmployeeRegistration = () => {
   const validateNumber = (value) => {
     // Check if the input is empty
     if (!value || value.trim().length === 0) {
-      return "UAN Number is Required.";
+      return true;
     }
 
     // Check if the value contains only digits
@@ -1413,7 +1413,7 @@ const EmployeeRegistration = () => {
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
-                        PAN Number <span style={{ color: "red" }}>*</span>
+                        PAN Number 
                       </label>
                       <input
                         type={isUpdating ? "text" : "text"}
@@ -1426,7 +1426,6 @@ const EmployeeRegistration = () => {
                         autoComplete="off"
                         onKeyDown={handleEmailChange}
                         {...register("panNo", {
-                          required: "PAN Number is Required",
                           maxLength: {
                             value: 10,
                             message: "Pan Number must not exceed 10 Characters",
