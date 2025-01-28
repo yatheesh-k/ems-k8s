@@ -164,4 +164,5 @@ public class Constants {
     public static final String INVOICE = "/invoice";
     public static final String INVOICE_GET = "/invoice/";
     public static final String INVOICE_DOWNLOAD = "/downloadInvoice/";
+    public static final String SLASH = "/";
 }

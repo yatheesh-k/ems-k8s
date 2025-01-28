@@ -124,6 +124,11 @@ public class BankServiceImpl implements BankService {
         String index = ResourceIdUtils.generateCompanyIndex(companyEntity.getShortName());
         try {
             entity = openSearchOperations.getBankById(index, null,bankId);
+            if (entity == null) {
+                log.error("Bank with ID {} not found", bankId);
+                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_BANK_DETAILS), companyId),
+                        HttpStatus.NOT_FOUND);
+            }
             BankUtils.unmaskBankProperties(entity);
 
         } catch (Exception ex) {
@@ -170,9 +175,9 @@ public class BankServiceImpl implements BankService {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
         // Process and mask sensitive bank details before saving
-        Entity entity = BankUtils.maskCompanyBankUpdateProperties(bankUpdateRequest, bankId, companyId);
+        Entity entity = BankUtils.maskCompanyBankUpdateProperties(bankUpdateRequest, bankEntity,bankId, companyId);
         // Save the updated bank details back to OpenSearch
-        openSearchOperations.saveEntity(entity, companyId, Constants.INDEX_EMS);
+        openSearchOperations.saveEntity(entity, bankId, index);
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK
         );
