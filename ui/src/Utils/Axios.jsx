@@ -297,7 +297,7 @@ export const EmployeePayslipGetById = (employeeId, payslipId, month, year) => {
 
 
 export const EmployeePayslipsGet = (employeeId, month, year) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
   return axiosInstance.get(`/${company}/employee/${employeeId}/payslips`, {
     params: {
       month, year
@@ -306,7 +306,7 @@ export const EmployeePayslipsGet = (employeeId, month, year) => {
 }
 
 export const AllEmployeePayslipsGet = (month, year) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
   return axiosInstance.get(`/${company}/employee/all/payslip`, {
     params: {
       month, year
@@ -367,7 +367,7 @@ export const AttendancePatchById = (employeeId, attendanceId, data) => {
 }
 
 export const AttendanceDeleteById = (employeeId, attendanceId) => {
-  const company = localStorage.getItem("company")
+  const company = localStorage.getItem("companyName")
   return axiosInstance.delete(`/${company}/employee/${employeeId}/attendance/${attendanceId}`);
 }
 
