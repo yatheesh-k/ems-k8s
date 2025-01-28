@@ -60,7 +60,13 @@ const InvoiceView = () => {
           <b>Customer Name</b>
         </h6>
       ),
-      selector: (row) => row.customerName,
+      selector: (row) => (
+        <div title={row.customerName || ""}>
+          {row.customerName && row.customerName.length > 18
+            ? row.customerName.slice(0, 20) + "..."
+            : row.customerName}
+        </div>
+      ),
       width: "190px",
     },
     {
@@ -125,7 +131,7 @@ const InvoiceView = () => {
           <button
             className="btn btn-sm"
             style={{ backgroundColor: "transparent" }}
-            onClick={() =>handleView(row.customerId, row.invoiceId)}
+            onClick={() => handleView(row.customerId, row.invoiceId)}
             title="View Invoice"
           >
             <Eye size={22} color="green" />

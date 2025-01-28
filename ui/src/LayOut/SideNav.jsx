@@ -701,7 +701,7 @@ const SideNav = () => {
                       style={{ fontSize: "medium" }}
                     ></i>
                   </span>
-                  <span className="align-middle">Bank</span>
+                  <span className="align-middle">Bank Details</span>
                   <i
                     className={`bi ${
                       isBankOpen ? "bi-chevron-up" : "bi-chevron-down"
@@ -1527,7 +1527,7 @@ const SideNav = () => {
                 <a
                   className="sidebar-link collapsed d-flex justify-content-between align-items-center"
                   href=" "
-                  onClick={toggleBank}
+                  onClick={toggleInvoice}
                   data-bs-target="#attendenceManagement"
                   data-bs-toggle="collapse"
                 >
@@ -1540,7 +1540,7 @@ const SideNav = () => {
                   <span className="align-middle">Invoice</span>
                   <i
                     className={`bi ${
-                      isBankOpen ? "bi-chevron-up" : "bi-chevron-down"
+                      isInvoiceOpen ? "bi-chevron-up" : "bi-chevron-down"
                     } ms-auto`}
                   ></i>
                 </a>
@@ -1556,8 +1556,8 @@ const SideNav = () => {
                       location.pathname === "/addAttendance" ? "active" : ""
                     }`}
                   >
-                    <Link className="sidebar-link" to="/accountRegistration">
-                      Bank Registartion
+                    <Link className="sidebar-link" to="/invoiceRegistartion">
+                      Invoice Registartion
                     </Link>
                   </li>
                   <li
@@ -1566,8 +1566,8 @@ const SideNav = () => {
                       location.pathname === "/attendanceReport" ? "active" : ""
                     }`}
                   >
-                    <Link className="sidebar-link" to="/accountsView">
-                      Bank View
+                    <Link className="sidebar-link" to="/invoiceView">
+                      Invoice View
                     </Link>
                   </li>
                 </ul>

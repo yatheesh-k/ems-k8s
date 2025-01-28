@@ -21,7 +21,6 @@ const EmployeeProfile = () => {
                 console.error("Error fetching employee data:", error);
             }
         };
-
         fetchData();
     }, [user.userId]); 
 
