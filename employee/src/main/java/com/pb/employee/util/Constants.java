@@ -165,4 +165,6 @@ public class Constants {
     public static final String INVOICE_GET = "/invoice/";
     public static final String INVOICE_DOWNLOAD = "/downloadInvoice/";
     public static final String SLASH = "/";
+    public static final String COMPANY_ADMIN = "company_admin";
+
 }
