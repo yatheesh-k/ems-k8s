@@ -1,21 +1,27 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Slide, toast } from 'react-toastify';
-import LayOut from '../../LayOut/LayOut';
-import Select from 'react-select'
-import { BankGetApiById, BankPostApi, BankPutApiById, } from '../../Utils/Axios';
-import { useAuth } from '../../Context/AuthContext';
-
-
+import React, { useState, useEffect, useRef } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Slide, toast } from "react-toastify";
+import LayOut from "../../LayOut/LayOut";
+import Select from "react-select";
+import { BankGetApiById, BankPostApi, BankPutApiById } from "../../Utils/Axios";
+import { useAuth } from "../../Context/AuthContext";
 
 const AccountRegistartion = () => {
-  const { register, handleSubmit, formState: { errors }, control, trigger, setValue, reset } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    control,
+    trigger,
+    setValue,
+    reset,
+  } = useForm();
 
   const [isUpdating, setIsUpdating] = useState(false);
-  const {user}=useAuth();
-  const companyId=user.companyId;
-  console.log("companyId from accounts registartion",companyId);
+  const { user } = useAuth();
+  const companyId = user.companyId;
+  console.log("companyId from accounts registartion", companyId);
   const [passwordShown, setPasswordShown] = useState(false);
   const [update, setUpdate] = useState([]);
   const [errorMessage, setErrorMessage] = useState(""); // State for error message
@@ -28,29 +34,33 @@ const AccountRegistartion = () => {
       bankName: data.bankName,
       branch: data.branch,
       ifscCode: data.ifscCode,
-      address:data.address,
+      address: data.address,
       accountType: data.accountType.value, // Extract the value of the accountType object
     };
 
-    console.log('Flattened Payload:', payload); // Log the payload to verify its structure
+    console.log("Flattened Payload:", payload); // Log the payload to verify its structure
 
     if (location && location.state && location.state.bankId) {
       // If updating, call the PUT API
       BankPutApiById(companyId, location.state.bankId, payload)
         .then((res) => {
-          const successMessage = res.data.message || 'Bank Account updated successfully';
+          const successMessage =
+            res.data.message || "Bank Account updated successfully";
           toast.success(successMessage, {
-            position: 'top-right',
+            position: "top-right",
             autoClose: 1000,
           });
           setUpdate(res.data.data);
-          navigate('/accountsView');
+          navigate("/accountsView");
         })
         .catch((error) => {
-          console.error('Error updating bank:', error); // Log the error for debugging
-          const errorMsg = error.response?.data?.error?.message || error.message || 'Error updating bank';
+          console.error("Error updating bank:", error); // Log the error for debugging
+          const errorMsg =
+            error.response?.data?.error?.message ||
+            error.message ||
+            "Error updating bank";
           toast.error(errorMsg, {
-            position: 'top-right',
+            position: "top-right",
             autoClose: 1000,
           });
         });
@@ -58,18 +68,19 @@ const AccountRegistartion = () => {
       // If adding new bank, call the POST API
       BankPostApi(companyId, payload)
         .then((response) => {
-          toast.success('Bank Account added successfully', {
-            position: 'top-right',
+          toast.success("Bank Account added successfully", {
+            position: "top-right",
             autoClose: 1000,
           });
           setUpdate((prevState) => [...prevState, response.data.data]);
-          navigate('/accountsView');
+          navigate("/accountsView");
         })
         .catch((error) => {
-          console.error('Error adding bank account:', error); // Log the full error object
-          const errorMessage = error.response?.data?.error?.message || 'Error adding bank details';
+          console.error("Error adding bank account:", error); // Log the full error object
+          const errorMessage =
+            error.response?.data?.error?.message || "Error adding bank details";
           toast.error(errorMessage, {
-            position: 'top-right',
+            position: "top-right",
             autoClose: 1000,
           });
         });
@@ -77,32 +88,48 @@ const AccountRegistartion = () => {
   };
 
   useEffect(() => {
-    console.log('Location state:', location.state);
-    console.log('companyId:', companyId);
+    console.log("Location state:", location.state);
+    console.log("companyId:", companyId);
+
     if (location && location.state && location.state.bankId) {
       const bankId = location.state.bankId;
-      console.log('bankId:', bankId);
+      console.log("bankId:", bankId);
+
       BankGetApiById(companyId, bankId)
         .then((response) => {
-          console.log('bank data:', response);
-          reset(response.data);
+          console.log("bank data:", response);
+
+          // Assuming the response.data is the correct object to reset the form with
+          const bankData = {
+            ...response.data,
+            // If the response contains accountType as a string (e.g. 'checking' or 'savings')
+            accountType: {
+              value: response.data.accountType,
+              label: response.data.accountType,
+            }, // Formatting for Select dropdown
+          };
+
+          // Reset the form with the correctly formatted data
+          reset(bankData);
           setIsUpdating(true);
         })
         .catch((error) => {
-          console.error('Error fetching data:', error.response || error);
+          console.error("Error fetching data:", error.response || error);
           if (error.response) {
-            console.error('API Error Response:', error.response.data);
+            console.error("API Error Response:", error.response.data);
           }
-          toast.error('Error fetching Bank data.');
+          toast.error("Error fetching Bank data.");
         });
     }
   }, [location.state?.bankId, companyId, reset]);
 
   const validateField = (value, type) => {
     switch (type) {
-
-      case 'ifscCode':
-        return /^[A-Z]{4}0[A-Z0-9]{6}$/.test(value) || "Invalid IFSC Code format. It should be in the format: AAAA0BBBBBB ";
+      case "ifscCode":
+        return (
+          /^[A-Z]{4}0[A-Z0-9]{6}$/.test(value) ||
+          "Invalid IFSC Code format. It should be in the format: AAAA0BBBBBB "
+        );
       default:
         return true;
     }
@@ -112,24 +139,23 @@ const AccountRegistartion = () => {
     const key = e.key;
 
     // Alphanumeric check for customerName, state, city fields (no special characters allowed except spaces)
-    if (type === 'alpha' && /[^a-zA-Z\s]/.test(key)) {
+    if (type === "alpha" && /[^a-zA-Z\s]/.test(key)) {
       e.preventDefault();
     }
 
-    if (type === 'alphaNumeric' && /[^a-zA-Z0-9]/.test(key)) {
+    if (type === "alphaNumeric" && /[^a-zA-Z0-9]/.test(key)) {
       e.preventDefault();
     }
 
     // Numeric check for fields that should only allow numbers
-    if (type === 'numeric' && !/^[0-9]$/.test(key)) {
+    if (type === "numeric" && !/^[0-9]$/.test(key)) {
       e.preventDefault();
     }
-
   };
 
   // Custom validator to check trailing spaces
   const noTrailingSpaces = (value) => {
-    if (value.endsWith(' ')) {
+    if (value.endsWith(" ")) {
       return "Spaces are not allowed at the end";
     }
     return true; // Return true if the value is valid
@@ -137,14 +163,14 @@ const AccountRegistartion = () => {
 
   const handleInputChange = (e, fieldName) => {
     // Get the input value, trim leading spaces and replace multiple spaces with a single space
-    let value = e.target.value.trimStart().replace(/ {2,}/g, ' ');
+    let value = e.target.value.trimStart().replace(/ {2,}/g, " ");
 
     // Capitalize the first letter of each word
     value = value.replace(/\b\w/g, (char) => char.toUpperCase());
 
     // Update the field value and trigger validation
     setValue(fieldName, value);
-    trigger(fieldName);  // Trigger validation
+    trigger(fieldName); // Trigger validation
   };
 
   const clearForm = () => {
@@ -205,7 +231,8 @@ const AccountRegistartion = () => {
                       <label className="form-label">
                         Bank Account<span style={{ color: "red" }}>*</span>
                       </label>
-                      <input type="text"
+                      <input
+                        type="text"
                         className="form-control"
                         placeholder="Enter Bank Account Number"
                         name="accountNumber"
@@ -214,18 +241,22 @@ const AccountRegistartion = () => {
                           required: "Bank Account Number is Required",
                           minLength: {
                             value: 9,
-                            message: 'Bank Account Number must be at least 9 characters long',
+                            message:
+                              "Bank Account Number must be at least 9 characters long",
                           },
                           maxLength: {
                             value: 18,
-                            message: 'Bank Account Number must be at most 18 characters long'
+                            message:
+                              "Bank Account Number must be at most 18 characters long",
                           },
                         })}
                         onChange={(e) => handleInputChange(e, "accountNumber")}
-                        onKeyPress={(e) => preventInvalidInput(e, 'numeric')}
+                        onKeyPress={(e) => preventInvalidInput(e, "numeric")}
                       />
                       {errors.accountNumber && (
-                        <p className="errorMsg">{errors.accountNumber.message}</p>
+                        <p className="errorMsg">
+                          {errors.accountNumber.message}
+                        </p>
                       )}
                     </div>
                     <div className="col-lg-1"></div>
@@ -244,7 +275,8 @@ const AccountRegistartion = () => {
                           validate: noTrailingSpaces,
                           minLength: {
                             value: 3,
-                            message: "Bank Name must be at least 3 characters long",
+                            message:
+                              "Bank Name must be at least 3 characters long",
                           },
                           maxLength: {
                             value: 60,
@@ -252,7 +284,7 @@ const AccountRegistartion = () => {
                           },
                         })}
                         onChange={(e) => handleInputChange(e, "bankName")}
-                        onKeyPress={(e) => preventInvalidInput(e, 'alpha')}
+                        onKeyPress={(e) => preventInvalidInput(e, "alpha")}
                       />
                       {errors.bankName && (
                         <p className="errorMsg">{errors.bankName.message}</p>
@@ -275,15 +307,17 @@ const AccountRegistartion = () => {
                           validate: noTrailingSpaces,
                           minLength: {
                             value: 3,
-                            message: "Branch Name must be at least 3 characters long",
+                            message:
+                              "Branch Name must be at least 3 characters long",
                           },
                           maxLength: {
                             value: 60,
-                            message: "Branch Name must not exceed 60 characters.",
+                            message:
+                              "Branch Name must not exceed 60 characters.",
                           },
                         })}
                         onChange={(e) => handleInputChange(e, "branch")}
-                        onKeyPress={(e) => preventInvalidInput(e, 'alpha')}
+                        onKeyPress={(e) => preventInvalidInput(e, "alpha")}
                       />
                       {errors.branch && (
                         <p className="errorMsg">{errors.branch.message}</p>
@@ -306,12 +340,14 @@ const AccountRegistartion = () => {
                           required: "IFSC Code is Required",
                           maxLength: {
                             value: 11,
-                            message: 'IFSC Code must be 11 characters long',
+                            message: "IFSC Code must be 11 characters long",
                           },
-                          validate: (value) => validateField(value, 'ifscCode'),
+                          validate: (value) => validateField(value, "ifscCode"),
                         })}
                         onChange={(e) => handleInputChange(e, "ifscCode")}
-                        onKeyPress={(e) => preventInvalidInput(e, 'alphaNumeric')}
+                        onKeyPress={(e) =>
+                          preventInvalidInput(e, "alphaNumeric")
+                        }
                         onInput={(e) => {
                           e.target.value = e.target.value.toUpperCase(); // Convert to uppercase
                         }}
@@ -333,7 +369,7 @@ const AccountRegistartion = () => {
                         render={({ field }) => (
                           <Select
                             {...field}
-                            options={accountTypes}
+                            options={accountTypes} 
                             getOptionLabel={(e) => e.label}
                             getOptionValue={(e) => e.value}
                           />
@@ -359,17 +395,19 @@ const AccountRegistartion = () => {
                           validate: noTrailingSpaces,
                           minLength: {
                             value: 3,
-                            message: 'Address must be at least 3 characters long'
+                            message:
+                              "Address must be at least 3 characters long",
                           },
                           maxLength: {
                             value: 250,
-                            message: 'Address must be at most 250 characters long'
-                          }
+                            message:
+                              "Address must be at most 250 characters long",
+                          },
                         })}
                         onChange={(e) => handleInputChange(e, "address")}
-                        onKeyPress={(e) => preventInvalidInput(e, 'address')}
+                        onKeyPress={(e) => preventInvalidInput(e, "address")}
                       />
-                       {errors.address && (
+                      {errors.address && (
                         <p className="errorMsg">{errors.address.message}</p>
                       )}
                     </div>
@@ -420,7 +458,6 @@ const AccountRegistartion = () => {
         </div>
       </div>
     </LayOut>
-
   );
-}
+};
 export default AccountRegistartion;

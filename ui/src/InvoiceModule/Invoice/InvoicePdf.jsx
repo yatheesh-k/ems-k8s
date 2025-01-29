@@ -144,51 +144,52 @@ const InvoicePdf = () => {
         <div className="row">
           <div className="col-md-12">
             <div
-              className="card card-body printableArea bg-white mt-5"
+              className="card card-body bg-white mt-5"
               style={{ paddingTop: "50px", paddingRight: "60px" }}
             >
-              <p
+              <div
                 style={{
-                  fontWeight: "bold",
-                  width: "150px",
-                  marginBottom: "0px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
                 }}
               >
-                {" "}
-                PAN No: {invoiceData.panNo},
-              </p>
-              <p style={{ fontWeight: "bold", width: "400px" }}>
-                GST Number : {companyDetails.gstNo}
-              </p>
-              <div style={{ textAlign: "right" }}>
-                <img
-                  src={companyDetails.imageFile}
-                  style={{ height: "60px", width: "155px", marginTop: "0px" }}
-                  alt="logo"
-                />
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontWeight: "bold", marginBottom: "0px" }}>
+                    PAN No: {invoiceData.panNo}
+                  </p>
+                  <p style={{ fontWeight: "bold" }}>
+                    GST Number: {companyDetails.gstNo}
+                  </p>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <img
+                    src={companyDetails.imageFile}
+                    style={{ height: "60px", width: "155px" }}
+                    alt="logo"
+                  />
+                </div>
               </div>
-              <h1>Invoice</h1>
+              <h1 style={{ textAlign: "center" }}>Invoice</h1>
               <div className="row">
                 {/* Billing Information */}
                 <div className="col-md-6">
                   <div className="text-left">
                     <address>
-                      <p>
-                        Billed To,
-                      </p>
-                      <p>
+                      <p style={{ marginBottom: "10px" }}>Billed To,</p>
+                      <p style={{ marginBottom: "10px" }}>
                         <b>{invoiceData.customerName},</b>
                       </p>
-                      <p>
+                      <p style={{ marginBottom: "10px" }}>
                         <b>Email : {invoiceData.email},</b>
                       </p>
-                      <p>
+                      <p style={{ marginBottom: "10px" }}>
                         <b>Contact No : {invoiceData.mobileNumber},</b>
                       </p>
-                      <p>
-                        <b>GST : {invoiceData.gstNo},</b>
+                      <p style={{ marginBottom: "10px" }}>
+                        <b>GST : {invoiceData.customerGstNo},</b>
                       </p>
-                      <p>
+                      <p style={{ marginBottom: "10px" }}>
                         <b>Address : {invoiceData.customerAddress}.</b>
                       </p>
                     </address>
@@ -198,7 +199,7 @@ const InvoicePdf = () => {
                   {" "}
                   {/* Use 'text-end' for Bootstrap 5 */}
                   <p>
-                    <b>Invoice ID : </b>-<b>{invoiceData.invoiceNumber}</b>
+                    <b>Invoice ID :- {invoiceData.invoiceNumber}</b>
                   </p>
                   <p>
                     <b>Invoice Date :</b> <CalendarFill />{" "}
@@ -264,21 +265,28 @@ const InvoicePdf = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {invoiceData.orderRequests &&
-                          invoiceData.orderRequests.map((item, index) => (
+                        {invoiceData.orderDetails &&
+                        invoiceData.orderDetails.length > 0 ? (
+                          invoiceData.orderDetails.map((item, index) => (
                             <tr key={index}>
                               <td className="text-center">{index + 1}</td>
                               <td className="text-left">{item.hsnNo}</td>
                               <td className="text-left">{item.productName}</td>
-                              <td className="text-left">
-                                {item.productCompany}
-                              </td>
+                              <td className="text-left">{item.service}</td>
                               <td className="text-left">{item.quantity}</td>
                               <td className="text-left">{item.unitCost}</td>
                               <td className="text-left">{item.totalCost}</td>
                             </tr>
-                          ))}
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan="7" style={{ textAlign: "center" }}>
+                              No product details available
+                            </td>
+                          </tr>
+                        )}
                       </tbody>
+
                       <tfoot>
                         {/* Total Cost, IGST, and Grand Total */}
                         <tr>
@@ -399,7 +407,7 @@ const InvoicePdf = () => {
                             <span className="text-sm">
                               The payment should be made favouring{" "}
                               <strong>{companyDetails.companyName}</strong> or
-                              Direct deposite information below.
+                              Direct deposite information given above.
                             </span>
                           </td>
                         </tr>
@@ -458,22 +466,22 @@ const InvoicePdf = () => {
                       <p style={{ marginTop: "50px" }}>
                         <b>{companyDetails.companyName}</b>{" "}
                       </p>
-                      <img
+                      {/* <img
                         src={companyDetails.stampImage}
                         alt="Stamp"
                         style={{ width: "130px", height: "130px" }}
-                      />
+                      /> */}
                       <h5>Authorized Signature</h5>
                     </div>
 
                     {/* <h6 style={{ textAlign: "center" }}>CIN : </h6> */}
                     <hr />
                     <div style={{ margin: "40px 0px" }}>
-                      <h5 style={{ textAlign: "center" }}>
-                        {companyDetails.companyName}
-                      </h5>
+                      <p style={{ textAlign: "center", marginBottom: "0px" }}>
+                        {companyDetails.companyName},
+                      </p>
                       <p style={{ marginBottom: "0px", textAlign: "center" }}>
-                        {companyDetails.address}
+                        {companyDetails.companyAddress},
                       </p>
                       <p style={{ marginBottom: "0px", textAlign: "center" }}>
                         {companyDetails.mobileNo}, {companyDetails.emailId}{" "}
