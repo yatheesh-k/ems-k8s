@@ -687,7 +687,7 @@ public class PayslipServiceImpl implements PayslipService {
                 attendanceEntities = openSearchOperations.getAttendanceById(attendanceId, null, index);
                 if (attendanceEntities == null) {
                     log.error("Employee Attendance is not found for employee {}", employee.getId());
-                    employeesWithoutAttendance.add(employee.getId());
+                    employeesWithoutAttendance.add(employee.getEmployeeId()+"  "+employee.getFirstName()+" "+employee.getLastName());
                     continue; // Skip to the next employee if attendance is not found
                 }
 
