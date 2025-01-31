@@ -96,10 +96,10 @@ const Template = () => {
     const calculateValues = () => {
         console.log("Gross Amount: ", grossAmount); // Log the grossAmount
     
-        if (salaryStructures.length === 0) {
-            toast.error("No salary structure available for calculation.");
-            return;
-        }
+        // if (salaryStructures.length === 0) {
+        //     toast.error("No salary structure available for calculation.");
+        //     return;
+        // }
     
         const activeStructure = salaryStructures.find(structure => structure.status === "Active");
         if (!activeStructure) {

@@ -21,159 +21,127 @@ const GeneratePaySlip = () => {
     formState: { errors },
     reset,
   } = useForm();
-
   const [view, setView] = useState([]);
   const [show, setShow] = useState(false);
-  const [selectedMonthYear, setSelectedMonthYear] = useState("");
-  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
-  const [templateAvailable, setTemplateAvailable] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedMonthYear, setSelectedMonthYear] = useState("");
   const [currentTemplate, setCurrentTemplate] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const currentYear = new Date().getFullYear();
-  const startYear = 2000;
   const years = Array.from(
-    { length: currentYear - startYear + 1 },
-    (_, index) => startYear + index
+    { length: new Date().getFullYear() - 1999 },
+    (_, i) => 2000 + i
   ).reverse();
-
-  const months = Array.from({ length: 12 }, (_, index) => ({
-    value: (index + 1).toString().padStart(2, "0"),
-    label: new Date(2000, index, 1).toLocaleString("default", {
-      month: "long",
-    }),
+  const months = Array.from({ length: 12 }, (_, i) => ({
+    value: i + 1,
+    label: new Date(0, i).toLocaleString("default", { month: "long" }),
   }));
 
-  const handleApiErrors = (error) => {
-    // Check if the error object has the response property (for HTTP errors)
-    if (error && error.response) {
-      // Check if the response has the error message
-      if (
-        error.response.data &&
-        error.response.data.error &&
-        error.response.data.error.message
-      ) {
-        const errorMessage = error.response.data.error.message;
-        toast.error(errorMessage); // Display the error message using toast
-      } else {
-        // If there's no specific error message, display a generic network error message
-        toast.error("Network Error!");
+  useEffect(() => {
+    const fetchTemplate = async () => {
+      try {
+        const response = await TemplateGetAPI();
+        setCurrentTemplate(response.data.data);
+      } catch (error) {
+        toast.error("Failed to fetch payslip templates.");
       }
-
-      // Optionally log the error for debugging purposes
-      console.error(error.response);
-    } else {
-      // If it's a network error or no response is available, handle it separately
-      toast.error("An error occurred. Please try again later.");
-      console.error(error); // Log the error details for further debugging
-    }
-  };
-
-  const onSubmit = (data) => {
-    const { month, year } = data;
-    const capitalizedMonth =
-      month.label.charAt(0).toUpperCase() + month.label.slice(1);
-
-    const payload = {
-      companyName: user.company,
-      month: capitalizedMonth,
-      year: year.label,
     };
-    const salaryId = user.salaryId || null;
+    fetchTemplate();
+  }, []);
 
-    EmployeePayslipResponse(salaryId, payload)
-      .then((response) => {
-        const { generatePayslip } = response.data.data;
-        setView(generatePayslip);
-        setSelectedMonthYear(`${capitalizedMonth} ${year.label}`);
-        setShow(true);
-      })
-      .catch((error) => {
-        console.error(error);
-        handleApiErrors(error); // Pass the error object to the handler
-      });
-  };
+  const handleEditClick = (employeeId, payslipId, salaryId, month, year) => {
+    const payslipTemplateNo = currentTemplate?.payslipTemplateNo;
 
-  const handleSelectAllChange = () => {
-    console.log("Select all clicked. Current selectAll state:", selectAll); // Log the current selectAll state
-
-    if (selectAll) {
-      setSelectedEmployees([]);
-      console.log("Deselecting all employees."); // Log when deselecting all employees
-    } else {
-      const allEmployeeIds = view.map((employee) => employee.employeeId);
-      setSelectedEmployees(allEmployeeIds);
-      console.log(
-        "Selecting all employees. Selected employee IDs:",
-        allEmployeeIds
-      ); // Log selected employeeIds
-    }
-
-    setSelectAll(!selectAll);
-  };
-
-  // Handle selecting or deselecting individual employee checkboxes
-  // Handle selecting or deselecting individual employee checkboxes
-  const handleCheckboxChange = (employeeId) => {
-    console.log("Checkbox clicked for employeeId:", employeeId); // Log the employeeId clicked
-
-    // Find the employee data associated with the clicked employeeId
-    const employeeData = view.find(
-      (employee) => employee.employeeId === employeeId
-    );
-
-    // If the employee is already selected, deselect it
-    if (selectedEmployees.some((emp) => emp.employeeId === employeeId)) {
-      setSelectedEmployees(
-        selectedEmployees.filter((emp) => emp.employeeId !== employeeId)
+    if (payslipTemplateNo) {
+      navigate(
+        `/payslipUpdate${payslipTemplateNo}?employeeId=${employeeId}&payslipId=${payslipId}&salaryId=${salaryId}&month=${month}&year=${year}`
       );
-      console.log(
-        `Deselected employeeId: ${employeeId}. Current selectedEmployees:`,
-        selectedEmployees
-      ); // Log when deselecting an employee
     } else {
-      setSelectedEmployees([
-        ...selectedEmployees,
-        { employeeId, salaryId: employeeData.salaryId }, // Store both employeeId and salaryId
-      ]);
-      console.log(
-        `Selected employeeId: ${employeeId}. Current selectedEmployees:`,
-        selectedEmployees
-      ); // Log when selecting an employee
+      toast.error("Payslip template number not found.");
+    }
+  };
+
+  const onSubmit = async ({ month, year }) => {
+    try {
+      const response = await EmployeePayslipResponse(user.salaryId, {
+        companyName: user.company,
+        month: month.label,
+        year: year.label,
+      });
+      setView(response.data.data.generatePayslip);
+      setSelectedMonthYear(`${month.label} ${year.label}`);
+      setShow(true);
+    } catch (error) {
+      toast.error("Error fetching payslip data.");
+    }
+  };
+
+  const handleSelectAll = () => {
+    setSelectAll(!selectAll);
+    setSelectedEmployees(
+      selectAll
+        ? []
+        : view.map((emp) => ({
+            employeeId: emp.employeeId,
+            salaryId: emp.salaryId,
+          }))
+    );
+  };
+
+  const handleCheckboxChange = (employeeId, salaryId) => {
+    setSelectedEmployees((prev) =>
+      prev.some((emp) => emp.employeeId === employeeId)
+        ? prev.filter((emp) => emp.employeeId !== employeeId)
+        : [...prev, { employeeId, salaryId }]
+    );
+  };
+
+  const handleGeneratePaySlips = async () => {
+    if (selectedEmployees.length === 0)
+      return toast.error("Please select at least one employee.");
+    if (!selectedMonthYear) return toast.error("Please select month and year.");
+
+    try {
+      const [month, year] = selectedMonthYear.split(" ");
+      await Promise.all(
+        selectedEmployees.map(({ employeeId, salaryId }) =>
+          EmployeePayslipGenerationPostById(employeeId, salaryId, {
+            companyName: user.company,
+            month,
+            year,
+          })
+        )
+      );
+      toast.success("PaySlips Generated Successfully", {
+        transition: Bounce,
+        autoClose: 3000,
+      });
+      navigate("/payslipsList");
+    } catch (error) {
+      toast.error("Failed to generate payslips.");
     }
   };
 
   const columns = [
     {
       name: (
+        <input type="checkbox" checked={selectAll} onChange={handleSelectAll} />
+        
+      ),
+      cell: (row) => (
         <input
           type="checkbox"
-          className="form-check-input"
-          checked={selectAll}
-          onChange={handleSelectAllChange}
+          checked={selectedEmployees.some(
+            (emp) => emp.employeeId === row.employeeId
+          )}
+          onChange={() => handleCheckboxChange(row.employeeId, row.salaryId)}
         />
       ),
-      selector: "employeeId",
-      cell: (row) => {
-        const isSelected = selectedEmployees.some(
-          (emp) => emp.employeeId === row.employeeId
-        );
-        return (
-          <input
-            type="checkbox"
-            className="form-check-input"
-            checked={isSelected}
-            onChange={() => handleCheckboxChange(row.employeeId)}
-          />
-        );
-      },
-      ignoreRowClick: true,
-      allowOverflow: true,
-      button: true,
+      width: "90px",
     },
     {
       name: (
@@ -255,144 +223,6 @@ const GeneratePaySlip = () => {
     },
   ];
 
-  const fetchTemplate = async () => {
-    try {
-      const response = await TemplateGetAPI();
-      const templateNumber = response.data.data.payslipTemplateNo;
-      const templateData = response.data.data;
-      setCurrentTemplate(templateData);
-      setTemplateAvailable(!!templateNumber);
-      if (!templateData.payslipTemplateNo) {
-        toast.error("Invalid payslip template number.");
-      }
-    } catch (error) {
-      setTemplateAvailable(false);
-      console.error("API fetch error:", error);
-      // toast.error("Failed to fetch payslip templates. Please try again.");
-    }
-  };
-  const handleEditClick = (employeeId, payslipId, salaryId, month, year) => {
-    const payslipTemplateNo = currentTemplate?.payslipTemplateNo;
-
-    if (payslipTemplateNo) {
-      navigate(
-        `/payslipUpdate${payslipTemplateNo}?employeeId=${employeeId}&payslipId=${payslipId}&salaryId=${salaryId}&month=${month}&year=${year}`
-      );
-    } else {
-      toast.error("Payslip template number not found.");
-    }
-  };
-
-  useEffect(() => {
-    fetchTemplate();
-  }, []);
-
-  const handleGeneratePaySlips = async () => {
-    // Check if at least one employee is selected
-    if (selectedEmployees.length === 0 && !selectAll) {
-      console.log("No employees selected.");
-      toast.error("Please select at least one employee.");
-      return;
-    }
-
-    if (!selectedMonthYear) {
-      console.log("No month/year selected.");
-      toast.error("Please select month and year before generating payslips.");
-      return;
-    }
-
-    const [month, year] = selectedMonthYear.split(" ");
-    console.log(`Generating payslips for month: ${month}, year: ${year}`);
-
-    const payload = {
-      companyName: user.company,
-      month,
-      year,
-    };
-    console.log("Payload for generating payslips:", payload);
-
-    try {
-      if (selectAll) {
-        console.log("Generating payslips for all employees...");
-        const response = await EmployeePayslipGeneration(payload);
-        console.log("Response from EmployeePayslipGeneration API:", response);
-        toast.success("PaySlips Generated Successfully", {
-          position: "top-right",
-          transition: Bounce,
-          hideProgressBar: true,
-          theme: "colored",
-          autoClose: 3000,
-        });
-        navigate("/payslipsList");
-      } else {
-        console.log("Generating payslips for individual selected employees...");
-
-        for (const { employeeId, salaryId } of selectedEmployees) {
-          console.log(
-            `Processing employeeId: ${employeeId} with salaryId: ${salaryId}`
-          );
-
-          const data = {
-            month,
-            year,
-            companyName: user.company,
-          };
-
-          console.log(
-            `Sending request for employeeId: ${employeeId}, salaryId: ${salaryId}`
-          );
-          const response = await EmployeePayslipGenerationPostById(
-            employeeId,
-            salaryId,
-            data
-          );
-          console.log(
-            `Response from EmployeePayslipGenerationPostById for employeeId ${employeeId}:`,
-            response
-          );
-        }
-
-        toast.success(
-          "PaySlips Generated Successfully for Selected Employees",
-          {
-            position: "top-right",
-            transition: Bounce,
-            hideProgressBar: true,
-            theme: "colored",
-            autoClose: 3000,
-          }
-        );
-        navigate("/payslipsList");
-      }
-    } catch (error) {
-      console.error("Error generating payslips:", error);
-      toast.error("Failed to generate payslips.");
-    }
-  };
-
-  if (!templateAvailable) {
-    return (
-      <LayOut>
-        <div className="container-fluid p-0">
-          <div className="row justify-content-center">
-            <div className="col-8 text-center mt-5">
-              <h2>No Payslip Template Available</h2>
-              <p>
-                To set up the Payslip templates before proceeding, Please select
-                the Template from Settings{" "}
-                <a href="/payslipTemplates">Payslip Templates </a>
-              </p>
-              <p>
-                Please contact the administrator to set up the Payslip templates
-                before proceeding.
-              </p>
-            </div>
-          </div>
-        </div>
-      </LayOut>
-    );
-  }
-
   return (
     <LayOut>
       <div className="container-fluid p-0">
@@ -426,6 +256,7 @@ const GeneratePaySlip = () => {
                   style={{ borderTopColor: "#D7D9DD" }}
                 />
               </div>
+
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="card-body">
                   <div className="row">
@@ -434,41 +265,27 @@ const GeneratePaySlip = () => {
                       <Controller
                         name="year"
                         control={control}
-                        defaultValue=""
                         rules={{ required: true }}
                         render={({ field }) => (
                           <Select
                             {...field}
-                            options={years.map((year) => ({
-                              value: year,
-                              label: year.toString(),
-                            }))}
-                            placeholder="Select Year"
+                            options={years.map((y) => ({ value: y, label: y }))}
                           />
                         )}
                       />
-                      {errors.year && (
-                        <p className="errorMsg">Year is Required</p>
-                      )}
+                      {errors.year && <p>Year is Required</p>}
                     </div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">Select Month</label>
                       <Controller
                         name="month"
                         control={control}
-                        defaultValue={null}
                         rules={{ required: true }}
                         render={({ field }) => (
-                          <Select
-                            {...field}
-                            options={months}
-                            placeholder="Select Month"
-                          />
+                          <Select {...field} options={months} />
                         )}
                       />
-                      {errors.month && (
-                        <p className="errorMsg">Month is Required</p>
-                      )}
+                      {errors.month && <p>Month is Required</p>}
                     </div>
                     <div className="col-12 col-md-6 col-lg-2 mt-4">
                       <button
@@ -485,42 +302,28 @@ const GeneratePaySlip = () => {
             </div>
           </div>
         </div>
-        {show && (
-          <div className="col-12">
-            <div className="card">
-              <div className="card-header">
-                <h5
-                  className="card-title"
-                  style={{ paddingLeft: "15px", marginTop: "10px" }}
-                >
-                  Month/Year: {selectedMonthYear}
-                </h5>
-              </div>
-              <div
-                className="dropdown-divider"
-                style={{ borderTopColor: "#d7d9dd" }}
-              />
-              <DataTable
-                data={view}
-                columns={columns}
-                pagination
-                paginationPerPage={rowsPerPage}
-                onChangePage={setCurrentPage}
-                onChangeRowsPerPage={setRowsPerPage}
-              />
-              <div className="m-3 d-flex justify-content-end bg-transparent">
-                <button
-                  className="btn btn-primary"
-                  type="button"
-                  onClick={handleGeneratePaySlips}
-                >
-                  Generate PaySlips
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
+      {show && (
+        <DataTable
+          data={view}
+          columns={columns}
+          pagination
+          paginationPerPage={rowsPerPage}
+          onChangePage={setCurrentPage}
+          onChangeRowsPerPage={setRowsPerPage}
+        />
+      )}
+      {show && (
+        <div className="m-3 d-flex justify-content-end bg-transparent">
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={handleGeneratePaySlips}
+          >
+            Generate PaySlips
+          </button>
+        </div>
+      )}
     </LayOut>
   );
 };

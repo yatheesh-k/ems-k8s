@@ -336,14 +336,27 @@ const InvoiceRegistration = () => {
     }
   };
 
+  const handleInvoiceDateChange = (e) => {
+    const invoiceDate = new Date(e.target.value);
+    const dueDate = new Date(invoiceDate);
+    dueDate.setDate(invoiceDate.getDate() + 15); // Add 15 days to Invoice Date
+    setValue("dueDate", dueDate.toISOString().split("T")[0]);
+  };
+
+  useEffect(() => {
+    const invoiceDate = document.getElementById("invoiceDate").value;
+    if (invoiceDate) {
+      handleInvoiceDateChange({ target: { value: invoiceDate } });
+    }
+  }, []);
+
   return (
-    // <div id="main-wrapper" data-sidebartype="mini-sidebar">
     <LayOut>
       <div className="container-fluid p-0">
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3">
-              <strong>Registration</strong>{" "}
+              <strong>Invoice Registration</strong>{" "}
             </h1>
           </div>
           <div className="col-auto">
@@ -352,7 +365,8 @@ const InvoiceRegistration = () => {
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
-                <li className="breadcrumb-item active">Registration</li>
+                <li className="breadcrumb-item active">Invoices</li>
+                <li className="breadcrumb-item active">Invoice Registration</li>
               </ol>
             </nav>
           </div>
@@ -362,7 +376,7 @@ const InvoiceRegistration = () => {
             <div className="card">
               <div className="card-header">
                 <h5 className="card-title" style={{ marginBottom: "0px" }}>
-                  Invoice
+                  Invoice Registration Form
                 </h5>
                 <div
                   className="dropdown-divider"
@@ -508,42 +522,6 @@ const InvoiceRegistration = () => {
                       </p> // Display the error message if validation fails
                     )}
                   </div>
-                  <div className="form-group row">
-                    <label
-                      htmlFor="invoiceDate"
-                      className="col-sm-2 text-right control-label col-form-label"
-                    >
-                      Due Date<span style={{ color: "red" }}>*</span>
-                    </label>
-                    <div className="col-sm-9 mb-3">
-                      <input
-                        type="date"
-                        className="form-control"
-                        name="dueDate"
-                        id="dueDate"
-                        autoComplete="off"
-                        {...register("dueDate", {
-                          required: "Due date is required",
-                          validate: {
-                            notPast: (value) => {
-                              const today = new Date();
-                              const selectedDate = new Date(value);
-                              // Check if the selected date is today or in the future
-                              return (
-                                selectedDate >= today ||
-                                "Due date cannot be in the past."
-                              );
-                            },
-                          },
-                        })}
-                      />
-                    </div>
-                    {errors.dueDate && (
-                      <p className="errorMsg" style={{ marginLeft: "170px" }}>
-                        {errors.dueDate.message}
-                      </p> // Display the error message if validation fails
-                    )}
-                  </div>
                   {/* Invoice Number */}
                   {/* <div className="form-group row">
                     <label
@@ -585,6 +563,7 @@ const InvoiceRegistration = () => {
                         autoComplete="off"
                         {...register("invoiceDate", {
                           required: "Invoice date is required",
+                          onChange: handleInvoiceDateChange, // Set due date when invoice date changes
                         })}
                       />
                     </div>
@@ -593,6 +572,32 @@ const InvoiceRegistration = () => {
                         {errors.invoiceDate.message}
                       </p>
                     )}
+                  </div>
+
+                  <div className="form-group row">
+                    <label
+                      htmlFor="dueDate"
+                      className="col-sm-2 text-right control-label col-form-label"
+                    >
+                      Due Date
+                    </label>
+                    <div className="col-sm-9 mb-3">
+                      <input
+                        type="date"
+                        className="form-control"
+                        name="dueDate"
+                        id="dueDate"
+                        autoComplete="off"
+                        {...register("dueDate", {
+                        })}
+                        disabled // Make the due date read-only since it's auto-calculated
+                      />
+                    </div>
+                    {/* {errors.dueDate && (
+                      <p className="errorMsg" style={{ marginLeft: "170px" }}>
+                        {errors.dueDate.message}
+                      </p>
+                    )} */}
                   </div>
                   <div className="row">
                     <div className="col-sm-6">
@@ -734,7 +739,7 @@ const InvoiceRegistration = () => {
                                 htmlFor={`productCost-${index}`}
                                 className=" text-right control-label col-form-label"
                               >
-                               Unit Cost
+                                Unit Cost
                               </label>
                               <input
                                 className="form-control"

@@ -155,7 +155,7 @@ const ProductView = () => {
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3">
-              <strong>Products</strong>
+              <strong>Product View</strong>
             </h1>
           </div>
           <div className="col-auto">
@@ -165,6 +165,7 @@ const ProductView = () => {
                   <Link to={"/"}>Home</Link>
                 </li>
                 <li className="breadcrumb-item active">Products</li>
+                <li className="breadcrumb-item active">Product View</li>
               </ol>
             </nav>
           </div>

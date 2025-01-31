@@ -204,8 +204,9 @@ const AccountRegistartion = () => {
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
+                <li className="breadcrumb-item active">Settings</li>
                 <li className="breadcrumb-item">
-                  <a href="/accountsView">AccountDetails</a>
+                  <a href="/accountsView">Bank Details</a>
                 </li>
                 <li className="breadcrumb-item active">Registration</li>
               </ol>
