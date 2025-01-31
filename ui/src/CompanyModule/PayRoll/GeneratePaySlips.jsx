@@ -130,7 +130,6 @@ const GeneratePaySlip = () => {
     {
       name: (
         <input type="checkbox" checked={selectAll} onChange={handleSelectAll} />
-        
       ),
       cell: (row) => (
         <input
@@ -158,9 +157,21 @@ const GeneratePaySlip = () => {
           <b>Name</b>
         </h6>
       ),
-      selector: "attendance.firstName",
-      cell: (row) => `${row.attendance.firstName} ${row.attendance.lastName}`,
-      width: "150px",
+      selector: (row) => {
+        const firstName = row.attendance.firstName || ""; // Ensure firstName is a string
+        const lastName = row.attendance.lastName || ""; // Ensure lastName is a string
+
+        return (
+          <div title={`${firstName} ${lastName}`}>
+            {`${
+              firstName.length > 18 ? firstName.slice(0, 10) + "..." : firstName
+            } ${
+              lastName.length > 10 ? lastName.slice(0, 10) + "..." : lastName
+            }`}
+          </div>
+        );
+      },
+      width: "190px",
     },
     {
       name: (

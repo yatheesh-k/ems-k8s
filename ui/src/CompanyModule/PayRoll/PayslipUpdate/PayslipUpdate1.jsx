@@ -55,6 +55,70 @@ const PayslipUpdate1 = () => {
   const year = queryParams.get("year");
   const { user, logoFileName } = useAuth();
 
+  const numberToWords = (num) => {
+    const units = [
+      '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
+      'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
+      'Seventeen', 'Eighteen', 'Nineteen'
+    ];
+    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+    const unitsPlaces = ['', 'Lakh', 'Thousand', 'Hundred'];
+
+    if (num === 0) return 'Zero';
+
+    const convertToWords = (n) => {
+      if (n === 0) return '';
+
+      let word = '';
+      if (n >= 100) {
+        word += units[Math.floor(n / 100)] + ' Hundred ';
+        n %= 100;
+      }
+      if (n >= 20) {
+        word += tens[Math.floor(n / 10)] + ' ';
+        n %= 10;
+      }
+      if (n > 0) {
+        word += units[n] + ' ';
+      }
+      return word.trim();
+    };
+
+    let result = '';
+    let integerPart = Math.floor(num);
+
+    // Handle Lakhs and Thousands in the Indian numbering system
+    if (integerPart >= 100000) {
+      const lakhs = Math.floor(integerPart / 100000);
+      result += convertToWords(lakhs) + ' Lakh ';
+      integerPart %= 100000;
+    }
+
+    if (integerPart >= 1000) {
+      const thousands = Math.floor(integerPart / 1000);
+      result += convertToWords(thousands) + ' Thousand ';
+      integerPart %= 1000;
+    }
+
+    if (integerPart >= 100) {
+      const hundreds = Math.floor(integerPart / 100);
+      result += convertToWords(hundreds) + ' Hundred ';
+      integerPart %= 100;
+    }
+
+    if (integerPart > 0) {
+      result += convertToWords(integerPart);
+    }
+
+    // Handle decimal (cents)
+    let decimalPart = Math.round((num % 1) * 100);
+    if (decimalPart > 0) {
+      result += ' and ' + convertToWords(decimalPart) + ' Paise';
+    }
+
+    return result.trim();
+  };
+
   const fetchCompanyData = async (companyId) => {
     try {
       const response = await companyViewByIdApi(companyId);
@@ -1419,7 +1483,7 @@ const PayslipUpdate1 = () => {
                         colSpan={3}
                         style={{ textAlign: "left", border: "1px solid black" }}
                       >
-                        <b>{payslipData.inWords || ""}</b>
+                        <b>{numberToWords(totals.netPay)}</b>
                       </td>
                     </tr>
                     {netPayError && (
@@ -1431,12 +1495,12 @@ const PayslipUpdate1 = () => {
                 </table>
               </div>
             </div>
-            <span className="mt-4">
+            {/* <span className="mt-4">
               <em>
                 This is a computer-generated payslip and does not require
                 authentication
               </em>
-            </span>
+            </span> */}
             <div
               className="bottom"
               style={{
