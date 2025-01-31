@@ -7,7 +7,10 @@ import { useDispatch, useSelector } from "react-redux";
 import LayOut from "../../LayOut/LayOut";
 import { CustomerDeleteApiById } from "../../Utils/Axios";
 import { useAuth } from "../../Context/AuthContext";
-import { fetchCustomers, removeCustomerFromState } from "../../Redux/CustomerSlice";
+import {
+  fetchCustomers,
+  removeCustomerFromState,
+} from "../../Redux/CustomerSlice";
 
 const CustomersView = () => {
   const dispatch = useDispatch();
@@ -90,7 +93,7 @@ const CustomersView = () => {
     {
       name: (
         <h6>
-          <b>Customer Name</b>
+          <b>Client Name</b>
         </h6>
       ),
       selector: (row) => row.customerName,
@@ -172,16 +175,17 @@ const CustomersView = () => {
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3">
-              <strong>Customers</strong>
+              <strong>Client View</strong>
             </h1>
           </div>
           <div className="col-auto">
             <nav aria-label="breadcrumb">
               <ol className="breadcrumb mb-0">
                 <li className="breadcrumb-item">
-                  <Link to={"/"}>Home</Link>
+                  <a href="/main">Home</a>
                 </li>
-                <li className="breadcrumb-item active">Customers</li>
+                <li className="breadcrumb-item active">Clients</li>
+                <li className="breadcrumb-item active">Client View</li>
               </ol>
             </nav>
           </div>
@@ -195,7 +199,7 @@ const CustomersView = () => {
                 <div className="row">
                   <div className="col-md-4">
                     <Link to={"/customerRegistration"}>
-                      <button className="btn btn-primary">Add Customer</button>
+                      <button className="btn btn-primary">Add Client</button>
                     </Link>
                   </div>
                   <div className="col-md-4 offset-md-4 d-flex justify-content-end">

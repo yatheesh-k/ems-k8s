@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import LayOut from "../../../LayOut/LayOut";
-import { companyViewByIdApi, EmployeeGetApiById, TemplateGetAPI, TemplateSelectionPatchAPI } from "../../../Utils/Axios";
+import {
+  companyViewByIdApi,
+  EmployeeGetApiById,
+  TemplateGetAPI,
+  TemplateSelectionPatchAPI,
+} from "../../../Utils/Axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../../../Context/AuthContext";
 import InternshipTemplate1 from "./InternshipTemplate1";
@@ -15,7 +20,7 @@ const InternShipTemplates = () => {
   const [loading, setLoading] = useState(false);
   const [isFetched, setIsFetched] = useState(false);
 
-  const { user,logoFileName } = useAuth();
+  const { user, logoFileName } = useAuth();
 
   const fetchCompanyData = async (companyId) => {
     try {
@@ -56,7 +61,9 @@ const InternShipTemplates = () => {
       setFetchedTemplate(res.data.data); // Store fetched data
       setIsFetched(true); // Mark template as fetched
       // Find the corresponding template and set it as selected
-      const templateToSelect = templates.find(template => template.name === templateNo);
+      const templateToSelect = templates.find(
+        (template) => template.name === templateNo
+      );
       if (templateToSelect) {
         setSelectedTemplate(templateToSelect);
         setActiveCardIndex(templates.indexOf(templateToSelect)); // Set the active card index
@@ -72,41 +79,42 @@ const InternShipTemplates = () => {
     }
   }, [companyData]);
 
-  const templates = useMemo(() => [
-    {
-      title: "Template 1",
-      name: "1",
-      content: (data) => (
-        <InternshipTemplate1
-          companyLogo={logoFileName}
-          companyData={companyData}
-          date="October 28, 2024"
-          employeeName="John Doe"
-          employeeId="E123456"
-          jobTitle="Software Engineer"
-          joiningDate="January 1, 2020"
-          lastWorkingDate="October 27, 2024"
-        />
-      ),
-    },
-    {
-      title: "Template 2",
-      name: "2",
-      content: (data) => (
-        <InternShipTemplate2
-          companyLogo={logoFileName}
-          companyData={companyData}
-          date="October 28, 2024"
-          employeeName="John Doe"
-          employeeId="E123456"
-          jobTitle="Software Engineer"
-          effectiveDate="November,2024"
-
-        />
-      ),
-    },
-
-  ], [user,companyData,logoFileName]);
+  const templates = useMemo(
+    () => [
+      {
+        title: "Template 1",
+        name: "1",
+        content: (data) => (
+          <InternshipTemplate1
+            companyLogo={logoFileName}
+            companyData={companyData}
+            date="October 28, 2024"
+            employeeName="John Doe"
+            employeeId="E123456"
+            jobTitle="Software Engineer"
+            joiningDate="January 1, 2020"
+            lastWorkingDate="October 27, 2024"
+          />
+        ),
+      },
+      {
+        title: "Template 2",
+        name: "2",
+        content: (data) => (
+          <InternShipTemplate2
+            companyLogo={logoFileName}
+            companyData={companyData}
+            date="October 28, 2024"
+            employeeName="John Doe"
+            employeeId="E123456"
+            jobTitle="Software Engineer"
+            effectiveDate="November,2024"
+          />
+        ),
+      },
+    ],
+    [user, companyData, logoFileName]
+  );
 
   useEffect(() => {
     // Set default template as Template 1
@@ -128,9 +136,10 @@ const InternShipTemplates = () => {
     };
     try {
       const response = await TemplateSelectionPatchAPI(dataToSubmit);
-      
+
       // Assuming a successful submission is indicated by the presence of a specific property
-      if (response.data) { // Adjust this condition based on your API's response structure
+      if (response.data) {
+        // Adjust this condition based on your API's response structure
         toast.success("Template submitted successfully!");
         setSelectedTemplate(null);
         setActiveCardIndex(null);
@@ -141,20 +150,27 @@ const InternShipTemplates = () => {
     } catch (error) {
       // Log the error for debugging
       console.error("API call error:", error);
-  
+
       // Check if the error response has details
       if (error.response) {
         console.error("Response data:", error.response.data); // Log response data
-        const errorMessage = error.response.data.detail || "An error occurred";
-        toast.error(`Error: ${errorMessage}`);
+        const errorMessage =
+          error.response.data.error?.message || "An error occurred";
+
+        toast.error(`${errorMessage}`);
       } else {
         toast.error("An unexpected error occurred");
       }
     }
   };
-  
+
   const handleApiErrors = (error) => {
-    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+    if (
+      error.response &&
+      error.response.data &&
+      error.response.data.error &&
+      error.response.data.error.message
+    ) {
       const errorMessage = error.response.data.error.message;
       toast.error(errorMessage);
     } else {
@@ -185,12 +201,22 @@ const InternShipTemplates = () => {
         <div>
           <div className="row d-flex justify-content-evenly">
             {templates.map((template, index) => (
-              <div className="col-md-3" key={index} onClick={() => handleCardClick(template, index)}>
-                <div className={`card mb-3 cursor-grab border ${activeCardIndex === index ? 'bg-light' : ''}`}>
+              <div
+                className="col-md-3"
+                key={index}
+                onClick={() => handleCardClick(template, index)}
+              >
+                <div
+                  className={`card mb-3 cursor-grab border ${
+                    activeCardIndex === index ? "bg-light" : ""
+                  }`}
+                >
                   <div className="card-body">
                     <div className="row">
                       <div className="col mt-0">
-                        <h5 className="card-title text-muted">{template.title}</h5>
+                        <h5 className="card-title text-muted">
+                          {template.title}
+                        </h5>
                       </div>
                     </div>
                     <div className="mb-0">
@@ -204,10 +230,12 @@ const InternShipTemplates = () => {
           {selectedTemplate && (
             <div className="card mb-3">
               <div className="card-body">
-                <h5 className="card-title text-center">{selectedTemplate.title}</h5>
+                <h5 className="card-title text-center">
+                  {selectedTemplate.title}
+                </h5>
                 {selectedTemplate.content("")}
                 <div className="text-end">
-                {!isFetched && (
+                  {!isFetched && (
                     <>
                       <button
                         className="btn btn-secondary mt-3 me-2"
@@ -219,7 +247,11 @@ const InternShipTemplates = () => {
                       >
                         Close
                       </button>
-                      <button className="btn btn-primary mt-3" type="button" onClick={handleSubmitTemplate}>
+                      <button
+                        className="btn btn-primary mt-3"
+                        type="button"
+                        onClick={handleSubmitTemplate}
+                      >
                         Select Template
                       </button>
                     </>

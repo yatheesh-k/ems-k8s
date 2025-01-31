@@ -178,27 +178,27 @@ const PayslipUpdate2 = () => {
   
         // Create the payload to send to the server
         const payload = {
-          companyName: user.company,
+          companyName: user.company || "", // Default to empty string if undefined
           salary: {
             ...payslipData.salary,
-            salaryId: payslipData.salary.salaryId,
+            salaryId: payslipData.salary.salaryId ?? 0, // Default to 0 if missing
             salaryConfigurationEntity: {
               ...payslipData.salary.salaryConfigurationEntity,
-              allowances: allowances, // Updated allowances including recalculated "Other Allowances" and Bonus
-              newAllowances: newAllowances, // Only new allowances like "Bonus"
-              deductions: mergedDeductions, // Merged deductions with the updates
+              allowances: allowances ?? {}, // Default to empty object if missing
+              newAllowances: newAllowances ?? {}, // Default to empty object
+              deductions: mergedDeductions ?? {}, // Default to empty object
             },
-            totalEarnings: totals.totalEarnings,
-            totalDeductions: totals.totalDeductions,
-            totalTax: totals.totalTax,
-            netSalary: totals.netPay,
+            totalEarnings: Number(totals.totalEarnings) || 0, // Convert to number or default to 0
+            totalDeductions: Number(totals.totalDeductions) || 0,
+            totalTax: Number(totals.totalTax) || 0,
+            netSalary: Number(totals.netPay) || 0,
+            incomeTax: Number(payslipData.salary.incomeTax) || 0, // Convert empty string to 0
           },
           attendance: payslipData.attendance,
           month,
           year,
-          updatedOtherAllowance, // Include updatedOtherAllowance in the payload
-        };
-  
+          updatedOtherAllowance,// Convert to number or default to 0
+        };        
         console.log("Payload being sent:", payload);
   
         // Call the API to update the payslip

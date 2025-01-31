@@ -198,7 +198,7 @@ const ProductRegistration = () => {
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3">
-              <strong>Registration</strong>{" "}
+              <strong>Product Registration</strong>{" "}
             </h1>
           </div>
           <div className="col-auto">
@@ -207,10 +207,8 @@ const ProductRegistration = () => {
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
-                <li className="breadcrumb-item">
-                  <a href="/employeeView">Products</a>
-                </li>
-                <li className="breadcrumb-item active">Registration</li>
+                <li className="breadcrumb-item active">Products</li>
+                <li className="breadcrumb-item active">Product Registration</li>
               </ol>
             </nav>
           </div>
@@ -220,7 +218,7 @@ const ProductRegistration = () => {
             <div className="card">
               <div className="card-header">
                 <h5 className="card-title" style={{ marginBottom: "0px" }}>
-                  {isUpdating ? "Customer Data" : "Product Registration"}
+                  {isUpdating ? "Customer Data" : "Product Registration Form"}
                 </h5>
                 <div
                   className="dropdown-divider"

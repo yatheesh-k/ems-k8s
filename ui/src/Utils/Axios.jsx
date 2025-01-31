@@ -350,7 +350,11 @@ export const EmployeePayslipDeleteById = (employeeId, payslipId) => {
 
 export const AttendanceManagementApi = (formData) => {
   const company = localStorage.getItem("companyName")
-  return axiosInstance.post(`/${company}/employee/attendance`, formData);
+  return axiosInstance.post(`/${company}/employee/attendance`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 }
 
 export const AttendanceReportApi = (employeeId, month, year) => {
@@ -372,8 +376,12 @@ export const AttendanceDeleteById = (employeeId, attendanceId) => {
 }
 
 export const CompanyImagePatchApi = (companyId, formData) => {
-  return axiosInstance.patch(`/company/image/${companyId}`, formData);
-}
+  return axiosInstance.patch(`/company/image/${companyId}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
 
 export const CompanyImageGetApi = (companyId) => {
   return axiosInstance.get(`/company/${companyId}/image`);
