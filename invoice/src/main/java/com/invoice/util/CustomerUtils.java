@@ -141,9 +141,9 @@ public class CustomerUtils {
             city = Base64.getEncoder().encodeToString(customerRequest.getCity().getBytes());
         }
 
-        if (customerRequest.getGstNo() != null) {
+        if (customerRequest.getCustomerGstNo() != null) {
             // Masking the state information
-            gst = Base64.getEncoder().encodeToString(customerRequest.getGstNo().getBytes());
+            gst = Base64.getEncoder().encodeToString(customerRequest.getCustomerGstNo().getBytes());
         }
         if (customerRequest.getPinCode() != null) {
             // Masking the state information
