@@ -198,7 +198,7 @@ const CustomersRegistration = () => {
         );
 
       case "pincode":
-        return /^\d{6}$/.test(value) || "PinCode must be exactly 6 digits";
+        return /^\d{6}$/.test(value) || "Zip Code must be exactly 6 digits";
 
       case "gst":
         return (
@@ -324,17 +324,17 @@ const CustomersRegistration = () => {
                         name="customerName"
                         autoComplete="off"
                         {...register("customerName", {
-                          required: "Customer Name is Required",
+                          required: "Client Name is Required",
                           validate: noTrailingSpaces,
                           minLength: {
                             value: 3,
                             message:
-                              "Customer Name must be at least 3 characters long",
+                              "Client Name must be at least 3 characters long",
                           },
                           maxLength: {
                             value: 60,
                             message:
-                              "Customer Name must not exceed 60 characters.",
+                              "Client Name must not exceed 60 characters.",
                           },
                         })}
                         onChange={(e) => handleInputChange(e, "customerName")}
@@ -499,7 +499,7 @@ const CustomersRegistration = () => {
                         className="form-control"
                         autoComplete="off"
                         {...register("pinCode", {
-                          required: "Pin Code is Required.",
+                          required: "Zip Code is Required.",
                           validate: (value) => validateField(value, "pincode"),
                         })}
                         onChange={(e) => handleInputChange(e, "pinCode")}
@@ -539,9 +539,9 @@ const CustomersRegistration = () => {
                           e.target.value = e.target.value.toUpperCase(); // Convert to uppercase
                         }}
                       />
-                      {errors.gstNo && (
+                      {errors.customerGstNo && (
                         <p className="errorMsg">
-                          {errors.gstNo.message || "Gst Number is Required"}
+                          {errors.customerGstNo.message || "Gst Number is Required"}
                         </p>
                       )}
                     </div>
@@ -585,14 +585,18 @@ const CustomersRegistration = () => {
                         Status <span style={{ color: "red" }}>*</span>
                       </label>
                       <Controller
-                        name="status" // The name you want for the field
+                        name="status"
                         control={control}
+                        rules={{ required: "Status is required" }} // Ensure required validation is applied
                         render={({ field }) => (
                           <Select
                             {...field}
-                            options={statusOptions} // Dropdown options for Active and Inactive
-                            getOptionLabel={(e) => e.label} // What to display in the dropdown
-                            getOptionValue={(e) => e.value} // Value submitted with the form
+                            options={statusOptions}
+                            getOptionLabel={(e) => e.label}
+                            getOptionValue={(e) => e.value}
+                            onChange={(selectedOption) =>
+                              field.onChange(selectedOption)
+                            } // Ensure onChange is handled
                           />
                         )}
                       />

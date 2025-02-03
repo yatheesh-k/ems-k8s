@@ -484,18 +484,31 @@ const InvoiceRegistration = () => {
                         id="vendorCode"
                         placeholder="Enter Vendor Code"
                         {...register("vendorCode", {
-                          required: "Vendor Code is required", // Make the field required with a custom error message
+                          required: "Vendor Code is required",
+                          pattern: {
+                            value: /^[A-Za-z0-9]+$/, // Accept only alphabets and numbers
+                            message: "Only alphabets and numbers are allowed",
+                          },
+                          minLength: {
+                            value: 3,
+                            message:
+                              "Vendor Code must be at least 3 characters long",
+                          },
+                          maxLength: {
+                            value: 10,
+                            message: "Vendor Code cannot exceed 10 characters",
+                          },
                         })}
                       />
                     </div>
                     {errors.vendorCode && (
                       <p className="errorMsg" style={{ marginLeft: "170px" }}>
                         {errors.vendorCode.message}
-                      </p> // Display the error message if validation fails
+                      </p>
                     )}
                   </div>
 
-                  {/* purchase order */}
+                  {/* Purchase Order */}
                   <div className="form-group row">
                     <label
                       htmlFor="purchaseOrder"
@@ -511,15 +524,28 @@ const InvoiceRegistration = () => {
                         id="purchaseOrder"
                         placeholder="Enter Purchase Order"
                         {...register("purchaseOrder", {
-                          required: "Enter Purchase Order",
+                          required: "Purchase Order is required",
+                          pattern: {
+                            value: /^[A-Za-z0-9]+$/, // Accept only alphabets and numbers
+                            message: "Only alphabets and numbers are allowed",
+                          },
+                          minLength: {
+                            value: 3,
+                            message:
+                              "Purchase Order must be at least 3 characters long",
+                          },
+                          maxLength: {
+                            value: 10,
+                            message:
+                              "Purchase Order cannot exceed 10 characters",
+                          },
                         })}
-                        onKeyPress={allowNumbersOnly}
                       />
                     </div>
                     {errors.purchaseOrder && (
                       <p className="errorMsg" style={{ marginLeft: "170px" }}>
                         {errors.purchaseOrder.message}
-                      </p> // Display the error message if validation fails
+                      </p>
                     )}
                   </div>
                   {/* Invoice Number */}
@@ -588,8 +614,7 @@ const InvoiceRegistration = () => {
                         name="dueDate"
                         id="dueDate"
                         autoComplete="off"
-                        {...register("dueDate", {
-                        })}
+                        {...register("dueDate", {})}
                         disabled // Make the due date read-only since it's auto-calculated
                       />
                     </div>

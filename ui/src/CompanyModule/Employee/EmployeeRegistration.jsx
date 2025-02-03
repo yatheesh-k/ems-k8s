@@ -512,18 +512,18 @@ const EmployeeRegistration = () => {
     } else if (!/^[A-Za-z\s]+$/.test(trimmedValue)) {
       return "Only Alphabetic Characters are Allowed.";
     } else {
-      const words = trimmedValue.split(" ");
+      const words = trimmedValue.split(/\s+/); // Split words, handling multiple spaces
 
-      // Check for minimum and maximum word length, allowing one-character words at the end
-      for (let i = 0; i < words.length; i++) {
-        const word = words[i];
+      // Ensure first and last words are at least 3 characters
+      if (words[0].length < 3) {
+        return "First word must have at least 3 characters.";
+      }
+      if (words[words.length - 1].length < 3) {
+        return "Last word must have at least 3 characters.";
+      }
 
-        // If the word length is less than 3 and it's not the last word, show error
-        if (word.length < 3 && i !== words.length - 1) {
-          return "Minimum Length 3 Characters Required.";
-        }
-
-        // Check maximum word length
+      // Check max word length
+      for (let word of words) {
         if (word.length > 100) {
           return "Max Length 100 Characters Exceeded.";
         }
@@ -531,18 +531,18 @@ const EmployeeRegistration = () => {
 
       // Check for trailing and leading spaces
       if (/\s$/.test(value)) {
-        return "Spaces at the end are not allowed."; // Trailing space error
+        return "Spaces at the end are not allowed.";
       } else if (/^\s/.test(value)) {
-        return "No Leading Space Allowed."; // Leading space error
+        return "No Leading Space Allowed.";
       }
 
       // Check if there are multiple spaces between words
-      else if (/\s{2,}/.test(trimmedValue)) {
+      if (/\s{2,}/.test(trimmedValue)) {
         return "No Multiple Spaces Between Words Allowed.";
       }
     }
 
-    return true; // Return true if all conditions are satisfied
+    return true; // Validation successful
   };
 
   const validateNumber = (value) => {
@@ -872,12 +872,12 @@ const EmployeeRegistration = () => {
                           required: "First Name is Required",
                           minLength: {
                             value: 3,
-                            message: "Mimimum 3 Characters Required."
+                            message: "Mimimum 3 Characters Required.",
                           },
                           maxLength: {
                             value: 150,
                             message: "Max lenght 150 Characters Exceeded.", // Maximum 150 characters
-                          },  
+                          },
                           validate: {
                             validateFirstName,
                           },
@@ -1041,7 +1041,7 @@ const EmployeeRegistration = () => {
                           required: "Manager is Required",
                           minLength: {
                             value: 3,
-                            message: "Mimimum 3 Characters Required."
+                            message: "Mimimum 3 Characters Required.",
                           },
                           maxLength: {
                             value: 150,
@@ -1412,9 +1412,7 @@ const EmployeeRegistration = () => {
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
-                      <label className="form-label">
-                        PAN Number 
-                      </label>
+                      <label className="form-label">PAN Number</label>
                       <input
                         type={isUpdating ? "text" : "text"}
                         readOnly={isUpdating}
