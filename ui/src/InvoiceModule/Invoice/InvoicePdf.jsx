@@ -186,9 +186,11 @@ const InvoicePdf = () => {
                       <p style={{ marginBottom: "10px" }}>
                         <b>Contact No : {invoiceData.mobileNumber},</b>
                       </p>
-                      <p style={{ marginBottom: "10px" }}>
-                        <b>GST : {invoiceData.customerGstNo},</b>
-                      </p>
+                      {invoiceData.customerGstNo && (
+                        <p style={{ marginBottom: "10px" }}>
+                          <b>GST : {invoiceData.customerGstNo},</b>
+                        </p>
+                      )}
                       <p style={{ marginBottom: "10px" }}>
                         <b>Address : {invoiceData.customerAddress}.</b>
                       </p>
@@ -203,21 +205,31 @@ const InvoicePdf = () => {
                   </p>
                   <p>
                     <b>Invoice Date :</b> <CalendarFill />{" "}
-                    <b>{invoiceData.invoiceDate}</b>
+                    <b>
+                      {new Date(invoiceData.invoiceDate).getFullYear()}-
+                      {new Date(invoiceData.invoiceDate).toLocaleString(
+                        "en-US",
+                        { month: "short" }
+                      )}
+                      -{new Date(invoiceData.invoiceDate).getDate()}
+                    </b>
                   </p>
                   <p>
                     <b>Due Date :</b> <CalendarFill />{" "}
-                    <b>{invoiceData.dueDate}</b>
+                    <b>
+                      {new Date(invoiceData.dueDate).getFullYear()}-
+                      {new Date(invoiceData.dueDate).toLocaleString("en-US", {
+                        month: "short",
+                      })}
+                      -{new Date(invoiceData.dueDate).getDate()}
+                    </b>
                   </p>
                 </div>
 
                 {/* Bank Details in Two Columns */}
                 <div className="col-md-12">
                   <div className="table-responsive m-t-40">
-                    <table
-                      className="table table-hover"
-                      style={{ marginBottom: "0px" }}
-                    >
+                    <table className="table" style={{ marginBottom: "0px" }}>
                       <thead>
                         <tr>
                           <th
@@ -274,8 +286,12 @@ const InvoicePdf = () => {
                               <td className="text-left">{item.productName}</td>
                               <td className="text-left">{item.service}</td>
                               <td className="text-left">{item.quantity}</td>
-                              <td className="text-left">{item.unitCost}</td>
-                              <td className="text-left">{item.totalCost}</td>
+                              <td className="text-left">
+                                {(parseFloat(item.unitCost) || 0).toFixed(2)}
+                              </td>
+                              <td className="text-left">
+                                {(parseFloat(item.totalCost) || 0).toFixed(2)}
+                              </td>
                             </tr>
                           ))
                         ) : (
@@ -296,7 +312,11 @@ const InvoicePdf = () => {
                           >
                             Total Amount
                           </td>
-                          <td>{invoiceData.totalAmount}</td>
+                          <td>
+                            {(parseFloat(invoiceData.totalAmount) || 0).toFixed(
+                              2
+                            )}
+                          </td>
                         </tr>
                         {/* <tr>
                         <td colSpan="6" style={{ textAlign: 'right', fontWeight: 'bold' }}>IGST (18%)</td>
@@ -355,7 +375,9 @@ const InvoicePdf = () => {
                             >
                               IGST (18%)
                             </td>
-                            <td>{invoiceData.igst}</td>
+                            <td>{(parseFloat(invoiceData.igst) || 0).toFixed(
+                              2
+                            )}</td>
                           </tr>
                         ) : (
                           <>
@@ -369,7 +391,9 @@ const InvoicePdf = () => {
                               >
                                 SGST (9%)
                               </td>
-                              <td>{invoiceData.sgst}</td>
+                              <td>{(parseFloat(invoiceData.sgst) || 0).toFixed(
+                              2
+                            )}</td>
                             </tr>
                             <tr>
                               <td
@@ -381,7 +405,9 @@ const InvoicePdf = () => {
                               >
                                 CGST (9%)
                               </td>
-                              <td>{invoiceData.cgst}</td>
+                              <td>{(parseFloat(invoiceData.cgst) || 0).toFixed(
+                              2
+                            )}</td>
                             </tr>
                           </>
                         )}
@@ -392,7 +418,9 @@ const InvoicePdf = () => {
                           >
                             Grand Total
                           </td>
-                          <td>{invoiceData.grandTotal}</td>
+                          <td>{(parseFloat(invoiceData.grandTotal) || 0).toFixed(
+                              2
+                            )}</td>
                         </tr>
                         <tr>
                           <td

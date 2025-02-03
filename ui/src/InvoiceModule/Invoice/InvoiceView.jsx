@@ -57,7 +57,7 @@ const InvoiceView = () => {
     {
       name: (
         <h6>
-          <b>Customer Name</b>
+          <b>Client Name</b>
         </h6>
       ),
       selector: (row) => (
@@ -152,7 +152,7 @@ const InvoiceView = () => {
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3">
-              <strong>Invoices</strong>
+              <strong>Invoice View</strong>
             </h1>
           </div>
           <div className="col-auto">
@@ -162,6 +162,7 @@ const InvoiceView = () => {
                   <Link to={"/"}>Home</Link>
                 </li>
                 <li className="breadcrumb-item active">Invoices</li>
+                <li className="breadcrumb-item active">Invoice View</li>
               </ol>
             </nav>
           </div>

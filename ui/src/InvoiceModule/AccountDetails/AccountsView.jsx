@@ -151,7 +151,7 @@ const AccountsView = () => {
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3">
-              <strong>Account Details</strong>
+              <strong>Bank Details</strong>
             </h1>
           </div>
           <div className="col-auto">
@@ -160,7 +160,8 @@ const AccountsView = () => {
                 <li className="breadcrumb-item">
                   <Link to={"/"}>Home</Link>
                 </li>
-                <li className="breadcrumb-item active">AccountDetails</li>
+                <li className="breadcrumb-item active">Settings</li>
+                <li className="breadcrumb-item active">Bank Details</li>
               </ol>
             </nav>
           </div>
@@ -174,7 +175,7 @@ const AccountsView = () => {
                 <div className="row">
                   <div className="col-md-4">
                     <Link to={"/accountRegistration"}>
-                      <button className="btn btn-primary">Add Account</button>
+                      <button className="btn btn-primary">Add Bank Account</button>
                     </Link>
                   </div>
                   <div className="col-md-4 offset-md-4 d-flex justify-content-end">

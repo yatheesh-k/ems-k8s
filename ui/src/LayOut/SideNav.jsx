@@ -690,7 +690,7 @@ const SideNav = () => {
                       style={{ fontSize: "medium" }}
                     ></i>
                   </span>
-                  <span className="align-middle">Customers</span>
+                  <span className="align-middle">Clients</span>
                   <i
                     className={`bi ${
                       isCustomerOpne ? "bi-chevron-up" : "bi-chevron-down"
@@ -706,23 +706,23 @@ const SideNav = () => {
                   <li
                     style={{ paddingLeft: "40px" }}
                     className={`sidebar-item ${
+                      location.pathname === "/customersView" ? "active" : ""
+                    }`}
+                  >
+                    <Link className="sidebar-link" to="/customersView">
+                      Client View
+                    </Link>
+                  </li>
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${
                       location.pathname === "/customerRegistration"
                         ? "active"
                         : ""
                     }`}
                   >
                     <Link className="sidebar-link" to="/customerRegistration">
-                      Customer Registartion
-                    </Link>
-                  </li>
-                  <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${
-                      location.pathname === "/customersView" ? "active" : ""
-                    }`}
-                  >
-                    <Link className="sidebar-link" to="/customersView">
-                      Customer View
+                      Client Registration
                     </Link>
                   </li>
                 </ul>
@@ -757,21 +757,21 @@ const SideNav = () => {
                   <li
                     style={{ paddingLeft: "40px" }}
                     className={`sidebar-item ${
-                      location.pathname === "/addAttendance" ? "active" : ""
-                    }`}
-                  >
-                    <Link className="sidebar-link" to="/productRegistartion">
-                      Product Registartion
-                    </Link>
-                  </li>
-                  <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${
                       location.pathname === "/attendanceReport" ? "active" : ""
                     }`}
                   >
                     <Link className="sidebar-link" to="/productsView">
                       product View
+                    </Link>
+                  </li>
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${
+                      location.pathname === "/addAttendance" ? "active" : ""
+                    }`}
+                  >
+                    <Link className="sidebar-link" to="/productRegistartion">
+                      Product Registartion
                     </Link>
                   </li>
                 </ul>
@@ -790,7 +790,7 @@ const SideNav = () => {
                       style={{ fontSize: "medium" }}
                     ></i>
                   </span>
-                  <span className="align-middle">Invoice</span>
+                  <span className="align-middle">Invoices</span>
                   <i
                     className={`bi ${
                       isInvoiceOpen ? "bi-chevron-up" : "bi-chevron-down"
@@ -806,21 +806,21 @@ const SideNav = () => {
                   <li
                     style={{ paddingLeft: "40px" }}
                     className={`sidebar-item ${
-                      location.pathname === "/addAttendance" ? "active" : ""
-                    }`}
-                  >
-                    <Link className="sidebar-link" to="/invoiceRegistartion">
-                      Invoice Registartion
-                    </Link>
-                  </li>
-                  <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${
                       location.pathname === "/attendanceReport" ? "active" : ""
                     }`}
                   >
                     <Link className="sidebar-link" to="/invoiceView">
                       Invoice View
+                    </Link>
+                  </li>
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${
+                      location.pathname === "/addAttendance" ? "active" : ""
+                    }`}
+                  >
+                    <Link className="sidebar-link" to="/invoiceRegistartion">
+                      Invoice Registartion
                     </Link>
                   </li>
                 </ul>
@@ -869,7 +869,7 @@ const SideNav = () => {
                     }`}
                   >
                     <Link className="sidebar-link" to="/accountsView">
-                      Bank View
+                      Bank Details
                     </Link>
                   </li>
                   <li
@@ -1337,7 +1337,7 @@ const SideNav = () => {
                       style={{ fontSize: "medium" }}
                     ></i>
                   </span>
-                  <span className="align-middle">Customers</span>
+                  <span className="align-middle">Clients</span>
                   <i
                     className={`bi ${
                       isCustomerOpne ? "bi-chevron-up" : "bi-chevron-down"
@@ -1353,23 +1353,23 @@ const SideNav = () => {
                   <li
                     style={{ paddingLeft: "40px" }}
                     className={`sidebar-item ${
+                      location.pathname === "/customersView" ? "active" : ""
+                    }`}
+                  >
+                    <Link className="sidebar-link" to="/customersView">
+                      Client View
+                    </Link>
+                  </li>
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${
                       location.pathname === "/customerRegistration"
                         ? "active"
                         : ""
                     }`}
                   >
                     <Link className="sidebar-link" to="/customerRegistration">
-                      Customer Registartion
-                    </Link>
-                  </li>
-                  <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${
-                      location.pathname === "/customersView" ? "active" : ""
-                    }`}
-                  >
-                    <Link className="sidebar-link" to="/customersView">
-                      Customer View
+                      Client Registration
                     </Link>
                   </li>
                 </ul>
@@ -1388,7 +1388,7 @@ const SideNav = () => {
                       style={{ fontSize: "medium" }}
                     ></i>
                   </span>
-                  <span className="align-middle">Product</span>
+                  <span className="align-middle">Products</span>
                   <i
                     className={`bi ${
                       isProductsOpen ? "bi-chevron-up" : "bi-chevron-down"
@@ -1404,21 +1404,21 @@ const SideNav = () => {
                   <li
                     style={{ paddingLeft: "40px" }}
                     className={`sidebar-item ${
-                      location.pathname === "/addAttendance" ? "active" : ""
-                    }`}
-                  >
-                    <Link className="sidebar-link" to="/productRegistartion">
-                      Product Registartion
-                    </Link>
-                  </li>
-                  <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${
                       location.pathname === "/attendanceReport" ? "active" : ""
                     }`}
                   >
                     <Link className="sidebar-link" to="/productsView">
                       product View
+                    </Link>
+                  </li>
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${
+                      location.pathname === "/addAttendance" ? "active" : ""
+                    }`}
+                  >
+                    <Link className="sidebar-link" to="/productRegistartion">
+                      Product Registartion
                     </Link>
                   </li>
                 </ul>
@@ -1437,7 +1437,7 @@ const SideNav = () => {
                       style={{ fontSize: "medium" }}
                     ></i>
                   </span>
-                  <span className="align-middle">Invoice</span>
+                  <span className="align-middle">Invoices</span>
                   <i
                     className={`bi ${
                       isInvoiceOpen ? "bi-chevron-up" : "bi-chevron-down"
@@ -1453,21 +1453,21 @@ const SideNav = () => {
                   <li
                     style={{ paddingLeft: "40px" }}
                     className={`sidebar-item ${
-                      location.pathname === "/addAttendance" ? "active" : ""
-                    }`}
-                  >
-                    <Link className="sidebar-link" to="/invoiceRegistartion">
-                      Invoice Registartion
-                    </Link>
-                  </li>
-                  <li
-                    style={{ paddingLeft: "40px" }}
-                    className={`sidebar-item ${
                       location.pathname === "/attendanceReport" ? "active" : ""
                     }`}
                   >
                     <Link className="sidebar-link" to="/invoiceView">
                       Invoice View
+                    </Link>
+                  </li>
+                  <li
+                    style={{ paddingLeft: "40px" }}
+                    className={`sidebar-item ${
+                      location.pathname === "/addAttendance" ? "active" : ""
+                    }`}
+                  >
+                    <Link className="sidebar-link" to="/invoiceRegistartion">
+                      Invoice Registartion
                     </Link>
                   </li>
                 </ul>

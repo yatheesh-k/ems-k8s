@@ -1,22 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import LayOut from '../../LayOut/LayOut';
-import { CustomerGetApiById, CustomerPostApi, CustomerPutApiById, } from '../../Utils/Axios';
-import Select from 'react-select'
-import { useAuth } from '../../Context/AuthContext';
-
+import React, { useState, useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
+import LayOut from "../../LayOut/LayOut";
+import {
+  CustomerGetApiById,
+  CustomerPostApi,
+  CustomerPutApiById,
+} from "../../Utils/Axios";
+import Select from "react-select";
+import { useAuth } from "../../Context/AuthContext";
 
 const CustomersRegistration = () => {
   const navigate = useNavigate();
-  const {user}=useAuth();
-  const companyId = user.companyId
-  console.log("company Id from Customer registration",companyId);
+  const { user } = useAuth();
+  const companyId = user.companyId;
+  console.log("company Id from Customer registration", companyId);
   const location = useLocation();
   const [isUpdating, setIsUpdating] = useState(false);
   const [update, setUpdate] = useState([]);
-  const { register, handleSubmit, reset, control, trigger, setValue, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    control,
+    trigger,
+    setValue,
+    formState: { errors },
+  } = useForm();
   const [errorMessage, setErrorMessage] = useState(""); // State for error message
 
   const onSubmit = (data) => {
@@ -25,68 +36,72 @@ const CustomersRegistration = () => {
       status: data.status.value,
     };
     if (location && location.state && location.state.customerId) {
-      CustomerPutApiById(companyId,location.state.customerId, payload)
+      CustomerPutApiById(companyId, location.state.customerId, payload)
         .then((res) => {
-          const successMessage = res.data.message || 'Customer updated successfully';
+          const successMessage =
+            res.data.message || "Customer updated successfully";
           toast.success(successMessage, {
-            position: 'top-right',
+            position: "top-right",
             autoClose: 1000,
           });
           setUpdate(res.data.data);
-          navigate('/customersView');
+          navigate("/customersView");
         })
         .catch((error) => {
-          console.error('Error updating customer:', error); // Log the error for debugging
-          const errorMsg = error.response?.data?.error?.message || error.message || 'Error updating customer';
+          console.error("Error updating customer:", error); // Log the error for debugging
+          const errorMsg =
+            error.response?.data?.error?.message ||
+            error.message ||
+            "Error updating customer";
           toast.error(errorMsg, {
-            position: 'top-right',
+            position: "top-right",
             autoClose: 1000,
           });
         });
     } else {
       CustomerPostApi(companyId, payload)
         .then((response) => {
-          toast.success('Customer added successfully', {
-            position: 'top-right',
+          toast.success("Customer added successfully", {
+            position: "top-right",
             autoClose: 1000,
           });
-          navigate('/customersView');
+          navigate("/customersView");
         })
         .catch((error) => {
           // Handle API error response
-          const errorMessage = error.response?.data?.error?.message || 'Error adding customer';
-          console.error('API Error:', errorMessage);
+          const errorMessage =
+            error.response?.data?.error?.message || "Error adding customer";
+          console.error("API Error:", errorMessage);
           toast.error(errorMessage);
         });
     }
   };
 
   useEffect(() => {
-    console.log('Location state:', location.state);
-    console.log('companyId:', companyId);
+    console.log("Location state:", location.state);
+    console.log("companyId:", companyId);
     if (location && location.state && location.state.customerId) {
       const customerId = location.state.customerId;
-      console.log('customerId:', customerId);
+      console.log("customerId:", customerId);
       CustomerGetApiById(companyId, customerId)
         .then((response) => {
-          console.log('Customer data:', response);
+          console.log("Customer data:", response);
           const customerData = {
             ...response,
-            status: { value: response.status, label: response.status }
-            };
+            status: { value: response.status, label: response.status },
+          };
           reset(customerData);
           setIsUpdating(true);
         })
         .catch((error) => {
-          console.error('Error fetching data:', error.response || error);
+          console.error("Error fetching data:", error.response || error);
           if (error.response) {
-            console.error('API Error Response:', error.response.data);
+            console.error("API Error Response:", error.response.data);
           }
-          toast.error('Error fetching customer data.');
+          toast.error("Error fetching customer data.");
         });
     }
   }, [location.state?.customerId, reset]);
-
 
   const handleEmailChange = (e) => {
     // Get the current value of the input field
@@ -169,22 +184,33 @@ const CustomersRegistration = () => {
   }
   const validateField = (value, type) => {
     switch (type) {
-      case 'email':
-        const emailRegex = /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/;
-        if (/[A-Z]/.test(value)) return "Email cannot contain uppercase letters";  // Ensure no uppercase letters in email
+      case "email":
+        const emailRegex =
+          /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/;
+        if (/[A-Z]/.test(value))
+          return "Email cannot contain uppercase letters"; // Ensure no uppercase letters in email
         return emailRegex.test(value) || "Invalid Email format";
 
-      case 'mobile':
-        return /^[6-9][0-9]{9}$/.test(value) || "Mobile Number must start with 6-9 and be exactly 10 digits long";
+      case "mobile":
+        return (
+          /^[6-9][0-9]{9}$/.test(value) ||
+          "Mobile Number must start with 6-9 and be exactly 10 digits long"
+        );
 
-      case 'pincode':
-        return /^\d{6}$/.test(value) || "PinCode must be exactly 6 digits";
+      case "pincode":
+        return /^\d{6}$/.test(value) || "Zip Code must be exactly 6 digits";
 
-      case 'gst':
-        return /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9][Z][A-Z0-9]$/.test(value) || "Invalid GST Number format. It should be in the format: 22AAAAA0000A1Z5.";
+      case "gst":
+        return (
+          /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][0-9][Z][A-Z0-9]$/.test(value) ||
+          "Invalid GST Number format. It should be in the format: 22AAAAA0000A1Z5."
+        );
 
-      case 'stateCode':
-        return /^[0-9]{1,2}$/.test(value) || "State Code must be a numeric value (1-2 digits)";
+      case "stateCode":
+        return (
+          /^[0-9]{1,2}$/.test(value) ||
+          "State Code must be a numeric value (1-2 digits)"
+        );
 
       default:
         return true;
@@ -193,55 +219,54 @@ const CustomersRegistration = () => {
 
   // Custom validator to check trailing spaces
   const noTrailingSpaces = (value) => {
-    if (value.endsWith(' ')) {
+    if (value.endsWith(" ")) {
       return "Spaces are not allowed at the end";
     }
     return true; // Return true if the value is valid
   };
 
-
   const preventInvalidInput = (e, type) => {
     const key = e.key;
 
     // Alphanumeric check for customerName, state, city fields (no special characters allowed except spaces)
-    if (type === 'alpha' && /[^a-zA-Z\s]/.test(key)) {
+    if (type === "alpha" && /[^a-zA-Z\s]/.test(key)) {
       e.preventDefault();
     }
 
-    if (type === 'alphaNumeric' && /[^a-zA-Z0-9]/.test(key)) {
+    if (type === "alphaNumeric" && /[^a-zA-Z0-9]/.test(key)) {
       e.preventDefault();
     }
 
     // Address-specific special characters: only allow &, /, and ,
-    if (type === 'address' && !/[a-zA-Z0-9\s&,-\/]/.test(key)) {
+    if (type === "address" && !/[a-zA-Z0-9\s&,-\/]/.test(key)) {
       e.preventDefault();
     }
     // Numeric check for fields that should only allow numbers
-    if (type === 'numeric' && !/^[0-9]$/.test(key)) {
+    if (type === "numeric" && !/^[0-9]$/.test(key)) {
       e.preventDefault();
     }
 
     // Prevent spaces (if any additional validation is needed)
-    if (type === 'whitespace' && key === ' ') {
+    if (type === "whitespace" && key === " ") {
       e.preventDefault();
     }
   };
 
   // Capitalize the first letter of each word expect email
   const handleInputChange = (e, fieldName) => {
-    let value = e.target.value.trimStart().replace(/ {2,}/g, ' ');  // Remove leading spaces and extra spaces
+    let value = e.target.value.trimStart().replace(/ {2,}/g, " "); // Remove leading spaces and extra spaces
 
     if (fieldName !== "email") {
-      value = value.replace(/\b\w/g, (char) => char.toUpperCase());  // Capitalize first letter after space
+      value = value.replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize first letter after space
     }
 
     setValue(fieldName, value);
-    trigger(fieldName);  // Trigger validation
+    trigger(fieldName); // Trigger validation
   };
 
   const statusOptions = [
-    { label: 'Active', value: 'Active' },
-    { label: 'Inactive', value: 'InActive' },
+    { label: "Active", value: "Active" },
+    { label: "Inactive", value: "InActive" },
   ];
 
   const clearForm = () => {
@@ -252,14 +277,13 @@ const CustomersRegistration = () => {
     navigate("/customersView");
   };
 
-
   return (
     <LayOut>
       <div className="container-fluid p-0">
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
             <h1 className="h3 mb-3">
-              <strong>Registration</strong>{" "}
+              <strong>Client Registration</strong>{" "}
             </h1>
           </div>
           <div className="col-auto">
@@ -268,10 +292,8 @@ const CustomersRegistration = () => {
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
-                <li className="breadcrumb-item">
-                  <a href="/employeeView">Customers</a>
-                </li>
-                <li className="breadcrumb-item active">Registration</li>
+                <li className="breadcrumb-item active">Clients</li>
+                <li className="breadcrumb-item active">Client Registration</li>
               </ol>
             </nav>
           </div>
@@ -281,7 +303,7 @@ const CustomersRegistration = () => {
             <div className="card">
               <div className="card-header">
                 <h5 className="card-title" style={{ marginBottom: "0px" }}>
-                  {isUpdating ? "Customer Data" : "Customer Registration"}
+                  {isUpdating ? "Client Data" : "Client Registration Form"}
                 </h5>
                 <div
                   className="dropdown-divider"
@@ -293,31 +315,35 @@ const CustomersRegistration = () => {
                   <div className="row ">
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
-                        Customer Name<span style={{ color: "red" }}>*</span>
+                        Client Name<span style={{ color: "red" }}>*</span>
                       </label>
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Enter Customer Name"
+                        placeholder="Enter Client Name"
                         name="customerName"
                         autoComplete="off"
                         {...register("customerName", {
-                          required: "Customer Name is Required",
+                          required: "Client Name is Required",
                           validate: noTrailingSpaces,
                           minLength: {
                             value: 3,
-                            message: "Customer Name must be at least 3 characters long"
+                            message:
+                              "Client Name must be at least 3 characters long",
                           },
                           maxLength: {
                             value: 60,
-                            message: "Customer Name must not exceed 60 characters."
+                            message:
+                              "Client Name must not exceed 60 characters.",
                           },
                         })}
                         onChange={(e) => handleInputChange(e, "customerName")}
-                        onKeyPress={(e) => preventInvalidInput(e, 'alpha')}
+                        onKeyPress={(e) => preventInvalidInput(e, "alpha")}
                       />
                       {errors.customerName && (
-                        <p className="errorMsg">{errors.customerName.message}</p>
+                        <p className="errorMsg">
+                          {errors.customerName.message}
+                        </p>
                       )}
                     </div>
                     <div className="col-lg-1"></div>
@@ -326,7 +352,7 @@ const CustomersRegistration = () => {
                         Email Id <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
-                        type='text'
+                        type="text"
                         className="form-control"
                         placeholder="Enter Email Id"
                         name="email"
@@ -334,10 +360,10 @@ const CustomersRegistration = () => {
                         // onInput={toInputEmailCase}
                         {...register("email", {
                           required: "Email Id is Required",
-                          validate: (value) => validateField(value, 'email')
+                          validate: (value) => validateField(value, "email"),
                         })}
                         onChange={(e) => handleInputChange(e, "email")}
-                        onKeyPress={(e) => preventInvalidInput(e, 'whitespace')}
+                        onKeyPress={(e) => preventInvalidInput(e, "whitespace")}
                       />
                       {errors.email && (
                         <p className="errorMsg">{errors.email.message}</p>
@@ -387,7 +413,9 @@ const CustomersRegistration = () => {
                         onChange={(e) => handleInputChange(e, "mobileNumber")}
                       />
                       {errors.mobileNumber && (
-                        <p className="errorMsg">{errors.mobileNumber.message}</p>
+                        <p className="errorMsg">
+                          {errors.mobileNumber.message}
+                        </p>
                       )}
                     </div>
                     <div className="col-lg-1"></div>
@@ -407,20 +435,20 @@ const CustomersRegistration = () => {
                           validate: noTrailingSpaces,
                           minLength: {
                             value: 3,
-                            message: "State Name must be at least 3 characters long"
+                            message:
+                              "State Name must be at least 3 characters long",
                           },
                           maxLength: {
                             value: 60,
-                            message: "State Name must not exceed 60 digits."
+                            message: "State Name must not exceed 60 digits.",
                           },
                         })}
                         onChange={(e) => handleInputChange(e, "state")}
-                        onKeyPress={(e) => preventInvalidInput(e, 'alpha')}
+                        onKeyPress={(e) => preventInvalidInput(e, "alpha")}
                       />
                       {errors.state && (
                         <p className="errorMsg">
-                          {errors.state.message ||
-                            "State Name is Required"}
+                          {errors.state.message || "State Name is Required"}
                         </p>
                       )}
                     </div>
@@ -441,27 +469,27 @@ const CustomersRegistration = () => {
                           validate: noTrailingSpaces,
                           minLength: {
                             value: 3,
-                            message: "City Name must be at least 3 characters long"
+                            message:
+                              "City Name must be at least 3 characters long",
                           },
                           maxLength: {
                             value: 60,
-                            message: "City Name must not exceed 60 digits."
+                            message: "City Name must not exceed 60 digits.",
                           },
                         })}
                         onChange={(e) => handleInputChange(e, "city")}
-                        onKeyPress={(e) => preventInvalidInput(e, 'alpha')}
+                        onKeyPress={(e) => preventInvalidInput(e, "alpha")}
                       />
                       {errors.city && (
                         <p className="errorMsg">
-                          {errors.city.message ||
-                            "City Name is Required"}
+                          {errors.city.message || "City Name is Required"}
                         </p>
                       )}
                     </div>
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
-                        Pin Code <span style={{ color: "red" }}>*</span>
+                        Zip Code <span style={{ color: "red" }}>*</span>
                       </label>
                       <input
                         type="text"
@@ -471,16 +499,15 @@ const CustomersRegistration = () => {
                         className="form-control"
                         autoComplete="off"
                         {...register("pinCode", {
-                          required: "Pin Code is Required.",
-                          validate: (value) => validateField(value, 'pincode'),
+                          required: "Zip Code is Required.",
+                          validate: (value) => validateField(value, "pincode"),
                         })}
                         onChange={(e) => handleInputChange(e, "pinCode")}
-                        onKeyPress={(e) => preventInvalidInput(e, 'numeric')}
+                        onKeyPress={(e) => preventInvalidInput(e, "numeric")}
                       />
                       {errors.pinCode && (
                         <p className="errorMsg">
-                          {errors.pinCode.message ||
-                            "Pin Code is Required"}
+                          {errors.pinCode.message || "Pin Code is Required"}
                         </p>
                       )}
                     </div>
@@ -498,22 +525,23 @@ const CustomersRegistration = () => {
                         autoComplete="off"
                         {...register("customerGstNo", {
                           validate: (value) =>
-                            !value || validateField(value, 'gst'), // Validate only if the field is not empty
+                            !value || validateField(value, "gst"), // Validate only if the field is not empty
                           maxLength: {
                             value: 15,
                             message: "GST Number should be 15 characters long",
                           },
                         })}
                         onChange={(e) => handleInputChange(e, "customerGstNo")}
-                        onKeyPress={(e) => preventInvalidInput(e, 'alphaNumeric')}
+                        onKeyPress={(e) =>
+                          preventInvalidInput(e, "alphaNumeric")
+                        }
                         onInput={(e) => {
                           e.target.value = e.target.value.toUpperCase(); // Convert to uppercase
                         }}
                       />
-                      {errors.gstNo && (
+                      {errors.customerGstNo && (
                         <p className="errorMsg">
-                          {errors.gstNo.message ||
-                            "Gst Number is Required"}
+                          {errors.customerGstNo.message || "Gst Number is Required"}
                         </p>
                       )}
                     </div>
@@ -531,7 +559,8 @@ const CustomersRegistration = () => {
                         autoComplete="off"
                         {...register("stateCode", {
                           required: "State Code is Required",
-                          validate: (value) => !value || validateField(value, "stateCode"), // Validate only if the field is not empty
+                          validate: (value) =>
+                            !value || validateField(value, "stateCode"), // Validate only if the field is not empty
                           minLength: {
                             value: 2,
                             message: "State Code must be exactly 2 digits.",
@@ -546,8 +575,7 @@ const CustomersRegistration = () => {
                       />
                       {errors.stateCode && (
                         <p className="errorMsg">
-                          {errors.stateCode.message ||
-                            "State Code is Required"}
+                          {errors.stateCode.message || "State Code is Required"}
                         </p>
                       )}
                     </div>
@@ -557,19 +585,25 @@ const CustomersRegistration = () => {
                         Status <span style={{ color: "red" }}>*</span>
                       </label>
                       <Controller
-                        name="status"  // The name you want for the field
+                        name="status"
                         control={control}
+                        rules={{ required: "Status is required" }} // Ensure required validation is applied
                         render={({ field }) => (
                           <Select
                             {...field}
-                            options={statusOptions}  // Dropdown options for Active and Inactive
-                            getOptionLabel={(e) => e.label}  // What to display in the dropdown
-                            getOptionValue={(e) => e.value}  // Value submitted with the form
+                            options={statusOptions}
+                            getOptionLabel={(e) => e.label}
+                            getOptionValue={(e) => e.value}
+                            onChange={(selectedOption) =>
+                              field.onChange(selectedOption)
+                            } // Ensure onChange is handled
                           />
                         )}
                       />
                       {errors.status && (
-                        <p className="errorMsg">{errors.status.message || "Status is required"}</p>
+                        <p className="errorMsg">
+                          {errors.status.message || "Status is required"}
+                        </p>
                       )}
                     </div>
                     <div className="col-lg-1"></div>
@@ -588,15 +622,17 @@ const CustomersRegistration = () => {
                           validate: noTrailingSpaces,
                           minLength: {
                             value: 3,
-                            message: 'Address must be at least 3 characters long'
+                            message:
+                              "Address must be at least 3 characters long",
                           },
                           maxLength: {
                             value: 250,
-                            message: 'Address must be at most 250 characters long'
-                          }
+                            message:
+                              "Address must be at most 250 characters long",
+                          },
                         })}
                         onChange={(e) => handleInputChange(e, "address")}
-                        onKeyPress={(e) => preventInvalidInput(e, 'address')}
+                        onKeyPress={(e) => preventInvalidInput(e, "address")}
                       />
                       {errors.address && (
                         <p className="errorMsg">
@@ -655,6 +691,3 @@ const CustomersRegistration = () => {
 };
 
 export default CustomersRegistration;
-
-
-

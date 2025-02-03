@@ -204,8 +204,9 @@ const AccountRegistartion = () => {
                 <li className="breadcrumb-item">
                   <a href="/main">Home</a>
                 </li>
+                <li className="breadcrumb-item active">Settings</li>
                 <li className="breadcrumb-item">
-                  <a href="/accountsView">AccountDetails</a>
+                  <a href="/accountsView">Bank Details</a>
                 </li>
                 <li className="breadcrumb-item active">Registration</li>
               </ol>
@@ -366,13 +367,19 @@ const AccountRegistartion = () => {
                       <Controller
                         name="accountType"
                         control={control}
-                        render={({ field }) => (
-                          <Select
-                            {...field}
-                            options={accountTypes} 
-                            getOptionLabel={(e) => e.label}
-                            getOptionValue={(e) => e.value}
-                          />
+                        rules={{ required: "Account Type is required" }} // Add validation rule
+                        render={({ field, fieldState: { error } }) => (
+                          <>
+                            <Select
+                              {...field}
+                              options={accountTypes}
+                              getOptionLabel={(e) => e.label}
+                              getOptionValue={(e) => e.value}
+                              onChange={(selectedOption) =>
+                                field.onChange(selectedOption)
+                              } // Ensure onChange is handled
+                            />
+                          </>
                         )}
                       />
                       {errors.accountType && (

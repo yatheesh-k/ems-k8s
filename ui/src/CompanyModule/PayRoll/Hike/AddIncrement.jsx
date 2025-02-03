@@ -646,17 +646,20 @@ const AddIncrement = () => {
         const percentage = parseFloat(value.replace("%", ""));
         if (!isNaN(percentage)) {
           // Calculate based on grossAmount or basicAmount
-          if (key === "Provident Fund Employee" || key === "Provident Fund Employer") {
-            displayValue = (percentage / 100) * basicAmount;  // For HRA, use basicAmount
+          if (
+            key === "Provident Fund Employee" ||
+            key === "Provident Fund Employer"
+          ) {
+            displayValue = (percentage / 100) * basicAmount; // For HRA, use basicAmount
           } else {
-            displayValue = (percentage / 100) * grossAmountValue;  // For other allowances, use grossAmount
+            displayValue = (percentage / 100) * grossAmountValue; // For other allowances, use grossAmount
           }
         }
       } else if (typeof value === "number") {
         // If it's a number (fixed value), just display that value
         displayValue = value;
       }
-  
+
       // Ensure that displayValue is a number and set it to 0 if not
       displayValue = isNaN(displayValue) ? 0 : displayValue;
 
@@ -672,7 +675,8 @@ const AddIncrement = () => {
       salaryConfigurationEntity: {
         allowances: allowancesData,
         deductions: deductionsData,
-      },salaryConfigurationEntity: {
+      },
+      salaryConfigurationEntity: {
         allowances: {
           ...allowancesData, // Pass the calculated allowances data
         },
@@ -811,8 +815,8 @@ const AddIncrement = () => {
   const getCurrentDate = () => {
     const today = new Date();
     const yyyy = today.getFullYear();
-    const mm = (today.getMonth() + 1).toString().padStart(2, '0');
-    const dd = today.getDate().toString().padStart(2, '0');
+    const mm = (today.getMonth() + 1).toString().padStart(2, "0");
+    const dd = today.getDate().toString().padStart(2, "0");
     return `${yyyy}-${mm}-${dd}`;
   };
 
@@ -1716,8 +1720,13 @@ const AddIncrement = () => {
               </label>
             </div>
           </ModalBody>
-          <div className="text-center">
-            <Button variant="primary ml-2" onClick={handleModalClose}>
+          <div style={{ marginLeft: "58%" }}>
+            <Button
+              variant="primary"
+              className="ml-4"
+              style={{ marginRight: "10px" }}
+              onClick={handleModalClose}
+            >
               Confirm
             </Button>
             <Button variant="secondary" onClick={() => setShowPfModal(false)}>
