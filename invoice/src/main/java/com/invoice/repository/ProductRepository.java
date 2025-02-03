@@ -17,4 +17,6 @@ public interface ProductRepository extends JpaRepository<ProductModel, String> {
     boolean existsByCompanyIdAndProductId(String companyId, String productId);
 
     void deleteByCompanyIdAndProductId(String companyId, String productId);
+
+    boolean existsByProductId(String productId);
 }

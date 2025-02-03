@@ -54,4 +54,8 @@ public class Constants {
     public static final String PRODUCT = "product";
     public static final String BANK = "bank_details";
     public static final String TYPE = "type";
+    public static final String TEMPLATE = "invoice-template.ftl";
+    public static final String ATTACHMENT =  "attachment";
+    public static final String INVOICE_ =  "Invoice-";
+    public static final String PDF = ".pdf";
 }

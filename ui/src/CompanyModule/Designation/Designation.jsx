@@ -130,20 +130,20 @@ const Designation = () => {
   };
 
   const validateName = (value) => {
-    // Trim leading and trailing spaces before further validation
+    // Trim leading and trailing spaces before validation
     const trimmedValue = value.trim();
-
+  
     // Check if value is empty after trimming (meaning it only had spaces)
     if (trimmedValue.length === 0) {
-      return "Department Name is Required.";
+      return "Designation Name is Required.";
     }
-
+  
     // Allow alphabetic characters, numbers, spaces, and some special characters like /, !, @, #, &...
     else if (!/^[A-Za-z\s/]+$/.test(trimmedValue)) {
       return "Only Alphabetic Characters, Spaces, and '/' are Allowed.";
     } else {
       const words = trimmedValue.split(" ");
-
+  
       // Check for minimum and maximum word length
       for (const word of words) {
         // If the word is a single character and it's not the only word in the string, skip this rule
@@ -153,12 +153,17 @@ const Designation = () => {
           return "Max Length 40 Characters Required.";  // If any word is longer than 40 characters
         }
       }
-
+  
+      // Check for the total length of the string after trimming (no more than 40 characters)
+      if (trimmedValue.length > 40) {
+        return "Designation name must not exceed 40 characters.";  // If the total length of the input is more than 40 characters
+      }
+  
       // Check for multiple spaces between words
       if (/\s{2,}/.test(trimmedValue)) {
         return "No Multiple Spaces Between Words Allowed.";
       }
-
+  
       // Check if the value has leading or trailing spaces (shouldn't happen due to trimming)
       if (/^\s/.test(value)) {
         return "Leading space not allowed.";  // Leading space error
@@ -166,7 +171,7 @@ const Designation = () => {
         return "Spaces at the end are not allowed.";  // Trailing space error
       }
     }
-
+  
     return true; // Return true if all conditions are satisfied
   };
 

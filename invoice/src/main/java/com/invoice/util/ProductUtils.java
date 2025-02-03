@@ -27,6 +27,7 @@ public class ProductUtils {
         BeanUtils.copyProperties(productRequest, product);
         return product;
     }
+
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static void updateProductFromRequest(ProductModel productToUpdate, ProductRequest productRequest) throws JsonMappingException, InvoiceException {
@@ -35,6 +36,7 @@ public class ProductUtils {
         }
         OBJECT_MAPPER.updateValue(productToUpdate, productRequest);
     }
+
     public static ProductModel maskProductProperties(ProductRequest productRequest, String id, BigDecimal unitCost, String companyId) {
         String productName = null, productCost = null, service = null, hsnNo = null, gst = null, encodedUnitCost = null;
         ObjectMapper objectMapper = new ObjectMapper();
@@ -77,7 +79,6 @@ public class ProductUtils {
         return productModel;
     }
 
-
     public static ProductModel unmaskProductProperties(ProductModel maskedProduct) {
         ProductModel productModel = new ProductModel();
 
@@ -114,5 +115,36 @@ public class ProductUtils {
         productModel.setCompanyId(maskedProduct.getCompanyId());
         productModel.setProductId(maskedProduct.getProductId());
         return productModel;
+    }
+
+    public static ProductModel maskProductPropertiesForUpdate(ProductModel productToUpdate, ProductRequest productRequest, BigDecimal unitCost, String companyId) {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Update the product properties from the request if they are not null
+
+        if (productRequest.getProductCost() != null) {
+            String productCost = Base64.getEncoder().encodeToString(productRequest.getProductCost().getBytes());
+            productToUpdate.setProductCost(productCost);
+        }
+
+        if (productRequest.getService() != null) {
+            String service = Base64.getEncoder().encodeToString(productRequest.getService().getBytes());
+            productToUpdate.setService(service);
+        }
+
+        if (productRequest.getGst() != null) {
+            String gst = Base64.getEncoder().encodeToString(productRequest.getGst().getBytes());
+            productToUpdate.setGst(gst);
+        }
+
+        // Mask the unit cost
+        if (unitCost != null) {
+            String encodedUnitCost = Base64.getEncoder().encodeToString(unitCost.toString().getBytes());
+            productToUpdate.setUnitCost(encodedUnitCost);
+        }
+
+        productToUpdate.setCompanyId(companyId);
+
+        return productToUpdate;
     }
 }

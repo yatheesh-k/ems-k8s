@@ -29,6 +29,9 @@ public class InvoiceRequest {
     @NotNull(message = "{dueDate.notnull.message}")
     private String dueDate;
 
+    @NotNull(message = "{bankId.notnull.message}")
+    private String bankId;
+
     @NotNull(message = "{Product.Details.notnull.message}")
     @Size(min = 1, message = "{Product.Details.size.message}")
     private List<OrderRequest> orderRequests;

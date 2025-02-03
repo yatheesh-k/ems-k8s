@@ -8,6 +8,7 @@ import com.invoice.repository.ProductRepository;
 import com.invoice.request.InvoiceRequest;
 import com.invoice.request.OrderRequest;
 import com.invoice.response.InvoiceResponse;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
@@ -33,6 +34,7 @@ public class InvoiceUtils {
         invoice.setStatus(request.getStatus());
         invoice.setDueDate(request.getDueDate());
         invoice.setCompanyId(companyId);
+        invoice.setBankId(request.getBankId());
         return invoice;
     }
 
@@ -86,13 +88,12 @@ public class InvoiceUtils {
                                                  BigDecimal totalAmount, Config config) {
 
         String companyStateCode = extractStateCode(company.getGstNo());
-        String customerStateCode = extractStateCode(customer.getGstNo());
+        String customerStateCode = extractStateCode(customer.getCustomerGstNo());
         BigDecimal gstRate = config.getRate();
         BigDecimal gstAmount;
         // Check if customer GST number is null or empty
-        String customerGstNo = customer.getGstNo();
+        String customerGstNo = customer.getCustomerGstNo();
         if (customerGstNo == null || customerGstNo.trim().isEmpty()) {
-            invoice.setGst(Constants.ZERO);
             invoice.setCGst(Constants.ZERO);
             invoice.setSGst(Constants.ZERO);
             invoice.setIGst(Constants.ZERO);
@@ -105,12 +106,10 @@ public class InvoiceUtils {
             invoice.setCGst(gstAmount.toString());
             invoice.setSGst(gstAmount.toString());
             invoice.setIGst(Constants.ZERO);
-            invoice.setGst(Constants.ZERO);
         } else {
             gstAmount = totalAmount.multiply(gstRate);
             invoice.setCGst(Constants.ZERO);
             invoice.setSGst(Constants.ZERO);
-            invoice.setGst(Constants.ZERO);
             invoice.setIGst(gstAmount.toString());
         }
         BigDecimal grandTotal = totalAmount.add(gstAmount);
@@ -121,9 +120,6 @@ public class InvoiceUtils {
 
         if (invoice.getCGst() != null) {
             invoice.setCGst(Base64.getEncoder().encodeToString(invoice.getCGst().getBytes()));
-        }
-        if (invoice.getGst() != null) {
-            invoice.setGst(Base64.getEncoder().encodeToString(invoice.getGst().getBytes()));
         }
         if (invoice.getSGst() != null) {
             invoice.setSGst(Base64.getEncoder().encodeToString(invoice.getSGst().getBytes()));
@@ -162,8 +158,11 @@ public class InvoiceUtils {
         return invoice;
     }
 
-    public static InvoiceResponse fromEntities(CompanyEntity companyEntity, CustomerModel customerModel, InvoiceModel invoiceModel, List<BankEntity> bankEntities) {
-        // Map all bank details
+    public static InvoiceResponse fromEntities(
+            CompanyEntity companyEntity,
+            CustomerModel customerModel,
+            InvoiceModel invoiceModel,
+            List<BankEntity> bankEntities) {
         List<InvoiceResponse.BankDetailResponse> bankDetails = bankEntities.stream()
                 .map(bank -> InvoiceResponse.BankDetailResponse.builder()
                         .bankName(bank.getBankName())
@@ -174,7 +173,6 @@ public class InvoiceUtils {
                         .bankAddress(bank.getAddress())
                         .build())
                 .toList();
-        // Map all order details
         List<InvoiceResponse.OrderDetailResponse> orderDetails = invoiceModel.getOrderModels().stream()
                 .map(order -> InvoiceResponse.OrderDetailResponse.builder()
                         .productName(order.getProduct().getProductName())
@@ -188,32 +186,41 @@ public class InvoiceUtils {
         return InvoiceResponse.builder()
                 .companyName(companyEntity.getCompanyName())
                 .companyAddress(companyEntity.getCompanyAddress())
+                .mobileNo(companyEntity.getMobileNo())
+                .emailId(companyEntity.getEmailId())
                 .companyBranch(companyEntity.getCompanyBranch())
                 .cinNo(companyEntity.getCinNo())
+                .panNo(companyEntity.getPanNo())
+                .gstNo(companyEntity.getGstNo())
                 .customerName(customerModel.getCustomerName())
                 .customerEmail(customerModel.getEmail())
                 .contactNumber(customerModel.getMobileNumber())
-                .customerGstNo(customerModel.getGstNo())
-                .gstNo(companyEntity.getGstNo())
+                .customerGstNo(customerModel.getCustomerGstNo())
                 .customerAddress(customerModel.getAddress())
                 .customerState(customerModel.getState())
                 .customerCity(customerModel.getCity())
                 .customerPinCode(customerModel.getPinCode())
+                .state(customerModel.getState())
+                .email(customerModel.getEmail())
+                .mobileNumber(customerModel.getMobileNumber())
+                .status(invoiceModel.getStatus())
+                .cgst(invoiceModel.getCGst())
+                .sgst(invoiceModel.getSGst())
+                .igst(invoiceModel.getIGst())
                 .invoiceDate(invoiceModel.getInvoiceDate().toString())
                 .dueDate(invoiceModel.getDueDate().toString())
-                .invoiceNumber(invoiceModel.getInvoiceId())
+                .invoiceId(invoiceModel.getInvoiceId())
+                .invoiceNumber(String.valueOf(invoiceModel.getInvoiceNumber()))
+                .customerId(invoiceModel.getCustomerId())
+                .companyId(invoiceModel.getCompanyId())
                 .purchaseOrder(invoiceModel.getPurchaseOrder())
                 .vendorCode(invoiceModel.getVendorCode())
-                .status(invoiceModel.getStatus())
-                .gst(invoiceModel.getGst())
-                .cGst(invoiceModel.getCGst())
-                .sGst(invoiceModel.getSGst())
-                .iGst(invoiceModel.getIGst())
                 .totalAmount(invoiceModel.getTotalAmount())
                 .grandTotal(invoiceModel.getGrandTotal())
                 .grandTotalInWords(invoiceModel.getGrandTotalInWords())
                 .bankDetails(bankDetails)
                 .orderDetails(orderDetails)
+
                 .build();
     }
 
@@ -234,6 +241,9 @@ public class InvoiceUtils {
         if (invoiceResponse.getGstNo() != null) {
             invoiceResponse.setGstNo(new String(Base64.getDecoder().decode(invoiceResponse.getGstNo()), StandardCharsets.UTF_8));
         }
+        if (invoiceResponse.getPanNo() != null) {
+            invoiceResponse.setPanNo(new String(Base64.getDecoder().decode(invoiceResponse.getPanNo()), StandardCharsets.UTF_8));
+        }
         if (invoiceResponse.getCustomerGstNo() != null) {
             invoiceResponse.setCustomerGstNo(new String(Base64.getDecoder().decode(invoiceResponse.getCustomerGstNo()), StandardCharsets.UTF_8));
         }
@@ -249,26 +259,35 @@ public class InvoiceUtils {
         if (invoiceResponse.getCustomerPinCode() != null) {
             invoiceResponse.setCustomerPinCode(new String(Base64.getDecoder().decode(invoiceResponse.getCustomerPinCode()), StandardCharsets.UTF_8));
         }
+        if (invoiceResponse.getMobileNumber() != null) {
+            invoiceResponse.setMobileNumber(new String(Base64.getDecoder().decode(invoiceResponse.getMobileNumber()), StandardCharsets.UTF_8));
+        }
         if (invoiceResponse.getGrandTotal() != null) {
             invoiceResponse.setGrandTotal(new String(Base64.getDecoder().decode(invoiceResponse.getGrandTotal()), StandardCharsets.UTF_8));
+        }
+        if (invoiceResponse.getEmail() != null) {
+            invoiceResponse.setEmail(new String(Base64.getDecoder().decode(invoiceResponse.getEmail()), StandardCharsets.UTF_8));
+        }
+        if (invoiceResponse.getMobileNo() != null) {
+            invoiceResponse.setMobileNo(new String(Base64.getDecoder().decode(invoiceResponse.getMobileNo()), StandardCharsets.UTF_8));
+        }
+        if (invoiceResponse.getState() != null) {
+            invoiceResponse.setState(new String(Base64.getDecoder().decode(invoiceResponse.getState()), StandardCharsets.UTF_8));
+        }
+        if (invoiceResponse.getCgst() != null) {
+            invoiceResponse.setCgst(new String(Base64.getDecoder().decode(invoiceResponse.getCgst()), StandardCharsets.UTF_8));
+        }
+        if (invoiceResponse.getSgst() != null) {
+            invoiceResponse.setSgst(new String(Base64.getDecoder().decode(invoiceResponse.getSgst()), StandardCharsets.UTF_8));
+        }
+        if (invoiceResponse.getIgst() != null) {
+            invoiceResponse.setIgst(new String(Base64.getDecoder().decode(invoiceResponse.getIgst()), StandardCharsets.UTF_8));
         }
         if (invoiceResponse.getGrandTotalInWords() != null) {
             invoiceResponse.setGrandTotalInWords(new String(Base64.getDecoder().decode(invoiceResponse.getGrandTotalInWords()), StandardCharsets.UTF_8));
         }
         if (invoiceResponse.getTotalAmount() != null) {
             invoiceResponse.setTotalAmount(new String(Base64.getDecoder().decode(invoiceResponse.getTotalAmount()), StandardCharsets.UTF_8));
-        }
-        if (invoiceResponse.getGst() != null) {
-            invoiceResponse.setGst(new String(Base64.getDecoder().decode(invoiceResponse.getGst()), StandardCharsets.UTF_8));
-        }
-        if (invoiceResponse.getCGst() != null) {
-            invoiceResponse.setCGst(new String(Base64.getDecoder().decode(invoiceResponse.getCGst()), StandardCharsets.UTF_8));
-        }
-        if (invoiceResponse.getSGst() != null) {
-            invoiceResponse.setSGst(new String(Base64.getDecoder().decode(invoiceResponse.getSGst()), StandardCharsets.UTF_8));
-        }
-        if (invoiceResponse.getIGst() != null) {
-            invoiceResponse.setIGst(new String(Base64.getDecoder().decode(invoiceResponse.getIGst()), StandardCharsets.UTF_8));
         }
         // Decode the list of bank details and order details if present
         if (invoiceResponse.getBankDetails() != null) {
