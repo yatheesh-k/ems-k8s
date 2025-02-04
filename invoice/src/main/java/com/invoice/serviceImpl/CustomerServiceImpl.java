@@ -153,7 +153,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public ResponseEntity<?> updateCustomer(String companyId,String customerId, @Valid CustomerUpdateRequest customerRequest) throws InvoiceException,IOException {
+    public ResponseEntity<?> updateCustomer(String companyId,String customerId, CustomerUpdateRequest customerRequest) throws InvoiceException,IOException {
         log.info("Updating customer with ID: {}", customerId);
 
         CompanyEntity companyEntity;

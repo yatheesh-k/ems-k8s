@@ -30,7 +30,7 @@ public class CustomerUpdateRequest {
     private String pinCode;
 
     @Nullable
-    private String gstNo;
+    private String customerGstNo;
 
     @Nullable
     private String stateCode;

@@ -139,7 +139,7 @@
      assignments to ensure company’s growth.
     </p>
     <p>With Best Wishes,</p>
-    <p style = "margin-top: 70px;">Authorized Signature</p>
+    <p style = "margin-top: 10px;">Authorized Signature</p>
     </div>
 
 </body>

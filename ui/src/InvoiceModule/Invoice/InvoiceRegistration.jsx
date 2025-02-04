@@ -398,14 +398,14 @@ const InvoiceRegistration = () => {
                       htmlFor="customer"
                       className="col-sm-2 text-right control-label col-form-label"
                     >
-                      Customer Name <span style={{ color: "red" }}>*</span>
+                      Client Name <span style={{ color: "red" }}>*</span>
                     </label>
                     <div className="col-sm-9 mb-3">
                       <Controller
                         name="customerName"
                         id="customerName"
                         control={control}
-                        rules={{ required: "Customer Name is required" }} // Mandatory validation rule
+                        rules={{ required: "Client Name is required" }} // Mandatory validation rule
                         render={({ field }) => (
                           <Select
                             {...field} // Spread the controller's field props
