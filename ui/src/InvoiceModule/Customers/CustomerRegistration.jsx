@@ -14,7 +14,7 @@ import { useAuth } from "../../Context/AuthContext";
 const CustomersRegistration = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const companyId = user.companyId;
+  const companyId = user.companyId
   console.log("company Id from Customer registration", companyId);
   const location = useLocation();
   const [isUpdating, setIsUpdating] = useState(false);
@@ -88,7 +88,7 @@ const CustomersRegistration = () => {
           console.log("Customer data:", response);
           const customerData = {
             ...response,
-            status: { value: response.status, label: response.status },
+            status: { value: response.status, label: response.status }
           };
           reset(customerData);
           setIsUpdating(true);
@@ -217,12 +217,19 @@ const CustomersRegistration = () => {
     }
   };
 
-  // Custom validator to check trailing spaces
-  const noTrailingSpaces = (value) => {
-    if (value.endsWith(" ")) {
+  const noTrailingSpaces = (value, fieldName) => {
+    // Check if the value ends with a space
+    if (value.endsWith(' ')) {
       return "Spaces are not allowed at the end";
     }
-    return true; // Return true if the value is valid
+
+    // Check if the value is less than 3 characters long
+    if (value.length < 3) {
+      return `${fieldName} must be at least 3 characters long`;
+    }
+
+    // If no error, return true
+    return true;
   };
 
   const preventInvalidInput = (e, type) => {
@@ -323,14 +330,10 @@ const CustomersRegistration = () => {
                         placeholder="Enter Client Name"
                         name="customerName"
                         autoComplete="off"
+                        disabled={isUpdating}
                         {...register("customerName", {
-                          required: "Client Name is Required",
-                          validate: noTrailingSpaces,
-                          minLength: {
-                            value: 3,
-                            message:
-                              "Client Name must be at least 3 characters long",
-                          },
+                          required: "Customer Name is Required",
+                          validate: (value) => noTrailingSpaces(value, "customerName"),
                           maxLength: {
                             value: 60,
                             message:
@@ -357,7 +360,7 @@ const CustomersRegistration = () => {
                         placeholder="Enter Email Id"
                         name="email"
                         autoComplete="off"
-                        // onInput={toInputEmailCase}
+                        disabled={isUpdating}
                         {...register("email", {
                           required: "Email Id is Required",
                           validate: (value) => validateField(value, "email"),
@@ -379,6 +382,7 @@ const CustomersRegistration = () => {
                         className="form-control"
                         placeholder="Enter Personal Mobile Number"
                         autoComplete="off"
+                        disabled={isUpdating}
                         maxLength={14} // Limit input to 14 characters (3 for +91, 1 for space, 10 for digits)
                         defaultValue="+91 " // Set the initial value to +91 with a space
                         onInput={handlePhoneNumberChange} // Handle input changes
@@ -425,19 +429,13 @@ const CustomersRegistration = () => {
                       </label>
                       <input
                         type="text"
-                        // readOnly={isUpdating}
                         name="state"
                         placeholder="Enter State Name"
                         className="form-control"
                         autoComplete="off"
                         {...register("state", {
                           required: "State Name is Required.",
-                          validate: noTrailingSpaces,
-                          minLength: {
-                            value: 3,
-                            message:
-                              "State Name must be at least 3 characters long",
-                          },
+                          validate: (value) => noTrailingSpaces(value, "state"),
                           maxLength: {
                             value: 60,
                             message: "State Name must not exceed 60 digits.",
@@ -459,19 +457,13 @@ const CustomersRegistration = () => {
                       </label>
                       <input
                         type="text"
-                        // readOnly={isUpdating}
                         name="city"
                         placeholder="Enter City Name"
                         className="form-control"
                         autoComplete="off"
                         {...register("city", {
                           required: "City Name is Required.",
-                          validate: noTrailingSpaces,
-                          minLength: {
-                            value: 3,
-                            message:
-                              "City Name must be at least 3 characters long",
-                          },
+                          validate: (value) => noTrailingSpaces(value, "city"),
                           maxLength: {
                             value: 60,
                             message: "City Name must not exceed 60 digits.",
@@ -518,7 +510,6 @@ const CustomersRegistration = () => {
                       </label>
                       <input
                         type="text"
-                        // readOnly={isUpdating}
                         name="gstNo"
                         placeholder="Enter Gst Number"
                         className="form-control"
@@ -548,11 +539,10 @@ const CustomersRegistration = () => {
                     <div className="col-lg-1"></div>
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
-                        State Code <span style={{ color: "red" }}>*</span>
+                        State Code <span style={{ color: "red" }}></span>
                       </label>
                       <input
                         type="text"
-                        // readOnly={isUpdating}
                         name="stateCode"
                         placeholder="Enter State Code"
                         className="form-control"
@@ -619,12 +609,7 @@ const CustomersRegistration = () => {
                         rows="4"
                         {...register("address", {
                           required: "Address is Required",
-                          validate: noTrailingSpaces,
-                          minLength: {
-                            value: 3,
-                            message:
-                              "Address must be at least 3 characters long",
-                          },
+                          validate: (value) => noTrailingSpaces(value, "address"),
                           maxLength: {
                             value: 250,
                             message:

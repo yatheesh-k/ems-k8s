@@ -51,37 +51,43 @@ const Department = () => {
     fetchDepartments();
   }, []);
 
-  const onSubmit = async (data) => {
-    setLoading(true);
-    try {
-      const formData = {
-        companyName: user.company,
-        name: data.name,
-      };
-      if (editingId) {
-        await DepartmentPutApiById(editingId, formData);
-        setTimeout(() => {
-          toast.success('Department Updated Successfully');
-          fetchDepartments(); // Fetch updated list of departments after delay
-          setAddDeparment(false);
-        }, 1500);
-      } else {
-        await DepartmentPostApi(formData);
-        setTimeout(() => {
-          toast.success('Department Created Successfully');
-          fetchDepartments();
-          setAddDeparment(false);
-        }, 1500);
-      }
+ const onSubmit = async (data) => {
+  setLoading(true);
+  try {
+    const formData = {
+      companyName: user.company,
+      name: data.name,
+    };
 
-      reset();
-      setEditingId(null);
-    } catch (error) {
-      handleApiErrors(error);
-    } finally {
-      setLoading(false);
+    let updatedDepartments = [...departments]; // Create a copy
+
+    if (editingId) {
+      const index = updatedDepartments.findIndex(dept => dept.id === editingId);
+      if (index !== -1) {
+        updatedDepartments[index] = { ...updatedDepartments[index], name: data.name }; // Optimistic update
+        setDepartments(updatedDepartments); // Update the state immediately
+      }
+      await DepartmentPutApiById(editingId, formData);
+      toast.success('Department Updated Successfully');
+    } else {
+      const newDepartment = { ...formData }; // Assuming API returns the ID
+      updatedDepartments.push(newDepartment); // Optimistic update
+      setDepartments(updatedDepartments); // Update the state immediately
+      await DepartmentPostApi(formData);
+      toast.success('Department Created Successfully');
     }
-  };
+
+    handleCloseAddDepartmentModal();
+    reset();
+    setEditingId(null);
+  } catch (error) {
+    handleApiErrors(error);
+    // Revert the optimistic update if the API call fails
+    fetchDepartments(); // Refetch to get the correct data
+  } finally {
+    setLoading(false);
+  }
+};
 
 
   const handleConfirmDelete = async () => {

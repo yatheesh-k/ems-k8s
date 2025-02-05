@@ -142,10 +142,10 @@ const OfferLetterForm = () => {
     let formattedValue = capitalizedWords.join(" ");
 
     // Remove spaces not allowed (before the first two characters)
-    if (formattedValue.length > 2) {
+    if (formattedValue.length > 1) {
       formattedValue =
-        formattedValue.slice(0, 2) +
-        formattedValue.slice(2).replace(/\s+/g, " ");
+        formattedValue.slice(0, 1) +
+        formattedValue.slice(1).replace(/\s+/g, " ");
     }
 
     // Update input value
@@ -187,84 +187,89 @@ const OfferLetterForm = () => {
       return "Field is Required.";
     }
 
-    // Allow alphabetic characters, spaces, and numbers
+    // Check for trailing spaces first
+    if (/\s$/.test(value)) {
+      return "Spaces at the end are not allowed.";
+    } else if (/^\s/.test(value)) {
+      return "No Leading Space Allowed.";
+    }
+
+    // Ensure only alphabetic characters and spaces
     else if (!/^[A-Za-z\s]+$/.test(trimmedValue)) {
       return "Only Alphabetic Characters are Allowed.";
-    } else {
+    }
+
+    // Check for minimum and maximum word length
+    else {
       const words = trimmedValue.split(" ");
-
-      // Check for minimum and maximum word length, allowing one-character words at the end
-      for (let i = 0; i < words.length; i++) {
-        const word = words[i];
-
-        // If the word length is less than 3 and it's not the last word, show error
-        if (word.length < 3 && i !== words.length - 1) {
-          return "Minimum Length 3 Characters Required.";
+      for (const word of words) {
+        if (word.length < 1) {
+          return "Minimum Length 1 Character Required."; // If any word is shorter than 1 character
+        } else if (word.length > 100) {
+          return "Max Length 100 Characters Required."; // If any word is longer than 100 characters
         }
-
-        // Check maximum word length
-        if (word.length > 100) {
-          return "Max Length 100 Characters Exceeded.";
-        }
-      }
-
-      // Check for trailing and leading spaces
-      if (/\s$/.test(value)) {
-        return "Spaces at the end are not allowed."; // Trailing space error
-      } else if (/^\s/.test(value)) {
-        return "No Leading Space Allowed."; // Leading space error
       }
 
       // Check if there are multiple spaces between words
-      else if (/\s{2,}/.test(trimmedValue)) {
-        return "No Multiple Spaces Between Words Allowed.";
-      }
-    }
-
-    return true; // Return true if all conditions are satisfied
-  };
-
-  const validatePosition = (value) => {
-    // Trim leading and trailing spaces before further validation
-    const trimmedValue = value.trim();
-
-    // Check if value is empty after trimming (meaning it only had spaces)
-    if (trimmedValue.length === 0) {
-      return "Department Name is Required.";
-    }
-
-    // Allow alphabetic characters, numbers, spaces, and some special characters like /, !, @, #, &...
-    else if (!/^[A-Za-z\s/]+$/.test(trimmedValue)) {
-      return "Only Alphabetic Characters, Spaces, and '/' are Allowed.";
-    } else {
-      const words = trimmedValue.split(" ");
-
-      // Check for minimum and maximum word length
-      for (const word of words) {
-        // If the word is a single character and it's not the only word in the string, skip this rule
-        if (word.length < 2 && words.length === 1) {
-          return "Minimum Length 2 Characters Required."; // If any word is shorter than 2 characters and it's a single word
-        } else if (word.length > 40) {
-          return "Max Length 40 Characters Required."; // If any word is longer than 40 characters
-        }
-      }
-
-      // Check for multiple spaces between words
       if (/\s{2,}/.test(trimmedValue)) {
         return "No Multiple Spaces Between Words Allowed.";
       }
 
-      // Check if the value has leading or trailing spaces (shouldn't happen due to trimming)
-      if (/^\s/.test(value)) {
-        return "Leading space not allowed."; // Leading space error
-      } else if (/\s$/.test(value)) {
-        return "Spaces at the end are not allowed."; // Trailing space error
+      // Check minimum character length after other validations
+      if (trimmedValue.length < 3) {
+        return "Minimum 3 Characters Required.";
       }
     }
 
     return true; // Return true if all conditions are satisfied
   };
-
+  
+  const validatePosition = (value) => {
+    // Trim leading and trailing spaces before further validation
+    const trimmedValue = value.trim();
+  
+    // Check if value is empty after trimming (meaning it only had spaces)
+    if (trimmedValue.length === 0) {
+      return "Position Name is Required.";
+    }
+  
+    // Check for trailing spaces first
+    if (/\s$/.test(value)) {
+      return "Spaces at the end are not allowed."; // Trailing space error
+    } else if (/^\s/.test(value)) {
+      return "No Leading Space Allowed."; // Leading space error
+    }
+  
+    // Ensure only allowed characters (alphabetic characters, spaces, and '/')
+    else if (!/^[A-Za-z\s/]+$/.test(trimmedValue)) {
+      return "Only Alphabetic Characters, Spaces, and '/' are Allowed.";
+    }
+  
+    // Check for minimum and maximum word length
+    else {
+      const words = trimmedValue.split(" ");
+      for (const word of words) {
+        // If the word is a single character and it's not the only word in the string, skip this rule
+        if (word.length < 2 && words.length === 1) {
+          return "Minimum 3 Characters Required."; // If any word is shorter than 2 characters and it's a single word
+        } else if (word.length > 40) {
+          return "Max Length 40 Characters Required."; // If any word is longer than 40 characters
+        }
+      }
+  
+      // Check if there are multiple spaces between words
+      if (/\s{2,}/.test(trimmedValue)) {
+        return "No Multiple Spaces Between Words Allowed.";
+      }
+  
+      // Check minimum character length after other validations
+      if (trimmedValue.length < 3) {
+        return "Minimum 3 Characters Required.";
+      }
+    }
+  
+    return true; // Return true if all conditions are satisfied
+  };
   const today = new Date();
   const threeMonthsFromNow = new Date(
     today.getFullYear(),
@@ -319,10 +324,6 @@ const OfferLetterForm = () => {
                         onKeyDown={handleEmailChange}
                         {...register("employeeName", {
                           required: "Employee Name is Required",
-                          minLength: {
-                            value: 3,
-                            message: "Minimum 3 Characters Required",
-                          },
                           validate: {
                             validateName,
                           },
@@ -348,11 +349,6 @@ const OfferLetterForm = () => {
                         onKeyDown={handleEmailChange}
                         {...register("employeeFatherName", {
                           required: "Father Name is Required",
-                          required: "Employee Name is Required",
-                          minLength: {
-                            value: 3,
-                            message: "Minimum 3 Characters Required",
-                          },
                           validate: {
                             validateName,
                           },
@@ -489,23 +485,12 @@ const OfferLetterForm = () => {
                               /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/, // Your pattern for valid characters
                             message: "Please enter valid Job Location",
                           },
-                          minLength: {
-                            value: 3,
-                            message: "Minimum 3 Characters allowed",
-                          },
                           maxLength: {
                             value: 200,
                             message: "Maximum 200 Characters allowed",
                           },
                           validate: {
-                            // Custom validation for trailing spaces
-                            noTrailingSpaces: (value) => {
-                              if (/\s$/.test(value)) {
-                                // Check for trailing space
-                                return "Spaces at the end are not allowed"; // Error message
-                              }
-                              return true; // Validation passes
-                            },
+                            validateName,
                           },
                         })}
                       />
@@ -524,6 +509,7 @@ const OfferLetterForm = () => {
                         maxLength={10}
                         placeholder="Enter Gross Compensation"
                         name="grossCompensation"
+                        onKeyDown={handleEmailChange}
                         {...register("grossCompensation", {
                           required: "Gross Compensation is required",
                           min: {
@@ -532,7 +518,10 @@ const OfferLetterForm = () => {
                           },
                           pattern: {
                             value: /^[0-9]+$/,
-                            message: "These field Accepts Only Integers",
+                            message: "This field accepts only integers.",
+                          },
+                          validate: {
+                            validateName,
                           },
                         })}
                       />
@@ -556,8 +545,8 @@ const OfferLetterForm = () => {
                         {...register("employeePosition", {
                           required: "Position is required",
                           validate: {
-                            validatePosition,
-                          },
+                            validatePosition, 
+                          },                          
                         })}
                       />
                       {errors.employeePosition && (
@@ -584,13 +573,12 @@ const OfferLetterForm = () => {
                               /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
                             message: "Please enter valid Address",
                           },
-                          minLength: {
-                            value: 3,
-                            message: "Minimum 3 Characters allowed",
-                          },
                           maxLength: {
                             value: 200,
                             message: "Maximum 200 Characters allowed",
+                          },
+                          validate: {
+                            validateName,
                           },
                         })}
                       />

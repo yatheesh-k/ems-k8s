@@ -41,10 +41,11 @@ const EmsLogin = () => {
     try {
       const response = await loginApi(data);
       const token = response.data?.token;
-
+      console.log("token",token)
       if (token) {
         try {
           const decodedToken = jwtDecode(token);
+          console.log("decodedToken",decodedToken)
           const {
             sub: userId,
             roles: userRole,
@@ -53,7 +54,9 @@ const EmsLogin = () => {
           } = decodedToken;
           setAuthUser({ userId, userRole, company, employeeId });
           toast.success("Login Successful");
-          window.location.href = "/main";    
+          setTimeout(() => {
+            window.location.href = "/main";
+          }, 500);  
         } catch (decodeError) {
           setErrorMessage("Failed to decode token. Ensure token is valid.");
           setShowErrorModal(true);
@@ -108,19 +111,19 @@ const EmsLogin = () => {
   const toInputLowerCase = (e) => {
     const input = e.target;
     let value = input.value;
-  
+
     // Remove all spaces from the input
     value = value.replace(/\s+/g, '');
-  
+
     // If the first character is not lowercase, make it lowercase
     if (value.length > 0 && value[0] !== value[0].toLowerCase()) {
       value = value.charAt(0).toLowerCase() + value.slice(1);
     }
-  
+
     // Update the input value
     input.value = value;
   };
-  
+
 
   return (
     <div>
@@ -141,7 +144,7 @@ const EmsLogin = () => {
                 <div className="newLoginRightSecTitle">Login</div>
                 <div className="newLoginRightSecSelectLogin">
 
-                <div className="loginBtn"><span>Continue with EMS login</span></div>
+                  <div className="loginBtn"><span>Continue with EMS login</span></div>
 
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)}>
@@ -153,12 +156,12 @@ const EmsLogin = () => {
                       placeholder="Email Id"
                       autoComplete="off"
                       onKeyDown={handleEmailChange}
-                     // onInput={toInputLowerCase}
+                      // onInput={toInputLowerCase}
                       {...register("username", {
                         required: "Email Id is Required.",
                         pattern: {
                           value:
-                          /^[a-z][a-zA-Z0-9._+-]*@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
+                            /^[a-z][a-zA-Z0-9._+-]*@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/,
                           message:
                             "Invalid email Id format. Only .com, .in, .org, .net, .edu, .gov are allowed.",
                         },
@@ -189,9 +192,8 @@ const EmsLogin = () => {
                         })}
                       />
                       <span
-                        className={`bi bi-eye-fill field-icon pb-1 toggle-password ${
-                          passwordShown ? "text-primary" : ""
-                        }`}
+                        className={`bi bi-eye-fill field-icon pb-1 toggle-password ${passwordShown ? "text-primary" : ""
+                          }`}
                         onClick={togglePasswordVisibility}
                       ></span>
                     </div>
