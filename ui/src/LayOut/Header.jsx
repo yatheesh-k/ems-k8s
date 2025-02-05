@@ -89,18 +89,19 @@ const Header = ({ toggleSidebar }) => {
     };
   }, []);
 
-    const handleLogOut = (roles) => {
-      const companyName=localStorage.getItem("companyName");
-      localStorage.removeItem("token","refreshToken"); // Clear only the token
-      toast.success('Logout Successful');
-      if (roles==="ems_admin") {
-        navigate("/login");
-      } else if (companyName) {
-        navigate(`/${companyName}/login`);
-      }else{
-        navigate("/login");
-      }
-     };
+  const handleLogOut = (roles) => {
+    const companyName=localStorage.getItem("companyName");
+    localStorage.removeItem("token"); // Clear only the token
+    localStorage.removeItem("refreshToken");
+    toast.success('Logout Successful');
+    if (roles==="ems_admin") {
+      navigate("/login");
+    } else if (companyName) {
+      navigate(`/${companyName}/login`);
+    }else{
+      navigate("/login");
+    }
+   };
 
   const closeModal = () => {
     setShowErrorModal(false);

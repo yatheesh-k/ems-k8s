@@ -57,6 +57,16 @@ import Template from '../CompanyModule/Settings/OfferLetter/Template';
 import OfferLetterForm from '../CompanyModule/Settings/OfferLetter/OfferLetterForm';
 import OfferLetterPreview from '../CompanyModule/Settings/OfferLetter/OfferLetterPreview';
 import EmployeeSalaryView from '../EmployeeModule/EmployeeSalaryView';
+import AccountRegistration from '../InvoiceModule/AccountDetails/AccountRegistration';
+import AccountsView from '../InvoiceModule/AccountDetails/AccountsView';
+import CustomersRegistration from '../InvoiceModule/Customers/CustomerRegistration';
+import CustomersView from '../InvoiceModule/Customers/CustomersView'
+import InvoiceRegistration from '../InvoiceModule/Invoice/InvoiceRegistration';
+import InvoiceView from '../InvoiceModule/Invoice/InvoiceView';
+import InvoicePdf from '../InvoiceModule/Invoice/InvoicePdf';
+import ProductView from '../InvoiceModule/Products/ProductsView';
+import ProductRegistration from '../InvoiceModule/Products/ProductRegistration'
+import CreatePassword from '../Login/CreatePassword';
 
 const Rout = () => {
   const location = useLocation();
@@ -171,6 +181,16 @@ const Rout = () => {
       <Route path='/payslipDoc2' element={<PayslipDoc2/>}></Route>
       <Route path='/payslipDoc3' element={<PayslipDoc3 />}></Route>
       <Route path='/payslipDoc4' element={<PayslipDoc4/>}></Route>
+      <Route path='/customerRegistration' element={<CustomersRegistration/>}></Route>
+      <Route path='/customersView' element={<CustomersView/>}></Route>
+      <Route path='/productRegistartion' element={<ProductRegistration/>}></Route>
+      <Route path='/productsView' element={<ProductView/>}></Route>
+      <Route path='/invoiceRegistartion' element={<InvoiceRegistration/>}></Route>
+      <Route path='/invoiceView' element={<InvoiceView/>}></Route>
+      <Route path='/invoicePdf' element={<InvoicePdf/>}></Route>
+      <Route path='/accountRegistration' element={<AccountRegistration/>}></Route>
+      <Route path='/accountsView' element={<AccountsView/>}></Route>
+      <Route path='/:company/createPassword' element={<CreatePassword/>}></Route>
     </Routes>
   );
 };

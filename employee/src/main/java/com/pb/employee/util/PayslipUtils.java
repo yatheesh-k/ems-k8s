@@ -699,7 +699,7 @@ public class PayslipUtils {
 
         // **Other Allowance** (Gross CTC - Total Allowances - Deductions)
         double otherAllowanceAnnual = grossAmount - totalAllowanceAnnual;
-        double otherAllowanceMonthly = otherAllowanceAnnual / 12;
+        double otherAllowanceMonthly = Math.round(otherAllowanceAnnual / 12);
 
         if (otherAllowanceAnnual > 0) {
             Map<String, String> otherAllowanceData = new HashMap<>();
