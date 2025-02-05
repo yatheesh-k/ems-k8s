@@ -90,22 +90,17 @@ const OfferLetterPreview = () => {
     try {
       const response = await CompanySalaryStructureGetApi();
       const structures = response.data.data;
-      console.log("Fetched Salary Structures:", structures); // Debugging log
-
+      console.log("Fetched Salary Structures:", structures); // Check if the data is as expected
       setSalaryStructures(structures); // Set the fetched data
 
-      // Find the active salary structure
+      // If there is an active structure, call calculateValues to update totals
       const activeStructure = structures.find(
         (structure) => structure.status === "Active"
       );
-
-      console.log("Active Salary Structure:", activeStructure); // Debugging log
-
+      console.log("Active Salary Structure:", activeStructure); // Check the active structure
       if (activeStructure) {
         setSalaryConfigurationId(activeStructure.id);
-
-        // Ensure activeStructure is passed to calculateValues()
-        calculateValues(activeStructure);
+        calculateValues(); // Call calculateValues here to update calculated values
       } else {
         toast.error("No active salary structure found.");
         setError(true);
@@ -132,23 +127,106 @@ const OfferLetterPreview = () => {
     calculateValues();
   };
 
-  const calculateValues = (salaryStructure) => {
-    if (!salaryStructure || !salaryStructure.allowances) {
-      console.error("Error: salaryStructure or allowances is undefined");
+  const calculateValues = () => {
+    if (salaryStructures.length === 0) {
+      //toast.error("No salary structure available for calculation.");
       return;
     }
 
-    console.log("Calculating values for:", salaryStructure);
+    const activeStructure = salaryStructures.find(
+      (structure) => structure.status === "Active"
+    );
+    if (!activeStructure) {
+      toast.error("No active salary structure available.");
+      return;
+    }
 
-    // Extract allowances and perform calculations
-    const { allowances, deductions } = salaryStructure;
+    const allowances = activeStructure.allowances;
+    const deductions = activeStructure.deductions;
+    console.log("Deductions: ", deductions); // Log deductions to check the structure
 
-    // Example calculations (modify as needed)
-    const basicSalary = parseFloat(allowances["Basic Salary"]) || 0;
-    const hra = parseFloat(allowances["HRA"]) || 0;
-    const totalEarnings = basicSalary + hra; // Modify logic as needed
+    // Extract Basic Salary from allowances
+    const basicSalary = allowances["Basic Salary"]
+      ? parseFloat(allowances["Basic Salary"])
+      : 0;
+    const basicSalaryAmount = (basicSalary / 100) * grossAmount;
+    setBasic(basicSalaryAmount);
 
-    console.log("Total Earnings:", totalEarnings);
+    const totalAllowances = Object.entries(allowances).reduce(
+      (dcc, [key, value]) => {
+        let allowanceAmount = 0;
+
+        if (key === "HRA") {
+          // If the allowance is HRA, calculate it using Basic Salary
+          console.log("Calculating HRA for Basic Salary: ", basicSalary); // Log for debugging
+          if (typeof value === "string" && value.includes("%")) {
+            const percentageValue = parseFloat(value.slice(0, -1)) / 100; // Convert percentage to decimal
+            allowanceAmount = basicSalaryAmount * percentageValue; // HRA based on Basic Salary
+            console.log(`HRA calculated as percentage: ${allowanceAmount}`); // Log calculated HRA
+          } else {
+            allowanceAmount = parseFloat(value);
+            console.log(`HRA as fixed value: ${allowanceAmount}`); // Log fixed HRA value
+          }
+        } else {
+          // For other allowances, calculate based on Gross Amount
+          if (typeof value === "string" && value.includes("%")) {
+            const percentageValue = parseFloat(value.slice(0, -1)) / 100; // Convert percentage to decimal
+            allowanceAmount = grossAmount * percentageValue;
+            console.log(
+              `${key} allowance calculated as percentage: ${allowanceAmount}`
+            ); // Log percentage-based calculation
+          } else {
+            allowanceAmount = parseFloat(value);
+            console.log(`${key} allowance as fixed value: ${allowanceAmount}`); // Log fixed allowance value
+          }
+        }
+
+        return dcc + allowanceAmount;
+      },
+      0
+    );
+
+    console.log("Total Allowances: ", totalAllowances); // Log the total calculated allowances
+
+    const totalDeductions = Object.entries(deductions).reduce(
+      (acc, [key, value]) => {
+        let deductionAmount = 0;
+    
+        if (key === "Provident Fund Employee" || key === "Provident Fund Employer") {
+          console.log(`Calculating ${key} deduction.`); // Log for debugging
+    
+          if (typeof value === "string" && value.includes("%")) {
+            const percentageValue = parseFloat(value.slice(0, -1)) / 100; // Convert percentage to decimal
+            deductionAmount = basicSalaryAmount * percentageValue;  // Provident Fund deduction based on Gross Amount
+            console.log(`${key} deduction calculated as percentage: ${deductionAmount}`); // Log percentage-based deduction calculation
+          } else {
+            deductionAmount = parseFloat(value); // Fixed deduction value for Provident Fund
+            console.log(`${key} deduction as fixed value: ${deductionAmount}`); // Log fixed deduction value
+          }
+        } else {
+          // For other deductions, calculate based on Gross Amount
+          if (typeof value === "string" && value.includes("%")) {
+            const percentageValue = parseFloat(value.slice(0, -1)) / 100; // Convert percentage to decimal
+            deductionAmount = grossAmount * percentageValue; // Other deductions based on Gross Amount
+            console.log(`${key} deduction calculated as percentage: ${deductionAmount}`); // Log percentage-based deduction calculation
+          } else {
+            deductionAmount = parseFloat(value); // Fixed deduction value
+            console.log(`${key} deduction as fixed value: ${deductionAmount}`); // Log fixed deduction value
+          }
+        }
+    
+        return acc + deductionAmount;
+      },
+      0
+    );    
+    const netSalary = grossAmount - totalDeductions;
+    console.log("Net Salary: ", netSalary); // Log the calculated net salary
+
+    setCalculatedValues({
+      totalAllowances,
+      totalDeductions,
+      netSalary,
+    });
   };
 
   console.log("calculateValues", calculatedValues);
@@ -610,10 +688,7 @@ const OfferLetterPreview = () => {
                       {Object.entries(structure.allowances).map(
                         ([key, value]) => {
                           let allowanceAmount;
-                          if (
-                            key === "HRA" ||
-                            key === "Provident Fund Employer"
-                          ) {
+                          if (key === "HRA" || key==='Provident Fund Employer') {
                             // Assuming Basic Salary is part of structure and it can be accessed, calculate HRA as a percentage of Basic Salary
                             if (value.includes("%")) {
                               allowanceAmount =
@@ -720,10 +795,7 @@ const OfferLetterPreview = () => {
                       {Object.entries(structure.deductions).map(
                         ([key, value]) => {
                           let deductionAmount;
-                          if (
-                            key === "Provident Fund Employee" ||
-                            key === "Provident Fund Employer"
-                          ) {
+                          if (key === "Provident Fund Employee" || key==='Provident Fund Employer') {
                             // Assuming Basic Salary is part of structure and it can be accessed, calculate HRA as a percentage of Basic Salary
                             if (value.includes("%")) {
                               deductionAmount =

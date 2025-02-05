@@ -229,8 +229,9 @@ public class OpenSearchOperations {
                 .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.DESIGNATION)));
 
         if (designationName != null) {
+            String lowerCaseDesignationName = designationName.toLowerCase(); // Convert input to lowercase
             boolQueryBuilder = boolQueryBuilder
-                    .filter(q -> q.term(t -> t.field(Constants.NAME + Constants.KEYWORD).value(FieldValue.of(designationName))));
+                    .filter(q -> q.term(t -> t.field(Constants.NAME).value(FieldValue.of(lowerCaseDesignationName)))); // Search in lowercase
         }
         BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
         SearchResponse<DesignationEntity> searchResponse = null;
@@ -326,8 +327,9 @@ public class OpenSearchOperations {
         boolQueryBuilder =
                 boolQueryBuilder.filter(q -> q.term(t -> t.field(Constants.TYPE).value(FieldValue.of(Constants.DEPARTMENT))));
         if (departmentName != null) {
+            String lowerCaseDepartmentName = departmentName.toLowerCase(); // Convert input to lowercase
             boolQueryBuilder = boolQueryBuilder
-                    .filter(q -> q.term(t -> t.field(Constants.NAME + Constants.KEYWORD).value(FieldValue.of(departmentName))));
+                    .filter(q -> q.term(t -> t.field(Constants.NAME).value(FieldValue.of(lowerCaseDepartmentName)))); // Search in lowercase
         }
         BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
         SearchResponse<DepartmentEntity> searchResponse = null;

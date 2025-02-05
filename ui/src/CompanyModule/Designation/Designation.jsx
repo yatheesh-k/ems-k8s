@@ -65,27 +65,32 @@ const Designation = () => {
         companyName: user.company,
         name: data.name
       };
+  
+      let updatedDesignations = [...designations]; // Create a copy for optimistic update
+  
       if (editingUserId) {
-        await DesignationPutApiById(editingUserId, formData);
-        setTimeout(() => {
-          toast.success('Designation Updated Successfully');
-          fetchDesignation(); // Fetch updated list of departments after delay
-          setAddDesignation(false);
-        }, 1500);
-
+        const index = updatedDesignations.findIndex(dept => dept.id === editingUserId); // Find the index of the designation to update
+        if (index !== -1) {
+          updatedDesignations[index] = { ...updatedDesignations[index], name: data.name }; // Optimistic update
+          setDesignations(updatedDesignations); // Update the state immediately
+        }
+        await DesignationPutApiById(editingUserId, formData); // Await the actual API call
+        toast.success('Designation Updated Successfully');
       } else {
-        await DesignationPostApi(formData);
-
-        setTimeout(() => {
-          toast.success('Designation Created Successfully');
-          fetchDesignation(); // Fetch updated list of departments after delay
-          setAddDesignation(false);
-        }, 1500);
+        const newDesignation = { ...formData }; // Create a new designation object (you might need to add the ID if your API returns it)
+        updatedDesignations.push(newDesignation); // Optimistic update
+        setDesignations(updatedDesignations); // Update the state immediately
+        await DesignationPostApi(formData); // Await the actual API call
+        toast.success('Designation Created Successfully');
       }
+  
+      setAddDesignation(false); // Close the modal *after* successful update
       reset();
       setEditingUserId(null);
     } catch (error) {
       handleApiErrors(error);
+      // Revert the optimistic update in case of error
+      fetchDesignation(); // Refetch designations from the API to correct the UI
     } finally {
       setLoading(false);
     }

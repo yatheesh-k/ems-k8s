@@ -351,6 +351,7 @@ function Profile() {
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
+   
   const validateAddress = (value) => {
     // Check for leading or trailing spaces
     if (/^\s/.test(value)) {
@@ -365,9 +366,9 @@ function Profile() {
     }
 
     // Validate special characters and alphanumeric characters
-    const validCharsRegex = /^[A-Za-z0-9\s,.'\-/&@#$()*+!]*$/;
+    const validCharsRegex = /^[A-Za-z0-9\s,.'\-/&@#$()*+!:]*$/;
     if (!validCharsRegex.test(value)) {
-      return "Invalid characters used. Only alphabets, numbers, and special characters (, . ' - / & @ # $ ( ) *) are allowed.";
+      return "Invalid characters used. Only alphabets, numbers, and special characters (, . ' - / & @ # $ ( ) * + :) are allowed.";
     }
 
     return true; // Return true if all conditions are satisfied
@@ -593,16 +594,14 @@ function Profile() {
                         type="text"
                         className="form-control"
                         placeholder="Enter Company Address"
-                        //onKeyDown={handleEmailChange}
                         onInput={toInputAddressCase}
                         autoComplete="off"
                         {...register("companyAddress", {
                           required: "Company Address is Required",
                           pattern: {
-                            value:
-                              /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
-                            message: "Please enter valid Address",
-                          },
+                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^+\-/+:]*$/,
+                            message: "Please enter a valid address.",
+                          },                          
                           minLength: {
                             value: 3,
                             message: "Minimum 3 Characters allowed",
@@ -844,8 +843,7 @@ function Profile() {
                           {...register("address", {
                             required: "Address is Required",
                             pattern: {
-                              value:
-                                /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^\-/]*$/,
+                              value:/^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^+\-/+:]*$/,
                               message: "Please enter valid Address",
                             },
                             minLength: {

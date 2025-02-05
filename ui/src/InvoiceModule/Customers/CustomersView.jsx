@@ -126,15 +126,6 @@ const CustomersView = () => {
       selector: (row) => row.state,
       width: "170px",
     },
-    // {
-    //   name: (
-    //     <h6>
-    //       <b>City</b>
-    //     </h6>
-    //   ),
-    //   selector: (row) => row.city,
-    //   width: "150px",
-    // },
     {
       name: (
         <h6>
