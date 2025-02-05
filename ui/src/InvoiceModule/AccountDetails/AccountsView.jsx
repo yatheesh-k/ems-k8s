@@ -93,28 +93,28 @@ const AccountsView = () => {
     {
       name: <h6><b>Bank Name</b></h6>,
       selector: (row) => row.bankName,
-      width: "250px",
+      width: "220px",
     },
-    // {
-    //   name: "IFSC Code",
-    //   selector: (row) => row.ifscCode,
-    //   width: "190px",
-    // },
+    {
+      name: <h6><b>IFSC Code</b></h6>,
+      selector: (row) => row.ifscCode,
+      width: "220px",
+    },
     {
       name: <h6><b>Branch Name</b></h6>,
       selector: (row) => row.branch,
-      width: "250px",
-    },
-    {
-      name: <h6><b>Account Type</b></h6>,
-      selector: (row) => row.accountType,
-      width: "250px",
+      width: "220px",
     },
     // {
-    //   name: "Address",
-    //   selector: (row) => row.address,
-    //   width: "190px",
+    //   name: <h6><b>Account Type</b></h6>,
+    //   selector: (row) => row.accountType,
+    //   width: "250px",
     // },
+    {
+      name: <h6><b>Address</b></h6>,
+      selector: (row) => row.address,
+      width: "180px",
+    },
     {
       name: <h6><b>Actions</b></h6>,
       cell: (row) => (

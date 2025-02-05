@@ -25,8 +25,10 @@ const AccountRegistartion = () => {
   const [passwordShown, setPasswordShown] = useState(false);
   const [update, setUpdate] = useState([]);
   const [errorMessage, setErrorMessage] = useState(""); // State for error message
+  const [accountDetails, setAccountDetails] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const existingAccountTypeValue = isUpdating ? accountDetails?.accountType : "";
 
   const onSubmit = (data) => {
     const payload = {
@@ -153,12 +155,19 @@ const AccountRegistartion = () => {
     }
   };
 
-  // Custom validator to check trailing spaces
-  const noTrailingSpaces = (value) => {
-    if (value.endsWith(" ")) {
+  const noTrailingSpaces = (value, fieldName) => {
+    // Check if the value ends with a space
+    if (value.endsWith(' ')) {
       return "Spaces are not allowed at the end";
     }
-    return true; // Return true if the value is valid
+
+    // Check if the value is less than 3 characters long
+    if (value.length < 3) {
+      return `${fieldName} must be at least 3 characters long`;
+    }
+
+    // If no error, return true
+    return true;
   };
 
   const handleInputChange = (e, fieldName) => {
@@ -273,12 +282,7 @@ const AccountRegistartion = () => {
                         autoComplete="off"
                         {...register("bankName", {
                           required: "Bank Name is Required",
-                          validate: noTrailingSpaces,
-                          minLength: {
-                            value: 3,
-                            message:
-                              "Bank Name must be at least 3 characters long",
-                          },
+                          validate: (value) => noTrailingSpaces(value, "bankName"),
                           maxLength: {
                             value: 60,
                             message: "Bank Name must not exceed 60 characters.",
@@ -305,12 +309,7 @@ const AccountRegistartion = () => {
                         autoComplete="off"
                         {...register("branch", {
                           required: "Branch Name is Required",
-                          validate: noTrailingSpaces,
-                          minLength: {
-                            value: 3,
-                            message:
-                              "Branch Name must be at least 3 characters long",
-                          },
+                          validate: (value) => noTrailingSpaces(value, "branch"),
                           maxLength: {
                             value: 60,
                             message:
@@ -367,19 +366,17 @@ const AccountRegistartion = () => {
                       <Controller
                         name="accountType"
                         control={control}
-                        rules={{ required: "Account Type is required" }} // Add validation rule
-                        render={({ field, fieldState: { error } }) => (
-                          <>
-                            <Select
-                              {...field}
-                              options={accountTypes}
-                              getOptionLabel={(e) => e.label}
-                              getOptionValue={(e) => e.value}
-                              onChange={(selectedOption) =>
-                                field.onChange(selectedOption)
-                              } // Ensure onChange is handled
-                            />
-                          </>
+                        defaultValue={isUpdating ? existingAccountTypeValue : ""} // Ensure correct initial value
+                        rules={{ required: "Account Type is Required" }}
+                        render={({ field }) => (
+                          <Select
+                            {...field}
+                            options={accountTypes}
+                            getOptionLabel={(e) => e.label}
+                            getOptionValue={(e) => e.value}
+                            value={accountTypes.find((option) => option.value === field.value) || null} // Ensure the correct value is set
+                            onChange={(selectedOption) => field.onChange(selectedOption?.value)} // Handle selection
+                          />
                         )}
                       />
                       {errors.accountType && (
@@ -399,12 +396,7 @@ const AccountRegistartion = () => {
                         rows="4"
                         {...register("address", {
                           required: "Address is Required",
-                          validate: noTrailingSpaces,
-                          minLength: {
-                            value: 3,
-                            message:
-                              "Address must be at least 3 characters long",
-                          },
+                          validate: (value) => noTrailingSpaces(value, "address"),
                           maxLength: {
                             value: 250,
                             message:
@@ -466,5 +458,5 @@ const AccountRegistartion = () => {
       </div>
     </LayOut>
   );
-};
+}
 export default AccountRegistartion;

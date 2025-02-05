@@ -135,7 +135,7 @@ const EmployeeRegistration = () => {
     // Remove leading spaces
     value = value.replace(/^\s+/g, "");
 
-    // Ensure only allowed characters (alphabets, numbers, and some special chars)
+    // Ensure only allowed characters (alphabets and spaces)
     const allowedCharsRegex = /^[a-zA-Z\s]+$/;
     value = value
       .split("")
@@ -474,30 +474,37 @@ const EmployeeRegistration = () => {
       return "Field is Required.";
     }
 
-    // Allow alphabetic characters, numbers, spaces, and the / character
+    // Check for trailing spaces first
+    if (/\s$/.test(value)) {
+      return "Spaces at the end are not allowed.";
+    } else if (/^\s/.test(value)) {
+      return "No Leading Space Allowed.";
+    }
+
+    // Ensure only alphabetic characters and spaces
     else if (!/^[A-Za-z\s]+$/.test(trimmedValue)) {
       return "Only Alphabetic Characters are Allowed.";
-    } else {
-      const words = trimmedValue.split(" ");
+    }
 
-      // Check for minimum and maximum word length
+    // Check for minimum and maximum word length
+    else {
+      const words = trimmedValue.split(" ");
       for (const word of words) {
         if (word.length < 1) {
           return "Minimum Length 1 Character Required."; // If any word is shorter than 1 character
         } else if (word.length > 100) {
-          return "Max Length 100 Characters Required."; // If any word is longer than 40 characters
+          return "Max Length 100 Characters Required."; // If any word is longer than 100 characters
         }
       }
 
-      if (/\s$/.test(value)) {
-        return "Spaces at the end are not allowed."; // Trailing space error
-      } else if (/^\s/.test(value)) {
-        return "No Leading Space Allowed."; // Leading space error
+      // Check if there are multiple spaces between words
+      if (/\s{2,}/.test(trimmedValue)) {
+        return "No Multiple Spaces Between Words Allowed.";
       }
 
-      // Check if there are multiple spaces between words
-      else if (/\s{2,}/.test(trimmedValue)) {
-        return "No Multiple Spaces Between Words Allowed.";
+      // Check minimum character length after other validations
+      if (trimmedValue.length < 3) {
+        return "Minimum 3 Characters Required.";
       }
     }
 
@@ -505,44 +512,48 @@ const EmployeeRegistration = () => {
   };
 
   const validateFirstName = (value) => {
+    // Trim leading and trailing spaces before further validation
     const trimmedValue = value.trim();
 
+    // Check if value is empty after trimming (meaning it only had spaces)
     if (trimmedValue.length === 0) {
       return "Field is Required.";
-    } else if (!/^[A-Za-z\s]+$/.test(trimmedValue)) {
+    }
+
+    // Check for trailing spaces first
+    if (/\s$/.test(value)) {
+      return "Spaces e at the end are not allowed.";
+    } else if (/^\s/.test(value)) {
+      return "No Leading Space Allowed.";
+    }
+
+    // Ensure only alphabetic characters and spaces
+    else if (!/^[A-Za-z\s]+$/.test(trimmedValue)) {
       return "Only Alphabetic Characters are Allowed.";
-    } else {
-      const words = trimmedValue.split(/\s+/); // Split words, handling multiple spaces
+    }
 
-      // Ensure first and last words are at least 3 characters
-      if (words[0].length < 3) {
-        return "First word must have at least 3 characters.";
-      }
-      if (words[words.length - 1].length < 3) {
-        return "Last word must have at least 3 characters.";
-      }
-
-      // Check max word length
-      for (let word of words) {
-        if (word.length > 100) {
-          return "Max Length 100 Characters Exceeded.";
+    // Check for minimum and maximum word length
+    else {
+      const words = trimmedValue.split(" ");
+      for (const word of words) {
+        if (word.length < 1) {
+          return "Minimum Length 1 Character Required."; // If any word is shorter than 1 character
+        } else if (word.length > 100) {
+          return "Max Length 100 Characters Required."; // If any word is longer than 100 characters
         }
       }
-
-      // Check for trailing and leading spaces
-      if (/\s$/.test(value)) {
-        return "Spaces at the end are not allowed.";
-      } else if (/^\s/.test(value)) {
-        return "No Leading Space Allowed.";
-      }
-
       // Check if there are multiple spaces between words
       if (/\s{2,}/.test(trimmedValue)) {
         return "No Multiple Spaces Between Words Allowed.";
       }
+
+      // Check minimum character length after other validations
+      if (trimmedValue.length < 3) {
+        return "Minimum 3 Characters Required.";
+      }
     }
 
-    return true; // Validation successful
+    return true; // Return true if all conditions are satisfied
   };
 
   const validateNumber = (value) => {
@@ -591,35 +602,43 @@ const EmployeeRegistration = () => {
   };
 
   const validateLocation = (value) => {
-    if (!value || value.trim().length === 0) {
+    // Trim leading and trailing spaces before further validation
+    const trimmedValue = value.trim();
+
+    // Check if value is empty after trimming (meaning it only had spaces)
+    if (trimmedValue.length === 0) {
       return "Location is Required.";
-    } else if (!/^[a-zA-Z0-9\s!-_@#&()*/,.\\-{}]+$/.test(value)) {
+    }
+
+    // Check for trailing spaces first
+    if (/\s$/.test(value)) {
+      return "Spaces at the end are not allowed."; // Trailing space error
+    } else if (/^\s/.test(value)) {
+      return "No Leading Space Allowed."; // Leading space error
+    }
+
+    // Ensure only allowed characters (alphabets, numbers, spaces, and some special chars)
+    else if (!/^[a-zA-Z0-9\s!-_@#&()*/,.\\-{}]+$/.test(trimmedValue)) {
       return "Invalid Format of Location.";
-    } else {
-      const words = value.split(" ");
+    }
 
-      // Check for minimum and maximum word length, allowing one-character words at the end
-      for (let i = 0; i < words.length; i++) {
-        const word = words[i];
-
-        // If the word length is less than 3 and it's not the last word, show error
-        if (word.length < 3 && i !== words.length - 1) {
-          return "Minimum Length 3 Characters Required.";
-        }
-
-        // Check maximum word length
-        if (word.length > 250) {
-          return "Max Length 250 Characters Exceeded.";
+    // Check for minimum and maximum word length
+    else {
+      const words = trimmedValue.split(" ");
+      for (const word of words) {
+        if (word.length < 1) {
+          return "Minimum Length 1 Character Required."; // If any word is shorter than 1 character
+        } else if (word.length > 100) {
+          return "Max Length 100 Characters Required."; // If any word is longer than 100 characters
         }
       }
 
-      if (/^\s|\s$/.test(value)) {
-        return "Spaces at the end are not allowed.";
-      } else if (/\s{2,}/.test(value)) {
+      // Check if there are multiple spaces between words
+      if (/\s{2,}/.test(trimmedValue)) {
         return "No Multiple Spaces Between Words Allowed.";
       }
-      if (/\s$/.test(value)) {
-        return "No Trailing Space Allowed."; // Space after the last character is not allowed
+       if (trimmedValue.length < 3) {
+        return "Minimum 3 Characters Required.";
       }
     }
 
@@ -653,10 +672,10 @@ const EmployeeRegistration = () => {
     let formattedValue = capitalizedWords.join(" ");
 
     // Remove spaces not allowed (before the first two characters)
-    if (formattedValue.length > 2) {
+    if (formattedValue.length > 1) {
       formattedValue =
-        formattedValue.slice(0, 2) +
-        formattedValue.slice(2).replace(/\s+/g, " ");
+        formattedValue.slice(0, 1) +
+        formattedValue.slice(1).replace(/\s+/g, " ");
     }
 
     // Update input value
@@ -803,9 +822,7 @@ const EmployeeRegistration = () => {
                             <Select
                               {...field}
                               options={Employement}
-                              value={Employement.find(
-                                (option) => option.value === field.value
-                              )}
+                              value={field.value ? Employement.find((option) => option.value === field.value) : null}
                               onChange={(val) => field.onChange(val.value)}
                               placeholder="Select Employee Type"
                             />
@@ -870,10 +887,6 @@ const EmployeeRegistration = () => {
                         onKeyDown={handleEmailChange}
                         {...register("firstName", {
                           required: "First Name is Required",
-                          minLength: {
-                            value: 3,
-                            message: "Mimimum 3 Characters Required.",
-                          },
                           maxLength: {
                             value: 150,
                             message: "Max lenght 150 Characters Exceeded.", // Maximum 150 characters
@@ -904,11 +917,7 @@ const EmployeeRegistration = () => {
                         onKeyDown={handleEmailChange}
                         {...register("lastName", {
                           required: "Last Name is Required",
-                          validate: { validateLastName },
-                          minLength: {
-                            value: 1,
-                            message: "Minimum 1 Character Required",
-                          },
+                          validate: { validateFirstName },
                         })}
                       />
                       {errors.lastName && (
@@ -1039,10 +1048,6 @@ const EmployeeRegistration = () => {
                         onKeyDown={handleEmailChange}
                         {...register("manager", {
                           required: "Manager is Required",
-                          minLength: {
-                            value: 3,
-                            message: "Mimimum 3 Characters Required.",
-                          },
                           maxLength: {
                             value: 150,
                             message: "Max lenght 150 Characters Exceeded.", // Maximum 150 characters
@@ -1073,10 +1078,6 @@ const EmployeeRegistration = () => {
                         {...register("location", {
                           required: "Location is Required",
                           validate: validateLocation,
-                          minLength: {
-                            value: 3,
-                            message: "Minimum 3 Characters allowed",
-                          },
                           maxLength: {
                             value: 250,
                             message: "Maximum 250 Characters allowed",
@@ -1119,9 +1120,8 @@ const EmployeeRegistration = () => {
                               })}
                             />
                             <span
-                              className={`bi bi-eye field-icon pb-1 toggle-password ${
-                                passwordShown ? "text-primary" : ""
-                              }`}
+                              className={`bi bi-eye field-icon pb-1 toggle-password ${passwordShown ? "text-primary" : ""
+                                }`}
                               onClick={togglePasswordVisiblity}
                               style={{
                                 background: "transparent",
@@ -1182,17 +1182,17 @@ const EmployeeRegistration = () => {
                             options={
                               showNoticePeriodOption
                                 ? [
-                                    { value: "Active", label: "Active" },
-                                    { value: "InActive", label: "InActive" },
-                                    {
-                                      value: "NoticePeriod",
-                                      label: "Notice Period",
-                                    }, // Show Notice Period
-                                  ]
+                                  { value: "Active", label: "Active" },
+                                  { value: "InActive", label: "InActive" },
+                                  {
+                                    value: "NoticePeriod",
+                                    label: "Notice Period",
+                                  }, // Show Notice Period
+                                ]
                                 : [
-                                    { value: "Active", label: "Active" },
-                                    { value: "InActive", label: "InActive" }, // Show only Active and InActive
-                                  ]
+                                  { value: "Active", label: "Active" },
+                                  { value: "InActive", label: "InActive" }, // Show only Active and InActive
+                                ]
                             }
                             value={
                               field.value
@@ -1362,16 +1362,12 @@ const EmployeeRegistration = () => {
                         {...register("bankName", {
                           required: "Bank Name is Required",
                           validate: validateFirstName,
-                          minLength: {
-                            value: 3,
-                            message: "Minimum 3 Characters Required",
-                          },
                           maxLength: {
                             value: 50,
                             message: "Maximum 50 Characters Required",
                           },
                         })}
-                        // disabled={editMode}
+                      // disabled={editMode}
                       />
                       {errors.bankName && (
                         <p className="errorMsg">{errors.bankName.message}</p>
