@@ -429,8 +429,8 @@ public class CompanyUtils {
     public static Map<String, Object> duplicateValues(CompanyRequest companyRequest, List<CompanyEntity> companyEntities) {
         Map<String, Object> responseBody = new HashMap<>();
            String cinNo = null, regNo = null, mobileNo = null, landNo =  null,
-                   gstNo = null, panNo= null, personalMail = null, personalMobile = null,
-                   emailId=null,mailId=null;
+                   panNo= null, personalMail = null, personalMobile = null,
+                   mailId=null;
         for (CompanyEntity companyEntity :companyEntities) {
 
             if (companyRequest.getEmailId() != null && companyEntity.getEmailId() != null) {
@@ -467,14 +467,6 @@ public class CompanyUtils {
 
             if (companyRequest.getEmailId().equals(companyRequest.getPersonalMailId())){
                 responseBody.put(Constants.DUPLICATE_AS_EMAIL_NO, companyRequest.getEmailId());
-            }
-
-            if (companyRequest.getGstNo() != null && companyEntity.getGstNo() != null) {
-                gstNo = new String(Base64.getDecoder().decode(companyEntity.getGstNo().getBytes()));
-                if (gstNo.equals(companyRequest.getGstNo())){
-                    responseBody.put(Constants.DUPLICATE_GST_NO, companyRequest.getGstNo());
-                }
-
             }
             if (companyRequest.getPanNo() != null && companyEntity.getPanNo() != null) {
                 panNo = new String(Base64.getDecoder().decode(companyEntity.getPanNo().getBytes()));
@@ -845,8 +837,6 @@ public class CompanyUtils {
     public static Map<String, Object> duplicateValuesInCompany(CompanyRequest companyRequest) {
 
         Map<String, Object> responseBody = new HashMap<>();
-        String cinNo = null, regNo = null, mobileNo = null, landNo =  null, gstNo = null, panNo= null, personalMail = null, personalMobile = null, emailId=null;
-
 
             if (companyRequest.getAlternateNo().equals(companyRequest.getMobileNo())){
                 responseBody.put(Constants.DUPLICATE_AS_MOBILE_NO, companyRequest.getAlternateNo());

@@ -91,8 +91,6 @@ public class EmployeeRequest {
     private String status;
 
     @Schema(example = "panNo")
-    @Pattern(regexp = "^[A-Z]{5}[0-9]{4}[A-Z]{1}$", message = "{invalid.panNo}")
-    @NotBlank(message = "{panNo.notnull.message}")
     private String panNo;
 
     @Schema(example = "uanNo")
