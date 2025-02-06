@@ -87,6 +87,9 @@ const Designation = () => {
       setAddDesignation(false); // Close the modal *after* successful update
       reset();
       setEditingUserId(null);
+      setTimeout(() => {
+        fetchDesignation();
+      }, 1500);
     } catch (error) {
       handleApiErrors(error);
       // Revert the optimistic update in case of error
