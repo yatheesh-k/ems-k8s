@@ -76,7 +76,8 @@ const GeneratePaySlip = () => {
       setSelectedMonthYear(`${month.label} ${year.label}`);
       setShow(true);
     } catch (error) {
-      toast.error("Error fetching payslip data.");
+      const errorMessage = error.response?.data?.error?.message || "Error fetching payslip data.";
+      toast.error(errorMessage);
     }
   };
 

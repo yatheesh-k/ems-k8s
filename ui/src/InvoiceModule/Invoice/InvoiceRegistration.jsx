@@ -331,7 +331,7 @@ const InvoiceRegistration = () => {
   };
 
   const allowNumbersOnly = (e) => {
-    if (!/^[1-9\s]*$/.test(e.key)) {
+    if (!/^[0-9\s]*$/.test(e.key)) {
       e.preventDefault();
     }
   };
@@ -744,6 +744,7 @@ const InvoiceRegistration = () => {
                                 id={`quantity-${index}`}
                                 name={`productsInfo[${index}].quantity`}
                                 type="text"
+                                onKeyDown={allowNumbersOnly}
                                 placeholder="Enter Quantity"
                                 maxLength={4}
                                 {...register(
@@ -752,7 +753,6 @@ const InvoiceRegistration = () => {
                                     required: "Quantity is required",
                                   }
                                 )}
-                                onKeyPress={allowNumbersOnly}
                               />
                             </div>
 
