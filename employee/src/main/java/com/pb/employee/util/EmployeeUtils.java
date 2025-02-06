@@ -103,7 +103,7 @@ public class EmployeeUtils {
         Map<String, Object> responseBody = new HashMap<>();
 
             for (EmployeeEntity employeeEntity : employees) {
-                String employeeId = null, aadhaarId = null, panNo = null, uanNo = null, accountNo = null, mobileNo=null;
+                String aadhaarId = null, uanNo = null, accountNo = null, mobileNo=null;
                 if (employeeEntity.getEmployeeId() != null && employeeEntity.getEmployeeId().equals(employeeRequest.getEmployeeId())) {
                     responseBody.put(Constants.DUPLICATE_EMPLOYEE_ID, employeeRequest.getEmployeeId());
 
@@ -120,12 +120,6 @@ public class EmployeeUtils {
                         responseBody.put(Constants.DUPLICATE_MOBILE_NO, employeeRequest.getMobileNo());
                     }
                 }
-                if (employeeEntity.getPanNo() != null) {
-                    panNo = new String((Base64.getDecoder().decode(employeeEntity.getPanNo().toString().getBytes())));
-                    if (panNo.equals(employeeRequest.getPanNo())) {
-                        responseBody.put(Constants.DUPLICATE_PAN_NO, employeeRequest.getPanNo());
-                    }
-                }
                 if (employeeEntity.getUanNo() != null) {
                     uanNo = new String((Base64.getDecoder().decode(employeeEntity.getUanNo().toString().getBytes())));
                     if (uanNo.equals(employeeRequest.getUanNo()) && !uanNo.isEmpty()) {
@@ -138,10 +132,7 @@ public class EmployeeUtils {
                         responseBody.put(Constants.DUPLICATE_ACCOUNT_NO, employeeRequest.getAccountNo());
                     }
                 }
-
-
             }
-
         return responseBody;
     }
     public static Map<String, Object> duplicateUpdateValues(EmployeeUpdateRequest employeeUpdateRequest, List<EmployeeEntity> employees) throws EmployeeException {
