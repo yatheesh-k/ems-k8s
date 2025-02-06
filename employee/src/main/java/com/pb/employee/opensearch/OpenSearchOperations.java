@@ -223,37 +223,46 @@ public class OpenSearchOperations {
 
 
     public List<DesignationEntity> getCompanyDesignationByName(String companyName, String designationName) throws EmployeeException {
-        logger.debug("Getting the Resource by id {} and :{}", companyName, designationName);
-        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
-        boolQueryBuilder = boolQueryBuilder
-                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.DESIGNATION)));
+        logger.debug("Getting the Resource by id {} : {}", companyName, designationName);
 
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+        // Filter by type "designation"
+        boolQueryBuilder = boolQueryBuilder.filter(q -> q.term(t -> t.field(Constants.TYPE).value(FieldValue.of(Constants.DESIGNATION))));
+
+        // Case-insensitive search using match query
         if (designationName != null) {
-            String lowerCaseDesignationName = designationName.toLowerCase(); // Convert input to lowercase
-            boolQueryBuilder = boolQueryBuilder
-                    .filter(q -> q.term(t -> t.field(Constants.NAME).value(FieldValue.of(lowerCaseDesignationName)))); // Search in lowercase
+            boolQueryBuilder = boolQueryBuilder.filter(q ->
+                    q.match(m -> m.field(Constants.NAME).query(FieldValue.of(designationName))) // Match query is case-insensitive
+            );
         }
         BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
         SearchResponse<DesignationEntity> searchResponse = null;
+
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
+
         try {
-            searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
-                    .query(finalBoolQueryBuilder.build()._toQuery()), DesignationEntity.class);
+            searchResponse = esClient.search(t ->
+                            t.index(index)
+                                    .size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                                    .query(finalBoolQueryBuilder.build()._toQuery()),
+                    DesignationEntity.class
+            );
         } catch (IOException e) {
-            e.getStackTrace();
-            logger.error(e.getMessage());
-            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("Error searching designation: {}", e.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
         List<Hit<DesignationEntity>> hits = searchResponse.hits().hits();
-        logger.info("Number of hits {}", hits.size());
+        logger.info("Number of hits: {}", hits.size());
+
         List<DesignationEntity> designationEntities = new ArrayList<>();
-        if (hits.size() > 0) {
-            for (Hit<DesignationEntity> hit : hits) {
-                designationEntities.add(hit.source());
-            }
+        for (Hit<DesignationEntity> hit : hits) {
+            designationEntities.add(hit.source());
         }
         return designationEntities;
     }
+
+
 
     public List<CompanyEntity> getCompanyByData(String companyName, String type, String shortName) throws EmployeeException {
         logger.debug("Getting the Resource by name {}, {},{}", companyName, type, shortName);
