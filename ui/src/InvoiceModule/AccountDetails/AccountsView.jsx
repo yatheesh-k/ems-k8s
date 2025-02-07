@@ -103,7 +103,7 @@ const AccountsView = () => {
     {
       name: <h6><b>Branch Name</b></h6>,
       selector: (row) => row.branch,
-      width: "220px",
+      width: "200px",
     },
     // {
     //   name: <h6><b>Account Type</b></h6>,
