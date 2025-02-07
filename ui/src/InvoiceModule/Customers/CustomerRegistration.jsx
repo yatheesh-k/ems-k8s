@@ -273,7 +273,7 @@ const CustomersRegistration = () => {
 
   const statusOptions = [
     { label: "Active", value: "Active" },
-    { label: "Inactive", value: "InActive" },
+    { label: "InActive", value: "InActive" },
   ];
 
   const clearForm = () => {
