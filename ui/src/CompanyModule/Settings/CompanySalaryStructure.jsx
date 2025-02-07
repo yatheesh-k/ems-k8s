@@ -260,9 +260,14 @@ const CompanySalaryStructure = () => {
     try {
       const response = await DeductionsGetApi();
       const deductionsData = response.data;
-      setDeductions(deductionsData);
+      const filteredDeductions = deductionsData.filter(
+        (deduction) =>
+          deduction !== "Provident Fund Employee" &&
+          deduction !== "Provident Fund Employer"
+      );
+      setDeductions(filteredDeductions);
       setDeductionFields(
-        deductionsData.map((deduction) => ({
+        filteredDeductions.map((deduction) => ({
           label: deduction,
           type: "text",
           value: "",
@@ -904,72 +909,71 @@ const CompanySalaryStructure = () => {
                       const isChecked =
                         fieldCheckboxes.deductions[field.label] || false;
                       return (
-                        isChecked && (
-                          <div className="row bbl ptb25" key={index}>
-                            {/* Checkbox Field */}
-                            <div className="col-auto mt-2">
-                              <input
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={() => handleCheckboxChange(index)} // Handle checkbox change
-                              />
-                            </div>
+                        <div className="row bbl ptb25" key={index}>
+                          {/* Checkbox Field */}
+                          <div className="col-auto mt-2">
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => handleCheckboxChange(index)} // Handle checkbox change
+                            />
+                          </div>
 
-                            {/* Label Field */}
-                            <div className="col-sm-3">
-                              <input
-                                type="text"
-                                className="form-control"
-                                readOnly
-                                value={field.label}
-                                onChange={(e) =>
-                                  handleLabelChange(index, e.target.value)
-                                }
-                                disabled={!isEditing || !isChecked}
-                              />
-                            </div>
+                          {/* Label Field */}
+                          <div className="col-sm-3">
+                            <input
+                              type="text"
+                              className="form-control"
+                              readOnly
+                              value={field.label}
+                              onChange={(e) =>
+                                handleLabelChange(index, e.target.value)
+                              }
+                              disabled={!isEditing} // Allow edit only in editing mode
+                            />
+                          </div>
 
-                            {/* Type Field */}
-                            <div className="col-sm-3">
-                              <select
-                                className="form-select"
-                                value={field.type}
-                                onChange={(e) =>
-                                  handleTypeChange(index, e.target.value)
-                                }
-                                disabled={!isEditing || !isChecked}
-                              >
-                                <option value="percentage">%</option>
-                                <option value="text">₹</option>
-                              </select>
-                            </div>
+                          {/* Type Field */}
+                          <div className="col-sm-3">
+                            <select
+                              className="form-select"
+                              value={field.type}
+                              onChange={(e) =>
+                                handleTypeChange(index, e.target.value)
+                              }
+                              disabled={!isEditing || !isChecked} // Disable only if not checked
+                            >
+                              <option value="percentage">%</option>
+                              <option value="text">₹</option>
+                            </select>
+                          </div>
 
-                            {/* Value Field */}
-                            <div className="col-sm-3">
-                              <input
-                                type="text"
-                                className="form-control"
-                                value={field.value}
-                                onChange={(e) => {
-                                  const newValue = e.target.value;
-                                  if (field.type === "percentage") {
-                                    if (/^\d{0,2}$/.test(newValue)) {
-                                      handleValueChange(index, newValue);
-                                    }
-                                  } else {
+                          {/* Value Field */}
+                          <div className="col-sm-3">
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={field.value}
+                              onChange={(e) => {
+                                const newValue = e.target.value;
+                                if (field.type === "percentage") {
+                                  if (/^\d{0,2}$/.test(newValue)) {
                                     handleValueChange(index, newValue);
                                   }
-                                  validateField({ ...field, value: newValue });
-                                }}
-                                placeholder="Enter Value"
-                                disabled={!isEditing || !isChecked}
-                                maxLength={7}
-                              />
-                            </div>
+                                } else {
+                                  handleValueChange(index, newValue);
+                                }
+                                validateField({ ...field, value: newValue });
+                              }}
+                              placeholder="Enter Value"
+                              disabled={!isEditing || !isChecked} // Disable instead of hiding
+                              maxLength={7}
+                            />
                           </div>
-                        )
+                        </div>
                       );
                     })}
+
                     <button
                       type="button"
                       onClick={() => setShowModal(true)}
@@ -1067,7 +1071,7 @@ const CompanySalaryStructure = () => {
                             {...register("fieldName", {
                               required: "Field name is required",
                               pattern: {
-                                value: /^[A-Za-z\s]+$/, // Only alphabetic characters and spaces allowed
+                                value: /^[A-Za-z\s&-]+$/, // Only alphabetic characters and spaces allowed
                                 message:
                                   "This field accepts only alphabetic characters",
                               },
@@ -1091,14 +1095,9 @@ const CompanySalaryStructure = () => {
                               },
                             })}
                           />
-                          {errors.fieldName && (
+                          {(errors.fieldName || errorMessage) && (
                             <p className="errorMsg text-danger">
-                              {errors.fieldName.message}
-                            </p>
-                          )}
-                          {errorMessage && (
-                            <p className="errorMsg text-danger">
-                              {errorMessage}
+                              {errors.fieldName?.message || errorMessage}
                             </p>
                           )}
                         </div>
