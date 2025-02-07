@@ -224,45 +224,62 @@ public class OpenSearchOperations {
 
     public List<DesignationEntity> getCompanyDesignationByName(String companyName, String designationName) throws EmployeeException {
         logger.debug("Getting the Resource by id {} : {}", companyName, designationName);
-
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
-        // Filter by type "designation"
-        boolQueryBuilder = boolQueryBuilder.filter(q -> q.term(t -> t.field(Constants.TYPE).value(FieldValue.of(Constants.DESIGNATION))));
+        boolQueryBuilder =
+                boolQueryBuilder.filter(q -> q.term(t -> t.field(Constants.TYPE).value(FieldValue.of(Constants.DESIGNATION))));
 
-        // Case-insensitive search using match query
         if (designationName != null) {
-            boolQueryBuilder = boolQueryBuilder.filter(q ->
-                    q.match(m -> m.field(Constants.NAME).query(FieldValue.of(designationName))) // Match query is case-insensitive
-            );
+               boolQueryBuilder = boolQueryBuilder
+                    .should(q -> q.match(t -> t.field(Constants.NAME).query(FieldValue.of(designationName))));
         }
         BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
         SearchResponse<DesignationEntity> searchResponse = null;
-
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
-
         try {
-            searchResponse = esClient.search(t ->
-                            t.index(index)
-                                    .size(SIZE_ELASTIC_SEARCH_MAX_VAL)
-                                    .query(finalBoolQueryBuilder.build()._toQuery()),
-                    DesignationEntity.class
-            );
+            searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                    .query(finalBoolQueryBuilder.build()._toQuery()), DesignationEntity.class);
         } catch (IOException e) {
-            logger.error("Error searching designation: {}", e.getMessage());
-            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
+            e.getStackTrace();
+            logger.error(e.getMessage());
+            throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         List<Hit<DesignationEntity>> hits = searchResponse.hits().hits();
-        logger.info("Number of hits: {}", hits.size());
-
-        List<DesignationEntity> designationEntities = new ArrayList<>();
-        for (Hit<DesignationEntity> hit : hits) {
-            designationEntities.add(hit.source());
+        logger.info("Number of hits {}", hits.size());
+        List<DesignationEntity> departmentEntities = new ArrayList<>();
+        if (hits.size() > 0) {
+            for (Hit<DesignationEntity> hit : hits) {
+                departmentEntities.add(hit.source());
+            }
         }
-        return designationEntities;
+        return departmentEntities;
+    }
+    public boolean isDesignationPresent(String companyName, String designationName) throws EmployeeException {
+        // Fetch all designations from the database
+        List<DesignationEntity> designationEntities = getCompanyDesignationByName(companyName,designationName);
+
+        // Iterate through the designation list to check if the designation already exists
+        for (DesignationEntity designation : designationEntities) {
+            // Check if the name matches the input designation (case-insensitive)
+            if (designation.getName().equalsIgnoreCase(designationName)) {
+                return true; // Designation already exists
+            }
+        }
+        return false; // Designation doesn't exist
     }
 
+    public boolean isDepartmentPresent(String companyName, String departmentName) throws EmployeeException {
+        // Fetch all designations from the database
+        List<DepartmentEntity> designationEntities = getCompanyDepartmentByName(companyName,departmentName);
 
+        // Iterate through the designation list to check if the designation already exists
+        for (DepartmentEntity department : designationEntities) {
+            // Check if the name matches the input designation (case-insensitive)
+            if (department.getName().equalsIgnoreCase(departmentName)) {
+                return true; // Designation already exists
+            }
+        }
+        return false; // Designation doesn't exist
+    }
 
     public List<CompanyEntity> getCompanyByData(String companyName, String type, String shortName) throws EmployeeException {
         logger.debug("Getting the Resource by name {}, {},{}", companyName, type, shortName);

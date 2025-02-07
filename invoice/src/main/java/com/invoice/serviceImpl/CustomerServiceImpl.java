@@ -60,7 +60,9 @@ public class CustomerServiceImpl implements CustomerService {
             if (customerOptional.isPresent()) {
                 log.error("Customer already exists with ID: {}", customerId);
                 // Return a response indicating that the customer already exists
-                throw  new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.CUSTOMER_ALREADY_EXISTS),
+                return  new ResponseEntity<>(ResponseBuilder.builder().build().
+                        createFailureResponse(new Exception(String.valueOf(InvoiceErrorMessageHandler.getMessage
+                                (InvoiceErrorMessageKey.CUSTOMER_ALREADY_EXISTS)))),
                         HttpStatus.CONFLICT);
             }
             // If customer does not exist, proceed to create a new customer
