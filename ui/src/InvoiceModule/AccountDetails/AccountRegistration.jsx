@@ -28,7 +28,9 @@ const AccountRegistartion = () => {
   const [accountDetails, setAccountDetails] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const existingAccountTypeValue = isUpdating ? accountDetails?.accountType : "";
+  const existingAccountTypeValue = isUpdating
+    ? accountDetails?.accountType
+    : "";
 
   const onSubmit = (data) => {
     const payload = {
@@ -157,7 +159,7 @@ const AccountRegistartion = () => {
 
   const noTrailingSpaces = (value, fieldName) => {
     // Check if the value ends with a space
-    if (value.endsWith(' ')) {
+    if (value.endsWith(" ")) {
       return "Spaces are not allowed at the end";
     }
 
@@ -282,7 +284,8 @@ const AccountRegistartion = () => {
                         autoComplete="off"
                         {...register("bankName", {
                           required: "Bank Name is Required",
-                          validate: (value) => noTrailingSpaces(value, "bankName"),
+                          validate: (value) =>
+                            noTrailingSpaces(value, "bankName"),
                           maxLength: {
                             value: 60,
                             message: "Bank Name must not exceed 60 characters.",
@@ -309,7 +312,8 @@ const AccountRegistartion = () => {
                         autoComplete="off"
                         {...register("branch", {
                           required: "Branch Name is Required",
-                          validate: (value) => noTrailingSpaces(value, "branch"),
+                          validate: (value) =>
+                            noTrailingSpaces(value, "branch"),
                           maxLength: {
                             value: 60,
                             message:
@@ -366,7 +370,6 @@ const AccountRegistartion = () => {
                       <Controller
                         name="accountType"
                         control={control}
-                        defaultValue={isUpdating ? existingAccountTypeValue : ""} // Ensure correct initial value
                         rules={{ required: "Account Type is Required" }}
                         render={({ field }) => (
                           <Select
@@ -374,8 +377,10 @@ const AccountRegistartion = () => {
                             options={accountTypes}
                             getOptionLabel={(e) => e.label}
                             getOptionValue={(e) => e.value}
-                            value={accountTypes.find((option) => option.value === field.value) || null} // Ensure the correct value is set
-                            onChange={(selectedOption) => field.onChange(selectedOption?.value)} // Handle selection
+                            onChange={(selectedOption) =>
+                              field.onChange(selectedOption)
+                            }
+                            placeholder="Select Account Type"
                           />
                         )}
                       />
@@ -396,7 +401,8 @@ const AccountRegistartion = () => {
                         rows="4"
                         {...register("address", {
                           required: "Address is Required",
-                          validate: (value) => noTrailingSpaces(value, "address"),
+                          validate: (value) =>
+                            noTrailingSpaces(value, "address"),
                           maxLength: {
                             value: 250,
                             message:
@@ -458,5 +464,5 @@ const AccountRegistartion = () => {
       </div>
     </LayOut>
   );
-}
+};
 export default AccountRegistartion;

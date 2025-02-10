@@ -23,7 +23,7 @@ const InternShipForm = () => {
     control,
     formState: { errors },
     reset,
-  } = useForm({ mode: 'onChange' });
+  } = useForm({ mode: "onChange" });
   const { user, companyData, logoFileName } = useAuth();
   const [emp, setEmp] = useState([]);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -263,11 +263,23 @@ const InternShipForm = () => {
   const getCurrentDate = () => {
     const today = new Date();
     const yyyy = today.getFullYear();
-    const mm = (today.getMonth() + 1).toString().padStart(2, '0');
-    const dd = today.getDate().toString().padStart(2, '0');
+    const mm = (today.getMonth() + 1).toString().padStart(2, "0");
+    const dd = today.getDate().toString().padStart(2, "0");
     return `${yyyy}-${mm}-${dd}`;
-  };  
+  };
 
+  const handleEmailChange = (e) => {
+    // Get the current value of the input field
+    const value = e.target.value;
+    // Check if the value is empty
+    if (value.trim() !== "") {
+      return; // Allow space button
+    }
+    // Prevent space character entry if the value is empty
+    if (e.keyCode === 32) {
+      e.preventDefault();
+    }
+  };
 
   const validateName = (value) => {
     // Trim leading and trailing spaces before further validation
@@ -382,19 +394,16 @@ const InternShipForm = () => {
                         onInput={toInputTitleCase}
                         minLength={2}
                         autoComplete="off"
+                        onKeyDown={handleEmailChange}
                         {...register("employeeName", {
                           required: "Employee Name is Required",
                           minLength: {
                             value: 3,
                             message: "Minimum 3 Characters Required",
                           },
-                          maxLength: {
-                            value: 100,
-                            message: "Maximum 100 Characters Required",
                           validate: {
                             validateName,
                           },
-                        }
                         })}
                       />
                       {errors.employeeName && (
