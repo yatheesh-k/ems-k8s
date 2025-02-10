@@ -59,9 +59,8 @@ public class DepartmentServiceImpl implements DepartmentService {
             throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_DEPARTMENT), departmentRequest.getName()),
                     HttpStatus.BAD_REQUEST);
         }
-
-        List<DepartmentEntity> department = openSearchOperations.getCompanyDepartmentByName(departmentRequest.getCompanyName(), departmentRequest.getName());
-        if(department !=null && department.size() > 0) {
+        boolean departmentPresent = openSearchOperations.isDepartmentPresent(departmentRequest.getCompanyName(), departmentRequest.getName());
+        if(departmentPresent) {
             log.error("Department with name {} already existed", departmentRequest.getName());
             throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.DEPARTMENT_ID_ALREADY_EXISTS), departmentRequest.getName()),
                     HttpStatus.CONFLICT);

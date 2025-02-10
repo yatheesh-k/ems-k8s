@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -60,9 +61,16 @@ public class BankServiceImpl implements BankService {
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.BANK_ALREADY_EXISTS),
                     HttpStatus.CONFLICT);
         }
+        List<BankEntity> bankEntities = openSearchOperations.getBankDetailsOfCompany(index);
+        Map<String, Object> duplicateValuesInTheBank = BankUtils.duplicateValuesInBank(bankRequest,bankEntities);
+        if (!duplicateValuesInTheBank.isEmpty()) {
+            return new ResponseEntity<>(
+                    ResponseBuilder.builder().build().failureResponse(duplicateValuesInTheBank),
+                    HttpStatus.CONFLICT
+            );
+        }
         // Step 4.3: Mask and prepare the bank entity
         bankEntity = BankUtils.maskCompanyBankProperties(bankRequest, resourceId, companyId);
-
         try {
           // Step 4.4: Save the bank details to the generated index for each bank entry
            openSearchOperations.saveEntity(bankEntity, resourceId, index);

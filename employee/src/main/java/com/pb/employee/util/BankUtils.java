@@ -128,4 +128,16 @@ public class BankUtils {
             return bankEntity;
     }
 
+    public static Map<String, Object> duplicateValuesInBank(BankRequest bankRequest,List<BankEntity> bankEntities) {
+        Map<String, Object> responseBody = new HashMap<>();
+
+        // Check for duplicates against existing entities in the database
+        for (BankEntity bankEntity : bankEntities) {
+            String accountNo = new String(Base64.getDecoder().decode(bankEntity.getAccountNumber().getBytes()));
+            if (accountNo.equals(bankRequest.getAccountNumber())) {
+                responseBody.put(Constants.DUPLICATE_ACCOUNT_NO, bankRequest.getAccountNumber());
+            }
+        }
+        return responseBody;
+    }
 }
