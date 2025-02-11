@@ -103,7 +103,10 @@ const AddIncrement = () => {
   useEffect(() => {
     EmployeeGetApi().then((data) => {
       const filteredData = data
-        .filter((employee) => employee.firstName !== null)
+        .filter(
+          (employee) =>
+            employee.firstName !== null && employee.status !== "InActive"
+        )
         .map(({ referenceId, ...rest }) => rest);
       setEmployes(
         filteredData.map((employee) => ({
@@ -117,7 +120,7 @@ const AddIncrement = () => {
         }))
       );
     });
-  }, []);
+  }, []); 
 
   useEffect(() => {
     if (id && salaryId) {
