@@ -151,9 +151,10 @@ const PayslipDoc2 = () => {
                 className="company-details text-center"
                 style={{ padding: "2px" }}
               >
+                <h5>{companyData.companyName}</h5>
                 <h6>{companyData.companyAddress}.</h6>
-                <h6>{companyData.mobileNo}</h6>
-                <h6>{companyData.emailId}</h6>
+                {/* <h6>{companyData.mobileNo}</h6>
+                <h6>{companyData.emailId}</h6> */}
               </div>
             </div>
           </div>
