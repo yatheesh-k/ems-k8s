@@ -959,7 +959,7 @@ const SideNav = () => {
               >
                 <Link className="sidebar-link" to="/employeeSalary">
                   <i className="bi bi-card-list"></i>
-                  <span className="align-middle">Salary List</span>
+                  <span className="align-middle">Salary Summary</span>
                 </Link>
               </li>
               <li
