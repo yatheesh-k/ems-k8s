@@ -194,6 +194,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     public ResponseEntity<?> updateEmployeeById(String employeeId, EmployeeUpdateRequest employeeUpdateRequest) throws IOException, EmployeeException {
           log.info("getting details of {}", employeeId);
         EmployeeEntity user;
+        List<EmployeeSalaryEntity> salaryEntities;
+
         String index = ResourceIdUtils.generateCompanyIndex(employeeUpdateRequest.getCompanyName());
         try {
             user = openSearchOperations.getEmployeeById(employeeId, null, index);
@@ -210,6 +212,8 @@ public class EmployeeServiceImpl implements EmployeeService {
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_COMPANY),
                         HttpStatus.BAD_REQUEST);
             }
+            salaryEntities = openSearchOperations.getEmployeeSalaries(employeeUpdateRequest.getCompanyName(), employeeId);
+
         } catch (Exception ex) {
 
             log.error("Exception while fetching company details {}", ex);
@@ -238,6 +242,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         Entity entity = CompanyUtils.maskEmployeeUpdateProperties(user, employeeUpdateRequest);
         openSearchOperations.saveEntity(entity, employeeId, index);
+        // Step 7: Deactivate Salaries if Employee is Made Inactive
+        if (Constants.INACTIVE.equalsIgnoreCase(employeeUpdateRequest.getStatus()) && salaryEntities != null) {
+            for (EmployeeSalaryEntity salaryEntity : salaryEntities) {
+                salaryEntity.setStatus(Constants.INACTIVE);
+                openSearchOperations.saveEntity(salaryEntity, salaryEntity.getSalaryId(), index);
+            }
+            log.info("Salaries set to inactive for employee: {}", employeeId);
+        }
         return new ResponseEntity<>(
                 ResponseBuilder.builder().build().createSuccessResponse(Constants.SUCCESS), HttpStatus.OK);
     }

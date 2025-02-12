@@ -721,24 +721,17 @@ public class PayslipServiceImpl implements PayslipService {
                     }
                 }
             }
-
-            // Return response with generated payslips and employees without attendance
-            if (generatedPayslips.size() == 0) {
-                log.error("Attendance not found for the employees or payslips already generated{}", employeesWithoutAttendance);
-                throw new EmployeeException(String.format(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.EMPLOYEE_PAYSLIP_ALREADY_EXISTS), employeesWithoutAttendance),
-                        HttpStatus.BAD_REQUEST);
+            // If no payslips were generated due to missing attendance, return an error response
+            if (!employeesWithoutAttendance.isEmpty()) {
+                return new ResponseEntity<>(ResponseBuilder.builder().build().createFailureResponse(Constants.NO_ATTENDANCE), HttpStatus.CONFLICT);
             }
-
             Map<String, Object> responseBody = new HashMap<>();
             responseBody.put(Constants.GENERATE_PAYSLIP, generatedPayslips);
             responseBody.put(Constants.EMPLOYEE_WITHOUT_ATTENDANCE, employeesWithoutAttendance);
 
             return new ResponseEntity<>(ResponseBuilder.builder().build().createSuccessResponse(responseBody), HttpStatus.CREATED);
 
-        } catch (IOException | EmployeeException ex) {
-            log.error("Error generating payslips: {}", ex.getMessage());
-            throw ex; // Re-throw the caught exception for higher level handling
-        } catch (Exception ex) {
+        } catch (EmployeeException ex) {
             log.error("Unexpected error generating payslips: {}", ex.getMessage());
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_SAVE_EMPLOYEE),
                     HttpStatus.INTERNAL_SERVER_ERROR);
