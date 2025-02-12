@@ -4,7 +4,7 @@ import { AttendanceManagementApi, EmployeeGetApi } from "../../Utils/Axios";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { Download } from "react-bootstrap-icons";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
 
 const ManageAttendance = () => {
   const {
@@ -22,16 +22,29 @@ const ManageAttendance = () => {
       try {
         const data = await EmployeeGetApi();
         const formattedData = data
-          .filter((employee) => employee.firstName !== null)
-          .map(({ employeeId, firstName, lastName, emailId, Month, Year, workingDays }) => ({
-            employeeId,
-            firstName,
-            lastName,
-            emailId,
-            Month,
-            Year,
-            workingDays,
-          }));
+          .filter(
+            (employee) =>
+              employee.firstName !== null && employee.status !== "InActive"
+          )
+          .map(
+            ({
+              employeeId,
+              firstName,
+              lastName,
+              emailId,
+              Month,
+              Year,
+              workingDays,
+            }) => ({
+              employeeId,
+              firstName,
+              lastName,
+              emailId,
+              Month,
+              Year,
+              workingDays,
+            })
+          );
         setEmployees(formattedData);
       } catch (error) {
         console.error("Error fetching employees:", error);
@@ -51,7 +64,7 @@ const ManageAttendance = () => {
       if (response.data.path) {
         toast.success("Attendance Added Successfully");
         reset();
-        setSelectedFile(null)
+        setSelectedFile(null);
       } else {
         toast.error(response.data.error.message);
       }
@@ -61,7 +74,12 @@ const ManageAttendance = () => {
   };
 
   const handleApiErrors = (error) => {
-    if (error.response && error.response.data && error.response.data.error && error.response.data.error.message) {
+    if (
+      error.response &&
+      error.response.data &&
+      error.response.data.error &&
+      error.response.data.error.message
+    ) {
       const errorMessage = error.response.data.error.message;
       toast.error(errorMessage);
     } else {
@@ -69,18 +87,30 @@ const ManageAttendance = () => {
     }
     console.error(error.response);
   };
-  
+
   const downloadExcel = () => {
     const currentDate = new Date();
-    const currentMonth = currentDate.toLocaleString('default', { month: 'long' }); 
+    const currentMonth = currentDate.toLocaleString("default", {
+      month: "long",
+    });
     const currentYear = currentDate.getFullYear();
-    const updatedEmployees = employees.map(employee => ({
+    const updatedEmployees = employees.map((employee) => ({
       ...employee,
       Month: currentMonth,
-      Year: currentYear
+      Year: currentYear,
     }));
 
-    const worksheet = XLSX.utils.json_to_sheet(updatedEmployees, { header: ["employeeId", "firstName", "lastName", "emailId", "Month", "Year", "workingDays"] });
+    const worksheet = XLSX.utils.json_to_sheet(updatedEmployees, {
+      header: [
+        "employeeId",
+        "firstName",
+        "lastName",
+        "emailId",
+        "Month",
+        "Year",
+        "workingDays",
+      ],
+    });
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Employees");
     XLSX.writeFile(workbook, "attendance_data.xlsx");
@@ -91,13 +121,14 @@ const ManageAttendance = () => {
     setSelectedFile(null); // Clear the file selection
   };
 
-
   return (
     <LayOut>
       <div className="container-fluid p-0">
         <div className="row d-flex align-items-center justify-content-between mt-1 mb-2">
           <div className="col">
-            <h1 className="h3 mb-3"><strong>Manage Attendance</strong></h1>
+            <h1 className="h3 mb-3">
+              <strong>Manage Attendance</strong>
+            </h1>
           </div>
           <div className="col-auto" style={{ paddingBottom: "20px" }}>
             <nav aria-label="breadcrumb">
@@ -115,22 +146,33 @@ const ManageAttendance = () => {
           <div className="col-12">
             <div className="card">
               <div className="card-header d-flex justify-content-between align-items-center">
-                <h5 className="card-title" style={{marginBottom:"0px"}}>Manage Attendance</h5>
+                <h5 className="card-title" style={{ marginBottom: "0px" }}>
+                  Manage Attendance
+                </h5>
                 <button
                   type="button"
                   className="btn btn-outline-primary"
                   onClick={downloadExcel}
                 >
-                  Download Attendance Excel Sheet <Download size={20} className="ml-1" />
+                  Download Attendance Excel Sheet{" "}
+                  <Download size={20} className="ml-1" />
                 </button>
               </div>
-              <div className="dropdown-divider" style={{ borderTopColor: "#d7d9dd" }} />
+              <div
+                className="dropdown-divider"
+                style={{ borderTopColor: "#d7d9dd" }}
+              />
               <div className="card-body">
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="mb-4">
                     <div className="col-12 row d-flex justify-content-center">
-                      <div className="col-6 col-md-6 col-lg-6 mt-2" style={{ maxWidth: "400px" }}>
-                        <label className="form-label">Select Attendance File</label>
+                      <div
+                        className="col-6 col-md-6 col-lg-6 mt-2"
+                        style={{ maxWidth: "400px" }}
+                      >
+                        <label className="form-label">
+                          Select Attendance File
+                        </label>
                         <input
                           className="form-control"
                           type="file"
@@ -140,21 +182,20 @@ const ManageAttendance = () => {
                           })}
                         />
                         {errors.attendanceFile && (
-                          <p className="errorMsg">{errors.attendanceFile.message}</p>
+                          <p className="errorMsg">
+                            {errors.attendanceFile.message}
+                          </p>
                         )}
                       </div>
                       <div className="col-4 col-md-4 col-lg-4 mt-4">
-                      <button
-                          type="button" 
+                        <button
+                          type="button"
                           className="btn btn-secondary me-1 mt-2"
                           onClick={clearForm}
                         >
                           Cancel
                         </button>
-                        <button
-                          type="submit" 
-                          className="btn btn-primary mt-2"
-                        >
+                        <button type="submit" className="btn btn-primary mt-2">
                           Submit
                         </button>
                       </div>

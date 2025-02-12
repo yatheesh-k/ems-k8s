@@ -1482,7 +1482,7 @@ const PayslipUpdate3 = () => {
                             {...register("fieldName", {
                               required: "Field name is required",
                               pattern: {
-                                value: /^[A-Za-z\s]+$/,
+                                value: /^[A-Za-z\s&-]+$/,
                                 message:
                                   "This field accepts only alphabetic characters",
                               },
@@ -1491,7 +1491,7 @@ const PayslipUpdate3 = () => {
                                 message: "Minimum 2 characters required",
                               },
                               maxLength: {
-                                value: 20,
+                                value: 40,
                                 message: "Maximum 20 characters required",
                               },
                             })}

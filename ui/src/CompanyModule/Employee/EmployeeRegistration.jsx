@@ -503,8 +503,8 @@ const EmployeeRegistration = () => {
       }
 
       // Check minimum character length after other validations
-      if (trimmedValue.length < 3) {
-        return "Minimum 3 Characters Required.";
+      if (trimmedValue.length < 1) {
+        return "Minimum 1 Characters Required.";
       }
     }
 
@@ -917,7 +917,7 @@ const EmployeeRegistration = () => {
                         onKeyDown={handleEmailChange}
                         {...register("lastName", {
                           required: "Last Name is Required",
-                          validate: { validateFirstName },
+                          validate: { validateLastName },
                         })}
                       />
                       {errors.lastName && (

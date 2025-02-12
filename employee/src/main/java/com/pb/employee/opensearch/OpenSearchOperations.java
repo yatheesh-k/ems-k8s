@@ -223,15 +223,14 @@ public class OpenSearchOperations {
 
 
     public List<DesignationEntity> getCompanyDesignationByName(String companyName, String designationName) throws EmployeeException {
-        logger.debug("Getting the Resource by id {} and :{}", companyName, designationName);
+        logger.debug("Getting the Resource by id {} : {}", companyName, designationName);
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
-        boolQueryBuilder = boolQueryBuilder
-                .filter(q -> q.matchPhrase(t -> t.field(Constants.TYPE).query(Constants.DESIGNATION)));
+        boolQueryBuilder =
+                boolQueryBuilder.filter(q -> q.term(t -> t.field(Constants.TYPE).value(FieldValue.of(Constants.DESIGNATION))));
 
         if (designationName != null) {
-            String lowerCaseDesignationName = designationName.toLowerCase(); // Convert input to lowercase
-            boolQueryBuilder = boolQueryBuilder
-                    .filter(q -> q.term(t -> t.field(Constants.NAME).value(FieldValue.of(lowerCaseDesignationName)))); // Search in lowercase
+               boolQueryBuilder = boolQueryBuilder
+                    .should(q -> q.match(t -> t.field(Constants.NAME).query(FieldValue.of(designationName))));
         }
         BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
         SearchResponse<DesignationEntity> searchResponse = null;
@@ -246,13 +245,40 @@ public class OpenSearchOperations {
         }
         List<Hit<DesignationEntity>> hits = searchResponse.hits().hits();
         logger.info("Number of hits {}", hits.size());
-        List<DesignationEntity> designationEntities = new ArrayList<>();
+        List<DesignationEntity> departmentEntities = new ArrayList<>();
         if (hits.size() > 0) {
             for (Hit<DesignationEntity> hit : hits) {
-                designationEntities.add(hit.source());
+                departmentEntities.add(hit.source());
             }
         }
-        return designationEntities;
+        return departmentEntities;
+    }
+    public boolean isDesignationPresent(String companyName, String designationName) throws EmployeeException {
+        // Fetch all designations from the database
+        List<DesignationEntity> designationEntities = getCompanyDesignationByName(companyName,designationName);
+
+        // Iterate through the designation list to check if the designation already exists
+        for (DesignationEntity designation : designationEntities) {
+            // Check if the name matches the input designation (case-insensitive)
+            if (designation.getName().equalsIgnoreCase(designationName)) {
+                return true; // Designation already exists
+            }
+        }
+        return false; // Designation doesn't exist
+    }
+
+    public boolean isDepartmentPresent(String companyName, String departmentName) throws EmployeeException {
+        // Fetch all designations from the database
+        List<DepartmentEntity> designationEntities = getCompanyDepartmentByName(companyName,departmentName);
+
+        // Iterate through the designation list to check if the designation already exists
+        for (DepartmentEntity department : designationEntities) {
+            // Check if the name matches the input designation (case-insensitive)
+            if (department.getName().equalsIgnoreCase(departmentName)) {
+                return true; // Designation already exists
+            }
+        }
+        return false; // Designation doesn't exist
     }
 
     public List<CompanyEntity> getCompanyByData(String companyName, String type, String shortName) throws EmployeeException {

@@ -122,7 +122,10 @@ const ExistsEmpRegistration = () => {
   useEffect(() => {
     EmployeeGetApi().then((data) => {
       const filteredData = data
-        .filter((employee) => employee.firstName !== null)
+        .filter(
+          (employee) =>
+            employee.firstName !== null && employee.status !== "InActive"
+        )
         .map(({ referenceId, ...rest }) => rest);
       setEmp(
         filteredData.map((employee) => ({
@@ -531,7 +534,7 @@ const ExistsEmpRegistration = () => {
                             type="date"
                             className="form-control"
                             placeholder="Last Working Date"
-                            max={getCurrentDate()}  
+                            max={getCurrentDate()}
                           />
                         )}
                       />
