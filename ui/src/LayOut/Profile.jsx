@@ -35,7 +35,7 @@ function Profile() {
   const [imgError, setImgError] = useState(null);
   const { user = {}, logoFileName } = useAuth();
   console.log("user:", user.companyId);
-  
+
   const navigate = useNavigate();
   const [response, setResponse] = useState({ data: {} });
   const [hasCinNo, setHasCinNo] = useState(false);
@@ -104,13 +104,21 @@ function Profile() {
     e.preventDefault(); // Prevent form default action
     if (!user.companyId) return;
     if (!postImage) {
-      setErrorMessage("Logo is Required");
+      setErrorMessage("Logo is required");
       return;
     }
+
+    // Restrict file names with spaces
+    if (/\s/.test(postImage.name)) {
+      setErrorMessage("File name should not contain spaces.");
+      return;
+    }
+
     try {
       const formData = new FormData();
       formData.append("image", "string");
       formData.append("file", postImage);
+
       await CompanyImagePatchApi(user.companyId, formData);
       setPostImage(null);
       setSuccessMessage("Logo updated successfully.");
@@ -351,7 +359,7 @@ function Profile() {
     // Restore the cursor position
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
-   
+
   const validateAddress = (value) => {
     // Check for leading or trailing spaces
     if (/^\s/.test(value)) {
@@ -599,9 +607,10 @@ function Profile() {
                         {...register("companyAddress", {
                           required: "Company Address is Required",
                           pattern: {
-                            value: /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^+\-/+:]*$/,
+                            value:
+                              /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^+\-/+:]*$/,
                             message: "Please enter a valid address.",
-                          },                          
+                          },
                           minLength: {
                             value: 3,
                             message: "Minimum 3 Characters allowed",
@@ -843,7 +852,8 @@ function Profile() {
                           {...register("address", {
                             required: "Address is Required",
                             pattern: {
-                              value:/^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^+\-/+:]*$/,
+                              value:
+                                /^(?=.*[a-zA-Z])[a-zA-Z0-9\s,'#,-_&*.()^+\-/+:]*$/,
                               message: "Please enter valid Address",
                             },
                             minLength: {
