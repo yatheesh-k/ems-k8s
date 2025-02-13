@@ -1,10 +1,12 @@
 package com.invoice.request;
 
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -13,27 +15,19 @@ import java.util.List;
 @AllArgsConstructor
 public class InvoiceRequest {
 
-    @NotNull(message = "{customerName.notnull.message}")
-    private String customerName;
+    private Map<
+            @Pattern(regexp = "^[a-zA-Z0-9&\\-\\s]+$", message = "{invoice.key.format}")
+            @Size(min = 2, max = 50, message = "{invoice.key.size}") String,
 
-    @NotNull(message = "{bankId.notnull.message}")
-    private String bankId;
+            @Pattern(regexp = "^[a-zA-Z0-9&\\-\\s%]+$", message = "{invoice.format}")
+            @Size(min = 1, max = 30, message = "{invoice.size}") String> invoice;
 
-    @NotNull(message = "{purchaseOrder.notnull.message}")
-    private String purchaseOrder;
+    private List<Map<
+            @Pattern(regexp = "^[a-zA-Z0-9&\\-\\s]+$", message = "{invoice.key.format}")
+            @Size(min = 2, max = 50, message = "{invoice.key.size}") String,
 
-    @NotNull(message = "{vendorCode.notnull.message}")
-    private String vendorCode;
-
-    @NotNull(message = "{invoiceDate.notnull.message}")
-    private String invoiceDate;
-
-    @NotNull(message = "{dueDate.notnull.message}")
-    private String dueDate;
-
-    @NotNull(message = "{Product.Details.notnull.message}")
-    @Size(min = 1, message = "{Product.Details.size.message}")
-    private List<OrderRequest> orderRequests;
+            @Pattern(regexp = "^[a-zA-Z0-9&\\-\\s%]+$", message = "{invoice.format}")
+            @Size(min = 1, max = 30, message = "{invoice.size}") String>> products;
 
     private String status;
 }

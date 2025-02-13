@@ -12,9 +12,8 @@ public class ResourceIdUtils {
         return generateGlobalResourceId(ResourceType.CUSTOMER, email,mobileNumber);
     }
 
-    public static String generateInvoiceResourceId(String companyId, String customerId, String invoiceDate) {
-        long timestamp = System.currentTimeMillis(); // Add timestamp for uniqueness
-        return generateGlobalResourceId(ResourceType.INVOICE, companyId, customerId, invoiceDate, timestamp);
+    public static String generateInvoiceResourceId(String companyId, String bankId) {
+        return generateGlobalResourceId(ResourceType.INVOICE, companyId, bankId);
     }
 
     public static String generateCompanyIndex(String name) {
