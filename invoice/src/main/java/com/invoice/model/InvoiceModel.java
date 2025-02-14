@@ -25,8 +25,6 @@ public class InvoiceModel implements Entity{
     private BankEntity bank;
 
     private Map<String, String> invoice;
-    private List<Map<String, String>> products;
-
     private String status;
     private String type;
 }

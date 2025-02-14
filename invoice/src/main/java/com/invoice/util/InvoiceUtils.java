@@ -43,20 +43,6 @@ public class InvoiceUtils {
             }
             entity.setInvoice(maskedInvoice);
         }
-        if (request.getProducts() != null) {
-            List<Map<String, String>> maskedProducts = new ArrayList<>();
-
-            for (Map<String, String> productMap : request.getProducts()) {
-                Map<String, String> maskedMap = new HashMap<>();
-
-                for (Map.Entry<String, String> entry : productMap.entrySet()) {
-                    maskedMap.put(entry.getKey(), maskValue(entry.getValue())); // Apply masking function
-                }
-
-                maskedProducts.add(maskedMap);
-            }
-            entity.setProducts(maskedProducts);
-        }
 
         return entity;
     }
@@ -82,23 +68,6 @@ public class InvoiceUtils {
                 }
                 invoiceEntity.setInvoice(decodedCustomFields);
             }
-            if (invoiceEntity.getProducts() != null) {
-                List<Map<String, String>> maskedProducts = new ArrayList<>();
-
-                for (Map<String, String> productMap : invoiceEntity.getProducts()) {
-                    Map<String, String> maskedMap = new HashMap<>();
-
-                    for (Map.Entry<String, String> entry : productMap.entrySet()) {
-                        maskedMap.put(entry.getKey(), unMaskValue(entry.getValue())); // Apply masking function
-                    }
-
-                    maskedProducts.add(maskedMap);
-                }
-
-                invoiceEntity.setProducts(maskedProducts);
-            }
-
-
             if (invoiceEntity.getCustomer() != null) {
                 log.debug("Before unmasking customer: {}", invoiceEntity.getCustomer());
                 invoiceEntity.getCustomer().setAddress(unMaskValue(invoiceEntity.getCustomer().getAddress()));

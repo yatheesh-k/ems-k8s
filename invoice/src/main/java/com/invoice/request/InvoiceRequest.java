@@ -22,12 +22,5 @@ public class InvoiceRequest {
             @Pattern(regexp = "^[a-zA-Z0-9&\\-\\s%]+$", message = "{invoice.format}")
             @Size(min = 1, max = 30, message = "{invoice.size}") String> invoice;
 
-    private List<Map<
-            @Pattern(regexp = "^[a-zA-Z0-9&\\-\\s]+$", message = "{invoice.key.format}")
-            @Size(min = 2, max = 50, message = "{invoice.key.size}") String,
-
-            @Pattern(regexp = "^[a-zA-Z0-9&\\-\\s%]+$", message = "{invoice.format}")
-            @Size(min = 1, max = 30, message = "{invoice.size}") String>> products;
-
     private String status;
 }
