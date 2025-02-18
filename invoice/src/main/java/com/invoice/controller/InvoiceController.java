@@ -24,7 +24,7 @@ public class InvoiceController {
     @Autowired
     private InvoiceService invoiceService;
 
-    @PostMapping("company/{companyId}/customer/{customerId}/bank/{bankId}/invoice")
+    @PostMapping("company/{companyId}/customer/{customerId}/invoice")
     @Operation(security = { @SecurityRequirement(name = Constants.AUTH_KEY) },summary = "${api.createInvoice.tag}", description = "${api.createInvoice.description}")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponse(responseCode = "201", description = "CREATED")
@@ -33,9 +33,8 @@ public class InvoiceController {
                                              @Parameter(required = true, description = "${api.createCompanyPayload.description}")
                                              @PathVariable String companyId,
                                              @PathVariable String customerId,
-                                             @PathVariable String bankId,
                                              @RequestBody @Valid InvoiceRequest invoiceRequest) throws InvoiceException, IOException {
-        return invoiceService.generateInvoice(companyId,customerId,bankId,invoiceRequest);
+        return invoiceService.generateInvoice(companyId,customerId,invoiceRequest);
     }
 
     @GetMapping("company/{companyId}/invoice")
