@@ -35,6 +35,11 @@ const InvoiceRegistration = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [customFields, setCustomFields] = useState([]); // Dynamic field names
+  const [newField, setNewField] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [productRows, setProductRows] = useState([]);
   const { user } = useAuth();
   const companyId = user.companyId;
   console.log("companyId", companyId);
@@ -287,10 +292,10 @@ const InvoiceRegistration = () => {
 
       setShowPreview(true); // Show preview on successful submission
     } catch (error) {
-      toast.error("Failed to save invoice", {
-        position: "top-right",
-        autoClose: 1000,
-      });
+      // toast.error("Failed to save invoice", {
+      //   position: "top-right",
+      //   autoClose: 1000,
+      // });
     } finally {
       setLoad(false); // Hide loading state
     }
@@ -339,7 +344,7 @@ const InvoiceRegistration = () => {
   const handleInvoiceDateChange = (e) => {
     const invoiceDate = new Date(e.target.value);
     const dueDate = new Date(invoiceDate);
-    dueDate.setDate(invoiceDate.getDate() + 15); // Add 15 days to Invoice Date
+    dueDate.setDate(invoiceDate.getDate() + 15);
     setValue("dueDate", dueDate.toISOString().split("T")[0]);
   };
 
@@ -349,6 +354,44 @@ const InvoiceRegistration = () => {
       handleInvoiceDateChange({ target: { value: invoiceDate } });
     }
   }, []);
+
+  const handleAddField = () => {
+    const trimmedNewField = newField.trim();
+
+    if (trimmedNewField !== "") {
+      if (customFields.length < 6) {
+        if (!customFields.includes(trimmedNewField)) {
+          setCustomFields([...customFields, trimmedNewField]);
+          setNewField("");
+          setShowModal(false);
+        } else {
+          setErrorMessage(`Field "${trimmedNewField}" already exists.`); // Set error message
+        }
+      } else {
+        setErrorMessage("You can only add up to 6 fields."); // Set error message
+      }
+    }
+  };
+
+  // Add new product row
+  const handleAddProductRow = () => {
+    setProductRows([...productRows, {}]);
+  };
+
+  // Remove product row
+  const handleDeleteRow = (index) => {
+    setProductRows(productRows.filter((_, i) => i !== index));
+  };
+
+  // Remove custom field
+  const handleDeleteField = (fieldIndex) => {
+    setCustomFields(customFields.filter((_, i) => i !== fieldIndex));
+  };
+
+  // Handle form submission
+  // const onSubmit = (data) => {
+  //   console.log("Form Submitted:", data);
+  // };
 
   return (
     <LayOut>
@@ -419,12 +462,15 @@ const InvoiceRegistration = () => {
                           />
                         )}
                       />
+                      {errors.customerName && (
+                        <p
+                          className="errorMsg"
+                          style={{ marginLeft: "6px", marginBottom: "0" }}
+                        >
+                          {errors.customerName.message}
+                        </p> // Display error message
+                      )}
                     </div>
-                    {errors.customerName && (
-                      <p className="errorMsg" style={{ marginLeft: "170px" }}>
-                        {errors.customerName.message}
-                      </p> // Display error message
-                    )}
                   </div>
 
                   <div className="form-group row mt-1">
@@ -432,8 +478,7 @@ const InvoiceRegistration = () => {
                       htmlFor="bankName"
                       className="col-sm-2 text-right control-label col-form-label"
                     >
-                      Bank Name
-                      <span style={{ color: "red" }}>*</span>
+                      Bank Name <span style={{ color: "red" }}>*</span>
                     </label>
                     <div className="col-sm-9 mb-3">
                       <Controller
@@ -460,12 +505,15 @@ const InvoiceRegistration = () => {
                           />
                         )}
                       />
+                      {errors.bankName && (
+                        <p
+                          className="errorMsg"
+                          style={{ marginLeft: "6px", marginBottom: "0" }}
+                        >
+                          {errors.bankName.message}
+                        </p>
+                      )}
                     </div>
-                    {errors.bankName && (
-                      <p className="errorMsg" style={{ marginLeft: "170px" }}>
-                        {errors.bankName.message}
-                      </p>
-                    )}
                   </div>
 
                   {/* Vendor Code */}
@@ -474,7 +522,7 @@ const InvoiceRegistration = () => {
                       htmlFor="vendorCode"
                       className="col-sm-2 text-right control-label col-form-label"
                     >
-                      Vendor Code<span style={{ color: "red" }}>*</span>
+                      Vendor Code <span style={{ color: "red" }}>*</span>
                     </label>
                     <div className="col-sm-9 mb-3">
                       <input
@@ -500,12 +548,15 @@ const InvoiceRegistration = () => {
                           },
                         })}
                       />
+                      {errors.vendorCode && (
+                        <p
+                          className="errorMsg"
+                          style={{ marginLeft: "6px", marginBottom: "0" }}
+                        >
+                          {errors.vendorCode.message}
+                        </p>
+                      )}
                     </div>
-                    {errors.vendorCode && (
-                      <p className="errorMsg" style={{ marginLeft: "170px" }}>
-                        {errors.vendorCode.message}
-                      </p>
-                    )}
                   </div>
 
                   {/* Purchase Order */}
@@ -514,7 +565,7 @@ const InvoiceRegistration = () => {
                       htmlFor="purchaseOrder"
                       className="col-sm-2 text-right control-label col-form-label"
                     >
-                      Purchase Order<span style={{ color: "red" }}>*</span>
+                      Purchase Order <span style={{ color: "red" }}>*</span>
                     </label>
                     <div className="col-sm-9 mb-3">
                       <input
@@ -541,12 +592,15 @@ const InvoiceRegistration = () => {
                           },
                         })}
                       />
+                      {errors.purchaseOrder && (
+                        <p
+                          className="errorMsg"
+                          style={{ marginLeft: "6px", marginBottom: "0" }}
+                        >
+                          {errors.purchaseOrder.message}
+                        </p>
+                      )}
                     </div>
-                    {errors.purchaseOrder && (
-                      <p className="errorMsg" style={{ marginLeft: "170px" }}>
-                        {errors.purchaseOrder.message}
-                      </p>
-                    )}
                   </div>
                   {/* Invoice Number */}
                   {/* <div className="form-group row">
@@ -578,7 +632,7 @@ const InvoiceRegistration = () => {
                       htmlFor="invoiceDate"
                       className="col-sm-2 text-right control-label col-form-label"
                     >
-                      Invoice Date<span style={{ color: "red" }}>*</span>
+                      Invoice Date <span style={{ color: "red" }}>*</span>
                     </label>
                     <div className="col-sm-9 mb-3">
                       <input
@@ -592,12 +646,15 @@ const InvoiceRegistration = () => {
                           onChange: handleInvoiceDateChange, // Set due date when invoice date changes
                         })}
                       />
+                      {errors.invoiceDate && (
+                        <p
+                          className="errorMsg"
+                          style={{ marginLeft: "6px", marginBottom: "0" }}
+                        >
+                          {errors.invoiceDate.message}
+                        </p>
+                      )}
                     </div>
-                    {errors.invoiceDate && (
-                      <p className="errorMsg" style={{ marginLeft: "170px" }}>
-                        {errors.invoiceDate.message}
-                      </p>
-                    )}
                   </div>
 
                   <div className="form-group row">
@@ -615,16 +672,168 @@ const InvoiceRegistration = () => {
                         id="dueDate"
                         autoComplete="off"
                         {...register("dueDate", {})}
-                        disabled // Make the due date read-only since it's auto-calculated
+                        disabled
                       />
                     </div>
                     {/* {errors.dueDate && (
-                      <p className="errorMsg" style={{ marginLeft: "170px" }}>
+                      <p className="errorMsg" style={{ marginLeft: "6px" }}>
                         {errors.dueDate.message}
                       </p>
                     )} */}
                   </div>
-                  <div className="row">
+                  <button
+                    className="btn btn-primary mb-3"
+                    onClick={() => setShowModal(true)}
+                  >
+                    Add Fields
+                  </button>
+
+                  {showModal && (
+                    <div
+                      role="dialog"
+                      aria-modal="true"
+                      className="fade modal show" // Consider using a library for better modal handling
+                      tabIndex="-1"
+                      style={{ zIndex: "9999", display: "block" }} // Often, libraries handle styling
+                    >
+                      <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                          <div className="modal-header">
+                            <h5 className="modal-title">Add Custom Field</h5>
+                            <button
+                              className="close"
+                              onClick={() => setShowModal(false)}
+                            >
+                              &times;
+                            </button>
+                          </div>
+                          <div className="modal-body">
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Enter Field Name"
+                              value={newField}
+                              onChange={(e) => {
+                                setNewField(e.target.value);
+                                setErrorMessage("");
+                              }}
+                            />
+                            {errorMessage && (
+                              <p className="errorMsg text-danger">
+                                {errorMessage}
+                              </p>
+                            )}
+                          </div>
+                          <div className="modal-footer">
+                            <button
+                              className="btn btn-secondary"
+                              onClick={() => setShowModal(false)}
+                            >
+                              Close
+                            </button>
+                            <button
+                              className="btn btn-primary"
+                              onClick={handleAddField}
+                            >
+                              Add Field
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Display Custom Fields */}
+                  {customFields.length > 0 && (
+                    <div className="mb-3">
+                      <h5>Custom Fields:</h5>
+                      <div className="d-flex flex-wrap gap-2 align-items-center">
+                        {customFields.map((field, index) => (
+                          <div
+                            key={index}
+                            className="d-flex align-items-center"
+                          >
+                            <div className="border p-1 rounded">{field}</div>
+                            <button
+                              className="btn btn-danger btn-sm ml-2"
+                              onClick={() => handleDeleteField(index)}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Product Details Section */}
+                  <h4 className="ml-3" style={{ marginTop: "20px" }}>
+                    <b>Product Details</b>
+                  </h4>
+                  <button
+                    className="btn btn-secondary mb-3"
+                    onClick={handleAddProductRow}
+                  >
+                    Add Product Row
+                  </button>
+
+                  {/* Dynamically Generated Product Rows */}
+                  {productRows.map((_, rowIndex) => (
+                    <div key={rowIndex} className="row mb-2 align-items-center">
+                      {customFields.map((field, fieldIndex) => (
+                        <div key={fieldIndex} className="col-md-2">
+                          <label>{field}</label>
+                          {field === "Product Name" || field === "Name" ? (
+                            <Controller
+                              name={`products[${rowIndex}].productId`}
+                              control={control}
+                              rules={{ required: "Product is required" }}
+                              render={({ field }) => (
+                                <Select
+                                  {...field}
+                                  options={formattedProducts}
+                                  value={
+                                    formattedProducts.find(
+                                      (product) => product.value === field.value
+                                    ) || null
+                                  } // Find the selected product by matching value
+                                  onChange={(selectedOption) => {
+                                    handleProductChange(
+                                      selectedOption,
+                                      rowIndex
+                                    );
+                                    field.onChange(
+                                      selectedOption
+                                        ? selectedOption.value
+                                        : null
+                                    ); // Pass only productId (value)
+                                  }}
+                                  getOptionLabel={(e) => e.label}
+                                  getOptionValue={(e) => e.value}
+                                />
+                              )}
+                            />
+                          ) : (
+                            <input
+                              type="text"
+                              className="form-control"
+                              {...register(`products[${rowIndex}].${field}`)}
+                            />
+                          )}
+                        </div>
+                      ))}
+                      <div className="col-md-2">
+                        <button
+                          className="btn btn-danger mt-4"
+                          onClick={() => handleDeleteRow(rowIndex)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* <div className="row">
                     <div className="col-sm-6">
                       <h4 className="ml-3" style={{ marginTop: "20px" }}>
                         <b>Product Details</b>
@@ -655,7 +864,7 @@ const InvoiceRegistration = () => {
                                   htmlFor="productId"
                                   className="text-right control-label col-form-label pb-2"
                                 >
-                                  Product Name
+                                  Product Name{" "}
                                   <span style={{ color: "red" }}>*</span>
                                 </label>
                               </div>
@@ -713,7 +922,7 @@ const InvoiceRegistration = () => {
                                 htmlFor={`purchaseDate-${index}`}
                                 className="text-right control-label col-form-label"
                               >
-                                Purchase Date
+                                Purchase Date{" "}
                                 <span style={{ color: "red" }}>*</span>
                               </label>
                               <input
@@ -736,8 +945,7 @@ const InvoiceRegistration = () => {
                                 htmlFor={`quantity-${index}`}
                                 className="text-right control-label col-form-label"
                               >
-                                Quantity
-                                <span style={{ color: "red" }}>*</span>
+                                Quantity <span style={{ color: "red" }}>*</span>
                               </label>
                               <input
                                 className="form-control"
@@ -817,7 +1025,7 @@ const InvoiceRegistration = () => {
                           </div>
                         ))}
                     </div>
-                  </div>
+                  </div> */}
                 </div>
                 <div className="card-body">
                   <button
