@@ -1,13 +1,11 @@
 package com.invoice.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -15,33 +13,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Entity
-@Table(name = "invoice")
-public class InvoiceModel {
-
-    private String invoiceId;
-
-    private String purchaseOrder;
-    private String vendorCode;
-    private String invoiceDate;
-
-    @OneToMany(mappedBy = "invoiceModel", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderModel> orderModels;
-
-    private String customerId;
-    private String cGst;
-    private String sGst;
-    private String iGst;
-    private String totalAmount;
-    private String grandTotal;
-    private String dueDate;
-    private String grandTotalInWords;
-    private String status;
-    private String companyId;
-    private String bankId;
+public class InvoiceModel implements Entity{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long invoiceNumber;
+    private String invoiceId;
+    private String companyId;
+    private String customerId;
 
+    private CompanyEntity company;
+    private CustomerModel customer;
+    private BankEntity bank;
+
+    private Map<String, String> invoice;
+    private String status;
+    private String type;
 }
