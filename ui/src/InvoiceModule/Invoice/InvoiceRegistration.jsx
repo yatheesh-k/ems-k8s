@@ -16,7 +16,6 @@ const InvoiceRegistration = () => {
     register,
     handleSubmit,
     control,
-    trigger,
     setValue,
     reset,
     getValues,
@@ -64,8 +63,10 @@ const InvoiceRegistration = () => {
   const [formattedBanks, setFormattedBanks] = useState(banks);
   const navigate = useNavigate();
   const location = useLocation();
+
   console.log("customer", customer);
   console.log("product", product);
+
   console.log("formattedProducts", formattedProducts);
 
   useEffect(() => {
@@ -334,56 +335,6 @@ const InvoiceRegistration = () => {
     setProductsInfo(updatedProducts);
   };
 
-  const toInputTitleCase = (e) => {
-    const input = e.target;
-    let value = input.value;
-    const cursorPosition = input.selectionStart; // Save the cursor position
-    // Remove leading spaces
-    value = value.replace(/^\s+/g, "");
-    // Ensure only alphabets and spaces are allowed
-    const allowedCharsRegex = /^[a-zA-Z0-9\s!@#&()*/,.\\-]+$/;
-    value = value
-      .split("")
-      .filter((char) => allowedCharsRegex.test(char))
-      .join("");
-    // Capitalize the first letter of each word
-    const words = value.split(" ");
-    // Capitalize the first letter of each word and lowercase the rest
-    const capitalizedWords = words.map((word) => {
-      if (word.length > 0) {
-        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-      }
-      return "";
-    });
-    // Join the words back into a string
-    let formattedValue = capitalizedWords.join(" ");
-    // Remove spaces not allowed (before the first two characters)
-    if (formattedValue.length > 3) {
-      formattedValue =
-        formattedValue.slice(0, 3) +
-        formattedValue.slice(3).replace(/\s+/g, " ");
-    }
-    // Update input value
-    input.value = formattedValue;
-    // Restore the cursor position
-    input.setSelectionRange(cursorPosition, cursorPosition);
-  };
-
-  const handleKeyDown = async (e) => {
-    // Check if the key pressed is "Enter"
-    if (e.key === "Enter") {
-      e.preventDefault(); // Prevent default form submission
-
-      // Trigger validation for the field
-      const isValid = await trigger("fieldName");
-
-      // If validation passes, save the data
-      if (isValid) {
-        const fieldName = getValues("fieldName");
-      }
-    }
-  };
-
   const allowNumbersOnly = (e) => {
     if (!/^[0-9\s]*$/.test(e.key)) {
       e.preventDefault();
@@ -403,6 +354,17 @@ const InvoiceRegistration = () => {
       handleInvoiceDateChange({ target: { value: invoiceDate } });
     }
   }, []);
+
+  const toInputTitleCase = (e) => {
+    let value = e.target.value;
+    e.target.value = value.replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+  
+  const handleKeyDown = (e) => {
+    if (/\d/.test(e.key)) {
+      e.preventDefault();
+    }
+  };
 
   const handleAddField = () => {
     const trimmedNewField = newField.trim();
@@ -741,9 +703,9 @@ const InvoiceRegistration = () => {
                     <div
                       role="dialog"
                       aria-modal="true"
-                      className="fade modal show"
+                      className="fade modal show" // Consider using a library for better modal handling
                       tabIndex="-1"
-                      style={{ zIndex: "9999", display: "block" }}
+                      style={{ zIndex: "9999", display: "block" }} // Often, libraries handle styling
                     >
                       <div className="modal-dialog modal-dialog-centered">
                         <div className="modal-content">
@@ -756,66 +718,45 @@ const InvoiceRegistration = () => {
                               &times;
                             </button>
                           </div>
-                          <form onSubmit={handleSubmit(handleAddField)}>
-                            {" "}
-                            {/* Wrap with form and onSubmit */}
-                            <div className="modal-body">
-                              <input
-                                type="text"
-                                className="form-control"
-                                placeholder="Enter Field Name"
-                                {...register("fieldName", {
-                                  required: "Field name is required",
-                                  pattern: {
-                                    value: /^[A-Za-z\s&-]+$/,
-                                    message:
-                                      "This field accepts only alphabetic characters, spaces, hyphens and ampersands",
-                                  },
-                                  minLength: {
-                                    value: 2,
-                                    message: "Minimum 2 characters required",
-                                  },
-                                  maxLength: {
-                                    value: 40,
-                                    message: "Maximum 40 characters required",
-                                  },
-                                  validate: {
-                                    noTrailingSpaces: (value) => {
-                                      if (/\s$/.test(value)) {
-                                        return "Spaces at the end are not allowed";
-                                      }
-                                      return true;
-                                    },
-                                  },
-                                })}
-                                onInput={toInputTitleCase}
-                                onKeyDown={handleKeyDown}
-                                autoComplete="off"
-                              />
-                              {errors.fieldName && (
-                                <p className="errorMsg text-danger">
-                                  {errors.fieldName.message}
-                                </p>
-                              )}
-                            </div>
-                            <div className="modal-footer">
-                              <button
-                                className="btn btn-secondary"
-                                onClick={() => setShowModal(false)}
-                              >
-                                Close
-                              </button>
-                              <button type="submit" className="btn btn-primary">
-                                {" "}
-                                {/* Submit button */}
-                                Add Field
-                              </button>
-                            </div>
-                          </form>
+                          <div className="modal-body">
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Enter Field Name"
+                              value={newField}
+                              onChange={(e) => {
+                                setNewField(e.target.value);
+                                setErrorMessage(""); // Reset error when typing
+                              }}
+                              onInput={toInputTitleCase}
+                              onKeyDown={handleKeyDown}
+                              autoComplete="off"
+                            />
+                            {errorMessage && (
+                              <p className="errorMsg text-danger">
+                                {errorMessage}
+                              </p>
+                            )}
+                          </div>
+                          <div className="modal-footer">
+                            <button
+                              className="btn btn-secondary"
+                              onClick={() => setShowModal(false)}
+                            >
+                              Close
+                            </button>
+                            <button
+                              className="btn btn-primary"
+                              onClick={handleAddField}
+                            >
+                              Add Field
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
                   )}
+
                   {/* Display Custom Fields */}
                   {customFields.length > 0 && (
                     <div className="mb-3">
