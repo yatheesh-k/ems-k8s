@@ -2,7 +2,6 @@ package com.invoice.serviceImpl;
 
 import com.invoice.common.ResponseBuilder;
 import com.invoice.config.Config;
-import com.invoice.config.NumberToWordsConverter;
 import com.invoice.exception.InvoiceErrorMessageHandler;
 import com.invoice.exception.InvoiceErrorMessageKey;
 import com.invoice.exception.InvoiceException;
@@ -10,28 +9,18 @@ import com.invoice.model.*;
 import com.invoice.opensearch.OpenSearchOperations;
 import com.invoice.repository.CustomerRepository;
 import com.invoice.request.InvoiceRequest;
-import com.invoice.response.InvoiceResponse;
 import com.invoice.service.InvoiceService;
 import com.invoice.util.Constants;
-import com.invoice.util.CustomerUtils;
 import com.invoice.util.InvoiceUtils;
 import com.invoice.util.ResourceIdUtils;
-import com.itextpdf.text.DocumentException;
 import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.xhtmlrenderer.pdf.ITextRenderer;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringWriter;
-import java.math.BigDecimal;
 import java.util.*;
 
 
@@ -52,7 +41,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private Config config;
 
     @Override
-    public ResponseEntity<?> generateInvoice(String companyId,String customerId,String bankId,InvoiceRequest request) throws InvoiceException, IOException {
+    public ResponseEntity<?> generateInvoice(String companyId, String customerId, InvoiceRequest request) throws InvoiceException, IOException {
         CompanyEntity companyEntity;
         BankEntity bankEntity;
 
@@ -70,22 +59,21 @@ public class InvoiceServiceImpl implements InvoiceService {
             log.error("Customer ID {} does not belong to company ID {}", customer.getCustomerId(), companyId);
             throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.CUSTOMER_NOT_ASSOCIATED_WITH_COMPANY), HttpStatus.BAD_REQUEST);
         }
-        bankEntity=openSearchOperations.getBankById(index,null,bankId);
-        if (bankEntity== null){
+        bankEntity = openSearchOperations.getBankById(index, null, request.getBankId());
+        if (bankEntity == null) {
             throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.BANK_DETAILS_NOT_FOUND), HttpStatus.NOT_FOUND);
         }
 
-        try
-        {
+        try {
             InvoiceModel invoiceModel;
             // Step 4.1: Generate a unique resource ID for the customer using companyId and customer details
-            String invoiceId = ResourceIdUtils.generateInvoiceResourceId(companyId,bankEntity.getAccountNumber());
+            String invoiceId = ResourceIdUtils.generateInvoiceResourceId(companyId, bankEntity.getAccountNumber());
             invoiceModel = openSearchOperations.getInvoiceById(index, null, invoiceId);
-            if (invoiceModel!=null) {
+            if (invoiceModel != null) {
                 throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.INVOICE_ALREADY_EXISTS), HttpStatus.NOT_FOUND);
             }
-            Entity invoiceEntity = InvoiceUtils.maskInvoiceProperties(request, invoiceId,companyEntity,customer,bankEntity);
-            openSearchOperations.saveEntity(invoiceEntity,invoiceId,index);
+            Entity invoiceEntity = InvoiceUtils.maskInvoiceProperties(request, invoiceId, companyEntity, customer, bankEntity);
+            openSearchOperations.saveEntity(invoiceEntity, invoiceId, index);
 
             log.info("Invoice created successfully for customer: {}", customerId);
             return new ResponseEntity<>(ResponseBuilder.builder().build().createSuccessResponse(Constants.CREATE_SUCCESS), HttpStatus.CREATED);
@@ -110,7 +98,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             String index = ResourceIdUtils.generateCompanyIndex(companyEntity.getShortName());
 
             // Fetch invoices based on the presence of customerId
-             invoiceEntities = StringUtils.hasText(customerId)
+            invoiceEntities = StringUtils.hasText(customerId)
                     ? openSearchOperations.getInvoicesByCustomerId(companyId, customerId, index)
                     : openSearchOperations.getInvoicesByCompanyId(companyId, index);
 
@@ -130,6 +118,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             throw new InvoiceException("Unable to fetch invoices.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+}
 
 
 
@@ -371,4 +360,3 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
     }
 */
-}
