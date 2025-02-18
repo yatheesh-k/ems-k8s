@@ -52,7 +52,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private Config config;
 
     @Override
-    public ResponseEntity<?> generateInvoice(String companyId,String customerId,String bankId,InvoiceRequest request) throws InvoiceException, IOException {
+    public ResponseEntity<?> generateInvoice(String companyId,String customerId,InvoiceRequest request) throws InvoiceException, IOException {
         CompanyEntity companyEntity;
         BankEntity bankEntity;
 
@@ -70,7 +70,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             log.error("Customer ID {} does not belong to company ID {}", customer.getCustomerId(), companyId);
             throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.CUSTOMER_NOT_ASSOCIATED_WITH_COMPANY), HttpStatus.BAD_REQUEST);
         }
-        bankEntity=openSearchOperations.getBankById(index,null,bankId);
+        bankEntity=openSearchOperations.getBankById(index,null,request.getBankId());
         if (bankEntity== null){
             throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.BANK_DETAILS_NOT_FOUND), HttpStatus.NOT_FOUND);
         }
