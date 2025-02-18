@@ -58,4 +58,6 @@ public class Constants {
     public static final String ATTACHMENT =  "attachment";
     public static final String INVOICE_ =  "Invoice-";
     public static final String PDF = ".pdf";
+    public static final String CUSTOMER_ID= "customerId";
+    public static final String COMPANY_ID = "companyId";
 }
