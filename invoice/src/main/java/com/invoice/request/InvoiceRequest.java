@@ -23,4 +23,5 @@ public class InvoiceRequest {
             @Size(min = 1, max = 30, message = "{invoice.size}") String> invoice;
 
     private String status;
+    private String bankId;
 }

@@ -35,7 +35,7 @@ public class InvoiceController {
                                              @PathVariable String customerId,
                                              @PathVariable String bankId,
                                              @RequestBody @Valid InvoiceRequest invoiceRequest) throws InvoiceException, IOException {
-        return invoiceService.generateInvoice(companyId,customerId,bankId,invoiceRequest);
+        return invoiceService.generateInvoice(companyId,customerId,invoiceRequest);
     }
 
     @GetMapping("company/{companyId}/invoice")
