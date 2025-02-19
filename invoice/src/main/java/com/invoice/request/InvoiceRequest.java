@@ -22,6 +22,11 @@ public class InvoiceRequest {
             @Pattern(regexp = "^[a-zA-Z0-9&\\-\\s%]+$", message = "{invoice.format}")
             @Size(min = 1, max = 30, message = "{invoice.size}") String> invoice;
 
+    private String vendorCode;
+    private String purchaseOrder;
+    private String invoiceDate;
+    private String dueDate;
+
     private String status;
     private String bankId;
 }

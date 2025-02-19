@@ -24,6 +24,11 @@ public class InvoiceModel implements Entity{
     private CustomerModel customer;
     private BankEntity bank;
 
+    private String vendorCode;
+    private String purchaseOrder;
+    private String invoiceDate;
+    private String dueDate;
+
     private Map<String, String> invoice;
     private String status;
     private String type;

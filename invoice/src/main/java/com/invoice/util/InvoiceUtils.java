@@ -41,6 +41,10 @@ public class InvoiceUtils {
             }
             entity.setInvoice(maskedInvoice);
         }
+        entity.setInvoiceDate(maskValue(request.getInvoiceDate()));
+        entity.setDueDate(maskValue(request.getDueDate()));
+        entity.setPurchaseOrder(maskValue(request.getPurchaseOrder()));
+        entity.setVendorCode(maskValue(request.getVendorCode()));
 
         return entity;
     }
@@ -59,6 +63,12 @@ public class InvoiceUtils {
             if (invoiceEntity.getInvoiceId() != null) {
                 invoiceEntity.setInvoiceId(invoiceEntity.getInvoiceId());
             }
+
+            invoiceEntity.setInvoiceDate(unMaskValue(invoiceEntity.getInvoiceDate()));
+            invoiceEntity.setDueDate(unMaskValue(invoiceEntity.getDueDate()));
+            invoiceEntity.setPurchaseOrder(unMaskValue(invoiceEntity.getPurchaseOrder()));
+            invoiceEntity.setVendorCode(unMaskValue(invoiceEntity.getVendorCode()));
+
             if (invoiceEntity.getInvoice() != null) {
                 Map<String, String> decodedCustomFields = new HashMap<>();
                 for (Map.Entry<String, String> entry : invoiceEntity.getInvoice().entrySet()) {
