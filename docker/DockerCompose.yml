@@ -1,7 +1,7 @@
 services:
   frontend:
     build:
-      context: /var/lib/jenkins/workspace/Ems-docker-main/ui
+      context: ../ui
       dockerfile: Dockerfile
     ports:
       - "2800:2800"
