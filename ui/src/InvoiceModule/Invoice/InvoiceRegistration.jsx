@@ -242,62 +242,79 @@ const InvoiceRegistration = () => {
   //   };
 
   const onSubmit = async (data) => {
-    console.log("InvoiceRegdata", data);
-    console.log("productsInfo", data.productsInfo); // Ensure this has purchaseDate, quantity, and productId
+    console.log("🔍 Full Form Data Before Fix:", data); // Check the received form data
 
     setLoad(true);
 
     try {
-      const customerId = data.customerName.value;
+      const customerId = data.customerName?.value;
+      if (!customerId) {
+        console.error("❌ Customer ID is missing!");
+        toast.error("Customer ID is required");
+        setLoad(false);
+        return;
+      }
 
-      // Prepare the orderRequests payload
-      const orderRequests = data.productsInfo.map((product) => {
-        // Ensure the product has all necessary fields
-        return {
-          productId: product.productId || "", // Ensure productId is passed (set default if undefined)
-          hsnNo: product.hsnNo || "", // Ensure hsnNo is passed
-          purchaseDate: product.purchaseDate || "", // Ensure purchaseDate is passed
-          quantity: product.quantity || "", // Ensure quantity is passed
-        };
-      });
+      // ✅ Convert products array into a dynamic key-value object for customFields
+      const customFieldsObject = {};
 
+      // Add predefined fields to the object
+      customFieldsObject.customerName = data.customerName.label || "";
+      customFieldsObject.purchaseOrder = data.purchaseOrder || "";
+      customFieldsObject.vendorCode = data.vendorCode || "";
+      customFieldsObject.invoiceDate = data.invoiceDate || "";
+      customFieldsObject.dueDate = data.dueDate || "";
+      
+      // Add dynamic product fields
+      if (data.products?.length > 0) {
+        data.products.forEach((product) => {
+          Object.keys(product).forEach((key) => {
+            customFieldsObject[key] = product[key] || "";
+          });
+        });
+      }
+      
+      console.log("✅ Final Payload:", customFieldsObject);
+      
+      console.log("🛠️ Transformed Custom Fields:", customFieldsObject);
+
+      // ✅ Prepare final payload
       const invoiceDataToSend = {
-        customerName: data.customerName.label,
-        bankId: data.bankName,
-        purchaseOrder: data.purchaseOrder,
-        vendorCode: data.vendorCode,
-        invoiceDate: data.invoiceDate,
-        dueDate: data.dueDate,
-        orderRequests: orderRequests, // Pass the prepared orderRequests array
+        // customerName: data.customerName.label,
+        // purchaseOrder: data.purchaseOrder,
+        // vendorCode: data.vendorCode,
+        // invoiceDate: data.invoiceDate,
+        // dueDate: data.dueDate,
         status: "Active",
+        bankId: data.bankName,
+        invoice: customFieldsObject, // ✅ Dynamically generated custom fields
       };
 
-      console.log("invoiceDataToSend", invoiceDataToSend); // Verify purchaseDate, quantity, and productId are included here
+      console.log("📡 Sending Data to API:", invoiceDataToSend);
 
       const response = await InvoicePostApi(
         companyId,
         customerId,
         invoiceDataToSend
       );
+      console.log("✅ API Response:", response);
 
       toast.success("Invoice created successfully", {
         position: "top-right",
         autoClose: 1000,
       });
       navigate("/invoiceView");
-      setInvoiceData({
-        ...data,
-        product_details: data.productsInfo, // Ensure product details are included
-      });
 
-      setShowPreview(true); // Show preview on successful submission
+      setInvoiceData(data);
+      setShowPreview(true);
     } catch (error) {
-      // toast.error("Failed to save invoice", {
-      //   position: "top-right",
-      //   autoClose: 1000,
-      // });
+      console.error("❌ API Error:", error);
+      toast.error("Failed to save invoice", {
+        position: "top-right",
+        autoClose: 1000,
+      });
     } finally {
-      setLoad(false); // Hide loading state
+      setLoad(false);
     }
   };
 
@@ -359,7 +376,7 @@ const InvoiceRegistration = () => {
     let value = e.target.value;
     e.target.value = value.replace(/\b\w/g, (char) => char.toUpperCase());
   };
-  
+
   const handleKeyDown = (e) => {
     if (/\d/.test(e.key)) {
       e.preventDefault();
@@ -372,9 +389,10 @@ const InvoiceRegistration = () => {
     if (trimmedNewField !== "") {
       if (customFields.length < 6) {
         if (!customFields.includes(trimmedNewField)) {
-          setCustomFields([...customFields, trimmedNewField]);
-          setNewField("");
-          setShowModal(false);
+          setCustomFields((prevFields) => [...prevFields, trimmedNewField]); // Ensure correct state update
+          setNewField(""); // Reset input field
+          setShowModal(false); // Close modal if needed
+          setErrorMessage(""); // Reset error message
         } else {
           setErrorMessage(`Field "${trimmedNewField}" already exists.`); // Set error message
         }
@@ -693,12 +711,45 @@ const InvoiceRegistration = () => {
                     )} */}
                   </div>
                   <button
-                    className="btn btn-primary mb-3"
+                    type="button"
+                    className="btn btn-primary mb-2"
                     onClick={() => setShowModal(true)}
                   >
                     Add Fields
                   </button>
-
+                  {customFields.length > 0 && (
+                    <div>
+                      <h5>Custom Fields:</h5>
+                      <div className="d-flex flex-wrap gap-2">
+                        {customFields.map((field, index) => (
+                          <div
+                            key={index}
+                            className="d-flex align-items-center"
+                          >
+                            <input
+                              {...register(`customField_${index}`)}
+                              className="form-control me-2 mb-2"
+                              defaultValue={field}
+                              style={{ width: "150px" }} // Adjust width if needed
+                            />
+                            <button
+                              type="button"
+                              style={{ padding: "6px" }}
+                              className="btn btn-danger btn-sm mb-2"
+                              onClick={() =>
+                                setCustomFields(
+                                  customFields.filter((_, i) => i !== index)
+                                )
+                              }
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                 
                   {showModal && (
                     <div
                       role="dialog"
@@ -725,8 +776,30 @@ const InvoiceRegistration = () => {
                               placeholder="Enter Field Name"
                               value={newField}
                               onChange={(e) => {
-                                setNewField(e.target.value);
-                                setErrorMessage(""); // Reset error when typing
+                                const value = e.target.value;
+
+                                // Validation rules
+                                if (!/^[A-Za-z\s&-]+$/.test(value)) {
+                                  setErrorMessage(
+                                    "Only alphabetic characters, spaces, '&' and '-' are allowed."
+                                  );
+                                } else if (value.length < 2) {
+                                  setErrorMessage(
+                                    "Minimum 2 characters required."
+                                  );
+                                } else if (value.length > 40) {
+                                  setErrorMessage(
+                                    "Maximum 40 characters allowed."
+                                  );
+                                } else if (/\s$/.test(value)) {
+                                  setErrorMessage(
+                                    "Spaces at the end are not allowed."
+                                  );
+                                } else {
+                                  setErrorMessage(""); // No error
+                                }
+
+                                setNewField(value);
                               }}
                               onInput={toInputTitleCase}
                               onKeyDown={handleKeyDown}
@@ -757,95 +830,55 @@ const InvoiceRegistration = () => {
                     </div>
                   )}
 
-                  {/* Display Custom Fields */}
-                  {customFields.length > 0 && (
-                    <div className="mb-3">
-                      <h5>Custom Fields:</h5>
-                      <div className="d-flex flex-wrap gap-2 align-items-center">
-                        {customFields.map((field, index) => (
-                          <div
-                            key={index}
-                            className="d-flex align-items-center"
-                          >
-                            <div className="border p-1 rounded">{field}</div>
-                            <button
-                              className="btn btn-danger btn-sm ml-2"
-                              onClick={() => handleDeleteField(index)}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  {/* Add Product Row Button */}
+                  <div>
+                    <button
+                      type="button"
+                      className="btn btn-secondary mb-3"
+                      onClick={handleAddProductRow}
+                    >
+                      Add Product Row
+                    </button>
 
-                  {/* Product Details Section */}
-                  <h4 className="ml-3" style={{ marginTop: "20px" }}>
-                    <b>Product Details</b>
-                  </h4>
-                  <button
-                    className="btn btn-secondary mb-3"
-                    onClick={handleAddProductRow}
-                  >
-                    Add Product Row
-                  </button>
-
-                  {/* Dynamically Generated Product Rows */}
-                  {productRows.map((_, rowIndex) => (
-                    <div key={rowIndex} className="row mb-2 align-items-center">
-                      {customFields.map((field, fieldIndex) => (
-                        <div key={fieldIndex} className="col-md-2">
-                          <label>{field}</label>
-                          {field === "Product Name" || field === "Name" ? (
-                            <Controller
-                              name={`products[${rowIndex}].productId`}
-                              control={control}
-                              rules={{ required: "Product is required" }}
-                              render={({ field }) => (
-                                <Select
-                                  {...field}
-                                  options={formattedProducts}
-                                  value={
-                                    formattedProducts.find(
-                                      (product) => product.value === field.value
-                                    ) || null
-                                  } // Find the selected product by matching value
-                                  onChange={(selectedOption) => {
-                                    handleProductChange(
-                                      selectedOption,
-                                      rowIndex
-                                    );
-                                    field.onChange(
-                                      selectedOption
-                                        ? selectedOption.value
-                                        : null
-                                    ); // Pass only productId (value)
-                                  }}
-                                  getOptionLabel={(e) => e.label}
-                                  getOptionValue={(e) => e.value}
-                                />
-                              )}
-                            />
-                          ) : (
+                    {/* Dynamically Generated Product Rows */}
+                    {productRows.map((_, rowIndex) => (
+                      <div
+                        key={rowIndex}
+                        className="row mb-2 align-items-center"
+                      >
+                        {customFields.map((field, fieldIndex) => (
+                          <div key={fieldIndex} className="col-md-2">
+                            <label>{field}</label>
                             <input
                               type="text"
                               className="form-control"
                               {...register(`products[${rowIndex}].${field}`)}
                             />
-                          )}
-                        </div>
-                      ))}
-                      <div className="col-md-2">
-                        <button
-                          className="btn btn-danger mt-4"
-                          onClick={() => handleDeleteRow(rowIndex)}
+                          </div>
+                        ))}
+                        <div
+                          className="col-md-2"
+                          style={{
+                            paddingLeft: "0px",
+                            paddingRight: "0px",
+                            marginTop: "20px",
+                          }}
                         >
-                          Delete
-                        </button>
+                          <button
+                            type="button"
+                            className="btn btn-danger"
+                            onClick={() =>
+                              setProductRows(
+                                productRows.filter((_, i) => i !== rowIndex)
+                              )
+                            }
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
 
                   {/* <div className="row">
                     <div className="col-sm-6">
