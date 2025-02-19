@@ -11,7 +11,7 @@ services:
       - ELASTICSEARCH_URL=http://host.docker.internal:9200
   identity:
     build:
-      context: /var/lib/jenkins/workspace/Ems-docker-main
+      context: ../
       dockerfile: docker/identity
     ports:
       - "9090:9090"
@@ -21,7 +21,7 @@ services:
       - ELASTICSEARCH_URL=http://host.docker.internal:9200
   employee:
     build:
-      context: /var/lib/jenkins/workspace/Ems-docker-main
+      context: ../
       dockerfile: docker/employee
     ports:
       - "8092:8092"
