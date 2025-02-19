@@ -4,8 +4,6 @@ package com.invoice.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.invoice.model.*;
 import com.invoice.opensearch.OpenSearchOperations;
-import com.invoice.request.BankRequest;
-import com.invoice.request.CustomerRequest;
 import com.invoice.request.InvoiceRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
