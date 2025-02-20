@@ -10,6 +10,7 @@ import { InvoicePostApi } from "../../Utils/Axios";
 import { fetchCustomers } from "../../Redux/CustomerSlice";
 import { fetchProducts } from "../../Redux/ProductSlice";
 import { fetchBanks } from "../../Redux/BankSlice";
+import DeletePopup from "../../Utils/DeletePopup";
 
 const InvoiceRegistration = () => {
   const {
@@ -28,13 +29,24 @@ const InvoiceRegistration = () => {
   const { customers, loading, error } = useSelector((state) => state.customers);
   const { products } = useSelector((state) => state.products);
   const { banks } = useSelector((state) => state.banks);
-
+  const [productData, setProductData] = useState([]);
+  const [fieldErrors, setFieldErrors] = useState({});
   console.log("products", products);
   const [invoiceData, setInvoiceData] = useState(null);
+  const [productColumns, setProductColumns] = useState([
+    { key: "items", title: "Item", type: "text" },
+    { key: "hsn", title: "HSN-no", type: "text" },
+    { key: "service", title: "Service", type: "text" },
+    { key: "quantity", title: "Quantity", type: "number" },
+    { key: "unitCost", title: "Unit Cost", type: "number" },
+    { key: "totalCost", title: "Total Cost", type: "number", readonly: true },
+  ]);
+
   const [search, setSearch] = useState("");
   const [filteredData, setFilteredData] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState(null);
+  const [deleteType, setDeleteType] = useState(null);
   const [customFields, setCustomFields] = useState([]); // Dynamic field names
   const [newField, setNewField] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -74,6 +86,45 @@ const InvoiceRegistration = () => {
     dispatch(fetchProducts());
     dispatch(fetchBanks(companyId));
   }, [dispatch]);
+
+  const subTotal = productData.reduce(
+    (sum, row) => sum + (parseFloat(row.totalCost) || 0),
+    0
+  );
+
+  const validateInput = (type, value) => {
+    if (type === "text") return /^[a-zA-Z0-9_-]*$/.test(value); // Text allows letters, numbers, _ and -
+    if (type === "number") return /^[0-9]*$/.test(value); // Only numbers
+    if (type === "percentage") return /^([0-9]{1,2}|100)%?$/.test(value); // 1-3 digits with %
+    return true;
+  };
+
+  // ** Update Table Data **
+  const updateData = (index, key, value) => {
+    const colType =
+      productColumns.find((col) => col.key === key)?.type || "text";
+    if (validateInput(colType, value) || value === "") {
+      const updatedData = [...productData];
+      updatedData[index] = { ...updatedData[index], [key]: value };
+
+      // Auto-calculate totalCost if quantity or unitCost are updated
+      if (key === "quantity" || key === "unitCost") {
+        const quantity = parseFloat(updatedData[index].quantity) || 0;
+        const unitCost = parseFloat(updatedData[index].unitCost) || 0;
+        updatedData[index].totalCost = (quantity * unitCost).toFixed(2);
+      }
+      setProductData(updatedData);
+    } else {
+      setFieldErrors((prev) => {
+        const newErrors = { ...prev };
+        newErrors[index] = {
+          ...(newErrors[index] || {}),
+          [key]: `Invalid Format.`,
+        };
+        return newErrors;
+      });
+    }
+  };
 
   useEffect(() => {
     if (Array.isArray(products)) {
@@ -199,43 +250,6 @@ const InvoiceRegistration = () => {
 
   console.log("this is from customers options ", customer);
 
-  const handleProductChange = (selectedOption, index) => {
-    console.log("Selected Product:", selectedOption);
-
-    if (!selectedOption || !selectedOption.productCost) {
-      console.error(
-        "Selected product does not have productCost",
-        selectedOption
-      );
-      return;
-    }
-
-    const purchaseDate = getValues(`productsInfo[${index}].purchaseDate`);
-    const quantity = getValues(`productsInfo[${index}].quantity`);
-
-    const updatedProductsInfo = [...productsInfo];
-    updatedProductsInfo[index] = {
-      ...updatedProductsInfo[index],
-      productId: selectedOption.value, // Product ID
-      productName: selectedOption.label, // Product Name
-      hsnNo: selectedOption.hsnNo, // HSN No
-      productCost: selectedOption.productCost, // Product Cost
-      purchaseDate: purchaseDate,
-      quantity: quantity,
-    };
-
-    setProductsInfo(updatedProductsInfo);
-
-    // Update React Hook Form values for product details
-    setValue(`productsInfo[${index}].productName`, selectedOption.label);
-    setValue(`productsInfo[${index}].hsnNo`, selectedOption.hsnNo);
-    setValue(`productsInfo[${index}].productCost`, selectedOption.productCost);
-    setValue(`productsInfo[${index}].purchaseDate`, purchaseDate); // Empty initially
-    setValue(`productsInfo[${index}].quantity`, quantity); // Empty initially
-
-    console.log("Updated Products Info:", updatedProductsInfo);
-  };
-
   // Function to set default invoice date
   //   const getDefaultInvoiceDate = () => {
   //     return moment().format('YYYY-MM-DD');
@@ -259,12 +273,12 @@ const InvoiceRegistration = () => {
       const customFieldsObject = {};
 
       // Add predefined fields to the object
-      customFieldsObject.customerName = data.customerName.label || "";
-      customFieldsObject.purchaseOrder = data.purchaseOrder || "";
-      customFieldsObject.vendorCode = data.vendorCode || "";
-      customFieldsObject.invoiceDate = data.invoiceDate || "";
-      customFieldsObject.dueDate = data.dueDate || "";
-      
+      // customFieldsObject.customerName = data.customerName.label || "";
+      // customFieldsObject.purchaseOrder = data.purchaseOrder || "";
+      // customFieldsObject.vendorCode = data.vendorCode || "";
+      // customFieldsObject.invoiceDate = data.invoiceDate || "";
+      // customFieldsObject.dueDate = data.dueDate || "";
+
       // Add dynamic product fields
       if (data.products?.length > 0) {
         data.products.forEach((product) => {
@@ -273,21 +287,22 @@ const InvoiceRegistration = () => {
           });
         });
       }
-      
+
       console.log("✅ Final Payload:", customFieldsObject);
-      
+
       console.log("🛠️ Transformed Custom Fields:", customFieldsObject);
 
       // ✅ Prepare final payload
       const invoiceDataToSend = {
-        // customerName: data.customerName.label,
-        // purchaseOrder: data.purchaseOrder,
-        // vendorCode: data.vendorCode,
-        // invoiceDate: data.invoiceDate,
-        // dueDate: data.dueDate,
+        customerName: data.customerName.label,
+        purchaseOrder: data.purchaseOrder,
+        vendorCode: data.vendorCode,
+        invoiceDate: data.invoiceDate,
+        dueDate: data.dueDate,
         status: "Active",
         bankId: data.bankName,
-        invoice: customFieldsObject, // ✅ Dynamically generated custom fields
+        productColumns,
+        productData,
       };
 
       console.log("📡 Sending Data to API:", invoiceDataToSend);
@@ -316,6 +331,42 @@ const InvoiceRegistration = () => {
     } finally {
       setLoad(false);
     }
+  };
+
+  const handleDeleteColumn = (key) => {
+    setSelectedItemId(key);
+    setDeleteType("column");
+    setShowDeleteModal(true);
+  };
+
+  // Open delete popup for a row
+  const handleDeleteRow = (index) => {
+    setSelectedItemId(index);
+    setDeleteType("row");
+    setShowDeleteModal(true);
+  };
+
+  // Close the popup
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setSelectedItemId(null);
+    setDeleteType(null);
+  };
+
+  const handleConfirmDelete = (id) => {
+    if (deleteType === "column") {
+      setProductColumns(productColumns.filter((col) => col.key !== id));
+      setProductData(
+        productData.map((row) => {
+          const newRow = { ...row };
+          delete newRow[id];
+          return newRow;
+        })
+      );
+    } else if (deleteType === "row") {
+      setProductData(productData.filter((_, index) => index !== id));
+    }
+    handleCloseDeleteModal();
   };
 
   // // Automatically populate invoice number and date if they are not provided
@@ -403,19 +454,45 @@ const InvoiceRegistration = () => {
   };
 
   // Add new product row
-  const handleAddProductRow = () => {
-    setProductRows([...productRows, {}]);
+  const updateColumnTitle = (key, title) => {
+    setProductColumns(
+      productColumns.map((col) => (col.key === key ? { ...col, title } : col))
+    );
   };
 
-  // Remove product row
-  const handleDeleteRow = (index) => {
-    setProductRows(productRows.filter((_, i) => i !== index));
+  const updateColumnType = (key, type) => {
+    setProductColumns(
+      productColumns.map((col) => (col.key === key ? { ...col, type } : col))
+    );
+  };
+  const addColumn = () => {
+    if (productColumns.length >= 8) {
+      toast.error("You cannot add more than 8 columns.");
+      return;
+    }
+
+    const newKey = `custom_${productColumns.length}`;
+    const newColumn = { key: newKey, title: "New Field", type: "text" };
+
+    // Find the index of the "totalCost" column
+    const totalCostIndex = productColumns.findIndex(
+      (col) => col.key === "totalCost"
+    );
+
+    // If "totalCost" is found, insert the new column before it; otherwise, append at the end
+    const updatedColumns =
+      totalCostIndex !== -1
+        ? [
+            ...productColumns.slice(0, totalCostIndex),
+            newColumn,
+            ...productColumns.slice(totalCostIndex),
+          ]
+        : [...productColumns, newColumn];
+
+    setProductColumns(updatedColumns);
   };
 
-  // Remove custom field
-  const handleDeleteField = (fieldIndex) => {
-    setCustomFields(customFields.filter((_, i) => i !== fieldIndex));
-  };
+  const addRow = () => setProductData([...productData, {}]);
 
   // Handle form submission
   // const onSubmit = (data) => {
@@ -631,6 +708,49 @@ const InvoiceRegistration = () => {
                       )}
                     </div>
                   </div>
+
+                  <div className="form-group row">
+                    <label
+                      htmlFor="purchaseOrder"
+                      className="col-sm-2 text-right control-label col-form-label"
+                    >
+                      Invoice Number <span style={{ color: "red" }}>*</span>
+                    </label>
+                    <div className="col-sm-9 mb-3">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="purchaseOrder"
+                        id="purchaseOrder"
+                        placeholder="Enter Invoice Number"
+                        {...register("invoiceNo", {
+                          required: "Invoice Number is required",
+                          pattern: {
+                            value: /^[A-Za-z0-9]+$/, // Accept only alphabets and numbers
+                            message: "Only alphabets and numbers are allowed",
+                          },
+                          minLength: {
+                            value: 3,
+                            message:
+                              "Invoice Number must be at least 3 characters long",
+                          },
+                          maxLength: {
+                            value: 10,
+                            message:
+                              "Invoice Number cannot exceed 10 characters",
+                          },
+                        })}
+                      />
+                      {errors.invoiceNo && (
+                        <p
+                          className="errorMsg"
+                          style={{ marginLeft: "6px", marginBottom: "0" }}
+                        >
+                          {errors.invoiceNo.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                   {/* Invoice Number */}
                   {/* <div className="form-group row">
                     <label
@@ -710,174 +830,136 @@ const InvoiceRegistration = () => {
                       </p>
                     )} */}
                   </div>
-                  <button
-                    type="button"
-                    className="btn btn-primary mb-2"
-                    onClick={() => setShowModal(true)}
-                  >
-                    Add Fields
-                  </button>
-                  {customFields.length > 0 && (
-                    <div>
-                      <h5>Custom Fields:</h5>
-                      <div className="d-flex flex-wrap gap-2">
-                        {customFields.map((field, index) => (
-                          <div
-                            key={index}
-                            className="d-flex align-items-center"
-                          >
-                            <input
-                              {...register(`customField_${index}`)}
-                              className="form-control me-2 mb-2"
-                              defaultValue={field}
-                              style={{ width: "150px" }} // Adjust width if needed
-                            />
-                            <button
-                              type="button"
-                              style={{ padding: "6px" }}
-                              className="btn btn-danger btn-sm mb-2"
-                              onClick={() =>
-                                setCustomFields(
-                                  customFields.filter((_, i) => i !== index)
-                                )
-                              }
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                 
-                  {showModal && (
-                    <div
-                      role="dialog"
-                      aria-modal="true"
-                      className="fade modal show" // Consider using a library for better modal handling
-                      tabIndex="-1"
-                      style={{ zIndex: "9999", display: "block" }} // Often, libraries handle styling
-                    >
-                      <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content">
-                          <div className="modal-header">
-                            <h5 className="modal-title">Add Custom Field</h5>
-                            <button
-                              className="close"
-                              onClick={() => setShowModal(false)}
-                            >
-                              &times;
-                            </button>
-                          </div>
-                          <div className="modal-body">
-                            <input
-                              type="text"
-                              className="form-control"
-                              placeholder="Enter Field Name"
-                              value={newField}
-                              onChange={(e) => {
-                                const value = e.target.value;
-
-                                // Validation rules
-                                if (!/^[A-Za-z\s&-]+$/.test(value)) {
-                                  setErrorMessage(
-                                    "Only alphabetic characters, spaces, '&' and '-' are allowed."
-                                  );
-                                } else if (value.length < 2) {
-                                  setErrorMessage(
-                                    "Minimum 2 characters required."
-                                  );
-                                } else if (value.length > 40) {
-                                  setErrorMessage(
-                                    "Maximum 40 characters allowed."
-                                  );
-                                } else if (/\s$/.test(value)) {
-                                  setErrorMessage(
-                                    "Spaces at the end are not allowed."
-                                  );
-                                } else {
-                                  setErrorMessage(""); // No error
-                                }
-
-                                setNewField(value);
-                              }}
-                              onInput={toInputTitleCase}
-                              onKeyDown={handleKeyDown}
-                              autoComplete="off"
-                            />
-                            {errorMessage && (
-                              <p className="errorMsg text-danger">
-                                {errorMessage}
-                              </p>
-                            )}
-                          </div>
-                          <div className="modal-footer">
-                            <button
-                              className="btn btn-secondary"
-                              onClick={() => setShowModal(false)}
-                            >
-                              Close
-                            </button>
-                            <button
-                              className="btn btn-primary"
-                              onClick={handleAddField}
-                            >
-                              Add Field
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Add Product Row Button */}
-                  <div>
+                  <div className="mt-4">
                     <button
                       type="button"
-                      className="btn btn-secondary mb-3"
-                      onClick={handleAddProductRow}
+                      className="btn btn-primary mb-2"
+                      onClick={addColumn}
                     >
-                      Add Product Row
+                      Add Column
                     </button>
-
-                    {/* Dynamically Generated Product Rows */}
-                    {productRows.map((_, rowIndex) => (
-                      <div
-                        key={rowIndex}
-                        className="row mb-2 align-items-center"
-                      >
-                        {customFields.map((field, fieldIndex) => (
-                          <div key={fieldIndex} className="col-md-2">
-                            <label>{field}</label>
+                    <button
+                      type="button"
+                      className="btn btn-secondary mb-2 ms-2"
+                      onClick={addRow}
+                    >
+                      Add Row
+                    </button>
+                    <table className="table table-bordered">
+                      <thead>
+                        <tr>
+                          {productColumns.map((col) => (
+                            <th key={col.key} className="position-relative">
+                              {col.key !== "totalCost" && ( // Prevent deleting totalCost column
+                                <button
+                                  type="button"
+                                  className="btn btn-sm position-absolute top-0 end-0"
+                                  onClick={() => handleDeleteColumn(col.key)}
+                                  style={{ fontSize: "10px" }}
+                                >
+                                  ❌
+                                </button>
+                              )}
+                              <input
+                                type="text"
+                                className="form-control mb-1"
+                                value={col.title}
+                                onChange={(e) =>
+                                  updateColumnTitle(col.key, e.target.value)
+                                }
+                                disabled={col.key === "totalCost"} // Prevent editing totalCost header
+                              />
+                              <select
+                                className="form-select form-select-sm"
+                                value={col.type}
+                                onChange={(e) =>
+                                  updateColumnType(col.key, e.target.value)
+                                }
+                                disabled={col.key === "totalCost"} // Prevent changing type for totalCost
+                              >
+                                <option value="text">Text</option>
+                                <option value="number">Number</option>
+                                <option value="percentage">%</option>
+                              </select>
+                            </th>
+                          ))}
+                          <th style={{ paddingBottom: "35px" }}>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {productData.map((row, rowIndex) => (
+                          <tr key={rowIndex}>
+                            {productColumns.map((col) => (
+                              <td key={col.key}>
+                                <input
+                                  type={
+                                    col.type === "percentage"
+                                      ? "text"
+                                      : col.type
+                                  }
+                                  className="form-control"
+                                  value={row[col.key] || ""}
+                                  onChange={(e) =>
+                                    updateData(
+                                      rowIndex,
+                                      col.key,
+                                      e.target.value
+                                    )
+                                  }
+                                  disabled={col.key === "totalCost"} // Prevent editing totalCost directly
+                                />
+                                {fieldErrors[rowIndex] &&
+                                  fieldErrors[rowIndex][col.key] && (
+                                    <p
+                                      className="errorMsg"
+                                      style={{
+                                        color: "red",
+                                        fontSize: "0.8em",
+                                      }}
+                                    >
+                                      {fieldErrors[rowIndex][col.key]}
+                                    </p>
+                                  )}
+                              </td>
+                            ))}
+                            <td>
+                              <button
+                                type="button"
+                                className="btn btn-danger btn-sm"
+                                onClick={() => handleDeleteRow(rowIndex)}
+                              >
+                                Delete Row
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                        {/* SubTotal Row */}
+                        <tr>
+                          <td
+                            colSpan={productColumns.length - 1}
+                            className="text-end"
+                          >
+                            <strong>SubTotal:</strong>
+                          </td>
+                          <td>
                             <input
                               type="text"
                               className="form-control"
-                              {...register(`products[${rowIndex}].${field}`)}
+                              value={subTotal}
+                              readOnly
                             />
-                          </div>
-                        ))}
-                        <div
-                          className="col-md-2"
-                          style={{
-                            paddingLeft: "0px",
-                            paddingRight: "0px",
-                            marginTop: "20px",
-                          }}
-                        >
-                          <button
-                            type="button"
-                            className="btn btn-danger"
-                            onClick={() =>
-                              setProductRows(
-                                productRows.filter((_, i) => i !== rowIndex)
-                              )
-                            }
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                          </td>
+                          <td></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <DeletePopup
+                      show={showDeleteModal}
+                      handleClose={handleCloseDeleteModal}
+                      handleConfirm={() => handleConfirmDelete(selectedItemId)}
+                      id={selectedItemId}
+                      pageName="Field"
+                    />
                   </div>
 
                   {/* <div className="row">
