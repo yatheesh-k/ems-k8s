@@ -456,28 +456,28 @@ const CompanySalaryStructure = () => {
       .split("")
       .filter((char) => allowedCharsRegex.test(char))
       .join("");
-    // Capitalize the first letter of each word
-    const words = value.split(" ");
-    // Capitalize the first letter of each word and lowercase the rest
-    const capitalizedWords = words.map((word) => {
-      if (word.length > 0) {
-        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-      }
-      return "";
-    });
-    // Join the words back into a string
-    let formattedValue = capitalizedWords.join(" ");
-    // Remove spaces not allowed (before the first two characters)
-    if (formattedValue.length > 3) {
-      formattedValue =
-        formattedValue.slice(0, 3) +
-        formattedValue.slice(3).replace(/\s+/g, " ");
-    }
-    // Update input value
-    input.value = formattedValue;
-    // Restore the cursor position
+    // Capitalize first letter of each word & keep others as user typed
+  const words = value.split(" ");
+  const formattedValue = words.map((word) =>
+    word.length > 0 ? word.charAt(0).toUpperCase() + word.slice(1) : ""
+  ).join(" ");
+  // Trim multiple spaces after the first 3 characters
+  let finalValue = formattedValue.length > 3
+    ? formattedValue.slice(0, 3) + formattedValue.slice(3).replace(/\s+/g, " ")
+    : formattedValue;
+    input.value = finalValue;
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
+
+
+
+
+
+
+
+
+
+
 
   const handleEmailChange = (e) => {
     // Get the current value of the input field

@@ -21,21 +21,20 @@ const InvoiceView = () => {
   // Fetch invoices on component mount
   useEffect(() => {
     if (companyId) {
-      dispatch(fetchInvoices(companyId));
+      dispatch(fetchInvoices(companyId)).then((res) => {
+      });
     }
   }, [dispatch, companyId]);
 
   // Filter invoices based on search
   useEffect(() => {
-    if (invoices && Array.isArray(invoices)) {
-      const result = invoices.filter((invoice) =>
-        invoice.invoiceNumber.toLowerCase().includes(search.toLowerCase())
-      );
-      setFilteredData(result);
+    if (invoices?.data && Array.isArray(invoices.data)) {
+      console.log("Extracted Invoices Data:", invoices.data); // Debugging log
+      setFilteredData(invoices.data);
     } else {
       setFilteredData([]);
     }
-  }, [search, invoices]);
+  }, [invoices]);
 
   // Navigate to the Invoice PDF view page
   const handleView = (customerId, invoiceId) => {
@@ -62,9 +61,9 @@ const InvoiceView = () => {
       ),
       selector: (row) => (
         <div title={row.customerName || ""}>
-          {row.customerName && row.customerName.length > 18
-            ? row.customerName.slice(0, 20) + "..."
-            : row.customerName}
+          {row.customerc?.ustomerName && row.customer?.customerName.length > 18
+            ? row.customer?.customerName.slice(0, 20) + "..."
+            : row.customer?.customerName}
         </div>
       ),
       width: "190px",
@@ -75,7 +74,7 @@ const InvoiceView = () => {
           <b>Mobile Number</b>
         </h6>
       ),
-      selector: (row) => row.contactNumber,
+      selector: (row) =>  row.customer?.mobileNumber,
       width: "170px",
     },
     // {
@@ -89,7 +88,7 @@ const InvoiceView = () => {
           <b>State</b>
         </h6>
       ),
-      selector: (row) => row.customerState,
+      selector: (row) => row.customer?.state,
       width: "150px",
     },
     // {

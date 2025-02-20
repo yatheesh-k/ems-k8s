@@ -384,7 +384,7 @@ const CreatePassword = () => {
 
             <div className="text-center mt-4">
               <button type="submit" className="btn btn-primary" disabled={loading || isSubmitting}>
-                {loading ? "Loading..." : "Update Password"}
+                {loading ? "Loading..." : "Create Password"}
               </button>
             </div>
           </form>

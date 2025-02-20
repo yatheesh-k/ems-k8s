@@ -23,6 +23,7 @@ const GeneratePaySlip = () => {
   } = useForm();
   const [view, setView] = useState([]);
   const [show, setShow] = useState(false);
+  const [attendanceNull, setAttendanceNull] = useState([]);
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedMonthYear, setSelectedMonthYear] = useState("");
@@ -73,10 +74,12 @@ const GeneratePaySlip = () => {
         year: year.label,
       });
       setView(response.data.data.generatePayslip);
+      setAttendanceNull(response.data.data.employeesWithoutAttendance || []); // Ensure it's always an array
       setSelectedMonthYear(`${month.label} ${year.label}`);
       setShow(true);
     } catch (error) {
-      const errorMessage = error.response?.data?.error?.message || "Error fetching payslip data.";
+      const errorMessage =
+        error.response?.data?.error?.message || "Error fetching payslip data.";
       toast.error(errorMessage);
     }
   };
@@ -311,6 +314,11 @@ const GeneratePaySlip = () => {
                   </div>
                 </div>
               </form>
+              {attendanceNull.length > 0 && (
+                <div className="col-md-6 col-lg-4 mx-auto alert alert-danger mt-4 text-center">
+                  {attendanceNull}
+                </div>
+              )}
             </div>
           </div>
         </div>
