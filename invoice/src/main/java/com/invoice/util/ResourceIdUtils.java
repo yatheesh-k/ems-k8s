@@ -12,8 +12,8 @@ public class ResourceIdUtils {
         return generateGlobalResourceId(ResourceType.CUSTOMER, email,mobileNumber);
     }
 
-    public static String generateInvoiceResourceId(String companyId, String bankId) {
-        return generateGlobalResourceId(ResourceType.INVOICE, companyId, bankId);
+    public static String generateInvoiceResourceId(String companyId, String customerId,String timeStamp) {
+        return generateGlobalResourceId(ResourceType.INVOICE, companyId, customerId,timeStamp);
     }
 
     public static String generateCompanyIndex(String name) {

@@ -8,21 +8,27 @@ import com.invoice.model.CompanyEntity;
 import com.invoice.model.Entity;
 import com.invoice.model.InvoiceModel;
 import com.invoice.util.Constants;
+import com.invoice.util.ResourceIdUtils;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch.core.search.Hit;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch.OpenSearchClient;
+
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch.core.*;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 @Component
 public class OpenSearchOperations {
@@ -30,9 +36,9 @@ public class OpenSearchOperations {
     private static final Integer SIZE_ELASTIC_SEARCH_MAX_VAL = 9999;
     Logger logger = LoggerFactory.getLogger(OpenSearchOperations.class);
 
-
     @Autowired
     private OpenSearchClient esClient;
+
 
     public CompanyEntity getCompanyById(String resourceId, String type, String index) throws IOException {
         if (type != null) {
@@ -179,6 +185,32 @@ public class OpenSearchOperations {
             logger.error("Error fetching invoices for company {}: ", companyId, e);
             throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    public String findLastInvoiceNumber(String invoiceId, String shortName) throws InvoiceException {
+        String indexName = ResourceIdUtils.generateCompanyIndex(shortName);
+
+        try {
+            // Build search query
+            SearchRequest searchRequest = new SearchRequest.Builder()
+                    .index(indexName)
+                    .size(1)  // We need only one document
+                    .query(q -> q.term(t -> t.field("invoiceId.keyword").value(FieldValue.of(invoiceId))))
+                    .build();
+
+            // Execute search
+            SearchResponse<InvoiceModel> searchResponse = esClient.search(searchRequest, InvoiceModel.class);
+
+            List<Hit<InvoiceModel>> hits = searchResponse.hits().hits();
+            if (!hits.isEmpty() && hits.get(0).source() != null) {
+                InvoiceModel invoice = hits.get(0).source();
+                return invoice.getInvoiceNo(); // Assuming getInvoiceNo() exists in InvoiceModel
+            }
+        } catch (IOException e) {
+            logger.error("Error fetching invoice with ID {}: {}", invoiceId, e.getMessage());
+            throw new InvoiceException("Unable to fetch invoice", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return null; // Return null if no invoice is found
     }
 
 

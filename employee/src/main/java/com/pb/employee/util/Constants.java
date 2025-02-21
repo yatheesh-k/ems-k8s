@@ -168,4 +168,5 @@ public class Constants {
     public static final String COMPANY_ADMIN = "company_admin";
     public static final String ADMIN = "CompanyAdmin";
     public static final String NO_ATTENDANCE = "Attendance Not Found For All Employees";
+    public static final String CUSTOMER_ID= "customerId";
 }

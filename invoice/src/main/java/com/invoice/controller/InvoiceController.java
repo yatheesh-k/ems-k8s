@@ -44,7 +44,7 @@ public class InvoiceController {
                                                    @RequestHeader(Constants.AUTH_KEY) String authToken,
                                                    @Parameter(required = true, description = "${api.createCompanyPayload.description}")
                                                    @PathVariable String companyId,
-                                                   @RequestParam(required = false,name = Constants.CUSTOMER_ID) String customerId) throws InvoiceException, IOException {
+                                                   @RequestParam(required = false,name = Constants.CUSTOMER_ID) String customerId) throws InvoiceException {
         return invoiceService.getCompanyAllInvoices(companyId,customerId);
     }
 

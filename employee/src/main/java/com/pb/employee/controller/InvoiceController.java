@@ -73,9 +73,10 @@ public class InvoiceController {
     public ResponseEntity<?> getCompanyAllInvoices(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
                                                     @RequestHeader(Constants.AUTH_KEY) String authToken,
                                                     @Parameter(required = true, description = "${api.getCompanyPayload.description}")
-                                                    @PathVariable String companyId
+                                                    @PathVariable String companyId,
+                                                    @RequestParam(required = false,name = Constants.CUSTOMER_ID) String customerId
                                                     ) throws EmployeeException {
-        return invoiceService.getCompanyAllInvoices(authToken,companyId);
+        return invoiceService.getCompanyAllInvoices(authToken,companyId,customerId);
     }
 
     @GetMapping("company/{companyId}/customer/{customerId}/downloadInvoice/{invoiceId}")
