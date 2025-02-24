@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.util.StringUtils;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
@@ -316,6 +317,12 @@ public class AttendanceServiceImpl implements AttendanceService {
                 log.error("Invalid no. of days");
                 return new ResponseEntity<>(ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_NO_DAYS)))),
                         HttpStatus.BAD_REQUEST);
+            }
+            String decodedWorkingDays = new String(Base64.getDecoder().decode(String.valueOf(entity.getNoOfWorkingDays())), StandardCharsets.UTF_8);
+            if (String.valueOf(numberOfDays).equals(decodedWorkingDays)){
+                return new ResponseEntity<>(ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.NO_CHANGE_IN_WORKING_DAYS)))),
+                        HttpStatus.BAD_REQUEST);
+
             }
             // Fetch payslips only if the attendance entity is valid
             List<PayslipEntity> payslipEntities = openSearchOperations.getEmployeePayslip(company, employeeId, null, null);

@@ -140,4 +140,38 @@ public class BankUtils {
         }
         return responseBody;
     }
+    public static int noChangeInValuesOfBank(BankEntity bankEntity, BankUpdateRequest bankRequest) {
+        int noOfChanges = 0;
+
+        if (bankEntity.getAccountType() != null && bankRequest.getAccountType() != null) {
+            String accountType = new String(Base64.getDecoder().decode(bankEntity.getAccountType()));
+            if (!accountType.equals(bankRequest.getAccountType())) {
+                noOfChanges += 1;
+            }
+        }
+
+        if (bankEntity.getBranch() != null && bankRequest.getBranch() != null) {
+            String branch = new String(Base64.getDecoder().decode(bankEntity.getBranch()));
+            if (!branch.equals(bankRequest.getBranch())) {
+                noOfChanges += 1;
+            }
+        }
+
+        if (bankEntity.getIfscCode() != null && bankRequest.getIfscCode() != null) {
+            String ifscCode = new String(Base64.getDecoder().decode(bankEntity.getIfscCode()));
+            if (!ifscCode.equals(bankRequest.getIfscCode())) {
+                noOfChanges += 1;
+            }
+        }
+
+        if (bankEntity.getAddress() != null && bankRequest.getAddress() != null) {
+            String address = new String(Base64.getDecoder().decode(bankEntity.getAddress()));
+            if (!address.equals(bankRequest.getAddress())) {
+                noOfChanges += 1;
+            }
+        }
+
+        return noOfChanges;
+    }
+
 }

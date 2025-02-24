@@ -51,7 +51,7 @@ public class BankServiceImpl implements BankService {
         String index = ResourceIdUtils.generateCompanyIndex(companyEntity.getShortName());
 
         // Step 4.1: Generate a unique resource ID for the bank using companyId and bankName
-        String resourceId = ResourceIdUtils.generateBankResourceId(bankRequest.getBankName(), bankRequest.getAccountNumber());
+        String resourceId = ResourceIdUtils.generateBankResourceId(companyId,bankRequest.getAccountNumber());
 
         // Step 4.2: Check for inter-list duplicates (against the database)
         BankEntity dbBankRecords = openSearchOperations.getBankById(index,null,resourceId);  // Fetch bank records from the DB
@@ -176,6 +176,12 @@ public class BankServiceImpl implements BankService {
                 log.error("Unable to find the Bank details with ID {}", bankId);
                 throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.INVALID_BANK_DETAILS),
                         HttpStatus.NOT_FOUND);
+            }
+            int noOfChanges = BankUtils.noChangeInValuesOfBank(bankEntity,bankUpdateRequest);
+            if (noOfChanges==0){
+                return new ResponseEntity<>(
+                        ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.NO_CHANGE_IN_BANK_DETAILS)))),
+                        HttpStatus.CONFLICT);
             }
         } catch (Exception ex) {
             log.error("Exception while fetching bank details: {}", ex);
