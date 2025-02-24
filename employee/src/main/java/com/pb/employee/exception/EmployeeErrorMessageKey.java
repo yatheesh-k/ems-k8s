@@ -104,7 +104,9 @@ public enum EmployeeErrorMessageKey {
     BACKGROUND_ALREADY_EXISTS("background.already.exists"),
     UNABLE_GET_BACKGROUND_DETAILS("unable.background.details"),
     INVALID_BACKGROUND_DETAILS("invalid.background.details"),
-    INVALID_EMPLOYEE_TYPE("invalid.employee.type");
+    INVALID_EMPLOYEE_TYPE("invalid.employee.type"),
+    NO_CHANGE_IN_BANK_DETAILS("nochange.bank.details"),
+    NO_CHANGE_IN_WORKING_DAYS("nochange.working.days");
 
     private final String key;
 

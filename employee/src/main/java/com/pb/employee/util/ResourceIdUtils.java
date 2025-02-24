@@ -58,8 +58,8 @@ public class ResourceIdUtils {
     public static String generateRelievingId(String companyName, String relievingDate, String resignationDate) {
         return generateGlobalResourceId(ResourceType.RELIEVING, companyName, relievingDate,resignationDate);
     }
-    public static String generateBankResourceId(String bankName,String accountNo ) {
-        return generateGlobalResourceId(ResourceType.BANK, bankName,accountNo);
+    public static String generateBankResourceId(String companyId,String accountNo ) {
+        return generateGlobalResourceId(ResourceType.BANK, companyId,accountNo);
 
     }
     public static String generateBackgroundResourceId(String companyName, String employeeId) {
