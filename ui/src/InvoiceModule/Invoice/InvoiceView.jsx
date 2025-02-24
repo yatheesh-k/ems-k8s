@@ -29,17 +29,17 @@ const InvoiceView = () => {
   // Filter invoices based on search
   useEffect(() => {
     if (invoices?.data && Array.isArray(invoices.data)) {
-      console.log("Extracted Invoices Data:", invoices.data); // Debugging log
-      setFilteredData(invoices.data);
+      const filtered = invoices.data.filter((invoice) =>
+        invoice.invoiceNo?.toLowerCase().includes(search.toLowerCase())
+      );
+      setFilteredData(filtered);
     } else {
       setFilteredData([]);
     }
-  }, [invoices]);
+  }, [invoices, search]);
 
   // Navigate to the Invoice PDF view page
   const handleView = (customerId, invoiceId) => {
-    console.log("Customer ID:", customerId); // Debugging log
-    console.log("Invoice ID:", invoiceId); // Debugging log
     navigate("/invoicePdf", { state: { customerId, invoiceId } });
   };
 
@@ -102,7 +102,7 @@ const InvoiceView = () => {
           <b>Invoice Number</b>
         </h6>
       ),
-      selector: (row) => row.invoiceNumber,
+      selector: (row) => row.invoiceNo,
       width: "180px",
     },
     {
