@@ -21,26 +21,31 @@ const InvoiceView = () => {
   // Fetch invoices on component mount
   useEffect(() => {
     if (companyId) {
-      dispatch(fetchInvoices(companyId));
+      const timer = setTimeout(() => {
+        dispatch(fetchInvoices(companyId)).then((res) => {
+          // Handle the response if needed
+        });
+      }, 1500); // Delay of 1500ms
+  
+      // Clear the timeout if the component unmounts or companyId changes
+      return () => clearTimeout(timer);
     }
-  }, [dispatch, companyId]);
+  }, [dispatch, companyId]);  
 
   // Filter invoices based on search
   useEffect(() => {
-    if (invoices && Array.isArray(invoices)) {
-      const result = invoices.filter((invoice) =>
-        invoice.invoiceNumber.toLowerCase().includes(search.toLowerCase())
+    if (invoices?.data && Array.isArray(invoices.data)) {
+      const filtered = invoices.data.filter((invoice) =>
+        invoice.invoiceNo?.toLowerCase().includes(search.toLowerCase())
       );
-      setFilteredData(result);
+      setFilteredData(filtered);
     } else {
       setFilteredData([]);
     }
-  }, [search, invoices]);
+  }, [invoices, search]);
 
   // Navigate to the Invoice PDF view page
   const handleView = (customerId, invoiceId) => {
-    console.log("Customer ID:", customerId); // Debugging log
-    console.log("Invoice ID:", invoiceId); // Debugging log
     navigate("/invoicePdf", { state: { customerId, invoiceId } });
   };
 
@@ -62,9 +67,9 @@ const InvoiceView = () => {
       ),
       selector: (row) => (
         <div title={row.customerName || ""}>
-          {row.customerName && row.customerName.length > 18
-            ? row.customerName.slice(0, 20) + "..."
-            : row.customerName}
+          {row.customerc?.ustomerName && row.customer?.customerName.length > 18
+            ? row.customer?.customerName.slice(0, 20) + "..."
+            : row.customer?.customerName}
         </div>
       ),
       width: "190px",
@@ -75,7 +80,7 @@ const InvoiceView = () => {
           <b>Mobile Number</b>
         </h6>
       ),
-      selector: (row) => row.contactNumber,
+      selector: (row) =>  row.customer?.mobileNumber,
       width: "170px",
     },
     // {
@@ -89,7 +94,7 @@ const InvoiceView = () => {
           <b>State</b>
         </h6>
       ),
-      selector: (row) => row.customerState,
+      selector: (row) => row.customer?.state,
       width: "150px",
     },
     // {
@@ -103,7 +108,7 @@ const InvoiceView = () => {
           <b>Invoice Number</b>
         </h6>
       ),
-      selector: (row) => row.invoiceNumber,
+      selector: (row) => row.invoiceNo,
       width: "180px",
     },
     {

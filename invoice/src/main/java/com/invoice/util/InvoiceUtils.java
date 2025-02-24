@@ -2,72 +2,135 @@ package com.invoice.util;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.invoice.exception.InvoiceException;
 import com.invoice.model.*;
 import com.invoice.opensearch.OpenSearchOperations;
-import com.invoice.request.BankRequest;
-import com.invoice.request.CustomerRequest;
 import com.invoice.request.InvoiceRequest;
+import com.invoice.request.ProductColumnsRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 
 @Slf4j
 public class InvoiceUtils {
 
     @Autowired
-    private OpenSearchOperations openSearchOperations;
+    private static OpenSearchOperations openSearchOperations;
 
+    public static InvoiceModel maskInvoiceProperties(InvoiceRequest request, String invoiceId, CompanyEntity companyEntity, CustomerModel customerModel, BankEntity bankEntity) throws InvoiceException{
+     ObjectMapper objectMapper = new ObjectMapper();
 
+     // Convert the InvoiceRequest to InvoiceModel
+     InvoiceModel entity = objectMapper.convertValue(request, InvoiceModel.class);
 
-    public static Entity maskInvoiceProperties(InvoiceRequest request, String invoiceId, CompanyEntity companyEntity,CustomerModel customerModel,BankEntity bankEntity) {
-        ObjectMapper objectMapper = new ObjectMapper();
+            // Set the necessary fields
+            entity.setInvoiceId(invoiceId);
+            entity.setType(Constants.INVOICE);
+            entity.setStatus(request.getStatus());
+            entity.setCompanyId(companyEntity.getId());
+            entity.setCustomerId(customerModel.getCustomerId());
+            entity.setBank(bankEntity);
+            entity.setCustomer(customerModel);
+            entity.setCompany(companyEntity);
 
-        // Convert the InvoiceRequest to InvoiceModel
-        InvoiceModel entity = objectMapper.convertValue(request, InvoiceModel.class);
-
-        // Set the resource ID and type
-        entity.setInvoiceId(invoiceId);
-        entity.setType(Constants.INVOICE);
-        entity.setStatus(request.getStatus());
-        entity.setCompanyId(companyEntity.getId());
-        entity.setCustomerId(customerModel.getCustomerId());
-        entity.setBank(bankEntity);
-        entity.setCustomer(customerModel);
-        entity.setCompany(companyEntity);
-        // Mask invoice fields
-        if (request.getInvoice() != null) {
-            Map<String, String> maskedInvoice = new HashMap<>();
-            for (Map.Entry<String, String> entry : request.getInvoice().entrySet()) {
-                maskedInvoice.put(entry.getKey(), maskValue(entry.getValue())); // Mask the value
+            // Mask productData (List<Map<String, String>>)
+            if (request.getProductData() != null) {
+                List<Map<String, String>> maskedProductData = request.getProductData().stream()
+                        .map(InvoiceUtils::maskMapValues) // Mask each map in the list
+                        .collect(Collectors.toList());
+                entity.setProductData(maskedProductData);
             }
-            entity.setInvoice(maskedInvoice);
+
+            // Mask productColumns (List<ProductColumnsRequest>)
+            if (request.getProductColumns() != null) {
+                List<ProductColumnsRequest> maskedColumns = request.getProductColumns().stream()
+                        .map(InvoiceUtils::maskProductColumn)
+                        .collect(Collectors.toList());
+                entity.setProductColumns(maskedColumns);
+            }
+
+            // Mask other string fields
+            entity.setInvoiceDate(maskValue(request.getInvoiceDate()));
+            entity.setDueDate(maskValue(request.getDueDate()));
+            entity.setPurchaseOrder(maskValue(request.getPurchaseOrder()));
+            entity.setVendorCode(maskValue(request.getVendorCode()));
+            entity.setSubTotal(maskValue(request.getSubTotal()));
+
+            return entity;
         }
 
-        return entity;
-    }
-
-    private static String maskValue(String value) {
-        if (value == null || value.isEmpty()) {
-            return value; // Return as is if null or empty
+    // Mask values in a Map<String, String>
+        private static Map<String, String> maskMapValues(Map<String, String> data) {
+            return data.entrySet().stream()
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey, // Keep the key as is
+                            entry -> maskValue(entry.getValue()) // Mask the value
+                    ));
         }
-        return Base64.getEncoder().encodeToString(value.toString().getBytes()); // Replace with your desired masking pattern
-    }
 
-    public static void unMaskInvoiceProperties(InvoiceModel invoiceEntity) {
+        // Mask ProductColumnsRequest fields
+        private static ProductColumnsRequest maskProductColumn(ProductColumnsRequest column) {
+            return ProductColumnsRequest.builder()
+                    .key(maskValue(column.getKey()))
+                    .title(maskValue(column.getTitle()))
+                    .type(maskValue(column.getType()))
+                    .build();
+        }
+
+        // Masking logic (Base64 encoding)
+        private static String maskValue(String value) {
+            if (value == null || value.isEmpty()) {
+                return value;
+            }
+            return Base64.getEncoder().encodeToString(value.getBytes());
+        }
+
+
+    public static void unMaskInvoiceProperties(InvoiceModel invoiceEntity,HttpServletRequest request) {
         if (invoiceEntity != null) {
             log.debug("Unmasking invoice: {}", invoiceEntity);
 
             if (invoiceEntity.getInvoiceId() != null) {
                 invoiceEntity.setInvoiceId(invoiceEntity.getInvoiceId());
             }
-            if (invoiceEntity.getInvoice() != null) {
-                Map<String, String> decodedCustomFields = new HashMap<>();
-                for (Map.Entry<String, String> entry : invoiceEntity.getInvoice().entrySet()) {
-                    decodedCustomFields.put(entry.getKey(), unMaskValue(entry.getValue()));
-                }
-                invoiceEntity.setInvoice(decodedCustomFields);
+
+            invoiceEntity.setInvoiceDate(unMaskValue(invoiceEntity.getInvoiceDate()));
+            invoiceEntity.setDueDate(unMaskValue(invoiceEntity.getDueDate()));
+            invoiceEntity.setPurchaseOrder(unMaskValue(invoiceEntity.getPurchaseOrder()));
+            invoiceEntity.setVendorCode(unMaskValue(invoiceEntity.getVendorCode()));
+            invoiceEntity.setSubTotal(unMaskValue(invoiceEntity.getSubTotal()));
+            invoiceEntity.setInvoiceNo("IN/YYMMMM/001");
+
+
+            // Unmask productData (List<Map<String, String>>)
+            if (invoiceEntity.getProductData() != null) {
+                List<Map<String, String>> unmaskedProductData = invoiceEntity.getProductData().stream()
+                        .map(productMap -> {
+                            Map<String, String> unmaskedMap = new HashMap<>();
+                            for (Map.Entry<String, String> entry : productMap.entrySet()) {
+                                unmaskedMap.put(entry.getKey(), unMaskValue(entry.getValue()));
+                            }
+                            return unmaskedMap;
+                        })
+                        .collect(Collectors.toList());
+                invoiceEntity.setProductData(unmaskedProductData);
             }
+
+            // Unmask productColumns (List<ProductColumnsRequest>)
+            if (invoiceEntity.getProductColumns() != null) {
+                List<ProductColumnsRequest> unmaskedColumns = invoiceEntity.getProductColumns().stream()
+                        .map(InvoiceUtils::unMaskProductColumn)
+                        .collect(Collectors.toList());
+                invoiceEntity.setProductColumns(unmaskedColumns);
+            }
+
             if (invoiceEntity.getCustomer() != null) {
                 log.debug("Before unmasking customer: {}", invoiceEntity.getCustomer());
                 invoiceEntity.getCustomer().setAddress(unMaskValue(invoiceEntity.getCustomer().getAddress()));
@@ -77,6 +140,7 @@ public class InvoiceUtils {
                 invoiceEntity.getCustomer().setMobileNumber(unMaskValue(invoiceEntity.getCustomer().getMobileNumber()));
                 invoiceEntity.getCustomer().setEmail(unMaskValue(invoiceEntity.getCustomer().getEmail()));
                 invoiceEntity.getCustomer().setCustomerGstNo(unMaskValue(invoiceEntity.getCustomer().getCustomerGstNo()));
+                invoiceEntity.getCustomer().setCustomerName(unMaskValue(invoiceEntity.getCustomer().getCustomerName()));
                 log.debug("After unmasking customer: {}", invoiceEntity.getCustomer());
             }
 
@@ -97,17 +161,88 @@ public class InvoiceUtils {
                 invoiceEntity.getCompany().setPanNo(unMaskValue(invoiceEntity.getCompany().getPanNo()));
                 invoiceEntity.getCompany().setMobileNo(unMaskValue(invoiceEntity.getCompany().getMobileNo()));
                 invoiceEntity.getCompany().setCinNo(unMaskValue(invoiceEntity.getCompany().getCinNo()));
-                log.debug("After unmasking company: {}", invoiceEntity.getCompany());
+                String baseUrl = getBaseUrl(request);
+                String image = baseUrl + "var/www/ems/assets/img/" + invoiceEntity.getCompany().getImageFile();
+                invoiceEntity.getCompany().setImageFile(image);
+                String stampImage = baseUrl + "var/www/ems/assets/img/" + invoiceEntity.getCompany().getStampImage();
+                invoiceEntity.getCompany().setStampImage(stampImage);
             }
+            // Convert subTotal to a numeric value
+            double subTotal = parseAmount(invoiceEntity.getSubTotal());
+            double cGst = 0.0, sGst = 0.0, iGst = 0.0, grandTotal = subTotal;
+
+            if (invoiceEntity.getCustomer() != null && invoiceEntity.getCustomer().getCustomerGstNo() != null
+                    && !invoiceEntity.getCustomer().getCustomerGstNo().isEmpty()) {
+                cGst = subTotal * 0.09; // 9% CGST
+                sGst = subTotal * 0.09; // 9% SGST
+                grandTotal += cGst + sGst;
+            } else {
+                iGst = subTotal * 0.18; // 18% IGST
+                grandTotal += iGst;
+            }
+
+            // Set calculated values back to entity
+            invoiceEntity.setCGst(formatAmount(cGst));
+            invoiceEntity.setSGst(formatAmount(sGst));
+            invoiceEntity.setIGst(formatAmount(iGst));
+            invoiceEntity.setGrandTotal(formatAmount(grandTotal));
+
+            log.debug("Updated Invoice - cGst: {}, sGst: {}, iGst: {}, grandTotal: {}",
+                    invoiceEntity.getCGst(), invoiceEntity.getSGst(), invoiceEntity.getIGst(), invoiceEntity.getGrandTotal());
         }
     }
+    /**
+     * Formats a double value to two decimal places and converts it to a string.
+     */
+    private static String formatAmount(double amount) {
+        return String.format("%.2f", amount);
+    }
+    public static String getBaseUrl(HttpServletRequest request) {
+        String scheme = request.getScheme(); // http or https
+        String serverName = request.getServerName(); // localhost or IP address
+        int serverPort = request.getServerPort(); // port number
+        String contextPath = "/"+Constants.INDEX_EMS; // context path
 
+        return scheme + "://" + serverName + ":" + serverPort + contextPath + "/";
+    }
 
+    /**
+     * Parses a string amount into a double, handling nulls and invalid values.
+     */
+    private static double parseAmount(String amount) {
+        if (amount == null || amount.trim().isEmpty()) {
+            return 0.0;
+        }
+        try {
+            return Double.parseDouble(amount);
+        } catch (NumberFormatException e) {
+            log.error("Invalid amount format: {}", amount);
+            return 0.0;
 
+        }
+
+    }
+
+    /**
+     * Method to unmask a ProductColumn.
+     */
+    private static ProductColumnsRequest unMaskProductColumn(ProductColumnsRequest column) {
+        if (column != null) {
+            column.setKey(unMaskValue(column.getKey()));
+            column.setType(unMaskValue(column.getType()));
+            column.setTitle(unMaskValue(column.getTitle()));
+        }
+        return column;
+    }
+
+    /**
+     * Base64 decoding method to unmask values.
+     */
     private static String unMaskValue(String value) {
         if (value == null || value.isEmpty()) {
             return value; // Return as is if null or empty
         }
         return new String(Base64.getDecoder().decode(value)); // Correctly decode without extra bytes conversion
     }
+
 }

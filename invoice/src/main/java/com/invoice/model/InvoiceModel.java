@@ -1,6 +1,7 @@
 package com.invoice.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.invoice.request.ProductColumnsRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,7 +25,19 @@ public class InvoiceModel implements Entity{
     private CustomerModel customer;
     private BankEntity bank;
 
-    private Map<String, String> invoice;
+    private String vendorCode;
+    private String purchaseOrder;
+    private String invoiceDate;
+    private String dueDate;
+    private String invoiceNo;
+    private String subTotal;
+    private String cGst;
+    private String sGst;
+    private String iGst;
+    private String grandTotal;
+
+    private List<Map<String,  String>> productData;
+    private List<ProductColumnsRequest> productColumns;
     private String status;
     private String type;
 }

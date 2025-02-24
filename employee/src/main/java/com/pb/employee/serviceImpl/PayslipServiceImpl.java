@@ -728,8 +728,7 @@ public class PayslipServiceImpl implements PayslipService {
                     }
                 }
             }
-            // If no payslips were generated due to missing attendance, return an error response
-            if (employeesWithoutAttendance.isEmpty()) {
+            if (generatedPayslips.isEmpty()) {
                 return new ResponseEntity<>(ResponseBuilder.builder().build().createFailureResponse(Constants.NO_ATTENDANCE), HttpStatus.CONFLICT);
             }
             Map<String, Object> responseBody = new HashMap<>();

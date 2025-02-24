@@ -153,8 +153,8 @@
         <img src="${company.imageFile}" alt="Company Logo" />
         <p class="company">
             ${company.companyAddress}<br />
-            ${company.mobileNo}<br />
-            ${company.emailId}
+            /* ${company.mobileNo}<br />
+            ${company.emailId} */
         </p>
     </div>
     </td>

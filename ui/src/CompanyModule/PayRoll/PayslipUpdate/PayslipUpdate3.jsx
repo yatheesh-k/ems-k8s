@@ -521,24 +521,28 @@ const PayslipUpdate3 = () => {
       .split("")
       .filter((char) => allowedCharsRegex.test(char))
       .join("");
-    // Capitalize the first letter of each word
-    const words = value.split(" ");
-    // Capitalize the first letter of each word and lowercase the rest
-    const capitalizedWords = words.map((word) => {
-      if (word.length > 0) {
-        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-      }
-      return "";
-    });
-    let formattedValue = capitalizedWords.join(" ");
-    if (formattedValue.length > 3) {
-      formattedValue =
-        formattedValue.slice(0, 3) +
-        formattedValue.slice(3).replace(/\s+/g, " ");
-    }
-    input.value = formattedValue;
+    // Capitalize first letter of each word & keep others as user typed
+  const words = value.split(" ");
+  const formattedValue = words.map((word) =>
+    word.length > 0 ? word.charAt(0).toUpperCase() + word.slice(1) : ""
+  ).join(" ");
+  // Trim multiple spaces after the first 3 characters
+  let finalValue = formattedValue.length > 3
+    ? formattedValue.slice(0, 3) + formattedValue.slice(3).replace(/\s+/g, " ")
+    : formattedValue;
+    input.value = finalValue;
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
+
+
+
+
+
+
+
+
+
+
 
   const handleEmailChange = (e) => {
     const value = e.target.value;
