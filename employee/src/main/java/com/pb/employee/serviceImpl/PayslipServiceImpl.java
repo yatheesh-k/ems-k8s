@@ -618,6 +618,9 @@ public class PayslipServiceImpl implements PayslipService {
     }
     private String formatFieldName(String fieldName) {
         // Special cases for specific fields
+        if (fieldName.equals(fieldName.toUpperCase())) {
+            return fieldName;
+        }
         if (fieldName.equalsIgnoreCase(Constants.HRA_SMALL)) {
             return Constants.HRA; // Capitalize HRA
         } else if (fieldName.toLowerCase().startsWith(Constants.PF_SMALL)) {
@@ -657,7 +660,6 @@ public class PayslipServiceImpl implements PayslipService {
     @Override
     public ResponseEntity<?> generatePaySlipForEmployees(String salaryId, PayslipRequest payslipRequest) throws EmployeeException, IOException {
         String index = ResourceIdUtils.generateCompanyIndex(payslipRequest.getCompanyName());
-        AttendanceEntity attendanceEntities = null;
         List<PayslipEntity> generatedPayslips = new ArrayList<>();
         List<String> employeesWithoutAttendance = new ArrayList<>();
 
@@ -689,13 +691,17 @@ public class PayslipServiceImpl implements PayslipService {
                     }
                 }
 
+                // Generate attendance ID for the specific month and year
                 String attendanceId = ResourceIdUtils.generateAttendanceId(payslipRequest.getCompanyName(), employee.getId(), payslipRequest.getYear(), payslipRequest.getMonth());
 
-                attendanceEntities = openSearchOperations.getAttendanceById(attendanceId, null, index);
-                if (attendanceEntities == null) {
-                    log.error("Employee Attendance is not found for employee {}", employee.getId());
+                // Fetch attendance for the given month and year
+                AttendanceEntity attendanceEntity = openSearchOperations.getAttendanceById(attendanceId, null, index);
+
+                // If attendance is missing for the specific month and year, add to `employeesWithoutAttendance`
+                if (attendanceEntity == null && Constants.ACTIVE.equals(employee.getStatus())) {
+                    log.error("Employee Attendance is not found for employee {} for {}/{}", employee.getId(), payslipRequest.getMonth(), payslipRequest.getYear());
                     employeesWithoutAttendance.add(employee.getEmployeeId() + "  " + employee.getFirstName() + " " + employee.getLastName());
-                    continue; // Skip to the next employee if attendance is not found
+                    continue; // Skip to the next employee
                 }
 
                 // Generate payslip ID based on month, year, and employee ID
@@ -705,9 +711,10 @@ public class PayslipServiceImpl implements PayslipService {
                 PayslipEntity payslipEntity = openSearchOperations.getPayslipById(paySlipId, null, index);
                 if (payslipEntity != null) {
                     log.info("Payslip already exists for employee with ID {}", employee.getEmployeeId());
-                    continue; // Skip to the next employee if payslip already exists
+                    continue; // Skip if payslip already exists
                 }
 
+                // Retrieve department and designation details
                 DepartmentEntity departmentEntity = null;
                 DesignationEntity designationEntity = null;
                 if (employee.getDepartment() != null && employee.getDesignation() != null) {
@@ -719,7 +726,7 @@ public class PayslipServiceImpl implements PayslipService {
                 List<PayslipEntity> payslipPropertiesList = new ArrayList<>();
                 for (EmployeeSalaryEntity salary : salaryEntities) {
                     if (salary.getStatus().equals(EmployeeStatus.ACTIVE.getStatus())) {
-                        PayslipEntity payslipProperties = PayslipUtils.unMaskEmployeePayslipProperties(salary, payslipRequest, paySlipId, employee.getId(), attendanceEntities);
+                        PayslipEntity payslipProperties = PayslipUtils.unMaskEmployeePayslipProperties(salary, payslipRequest, paySlipId, employee.getId(), attendanceEntity);
                         assert designationEntity != null;
                         payslipProperties.setDesignation(designationEntity.getName());
                         payslipProperties.setDepartment(departmentEntity.getName());
@@ -728,9 +735,15 @@ public class PayslipServiceImpl implements PayslipService {
                     }
                 }
             }
+
+             // If no payslips were generated but there are employees without attendance, return a success response with only that information
             if (generatedPayslips.isEmpty()) {
-                return new ResponseEntity<>(ResponseBuilder.builder().build().createFailureResponse(Constants.NO_ATTENDANCE), HttpStatus.CONFLICT);
+                Map<String, Object> responseBody = new HashMap<>();
+                responseBody.put(Constants.EMPLOYEE_WITHOUT_ATTENDANCE, employeesWithoutAttendance);
+                return new ResponseEntity<>(ResponseBuilder.builder().build().createSuccessResponse(responseBody), HttpStatus.OK);
             }
+
+
             Map<String, Object> responseBody = new HashMap<>();
             responseBody.put(Constants.GENERATE_PAYSLIP, generatedPayslips);
             responseBody.put(Constants.EMPLOYEE_WITHOUT_ATTENDANCE, employeesWithoutAttendance);

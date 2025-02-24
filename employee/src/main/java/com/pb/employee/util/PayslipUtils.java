@@ -698,7 +698,7 @@ public class PayslipUtils {
         }
 
         // **Other Allowance** (Gross CTC - Total Allowances - Deductions)
-        double otherAllowanceAnnual = grossAmount - totalAllowanceAnnual;
+        double otherAllowanceAnnual = Math.round(grossAmount - totalAllowanceAnnual);
         double otherAllowanceMonthly = Math.round(otherAllowanceAnnual / 12);
 
         if (otherAllowanceAnnual > 0) {
