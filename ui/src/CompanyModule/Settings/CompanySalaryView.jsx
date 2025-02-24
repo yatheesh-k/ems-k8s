@@ -34,6 +34,11 @@ const CompanySalaryView = () => {
   }, []);
 
   const formatFieldName = (fieldName) => {
+    // If the field is entirely uppercase (e.g., "HRA"), return it as-is
+    if (/^[A-Z]+$/.test(fieldName)) {
+      return fieldName;
+    }
+
     return fieldName
       .replace(/([A-Z])/g, " $1")
       .replace(/^./, (str) => str.toUpperCase())
@@ -134,8 +139,15 @@ const CompanySalaryView = () => {
                           <h5>Allowances</h5>
                           <hr />
                           {Object.keys(structure.allowances).length > 0 ? (
-                            Object.keys(structure.allowances).map(
-                              (allowance) => (
+                            Object.keys(structure.allowances)
+                              .sort((a, b) => {
+                                if (a === "Basic Salary") return -1;
+                                if (b === "Basic Salary") return 1;
+                                if (a === "HRA") return -1;
+                                if (b === "HRA") return 1;
+                                return 0;
+                              })
+                              .map((allowance) => (
                                 <div key={allowance} className="mb-2">
                                   <label className="form-label">
                                     {formatFieldName(allowance)}
@@ -162,8 +174,7 @@ const CompanySalaryView = () => {
                                     </p>
                                   )}
                                 </div>
-                              )
-                            )
+                              ))
                           ) : (
                             <p>No allowances found.</p>
                           )}

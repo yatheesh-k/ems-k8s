@@ -22,10 +22,14 @@ const AccountsView = () => {
 
   useEffect(() => {
     if (companyId) {
-      console.log("fetchBanks", fetchBanks);
-      dispatch(fetchBanks(companyId));
+      const timer = setTimeout(() => {
+        console.log("fetchBanks", fetchBanks);
+        dispatch(fetchBanks(companyId));
+      }, 1500); // Delay of 1500ms
+  
+      return () => clearTimeout(timer); 
     }
-  }, [dispatch, companyId]);
+  }, [dispatch, companyId]);  
 
   useEffect(() => {
     console.log("Banks from Redux store:", banks);
