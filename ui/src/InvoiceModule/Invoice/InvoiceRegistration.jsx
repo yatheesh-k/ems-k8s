@@ -287,7 +287,7 @@ const InvoiceRegistration = () => {
 
       // ✅ Prepare final payload
       const invoiceDataToSend = {
-        customerName: data.customerName.label,
+        //customerName: data.customerName.label,
         purchaseOrder: data.purchaseOrder,
         vendorCode: data.vendorCode,
         invoiceDate: data.invoiceDate,

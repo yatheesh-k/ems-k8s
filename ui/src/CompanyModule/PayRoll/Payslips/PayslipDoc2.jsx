@@ -108,9 +108,17 @@ const PayslipDoc2 = () => {
 
   const formatFieldName = (fieldName) => {
     return fieldName
-      .replace(/([A-Z])/g, " $1")
-      .replace(/^./, (str) => str.toUpperCase())
-      .trim();
+      .split(" ")
+      .map((token) => {
+        if (token === token.toUpperCase()) {
+          return token;
+        }
+        return token
+          .replace(/([A-Z])/g, " $1")
+          .replace(/^./, (str) => str.toUpperCase())
+          .trim();
+      })
+      .join(" ");
   };
 
   return (
