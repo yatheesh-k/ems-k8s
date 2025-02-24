@@ -209,23 +209,16 @@ const AttendanceReport = () => {
         </h6>
       ),
       selector: (row, index) => (currentPage - 1) * rowsPerPage + index + 1,
-      width: "80px",
+      // width: "50px",
     },
     {
-      name: (
-        <h6>
-          <b>Name</b>
-        </h6>
+      name: <h6><b>Name</b></h6>,
+      selector: row => (
+        <div title={`${row.firstName} ${row.lastName}`}>
+           {`${row.firstName.length > 18 ? row.firstName.slice(0, 10) + '...' : row.firstName} ${row.lastName.length > 10 ? row.lastName.slice(0, 10) + '...' : row.lastName}`}
+        </div>      
       ),
-      selector: (row) => `${row.firstName} ${row.lastName}`,
-    },
-    {
-      name: (
-        <h6>
-          <b>Mail</b>
-        </h6>
-      ),
-      selector: (row) => row.emailId,
+      width: "190px",
     },
     {
       name: (
@@ -234,14 +227,7 @@ const AttendanceReport = () => {
         </h6>
       ),
       selector: (row) => row.month,
-    },
-    {
-      name: (
-        <h6>
-          <b>Year</b>
-        </h6>
-      ),
-      selector: (row) => row.year,
+      width: "140px",
     },
     {
       name: (
@@ -250,7 +236,7 @@ const AttendanceReport = () => {
         </h6>
       ),
       selector: (row) => row.noOfWorkingDays,
-      width: "240px",
+      width: "200px",
     },
     {
       name: (
@@ -259,7 +245,7 @@ const AttendanceReport = () => {
         </h6>
       ),
       selector: (row) => row.totalWorkingDays,
-      width: "240px",
+      width: "200px",
     },
     {
       name: (
@@ -332,7 +318,7 @@ const AttendanceReport = () => {
                       value={selectedMonth}
                       onChange={(e) => setSelectedMonth(e.target.value)} // Update the selectedMonth state
                     >
-                      <option value=''>Select Month</option>
+                      <option value="">Select Month</option>
                       {Array.from({ length: 12 }, (_, i) =>
                         new Date(0, i).toLocaleString("en-US", {
                           month: "long",
@@ -403,57 +389,14 @@ const AttendanceReport = () => {
                     <p className="text-center">No Attendance Found</p>
                   ) : (
                     <DataTable
-                      columns={[
-                        {
-                          name: "#",
-                          selector: (row, index) =>
-                            (currentPage - 1) * rowsPerPage + index + 1,
-                        },
-                        {
-                          name: "Name",
-                          selector: (row) => `${row.firstName} ${row.lastName}`,
-                        },
-                        {
-                          name: "Month",
-                          selector: (row) => row.month,
-                        },
-                        {
-                          name: "Total Working Days",
-                          selector: (row) => row.totalWorkingDays,
-                        },
-                        {
-                          name: "Days Worked",
-                          selector: (row) => row.noOfWorkingDays,
-                        },
-                        {
-                          name: (
-                            <h6>
-                              <b>Actions</b>
-                            </h6>
-                          ),
-                          cell: (row) => (
-                            <div>
-                              <button
-                                className="btn btn-sm"
-                                style={{
-                                  backgroundColor: "transparent",
-                                  border: "none",
-                                  padding: "10px",
-                                  marginLeft: "5px",
-                                }}
-                                onClick={() => handleShowEditModal(row)}
-                                title="Edit"
-                              >
-                                <PencilSquare size={22} color="#2255a4" />
-                              </button>
-                            </div>
-                          ),
-                        },
-                      ]}
+                      columns={columns}
                       data={attendanceData}
                       pagination
                       highlightOnHover
                       pointerOnHover
+                      dense
+                      onChangePage={(page) => setCurrentPage(page)}
+                      onChangeRowsPerPage={(perPage) => setRowsPerPage(perPage)}
                     />
                   )}
                 </div>
