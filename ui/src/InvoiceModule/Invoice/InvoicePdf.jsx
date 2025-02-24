@@ -315,7 +315,7 @@ const InvoicePdf = () => {
                                 </td>
                                 <td>
                                   {(
-                                    parseFloat(invoiceData.totalAmount) || 0
+                                    parseFloat(invoiceData.subTotal) || 0
                                   ).toFixed(2)}
                                 </td>
                               </tr>

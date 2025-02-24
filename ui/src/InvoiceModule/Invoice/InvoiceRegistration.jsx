@@ -39,7 +39,7 @@ const InvoiceRegistration = () => {
     { key: "service", title: "Service", type: "text" },
     { key: "quantity", title: "Quantity", type: "number" },
     { key: "unitCost", title: "Unit Cost", type: "number" },
-    { key: "totalCost", title: "Total Cost", type: "number", readonly: true },
+    { key: "totalCost", title: "Total Cost", type: "number" },
   ]);
 
   const [search, setSearch] = useState("");
@@ -83,7 +83,7 @@ const InvoiceRegistration = () => {
 
   useEffect(() => {
     dispatch(fetchCustomers());
-    dispatch(fetchProducts());
+    // dispatch(fetchProducts());
     dispatch(fetchBanks(companyId));
   }, [dispatch]);
 
@@ -194,11 +194,11 @@ const InvoiceRegistration = () => {
     }
   }, [search, customers]);
 
-  useEffect(() => {
-    if (companyId) {
-      dispatch(fetchProducts(companyId));
-    }
-  }, [dispatch, companyId]);
+  // useEffect(() => {
+  //   if (companyId) {
+  //     dispatch(fetchProducts(companyId));
+  //   }
+  // }, [dispatch, companyId]);
 
   useEffect(() => {
     console.log("Customers from Redux store:", products);
@@ -271,14 +271,6 @@ const InvoiceRegistration = () => {
 
       // ✅ Convert products array into a dynamic key-value object for customFields
       const customFieldsObject = {};
-
-      // Add predefined fields to the object
-      // customFieldsObject.customerName = data.customerName.label || "";
-      // customFieldsObject.purchaseOrder = data.purchaseOrder || "";
-      // customFieldsObject.vendorCode = data.vendorCode || "";
-      // customFieldsObject.invoiceDate = data.invoiceDate || "";
-      // customFieldsObject.dueDate = data.dueDate || "";
-
       // Add dynamic product fields
       if (data.products?.length > 0) {
         data.products.forEach((product) => {
@@ -291,6 +283,7 @@ const InvoiceRegistration = () => {
       console.log("✅ Final Payload:", customFieldsObject);
 
       console.log("🛠️ Transformed Custom Fields:", customFieldsObject);
+      console.log("subTotal:", subTotal);
 
       // ✅ Prepare final payload
       const invoiceDataToSend = {
@@ -301,6 +294,7 @@ const InvoiceRegistration = () => {
         dueDate: data.dueDate,
         status: "Active",
         bankId: data.bankName,
+        subTotal: subTotal.toString(),
         productColumns,
         productData,
       };
@@ -410,7 +404,16 @@ const InvoiceRegistration = () => {
   };
 
   const handleInvoiceDateChange = (e) => {
-    const invoiceDate = new Date(e.target.value);
+    const inputValue = e.target.value;
+    if (!inputValue) {
+      setValue("dueDate", "");
+      return;
+    }
+    const invoiceDate = new Date(inputValue);
+    if (isNaN(invoiceDate)) {
+      setValue("dueDate", "");
+      return;
+    }
     const dueDate = new Date(invoiceDate);
     dueDate.setDate(invoiceDate.getDate() + 15);
     setValue("dueDate", dueDate.toISOString().split("T")[0]);
@@ -709,48 +712,6 @@ const InvoiceRegistration = () => {
                     </div>
                   </div>
 
-                  <div className="form-group row">
-                    <label
-                      htmlFor="purchaseOrder"
-                      className="col-sm-2 text-right control-label col-form-label"
-                    >
-                      Invoice Number <span style={{ color: "red" }}>*</span>
-                    </label>
-                    <div className="col-sm-9 mb-3">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="purchaseOrder"
-                        id="purchaseOrder"
-                        placeholder="Enter Invoice Number"
-                        {...register("invoiceNo", {
-                          required: "Invoice Number is required",
-                          pattern: {
-                            value: /^[A-Za-z0-9]+$/, // Accept only alphabets and numbers
-                            message: "Only alphabets and numbers are allowed",
-                          },
-                          minLength: {
-                            value: 3,
-                            message:
-                              "Invoice Number must be at least 3 characters long",
-                          },
-                          maxLength: {
-                            value: 10,
-                            message:
-                              "Invoice Number cannot exceed 10 characters",
-                          },
-                        })}
-                      />
-                      {errors.invoiceNo && (
-                        <p
-                          className="errorMsg"
-                          style={{ marginLeft: "6px", marginBottom: "0" }}
-                        >
-                          {errors.invoiceNo.message}
-                        </p>
-                      )}
-                    </div>
-                  </div>
                   {/* Invoice Number */}
                   {/* <div className="form-group row">
                     <label
@@ -939,7 +900,7 @@ const InvoiceRegistration = () => {
                             colSpan={productColumns.length - 1}
                             className="text-end"
                           >
-                            <strong>SubTotal:</strong>
+                            <strong>Sub Total:</strong>
                           </td>
                           <td>
                             <input

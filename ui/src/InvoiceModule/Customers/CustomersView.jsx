@@ -26,10 +26,14 @@ const CustomersView = () => {
   // Fetch all customers on component mount
   useEffect(() => {
     if (companyId) {
-      dispatch(fetchCustomers(companyId));
+      const timer = setTimeout(() => {
+        dispatch(fetchCustomers(companyId));
+      }, 1500); // Delay of 1500ms
+  
+      return () => clearTimeout(timer);
     }
   }, [dispatch, companyId]);
-
+  
   useEffect(() => {
     console.log("Customers from Redux store:", customers);
   }, [customers]);
