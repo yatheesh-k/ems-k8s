@@ -39,11 +39,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public ResponseEntity<?> getCustomerAllInvoices(String authToken, String companyId, String customerId) throws EmployeeException {
-        return entityUtils.getRequest(authToken,Constants.COMPANY_ADD+companyId+Constants.CUSTOMER_GET+customerId+Constants.INVOICE);
-    }
-
-    @Override
     public ResponseEntity<?> getCompanyAllInvoices(String authToken, String companyId, String customerId) throws EmployeeException {
         return entityUtils.getRequest(authToken,Constants.COMPANY_ADD+companyId+Constants.INVOICE);
     }

@@ -7,6 +7,7 @@ import com.invoice.model.*;
 import com.invoice.opensearch.OpenSearchOperations;
 import com.invoice.request.InvoiceRequest;
 import com.invoice.request.ProductColumnsRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -92,7 +93,7 @@ public class InvoiceUtils {
         }
 
 
-    public static void unMaskInvoiceProperties(InvoiceModel invoiceEntity) {
+    public static void unMaskInvoiceProperties(InvoiceModel invoiceEntity,HttpServletRequest request) {
         if (invoiceEntity != null) {
             log.debug("Unmasking invoice: {}", invoiceEntity);
 
@@ -160,7 +161,11 @@ public class InvoiceUtils {
                 invoiceEntity.getCompany().setPanNo(unMaskValue(invoiceEntity.getCompany().getPanNo()));
                 invoiceEntity.getCompany().setMobileNo(unMaskValue(invoiceEntity.getCompany().getMobileNo()));
                 invoiceEntity.getCompany().setCinNo(unMaskValue(invoiceEntity.getCompany().getCinNo()));
-                log.debug("After unmasking company: {}", invoiceEntity.getCompany());
+                String baseUrl = getBaseUrl(request);
+                String image = baseUrl + "var/www/ems/assets/img/" + invoiceEntity.getCompany().getImageFile();
+                invoiceEntity.getCompany().setImageFile(image);
+                String stampImage = baseUrl + "var/www/ems/assets/img/" + invoiceEntity.getCompany().getStampImage();
+                invoiceEntity.getCompany().setStampImage(stampImage);
             }
             // Convert subTotal to a numeric value
             double subTotal = parseAmount(invoiceEntity.getSubTotal());
@@ -191,6 +196,14 @@ public class InvoiceUtils {
      */
     private static String formatAmount(double amount) {
         return String.format("%.2f", amount);
+    }
+    public static String getBaseUrl(HttpServletRequest request) {
+        String scheme = request.getScheme(); // http or https
+        String serverName = request.getServerName(); // localhost or IP address
+        int serverPort = request.getServerPort(); // port number
+        String contextPath = "/"+Constants.INDEX_EMS; // context path
+
+        return scheme + "://" + serverName + ":" + serverPort + contextPath + "/";
     }
 
     /**

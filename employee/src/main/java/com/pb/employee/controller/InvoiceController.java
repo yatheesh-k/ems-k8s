@@ -54,18 +54,6 @@ public class InvoiceController {
         return invoiceService.getInvoiceById(authToken,companyId,customerId,invoiceId);
     }
 
-    @GetMapping("company/{companyId}/customer/{customerId}/invoice")
-    @Operation(security = { @SecurityRequirement(name = Constants.AUTH_KEY) },summary = "${api.getCustomerAllInvoices.tag}", description = "${api.getInvoice.description}")
-    @ApiResponse(responseCode = "200", description = "OK")
-    public ResponseEntity<?> getCustomerAllInvoices(@Parameter(hidden = true, required = true, description = "${apiAuthToken.description}", example = "Bearer abcdef12-1234-1234-1234-abcdefabcdef")
-                                                       @RequestHeader(Constants.AUTH_KEY) String authToken,
-                                                       @Parameter(required = true, description = "${api.getCompanyPayload.description}")
-                                                       @PathVariable String companyId,
-                                                       @Parameter(required = true, description = "${api.getCustomerPayload.description}")
-                                                       @PathVariable String customerId
-                                                       ) throws EmployeeException {
-        return invoiceService.getCustomerAllInvoices(authToken,companyId,customerId);
-    }
 
     @GetMapping("company/{companyId}/invoice")
     @Operation(security = { @SecurityRequirement(name = Constants.AUTH_KEY) },summary = "${api.getCompanyAllInvoices.tag}", description = "${api.getInvoice.description}")

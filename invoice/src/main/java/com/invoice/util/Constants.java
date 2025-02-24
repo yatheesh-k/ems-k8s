@@ -60,4 +60,7 @@ public class Constants {
     public static final String PDF = ".pdf";
     public static final String CUSTOMER_ID= "customerId";
     public static final String COMPANY_ID = "companyId";
+    public static final String IGST = "iGst";
+    public static final String SGST = "sGst";
+    public static final String CGST = "cGst";
 }
