@@ -74,13 +74,31 @@ const GeneratePaySlip = () => {
         year: year.label,
       });
       setView(response.data.data.generatePayslip);
+
+      // Log the attendance data received from the API
+      console.log(
+        "Attendance Data from API:",
+        response.data.data.employeesWithoutAttendance
+      );
+
       setAttendanceNull(response.data.data.employeesWithoutAttendance || []); // Ensure it's always an array
       setSelectedMonthYear(`${month.label} ${year.label}`);
       setShow(true);
     } catch (error) {
+      // Try to get the error message from the response data
+      const errorData = error.response?.data?.data;
+      if (errorData) {
+        const attendanceError =
+          typeof errorData === "string" ? [errorData] : errorData;
+        setAttendanceNull(attendanceError);
+        console.log("Attendance Error Data:", attendanceError);
+      } else {
+        setAttendanceNull([]);
+        console.log("Attendance Error Data: []");
+      }
       const errorMessage =
         error.response?.data?.error?.message || "Error fetching payslip data.";
-      toast.error(errorMessage);
+      // toast.error(errorMessage);
     }
   };
 
@@ -297,7 +315,13 @@ const GeneratePaySlip = () => {
                         control={control}
                         rules={{ required: true }}
                         render={({ field }) => (
-                          <Select {...field} options={months} />
+                          <Select
+                            {...field}
+                            options={months}
+                            isOptionDisabled={(option) =>
+                              option.value > new Date().getMonth()+1
+                            }
+                          />
                         )}
                       />
                       {errors.month && <p>Month is Required</p>}
@@ -315,8 +339,12 @@ const GeneratePaySlip = () => {
                 </div>
               </form>
               {attendanceNull.length > 0 && (
-                <div className="col-md-6 col-lg-4 mx-auto alert alert-danger mt-4 text-center">
-                  {attendanceNull}
+                <div className="col-md-6 col-lg-4 mx-auto alert alert-danger text-center">
+                  {attendanceNull.map((error, index) => (
+                    <p style={{ marginBottom: "0px" }} key={index}>
+                      {error}
+                    </p>
+                  ))}
                 </div>
               )}
             </div>
