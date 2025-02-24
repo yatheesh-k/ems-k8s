@@ -112,6 +112,21 @@ const OfferLetterPreview = () => {
     }
   };
 
+  const formatFieldName = (fieldName) => {
+    return fieldName
+      .split(" ")
+      .map((token) => {
+        if (token === token.toUpperCase()) {
+          return token;
+        }
+        return token
+          .replace(/([A-Z])/g, " $1")
+          .replace(/^./, (str) => str.toUpperCase())
+          .trim();
+      })
+      .join(" ");
+  };
+
   useEffect(() => {
     fetchSalary();
   }, []); // Initially fetch the salary structures
@@ -727,11 +742,7 @@ const OfferLetterPreview = () => {
 
                           return (
                             <tr key={key}>
-                              <td>
-                                {key
-                                  .replace(/([A-Z])/g, " $1")
-                                  .replace(/^./, (str) => str.toUpperCase())}
-                              </td>
+                              <td>{formatFieldName(key)}</td>
                               <td>
                                 {Math.floor(allowanceAmount.toFixed(2) / 12)}
                               </td>{" "}
@@ -836,11 +847,7 @@ const OfferLetterPreview = () => {
 
                           return (
                             <tr key={key}>
-                              <td>
-                                {key
-                                  .replace(/([A-Z])/g, " $1")
-                                  .replace(/^./, (str) => str.toUpperCase())}
-                              </td>
+                              <td>{formatFieldName(key)}</td>
                               <td>
                                 {Math.round(deductionAmount.toFixed(2) / 12)}
                               </td>

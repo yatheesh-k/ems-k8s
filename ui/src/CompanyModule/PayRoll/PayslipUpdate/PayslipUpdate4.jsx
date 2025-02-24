@@ -57,52 +57,80 @@ const PayslipUpdate4 = () => {
 
   const numberToWords = (num) => {
     const units = [
-      '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
-      'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
-      'Seventeen', 'Eighteen', 'Nineteen'
+      "",
+      "One",
+      "Two",
+      "Three",
+      "Four",
+      "Five",
+      "Six",
+      "Seven",
+      "Eight",
+      "Nine",
+      "Ten",
+      "Eleven",
+      "Twelve",
+      "Thirteen",
+      "Fourteen",
+      "Fifteen",
+      "Sixteen",
+      "Seventeen",
+      "Eighteen",
+      "Nineteen",
     ];
-    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-    const unitsPlaces = ['', 'Lakh', 'Thousand', 'Hundred'];
+    const tens = [
+      "",
+      "",
+      "Twenty",
+      "Thirty",
+      "Forty",
+      "Fifty",
+      "Sixty",
+      "Seventy",
+      "Eighty",
+      "Ninety",
+    ];
+    const unitsPlaces = ["", "Lakh", "Thousand", "Hundred"];
 
-    if (num === 0) return 'Zero';
+    if (num === 0) return "Zero";
 
     const convertToWords = (n) => {
-      if (n === 0) return '';
+      if (n === 0) return "";
 
-      let word = '';
+      let word = "";
       if (n >= 100) {
-        word += units[Math.floor(n / 100)] + ' Hundred ';
+        word += units[Math.floor(n / 100)] + " Hundred ";
         n %= 100;
       }
       if (n >= 20) {
-        word += tens[Math.floor(n / 10)] + ' ';
+        word += tens[Math.floor(n / 10)] + " ";
         n %= 10;
       }
       if (n > 0) {
-        word += units[n] + ' ';
+        word += units[n] + " ";
       }
       return word.trim();
     };
 
-    let result = '';
+    let result = "";
     let integerPart = Math.floor(num);
 
     // Handle Lakhs and Thousands in the Indian numbering system
     if (integerPart >= 100000) {
       const lakhs = Math.floor(integerPart / 100000);
-      result += convertToWords(lakhs) + ' Lakh ';
+      result += convertToWords(lakhs) + " Lakh ";
       integerPart %= 100000;
     }
 
     if (integerPart >= 1000) {
       const thousands = Math.floor(integerPart / 1000);
-      result += convertToWords(thousands) + ' Thousand ';
+      result += convertToWords(thousands) + " Thousand ";
       integerPart %= 1000;
     }
 
     if (integerPart >= 100) {
       const hundreds = Math.floor(integerPart / 100);
-      result += convertToWords(hundreds) + ' Hundred ';
+      result += convertToWords(hundreds) + " Hundred ";
       integerPart %= 100;
     }
 
@@ -113,7 +141,7 @@ const PayslipUpdate4 = () => {
     // Handle decimal (cents)
     let decimalPart = Math.round((num % 1) * 100);
     if (decimalPart > 0) {
-      result += ' and ' + convertToWords(decimalPart) + ' Paise';
+      result += " and " + convertToWords(decimalPart) + " Paise";
     }
 
     return result.trim();
@@ -177,10 +205,11 @@ const PayslipUpdate4 = () => {
     if (employeeId && payslipId) {
       try {
         console.log("Using latest totals:", totals);
-  
+
         // Extract existing allowances
-        const allowances = payslipData.salary.salaryConfigurationEntity.allowances || {};
-  
+        const allowances =
+          payslipData.salary.salaryConfigurationEntity.allowances || {};
+
         // Extract new allowances like Bonus
         const newAllowances = {};
         allowanceFields.forEach((field) => {
@@ -192,54 +221,59 @@ const PayslipUpdate4 = () => {
             allowances[field.label] = Number(field.value);
           }
         });
-  
+
         // Add new allowances (like Bonus) to the existing allowances
         Object.assign(allowances, newAllowances);
-  
+
         // Calculate total of other allowances (excluding "Other Allowances")
         const totalAllowances = Object.entries(allowances)
           .filter(([key]) => key !== "Other Allowances") // Do not include "Other Allowances" in total calculation
           .reduce((total, [, amount]) => total + (Number(amount) || 0), 0);
-  
+
         const grossAmount = payslipData.salary.grossAmount || 0;
-  
+
         // Recalculate "Other Allowances" if necessary
         let updatedOtherAllowance =
           allowances["Other Allowances"] || grossAmount / 12 - totalAllowances;
-  
+
         // Prevent recalculation of "Other Allowances" when new fields like Bonus are added
         if (Object.keys(newAllowances).length > 0) {
           updatedOtherAllowance =
-            allowances["Other Allowances"] || grossAmount / 12 - totalAllowances;
+            allowances["Other Allowances"] ||
+            grossAmount / 12 - totalAllowances;
         }
-  
+
         // Prevent negative "Other Allowances"
         if (updatedOtherAllowance < 0) {
           setOtherAllowanceError("Other Allowance cannot be negative.");
-          console.log("Other Allowance cannot be negative.", updatedOtherAllowance);
+          console.log(
+            "Other Allowance cannot be negative.",
+            updatedOtherAllowance
+          );
           return; // Stop the update process if the value is negative
         } else {
           setOtherAllowanceError(""); // Clear the error if the allowance is valid
         }
-  
+
         // Ensure the "Other Allowances" is always updated correctly
         allowances["Other Allowances"] = updatedOtherAllowance.toString();
-  
+
         // Handle new deductions (from user input) and include them in the payload
         const updatedDeductions = deductionFields.reduce((acc, field) => {
           acc[field.label] = field.value;
           return acc;
         }, {});
-  
+
         // Extract existing deductions from the current payslip data
-        const existingDeductions = payslipData.salary.salaryConfigurationEntity.deductions || {};
-  
+        const existingDeductions =
+          payslipData.salary.salaryConfigurationEntity.deductions || {};
+
         // Merge the updated deductions with the existing ones, making sure to avoid duplication
         const mergedDeductions = {
           ...existingDeductions, // Include the existing deductions
-          ...updatedDeductions,  // Add new deductions
+          ...updatedDeductions, // Add new deductions
         };
-  
+
         // Create the payload to send to the server
         const payload = {
           companyName: user.company || "", // Default to empty string if undefined
@@ -261,10 +295,10 @@ const PayslipUpdate4 = () => {
           attendance: payslipData.attendance,
           month,
           year,
-          updatedOtherAllowance,// Convert to number or default to 0
-        };        
+          updatedOtherAllowance, // Convert to number or default to 0
+        };
         console.log("Payload being sent:", payload);
-  
+
         // Call the API to update the payslip
         await EmployeePayslipUpdate(employeeId, payslipId, payload);
         toast.success("Payslip updated successfully");
@@ -416,9 +450,17 @@ const PayslipUpdate4 = () => {
 
   const formatFieldName = (fieldName) => {
     return fieldName
-      .replace(/([A-Z])/g, " $1")
-      .replace(/^./, (str) => str.toUpperCase())
-      .trim();
+      .split(" ")
+      .map((token) => {
+        if (token === token.toUpperCase()) {
+          return token;
+        }
+        return token
+          .replace(/([A-Z])/g, " $1")
+          .replace(/^./, (str) => str.toUpperCase())
+          .trim();
+      })
+      .join(" ");
   };
 
   const handleAllowanceChange = (key, newValue) => {
@@ -523,27 +565,21 @@ const PayslipUpdate4 = () => {
       .filter((char) => allowedCharsRegex.test(char))
       .join("");
     // Capitalize first letter of each word & keep others as user typed
-  const words = value.split(" ");
-  const formattedValue = words.map((word) =>
-    word.length > 0 ? word.charAt(0).toUpperCase() + word.slice(1) : ""
-  ).join(" ");
-  // Trim multiple spaces after the first 3 characters
-  let finalValue = formattedValue.length > 3
-    ? formattedValue.slice(0, 3) + formattedValue.slice(3).replace(/\s+/g, " ")
-    : formattedValue;
+    const words = value.split(" ");
+    const formattedValue = words
+      .map((word) =>
+        word.length > 0 ? word.charAt(0).toUpperCase() + word.slice(1) : ""
+      )
+      .join(" ");
+    // Trim multiple spaces after the first 3 characters
+    let finalValue =
+      formattedValue.length > 3
+        ? formattedValue.slice(0, 3) +
+          formattedValue.slice(3).replace(/\s+/g, " ")
+        : formattedValue;
     input.value = finalValue;
     input.setSelectionRange(cursorPosition, cursorPosition);
   };
-
-
-
-
-
-
-
-
-
-
 
   const handleEmailChange = (e) => {
     const value = e.target.value;
@@ -875,7 +911,9 @@ const PayslipUpdate4 = () => {
                           textAlign: "left",
                           border: "1px solid black",
                         }}
-                      >{employeeDetails.location}</td>
+                      >
+                        {employeeDetails.location}
+                      </td>
                     </tr>
                     <tr>
                       <th
@@ -1457,7 +1495,7 @@ const PayslipUpdate4 = () => {
                             border: "1px solid black",
                           }}
                         >
-                         <b>{numberToWords(totals.netPay)}</b>
+                          <b>{numberToWords(totals.netPay)}</b>
                         </td>
                       </tr>
                       {netPayError && (
