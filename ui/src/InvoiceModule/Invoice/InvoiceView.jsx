@@ -21,10 +21,16 @@ const InvoiceView = () => {
   // Fetch invoices on component mount
   useEffect(() => {
     if (companyId) {
-      dispatch(fetchInvoices(companyId)).then((res) => {
-      });
+      const timer = setTimeout(() => {
+        dispatch(fetchInvoices(companyId)).then((res) => {
+          // Handle the response if needed
+        });
+      }, 1500); // Delay of 1500ms
+  
+      // Clear the timeout if the component unmounts or companyId changes
+      return () => clearTimeout(timer);
     }
-  }, [dispatch, companyId]);
+  }, [dispatch, companyId]);  
 
   // Filter invoices based on search
   useEffect(() => {
