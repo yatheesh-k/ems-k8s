@@ -33,20 +33,18 @@ const AccountRegistartion = () => {
     : "";
 
   const onSubmit = (data) => {
-    const payload = {
-      accountNumber: data.accountNumber,
-      bankName: data.bankName,
-      branch: data.branch,
-      ifscCode: data.ifscCode,
-      address: data.address,
-      accountType: data.accountType.value, // Extract the value of the accountType object
-    };
-
-    console.log("Flattened Payload:", payload); // Log the payload to verify its structure
-
     if (location && location.state && location.state.bankId) {
-      // If updating, call the PUT API
-      BankPutApiById(companyId, location.state.bankId, payload)
+      // If updating, build the update payload with only the required fields
+      const updatePayload = {
+        branch: data.branch,
+        ifscCode: data.ifscCode,
+        address: data.address,
+        accountType: data.accountType.value, // Extract the value from the accountType object
+      };
+
+      console.log("Update Payload:", updatePayload);
+
+      BankPutApiById(companyId, location.state.bankId, updatePayload)
         .then((res) => {
           const successMessage =
             res.data.message || "Bank Account updated successfully";
@@ -58,7 +56,7 @@ const AccountRegistartion = () => {
           navigate("/accountsView");
         })
         .catch((error) => {
-          console.error("Error updating bank:", error); // Log the error for debugging
+          console.error("Error updating bank:", error);
           const errorMsg =
             error.response?.data?.error?.message ||
             error.message ||
@@ -69,8 +67,19 @@ const AccountRegistartion = () => {
           });
         });
     } else {
-      // If adding new bank, call the POST API
-      BankPostApi(companyId, payload)
+      // If creating a new bank account, build the full payload
+      const createPayload = {
+        accountNumber: data.accountNumber,
+        bankName: data.bankName,
+        branch: data.branch,
+        ifscCode: data.ifscCode,
+        address: data.address,
+        accountType: data.accountType.value, // Extract the value of the accountType object
+      };
+
+      console.log("Create Payload:", createPayload);
+
+      BankPostApi(companyId, createPayload)
         .then((response) => {
           toast.success("Bank Account added successfully", {
             position: "top-right",
@@ -80,7 +89,7 @@ const AccountRegistartion = () => {
           navigate("/accountsView");
         })
         .catch((error) => {
-          console.error("Error adding bank account:", error); // Log the full error object
+          console.error("Error adding bank account:", error);
           const errorMessage =
             error.response?.data?.error?.message || "Error adding bank details";
           toast.error(errorMessage, {
@@ -264,6 +273,7 @@ const AccountRegistartion = () => {
                         })}
                         onChange={(e) => handleInputChange(e, "accountNumber")}
                         onKeyPress={(e) => preventInvalidInput(e, "numeric")}
+                        readOnly={isUpdating}
                       />
                       {errors.accountNumber && (
                         <p className="errorMsg">
@@ -293,6 +303,7 @@ const AccountRegistartion = () => {
                         })}
                         onChange={(e) => handleInputChange(e, "bankName")}
                         onKeyPress={(e) => preventInvalidInput(e, "alpha")}
+                        readOnly={isUpdating}
                       />
                       {errors.bankName && (
                         <p className="errorMsg">{errors.bankName.message}</p>

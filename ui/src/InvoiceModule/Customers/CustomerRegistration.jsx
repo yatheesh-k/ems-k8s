@@ -31,12 +31,21 @@ const CustomersRegistration = () => {
   const [errorMessage, setErrorMessage] = useState(""); // State for error message
 
   const onSubmit = (data) => {
-    const payload = {
-      ...data,
-      status: data.status.value,
-    };
     if (location && location.state && location.state.customerId) {
-      CustomerPutApiById(companyId, location.state.customerId, payload)
+      // Build the update payload with only the specified fields
+      const updatePayload = {
+        address: data.address,
+        state: data.state,
+        city: data.city,
+        pinCode: data.pinCode,
+        status: data.status.value, // Assuming status is a select option object
+        customerGstNo: data.customerGstNo,
+        stateCode: data.stateCode,
+      };
+  
+      console.log("Update Payload:", updatePayload);
+  
+      CustomerPutApiById(companyId, location.state.customerId, updatePayload)
         .then((res) => {
           const successMessage =
             res.data.message || "Customer updated successfully";
@@ -48,7 +57,7 @@ const CustomersRegistration = () => {
           navigate("/customersView");
         })
         .catch((error) => {
-          console.error("Error updating customer:", error); // Log the error for debugging
+          console.error("Error updating customer:", error);
           const errorMsg =
             error.response?.data?.error?.message ||
             error.message ||
@@ -59,7 +68,15 @@ const CustomersRegistration = () => {
           });
         });
     } else {
-      CustomerPostApi(companyId, payload)
+      // Build the full payload for creating a new customer
+      const createPayload = {
+        ...data,
+        status: data.status.value,
+      };
+  
+      console.log("Create Payload:", createPayload);
+  
+      CustomerPostApi(companyId, createPayload)
         .then((response) => {
           toast.success("Customer added successfully", {
             position: "top-right",
@@ -68,14 +85,13 @@ const CustomersRegistration = () => {
           navigate("/customersView");
         })
         .catch((error) => {
-          // Handle API error response
           const errorMessage =
             error.response?.data?.error?.message || "Error adding customer";
           console.error("API Error:", errorMessage);
           toast.error(errorMessage);
         });
     }
-  };
+  };  
 
   useEffect(() => {
     console.log("Location state:", location.state);
@@ -342,6 +358,7 @@ const CustomersRegistration = () => {
                         })}
                         onChange={(e) => handleInputChange(e, "customerName")}
                         onKeyPress={(e) => preventInvalidInput(e, "alpha")}
+                        readOnly={isUpdating}
                       />
                       {errors.customerName && (
                         <p className="errorMsg">
@@ -367,6 +384,7 @@ const CustomersRegistration = () => {
                         })}
                         onChange={(e) => handleInputChange(e, "email")}
                         onKeyPress={(e) => preventInvalidInput(e, "whitespace")}
+                        readOnly={isUpdating}
                       />
                       {errors.email && (
                         <p className="errorMsg">{errors.email.message}</p>
@@ -415,6 +433,7 @@ const CustomersRegistration = () => {
                           },
                         })}
                         onChange={(e) => handleInputChange(e, "mobileNumber")}
+                        readOnly={isUpdating}
                       />
                       {errors.mobileNumber && (
                         <p className="errorMsg">
