@@ -318,9 +318,6 @@ const GeneratePaySlip = () => {
                           <Select
                             {...field}
                             options={months}
-                            isOptionDisabled={(option) =>
-                              option.value > new Date().getMonth()+1
-                            }
                           />
                         )}
                       />
