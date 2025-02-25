@@ -171,16 +171,24 @@ public class InvoiceUtils {
             double subTotal = parseAmount(invoiceEntity.getSubTotal());
             double cGst = 0.0, sGst = 0.0, iGst = 0.0, grandTotal = subTotal;
 
-            if (invoiceEntity.getCustomer() != null && invoiceEntity.getCustomer().getCustomerGstNo() != null
-                    && !invoiceEntity.getCustomer().getCustomerGstNo().isEmpty()) {
-                cGst = subTotal * 0.09; // 9% CGST
-                sGst = subTotal * 0.09; // 9% SGST
-                grandTotal += cGst + sGst;
-            } else {
-                iGst = subTotal * 0.18; // 18% IGST
-                grandTotal += iGst;
-            }
+            // Get GST numbers
+            String companyGstNo = (invoiceEntity.getCompany() != null) ? invoiceEntity.getCompany().getGstNo() : null;
+            String customerGstNo = (invoiceEntity.getCustomer() != null) ? invoiceEntity.getCustomer().getCustomerGstNo() : null;
 
+            // Validate GST numbers
+            if (customerGstNo != null && !customerGstNo.isEmpty() && !customerGstNo.matches("^0+$")) {
+                if (companyGstNo != null && companyGstNo.length() >= 2 && customerGstNo.length() >= 2) {
+                    // Compare first two digits
+                    if (companyGstNo.substring(0, 2).equals(customerGstNo.substring(0, 2))) {
+                        cGst = subTotal * 0.09; // 9% CGST
+                        sGst = subTotal * 0.09; // 9% SGST
+                        grandTotal += cGst + sGst;
+                    } else {
+                        iGst = subTotal * 0.18; // 18% IGST
+                        grandTotal += iGst;
+                    }
+                }
+            }
             // Set calculated values back to entity
             invoiceEntity.setCGst(formatAmount(cGst));
             invoiceEntity.setSGst(formatAmount(sGst));
@@ -222,7 +230,6 @@ public class InvoiceUtils {
         }
 
     }
-
     /**
      * Method to unmask a ProductColumn.
      */

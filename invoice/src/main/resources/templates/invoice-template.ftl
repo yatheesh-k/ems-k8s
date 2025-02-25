@@ -192,6 +192,7 @@
         <div class="table-responsive" style="margin-left: 10px; position: relative; top: -10px;">
             <table class="table" style="width: 100%;">
                 <thead>
+                 <#assign columnCount = (invoice.productColumns?size + 1)!1>
                  <tr>
                      <th class="text-center">S.NO</th>
 
@@ -217,11 +218,11 @@
                            </#list>
                        <#else>
                            <tr>
-                               <td colspan="7" style="font-size: 13px;">No orders available.</td>
+                               <td colspan="${columnCount}" style="font-size: 13px;">No orders available.</td>
                            </tr>
                        </#if>
                     <tr style="text-align: right;">
-                        <td colspan="6" style="text-align: right; font-size: 13px;"><strong>Total Amount</strong></td>
+                        <td colspan="${columnCount-1}" style="text-align: right; font-size: 13px;"><strong>Total Amount</strong></td>
                         <td style="text-align: right; font-size: 13px;">${invoice.subTotal}</td>
                     </tr>
 
@@ -231,16 +232,16 @@
 
                  <#if iGstValue gt 0>
                      <tr>
-                         <td colspan="6" style="text-align: right; font-size: 13px;"><strong>IGST</strong> (18%)</td>
+                         <td colspan="${columnCount-1}" style="text-align: right; font-size: 13px;"><strong>IGST</strong> (18%)</td>
                          <td>${iGstValue}</td>
                      </tr>
                  <#elseif cGstValue gt 0 && sGstValue gt 0>
                      <tr>
-                         <td colspan="6" style="text-align: right; font-size: 13px;"><strong>CGST</strong> (9%)</td>
+                         <td colspan="${columnCount-1}" style="text-align: right; font-size: 13px;"><strong>CGST</strong> (9%)</td>
                          <td>${cGstValue}</td>
                      </tr>
                      <tr>
-                         <td colspan="6" style="text-align: right; font-size: 13px;"><strong>SGST</strong> (9%)</td>
+                         <td colspan="${columnCount-1}" style="text-align: right; font-size: 13px;"><strong>SGST</strong> (9%)</td>
                          <td>${sGstValue}</td>
                      </tr>
                  </#if>
@@ -250,32 +251,37 @@
 
                <#if iGstValue gt 0>
                    <tr>
-                       <td colspan="6" style="text-align: right; font-size: 13px;"><strong>IGST</strong> (18%)</td>
+                       <td colspan="${columnCount-1}" style="text-align: right; font-size: 13px;"><strong>IGST</strong> (18%)</td>
                        <td>${iGstValue}</td>
                    </tr>
                <#elseif cGstValue gt 0 && sGstValue gt 0>
                    <tr>
-                       <td colspan="6" style="text-align: right; font-size: 13px;"><strong>CGST</strong> (9%)</td>
+                       <td colspan="${columnCount-1}" style="text-align: right; font-size: 13px;"><strong>CGST</strong> (9%)</td>
                        <td>${cGstValue}</td>
                    </tr>
                    <tr>
-                       <td colspan="6" style="text-align: right; font-size: 13px;"><strong>SGST</strong> (9%)</td>
+                       <td colspan="${columnCount-1}" style="text-align: right; font-size: 13px;"><strong>SGST</strong> (9%)</td>
                        <td>${sGstValue}</td>
                    </tr>
                <#else>
                    <tr>
-                       <td colspan="7" style="text-align: right;">GST Not Found</td>
+                       <td colspan="${columnCount-1}" style="text-align: right; font-size: 13px;"><strong>CGST</strong> (9%)</td>
+                       <td>${cGstValue}</td>
+                   </tr>
+                   <tr>
+                       <td colspan="${columnCount-1}" style="text-align: right; font-size: 13px;"><strong>SGST</strong> (9%)</td>
+                       <td>${sGstValue}</td>
                    </tr>
                </#if>
 
 
 
                     <tr style="background-color:#f5f5f5;">
-                        <th class="text-right" colspan="6" style="font-size: 13px;"><b>Grand Total</b></th>
+                        <th class="text-right" colspan="${columnCount-1}" style="font-size: 13px;"><b>Grand Total</b></th>
                         <th class="text-right" style="font-size: 13px;"><b>${invoice.grandTotal}</b></th>
                     </tr>
                     <tr>
-                        <th colspan="7" class="text-center" style="font-size: 13px;">The Payment should be made
+                        <th colspan="${columnCount}" class="text-center" style="font-size: 13px;">The Payment should be made
                             favouring <b>${invoice.company.companyName}</b> or Direct deposit information given above.</th>
                     </tr>
                 </tbody>
@@ -347,5 +353,4 @@
         </div>
     </div>
 </body>
-
 </html>
