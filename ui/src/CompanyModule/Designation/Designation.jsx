@@ -182,7 +182,6 @@ const Designation = () => {
   
     return true; // Return true if all conditions are satisfied
   };
-  
 
   useEffect(() => {
     setFilteredData(designations);

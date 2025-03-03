@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 const Header = ({ toggleSidebar }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [roles, setRoles] = useState("");
+  const [roles, setRoles] = useState([]);
   const { user} = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,10 +20,9 @@ const Header = ({ toggleSidebar }) => {
   const [lastName, setLastName] = useState("");
   const profileDropdownRef = useRef(null);
   const navigate = useNavigate();
-
-  console.log("roles",roles)
   useEffect(() => {
     if (!user) return;
+
     const fetchData = async () => {
       setLoading(true);
       setError(null);
@@ -43,22 +42,24 @@ const Header = ({ toggleSidebar }) => {
   }, [user]);
 
   const token = localStorage.getItem("token");
+
   useEffect(() => {
     if (token) {
       const decodedToken = jwtDecode(token);
       const roles = decodedToken?.roles || [];
       setRoles(roles);
+
       const currentTime = Date.now() / 1000;
       const remainingTime = decodedToken.exp - currentTime;
 
       if (remainingTime > 0) {
         const timeoutId = setTimeout(() => {
-          handleLogOut(roles);
+          handleLogOut();
         }, remainingTime * 1000);
 
         return () => clearTimeout(timeoutId);
       } else {
-        handleLogOut(roles);
+        handleLogOut();
       }
     }
   }, [token]);

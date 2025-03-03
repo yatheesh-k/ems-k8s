@@ -26,7 +26,7 @@ const CompanyLogin = () => {
 
   const { setAuthUser } = useAuth();
     const { company } = useParams();
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
   const [passwordShown, setPasswordShown] = useState(false);
   const [otpSent, setOtpSent] = useState(false); 
   const [loading, setLoading] = useState(false);
@@ -284,7 +284,7 @@ const CompanyLogin = () => {
                                     </p>
                                   )}
                                   <small>
-                                    <a href="/updatePassword">Forgot Password?</a>
+                                    <a href="/forgotPassword">Forgot Password?</a>
                                   </small>
                                 </div>
 

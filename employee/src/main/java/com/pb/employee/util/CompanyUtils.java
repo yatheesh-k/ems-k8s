@@ -131,12 +131,12 @@ public class CompanyUtils {
         }
         if (companyEntity.getImageFile() != null){
             String baseUrl = getBaseUrl(request);
-            String image = baseUrl + "var/www/ems-testing/assets/img/" + companyEntity.getImageFile();
+            String image = baseUrl + "var/www/ems/assets/img/" + companyEntity.getImageFile();
             companyEntity.setImageFile(image);
         }
         if (companyEntity.getStampImage() != null){
             String baseUrl = getBaseUrl(request);
-            String image = baseUrl + "var/www/ems-testing/assets/img/" + companyEntity.getStampImage();
+            String image = baseUrl + "var/www/ems/assets/img/" + companyEntity.getStampImage();
             companyEntity.setStampImage(image);
         }
         companyEntity.setPassword("**********");
@@ -439,8 +439,7 @@ public class CompanyUtils {
                 }
 
             }
-            if (companyEntity.getCompanyRegNo() !=null &&companyRequest.getCompanyRegNo() != null && !companyEntity.getCompanyRegNo().isEmpty()) {
-
+            if (companyEntity.getCompanyRegNo() != null && companyRequest.getCompanyRegNo() != null && !companyEntity.getCompanyRegNo().isEmpty()) {
                 regNo = new String(Base64.getDecoder().decode(companyEntity.getCompanyRegNo().getBytes()));
                 if (regNo.equals(companyRequest.getCompanyRegNo())){
                     responseBody.put(Constants.DUPLICATE_REGISTER_NO, companyRequest.getCompanyRegNo());
@@ -498,8 +497,7 @@ public class CompanyUtils {
 
             }
 
-            if (companyEntity.getCinNo() !=null && companyRequest.getCinNo() != null && !companyEntity.getCinNo().isEmpty()) {
-
+            if (companyEntity.getCinNo() != null && companyRequest.getCinNo() != null && !companyEntity.getCinNo().isEmpty()) {
                 cinNo = new String(Base64.getDecoder().decode(companyEntity.getCinNo().getBytes()));
                 if (cinNo.equals(companyRequest.getCinNo())){
                     responseBody.put(Constants.DUPLICATE_CIN_NO, companyRequest.getCinNo());

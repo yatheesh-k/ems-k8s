@@ -561,26 +561,30 @@ const EmployeeRegistration = () => {
     if (!value || value.trim().length === 0) {
       return true;
     }
+
     // Check if the value contains only digits
     if (!/^\d+$/.test(value)) {
       return "Only Numeric Characters Are Allowed.";
     }
+
     // Check if there are any leading or trailing spaces
     if (/^\s|\s$/.test(value)) {
       return "No Leading or Trailing Spaces Are Allowed.";
     }
+
     // Check for multiple spaces in between numbers
     if (/\s{2,}/.test(value)) {
       return "No Multiple Spaces Between Numbers Allowed.";
     }
+
     // Optionally: Check if the number is composed of repeating digits
     const isRepeating = /^(\d)\1{11}$/.test(value); // Check if all digits are the same (e.g., "111111111111")
     if (isRepeating) {
       return "The Number Cannot Consist Of The Same Digit Repeated.";
     }
+
     return true; // Return true if all validations pass
   };
-
   const validatePAN = (value) => {
     const spaceError = "Spaces are not allowed in the PAN Number.";
     const patternError = "Invalid PAN Number format";

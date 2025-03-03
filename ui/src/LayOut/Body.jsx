@@ -1,17 +1,13 @@
-import React, { useEffect, useState } from "react";
-import LayOut from "./LayOut";
-import { useAuth } from "../Context/AuthContext";
-import { EmployeeGetApi } from "../Utils/Axios";
-import { toast } from "react-toastify";
-import {
-  PeopleFill,
-  PersonFillCheck,
-  PersonFillExclamation,
-} from "react-bootstrap-icons";
+import React, { useEffect, useState } from 'react';
+import LayOut from './LayOut';
+import { useAuth } from '../Context/AuthContext';
+import { EmployeeGetApi } from '../Utils/Axios';
+import { toast } from 'react-toastify';
+import { PeopleFill, PersonFillCheck, PersonFillExclamation } from 'react-bootstrap-icons';
 
 const Body = () => {
   const { user } = useAuth();
-  const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees]= useState([]);;
 
   const isAdmin = user?.userRole?.includes("ems_admin");
   const isCompanyAdmin = user?.userRole?.includes("company_admin");
@@ -19,48 +15,42 @@ const Body = () => {
   const [data, setData] = useState({
     totalEmployeesCount: 0,
     activeEmployeesCount: 0,
-    inactiveEmployeesCount: 0,
+    inactiveEmployeesCount: 0
   });
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     try {
       const response = await EmployeeGetApi();
-
-      console.log("Full API Response:", response);
-
+  
+      console.log('Full API Response:', response);
+  
       if (response && Array.isArray(response)) {
         const employees = response;
-
-        console.log("Employees Data:", employees);
-
+  
+        console.log('Employees Data:', employees);
+  
         const filteredData = employees
-          .filter(
-            (employee) => employee.firstName && employee.firstName.trim() !== ""
-          )
+          .filter((employee) => employee.firstName && employee.firstName.trim() !== '')
           .map(({ id, firstName, lastName, employeeId, status }) => ({
             label: `${firstName} ${lastName} (${employeeId})`,
             value: id,
-            status: status,
+            status: status 
           }));
-
+  
         setEmployees(filteredData);
 
         const totalEmployeesCount = filteredData.length;
-        const activeEmployeesCount = filteredData.filter(
-          (emp) => emp.status === "Active"
-        ).length;
-        const inactiveEmployeesCount = filteredData.filter(
-          (emp) => emp.status === "InActive"
-        ).length;
-
+        const activeEmployeesCount = filteredData.filter(emp => emp.status === 'Active').length;
+        const inactiveEmployeesCount = filteredData.filter(emp => emp.status === 'InActive').length;
+  
         setData({
           totalEmployeesCount,
           activeEmployeesCount,
-          inactiveEmployeesCount,
+          inactiveEmployeesCount
         });
       } else {
-        throw new Error("Invalid data format from API");
+        throw new Error('Invalid data format from API');
       }
     } catch (error) {
       handleApiErrors(error);
@@ -68,6 +58,8 @@ const Body = () => {
       setLoading(false);
     }
   };
+  
+  
 
   const handleApiErrors = (error) => {
     if (error.response?.data?.error?.message) {
@@ -76,7 +68,7 @@ const Body = () => {
     } else {
       // toast.error("Network Error !");
     }
-    console.error("API Error:", error);
+    console.error('API Error:', error);
   };
 
   useEffect(() => {
@@ -93,15 +85,15 @@ const Body = () => {
         </h1>
         <div className="row h-100">
           {user && user.userRole && user.userRole.includes("ems_admin") ? (
-            <div className="card">
-              <iframe
-                src="https://122.175.43.71:2801/kibana/s/ems/app/dashboards#/view/28814343-cc4e-4b7c-aa1b-c1f5b2271aa0?embed=true&fullscreen=true&_g=(filters:!(),refreshInterval:(pause:!t,value:60000),time:(from:now-15m,to:now))"
-                height="1000"
-                width="800"
-                title="EMS Dashboard"
-                style={{ border: "none" }}
-              ></iframe>
-            </div>
+           
+                <div className='card'>
+                  <iframe
+                    src="https://122.175.43.71:2800/kibana/s/ems/app/dashboards#/view/deba4a73-baa2-4c62-aa78-089197311bcb?embed=true&fullscreen=true"height="1000" width="800"
+                    title="EMS Dashboard"
+                      style={{ border: 'none'}}
+                  ></iframe>
+          </div>
+           
           ) : (
             <>
               {loading ? (
@@ -112,14 +104,9 @@ const Body = () => {
                     <div className="card mt-3">
                       <div className="card-body mt-3">
                         <div className="d-flex align-items-center mb-2">
-                          <PeopleFill color="blue" size={30} className="me-3" />
+                          <PeopleFill color='blue' size={30} className="me-3" />
                           <div>
-                            <h5
-                              className="card-title"
-                              style={{ color: "black" }}
-                            >
-                              Total Employees
-                            </h5>
+                            <h5 className="card-title" style={{color:"black"}}>Total Employees</h5>
                             <h1 className="mt-1">{data.totalEmployeesCount}</h1>
                           </div>
                         </div>
@@ -130,21 +117,10 @@ const Body = () => {
                     <div className="card mt-3">
                       <div className="card-body mt-3">
                         <div className="d-flex align-items-center mb-2">
-                          <PersonFillCheck
-                            color="green"
-                            size={30}
-                            className="me-3"
-                          />
+                          <PersonFillCheck color='green' size={30} className="me-3" />
                           <div>
-                            <h5
-                              className="card-title"
-                              style={{ color: "black" }}
-                            >
-                              Active Employees
-                            </h5>
-                            <h1 className="mt-1">
-                              {data.activeEmployeesCount}
-                            </h1>
+                            <h5 className="card-title" style={{color:"black"}}>Active Employees</h5>
+                            <h1 className="mt-1">{data.activeEmployeesCount}</h1>
                           </div>
                         </div>
                       </div>
@@ -154,21 +130,10 @@ const Body = () => {
                     <div className="card mt-3">
                       <div className="card-body mt-3">
                         <div className="d-flex align-items-center mb-2">
-                          <PersonFillExclamation
-                            color="red"
-                            size={30}
-                            className="me-3"
-                          />
+                          <PersonFillExclamation color='red' size={30} className="me-3" />
                           <div>
-                            <h5
-                              className="card-title"
-                              style={{ color: "black" }}
-                            >
-                              InActive Employees
-                            </h5>
-                            <h1 className="mt-1">
-                              {data.inactiveEmployeesCount}
-                            </h1>
+                            <h5 className="card-title" style={{color:"black"}}>InActive Employees</h5>
+                            <h1 className="mt-1">{data.inactiveEmployeesCount}</h1>
                           </div>
                         </div>
                       </div>
