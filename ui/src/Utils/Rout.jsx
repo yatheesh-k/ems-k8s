@@ -166,7 +166,7 @@ const Rout = () => {
       <Route path='/experienceForm' element={<ExperienceForm/>}></Route>
       <Route path='/offerLetterForm' element={<OfferLetterForm/>}></Route>
       <Route path='/offerLetterPreview' element={<OfferLetterPreview/>}></Route>
-      <Route path='/forgotPassword' element={<ForgotPassword />}></Route>
+      <Route path='/updatePassword' element={<ForgotPassword />}></Route>
       <Route path='/relievingTemplates' element={<RelievingLetter/>}></Route>
       <Route path='/relivingReview' element={<Preview/>}></Route>
       <Route path='/internsLetter' element={<InternShipForm/>}></Route>
