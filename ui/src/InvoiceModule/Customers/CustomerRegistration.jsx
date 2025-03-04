@@ -27,7 +27,7 @@ const CustomersRegistration = () => {
     trigger,
     setValue,
     formState: { errors },
-  } = useForm();
+  } = useForm({mode:"onChange"});
   const [errorMessage, setErrorMessage] = useState(""); // State for error message
 
   const onSubmit = (data) => {
@@ -48,7 +48,7 @@ const CustomersRegistration = () => {
       CustomerPutApiById(companyId, location.state.customerId, updatePayload)
         .then((res) => {
           const successMessage =
-            res.data.message || "Customer updated successfully";
+            res.data.message || "Client updated successfully";
           toast.success(successMessage, {
             position: "top-right",
             autoClose: 1000,
@@ -57,11 +57,11 @@ const CustomersRegistration = () => {
           navigate("/customersView");
         })
         .catch((error) => {
-          console.error("Error updating customer:", error);
+          console.error("Error updating Client:", error);
           const errorMsg =
             error.response?.data?.error?.message ||
             error.message ||
-            "Error updating customer";
+            "Error updating Client";
           toast.error(errorMsg, {
             position: "top-right",
             autoClose: 1000,
@@ -78,7 +78,7 @@ const CustomersRegistration = () => {
   
       CustomerPostApi(companyId, createPayload)
         .then((response) => {
-          toast.success("Customer added successfully", {
+          toast.success("Client added successfully", {
             position: "top-right",
             autoClose: 1000,
           });
@@ -86,7 +86,7 @@ const CustomersRegistration = () => {
         })
         .catch((error) => {
           const errorMessage =
-            error.response?.data?.error?.message || "Error adding customer";
+            error.response?.data?.error?.message || "Error adding Client";
           console.error("API Error:", errorMessage);
           toast.error(errorMessage);
         });
@@ -98,10 +98,8 @@ const CustomersRegistration = () => {
     console.log("companyId:", companyId);
     if (location && location.state && location.state.customerId) {
       const customerId = location.state.customerId;
-      console.log("customerId:", customerId);
       CustomerGetApiById(companyId, customerId)
         .then((response) => {
-          console.log("Customer data:", response);
           const customerData = {
             ...response,
             status: { value: response.status, label: response.status }
@@ -198,8 +196,14 @@ const CustomersRegistration = () => {
     // Update the input field's value
     event.target.value = value;
   }
+
   const validateField = (value, type) => {
     switch (type) {
+      case "customerName":
+        return(
+          /^[a-zA-Z\s.,]+$/.test(value)||
+          "Invalid Client Name Format"
+        );
       case "email":
         const emailRegex =
           /^(?![0-9]+@)[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in|org|net|edu|gov)$/;
@@ -227,7 +231,11 @@ const CustomersRegistration = () => {
           /^[0-9]{1,2}$/.test(value) ||
           "State Code must be a numeric value (1-2 digits)"
         );
-
+      case "address": 
+      return(
+        /^[a-zA-Z0-9\s!-_@#&()*/,.\\-{}]+$/.test(value)||
+        "Invalid Address Format Special Characters should allow !-_@#&()*,. "
+      )
       default:
         return true;
     }
@@ -241,9 +249,8 @@ const CustomersRegistration = () => {
 
     // Check if the value is less than 3 characters long
     if (value.length < 3) {
-      return `${fieldName} must be at least 3 characters long`;
+      return "Minimum 3 characters Required";
     }
-
     // If no error, return true
     return true;
   };
@@ -287,9 +294,9 @@ const CustomersRegistration = () => {
     trigger(fieldName); // Trigger validation
   };
 
-  const statusOptions = [
-    { label: "Active", value: "Active" },
-    { label: "InActive", value: "InActive" },
+  const clientStatus = [
+    { value: "Active", label: "Active" },
+    { value: "InActive", label: "InActive" },
   ];
 
   const clearForm = () => {
@@ -348,16 +355,21 @@ const CustomersRegistration = () => {
                         autoComplete="off"
                         disabled={isUpdating}
                         {...register("customerName", {
-                          required: "Customer Name is Required",
-                          validate: (value) => noTrailingSpaces(value, "customerName"),
+                          required: "Client Name is Required",
+                          validate: (value) => validateField(value, "customerName"),
                           maxLength: {
                             value: 60,
                             message:
                               "Client Name must not exceed 60 characters.",
                           },
+                          minLength: {
+                            value: 3,
+                            message:
+                              "Minimum 3 Characters Required.",
+                          },
                         })}
                         onChange={(e) => handleInputChange(e, "customerName")}
-                        onKeyPress={(e) => preventInvalidInput(e, "alpha")}
+                        // onKeyPress={(e) => preventInvalidInput(e, "alpha")}
                         readOnly={isUpdating}
                       />
                       {errors.customerName && (
@@ -415,24 +427,25 @@ const CustomersRegistration = () => {
                             },
                             correctLength: (value) => {
                               if (value.length !== 14) {
-                                return "Mobile Number is Required.";
+                                return "Mobile Number must be 10 digits.";
                               }
                               return true;
                             },
-                            notRepeatingDigits: (value) => {
-                              const isRepeating = /^(\d)\1{12}$/.test(value); // Check for repeating digits
-                              return (
-                                !isRepeating ||
-                                "Mobile Number cannot consist of the same digit repeated."
-                              );
-                            },
-                          },
+                           notRepeatingDigits: (value) => {
+          // Extract only numeric digits
+          const numericValue = value.replace(/\D/g, ""); // Remove non-numeric characters
+          const repeatingPattern = /(\d)\1{7,}/; // Matches any digit repeated 8 or more times
+          return (
+            !repeatingPattern.test(numericValue) ||
+            "Mobile Number cannot have the same digit repeated 8 or more times."
+          );
+        },
+      },
                           pattern: {
                             value: /^\+91\s[6-9]\d{9}$/, // Ensure it starts with +91, followed by a space, and then 6-9 and 9 more digits
-                            message: "Mobile Number is Required.",
+                            message: "Mobile Number must be 10 digits.",
                           },
                         })}
-                        onChange={(e) => handleInputChange(e, "mobileNumber")}
                         readOnly={isUpdating}
                       />
                       {errors.mobileNumber && (
@@ -457,7 +470,7 @@ const CustomersRegistration = () => {
                           validate: (value) => noTrailingSpaces(value, "state"),
                           maxLength: {
                             value: 60,
-                            message: "State Name must not exceed 60 digits.",
+                            message: "State Name must not be exceed 60 Characters.",
                           },
                         })}
                         onChange={(e) => handleInputChange(e, "state")}
@@ -485,7 +498,7 @@ const CustomersRegistration = () => {
                           validate: (value) => noTrailingSpaces(value, "city"),
                           maxLength: {
                             value: 60,
-                            message: "City Name must not exceed 60 digits.",
+                            message: "City Name must not exceed 60 Characters.",
                           },
                         })}
                         onChange={(e) => handleInputChange(e, "city")}
@@ -567,7 +580,7 @@ const CustomersRegistration = () => {
                         className="form-control"
                         autoComplete="off"
                         {...register("stateCode", {
-                          required: "State Code is Required",
+                         // required: "State Code is Required",
                           validate: (value) =>
                             !value || validateField(value, "stateCode"), // Validate only if the field is not empty
                           minLength: {
@@ -600,7 +613,7 @@ const CustomersRegistration = () => {
                         render={({ field }) => (
                           <Select
                             {...field}
-                            options={statusOptions}
+                            options={clientStatus}
                             getOptionLabel={(e) => e.label}
                             getOptionValue={(e) => e.value}
                             onChange={(selectedOption) =>
@@ -628,15 +641,19 @@ const CustomersRegistration = () => {
                         rows="4"
                         {...register("address", {
                           required: "Address is Required",
-                          validate: (value) => noTrailingSpaces(value, "address"),
+                          pattern: {
+                            value:  /^(?=.*[a-zA-Z])[a-zA-Z0-9\s!@#&()*/.,_-]+$/,
+                            message:
+                              "Invalid Address Format. Only letters, numbers, spaces, and !@#&()*/.,_- are allowed.",
+                          },
                           maxLength: {
                             value: 250,
                             message:
                               "Address must be at most 250 characters long",
                           },
                         })}
-                        onChange={(e) => handleInputChange(e, "address")}
-                        onKeyPress={(e) => preventInvalidInput(e, "address")}
+                        //onChange={(e) => handleInputChange(e, "address")}
+                        //onKeyPress={(e) => preventInvalidInput(e, "address")}
                       />
                       {errors.address && (
                         <p className="errorMsg">
@@ -680,7 +697,7 @@ const CustomersRegistration = () => {
                         style={{ marginRight: "85px" }}
                         type="submit"
                       >
-                        {isUpdating ? "Update Customer" : "Add Customer"}{" "}
+                        {isUpdating ? "Update Client" : "Add Client"}{" "}
                       </button>
                     </div>
                   </div>

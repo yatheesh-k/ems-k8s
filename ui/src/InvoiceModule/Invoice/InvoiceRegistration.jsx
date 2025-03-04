@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import Select from "react-select";
@@ -8,7 +8,6 @@ import LayOut from "../../LayOut/LayOut";
 import { useAuth } from "../../Context/AuthContext";
 import { InvoicePostApi } from "../../Utils/Axios";
 import { fetchCustomers } from "../../Redux/CustomerSlice";
-import { fetchProducts } from "../../Redux/ProductSlice";
 import { fetchBanks } from "../../Redux/BankSlice";
 import DeletePopup from "../../Utils/DeletePopup";
 
@@ -18,20 +17,17 @@ const InvoiceRegistration = () => {
     handleSubmit,
     control,
     setValue,
-    reset,
-    getValues,
     formState: { errors },
   } = useForm({ mode: "onChange" });
   // Select data from Redux store
   // const customers = useSelector(selectCustomers) || []; // Ensure it's an array
   //const products = useSelector(selectProducts);
   const dispatch = useDispatch();
-  const { customers, loading, error } = useSelector((state) => state.customers);
+  const { customers} = useSelector((state) => state.customers);
   const { products } = useSelector((state) => state.products);
   const { banks } = useSelector((state) => state.banks);
   const [productData, setProductData] = useState([]);
   const [fieldErrors, setFieldErrors] = useState({});
-  console.log("products", products);
   const [invoiceData, setInvoiceData] = useState(null);
   const [productColumns, setProductColumns] = useState([
     { key: "items", title: "Item", type: "text" },
@@ -39,7 +35,7 @@ const InvoiceRegistration = () => {
     { key: "service", title: "Service", type: "text" },
     { key: "quantity", title: "Quantity", type: "number" },
     { key: "unitCost", title: "Unit Cost", type: "number" },
-    { key: "totalCost", title: "Total Cost", type: "number" },
+    { key: "totalCost", title: "Total Cost (₹)", type: "number" },
   ]);
 
   const [search, setSearch] = useState("");
@@ -47,34 +43,16 @@ const InvoiceRegistration = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [deleteType, setDeleteType] = useState(null);
-  const [customFields, setCustomFields] = useState([]); // Dynamic field names
-  const [newField, setNewField] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [productRows, setProductRows] = useState([]);
   const { user } = useAuth();
   const companyId = user.companyId;
-  console.log("companyId", companyId);
-
-  const [productsInfo, setProductsInfo] = useState([
-    {
-      productName: "",
-      hsnNo: "",
-      purchaseDate: "",
-      quantity: "",
-      productCost: "",
-    },
-  ]);
   const [showPreview, setShowPreview] = useState(false);
   const [invoiceId, setInvoiceId] = useState(null); // to handle edit case
   const [load, setLoad] = useState(false); // to manage loading state for API calls
   const [customer, setCustomer] = useState(customers); // List of customers for the dropdown
   const [product, setProduct] = useState(products);
-  const [bank, setBank] = useState(banks);
   const [formattedProducts, setFormattedProducts] = useState(products);
   const [formattedBanks, setFormattedBanks] = useState(banks);
   const navigate = useNavigate();
-  const location = useLocation();
 
   console.log("customer", customer);
   console.log("product", product);
@@ -93,11 +71,13 @@ const InvoiceRegistration = () => {
   );
 
   const validateInput = (type, value) => {
-    if (type === "text") return /^[a-zA-Z0-9_-]*$/.test(value); // Text allows letters, numbers, _ and -
-    if (type === "number") return /^[0-9]*$/.test(value); // Only numbers
+    if (/^\s$/.test(value)) return false; // Disallow leading & trailing spaces
+    if (type === "text") return /^[a-zA-Z0-9 _\-\W]+$/.test(value); // Allows letters, numbers, spaces, and special characters
+    if (type === "number") return /^[0-9]+$/.test(value); // Only numbers
     if (type === "percentage") return /^([0-9]{1,2}|100)%?$/.test(value); // 1-3 digits with %
     return true;
   };
+  
 
   // ** Update Table Data **
   const updateData = (index, key, value) => {
@@ -114,6 +94,17 @@ const InvoiceRegistration = () => {
         updatedData[index].totalCost = (quantity * unitCost).toFixed(2);
       }
       setProductData(updatedData);
+      // Clear error when the input is valid
+    setFieldErrors((prev) => {
+      const newErrors = { ...prev };
+      if (newErrors[index]) {
+        delete newErrors[index][key];
+        if (Object.keys(newErrors[index]).length === 0) {
+          delete newErrors[index];
+        }
+      }
+      return newErrors;
+    });
     } else {
       setFieldErrors((prev) => {
         const newErrors = { ...prev };
@@ -159,11 +150,6 @@ const InvoiceRegistration = () => {
       setFormattedBanks(bankOptions);
     }
   }, [banks]);
-
-  const handleBankChange = (selectedOption) => {
-    console.log("Selected Bank:", selectedOption);
-    // Additional actions can be performed here, if necessary
-  };
 
   console.log("this is from product options ", formattedProducts);
 
@@ -215,13 +201,6 @@ const InvoiceRegistration = () => {
     }
   }, [search, products]);
 
-  // Function to auto-generate invoice number
-  //   const generateInvoiceNumber = () => {
-  //     const currentDate = moment().format('YYYYMMDD');
-  //     const randomSuffix = Math.floor(Math.random() * 10000);
-  //     return `${currentDate}-${randomSuffix}`;
-  //   };
-
   useEffect(() => {
     // Check if customers is an array before using map
     const productOptions = Array.isArray(products)
@@ -248,18 +227,8 @@ const InvoiceRegistration = () => {
     console.log(customerOptions);
   }, [customers]);
 
-  console.log("this is from customers options ", customer);
-
-  // Function to set default invoice date
-  //   const getDefaultInvoiceDate = () => {
-  //     return moment().format('YYYY-MM-DD');
-  //   };
-
   const onSubmit = async (data) => {
-    console.log("🔍 Full Form Data Before Fix:", data); // Check the received form data
-
     setLoad(true);
-
     try {
       const customerId = data.customerName?.value;
       if (!customerId) {
@@ -268,7 +237,6 @@ const InvoiceRegistration = () => {
         setLoad(false);
         return;
       }
-
       // ✅ Convert products array into a dynamic key-value object for customFields
       const customFieldsObject = {};
       // Add dynamic product fields
@@ -279,15 +247,8 @@ const InvoiceRegistration = () => {
           });
         });
       }
-
-      console.log("✅ Final Payload:", customFieldsObject);
-
-      console.log("🛠️ Transformed Custom Fields:", customFieldsObject);
-      console.log("subTotal:", subTotal);
-
-      // ✅ Prepare final payload
       const invoiceDataToSend = {
-        //customerName: data.customerName.label,
+        customerName: data.customerName.label,
         purchaseOrder: data.purchaseOrder,
         vendorCode: data.vendorCode,
         invoiceDate: data.invoiceDate,
@@ -363,46 +324,6 @@ const InvoiceRegistration = () => {
     handleCloseDeleteModal();
   };
 
-  // // Automatically populate invoice number and date if they are not provided
-  useEffect(() => {
-    if (!invoiceId) {
-      // Set default invoice number and date on new invoice creation
-      // setValue("invoiceNumber", generateInvoiceNumber());
-      // setValue("invoiceDate", getDefaultInvoiceDate());
-    }
-  }, [invoiceId, setValue]);
-
-  const togglePreview = (e) => {
-    e.preventDefault();
-    setShowPreview(true);
-  };
-
-  // // For managing the products dynamically
-  const AddProductsInfo = () => {
-    setProductsInfo([
-      ...productsInfo,
-      {
-        productId: "",
-        hsnNo: "",
-        purchaseDate: "",
-        quantity: "",
-        productCost: "",
-      },
-    ]);
-  };
-
-  const handleDelete = (index) => {
-    const updatedProducts = [...productsInfo];
-    updatedProducts.splice(index, 1);
-    setProductsInfo(updatedProducts);
-  };
-
-  const allowNumbersOnly = (e) => {
-    if (!/^[0-9\s]*$/.test(e.key)) {
-      e.preventDefault();
-    }
-  };
-
   const handleInvoiceDateChange = (e) => {
     const inputValue = e.target.value;
     if (!inputValue) {
@@ -425,37 +346,7 @@ const InvoiceRegistration = () => {
       handleInvoiceDateChange({ target: { value: invoiceDate } });
     }
   }, []);
-
-  const toInputTitleCase = (e) => {
-    let value = e.target.value;
-    e.target.value = value.replace(/\b\w/g, (char) => char.toUpperCase());
-  };
-
-  const handleKeyDown = (e) => {
-    if (/\d/.test(e.key)) {
-      e.preventDefault();
-    }
-  };
-
-  const handleAddField = () => {
-    const trimmedNewField = newField.trim();
-
-    if (trimmedNewField !== "") {
-      if (customFields.length < 6) {
-        if (!customFields.includes(trimmedNewField)) {
-          setCustomFields((prevFields) => [...prevFields, trimmedNewField]); // Ensure correct state update
-          setNewField(""); // Reset input field
-          setShowModal(false); // Close modal if needed
-          setErrorMessage(""); // Reset error message
-        } else {
-          setErrorMessage(`Field "${trimmedNewField}" already exists.`); // Set error message
-        }
-      } else {
-        setErrorMessage("You can only add up to 6 fields."); // Set error message
-      }
-    }
-  };
-
+  
   // Add new product row
   const updateColumnTitle = (key, title) => {
     setProductColumns(
@@ -497,10 +388,7 @@ const InvoiceRegistration = () => {
 
   const addRow = () => setProductData([...productData, {}]);
 
-  // Handle form submission
-  // const onSubmit = (data) => {
-  //   console.log("Form Submitted:", data);
-  // };
+  
 
   return (
     <LayOut>
@@ -711,31 +599,6 @@ const InvoiceRegistration = () => {
                       )}
                     </div>
                   </div>
-
-                  {/* Invoice Number */}
-                  {/* <div className="form-group row">
-                    <label
-                      htmlFor="invoiceNumber"
-                      className="col-sm-2 text-right control-label col-form-label"
-                    >
-                      Invoice Number
-                    </label>
-                    <div className="col-sm-9 mb-3">
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="invoiceNumber"
-                        name="invoiceNumber"
-                        {...register("invoiceNumber", {
-                          required: "Invoice number is required",
-                        })}
-                      />
-                    </div>
-                    {errors.invoiceNumber && (
-                      <p className="errorMsg">{errors.invoiceNumber.message}</p>
-                    )}
-                  </div> */}
-
                   {/* Invoice Date */}
                   <div className="form-group row">
                     <label
@@ -908,7 +771,7 @@ const InvoiceRegistration = () => {
                               className="form-control"
                               value={subTotal}
                               readOnly
-                            />
+                            />₹
                           </td>
                           <td></td>
                         </tr>

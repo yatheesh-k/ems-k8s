@@ -8,6 +8,7 @@ import { fetchBanks, removeBankFromState } from "../../Redux/BankSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { BankDeleteApiById } from "../../Utils/Axios";
 import { useAuth } from "../../Context/AuthContext";
+import DeletePopup from "../../Utils/DeletePopup";
 
 const AccountsView = () => {
   const dispatch = useDispatch();
@@ -17,6 +18,8 @@ const AccountsView = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState(null);
   const { user } = useAuth();
   const companyId = user.companyId;
 
@@ -52,14 +55,21 @@ const AccountsView = () => {
     console.log("bankId from bankView", bankId);
   };
 
+// Function to open delete confirmation modal
+const handleOpenDeleteModal = (bankId) => {
+  setSelectedItemId(bankId);
+  setShowDeleteModal(true);
+};
+
+// Function to close delete confirmation modal
+const handleCloseDeleteModal = () => {
+  setShowDeleteModal(false);
+  setSelectedItemId(null);
+};
+
   const handleDelete = async (bankId) => {
+    if (!selectedItemId) return;
     try {
-      console.log(
-        "Deleting customer with companyId:",
-        companyId,
-        "and bankId:",
-        bankId
-      );
       // Make a DELETE request to the API with the given ID
       const response = await BankDeleteApiById(companyId, bankId);
       console.log("Delete response:", response);
@@ -76,6 +86,8 @@ const AccountsView = () => {
       if (error.response && error.response.data) {
         console.error("Server Error Message:", error.response.data);
       }
+    }finally {
+      handleCloseDeleteModal();
     }
   };
 
@@ -134,7 +146,7 @@ const AccountsView = () => {
           <button
             className="btn btn-sm"
             style={{ backgroundColor: "transparent" }}
-            onClick={() => handleDelete(row.bankId)}
+            onClick={() => handleOpenDeleteModal(row.bankId)}
             title="Delete"
           >
             <XSquareFill size={22} color="#da542e" />
@@ -162,7 +174,7 @@ const AccountsView = () => {
             <nav aria-label="breadcrumb">
               <ol className="breadcrumb mb-0">
                 <li className="breadcrumb-item">
-                  <Link to={"/"}>Home</Link>
+                  <Link to={"/main"}>Home</Link>
                 </li>
                 <li className="breadcrumb-item active">Settings</li>
                 <li className="breadcrumb-item active">Bank Details</li>
@@ -202,6 +214,14 @@ const AccountsView = () => {
                 onChangeRowsPerPage={(perPage) => setRowsPerPage(perPage)}
               />
             </div>
+            <DeletePopup
+              show={showDeleteModal}
+              handleClose={handleCloseDeleteModal}
+              handleConfirm={handleDelete}
+              id={selectedItemId}
+              pageName="Bank Account"
+            />
+
           </div>
         </div>
       </div>

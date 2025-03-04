@@ -140,8 +140,8 @@ const AccountRegistartion = () => {
     switch (type) {
       case "ifscCode":
         return (
-          /^[A-Z]{4}0[A-Z0-9]{6}$/.test(value) ||
-          "Invalid IFSC Code format. It should be in the format: AAAA0BBBBBB "
+         /^[A-Z]{4}0[0-9]{6}$/.test(value) ||
+          "Invalid IFSC Code format."
         );
       default:
         return true;
@@ -164,6 +164,47 @@ const AccountRegistartion = () => {
     if (type === "numeric" && !/^[0-9]$/.test(key)) {
       e.preventDefault();
     }
+  };
+
+  const validateLocation = (value) => {
+    // Trim leading and trailing spaces before further validation
+    const trimmedValue = value.trim();
+    // Check if value is empty after trimming (meaning it only had spaces)
+    if (trimmedValue.length === 0) {
+      return "Location is Required.";
+    }
+    // Check for trailing spaces first
+    if (/\s$/.test(value)) {
+      return "Spaces at the end are not allowed."; // Trailing space error
+    } else if (/^\s/.test(value)) {
+      return "No Leading Space Allowed."; // Leading space error
+    }
+    // Ensure only allowed characters (alphabets, numbers, spaces, and some special chars)
+    else if (!/^[a-zA-Z0-9\s!-_@#&()*/,.\\-{}]+$/.test(trimmedValue)) {
+      return "Invalid Format of Location.";
+    }
+
+    // Check for minimum and maximum word length
+    else {
+      const words = trimmedValue.split(" ");
+      for (const word of words) {
+        if (word.length < 1) {
+          return "Minimum Length 1 Character Required."; // If any word is shorter than 1 character
+        } else if (word.length > 100) {
+          return "Max Length 100 Characters Required."; // If any word is longer than 100 characters
+        }
+      }
+
+      // Check if there are multiple spaces between words
+      if (/\s{2,}/.test(trimmedValue)) {
+        return "No Multiple Spaces Between Words Allowed.";
+      }
+       if (trimmedValue.length < 3) {
+        return "Minimum 3 Characters Required.";
+      }
+    }
+
+    return true; // Return true if all conditions are satisfied
   };
 
   const noTrailingSpaces = (value, fieldName) => {
@@ -205,8 +246,9 @@ const AccountRegistartion = () => {
     { value: "Savings", label: "Savings" },
     { value: "Current", label: "Current" },
     { value: "NRI", label: "NRI" },
-    { value: "Business", label: "Business" },
+    { value: "Demat ", label: "Demat" },
     { value: "Corporate", label: "Corporate" },
+    { value:"Business",label:"Business"}
   ];
 
   return (
@@ -238,7 +280,7 @@ const AccountRegistartion = () => {
             <div className="card">
               <div className="card-header">
                 <h5 className="card-title" style={{ marginBottom: "0px" }}>
-                  {isUpdating ? "Accounts Data" : "Bank Account Registration"}
+                  {isUpdating ? "Bank Account View" : "Bank Account Registration"}
                 </h5>
                 <div
                   className="dropdown-divider"
@@ -250,7 +292,7 @@ const AccountRegistartion = () => {
                   <div className="row">
                     <div className="col-12 col-md-6 col-lg-5 mb-3">
                       <label className="form-label">
-                        Bank Account<span style={{ color: "red" }}>*</span>
+                        Bank Account Number<span style={{ color: "red" }}>*</span>
                       </label>
                       <input
                         type="text"
@@ -412,8 +454,7 @@ const AccountRegistartion = () => {
                         rows="4"
                         {...register("address", {
                           required: "Address is Required",
-                          validate: (value) =>
-                            noTrailingSpaces(value, "address"),
+                          validate: validateLocation,
                           maxLength: {
                             value: 250,
                             message:
@@ -463,7 +504,7 @@ const AccountRegistartion = () => {
                         style={{ marginRight: "85px" }}
                         type="submit"
                       >
-                        {isUpdating ? "Update BankDetail" : "Add BankDetails"}{" "}
+                        {isUpdating ? "Update Bank Details" : "Add Bank Details"}{" "}
                       </button>
                     </div>
                   </div>

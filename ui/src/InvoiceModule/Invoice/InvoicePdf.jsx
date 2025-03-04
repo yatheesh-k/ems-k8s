@@ -159,7 +159,7 @@ const InvoicePdf = () => {
               >
                 <div style={{ flex: 1 }}>
                   <p style={{ fontWeight: "bold", marginBottom: "0px" }}>
-                    PAN No: {companyDetails.panNo || "N/A"}
+                    PAN Number: {companyDetails.panNo || "N/A"}
                   </p>
                   <p style={{ fontWeight: "bold" }}>
                     GST Number: {companyDetails.gstNo || "N/A"}
@@ -195,16 +195,17 @@ const InvoicePdf = () => {
                           {invoiceData.customer?.mobileNumber || "N/A"},
                         </b>
                       </p>
-                      {invoiceData.customer?.customerGstNo && (
-                        <p style={{ marginBottom: "10px" }}>
-                          <b>GST: {invoiceData.customer.customerGstNo},</b>
-                        </p>
-                      )}
+                      
                       <p style={{ marginBottom: "10px" }}>
                         <b>
                           Address: {invoiceData.customer?.address || "N/A"}.
                         </b>
                       </p>
+                      {invoiceData.customer?.customerGstNo && (
+                        <p style={{ marginBottom: "10px" }}>
+                          <b>GST: {invoiceData.customer.customerGstNo},</b>
+                        </p>
+                      )}
                     </address>
                   </div>
                 </div>
@@ -319,7 +320,7 @@ const InvoicePdf = () => {
                                   ).toFixed(2)}
                                 </td>
                               </tr>
-                              {invoiceData.igst ? (
+                              {!invoiceData.igst || parseFloat(invoiceData.igst) === 0 ? (
                                 <tr>
                                   <td
                                     colSpan={totalColumns - 1}
@@ -447,6 +448,16 @@ const InvoicePdf = () => {
                           <span>
                             {invoiceData.bank
                               ? invoiceData.bank.accountNumber
+                              : "N/A"}
+                          </span>
+                        </div>
+                        <div style={{ display: "flex", marginBottom: "10px" }}>
+                          <span style={{ fontWeight: "bold", width: "150px" }}>
+                            Account Type :
+                          </span>
+                          <span>
+                            {invoiceData.bank
+                              ? invoiceData.bank.accountType
                               : "N/A"}
                           </span>
                         </div>

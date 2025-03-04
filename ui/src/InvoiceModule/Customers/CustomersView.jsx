@@ -11,6 +11,7 @@ import {
   fetchCustomers,
   removeCustomerFromState,
 } from "../../Redux/CustomerSlice";
+import DeletePopup from "../../Utils/DeletePopup";
 
 const CustomersView = () => {
   const dispatch = useDispatch();
@@ -20,6 +21,8 @@ const CustomersView = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedItemId, setSelectedItemId] = useState(null);
   const { user } = useAuth();
   const companyId = user.companyId;
 
@@ -55,7 +58,20 @@ const CustomersView = () => {
     console.log("customerId from CustomerView", customerId);
   };
 
+  // Function to open delete confirmation modal
+const handleOpenDeleteModal = (bankId) => {
+  setSelectedItemId(bankId);
+  setShowDeleteModal(true);
+};
+
+// Function to close delete confirmation modal
+const handleCloseDeleteModal = () => {
+  setShowDeleteModal(false);
+  setSelectedItemId(null);
+};
+
   const handleDelete = async (customerId) => {
+    if (!selectedItemId) return;
     try {
       console.log(
         "Deleting customer with companyId:",
@@ -81,6 +97,8 @@ const CustomersView = () => {
       if (error.response && error.response.data) {
         console.error("Server Error Message:", error.response.data);
       }
+    }finally {
+      handleCloseDeleteModal();
     }
   };
 
@@ -140,7 +158,7 @@ const CustomersView = () => {
         <div>
           <button
             className="btn btn-sm"
-            style={{ backgroundColor: "transparent" }}
+            style={{ backgroundColor: "transparent",border:"none" }}
             onClick={() => handleEdit(row.customerId)}
             title="Edit"
           >
@@ -149,7 +167,7 @@ const CustomersView = () => {
           <button
             className="btn btn-sm"
             style={{ backgroundColor: "transparent" }}
-            onClick={() => handleDelete(row.customerId)}
+            onClick={() => handleOpenDeleteModal(row.bankId)}
             title="Delete"
           >
             <XSquareFill size={22} color="#da542e" />
@@ -199,7 +217,7 @@ const CustomersView = () => {
                   </div>
                   <div className="col-md-4 offset-md-4 d-flex justify-content-end">
                     <input
-                      type="text"
+                      type="search"
                       className="form-control"
                       placeholder="Search..."
                       value={search}
@@ -217,6 +235,14 @@ const CustomersView = () => {
                 onChangeRowsPerPage={(perPage) => setRowsPerPage(perPage)}
               />
             </div>
+            <DeletePopup
+              show={showDeleteModal}
+              handleClose={handleCloseDeleteModal}
+              handleConfirm={handleDelete}
+              id={selectedItemId}
+              pageName="Bank Account"
+            />
+
           </div>
         </div>
       </div>
