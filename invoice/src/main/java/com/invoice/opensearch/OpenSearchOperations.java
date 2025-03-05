@@ -195,10 +195,10 @@ public class OpenSearchOperations {
         String indexName = ResourceIdUtils.generateCompanyIndex(shortName);
 
         try {
-            // ✅ Check if index exists in OpenSearch
+            // ✅ Check if the index exists in OpenSearch
             boolean indexExists = esClient.indices().exists(i -> i.index(indexName)).value();
             if (!indexExists) {
-                logger.warn("Index {} does not exist. Creating first invoice for the financial year.", indexName);
+                logger.warn("Index '{}' does not exist. Creating first invoice for the financial year.", indexName);
                 return InvoiceUtils.generateFirstInvoiceNumber(); // Generate first invoice dynamically
             }
 
@@ -213,19 +213,25 @@ public class OpenSearchOperations {
             SearchResponse<InvoiceModel> searchResponse = esClient.search(searchRequest, InvoiceModel.class);
             List<Hit<InvoiceModel>> hits = searchResponse.hits().hits();
 
+            // ✅ Check if the response contains results
             if (!hits.isEmpty() && hits.get(0).source() != null) {
-                InvoiceModel lastInvoice = hits.get(0).source();
-                return lastInvoice.getInvoiceNo(); // ✅ Return last invoice number found
+                String lastInvoiceNo = hits.get(0).source().getInvoiceNo();
+                logger.info("Last invoice number found: {}", lastInvoiceNo);
+                return lastInvoiceNo; // ✅ Return last invoice number found
+            } else {
+                logger.warn("No invoices found in index '{}'. Generating first invoice number.", indexName);
             }
 
         } catch (OpenSearchException e) {
-            logger.error("OpenSearch exception while fetching last invoice: {}", e.getMessage(), e);
-            throw new InvoiceException("OpenSearch error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("OpenSearch error while fetching last invoice for company '{}': {}", companyId, e.getMessage(), e);
+            return InvoiceUtils.generateFirstInvoiceNumber(); // ✅ Generate first invoice on failure
         } catch (IOException e) {
-            logger.error("I/O error fetching last invoice number for company {}: {}", companyId, e.getMessage());
-            throw new InvoiceException("Unable to fetch invoice due to I/O error", HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("I/O error while fetching last invoice number for company '{}': {}", companyId, e.getMessage(), e);
+            return InvoiceUtils.generateFirstInvoiceNumber(); // ✅ Generate first invoice on failure
         }
 
-        return InvoiceUtils.generateFirstInvoiceNumber(); // ✅ Return first invoice if no invoices exist
+        // ✅ Return first invoice number if no invoices exist
+        return InvoiceUtils.generateFirstInvoiceNumber();
     }
+
 }
