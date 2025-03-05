@@ -16,6 +16,7 @@ import java.util.Map;
 public class InvoiceRequest {
 
     private List<Map<
+      
             @NotNull(message = "{invoice.key.notnull}") String,
             @NotNull(message = "{invoice.value.notnull}") String>> productData;
 
@@ -25,7 +26,9 @@ public class InvoiceRequest {
 
     private String vendorCode;
     private String purchaseOrder;
-    private String invoiceDate;
+
+    private @PastOrPresent(message = "{invoice.date.pastOrPresent}")
+    LocalDate invoiceDate;
     private String dueDate;
     private String subTotal;
     private String status;

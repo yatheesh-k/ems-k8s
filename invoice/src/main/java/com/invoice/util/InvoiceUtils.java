@@ -1,6 +1,5 @@
 package com.invoice.util;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.invoice.config.NumberToWordsConverter;
 import com.invoice.exception.InvoiceErrorMessageKey;
@@ -20,7 +19,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 
 @Slf4j
 public class InvoiceUtils {
@@ -67,7 +65,7 @@ public class InvoiceUtils {
             }
 
             // Mask other string fields
-            entity.setInvoiceDate(maskValue(request.getInvoiceDate()));
+            entity.setInvoiceDate(maskValue(String.valueOf(request.getInvoiceDate())));
             entity.setDueDate(maskValue(request.getDueDate()));
             entity.setPurchaseOrder(maskValue(request.getPurchaseOrder()));
             entity.setVendorCode(maskValue(request.getVendorCode()));
@@ -102,7 +100,6 @@ public class InvoiceUtils {
             return Base64.getEncoder().encodeToString(value.getBytes());
         }
 
-
     public static void unMaskInvoiceProperties(InvoiceModel invoiceEntity,HttpServletRequest request) {
         if (invoiceEntity != null) {
             log.debug("Unmasking invoice: {}", invoiceEntity);
@@ -117,7 +114,6 @@ public class InvoiceUtils {
             invoiceEntity.setVendorCode(unMaskValue(invoiceEntity.getVendorCode()));
             invoiceEntity.setSubTotal(unMaskValue(invoiceEntity.getSubTotal()));
             invoiceEntity.setInvoiceNo(invoiceEntity.getInvoiceNo());
-
 
             // Unmask productData (List<Map<String, String>>)
             if (invoiceEntity.getProductData() != null) {
@@ -282,7 +278,9 @@ public class InvoiceUtils {
         // Validate the format to avoid incorrect invoice numbers
         if (parts.length < 3) {
             log.error("Invalid invoice number format retrieved: {}", lastInvoiceNo);
+
             throw new InvoiceException(InvoiceErrorMessageKey.INVALID_INVOICE_ID_FORMAT.getMessage() + lastInvoiceNo, HttpStatus.INTERNAL_SERVER_ERROR);
+
         }
 
         try {
