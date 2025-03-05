@@ -196,7 +196,7 @@ const handleCloseDeleteModal = () => {
                   </div>
                   <div className="col-md-4 offset-md-4 d-flex justify-content-end">
                     <input
-                      type="text"
+                      type="search"
                       className="form-control"
                       placeholder="Search..."
                       value={search}

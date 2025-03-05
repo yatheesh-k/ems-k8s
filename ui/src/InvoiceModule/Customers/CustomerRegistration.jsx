@@ -642,9 +642,9 @@ const CustomersRegistration = () => {
                         {...register("address", {
                           required: "Address is Required",
                           pattern: {
-                            value:  /^(?=.*[a-zA-Z])[a-zA-Z0-9\s!@#&()*/.,_-]+$/,
+                            value:  /^(?=.*[a-zA-Z])[a-zA-Z0-9\s!@#&()*/.,_+:;-]+$/,
                             message:
-                              "Invalid Address Format. Only letters, numbers, spaces, and !@#&()*/.,_- are allowed.",
+                              "Invalid Address Format. Only letters, numbers, spaces, and !@#&()*/.,_-+:; are allowed.",
                           },
                           maxLength: {
                             value: 250,

@@ -17,6 +17,7 @@ const InvoiceRegistration = () => {
     handleSubmit,
     control,
     setValue,
+    reset,
     formState: { errors },
   } = useForm({ mode: "onChange" });
   // Select data from Redux store
@@ -53,11 +54,6 @@ const InvoiceRegistration = () => {
   const [formattedProducts, setFormattedProducts] = useState(products);
   const [formattedBanks, setFormattedBanks] = useState(banks);
   const navigate = useNavigate();
-
-  console.log("customer", customer);
-  console.log("product", product);
-
-  console.log("formattedProducts", formattedProducts);
 
   useEffect(() => {
     dispatch(fetchCustomers());
@@ -151,8 +147,6 @@ const InvoiceRegistration = () => {
     }
   }, [banks]);
 
-  console.log("this is from product options ", formattedProducts);
-
   const handleCustomerChange = (selectedOption) => {
     setInvoiceData(selectedOption);
     console.log("selectedOption", selectedOption);
@@ -180,11 +174,6 @@ const InvoiceRegistration = () => {
     }
   }, [search, customers]);
 
-  // useEffect(() => {
-  //   if (companyId) {
-  //     dispatch(fetchProducts(companyId));
-  //   }
-  // }, [dispatch, companyId]);
 
   useEffect(() => {
     console.log("Customers from Redux store:", products);
@@ -232,21 +221,23 @@ const InvoiceRegistration = () => {
     try {
       const customerId = data.customerName?.value;
       if (!customerId) {
-        console.error("❌ Customer ID is missing!");
         toast.error("Customer ID is required");
         setLoad(false);
         return;
       }
-      // ✅ Convert products array into a dynamic key-value object for customFields
-      const customFieldsObject = {};
-      // Add dynamic product fields
-      if (data.products?.length > 0) {
-        data.products.forEach((product) => {
-          Object.keys(product).forEach((key) => {
-            customFieldsObject[key] = product[key] || "";
-          });
-        });
+  
+      // ✅ Validate Product Rows (Ensure no empty fields)
+      const isProductDataValid = productData.every((row) => {
+        return productColumns.every((col) => row[col.key] && row[col.key].toString().trim() !== "");
+      });
+  
+      if (!isProductDataValid) {
+        toast.error("All product fields must be filled before submitting.");
+        setLoad(false);
+        return;
       }
+  
+      // ✅ Construct the invoice object
       const invoiceDataToSend = {
         customerName: data.customerName.label,
         purchaseOrder: data.purchaseOrder,
@@ -259,22 +250,17 @@ const InvoiceRegistration = () => {
         productColumns,
         productData,
       };
-
-      console.log("📡 Sending Data to API:", invoiceDataToSend);
-
-      const response = await InvoicePostApi(
-        companyId,
-        customerId,
-        invoiceDataToSend
-      );
+  
+      // ✅ Send API request
+      const response = await InvoicePostApi(companyId, customerId, invoiceDataToSend);
       console.log("✅ API Response:", response);
-
+  
       toast.success("Invoice created successfully", {
         position: "top-right",
         autoClose: 1000,
       });
       navigate("/invoiceView");
-
+  
       setInvoiceData(data);
       setShowPreview(true);
     } catch (error) {
@@ -287,7 +273,7 @@ const InvoiceRegistration = () => {
       setLoad(false);
     }
   };
-
+  
   const handleDeleteColumn = (key) => {
     setSelectedItemId(key);
     setDeleteType("column");
@@ -615,7 +601,7 @@ const InvoiceRegistration = () => {
                         id="invoiceDate"
                         autoComplete="off"
                         {...register("invoiceDate", {
-                          required: "Invoice date is required",
+                          required: "Invoice Date is required",
                           onChange: handleInvoiceDateChange, // Set due date when invoice date changes
                         })}
                       />
@@ -644,7 +630,9 @@ const InvoiceRegistration = () => {
                         name="dueDate"
                         id="dueDate"
                         autoComplete="off"
-                        {...register("dueDate", {})}
+                        {...register("dueDate", {
+                          required: "Due Date is required",
+                        })}
                         disabled
                       />
                     </div>
@@ -763,7 +751,7 @@ const InvoiceRegistration = () => {
                             colSpan={productColumns.length - 1}
                             className="text-end"
                           >
-                            <strong>Sub Total:</strong>
+                            <strong>Sub Total(₹):</strong>
                           </td>
                           <td>
                             <input
@@ -771,8 +759,9 @@ const InvoiceRegistration = () => {
                               className="form-control"
                               value={subTotal}
                               readOnly
-                            />₹
+                            />
                           </td>
+                          
                           <td></td>
                         </tr>
                       </tbody>
@@ -785,8 +774,22 @@ const InvoiceRegistration = () => {
                       pageName="Field"
                     />
                   </div>
-
-                  {/* <div className="row">
+                 
+                </div>
+                <div className="d-flex justify-content-end gap-2 mb-3 me-2">
+                  <button type="button" className="btn btn-secondary">
+                    Clear
+                  </button>
+                  <button type="submit" className="btn btn-primary" disabled={load}>
+                    {load ? "Submitting..." : "Submit"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+       {/* <div className="row">
                     <div className="col-sm-6">
                       <h4 className="ml-3" style={{ marginTop: "20px" }}>
                         <b>Product Details</b>
@@ -979,24 +982,10 @@ const InvoiceRegistration = () => {
                         ))}
                     </div>
                   </div> */}
-                </div>
-                <div className="card-body">
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    style={{ marginLeft: "90%" }}
-                    disabled={load}
-                  >
-                    {load ? "submitting..." : "submit"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
     </LayOut>
   );
 };
 
 export default InvoiceRegistration;
+
+
