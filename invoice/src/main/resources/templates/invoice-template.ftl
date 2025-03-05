@@ -12,8 +12,12 @@
             font-family: "Courier New", Courier, monospace;
             margin: 0;
             padding: 0;
-            font-size: 20px;
+            font-size: 15px;
             /* Reduced font size */
+        }
+        h6 {
+            font-size: 12px; /* Adjusted for subheadings */
+            font-weight: bold;
         }
 
         .container-fluid {
@@ -167,23 +171,28 @@
         </div>
         <!-- Customer and Invoice Details Section -->
         <div
-            style="position: relative; top: 20px; left: 20px; text-align: left; font-size: 20px; width: 38%; word-wrap: break-word; word-break: break-word; overflow-wrap: break-word;">
+            style="position: relative; top: 20px; left: 20px; text-align: left; font-size: 20px; width: 40%;
+                   word-wrap: break-word; word-break: break-word; overflow-wrap: break-word;">
             <!-- Customer Details (Left Side) -->
-            <div>
-                <h6 style="margin: 5px;"><b>Billed To,</b></h6>
-                <h6 style="margin: 0;" class="font-medium">${invoice.customer.customerName}</h6>
+            <div style="text-align: left;">
+                <h6 style="margin: 5px 0;"><b>To,</b></h6>
+                <h6 style="margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;"
+                    class="font-medium">
+                    ${invoice.customer.customerName}
+                </h6>
                 <h6 style="margin: 0;"><b>Email:</b> ${invoice.customer.email}</h6>
                 <h6 style="margin: 0;"><b>Contact No:</b> ${invoice.customer.mobileNumber}</h6>
-                <h6 style="margin: 0;"><b>GST:</b> ${invoice.customer.customerGstNo!0}</h6>
-                <h6
-                    style="margin: 0; word-wrap: break-word; word-break: break-word; white-space: normal; overflow-wrap: break-word;">
-                    <b>Address:</b> ${invoice.customer.address}, ${invoice.customer.state}
-                </h6>
+                <h6 style="margin: 0;"><b>Address:</b> ${invoice.customer.address}, ${invoice.customer.state}</h6>
+                <#if invoice.customer.customerGstNo?? && invoice.customer.customerGstNo?has_content>
+                    <h6 style="margin: 5px 0 0; padding-top: 5px; ">
+                        <b>GST:</b> ${invoice.customer.customerGstNo}
+                    </h6>
+                </#if>
             </div>
         </div>
         <div style="position: relative; top: -70px; right: 0; margin-left: auto; text-align: right; font-size: 20px;">
             <div>
-                <h6 style="margin: 0;"><b>Invoice Number:</b> ${invoice.invoiceNo}</h6>
+                <h6 style="margin: 0;"><b>Invoice Number:</b> ${invoice.invoiceNo!''}</h6>
                 <h6 style="margin: 0;"><b>Invoice Date:</b> ${invoice.invoiceDate}</h6>
                 <h6 style="margin: 0;"><b>Due Date:</b> ${invoice.dueDate}</h6>
             </div>
@@ -274,11 +283,12 @@
                    </tr>
                </#if>
 
-
-
                     <tr style="background-color:#f5f5f5;">
                         <th class="text-right" colspan="${columnCount-1}" style="font-size: 13px;"><b>Grand Total</b></th>
                         <th class="text-right" style="font-size: 13px;"><b>${invoice.grandTotal}</b></th>
+                    </tr>
+                    <tr>
+                        <th colspan="${columnCount}" class="text-center" style="font-size: 13px;"><b>${invoice.grandTotalInWords}</b></th>
                     </tr>
                     <tr>
                         <th colspan="${columnCount}" class="text-center" style="font-size: 13px;">The Payment should be made
@@ -297,14 +307,14 @@
                   </tr>
                   <tr>
                       <td style="font-weight: bold;">Account Type</td>
-                      <td>${invoice.bank.accountType! ''}</td>
+                      <td>${ invoice.bank.accountType !''}</td>
                   </tr>
                   <tr>
-                      <td style="font-weight: bold;">Account No</td>
+                      <td style="font-weight: bold;">Account No </td>
                       <td>${invoice.bank.accountNumber! ''}</td>
                   </tr>
                   <tr>
-                      <td style="font-weight: bold;">IFSC Code</td>
+                      <td style="font-weight: bold;">IFSC Code </td>
                       <td>${invoice.bank.ifscCode! ''}</td>
                   </tr>
                   <tr>
@@ -321,14 +331,14 @@
             </div>
         </div>
         <!-- Authorized Signature and Seal -->
-        <div style="position: relative; bottom: -10px; right: 0; text-align: right;">
+        <div style="position: fixed;bottom: 180px; right: 0; text-align: right;">
             <div class="row">
                 <div class="footer-content"
                     style="display: flex; align-items: center; justify-content: flex-end; text-align: right;">
                     <h6 style="margin: 0; font-weight: bold;">${invoice.company.companyName}</h6>
                     <#if stampImage?? && stampImage !="">
                         <img style="margin: -5; width: 100px; height:150px; margin-right: 40px; height: auto;"
-                            src="${invoice.company.imageFile}" alt="Seal" />
+                            src="${invoice.company.stampImage}" alt="Seal" />
                         <h6 style="margin: 0; font-weight: bold;">Authorized Signature:</h6>
                         <#else>
                             <p style="font-size: 13px; color: gray;">No authorized signature available.</p>
@@ -336,21 +346,18 @@
                 </div>
             </div>
         </div>
-        <div style="position: absolute; bottom: -130px; width: 100%;  text-align: center;">
-            <b style="display: inline-block; margin-bottom: 5px;">${invoice.company.cinNo!''}</b>
-            <div style="border-top: 1px solid #ccc;">
-                <h6
-                    style="margin: 0; word-wrap: break-word; word-break: break-word; white-space: normal; text-align: center;">
+        <div style="position: fixed; bottom: 0px; width: 100%; text-align: center;">
+            <b style="display: block; margin-bottom: 2px;">${invoice.company.cinNo!''}</b>
+            <div style="border-top: 1px solid #ccc; padding-top: 3px;">
+                <h6 style="margin: 2px 0; word-wrap: break-word; word-break: break-word; white-space: normal;">
                     <b>${invoice.company.companyName}</b>
                 </h6>
-               <h6 style="margin: 0; word-wrap: break-word; word-break: break-word; white-space: normal; width: 100%; text-align: left; margin-left: 20px;">
-                   <b>${invoice.company.companyAddress}</b><br/>
-                   <b>${invoice.company.mobileNo}</b><br/>
-                   <b>${invoice.company.emailId}</b>
-               </h6>
-
+                <h6 style="margin: 1px 0; word-wrap: break-word; word-break: break-word; white-space: normal; text-align: center;">
+                    <b>${invoice.company.companyAddress},${invoice.company.mobileNo},${invoice.company.emailId}</b><br/>
+                </h6>
             </div>
         </div>
-    </div>
+
+</div>
 </body>
 </html>

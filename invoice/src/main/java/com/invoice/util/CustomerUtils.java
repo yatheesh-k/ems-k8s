@@ -125,7 +125,7 @@ public class CustomerUtils {
 
     public static CustomerModel maskCustomerUpdateProperties(CustomerUpdateRequest customerRequest, CustomerModel customerModel) {
         // Declare unmasked variables
-        String address = null, state = null, city = null,
+        String address = null, state = null, city = null, status=null,
                 gst = null, pinCode = null, stateCode = null;
 
         if (customerRequest.getAddress() != null) {
@@ -139,6 +139,9 @@ public class CustomerUtils {
         if (customerRequest.getCity() != null) {
             // Masking the state information
             city = Base64.getEncoder().encodeToString(customerRequest.getCity().getBytes());
+        }
+        if (customerRequest.getStatus() != null) {  // ✅ Fixed getter method
+            status = customerRequest.getStatus();  // No need to encode status
         }
 
         if (customerRequest.getCustomerGstNo() != null) {
@@ -161,6 +164,7 @@ public class CustomerUtils {
         customerModel.setAddress(address);
         customerModel.setStateCode(stateCode);
         customerModel.setPinCode(pinCode);
+        customerModel.setStatus(status);
         // Add any other fields that need masking and setting...
         return customerModel;
     }

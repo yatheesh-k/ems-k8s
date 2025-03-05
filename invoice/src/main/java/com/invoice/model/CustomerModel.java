@@ -1,14 +1,9 @@
 package com.invoice.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.micrometer.common.lang.Nullable;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
-import java.util.List;
 
 @Getter
 @Setter
