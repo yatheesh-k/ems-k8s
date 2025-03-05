@@ -1,10 +1,10 @@
 server:
-  port: 8092
+  port: 8012
   servlet:
     contextPath: /ems
   ssl:
     enabled: true
-    key-store: certificates/ssl.jks
+    key-store: ../certificates/ssl.jks
     key-store-password: pathbreaker
     key-alias: pbt
     key-store-type: JKS
@@ -38,8 +38,8 @@ spring:
 fixed:
   otp: 123456
 es:
-  esHost: 192.168.1.163
-  esPort: 9200
+  esHost: localhost
+  esPort: 9201
 springdoc:
   swagger-ui:
     tagsSorter: alpha

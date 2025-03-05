@@ -35,6 +35,7 @@ public class InvoiceModel implements Entity{
     private String sGst;
     private String iGst;
     private String grandTotal;
+    private String grandTotalInWords;
 
     private List<Map<String,  String>> productData;
     private List<ProductColumnsRequest> productColumns;

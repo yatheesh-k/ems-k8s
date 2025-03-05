@@ -2,6 +2,8 @@ package com.invoice.util;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.invoice.config.NumberToWordsConverter;
+import com.invoice.exception.InvoiceErrorMessageKey;
 import com.invoice.exception.InvoiceException;
 import com.invoice.model.*;
 import com.invoice.opensearch.OpenSearchOperations;
@@ -10,7 +12,9 @@ import com.invoice.request.ProductColumnsRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -24,11 +28,16 @@ public class InvoiceUtils {
     @Autowired
     private static OpenSearchOperations openSearchOperations;
 
-    public static InvoiceModel maskInvoiceProperties(InvoiceRequest request, String invoiceId, CompanyEntity companyEntity, CustomerModel customerModel, BankEntity bankEntity) throws InvoiceException{
+    public static InvoiceModel maskInvoiceProperties(InvoiceRequest request, String invoiceId,String invoiceNo,CompanyEntity companyEntity, CustomerModel customerModel, BankEntity bankEntity) throws InvoiceException{
      ObjectMapper objectMapper = new ObjectMapper();
 
      // Convert the InvoiceRequest to InvoiceModel
      InvoiceModel entity = objectMapper.convertValue(request, InvoiceModel.class);
+
+        // Validate product details
+        if (request.getProductData() == null || request.getProductData().isEmpty()) {
+            throw new InvoiceException(InvoiceErrorMessageKey.PRODUCT_NOT_FOUND.getMessage(), HttpStatus.BAD_REQUEST);
+        }
 
             // Set the necessary fields
             entity.setInvoiceId(invoiceId);
@@ -39,6 +48,7 @@ public class InvoiceUtils {
             entity.setBank(bankEntity);
             entity.setCustomer(customerModel);
             entity.setCompany(companyEntity);
+            entity.setInvoiceNo(invoiceNo);
 
             // Mask productData (List<Map<String, String>>)
             if (request.getProductData() != null) {
@@ -57,7 +67,7 @@ public class InvoiceUtils {
             }
 
             // Mask other string fields
-            entity.setInvoiceDate(maskValue(request.getInvoiceDate()));
+            entity.setInvoiceDate(maskValue(String.valueOf(request.getInvoiceDate())));
             entity.setDueDate(maskValue(request.getDueDate()));
             entity.setPurchaseOrder(maskValue(request.getPurchaseOrder()));
             entity.setVendorCode(maskValue(request.getVendorCode()));
@@ -106,7 +116,7 @@ public class InvoiceUtils {
             invoiceEntity.setPurchaseOrder(unMaskValue(invoiceEntity.getPurchaseOrder()));
             invoiceEntity.setVendorCode(unMaskValue(invoiceEntity.getVendorCode()));
             invoiceEntity.setSubTotal(unMaskValue(invoiceEntity.getSubTotal()));
-            invoiceEntity.setInvoiceNo("IN/YYMMMM/001");
+            invoiceEntity.setInvoiceNo(invoiceEntity.getInvoiceNo());
 
 
             // Unmask productData (List<Map<String, String>>)
@@ -136,6 +146,7 @@ public class InvoiceUtils {
                 invoiceEntity.getCustomer().setAddress(unMaskValue(invoiceEntity.getCustomer().getAddress()));
                 invoiceEntity.getCustomer().setCity(unMaskValue(invoiceEntity.getCustomer().getCity()));
                 invoiceEntity.getCustomer().setState(unMaskValue(invoiceEntity.getCustomer().getState()));
+                invoiceEntity.getCustomer().setStateCode(unMaskValue(invoiceEntity.getCustomer().getStateCode()));
                 invoiceEntity.getCustomer().setPinCode(unMaskValue(invoiceEntity.getCustomer().getPinCode()));
                 invoiceEntity.getCustomer().setMobileNumber(unMaskValue(invoiceEntity.getCustomer().getMobileNumber()));
                 invoiceEntity.getCustomer().setEmail(unMaskValue(invoiceEntity.getCustomer().getEmail()));
@@ -195,6 +206,11 @@ public class InvoiceUtils {
             invoiceEntity.setIGst(formatAmount(iGst));
             invoiceEntity.setGrandTotal(formatAmount(grandTotal));
 
+            // Convert grand total to words and set it in the entity
+            BigDecimal grandTotalValue = new BigDecimal(grandTotal);
+            String grandTotalInWords = NumberToWordsConverter.convert(grandTotalValue);
+            invoiceEntity.setGrandTotalInWords(grandTotalInWords);
+
             log.debug("Updated Invoice - cGst: {}, sGst: {}, iGst: {}, grandTotal: {}",
                     invoiceEntity.getCGst(), invoiceEntity.getSGst(), invoiceEntity.getIGst(), invoiceEntity.getGrandTotal());
         }
@@ -250,6 +266,49 @@ public class InvoiceUtils {
             return value; // Return as is if null or empty
         }
         return new String(Base64.getDecoder().decode(value)); // Correctly decode without extra bytes conversion
+    }
+
+    public static String generateNextInvoiceNumber(String companyId, String shortName,OpenSearchOperations openSearchOperations) throws InvoiceException {
+        // Fetch last invoice number from OpenSearch
+        String lastInvoiceNo = openSearchOperations.findLastInvoiceNumber(companyId, shortName);
+
+        // If no previous invoice exists, start with the first invoice of the financial year
+        if (lastInvoiceNo == null || lastInvoiceNo.isEmpty()) {
+            return generateFirstInvoiceNumber();
+        }
+
+        String[] parts = lastInvoiceNo.split("-");
+
+        // Validate the format to avoid incorrect invoice numbers
+        if (parts.length < 3) {
+            log.error("Invalid invoice number format retrieved: {}", lastInvoiceNo);
+            throw new InvoiceException("Invalid invoice number format: " + lastInvoiceNo, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        try {
+            int nextNumber = Integer.parseInt(parts[2]) + 1;  // Increment last invoice number
+            return parts[0] + "-" + parts[1] + "-" + String.format("%03d", nextNumber);
+        } catch (NumberFormatException e) {
+            log.error("Error parsing invoice number: {}", lastInvoiceNo, e);
+            throw new InvoiceException("Error parsing invoice number: " + lastInvoiceNo, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public static String generateFirstInvoiceNumber() {
+        LocalDate currentDate = LocalDate.now();
+        int year = currentDate.getYear();
+        int nextYear = year + 1;
+        int prevYear = year - 1;
+
+        // Determine financial year (April - March cycle)
+        String financialYear;
+        if (currentDate.getMonthValue() < 4) { // If Jan, Feb, Mar → previous financial year
+            financialYear = prevYear + "-" + year;
+        } else { // April onwards → current financial year
+            financialYear = year + "-" + nextYear;
+        }
+
+        return financialYear + "-001"; // Example: 2024-25-001
     }
 
 }
