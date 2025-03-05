@@ -8,8 +8,11 @@ import com.invoice.model.CompanyEntity;
 import com.invoice.model.Entity;
 import com.invoice.model.InvoiceModel;
 import com.invoice.util.Constants;
+import com.invoice.util.InvoiceUtils;
 import com.invoice.util.ResourceIdUtils;
 import org.opensearch.client.opensearch._types.FieldValue;
+import org.opensearch.client.opensearch._types.OpenSearchException;
+import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch.core.search.Hit;
 import org.opensearch.client.opensearch.core.SearchRequest;
@@ -26,6 +29,7 @@ import org.springframework.stereotype.Component;
 import org.opensearch.client.opensearch.core.*;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -186,32 +190,42 @@ public class OpenSearchOperations {
             throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    public String findLastInvoiceNumber(String invoiceId, String shortName) throws InvoiceException {
+
+    public String findLastInvoiceNumber(String companyId, String shortName) throws InvoiceException {
         String indexName = ResourceIdUtils.generateCompanyIndex(shortName);
 
         try {
-            // Build search query
+            // ✅ Check if index exists in OpenSearch
+            boolean indexExists = esClient.indices().exists(i -> i.index(indexName)).value();
+            if (!indexExists) {
+                logger.warn("Index {} does not exist. Creating first invoice for the financial year.", indexName);
+                return InvoiceUtils.generateFirstInvoiceNumber(); // Generate first invoice dynamically
+            }
+
+            // ✅ Build search query to get the last invoice number
             SearchRequest searchRequest = new SearchRequest.Builder()
                     .index(indexName)
-                    .size(1)  // We need only one document
-                    .query(q -> q.term(t -> t.field("invoiceId.keyword").value(FieldValue.of(invoiceId))))
+                    .size(1)  // Fetch only the latest invoice
+                    .sort(s -> s.field(f -> f.field("invoiceNo.keyword").order(SortOrder.Desc))) // Sort descending
                     .build();
 
-            // Execute search
+            // ✅ Execute search query
             SearchResponse<InvoiceModel> searchResponse = esClient.search(searchRequest, InvoiceModel.class);
-
             List<Hit<InvoiceModel>> hits = searchResponse.hits().hits();
+
             if (!hits.isEmpty() && hits.get(0).source() != null) {
-                InvoiceModel invoice = hits.get(0).source();
-                return invoice.getInvoiceNo(); // Assuming getInvoiceNo() exists in InvoiceModel
+                InvoiceModel lastInvoice = hits.get(0).source();
+                return lastInvoice.getInvoiceNo(); // ✅ Return last invoice number found
             }
+
+        } catch (OpenSearchException e) {
+            logger.error("OpenSearch exception while fetching last invoice: {}", e.getMessage(), e);
+            throw new InvoiceException("OpenSearch error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (IOException e) {
-            logger.error("Error fetching invoice with ID {}: {}", invoiceId, e.getMessage());
-            throw new InvoiceException("Unable to fetch invoice", HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("I/O error fetching last invoice number for company {}: {}", companyId, e.getMessage());
+            throw new InvoiceException("Unable to fetch invoice due to I/O error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return null; // Return null if no invoice is found
+        return InvoiceUtils.generateFirstInvoiceNumber(); // ✅ Return first invoice if no invoices exist
     }
-
-
 }

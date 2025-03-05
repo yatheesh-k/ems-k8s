@@ -28,6 +28,7 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -75,21 +76,26 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         try {
             InvoiceModel invoiceModel;
-            // Step 4.1: Generate a unique resource ID for the customer using companyId and customer details
+            // Generate a timestamped invoiceId
             LocalDateTime currentDateTime = LocalDateTime.now();
             String timestamp = currentDateTime.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 
             String invoiceId = ResourceIdUtils.generateInvoiceResourceId(companyId, customerId, timestamp);
-           /* invoiceModel = openSearchOperations.getInvoiceById(index, null, invoiceId);
-            if (invoiceModel != null) {
-                throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.INVOICE_ALREADY_EXISTS), HttpStatus.NOT_FOUND);
-            }*/
-            Entity invoiceEntity = InvoiceUtils.maskInvoiceProperties(request, invoiceId, companyEntity, customer, bankEntity);
+
+            String invoiceNo = InvoiceUtils.generateNextInvoiceNumber(invoiceId,companyEntity.getShortName(),openSearchOperations); // Assuming this method increments invoice numbers correctly
+
+            // Create invoice entity
+            Entity invoiceEntity = InvoiceUtils.maskInvoiceProperties(request, invoiceId, invoiceNo, companyEntity, customer, bankEntity);
+
+            // Save to OpenSearch
             openSearchOperations.saveEntity(invoiceEntity, invoiceId, index);
 
             log.info("Invoice created successfully for customer: {}", customerId);
             return new ResponseEntity<>(ResponseBuilder.builder().build().createSuccessResponse(Constants.CREATE_SUCCESS), HttpStatus.CREATED);
         } catch (InvoiceException e) {
+            log.error("Error occurred: {}", e.getMessage(), e);
+            throw new InvoiceException(e.getMessage(), e.getMessage()); // Preserve original error message
+        } catch (Exception e) {
             log.error("Unexpected error: {}", e.getMessage(), e);
             throw new InvoiceException(InvoiceErrorMessageKey.UNEXPECTED_ERROR.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
