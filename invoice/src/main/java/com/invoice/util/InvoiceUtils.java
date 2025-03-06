@@ -169,9 +169,9 @@ public class InvoiceUtils {
                 invoiceEntity.getCompany().setMobileNo(unMaskValue(invoiceEntity.getCompany().getMobileNo()));
                 invoiceEntity.getCompany().setCinNo(unMaskValue(invoiceEntity.getCompany().getCinNo()));
                 String baseUrl = getBaseUrl(request);
-                String image = baseUrl + "var/www/ems/testing/assets/img/" + invoiceEntity.getCompany().getImageFile();
+                String image = baseUrl + "var/www/ems-testing/assets/img/" + invoiceEntity.getCompany().getImageFile();
                 invoiceEntity.getCompany().setImageFile(image);
-                String stampImage = baseUrl + "var/www/ems/testing/assets/img/" + invoiceEntity.getCompany().getStampImage();
+                String stampImage = baseUrl + "var/www/ems-testing/assets/img/" + invoiceEntity.getCompany().getStampImage();
                 invoiceEntity.getCompany().setStampImage(stampImage);
             }
             // Convert subTotal to a numeric value
@@ -221,7 +221,7 @@ public class InvoiceUtils {
         String scheme = request.getScheme(); // http or https
         String serverName = request.getServerName(); // localhost or IP address
         int serverPort = request.getServerPort(); // port number
-        String contextPath = "/"+Constants.INDEX_EMS; // context path
+        String contextPath = "/"+Constants.INDEX_INVOICE; // context path
 
         return scheme + "://" + serverName + ":" + serverPort + contextPath + "/";
     }

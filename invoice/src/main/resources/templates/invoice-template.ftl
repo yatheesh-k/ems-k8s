@@ -57,18 +57,6 @@
             font-size: small;
         }
 
-        .logo {
-            width: 200px;
-            height: 100px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: absolute;
-            right: 0;
-            top: -50px;
-            /* Adjust this value to move the logo higher */
-        }
-
         .logo img {
             width: 100%;
             height: auto;
@@ -147,18 +135,13 @@
 
 <body>
     <div class="container-fluid">
-        <!-- Header Section -->
-        <div class="row">
-            <div class="col-md-12">
-                <!-- Company Logo - Top Right -->
-                <div class="company-details" style="position:absolute ; top: -20px; right: 10px;">
-                    <#if imageFile??>
-                        <img src="${invoice.company.imageFile}" alt="Company Logo" />
-                        <#else>
-                            <img src="Image" alt="Company Logo" />
-                    </#if>
-                </div>
-            </div>
+        <!-- Company Logo - Top Right -->
+         <div class="company-details" style="position:absolute ; top: -20px; right: 10px;">
+            <#if invoice.company.imageFile?? && invoice.company.imageFile?has_content>
+                 <img src="${invoice.company.imageFile}" alt="Company Logo" />
+            <#else>
+                   <img src="Image" alt="Company Logo" />
+            </#if>
         </div>
         <!-- Invoice Heading Section -->
         <div style="position: relative; top: 10px; left: 0%; text-align: center;">
@@ -336,7 +319,7 @@
                 <div class="footer-content"
                     style="display: flex; align-items: center; justify-content: flex-end; text-align: right;">
                     <h6 style="margin: 0; font-weight: bold;">${invoice.company.companyName}</h6>
-                    <#if stampImage?? && stampImage !="">
+                    <#if invoice.company.stampImage?? && invoice.company.stampImage?has_content>
                         <img style="margin: -5; width: 100px; height:150px; margin-right: 40px; height: auto;"
                             src="${invoice.company.stampImage}" alt="Seal" />
                         <h6 style="margin: 0; font-weight: bold;">Authorized Signature:</h6>

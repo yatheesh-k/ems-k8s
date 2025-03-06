@@ -12,5 +12,6 @@ public class WebConfig implements WebMvcConfigurer {
         // Maps "/assets/img/**" URL path to the "D:/ems/ui/public/assets/img/" directory
         registry.addResourceHandler("/var/www/ems-testing/assets/img/**")
                 .addResourceLocations("file:/var/www/ems-testing/assets/img/");
+
     }
 }

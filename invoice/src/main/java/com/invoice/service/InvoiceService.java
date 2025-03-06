@@ -15,5 +15,5 @@ public interface InvoiceService {
 
     ResponseEntity<?> getInvoiceById(String companyId,String customerId,String invoiceId,HttpServletRequest request)throws InvoiceException, IOException;
 
-    ResponseEntity<?> downloadInvoice(String companyId, String customerId,String invoiceId,HttpServletRequest request)throws InvoiceException,IOException;
+    ResponseEntity<?> downloadInvoice(String companyId, String customerId,String invoiceId,HttpServletRequest request) throws Exception;
 }
