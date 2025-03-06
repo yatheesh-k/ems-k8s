@@ -26,9 +26,7 @@ public class InvoiceRequest {
 
     private String vendorCode;
     private String purchaseOrder;
-
-    private @PastOrPresent(message = "{invoice.date.pastOrPresent}")
-    LocalDate invoiceDate;
+    private String invoiceDate;
     private String dueDate;
     private String subTotal;
     private String status;

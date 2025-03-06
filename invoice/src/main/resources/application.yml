@@ -29,8 +29,8 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
 es:
-  esHost: 192.168.1.163
-  esPort: 9200
+  esHost: localhost
+  esPort: 9201
 # Swagger API Documentation
 springdoc:
   api-docs:

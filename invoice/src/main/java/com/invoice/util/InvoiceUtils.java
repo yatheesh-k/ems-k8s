@@ -65,7 +65,7 @@ public class InvoiceUtils {
             }
 
             // Mask other string fields
-            entity.setInvoiceDate(maskValue(String.valueOf(request.getInvoiceDate())));
+            entity.setInvoiceDate(maskValue((request.getInvoiceDate())));
             entity.setDueDate(maskValue(request.getDueDate()));
             entity.setPurchaseOrder(maskValue(request.getPurchaseOrder()));
             entity.setVendorCode(maskValue(request.getVendorCode()));
