@@ -75,7 +75,7 @@ public class InvoiceController {
                                              @Parameter(required = true, description = "${api.createCustomerPayload.description}")
                                              @PathVariable String customerId,
                                              @Parameter(required = true, description = "${api.createInvoicePayload.description}")
-                                             @PathVariable String invoiceId, HttpServletRequest request) throws InvoiceException, IOException {
+                                             @PathVariable String invoiceId, HttpServletRequest request) throws Exception {
         return invoiceService.downloadInvoice(companyId,customerId,invoiceId,request);
     }
 }
