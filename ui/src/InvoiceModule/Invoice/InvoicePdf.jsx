@@ -321,24 +321,7 @@ const InvoicePdf = () => {
                                 </td>
                               </tr>
                               {!invoiceData.igst || parseFloat(invoiceData.igst) === 0 ? (
-                                <tr>
-                                  <td
-                                    colSpan={totalColumns - 1}
-                                    style={{
-                                      textAlign: "right",
-                                      fontWeight: "bold",
-                                    }}
-                                  >
-                                    IGST (18%)
-                                  </td>
-                                  <td>
-                                    {(
-                                      parseFloat(invoiceData.igst) || 0
-                                    ).toFixed(2)}
-                                  </td>
-                                </tr>
-                              ) : (
-                                <>
+                                  <>
                                   <tr>
                                     <td
                                       colSpan={totalColumns - 1}
@@ -372,6 +355,24 @@ const InvoicePdf = () => {
                                     </td>
                                   </tr>
                                 </>
+                              ) : (
+                                <tr>
+                                <td
+                                  colSpan={totalColumns - 1}
+                                  style={{
+                                    textAlign: "right",
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  IGST (18%)
+                                </td>
+                                <td>
+                                  {(
+                                    parseFloat(invoiceData.igst) || 0
+                                  ).toFixed(2)}
+                                </td>
+                              </tr>
+                            
                               )}
                               <tr>
                                 <td
