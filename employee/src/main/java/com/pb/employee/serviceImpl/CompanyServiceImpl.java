@@ -330,7 +330,7 @@ public class CompanyServiceImpl implements CompanyService {
         try {
             companyEntity = openSearchOperations.getCompanyById(companyId, null, Constants.INDEX_EMS);
             String baseUrl = CompanyUtils.getBaseUrl(request);
-            image = baseUrl + "var/www/ems-testing/assets/img/" + companyEntity.getImageFile();
+            image = baseUrl + "var/www/ems/assets/img/" + companyEntity.getImageFile();
         } catch (Exception ex) {
             log.error("Exception while fetching company details {}", ex);
             throw new EmployeeException(
