@@ -225,7 +225,7 @@ public class InvoiceUtils {
         String scheme = request.getScheme(); // http or https
         String serverName = request.getServerName(); // localhost or IP address
         int serverPort = request.getServerPort(); // port number
-        String contextPath = "/"+Constants.INDEX_EMS; // context path
+        String contextPath = "/"+Constants.INDEX_INVOICE; // context path
 
         return scheme + "://" + serverName + ":" + serverPort + contextPath + "/";
     }

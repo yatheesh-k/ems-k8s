@@ -46,6 +46,7 @@ public class Constants {
     public static final String DEFAULT = "default";
     public static final String CUSTOMER = "customer";
     public static final String INDEX_EMS = "ems";
+    public static final String INDEX_INVOICE = "invoice";
     public static final String RESOURCE_ID = "ResourceId";
     public static final String SHORT_NAME = "shortName";
     public static final String DEPARTMENT = "department";

@@ -10,10 +10,7 @@ import com.invoice.opensearch.OpenSearchOperations;
 import com.invoice.repository.CustomerRepository;
 import com.invoice.request.InvoiceRequest;
 import com.invoice.service.InvoiceService;
-import com.invoice.util.Constants;
-import com.invoice.util.DateValidator;
-import com.invoice.util.InvoiceUtils;
-import com.invoice.util.ResourceIdUtils;
+import com.invoice.util.*;
 import com.itextpdf.text.DocumentException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -192,7 +189,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
     }
     @Override
-    public ResponseEntity<?> downloadInvoice(String companyId, String customerId, String invoiceId, HttpServletRequest request) throws InvoiceException, IOException {
+    public ResponseEntity<?> downloadInvoice(String companyId, String customerId, String invoiceId, HttpServletRequest request) throws Exception {
         log.info("Download Invoice with ID: {}", invoiceId);
 
         // Fetch Company Entity
@@ -203,6 +200,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
         String companyIndex = ResourceIdUtils.generateCompanyIndex(companyEntity.getShortName());
 
+        SSLUtil.disableSSLVerification();
         InvoiceModel invoiceEntity = openSearchOperations.getInvoiceById(companyIndex,null,invoiceId);
         if (invoiceEntity == null) {
             log.error("Invoice with ID {} not found", invoiceId);
