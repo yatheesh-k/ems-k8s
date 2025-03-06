@@ -26,7 +26,8 @@ public enum InvoiceErrorMessageKey {
     RESPONSE_BUILD_ERROR("builder.error"),
     UNABLE_GET_BANK_DETAILS("unable.to.get.bank.details"),
     INVALID_COMPANY("invalid.company"),
-    INVALID_INVOICE_ID_FORMAT("invalid.invoiceId.format");
+    INVALID_INVOICE_ID_FORMAT("invalid.invoiceId.format"),
+    INVALID_INVOICE_DATE("invalid.invoice.date");
 
     private final String message;
 

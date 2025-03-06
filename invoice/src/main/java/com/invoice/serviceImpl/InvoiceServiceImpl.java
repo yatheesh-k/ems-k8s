@@ -11,6 +11,7 @@ import com.invoice.repository.CustomerRepository;
 import com.invoice.request.InvoiceRequest;
 import com.invoice.service.InvoiceService;
 import com.invoice.util.Constants;
+import com.invoice.util.DateValidator;
 import com.invoice.util.InvoiceUtils;
 import com.invoice.util.ResourceIdUtils;
 import com.itextpdf.text.DocumentException;
@@ -59,6 +60,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         if (companyEntity == null) {
             throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.COMPANY_NOT_FOUND), HttpStatus.NOT_FOUND);
         }
+        // Validate Invoice Date
+        validateInvoiceDate(request.getInvoiceDate());
         String index = ResourceIdUtils.generateCompanyIndex(companyEntity.getShortName());
 
         CustomerModel customer = customerRepository.findById(customerId)
@@ -98,6 +101,12 @@ public class InvoiceServiceImpl implements InvoiceService {
         } catch (Exception e) {
             log.error("Unexpected error: {}", e.getMessage(), e);
             throw new InvoiceException(InvoiceErrorMessageKey.UNEXPECTED_ERROR.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public void validateInvoiceDate(String invoiceDate) throws InvoiceException {
+        if (!DateValidator.isPastOrPresent(invoiceDate)) {
+            throw new InvoiceException(InvoiceErrorMessageKey.INVALID_INVOICE_DATE.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
 

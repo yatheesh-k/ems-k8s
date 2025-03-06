@@ -67,7 +67,7 @@ public class InvoiceUtils {
             }
 
             // Mask other string fields
-            entity.setInvoiceDate(maskValue(String.valueOf(request.getInvoiceDate())));
+            entity.setInvoiceDate(maskValue(request.getInvoiceDate()));
             entity.setDueDate(maskValue(request.getDueDate()));
             entity.setPurchaseOrder(maskValue(request.getPurchaseOrder()));
             entity.setVendorCode(maskValue(request.getVendorCode()));
@@ -282,7 +282,7 @@ public class InvoiceUtils {
         // Validate the format to avoid incorrect invoice numbers
         if (parts.length < 3) {
             log.error("Invalid invoice number format retrieved: {}", lastInvoiceNo);
-            throw new InvoiceException("Invalid invoice number format: " + lastInvoiceNo, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new InvoiceException(InvoiceErrorMessageKey.INVALID_INVOICE_ID_FORMAT.getMessage() + lastInvoiceNo, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         try {
