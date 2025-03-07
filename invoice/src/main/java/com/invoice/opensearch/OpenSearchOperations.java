@@ -199,7 +199,6 @@ public class OpenSearchOperations {
             boolean indexExists = esClient.indices().exists(i -> i.index(indexName)).value();
             if (!indexExists) {
                 logger.warn("Index '{}' does not exist. Creating first invoice for the financial year.", indexName);
-              
                 return InvoiceUtils.generateFirstInvoiceNumber(); // Generate first invoice dynamically
             }
 

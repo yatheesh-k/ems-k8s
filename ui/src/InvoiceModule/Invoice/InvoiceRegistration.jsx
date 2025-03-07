@@ -273,6 +273,21 @@ const InvoiceRegistration = () => {
       setLoad(false);
     }
   };
+  const handleClearForm = () => {
+    reset({
+      customerName: null,
+      purchaseOrder: "",
+      vendorCode: "",
+      invoiceDate: "",
+      dueDate: "",
+      bankName: null,
+      products: [],
+    });
+  
+    setProductData([]);  // Clear product rows
+    setProductColumns([]); // Reset columns if needed
+    toast.info("Form cleared!", { position: "top-right", autoClose: 1000 });
+  };
   
   const handleDeleteColumn = (key) => {
     setSelectedItemId(key);
@@ -777,7 +792,7 @@ const InvoiceRegistration = () => {
                  
                 </div>
                 <div className="d-flex justify-content-end gap-2 mb-3 me-2">
-                  <button type="button" className="btn btn-secondary">
+                  <button type="button" className="btn btn-secondary" onClick={handleClearForm}>
                     Clear
                   </button>
                   <button type="submit" className="btn btn-primary" disabled={load}>
@@ -987,5 +1002,3 @@ const InvoiceRegistration = () => {
 };
 
 export default InvoiceRegistration;
-
-

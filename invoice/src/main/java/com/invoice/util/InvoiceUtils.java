@@ -1,5 +1,6 @@
 package com.invoice.util;
 
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.invoice.config.NumberToWordsConverter;
 import com.invoice.exception.InvoiceErrorMessageKey;
@@ -20,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+
 @Slf4j
 public class InvoiceUtils {
 
@@ -37,7 +39,17 @@ public class InvoiceUtils {
             throw new InvoiceException(InvoiceErrorMessageKey.PRODUCT_NOT_FOUND.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
-            // Set the necessary fields
+        // ✅ Validate productColumns (Ensure no empty or null values)
+        if (request.getProductColumns() == null || request.getProductColumns().isEmpty()) {
+            throw new InvoiceException(InvoiceErrorMessageKey.PRODUCT_NOT_FOUND.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+        for (ProductColumnsRequest column : request.getProductColumns()) {
+            if (column.getKey() == null || column.getTitle().trim().isEmpty()) {
+                throw new InvoiceException(InvoiceErrorMessageKey.PRODUCT_NOT_FOUND.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+        // Set the necessary fields
             entity.setInvoiceId(invoiceId);
             entity.setType(Constants.INVOICE);
             entity.setStatus(request.getStatus());
@@ -65,7 +77,7 @@ public class InvoiceUtils {
             }
 
             // Mask other string fields
-            entity.setInvoiceDate(maskValue((request.getInvoiceDate())));
+            entity.setInvoiceDate(maskValue(request.getInvoiceDate()));
             entity.setDueDate(maskValue(request.getDueDate()));
             entity.setPurchaseOrder(maskValue(request.getPurchaseOrder()));
             entity.setVendorCode(maskValue(request.getVendorCode()));
@@ -100,6 +112,7 @@ public class InvoiceUtils {
             return Base64.getEncoder().encodeToString(value.getBytes());
         }
 
+
     public static void unMaskInvoiceProperties(InvoiceModel invoiceEntity,HttpServletRequest request) {
         if (invoiceEntity != null) {
             log.debug("Unmasking invoice: {}", invoiceEntity);
@@ -114,6 +127,7 @@ public class InvoiceUtils {
             invoiceEntity.setVendorCode(unMaskValue(invoiceEntity.getVendorCode()));
             invoiceEntity.setSubTotal(unMaskValue(invoiceEntity.getSubTotal()));
             invoiceEntity.setInvoiceNo(invoiceEntity.getInvoiceNo());
+
 
             // Unmask productData (List<Map<String, String>>)
             if (invoiceEntity.getProductData() != null) {
@@ -169,9 +183,9 @@ public class InvoiceUtils {
                 invoiceEntity.getCompany().setMobileNo(unMaskValue(invoiceEntity.getCompany().getMobileNo()));
                 invoiceEntity.getCompany().setCinNo(unMaskValue(invoiceEntity.getCompany().getCinNo()));
                 String baseUrl = getBaseUrl(request);
-                String image = baseUrl + "var/www/ems-testing/assets/img/" + invoiceEntity.getCompany().getImageFile();
+                String image = baseUrl + "var/www/ems/assets/img/" + invoiceEntity.getCompany().getImageFile();
                 invoiceEntity.getCompany().setImageFile(image);
-                String stampImage = baseUrl + "var/www/ems-testing/assets/img/" + invoiceEntity.getCompany().getStampImage();
+                String stampImage = baseUrl + "var/www/ems/assets/img/" + invoiceEntity.getCompany().getStampImage();
                 invoiceEntity.getCompany().setStampImage(stampImage);
             }
             // Convert subTotal to a numeric value
@@ -240,7 +254,6 @@ public class InvoiceUtils {
             return 0.0;
 
         }
-
     }
     /**
      * Method to unmask a ProductColumn.
@@ -278,9 +291,7 @@ public class InvoiceUtils {
         // Validate the format to avoid incorrect invoice numbers
         if (parts.length < 3) {
             log.error("Invalid invoice number format retrieved: {}", lastInvoiceNo);
-
             throw new InvoiceException(InvoiceErrorMessageKey.INVALID_INVOICE_ID_FORMAT.getMessage() + lastInvoiceNo, HttpStatus.INTERNAL_SERVER_ERROR);
-
         }
 
         try {
@@ -295,18 +306,17 @@ public class InvoiceUtils {
     public static String generateFirstInvoiceNumber() {
         LocalDate currentDate = LocalDate.now();
         int year = currentDate.getYear();
-        int nextYear = year + 1;
+        int nextYear = (year + 1) % 100; // Get last two digits of next year
         int prevYear = year - 1;
 
         // Determine financial year (April - March cycle)
         String financialYear;
         if (currentDate.getMonthValue() < 4) { // If Jan, Feb, Mar → previous financial year
-            financialYear = prevYear + "-" + year;
+            financialYear = prevYear + "-" + String.format("%02d", year % 100);
         } else { // April onwards → current financial year
-            financialYear = year + "-" + nextYear;
+            financialYear = year + "-" + String.format("%02d", nextYear);
         }
 
         return financialYear + "-001"; // Example: 2024-25-001
     }
-
 }
