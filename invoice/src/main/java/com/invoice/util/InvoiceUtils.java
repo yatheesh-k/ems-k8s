@@ -39,7 +39,17 @@ public class InvoiceUtils {
             throw new InvoiceException(InvoiceErrorMessageKey.PRODUCT_NOT_FOUND.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
-            // Set the necessary fields
+        // ✅ Validate productColumns (Ensure no empty or null values)
+        if (request.getProductColumns() == null || request.getProductColumns().isEmpty()) {
+            throw new InvoiceException(InvoiceErrorMessageKey.PRODUCT_NOT_FOUND.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
+        for (ProductColumnsRequest column : request.getProductColumns()) {
+            if (column.getKey() == null || column.getTitle().trim().isEmpty()) {
+                throw new InvoiceException(InvoiceErrorMessageKey.PRODUCT_NOT_FOUND.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+        }
+        // Set the necessary fields
             entity.setInvoiceId(invoiceId);
             entity.setType(Constants.INVOICE);
             entity.setStatus(request.getStatus());
@@ -244,7 +254,6 @@ public class InvoiceUtils {
             return 0.0;
 
         }
-
     }
     /**
      * Method to unmask a ProductColumn.
@@ -297,18 +306,17 @@ public class InvoiceUtils {
     public static String generateFirstInvoiceNumber() {
         LocalDate currentDate = LocalDate.now();
         int year = currentDate.getYear();
-        int nextYear = year + 1;
+        int nextYear = (year + 1) % 100; // Get last two digits of next year
         int prevYear = year - 1;
 
         // Determine financial year (April - March cycle)
         String financialYear;
         if (currentDate.getMonthValue() < 4) { // If Jan, Feb, Mar → previous financial year
-            financialYear = prevYear + "-" + year;
+            financialYear = prevYear + "-" + String.format("%02d", year % 100);
         } else { // April onwards → current financial year
-            financialYear = year + "-" + nextYear;
+            financialYear = year + "-" + String.format("%02d", nextYear);
         }
 
         return financialYear + "-001"; // Example: 2024-25-001
     }
-
 }
