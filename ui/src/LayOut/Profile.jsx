@@ -37,6 +37,7 @@ function Profile() {
   const { user = {}, logoFileName,stamp } = useAuth();
   const [stampError,setStampError]=useState()
   const [stampImage, setStampImage]=useState()
+  const [showStampModal, setShowStampModal] = useState(false);
   const navigate = useNavigate();
   const [response, setResponse] = useState({ data: {} });
   const [hasCinNo, setHasCinNo] = useState(false);
@@ -186,21 +187,18 @@ function Profile() {
 
   const onChangePicture = (e) => {
     const file = e.target.files[0]; // Get the selected file
-
     // Check if no file is selected
     if (!file) {
       setImgError("No file selected.");
       setStampError("No file selected.")
       return; // Stop processing if no file is selected
     }
-
     // Check file size (limit to 200KB)
     if (file.size > 200 * 1024) {
       setImgError("File size must be less than 200KB.");
       setStampError("File size must be less than 200KB.")
       return; // Stop further processing if size exceeds limit
     }
-
     // Check file type (valid image types and PDF)
     const validTypes = ["image/png", "image/jpeg", "image/svg+xml"];
     if (!validTypes.includes(file.type)) {
@@ -208,7 +206,6 @@ function Profile() {
       setStampError("Only .png, .jpg, .jpeg, .svg files are allowed.")
       return; // Stop further processing if the type is invalid
     }
-
     // If the file is valid, clear previous errors and update the state
     setImgError(""); // Clear error messages
     setStampError("");
@@ -219,39 +216,14 @@ function Profile() {
 
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
+  const openStampModal = () => setShowStampModal(true);
+  const closeStampModal = () => setShowStampModal(false);
 
   const handleCloseUploadImageModal = () => {
     setPostImage(null);
     setStampImage(null)
     setShowModal(false);
     setErrorMessage("");
-  };
-
-  const toInputSpaceCase = (e) => {
-    let inputValue = e.target.value;
-    let newValue = "";
-
-    // Remove spaces from the beginning of inputValue
-    inputValue = inputValue.trimStart(); // Keep spaces only after the initial non-space character
-
-    // Track if we've encountered any non-space character yet
-    let encounteredNonSpace = false;
-
-    for (let i = 0; i < inputValue.length; i++) {
-      const char = inputValue.charAt(i);
-
-      // Allow any alphabetic characters (both lowercase and uppercase) and numbers
-      // Allow spaces only after encountering non-space characters
-      if (char.match(/[a-zA-Z0-9]/) || (encounteredNonSpace && char === " ")) {
-        if (char !== " ") {
-          encounteredNonSpace = true;
-        }
-        newValue += char;
-      }
-    }
-
-    // Update the input value
-    e.target.value = newValue;
   };
 
   const toInputTitleCase = (e) => {
@@ -332,36 +304,6 @@ function Profile() {
     input.value = value;
   };
 
-  const toInputLowerCase = (e) => {
-    const input = e.target;
-    let value = input.value;
-
-    // Remove leading spaces
-    value = value.replace(/^\s+/g, "");
-
-    // Initially disallow spaces if there are no non-space characters
-    if (!/\S/.test(value)) {
-      // If no non-space characters are present, prevent spaces
-      value = value.replace(/\s+/g, "");
-    } else {
-      // Convert the entire string to lowercase
-      value = value.toLowerCase();
-
-      // Remove leading spaces
-      value = value.replace(/^\s+/g, "");
-
-      // Capitalize the first letter of each word
-      const words = value.split(" ");
-      const capitalizedWords = words.map((word) => {
-        return word.charAt(0).toLowerCase() + word.slice(1);
-      });
-
-      value = capitalizedWords.join(" ");
-    }
-
-    // Update input value
-    input.value = value;
-  };
 
   const toInputAddressCase = (e) => {
     const input = e.target;
@@ -494,7 +436,7 @@ function Profile() {
                         cursor: "pointer",
                         marginRight: "80%",
                       }}
-                      onClick={openModal}
+                      onClick={openStampModal}
                     >
                       <div
                         style={{
@@ -515,7 +457,7 @@ function Profile() {
                         className="align-middle"
                         src={`${stamp}`}
                         accept=".png, .jpg. ,svg ,.jpeg,"
-                        alt="Company Logo"
+                        alt="Company Stamp"
                         style={{ height: "80px", width: "200px" }}
                       />
                     )}
@@ -525,7 +467,6 @@ function Profile() {
             </div>
           </div>
         </div>
-
         <form onSubmit={handleSubmit(handleDetailsSubmit)}>
           <div className="row">
             <div className="col-12">
@@ -973,6 +914,7 @@ function Profile() {
           </div>
         </form>
         {/* Modal for Logo Upload */}
+        {openModal && (
         <Modal
           show={showModal}
           onHide={handleCloseUploadImageModal}
@@ -1004,6 +946,8 @@ function Profile() {
             </Button>
           </ModalFooter>
         </Modal>
+        )}
+        {showStampModal && (
         <Modal
           show={showModal}
           onHide={handleCloseUploadImageModal}
@@ -1035,6 +979,7 @@ function Profile() {
             </Button>
           </ModalFooter>
         </Modal>
+        )}
       </div>
     </LayOut>
   );

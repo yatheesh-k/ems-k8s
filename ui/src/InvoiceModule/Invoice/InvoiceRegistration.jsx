@@ -396,23 +396,36 @@ const InvoiceRegistration = () => {
   
     setProductColumns(updatedColumns);
   };
-  
-  // Prevent changing the title to anything other than "New Field"
   const updateColumnTitle = (key, title) => {
-    if (key.startsWith("custom_") && title !== "New Field") {
-      toast.error("Column title can only be 'New Field'.");
+    // Allow temporary clearing while the user is typing
+    if (title === "") {
+      setProductColumns(
+        productColumns.map((col) =>
+          col.key === key ? { ...col, title: "" } : col
+        )
+      );
       return;
     }
   
+    // Trim the title to avoid issues with spaces
+    const trimmedTitle = title.trim();
+  
+    // Prevent invalid titles when the user confirms the change
+    if (trimmedTitle === "New Field") {
+      toast.error("Column title cannot be 'New Field'. Please enter a valid title.");
+      return;
+    }
+  
+    // Update the column title
     setProductColumns(
       productColumns.map((col) =>
         col.key === key
-          ? { ...col, title: key === "totalCost" ? "Total Amount" : title }
+          ? { ...col, title: key === "totalCost" ? "Total Amount" : trimmedTitle }
           : col
       )
     );
   };
-  
+   
 
   const addRow = () => setProductData([...productData, {}]);
 
