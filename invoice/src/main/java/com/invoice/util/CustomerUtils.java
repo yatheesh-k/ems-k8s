@@ -20,7 +20,7 @@ public class CustomerUtils {
     public static CustomerModel maskCustomerProperties(CustomerRequest customerRequest,String companyId,String customerId) {
         // Declare masked variables
         String customerName = null, email = null, mobileNo = null,
-                address = null,state =null,city =null,
+                address = null,state =null,city =null, status = null,
                 gst=null,pinCode=null,stateCode=null;
         // Masking bank details
         if (customerRequest.getCustomerName() != null) {
@@ -39,6 +39,10 @@ public class CustomerUtils {
         if (customerRequest.getState() != null) {
             // Masking the branch name as an example
             state = Base64.getEncoder().encodeToString(customerRequest.getState().getBytes());
+        }
+        if (customerRequest.getStatus() != null) {
+            // Masking the branch name as an example
+            status = Base64.getEncoder().encodeToString(customerRequest.getStatus().getBytes());
         }
 
         if (customerRequest.getCity() != null) {
@@ -65,6 +69,7 @@ public class CustomerUtils {
         customerModel.setCustomerName(customerName);
         customerModel.setCity(city);
         customerModel.setEmail(email);
+        customerModel.setStatus(status);
         customerModel.setCustomerGstNo(gst);
         customerModel.setState(state);
         customerModel.setAddress(address);
@@ -185,40 +190,6 @@ public class CustomerUtils {
             return new String(Base64.getEncoder().encode(encodedName.getBytes()));
         }
         return null;
-    }
-
-    public static int noChangeInValuesOfCustomer(CustomerModel customer, CustomerUpdateRequest request) {
-        int noOfChanges = 0;
-
-        if (!Objects.equals(customer.getAddress(), request.getAddress())) {
-            noOfChanges++;
-        }
-
-        if (!Objects.equals(customer.getState(), request.getState())) {
-            noOfChanges++;
-        }
-
-        if (!Objects.equals(customer.getCity(), request.getCity())) {
-            noOfChanges++;
-        }
-
-        if (!Objects.equals(customer.getPinCode(), request.getPinCode())) {
-            noOfChanges++;
-        }
-
-        if (!Objects.equals(customer.getStatus(), request.getStatus())) {
-            noOfChanges++;
-        }
-
-        if (!Objects.equals(customer.getCustomerGstNo(), request.getCustomerGstNo())) {
-            noOfChanges++;
-        }
-
-        if (!Objects.equals(customer.getStateCode(), request.getStateCode())) {
-            noOfChanges++;
-        }
-
-        return noOfChanges;
     }
 
     public static int noChangeInValuesOfBank(CustomerModel customerModel, CustomerUpdateRequest customerUpdateRequest) {

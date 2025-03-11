@@ -91,11 +91,6 @@ public class CustomerServiceImpl implements CustomerService {
                     HttpStatus.NOT_FOUND);
         }
 
-        if (companyId == null || companyId.trim().isEmpty()) {
-            log.info("Company ID is null, deleting all customers...");
-            repository.deleteAll(); // Deletes all customers from the database
-        }
-
         try {
             List<CustomerModel> customers = null;
             customers = repository.findByCompanyId(companyId);
@@ -108,11 +103,10 @@ public class CustomerServiceImpl implements CustomerService {
                 }
                 // Return the list of unmasked customers
                 return ResponseEntity.ok(customers);
-            }
-            else {
+            } else {
               // If no customers are found, return a 404 error
               log.error("No customers found for company ID: {}", companyId);
-              throw new InvoiceException(InvoiceErrorMessageKey.CUSTOMER_NOT_FOUND, HttpStatus.NOT_FOUND);
+              throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.CUSTOMER_NOT_FOUND), HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
             // Log the error and throw an internal server error if something goes wrong
