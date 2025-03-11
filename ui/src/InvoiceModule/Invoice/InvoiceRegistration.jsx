@@ -240,6 +240,15 @@ const InvoiceRegistration = () => {
         setLoad(false);
         return;
       }
+       // ✅ Validate column titles (ensure no empty titles or "New Field")
+    const invalidColumns = productColumns.filter(
+      (col) => !col.title.trim() || col.title === "New Field"
+    );
+    if (invalidColumns.length >0) {
+      toast.error("Column titles cannot be empty or 'New Field'. Please update them.");
+      setLoad(false);
+      return;
+    }
        // ✅ Check if at least one product is added
     if (productData.length === 0) {
       toast.error("At least one product must be added before submitting.");
@@ -293,6 +302,7 @@ const InvoiceRegistration = () => {
       setLoad(false);
     }
   };
+
   const handleClearForm = () => {
     reset({
       customerName: null,
