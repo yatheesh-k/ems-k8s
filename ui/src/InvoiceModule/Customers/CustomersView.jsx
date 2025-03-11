@@ -22,17 +22,19 @@ const CustomersView = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [selectedItemId, setSelectedItemId] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState(null);
+  const [isFetching, setIsFetching] = useState(true); // Local loading state
   const { user } = useAuth();
   const companyId = user.companyId;
 
   // Fetch all customers on component mount
   useEffect(() => {
     if (companyId) {
+      setIsFetching(true);
       const timer = setTimeout(() => {
-        dispatch(fetchCustomers(companyId));
-      }, 0); // Delay of 1500ms
+        dispatch(fetchCustomers(companyId)).finally(()=>setIsFetching(false));
+      }, 1000); // Delay of 1000ms
   
       return () => clearTimeout(timer);
     }
@@ -178,7 +180,7 @@ const handleCloseDeleteModal = () => {
     setSearch(searchTerm);
   };
 
-    if (loading) return  <Loader/>;
+    if (isFetching||loading) return  <Loader/>;
   return (
     <LayOut>
       <div className="container-fluid p-0">

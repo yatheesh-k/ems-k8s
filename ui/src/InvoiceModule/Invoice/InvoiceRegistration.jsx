@@ -240,7 +240,7 @@ const InvoiceRegistration = () => {
         setLoad(false);
         return;
       }
-      // ✅ Validate column titles (ensure no empty titles or "New Field")
+       // ✅ Validate column titles (ensure no empty titles or "New Field")
     const invalidColumns = productColumns.filter(
       (col) => !col.title.trim() || col.title === "New Field"
     );
@@ -302,6 +302,7 @@ const InvoiceRegistration = () => {
       setLoad(false);
     }
   };
+
   const handleClearForm = () => {
     reset({
       customerName: null,
@@ -405,27 +406,37 @@ const InvoiceRegistration = () => {
   
     setProductColumns(updatedColumns);
   };
+  const updateColumnTitle = (key, title) => {
+    // Allow temporary clearing while the user is typing
+    if (title === "") {
+      setProductColumns(
+        productColumns.map((col) =>
+          col.key === key ? { ...col, title: "" } : col
+        )
+      );
+      return;
+    }
   
-  // ✅ Ensures a valid title while updating
-const updateColumnTitle = (key, title) => {
-  const trimmedTitle = title.trim();
+    // Trim the title to avoid issues with spaces
+    const trimmedTitle = title.trim();
+  
+    // Prevent invalid titles when the user confirms the change
+    if (trimmedTitle === "New Field") {
+      toast.error("Column title cannot be 'New Field'. Please enter a valid title.");
+      return;
+    }
+  
+    // Update the column title
+    setProductColumns(
+      productColumns.map((col) =>
+        col.key === key
+          ? { ...col, title: key === "totalCost" ? "Total Amount" : trimmedTitle }
+          : col
+      )
+    );
+  };
+   
 
-  if (!trimmedTitle) {
-    toast.error("Column title cannot be empty.");
-    return;
-  }
-
-  if (key.startsWith("custom_") && trimmedTitle === "New Field") {
-    toast.error("Column title cannot be 'New Field'. Please enter a valid title.");
-    return;
-  }
-
-  setProductColumns(
-    productColumns.map((col) =>
-      col.key === key ? { ...col, title: trimmedTitle } : col
-    )
-  );
-};
   const addRow = () => setProductData([...productData, {}]);
 
   return (

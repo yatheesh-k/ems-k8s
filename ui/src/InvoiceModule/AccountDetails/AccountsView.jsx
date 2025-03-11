@@ -15,6 +15,7 @@ const AccountsView = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { banks, loading, error } = useSelector((state) => state.banks);
+  const [isFetching, setIsFetching] = useState(true); // Local loading state
   const [search, setSearch] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -26,9 +27,10 @@ const AccountsView = () => {
 
   useEffect(() => {
     if (companyId) {
+      setIsFetching(true);
       const timer = setTimeout(() => {
-        dispatch(fetchBanks(companyId));
-      }, 0); // Delay of 1500ms
+        dispatch(fetchBanks(companyId)).finally(() => setIsFetching(false));
+      }, 1500); // Delay of 1500ms
   
       return () => clearTimeout(timer); 
     }
@@ -160,7 +162,7 @@ const handleCloseDeleteModal = () => {
   const getFilteredList = (searchTerm) => {
     setSearch(searchTerm);
   };
-  if (loading) return  <Loader/>;
+  if (isFetching||loading) return  <Loader/>;
 
   return (
     <LayOut>
