@@ -29,15 +29,15 @@ function Profile() {
   } = useForm({ mode: "onChange" });
   const [companyData, setCompanyData] = useState({});
   const [postImage, setPostImage] = useState(null);
+  const [stampImage, setStampImage] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [error, setError] = useState(null);
   const [imgError, setImgError] = useState(null);
-  const { user = {}, logoFileName,stamp } = useAuth();
-  const [stampError,setStampError]=useState()
-  const [stampImage, setStampImage]=useState()
+  const [stampError, setStampError] = useState("");
   const [showStampModal, setShowStampModal] = useState(false);
+  const { user = {}, logoFileName,stamp } = useAuth();
   const navigate = useNavigate();
   const [response, setResponse] = useState({ data: {} });
   const [hasCinNo, setHasCinNo] = useState(false);
@@ -106,25 +106,17 @@ function Profile() {
     e.preventDefault(); // Prevent form default action
     if (!user.companyId) return;
     if (!postImage) {
-      setErrorMessage("Logo is required");
+      setErrorMessage("Logo is Required");
       return;
     }
-
-    // Restrict file names with spaces
-    if (/\s/.test(postImage.name)) {
-      setErrorMessage("File name should not contain spaces.");
-      return;
-    }
-
     try {
       const formData = new FormData();
       formData.append("image", "string");
       formData.append("file", postImage);
-
       await CompanyImagePatchApi(user.companyId, formData);
       setPostImage(null);
-      setSuccessMessage("Logo Added successfully.");
-      toast.success("Company Logo Added Successfully");
+      setSuccessMessage("Logo updated successfully.");
+      toast.success("Company Logo Updated Successfully");
       setErrorMessage("");
       setImgError(""); // Clear image error if everything goes fine
       closeModal();
@@ -140,40 +132,34 @@ function Profile() {
   };
 
   const handleStampSubmit = async (e) => {
-    e.preventDefault(); // Prevent form default action
+    e.preventDefault();
     if (!user.companyId) return;
     if (!stampImage) {
-      setErrorMessage("Logo is required");
+      setStampError("Stamp is Required");
       return;
     }
-
-    // Restrict file names with spaces
-    if (/\s/.test(stampImage.name)) {
-      setErrorMessage("File name should not contain spaces.");
-      return;
-    }
-
     try {
       const formData = new FormData();
       formData.append("image", "string");
       formData.append("file", stampImage);
-      await CompanyStampPatchApi(user.companyId, formData);
+      await CompanyStampPatchApi(user.companyId, formData); // API call
+
       setStampImage(null);
-      setSuccessMessage("Stamp Added successfully.");
-      toast.success("Stamp Added Successfully");
-      setErrorMessage("");
-      setStampError(""); // Clear image error if everything goes fine
-      closeModal();
+      setSuccessMessage("Stamp updated successfully.");
+      toast.success("Company Stamp Updated Successfully");
+      setStampError("");
+      closeStampModal();
       setTimeout(() => {
         window.location.href = "/main";
       }, 2000);
     } catch (err) {
       console.error("Stamp update error:", err);
       setSuccessMessage("");
-      toast.error("Failed To Update Logo");
-      setError(err);
+      toast.error("Failed To Update Stamp");
+      setStampError("Error uploading stamp");
     }
   };
+
 
   const handleEmailChange = (e) => {
     const value = e.target.value;
@@ -184,47 +170,51 @@ function Profile() {
       e.preventDefault();
     }
   };
+ // Validate Logo Upload
+ const onChangePicture = (e) => {
+  validateFile(e, setPostImage, setImgError);
+};
 
-  const onChangePicture = (e) => {
-    const file = e.target.files[0]; // Get the selected file
-    // Check if no file is selected
-    if (!file) {
-      setImgError("No file selected.");
-      setStampError("No file selected.")
-      return; // Stop processing if no file is selected
-    }
-    // Check file size (limit to 200KB)
-    if (file.size > 200 * 1024) {
-      setImgError("File size must be less than 200KB.");
-      setStampError("File size must be less than 200KB.")
-      return; // Stop further processing if size exceeds limit
-    }
-    // Check file type (valid image types and PDF)
-    const validTypes = ["image/png", "image/jpeg", "image/svg+xml"];
-    if (!validTypes.includes(file.type)) {
-      setImgError("Only .png, .jpg, .jpeg, .svg files are allowed.");
-      setStampError("Only .png, .jpg, .jpeg, .svg files are allowed.")
-      return; // Stop further processing if the type is invalid
-    }
-    // If the file is valid, clear previous errors and update the state
-    setImgError(""); // Clear error messages
-    setStampError("");
-    setStampImage(file);
-    setPostImage(file); // Store the selected file
-    console.log("File is valid and ready for upload:", file);
-  };
+// Validate Stamp Upload
+const onChangeStampPicture = (e) => {
+  validateFile(e, setStampImage, setStampError);
+};
 
-  const openModal = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
-  const openStampModal = () => setShowStampModal(true);
-  const closeStampModal = () => setShowStampModal(false);
+const validateFile = (e, setFile, setError) => {
+  const file = e.target.files[0];
+  if (!file) {
+    setError("No file selected.");
+    return;
+  }
+  if (file.size > 200 * 1024) {
+    setError("File size must be less than 200KB.");
+    return;
+  }
+  const validTypes = ["image/png", "image/jpeg", "image/svg+xml"];
+  if (!validTypes.includes(file.type)) {
+    setError("Only .png, .jpg, .jpeg, .svg files are allowed.");
+    return;
+  }
+  setError("");
+  setFile(file);
+};
+
+const openModal = () => setShowModal(true);
+const closeModal = () => setShowModal(false);
+const openStampModal = () => setShowStampModal(true);
+const closeStampModal = () => setShowStampModal(false);
 
   const handleCloseUploadImageModal = () => {
     setPostImage(null);
-    setStampImage(null)
     setShowModal(false);
     setErrorMessage("");
   };
+  const handleStampCloseModal=()=>{
+    setStampImage(null);
+    setShowStampModal(false);
+    setErrorMessage("");
+    setStampError("");
+  }
 
   const toInputTitleCase = (e) => {
     const input = e.target;
@@ -384,7 +374,7 @@ function Profile() {
               <div className="card-body">
                 <div className="row">
                   <div className="col-12 col-md-6 mb-3">
-                    <div
+                  <div
                       style={{
                         position: "relative",
                         fontSize: "50px",
@@ -429,7 +419,7 @@ function Profile() {
               <div className="card-body">
                 <div className="row">
                   <div className="col-12 col-md-6 mb-3">
-                    <div
+                  <div
                       style={{
                         position: "relative",
                         fontSize: "50px",
@@ -444,7 +434,7 @@ function Profile() {
                           justifyContent: "center",
                         }}
                       >
-                        <Upload/>
+                        <CameraFill />
                       </div>
                     </div>
                     <span className="text-info align-start">
@@ -457,7 +447,7 @@ function Profile() {
                         className="align-middle"
                         src={`${stamp}`}
                         accept=".png, .jpg. ,svg ,.jpeg,"
-                        alt="Company Stamp"
+                        alt="Company Logo"
                         style={{ height: "80px", width: "200px" }}
                       />
                     )}
@@ -914,7 +904,7 @@ function Profile() {
           </div>
         </form>
         {/* Modal for Logo Upload */}
-        {openModal && (
+        {showModal && (
         <Modal
           show={showModal}
           onHide={handleCloseUploadImageModal}
@@ -931,14 +921,10 @@ function Profile() {
               accept=".png, .jpg, .svg, .jpeg,"
               onChange={onChangePicture}
             />
-            {errorMessage && (
-              <p className="text-danger pb-0" style={{ marginLeft: "2%" }}>
-                {errorMessage}
-              </p>
-            )}
+           {imgError && <p className="text-danger">{imgError}</p>}
           </ModalBody>
           <ModalFooter>
-            <Button variant="secondary" onClick={handleCloseUploadImageModal}>
+            <Button variant="secondary" onClick={closeModal}>
               Cancel
             </Button>
             <Button variant="primary" onClick={handleLogoSubmit}>
@@ -947,39 +933,36 @@ function Profile() {
           </ModalFooter>
         </Modal>
         )}
-        {showStampModal && (
-        <Modal
-          show={showModal}
-          onHide={handleCloseUploadImageModal}
-          style={{ zIndex: "1050" }}
-          centered
-        >
-          <ModalHeader closeButton>
-            <ModalTitle>Upload Stamp</ModalTitle>
-          </ModalHeader>
-          <ModalBody>
-            <input
-              type="file"
-              className="form-control"
-              accept=".png, .jpg, .svg, .jpeg,"
-              onChange={onChangePicture}
-            />
-            {errorMessage && (
-              <p className="text-danger pb-0" style={{ marginLeft: "2%" }}>
-                {errorMessage}
-              </p>
-            )}
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="secondary" onClick={handleCloseUploadImageModal}>
-              Cancel
-            </Button>
-            <Button variant="primary" onClick={handleStampSubmit}>
-              Upload Stamp
-            </Button>
-          </ModalFooter>
-        </Modal>
-        )}
+
+         {showStampModal && (
+           <Modal
+           show={showStampModal}
+           onHide={handleStampCloseModal}
+           style={{ zIndex: "1050" }}
+           centered
+         >
+           <ModalHeader closeButton>
+             <ModalTitle>Upload Stamp</ModalTitle>
+           </ModalHeader>
+           <ModalBody>
+             <input
+               type="file"
+               className="form-control"
+               accept=".png, .jpg, .svg, .jpeg,"
+               onChange={onChangeStampPicture}
+             />
+              {stampError && <p className="text-danger">{stampError}</p>}
+           </ModalBody>
+           <ModalFooter>
+             <Button variant="secondary" onClick={closeStampModal}>
+               Cancel
+             </Button>
+             <Button variant="primary" onClick={handleStampSubmit}>
+               Upload Stamp
+             </Button>
+           </ModalFooter>
+         </Modal>
+         )}
       </div>
     </LayOut>
   );
