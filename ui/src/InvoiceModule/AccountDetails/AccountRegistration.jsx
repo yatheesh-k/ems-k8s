@@ -246,7 +246,7 @@ const AccountRegistartion = () => {
     { value: "Savings", label: "Savings" },
     { value: "Current", label: "Current" },
     { value: "NRI", label: "NRI" },
-    { value: "Demat ", label: "Demat" },
+    { value: "Demat", label: "Demat" },
     { value: "Corporate", label: "Corporate" },
     { value:"Business",label:"Business"}
   ];

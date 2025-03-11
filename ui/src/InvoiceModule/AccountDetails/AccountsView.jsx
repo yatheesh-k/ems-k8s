@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { BankDeleteApiById } from "../../Utils/Axios";
 import { useAuth } from "../../Context/AuthContext";
 import DeletePopup from "../../Utils/DeletePopup";
+import Loader from "../../Utils/Loader";
 
 const AccountsView = () => {
   const dispatch = useDispatch();
@@ -26,9 +27,8 @@ const AccountsView = () => {
   useEffect(() => {
     if (companyId) {
       const timer = setTimeout(() => {
-        console.log("fetchBanks", fetchBanks);
         dispatch(fetchBanks(companyId));
-      }, 1500); // Delay of 1500ms
+      }, 0); // Delay of 1500ms
   
       return () => clearTimeout(timer); 
     }
@@ -160,6 +160,7 @@ const handleCloseDeleteModal = () => {
   const getFilteredList = (searchTerm) => {
     setSearch(searchTerm);
   };
+  if (loading) return  <Loader/>;
 
   return (
     <LayOut>
