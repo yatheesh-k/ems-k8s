@@ -240,6 +240,15 @@ const InvoiceRegistration = () => {
         setLoad(false);
         return;
       }
+      // ✅ Validate column titles (ensure no empty titles or "New Field")
+    const invalidColumns = productColumns.filter(
+      (col) => !col.title.trim() || col.title === "New Field"
+    );
+    if (invalidColumns.length >0) {
+      toast.error("Column titles cannot be empty or 'New Field'. Please update them.");
+      setLoad(false);
+      return;
+    }
        // ✅ Check if at least one product is added
     if (productData.length === 0) {
       toast.error("At least one product must be added before submitting.");
@@ -397,23 +406,26 @@ const InvoiceRegistration = () => {
     setProductColumns(updatedColumns);
   };
   
-  // Prevent changing the title to anything other than "New Field"
-  const updateColumnTitle = (key, title) => {
-    if (key.startsWith("custom_") && title !== "New Field") {
-      toast.error("Column title can only be 'New Field'.");
-      return;
-    }
-  
-    setProductColumns(
-      productColumns.map((col) =>
-        col.key === key
-          ? { ...col, title: key === "totalCost" ? "Total Amount" : title }
-          : col
-      )
-    );
-  };
-  
+  // ✅ Ensures a valid title while updating
+const updateColumnTitle = (key, title) => {
+  const trimmedTitle = title.trim();
 
+  if (!trimmedTitle) {
+    toast.error("Column title cannot be empty.");
+    return;
+  }
+
+  if (key.startsWith("custom_") && trimmedTitle === "New Field") {
+    toast.error("Column title cannot be 'New Field'. Please enter a valid title.");
+    return;
+  }
+
+  setProductColumns(
+    productColumns.map((col) =>
+      col.key === key ? { ...col, title: trimmedTitle } : col
+    )
+  );
+};
   const addRow = () => setProductData([...productData, {}]);
 
   return (
