@@ -15,7 +15,6 @@ import com.invoice.util.Constants;
 import com.invoice.util.CustomerUtils;
 
 import com.invoice.util.ResourceIdUtils;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -52,10 +51,13 @@ public class CustomerServiceImpl implements CustomerService {
             // Step 2: Fetch all customers for the given companyId
             List<CustomerModel> customers = repository.findByCompanyId(companyId); // Assuming you have a method to fetch all customers for a company
 
+            // Encode the mobile number from the request into Base64 format
+            String encodedMobileNumber = Base64.getEncoder().encodeToString(customerRequest.getMobileNumber().getBytes());
+
             // Step 3: Search for the customer with the provided customerId
             Optional<CustomerModel> existingCustomer = customers.stream()
                     .filter(customer -> customer.getCustomerId().equals(customerId) ||
-                            customer.getMobileNumber().equals(customerRequest.getMobileNumber()))
+                            customer.getMobileNumber().equals(encodedMobileNumber))
                     .findFirst();
 
             if (existingCustomer.isPresent()) {
@@ -88,6 +90,12 @@ public class CustomerServiceImpl implements CustomerService {
             throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.COMPANY_NOT_FOUND),
                     HttpStatus.NOT_FOUND);
         }
+
+        if (companyId == null || companyId.trim().isEmpty()) {
+            log.info("Company ID is null, deleting all customers...");
+            repository.deleteAll(); // Deletes all customers from the database
+        }
+
         try {
             List<CustomerModel> customers = null;
             customers = repository.findByCompanyId(companyId);
@@ -214,7 +222,7 @@ public class CustomerServiceImpl implements CustomerService {
             }
             repository.deleteById(customerId);
             return new ResponseEntity<>(ResponseBuilder.builder().build().createSuccessResponse(Constants.DELETE_SUCCESS), HttpStatus.OK);
-        }  catch (Exception e) {
+        } catch (Exception e) {
             log.error("Error deleting customer with ID {}: {}", customerId, e.getMessage(), e);
             throw new InvoiceException(InvoiceErrorMessageKey.UNABLE_TO_DELETE_CUSTOMER, HttpStatus.INTERNAL_SERVER_ERROR);
         }

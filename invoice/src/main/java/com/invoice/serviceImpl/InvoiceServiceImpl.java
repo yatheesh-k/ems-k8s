@@ -128,10 +128,6 @@ public class InvoiceServiceImpl implements InvoiceService {
             if (invoiceEntities == null || invoiceEntities.isEmpty()) {
                 throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.INVOICE_NOT_FOUND), HttpStatus.NOT_FOUND);
             }
-            // Unmask sensitive properties in each invoice
-            for (InvoiceModel invoice : invoiceEntities) {
-                InvoiceUtils.unMaskInvoiceProperties(invoice, request);
-            }
 
             // Unmask sensitive properties in each invoice
             for (InvoiceModel invoice : invoiceEntities) {
@@ -179,7 +175,6 @@ public class InvoiceServiceImpl implements InvoiceService {
                 log.error("Invoice with ID {} not found", invoiceId);
                 throw new InvoiceException(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.INVOICE_NOT_FOUND), HttpStatus.NOT_FOUND);
             }
-
             // Unmask sensitive properties in the invoice
             InvoiceUtils.unMaskInvoiceProperties(invoiceEntity,request);
 
