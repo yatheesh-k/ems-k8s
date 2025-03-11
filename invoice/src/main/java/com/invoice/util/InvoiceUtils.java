@@ -7,6 +7,7 @@ import com.invoice.exception.InvoiceErrorMessageKey;
 import com.invoice.exception.InvoiceException;
 import com.invoice.model.*;
 import com.invoice.opensearch.OpenSearchOperations;
+import com.invoice.request.CustomerRequest;
 import com.invoice.request.InvoiceRequest;
 import com.invoice.request.ProductColumnsRequest;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +22,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static org.bouncycastle.asn1.x500.style.RFC4519Style.c;
+
 
 @Slf4j
 public class InvoiceUtils {
@@ -28,11 +31,11 @@ public class InvoiceUtils {
     @Autowired
     private static OpenSearchOperations openSearchOperations;
 
-    public static InvoiceModel maskInvoiceProperties(InvoiceRequest request, String invoiceId,String invoiceNo,CompanyEntity companyEntity, CustomerModel customerModel, BankEntity bankEntity) throws InvoiceException{
-     ObjectMapper objectMapper = new ObjectMapper();
+    public static InvoiceModel maskInvoiceProperties(InvoiceRequest request, String invoiceId, String invoiceNo, CompanyEntity companyEntity, CustomerModel customerModel, BankEntity bankEntity) throws InvoiceException {
+        ObjectMapper objectMapper = new ObjectMapper();
 
-     // Convert the InvoiceRequest to InvoiceModel
-     InvoiceModel entity = objectMapper.convertValue(request, InvoiceModel.class);
+        // Convert the InvoiceRequest to InvoiceModel
+        InvoiceModel entity = objectMapper.convertValue(request, InvoiceModel.class);
 
         // Validate product details
         if (request.getProductData() == null || request.getProductData().isEmpty()) {
@@ -41,79 +44,79 @@ public class InvoiceUtils {
 
         // ✅ Validate productColumns (Ensure no empty or null values)
         if (request.getProductColumns() == null || request.getProductColumns().isEmpty()) {
-            throw new InvoiceException(InvoiceErrorMessageKey.PRODUCT_NOT_FOUND.getMessage(), HttpStatus.BAD_REQUEST);
+            throw new InvoiceException(InvoiceErrorMessageKey.PLEASE_ENTER_FIELD_NAME.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
         for (ProductColumnsRequest column : request.getProductColumns()) {
             if (column.getKey() == null || column.getTitle().trim().isEmpty()) {
-                throw new InvoiceException(InvoiceErrorMessageKey.PRODUCT_NOT_FOUND.getMessage(), HttpStatus.BAD_REQUEST);
+                throw new InvoiceException(InvoiceErrorMessageKey.PLEASE_ENTER_FIELD_NAME.getMessage(), HttpStatus.BAD_REQUEST);
             }
         }
         // Set the necessary fields
-            entity.setInvoiceId(invoiceId);
-            entity.setType(Constants.INVOICE);
-            entity.setStatus(request.getStatus());
-            entity.setCompanyId(companyEntity.getId());
-            entity.setCustomerId(customerModel.getCustomerId());
-            entity.setBank(bankEntity);
-            entity.setCustomer(customerModel);
-            entity.setCompany(companyEntity);
-            entity.setInvoiceNo(invoiceNo);
+        entity.setInvoiceId(invoiceId);
+        entity.setType(Constants.INVOICE);
+        entity.setStatus(request.getStatus());
+        entity.setCompanyId(companyEntity.getId());
+        entity.setCustomerId(customerModel.getCustomerId());
+        entity.setBank(bankEntity);
+        entity.setCustomer(customerModel);
+        entity.setCompany(companyEntity);
+        entity.setInvoiceNo(invoiceNo);
 
-            // Mask productData (List<Map<String, String>>)
-            if (request.getProductData() != null) {
-                List<Map<String, String>> maskedProductData = request.getProductData().stream()
-                        .map(InvoiceUtils::maskMapValues) // Mask each map in the list
-                        .collect(Collectors.toList());
-                entity.setProductData(maskedProductData);
-            }
-
-            // Mask productColumns (List<ProductColumnsRequest>)
-            if (request.getProductColumns() != null) {
-                List<ProductColumnsRequest> maskedColumns = request.getProductColumns().stream()
-                        .map(InvoiceUtils::maskProductColumn)
-                        .collect(Collectors.toList());
-                entity.setProductColumns(maskedColumns);
-            }
-
-            // Mask other string fields
-            entity.setInvoiceDate(maskValue(request.getInvoiceDate()));
-            entity.setDueDate(maskValue(request.getDueDate()));
-            entity.setPurchaseOrder(maskValue(request.getPurchaseOrder()));
-            entity.setVendorCode(maskValue(request.getVendorCode()));
-            entity.setSubTotal(maskValue(request.getSubTotal()));
-
-            return entity;
+        // Mask productData (List<Map<String, String>>)
+        if (request.getProductData() != null) {
+            List<Map<String, String>> maskedProductData = request.getProductData().stream()
+                    .map(InvoiceUtils::maskMapValues) // Mask each map in the list
+                    .collect(Collectors.toList());
+            entity.setProductData(maskedProductData);
         }
+
+        // Mask productColumns (List<ProductColumnsRequest>)
+        if (request.getProductColumns() != null) {
+            List<ProductColumnsRequest> maskedColumns = request.getProductColumns().stream()
+                    .map(InvoiceUtils::maskProductColumn)
+                    .collect(Collectors.toList());
+            entity.setProductColumns(maskedColumns);
+        }
+
+        // Mask other string fields
+        entity.setInvoiceDate(maskValue(request.getInvoiceDate()));
+        entity.setDueDate(maskValue(request.getDueDate()));
+        entity.setPurchaseOrder(maskValue(request.getPurchaseOrder()));
+        entity.setVendorCode(maskValue(request.getVendorCode()));
+        entity.setSubTotal(maskValue(request.getSubTotal()));
+
+        return entity;
+    }
 
     // Mask values in a Map<String, String>
-        private static Map<String, String> maskMapValues(Map<String, String> data) {
-            return data.entrySet().stream()
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey, // Keep the key as is
-                            entry -> maskValue(entry.getValue()) // Mask the value
-                    ));
+    private static Map<String, String> maskMapValues(Map<String, String> data) {
+        return data.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey, // Keep the key as is
+                        entry -> maskValue(entry.getValue()) // Mask the value
+                ));
+    }
+
+    // Mask ProductColumnsRequest fields
+    private static ProductColumnsRequest maskProductColumn(ProductColumnsRequest column) {
+        return ProductColumnsRequest.builder()
+                .key(maskValue(column.getKey()))
+                .title(maskValue(column.getTitle()))
+                .type(maskValue(column.getType()))
+                .build();
+    }
+
+    // Masking logic (Base64 encoding)
+    private static String maskValue(String value) {
+        if (value == null || value.isEmpty()) {
+            return value;
         }
-
-        // Mask ProductColumnsRequest fields
-        private static ProductColumnsRequest maskProductColumn(ProductColumnsRequest column) {
-            return ProductColumnsRequest.builder()
-                    .key(maskValue(column.getKey()))
-                    .title(maskValue(column.getTitle()))
-                    .type(maskValue(column.getType()))
-                    .build();
-        }
-
-        // Masking logic (Base64 encoding)
-        private static String maskValue(String value) {
-            if (value == null || value.isEmpty()) {
-                return value;
-            }
-            return Base64.getEncoder().encodeToString(value.getBytes());
-        }
+        return Base64.getEncoder().encodeToString(value.getBytes());
+    }
 
 
-    public static void unMaskInvoiceProperties(InvoiceModel invoiceEntity,HttpServletRequest request) {
+    public static void unMaskInvoiceProperties(InvoiceModel invoiceEntity, HttpServletRequest request) {
         if (invoiceEntity != null) {
             log.debug("Unmasking invoice: {}", invoiceEntity);
 
@@ -225,17 +228,19 @@ public class InvoiceUtils {
                     invoiceEntity.getCGst(), invoiceEntity.getSGst(), invoiceEntity.getIGst(), invoiceEntity.getGrandTotal());
         }
     }
+
     /**
      * Formats a double value to two decimal places and converts it to a string.
      */
     private static String formatAmount(double amount) {
         return String.format("%.2f", amount);
     }
+
     public static String getBaseUrl(HttpServletRequest request) {
         String scheme = request.getScheme(); // http or https
         String serverName = request.getServerName(); // localhost or IP address
         int serverPort = request.getServerPort(); // port number
-        String contextPath = "/"+Constants.INDEX_INVOICE; // context path
+        String contextPath = "/" + Constants.INDEX_INVOICE; // context path
 
         return scheme + "://" + serverName + ":" + serverPort + contextPath + "/";
     }
@@ -255,6 +260,7 @@ public class InvoiceUtils {
 
         }
     }
+
     /**
      * Method to unmask a ProductColumn.
      */
@@ -277,7 +283,7 @@ public class InvoiceUtils {
         return new String(Base64.getDecoder().decode(value)); // Correctly decode without extra bytes conversion
     }
 
-    public static String generateNextInvoiceNumber(String companyId, String shortName,OpenSearchOperations openSearchOperations) throws InvoiceException {
+    public static String generateNextInvoiceNumber(String companyId, String shortName, OpenSearchOperations openSearchOperations) throws InvoiceException {
         // Fetch last invoice number from OpenSearch
         String lastInvoiceNo = openSearchOperations.findLastInvoiceNumber(companyId, shortName);
 

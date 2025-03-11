@@ -53,11 +53,12 @@ public class CustomerServiceImpl implements CustomerService {
             List<CustomerModel> customers = repository.findByCompanyId(companyId); // Assuming you have a method to fetch all customers for a company
 
             // Step 3: Search for the customer with the provided customerId
-            Optional<CustomerModel> customerOptional = customers.stream()
-                    .filter(customer -> customer.getCustomerId().equals(customerId)) // Filter the customer by ID
+            Optional<CustomerModel> existingCustomer = customers.stream()
+                    .filter(customer -> customer.getCustomerId().equals(customerId) ||
+                            customer.getMobileNumber().equals(customerRequest.getMobileNumber()))
                     .findFirst();
 
-            if (customerOptional.isPresent()) {
+            if (existingCustomer.isPresent()) {
                 log.error("Customer already exists with ID: {}", customerId);
                 // Return a response indicating that the customer already exists
                 return  new ResponseEntity<>(ResponseBuilder.builder().build().
@@ -175,6 +176,15 @@ public class CustomerServiceImpl implements CustomerService {
 
             if (customerOptional.isPresent()) {
                 CustomerModel customer = customerOptional.get();
+
+                // Step 4: Check if any field has changed before updating
+                int noOfChanges = CustomerUtils.noChangeInValuesOfBank(customer,customerRequest);
+                if (noOfChanges==0){
+                    log.error("No changes detected for customer with ID: {}", customerId);
+                    return new ResponseEntity<>(
+                            ResponseBuilder.builder().build().createFailureResponse(new Exception(String.valueOf(InvoiceErrorMessageHandler.getMessage(InvoiceErrorMessageKey.NO_CHANGES_DETECTED)))),
+                            HttpStatus.CONFLICT);
+                }
 
                 CustomerUtils.updateCustomerFromRequest(customer, customerRequest);
                 CustomerUtils.maskCustomerUpdateProperties(customerRequest,customer);
