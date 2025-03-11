@@ -480,6 +480,18 @@ const InvoicePdf = () => {
                             {invoiceData.bank ? invoiceData.bank.branch : "N/A"}
                           </span>
                         </div>
+                        <div style={{ display: "flex", marginBottom: "10px" }}>
+                          <span style={{ fontWeight: "bold", width: "150px" }}>
+                            Bank Address :
+                          </span>
+                          <span>
+                            {invoiceData.bank && invoiceData.bank.address
+                              ? invoiceData.bank.address.length > 20
+                                ? `${invoiceData.bank.address.substring(0, 20)}...`
+                                : invoiceData.bank.address
+                              : "N/A"}
+                          </span>
+                        </div>
                       </div>
                     </div>
                     <div style={{ textAlign: "right" }}>

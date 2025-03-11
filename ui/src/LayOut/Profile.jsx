@@ -9,11 +9,12 @@ import {
   ModalFooter,
 } from "react-bootstrap";
 import LayOut from "./LayOut";
-import { CameraFill } from "react-bootstrap-icons";
+import { CameraFill, Upload } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   CompanyImagePatchApi,
+  CompanyStampPatchApi,
   companyUpdateByIdApi,
   companyViewByIdApi,
 } from "../Utils/Axios";
@@ -33,9 +34,9 @@ function Profile() {
   const [errorMessage, setErrorMessage] = useState("");
   const [error, setError] = useState(null);
   const [imgError, setImgError] = useState(null);
-  const { user = {}, logoFileName } = useAuth();
-  console.log("user:", user.companyId);
-
+  const { user = {}, logoFileName,stamp } = useAuth();
+  const [stampError,setStampError]=useState()
+  const [stampImage, setStampImage]=useState()
   const navigate = useNavigate();
   const [response, setResponse] = useState({ data: {} });
   const [hasCinNo, setHasCinNo] = useState(false);
@@ -121,8 +122,8 @@ function Profile() {
 
       await CompanyImagePatchApi(user.companyId, formData);
       setPostImage(null);
-      setSuccessMessage("Logo updated successfully.");
-      toast.success("Company Logo Updated Successfully");
+      setSuccessMessage("Logo Added successfully.");
+      toast.success("Company Logo Added Successfully");
       setErrorMessage("");
       setImgError(""); // Clear image error if everything goes fine
       closeModal();
@@ -131,6 +132,42 @@ function Profile() {
       }, 2000);
     } catch (err) {
       console.error("Logo update error:", err);
+      setSuccessMessage("");
+      toast.error("Failed To Update Logo");
+      setError(err);
+    }
+  };
+
+  const handleStampSubmit = async (e) => {
+    e.preventDefault(); // Prevent form default action
+    if (!user.companyId) return;
+    if (!stampImage) {
+      setErrorMessage("Logo is required");
+      return;
+    }
+
+    // Restrict file names with spaces
+    if (/\s/.test(stampImage.name)) {
+      setErrorMessage("File name should not contain spaces.");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("image", "string");
+      formData.append("file", stampImage);
+      await CompanyStampPatchApi(user.companyId, formData);
+      setStampImage(null);
+      setSuccessMessage("Stamp Added successfully.");
+      toast.success("Stamp Added Successfully");
+      setErrorMessage("");
+      setStampError(""); // Clear image error if everything goes fine
+      closeModal();
+      setTimeout(() => {
+        window.location.href = "/main";
+      }, 2000);
+    } catch (err) {
+      console.error("Stamp update error:", err);
       setSuccessMessage("");
       toast.error("Failed To Update Logo");
       setError(err);
@@ -153,12 +190,14 @@ function Profile() {
     // Check if no file is selected
     if (!file) {
       setImgError("No file selected.");
+      setStampError("No file selected.")
       return; // Stop processing if no file is selected
     }
 
     // Check file size (limit to 200KB)
     if (file.size > 200 * 1024) {
       setImgError("File size must be less than 200KB.");
+      setStampError("File size must be less than 200KB.")
       return; // Stop further processing if size exceeds limit
     }
 
@@ -166,11 +205,14 @@ function Profile() {
     const validTypes = ["image/png", "image/jpeg", "image/svg+xml"];
     if (!validTypes.includes(file.type)) {
       setImgError("Only .png, .jpg, .jpeg, .svg files are allowed.");
+      setStampError("Only .png, .jpg, .jpeg, .svg files are allowed.")
       return; // Stop further processing if the type is invalid
     }
 
     // If the file is valid, clear previous errors and update the state
     setImgError(""); // Clear error messages
+    setStampError("");
+    setStampImage(file);
     setPostImage(file); // Store the selected file
     console.log("File is valid and ready for upload:", file);
   };
@@ -180,6 +222,7 @@ function Profile() {
 
   const handleCloseUploadImageModal = () => {
     setPostImage(null);
+    setStampImage(null)
     setShowModal(false);
     setErrorMessage("");
   };
@@ -426,6 +469,51 @@ function Profile() {
                       <img
                         className="align-middle"
                         src={`${logoFileName}`}
+                        accept=".png, .jpg. ,svg ,.jpeg,"
+                        alt="Company Logo"
+                        style={{ height: "80px", width: "200px" }}
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="card">
+              <div className="card-header">
+                <h5 className="card-title" style={{ marginBottom: "0px" }}>
+                  Add Company Stamp
+                </h5>
+              </div>
+              <div className="card-body">
+                <div className="row">
+                  <div className="col-12 col-md-6 mb-3">
+                    <div
+                      style={{
+                        position: "relative",
+                        fontSize: "50px",
+                        cursor: "pointer",
+                        marginRight: "80%",
+                      }}
+                      onClick={openModal}
+                    >
+                      <div
+                        style={{
+                          position: "relative",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Upload/>
+                      </div>
+                    </div>
+                    <span className="text-info align-start">
+                      Max-Size=200 KB{" "}
+                    </span>
+                  </div>
+                  <div className="col-12 col-md-6 mb-3">
+                    {stamp && (
+                      <img
+                        className="align-middle"
+                        src={`${stamp}`}
                         accept=".png, .jpg. ,svg ,.jpeg,"
                         alt="Company Logo"
                         style={{ height: "80px", width: "200px" }}
@@ -913,6 +1001,37 @@ function Profile() {
             </Button>
             <Button variant="primary" onClick={handleLogoSubmit}>
               Upload Logo
+            </Button>
+          </ModalFooter>
+        </Modal>
+        <Modal
+          show={showModal}
+          onHide={handleCloseUploadImageModal}
+          style={{ zIndex: "1050" }}
+          centered
+        >
+          <ModalHeader closeButton>
+            <ModalTitle>Upload Stamp</ModalTitle>
+          </ModalHeader>
+          <ModalBody>
+            <input
+              type="file"
+              className="form-control"
+              accept=".png, .jpg, .svg, .jpeg,"
+              onChange={onChangePicture}
+            />
+            {errorMessage && (
+              <p className="text-danger pb-0" style={{ marginLeft: "2%" }}>
+                {errorMessage}
+              </p>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="secondary" onClick={handleCloseUploadImageModal}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleStampSubmit}>
+              Upload Stamp
             </Button>
           </ModalFooter>
         </Modal>

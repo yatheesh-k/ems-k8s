@@ -31,13 +31,13 @@ const InvoiceRegistration = () => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [invoiceData, setInvoiceData] = useState(null);
   const [productColumns, setProductColumns] = useState([
-    { key: "items", title: "Item", type: "text" },
-    { key: "hsn", title: "HSN-no", type: "text" },
-    { key: "service", title: "Service", type: "text" },
-    { key: "quantity", title: "Quantity", type: "number" },
-    { key: "unitCost", title: "Unit Cost", type: "number" },
-    { key: "totalCost", title: "Total Cost (₹)", type: "number" },
-  ]);
+      { key: "items", title: "Item", type: "text" },
+      { key: "hsn", title: "HSN-no", type: "text" },
+      { key: "service", title: "Service", type: "text" },
+      { key: "quantity", title: "Quantity", type: "number" },
+      { key: "unitCost", title: "Unit Cost", type: "number" },
+      { key: "totalCost", title: "Total Cost (₹)", type: "number" },
+    ]);
 
   const [search, setSearch] = useState("");
   const [filteredData, setFilteredData] = useState([]);
@@ -68,51 +68,54 @@ const InvoiceRegistration = () => {
 
   const validateInput = (type, value) => {
     if (/^\s$/.test(value)) return false; // Disallow leading & trailing spaces
-    if (type === "text") return /^[a-zA-Z0-9 _\-\W]+$/.test(value); // Allows letters, numbers, spaces, and special characters
+    if (type === "text") return /^[a-zA-Z0-9 _\-.,&()]+$/.test(value); // Allows letters, numbers, spaces, and special characters
     if (type === "number") return /^[0-9]+$/.test(value); // Only numbers
     if (type === "percentage") return /^([0-9]{1,2}|100)%?$/.test(value); // 1-3 digits with %
     return true;
   };
-  
 
-  // ** Update Table Data **
   const updateData = (index, key, value) => {
-    const colType =
-      productColumns.find((col) => col.key === key)?.type || "text";
-    if (validateInput(colType, value) || value === "") {
-      const updatedData = [...productData];
-      updatedData[index] = { ...updatedData[index], [key]: value };
-
-      // Auto-calculate totalCost if quantity or unitCost are updated
-      if (key === "quantity" || key === "unitCost") {
-        const quantity = parseFloat(updatedData[index].quantity) || 0;
-        const unitCost = parseFloat(updatedData[index].unitCost) || 0;
+    const colType = productColumns.find((col) => col.key.toLowerCase() === key.toLowerCase())?.type || "text";
+    
+    // Normalize key to ensure case-insensitivity
+    const normalizedKey = key.toLowerCase() === "quantity" ? "quantity" : key;
+  
+    const updatedData = [...productData];
+    updatedData[index] = { ...updatedData[index], [normalizedKey]: value };
+  
+    // Check if quantity column exists
+    const quantityColumnExists = productColumns.some((col) => col.key.toLowerCase() === "quantity");
+  
+    if (normalizedKey === "quantity" || normalizedKey === "unitCost") {
+      const quantity = parseFloat(updatedData[index].quantity) || 0;
+      const unitCost = parseFloat(updatedData[index].unitCost) || 0;
+  
+      // 🛑 If backspace clears input, also clear totalCost
+      if (value === "") {
+        updatedData[index].totalCost = "";
+      } else if (!quantityColumnExists || isNaN(quantity) || quantity === 0) {
+        updatedData[index].totalCost = unitCost.toFixed(2);
+      } else {
         updatedData[index].totalCost = (quantity * unitCost).toFixed(2);
       }
-      setProductData(updatedData);
-      // Clear error when the input is valid
+    }
+  
+    setProductData(updatedData);
+  
+    // Clear error when input is valid
     setFieldErrors((prev) => {
       const newErrors = { ...prev };
       if (newErrors[index]) {
-        delete newErrors[index][key];
+        delete newErrors[index][normalizedKey];
         if (Object.keys(newErrors[index]).length === 0) {
           delete newErrors[index];
         }
       }
       return newErrors;
     });
-    } else {
-      setFieldErrors((prev) => {
-        const newErrors = { ...prev };
-        newErrors[index] = {
-          ...(newErrors[index] || {}),
-          [key]: `Invalid Format.`,
-        };
-        return newErrors;
-      });
-    }
   };
-
+  
+  
   useEffect(() => {
     if (Array.isArray(products)) {
       const productOptions = products.map((product) => ({
@@ -174,7 +177,6 @@ const InvoiceRegistration = () => {
     }
   }, [search, customers]);
 
-
   useEffect(() => {
     console.log("Customers from Redux store:", products);
   }, [products]);
@@ -225,7 +227,12 @@ const InvoiceRegistration = () => {
         setLoad(false);
         return;
       }
-  
+       // ✅ Check if at least one product is added
+    if (productData.length === 0) {
+      toast.error("At least one product must be added before submitting.");
+      setLoad(false);
+      return;
+    }
       // ✅ Validate Product Rows (Ensure no empty fields)
       const isProductDataValid = productData.every((row) => {
         return productColumns.every((col) => row[col.key] && row[col.key].toString().trim() !== "");
@@ -285,7 +292,6 @@ const InvoiceRegistration = () => {
     });
   
     setProductData([]);  // Clear product rows
-    setProductColumns([]); // Reset columns if needed
     toast.info("Form cleared!", { position: "top-right", autoClose: 1000 });
   };
   
@@ -350,8 +356,13 @@ const InvoiceRegistration = () => {
   
   // Add new product row
   const updateColumnTitle = (key, title) => {
+    // Update the column title for the totalCost key
     setProductColumns(
-      productColumns.map((col) => (col.key === key ? { ...col, title } : col))
+      productColumns.map((col) =>
+        col.key === key
+          ? { ...col, title: key === "totalCost" ? "Total Amount" : title } // Change title if it's "totalCost"
+          : col
+      )
     );
   };
 
@@ -388,8 +399,6 @@ const InvoiceRegistration = () => {
   };
 
   const addRow = () => setProductData([...productData, {}]);
-
-  
 
   return (
     <LayOut>
@@ -615,6 +624,8 @@ const InvoiceRegistration = () => {
                         name="invoiceDate"
                         id="invoiceDate"
                         autoComplete="off"
+                        max={new Date().toISOString().split("T")[0]} // Restricts future dates
+                        onFocus={(e) => e.target.showPicker()} 
                         {...register("invoiceDate", {
                           required: "Invoice Date is required",
                           onChange: handleInvoiceDateChange, // Set due date when invoice date changes
@@ -630,7 +641,6 @@ const InvoiceRegistration = () => {
                       )}
                     </div>
                   </div>
-
                   <div className="form-group row">
                     <label
                       htmlFor="dueDate"
@@ -702,7 +712,6 @@ const InvoiceRegistration = () => {
                                 onChange={(e) =>
                                   updateColumnType(col.key, e.target.value)
                                 }
-                                disabled={col.key === "totalCost"} // Prevent changing type for totalCost
                               >
                                 <option value="text">Text</option>
                                 <option value="number">Number</option>
@@ -733,7 +742,6 @@ const InvoiceRegistration = () => {
                                       e.target.value
                                     )
                                   }
-                                  disabled={col.key === "totalCost"} // Prevent editing totalCost directly
                                 />
                                 {fieldErrors[rowIndex] &&
                                   fieldErrors[rowIndex][col.key] && (
