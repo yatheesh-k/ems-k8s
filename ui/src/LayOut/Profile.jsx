@@ -515,7 +515,7 @@ function Profile() {
                         className="align-middle"
                         src={`${stamp}`}
                         accept=".png, .jpg. ,svg ,.jpeg,"
-                        alt="Company Logo"
+                        alt="Company Stamp"
                         style={{ height: "80px", width: "200px" }}
                       />
                     )}
