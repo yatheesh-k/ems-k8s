@@ -240,12 +240,10 @@ const InvoiceRegistration = () => {
         setLoad(false);
         return;
       }
-
       // ✅ Validate column titles (ensure no empty titles or "New Field")
     const invalidColumns = productColumns.filter(
       (col) => !col.title.trim() || col.title === "New Field"
     );
-
     if (invalidColumns.length >0) {
       toast.error("Column titles cannot be empty or 'New Field'. Please update them.");
       setLoad(false);
