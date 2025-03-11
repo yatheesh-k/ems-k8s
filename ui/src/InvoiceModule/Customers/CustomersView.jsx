@@ -12,6 +12,7 @@ import {
   removeCustomerFromState,
 } from "../../Redux/CustomerSlice";
 import DeletePopup from "../../Utils/DeletePopup";
+import Loader from "../../Utils/Loader";
 
 const CustomersView = () => {
   const dispatch = useDispatch();
@@ -31,7 +32,7 @@ const CustomersView = () => {
     if (companyId) {
       const timer = setTimeout(() => {
         dispatch(fetchCustomers(companyId));
-      }, 1500); // Delay of 1500ms
+      }, 0); // Delay of 1500ms
   
       return () => clearTimeout(timer);
     }
@@ -50,8 +51,9 @@ const CustomersView = () => {
       setFilteredData(result);
     } else {
       setFilteredData([]);
+      toast.error(error)
     }
-  }, [search, customers]);
+  }, [search, customers,error]);
 
   const handleEdit = (customerId) => {
     navigate(`/customerRegistration`, { state: { customerId } });
@@ -59,8 +61,8 @@ const CustomersView = () => {
   };
 
   // Function to open delete confirmation modal
-const handleOpenDeleteModal = (bankId) => {
-  setSelectedItemId(bankId);
+const handleOpenDeleteModal = (customerId) => {
+  setSelectedItemId(customerId);
   setShowDeleteModal(true);
 };
 
@@ -73,12 +75,6 @@ const handleCloseDeleteModal = () => {
   const handleDelete = async (customerId) => {
     if (!selectedItemId) return;
     try {
-      console.log(
-        "Deleting customer with companyId:",
-        companyId,
-        "and customerId:",
-        customerId
-      );
       // Make a DELETE request to the API with the given ID
       const response = await CustomerDeleteApiById(companyId, customerId);
       console.log("Delete response:", response);
@@ -167,7 +163,7 @@ const handleCloseDeleteModal = () => {
           <button
             className="btn btn-sm"
             style={{ backgroundColor: "transparent" }}
-            onClick={() => handleOpenDeleteModal(row.bankId)}
+            onClick={() => handleOpenDeleteModal(row.customerId)}
             title="Delete"
           >
             <XSquareFill size={22} color="#da542e" />
@@ -182,6 +178,7 @@ const handleCloseDeleteModal = () => {
     setSearch(searchTerm);
   };
 
+    if (loading) return  <Loader/>;
   return (
     <LayOut>
       <div className="container-fluid p-0">
@@ -240,7 +237,7 @@ const handleCloseDeleteModal = () => {
               handleClose={handleCloseDeleteModal}
               handleConfirm={handleDelete}
               id={selectedItemId}
-              pageName="Bank Account"
+              pageName="Client Details"
             />
 
           </div>
