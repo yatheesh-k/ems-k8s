@@ -633,13 +633,17 @@ public class PayslipServiceImpl implements PayslipService {
         }
 
         // For other fields, convert camelCase to readable format
-        String[] parts = fieldName.split("(?=[A-Z])"); // Split at capital letters
+        String[] parts = fieldName.split("(?<![A-Z])(?=[A-Z])"); // Split at capital letters
         StringBuilder formattedName = new StringBuilder();
 
         for (String part : parts) {
-            formattedName.append(part.substring(0, 1).toUpperCase()) // Capitalize the first letter
-                    .append(part.substring(1).toLowerCase()) // Lowercase the rest
-                    .append(" "); // Add a space
+            if (part.equals(part.toUpperCase())) { // If the part is ALL uppercase, keep it as is
+                formattedName.append(part).append(" ");
+            } else {
+                formattedName.append(part.substring(0, 1).toUpperCase()) // Capitalize the first letter
+                        .append(part.substring(1).toLowerCase()) // Lowercase the rest
+                        .append(" ");
+            }
         }
 
         return formattedName.toString().trim(); // Return the formatted name
