@@ -179,7 +179,6 @@ public class OpenSearchOperations {
         return null;
     }
 
-
     public DesignationEntity getDesignationById(String resourceId, String type, String index) throws IOException {
         if (type != null) {
             resourceId = type + "_" + resourceId;
@@ -221,38 +220,53 @@ public class OpenSearchOperations {
         return null;
     }
 
-
     public List<DesignationEntity> getCompanyDesignationByName(String companyName, String designationName) throws EmployeeException {
-        logger.debug("Getting the Resource by id {} : {}", companyName, designationName);
-        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
-        boolQueryBuilder =
-                boolQueryBuilder.filter(q -> q.term(t -> t.field(Constants.TYPE).value(FieldValue.of(Constants.DESIGNATION))));
+        logger.debug("Getting the Designation by company '{}' and designation '{}'", companyName, designationName);
 
-        if (designationName != null) {
-               boolQueryBuilder = boolQueryBuilder
-                    .should(q -> q.match(t -> t.field(Constants.NAME).query(FieldValue.of(designationName))));
+        BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+
+        // Filter by type = DESIGNATION
+        boolQueryBuilder.filter(q -> q.term(t -> t.field(Constants.TYPE).value(FieldValue.of(Constants.DESIGNATION))));
+
+        // Exact match on name.keyword
+        if (designationName != null && !designationName.trim().isEmpty()) {
+            boolQueryBuilder.must(q -> q.term(t ->
+                    t.field(Constants.NAME + ".keyword").value(FieldValue.of(designationName))
+            ));
         }
-        BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
-        SearchResponse<DesignationEntity> searchResponse = null;
+
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
+        SearchResponse<DesignationEntity> searchResponse;
+
         try {
-            searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
-                    .query(finalBoolQueryBuilder.build()._toQuery()), DesignationEntity.class);
+            searchResponse = esClient.search(s -> s
+                            .index(index)
+                            .size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                            .query(boolQueryBuilder.build()._toQuery()),
+                    DesignationEntity.class
+            );
         } catch (IOException e) {
-            e.getStackTrace();
-            logger.error(e.getMessage());
+            logger.error("Error searching in Elasticsearch: {}", e.getMessage());
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
         List<Hit<DesignationEntity>> hits = searchResponse.hits().hits();
-        logger.info("Number of hits {}", hits.size());
-        List<DesignationEntity> departmentEntities = new ArrayList<>();
-        if (hits.size() > 0) {
-            for (Hit<DesignationEntity> hit : hits) {
-                departmentEntities.add(hit.source());
-            }
+        logger.info("Number of exact matches for '{}' in company '{}': {}", designationName, companyName, hits.size());
+
+        List<DesignationEntity> designationEntities = new ArrayList<>();
+        for (Hit<DesignationEntity> hit : hits) {
+            designationEntities.add(hit.source());
         }
-        return departmentEntities;
+
+        if (designationEntities.isEmpty()) {
+            logger.info("No exact match found for '{}'. Size: 0", designationName);
+        } else {
+            logger.info("Found {} exact match(es) for '{}'", designationEntities.size(), designationName);
+        }
+
+        return designationEntities;
     }
+
     public boolean isDesignationPresent(String companyName, String designationName) throws EmployeeException {
         // Fetch all designations from the database
         List<DesignationEntity> designationEntities = getCompanyDesignationByName(companyName,designationName);
@@ -348,34 +362,43 @@ public class OpenSearchOperations {
     }
 
     public List<DepartmentEntity> getCompanyDepartmentByName(String companyName, String departmentName) throws EmployeeException {
-        logger.debug("Getting the Resource by id {} : {}", companyName, departmentName);
+        logger.debug("Getting the Department by company '{}' and department '{}'", companyName, departmentName);
+
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
-        boolQueryBuilder =
-                boolQueryBuilder.filter(q -> q.term(t -> t.field(Constants.TYPE).value(FieldValue.of(Constants.DEPARTMENT))));
-        if (departmentName != null) {
-            String lowerCaseDepartmentName = departmentName.toLowerCase(); // Convert input to lowercase
-            boolQueryBuilder = boolQueryBuilder
-                    .filter(q -> q.term(t -> t.field(Constants.NAME).value(FieldValue.of(lowerCaseDepartmentName)))); // Search in lowercase
+
+        // Filter by type = DEPARTMENT
+        boolQueryBuilder.filter(q -> q.term(t -> t.field(Constants.TYPE).value(FieldValue.of(Constants.DEPARTMENT))));
+
+        // Exact match on name.keyword
+        if (departmentName != null && !departmentName.trim().isEmpty()) {
+            boolQueryBuilder.must(q -> q.term(t ->
+                    t.field(Constants.NAME + ".keyword").value(FieldValue.of(departmentName))
+            ));
         }
-        BoolQuery.Builder finalBoolQueryBuilder = boolQueryBuilder;
-        SearchResponse<DepartmentEntity> searchResponse = null;
+
         String index = ResourceIdUtils.generateCompanyIndex(companyName);
+        SearchResponse<DepartmentEntity> searchResponse;
+
         try {
-            searchResponse = esClient.search(t -> t.index(index).size(SIZE_ELASTIC_SEARCH_MAX_VAL)
-                    .query(finalBoolQueryBuilder.build()._toQuery()), DepartmentEntity.class);
+            searchResponse = esClient.search(s -> s
+                            .index(index)
+                            .size(SIZE_ELASTIC_SEARCH_MAX_VAL)
+                            .query(boolQueryBuilder.build()._toQuery()),
+                    DepartmentEntity.class
+            );
         } catch (IOException e) {
-            e.getStackTrace();
-            logger.error(e.getMessage());
+            logger.error("Error searching in Elasticsearch: {}", e.getMessage());
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_TO_SEARCH), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
         List<Hit<DepartmentEntity>> hits = searchResponse.hits().hits();
-        logger.info("Number of hits {}", hits.size());
+        logger.info("Number of exact matches for '{}' in company '{}': {}", departmentName, companyName, hits.size());
+
         List<DepartmentEntity> departmentEntities = new ArrayList<>();
-        if (hits.size() > 0) {
-            for (Hit<DepartmentEntity> hit : hits) {
-                departmentEntities.add(hit.source());
-            }
+        for (Hit<DepartmentEntity> hit : hits) {
+            departmentEntities.add(hit.source());
         }
+
         return departmentEntities;
     }
 
@@ -972,6 +995,5 @@ public class OpenSearchOperations {
         }
 
         return salaryEntities;
-
     }
 }

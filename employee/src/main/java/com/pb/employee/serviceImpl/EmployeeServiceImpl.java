@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -87,7 +88,8 @@ public class EmployeeServiceImpl implements EmployeeService {
                 }
             List<CompanyEntity> shortNameEntity = openSearchOperations.getCompanyByData(null, Constants.COMPANY, employeeRequest.getCompanyName());
 
-            Entity companyEntity = EmployeeUtils.maskEmployeeProperties(employeeRequest, resourceId, shortNameEntity.getFirst().getId());
+            String defaultPassword = PasswordUtils.generateDefaultPassword();
+            Entity companyEntity = EmployeeUtils.maskEmployeeProperties(employeeRequest, resourceId, shortNameEntity.getFirst().getId(),defaultPassword);
             Entity result = openSearchOperations.saveEntity(companyEntity, resourceId, index);
         } catch (Exception exception) {
             log.error("Unable to save the employee details {} {}", employeeRequest.getEmailId(),exception.getMessage());
@@ -97,9 +99,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         // Send the email with company details
         CompletableFuture.runAsync(() -> {
             try {
+                String defaultPassword = PasswordUtils.generateDefaultPassword();
                 String companyUrl = EmailUtils.getBaseUrl(request)+employeeRequest.getCompanyName()+Constants.SLASH+Constants.CREATE_PASSWORD;
                 log.info("The company url : "+companyUrl);// Example URL
-                emailUtils.sendRegistrationEmail(employeeRequest.getEmailId(), companyUrl,Constants.EMPLOYEE);
+                emailUtils.sendRegistrationEmail(employeeRequest.getEmailId(), companyUrl,Constants.EMPLOYEE,defaultPassword);
             } catch (Exception e) {
                 log.error("Error sending email to employee: {}", employeeRequest.getEmailId());
                 throw new RuntimeException(e);
