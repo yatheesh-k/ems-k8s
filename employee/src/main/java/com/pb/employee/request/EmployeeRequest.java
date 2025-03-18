@@ -50,7 +50,7 @@ public class EmployeeRequest {
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\\W)(?!.* ).{6,16}$", message = "{invalid.password}")
     @NotBlank(message = "{password.notnull.message}")*/
     //password not mandatory
-    private String password;
+  //  private String password;
 
     @Schema(example = "designationId")
     @Size(min = 2, max = 100, message = "{designation.size.message}")

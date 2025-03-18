@@ -169,4 +169,10 @@ public class Constants {
     public static final String ADMIN = "CompanyAdmin";
     public static final String NO_ATTENDANCE = "Attendance Not Found For All Employees";
     public static final String CUSTOMER_ID= "customerId";
+    public static final String GENERATED_PAY_SLIP_EXISTED = "Generated Payslip Already Existed";
+    public static final String NO_PAY_SLIP_GENERATED = "Attendance Not Submitted for This Month";
+    public static final String UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    public static final String LOWER = "abcdefghijklmnopqrstuvwxyz";
+    public static final String DIGITS = "0123456789";
+    public static final String SPECIAL_CHARACTER = "@#&$%!";
 }
