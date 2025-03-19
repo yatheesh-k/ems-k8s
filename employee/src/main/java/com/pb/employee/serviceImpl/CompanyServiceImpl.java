@@ -111,7 +111,7 @@ public class CompanyServiceImpl implements CompanyService {
                     HttpStatus.CONFLICT);
         }
         try{
-            String defaultPassword = PasswordUtils.generateDefaultPassword();
+            String defaultPassword = PasswordUtils.generateStrongPassword();
             Entity companyEntity = CompanyUtils.maskCompanyProperties(companyRequest, resourceId,defaultPassword);
             Entity result = openSearchOperations.saveEntity(companyEntity, resourceId, Constants.INDEX_EMS);
         } catch (Exception exception) {
@@ -119,7 +119,7 @@ public class CompanyServiceImpl implements CompanyService {
             throw new EmployeeException(ErrorMessageHandler.getMessage(EmployeeErrorMessageKey.UNABLE_SAVE_COMPANY),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        String defaultPassword = PasswordUtils.generateDefaultPassword();
+        String defaultPassword = PasswordUtils.generateStrongPassword();
         openSearchOperations.createIndex(companyRequest.getShortName());
         String password = Base64.getEncoder().encodeToString(defaultPassword.getBytes());
         log.info("Creating the employee of company admin");
