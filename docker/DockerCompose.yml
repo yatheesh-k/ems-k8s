@@ -1,42 +1,29 @@
 services:
-  frontend:
-    build:
-      context: ../ui
-      dockerfile: Dockerfile
+  employee-images:
+    image: employee-images:latest
     ports:
-      - "2800:2800"
+      - "1000:1000"
     networks:
-      - ems-network
-    environment:
-      - ELASTICSEARCH_URL=http://host.docker.internal:9200
-  identity:
-    build:
-      context: ../
-      dockerfile: docker/identity
+      - my_network
+  identity-image:
+    image: identity-image:latest
     ports:
-      - "9090:9090"
+      - "2000:2000"
     networks:
-      - ems-network
-    environment:
-      - ELASTICSEARCH_URL=http://host.docker.internal:9200
-  employee:
-    build:
-      context: ../
-      dockerfile: docker/employee
+      - my_network
+  ui-image:
+    image: ui-image:latest
     ports:
-      - "8092:8092"
+      - "3000:3000"
     networks:
-      - ems-network
-    environment:
-      - ELASTICSEARCH_URL=http://host.docker.internal:9200
+      - my_network
+  invoice-image:  # Corrected indentation here
+    image: invoice-image:latest
+    ports:
+      - "4000:4000"
+    networks:
+      - my_network
 networks:
-  ems-network:
-
-
-
-
-
-
-
-
+  my_network:
+    driver: bridge
 

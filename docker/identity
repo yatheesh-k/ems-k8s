@@ -1,14 +1,16 @@
 FROM openjdk:21-jdk-slim
 WORKDIR /app
-COPY ./identity/gradle /app/gradle
-COPY ./identity/gradlew /app/
-COPY ./identity/build.gradle /app/
-COPY ./identity/gradle.properties /app/
-COPY ./identity/settings.gradle /app/
+COPY identity/gradle /app/gradle
+COPY identity/gradlew /app/
+COPY identity/build.gradle /app/
+COPY identity/gradle.properties /app/
+COPY identity/settings.gradle /app/
+
 RUN chmod +x gradlew
-COPY ./identity/src /app/src
-RUN for i in {1..5}; do ./gradlew build --no-daemon && break || sleep 15; done
+COPY identity/src /app/src
+COPY certificates /app/certificates
+RUN ./gradlew build
 RUN cp /app/build/libs/identity-1.0.0.jar /app/
-COPY ./certificates/ssl.jks /app/certificates/
-EXPOSE 9090
+EXPOSE 2000
 CMD ["java", "-jar", "/app/identity-1.0.0.jar"]
+

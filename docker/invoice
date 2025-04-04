@@ -1,0 +1,33 @@
+FROM openjdk:21-jdk-slim
+WORKDIR /app
+
+# Copy gradle files (relative to build context)
+COPY invoice/gradle /app/gradle
+COPY invoice/gradlew /app/
+COPY invoice/build.gradle /app/
+COPY invoice/settings.gradle /app/
+
+# Set execute permission for gradlew
+RUN chmod +x gradlew
+
+# Copy the src folder into the container
+COPY invoice/src /app/src
+
+# Run the gradle build process
+RUN ./gradlew build --no-daemon
+
+# Debug: List the contents of /app/build/libs
+RUN ls -al /app/build/libs
+
+# Copy the resulting .jar file into the container
+RUN cp /app/build/libs/invoice-0.0.1-SNAPSHOT.jar /app/
+
+# Copy the certificate
+COPY certificates/ssl.jks /app/certificates/
+
+# Expose the required port
+EXPOSE 4000
+
+# Set the command to run the application
+CMD ["java", "-jar", "/app/invoice-0.0.1-SNAPSHOT.jar"]
+

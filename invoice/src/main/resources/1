@@ -4,7 +4,7 @@ server:
     contextPath: /invoice
   ssl:
     enabled: true
-    key-store: certificates/ssl.jks
+    key-store: /opt/ems/invoice/certificates/ssl.jks
     key-store-password: pathbreaker
     key-alias: pbt
     key-store-type: JKS
@@ -17,7 +17,7 @@ spring:
   datasource:
     url: jdbc:mysql://172.31.42.182:3306/INVOICE_TESTING
     username: root
-    password: Path@2014
+    password: Admin123!
     driver-class-name: com.mysql.cj.jdbc.Driver
   # Hibernate Configuration
   jpa:
@@ -29,7 +29,7 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
 es:
-  esHost: localhost
+  esHost: 172.31.42.182
   esPort: 3306
 # Swagger API Documentation
 springdoc:
