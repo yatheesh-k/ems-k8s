@@ -1,29 +1,62 @@
 services:
-  employee-images:
-    image: employee-images:latest
-    ports:
-      - "1000:1000"
-    networks:
-      - my_network
-  identity-image:
-    image: identity-image:latest
-    ports:
-      - "2000:2000"
-    networks:
-      - my_network
-  ui-image:
-    image: ui-image:latest
+  frontend:
+    build:
+      context: ../
+      dockerfile: docker/frontend
     ports:
       - "3000:3000"
     networks:
-      - my_network
-  invoice-image:  # Corrected indentation here
-    image: invoice-image:latest
+      - ems-network
+    environment:
+      - ELASTICSEARCH_URL=http://host.docker.internal:9000
+      - SPRING_DATASOURCE_URL=jdbc:mysql://172.31.42.182:3306/invoicetest
+    volumes:
+      - ems_devupload_files:/home/deploy_admin08/ems_dev_imag_bkp
+  identity:
+    build:
+      context: ../
+      dockerfile: docker/identity
+    ports:
+      - "2000:2000"
+    networks:
+      - ems-network
+    environment:
+      - ELASTICSEARCH_URL=http://host.docker.internal:9000
+      - SPRING_DATASOURCE_URL=jdbc:mysql://172.31.42.182:3306/invoicetest
+    volumes:
+      - ems_devupload_files:/home/deploy_admin08/ems_dev_imag_bkp
+  employee:
+    build:
+      context: ../
+      dockerfile: docker/employee
+    ports:
+      - "1000:1000"
+    networks:
+      - ems-network
+    environment:
+      - ELASTICSEARCH_URL=http://host.docker.internal:9000
+      - SPRING_DATASOURCE_URL=jdbc:mysql://172.31.42.182:3306/invoicetest
+    volumes:
+      - ems_devupload_files:/home/deploy_admin08/ems_dev_imag_bkp
+  invoice:
+    build:
+      context: ../
+      dockerfile: docker/invoice
     ports:
       - "4000:4000"
     networks:
-      - my_network
+      - ems-network
+    environment:
+      - ELASTICSEARCH_URL=http://host.docker.internal:9000
+      - SPRING_DATASOURCE_URL=jdbc:mysql://172.31.42.182:3306/invoicetest
+    volumes:
+      - ems_devupload_files:/home/deploy_admin08/ems_dev_imag_bkp
 networks:
-  my_network:
-    driver: bridge
+  ems-network:
+volumes:
+  ems_devupload_files:
+
+
+
+
 
