@@ -8,7 +8,7 @@ services:
     networks:
       - ems-network
     environment:
-      - ELASTICSEARCH_URL=http://host.docker.internal:9000
+      - ELASTICSEARCH_URL=http://host.docker.internal:9200
       - SPRING_DATASOURCE_URL=jdbc:mysql://172.31.42.182:3306/invoicetest
     volumes:
       - ems_devupload_files:/home/deploy_admin08/ems_dev_imag_bkp
@@ -21,7 +21,7 @@ services:
     networks:
       - ems-network
     environment:
-      - ELASTICSEARCH_URL=http://host.docker.internal:9000
+      - ELASTICSEARCH_URL=http://host.docker.internal:9200
       - SPRING_DATASOURCE_URL=jdbc:mysql://172.31.42.182:3306/invoicetest
     volumes:
       - ems_devupload_files:/home/deploy_admin08/ems_dev_imag_bkp
@@ -34,7 +34,7 @@ services:
     networks:
       - ems-network
     environment:
-      - ELASTICSEARCH_URL=http://host.docker.internal:9000
+      - ELASTICSEARCH_URL=http://host.docker.internal:9200
       - SPRING_DATASOURCE_URL=jdbc:mysql://172.31.42.182:3306/invoicetest
     volumes:
       - ems_devupload_files:/home/deploy_admin08/ems_dev_imag_bkp
@@ -47,7 +47,7 @@ services:
     networks:
       - ems-network
     environment:
-      - ELASTICSEARCH_URL=http://host.docker.internal:9000
+      - ELASTICSEARCH_URL=http://host.docker.internal:9200
       - SPRING_DATASOURCE_URL=jdbc:mysql://172.31.42.182:3306/invoicetest
     volumes:
       - ems_devupload_files:/home/deploy_admin08/ems_dev_imag_bkp
